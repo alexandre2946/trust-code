@@ -24,7 +24,7 @@ Implemente_base(Loi_Etat_TPPI_WC_base, "Loi_Etat_TPPI_WC_base", Loi_Etat_TPPI_ba
 Sortie& Loi_Etat_TPPI_WC_base::printOn(Sortie& os) const { return os << que_suis_je() << finl; }
 Entree& Loi_Etat_TPPI_WC_base::readOn(Entree& is) { return Loi_Etat_TPPI_base::readOn(is); }
 
-// Dans l'ordre on fait ca
+// In order, the following steps are performed:
 //
 //    calculer_Cp();
 //    calculer_mu();

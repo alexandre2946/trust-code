@@ -38,7 +38,7 @@ Entree& Rectangle_32_64<_SIZE_>::readOn(Entree& s )
   return s;
 }
 
-/*! @brief Reordonne les sommets du rectangle.
+/*! @brief Reorders the vertices of the rectangle.
  *
  */
 template <typename _SIZE_>
@@ -53,7 +53,7 @@ void Rectangle_32_64<_SIZE_>::reordonner()
     }
 }
 
-/*! @brief Reordonne et verifie que l'on a bien des rectangles.
+/*! @brief Reorders and verifies that the elements are indeed rectangles.
  */
 template <typename _SIZE_>
 int Rectangle_32_64<_SIZE_>::reordonner_elem()
@@ -96,22 +96,22 @@ int Rectangle_32_64<_SIZE_>::reordonner_elem()
         if ( !est_egal(co(i, 0),xmin) && !est_egal(co(i, 1),ymin))
           NS[3]=S[i];
 
-      // Si un sommet vaut -1, ce n'est pas un Rectangle !
+      // If a vertex is -1, this is not a Rectangle!
       if (min_array(NS)==-1)
         {
           Cerr << "The element " << num_poly << " is not a rectangle." << finl;
           return -1;
         }
-      // Sinon on remplit elem
+      // Otherwise fill elem
       for(i=0; i<4; i++)
         elem(num_poly, i)=NS[i];
     }
   return 0;
 }
 
-/*! @brief Renvoie le nom LML d'un rectangle = "VOXEL8".
+/*! @brief Returns the LML name of a rectangle = "VOXEL8".
  *
- * @return (Nom&) toujours egal a "VOXEL8"
+ * @return (Nom&) always equal to "VOXEL8"
  */
 template <typename _SIZE_>
 const Nom& Rectangle_32_64<_SIZE_>::nom_lml() const
@@ -122,14 +122,14 @@ const Nom& Rectangle_32_64<_SIZE_>::nom_lml() const
 }
 
 
-/*! @brief Renvoie 1 si l'element ielem du domaine associe a l'element geometrique contient le point
+/*! @brief Returns 1 if element ielem of the domain associated with the geometric element contains the point
  *
- *               de coordonnees specifiees par le parametre "pos".
- *     Renvoie 0 sinon.
+ *               with coordinates specified by parameter "pos".
+ *     Returns 0 otherwise.
  *
- * @param (DoubleVect& pos) coordonnees du point que l'on cherche a localiser
- * @param (int ielem) le numero de l'element du domaine dans lequel on cherche le point.
- * @return (int) 1 si le point de coordonnees specifiees appartient a l'element ielem 0 sinon
+ * @param (DoubleVect& pos) coordinates of the point to locate
+ * @param (int ielem) the index of the domain element in which the point is searched.
+ * @return (int) 1 if the point with specified coordinates belongs to element ielem, 0 otherwise
  */
 template <typename _SIZE_>
 int Rectangle_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t element ) const
@@ -145,13 +145,13 @@ int Rectangle_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t element ) co
     return 0;
 }
 
-/*! @brief Renvoie 1 si les sommets specifies par le parametre "pos" sont les sommets de l'element "element" du domaine associe a
+/*! @brief Returns 1 if the vertices specified by parameter "pos" are the vertices of element "element" of the domain associated with
  *
- *     l'element geometrique.
+ *     the geometric element.
  *
- * @param (IntVect& pos) les numeros des sommets a comparer avec ceux de l'elements "element"
- * @param (int element) le numero de l'element du domaine dont on veut comparer les sommets
- * @return (int) 1 si les sommets passes en parametre sont ceux de l'element specifie, 0 sinon
+ * @param (IntVect& pos) the vertex indices to compare with those of element "element"
+ * @param (int element) the index of the domain element whose vertices are to be compared
+ * @return (int) 1 if the vertices passed as parameter are those of the specified element, 0 otherwise
  */
 template <typename _SIZE_>
 int Rectangle_32_64<_SIZE_>::contient(const SmallArrOfTID_t& som, int_t element ) const
@@ -167,9 +167,9 @@ int Rectangle_32_64<_SIZE_>::contient(const SmallArrOfTID_t& som, int_t element 
 }
 
 
-/*! @brief Calcule les volumes des elements du domaine associe.
+/*! @brief Computes the volumes of the elements of the associated domain.
  *
- * @param (DoubleVect& volumes) le vecteur contenant les valeurs  des des volumes des elements du domaine
+ * @param (DoubleVect& volumes) the vector containing the volume values of the domain elements
  */
 template <typename _SIZE_>
 void Rectangle_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const
@@ -197,9 +197,9 @@ void Rectangle_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const
 }
 
 
-/*! @brief Calcule les normales aux faces des elements du domaine associe.
+/*! @brief Computes the normals to the faces of the elements of the associated domain.
  *
- * @param (IntTab& face_sommets) les numeros des sommets des faces dans la liste des sommets du domaine associe
+ * @param (IntTab& face_sommets) the vertex indices of the faces in the vertex list of the associated domain
  * @param (DoubleTab& face_normales)
  */
 template <typename _SIZE_>

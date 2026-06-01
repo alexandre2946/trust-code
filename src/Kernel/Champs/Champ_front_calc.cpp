@@ -40,14 +40,14 @@ Champ_front_calc::Champ_front_calc() { set_distant(1); }
 
 Sortie& Champ_front_calc::printOn(Sortie& os) const { return os; }
 
-/*! @brief Lit le nom d'un probleme, le nom d'un bord et le nom d'un champ inconnue a partir d'un flot d'entree.
+/*! @brief Read the name of a problem, the name of a boundary and the name of an unknown field from an input stream.
  *
- *     Cree ensuite le champ de frontiere correspondant.
+ *     Then creates the corresponding boundary field.
  *     Format:
- *       Champ_front_calc nom_probleme nom_bord nom_champ
+ *       Champ_front_calc problem_name boundary_name field_name
  *
- * @param (Entree& is) un flot d'entre
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
  */
 Entree& Champ_front_calc::readOn(Entree& is)
 {
@@ -57,17 +57,17 @@ Entree& Champ_front_calc::readOn(Entree& is)
   return is;
 }
 
-/*! @brief Cree l'objet Champ_front_calc representant la trace d'un champ inconnue sur une frontiere a partir des noms:
+/*! @brief Create the Champ_front_calc object representing the trace of an unknown field on a boundary from names:
  *
- *          - du probleme portant l'inconnue
- *          - du bord concerne (la frontiere)
- *          - de l'inconnue
+ *          - of the problem carrying the unknown
+ *          - of the concerned boundary
+ *          - of the unknown
  *
- * @param (Nom& nom_pb) le nom du probleme auquel appartent l'inconnue dont on veut prendre la trace
- * @param (Nom& nom) le nom de la frontiere sur laquelle on prend la trace de l'inconnue
- * @param (Motcle& nom_inco) le nom de l'inconnue dont on veut prendre la trace
- * @throws pas de probleme du nom specifie
- * @throws le probleme n'a pas de champ du nom specifie
+ * @param (Nom& nom_pb) the name of the problem to which the unknown whose trace we want belongs
+ * @param (Nom& nom) the name of the boundary on which the trace of the unknown is taken
+ * @param (Motcle& nom_inco) the name of the unknown whose trace we want
+ * @throws no problem with the specified name
+ * @throws the problem does not have a field with the specified name
  */
 void Champ_front_calc::creer(const Nom& nom_pb, const Nom& nom_bord, const Motcle& nom_inco)
 {
@@ -100,7 +100,7 @@ void Champ_front_calc::creer(const Nom& nom_pb, const Nom& nom_bord, const Motcl
 
 int Champ_front_calc::initialiser(double temps, const Champ_Inc_base& inco)
 {
-  // 1er chose a faire : la c'est bon ! on creer le champ
+  // First thing to do: here it is fine! we create the field
   if (via_readon_) creer(nom_autre_pb_, nom_autre_bord_, nom_inco_);
 
   Ch_front_var_instationnaire_dep::initialiser(temps, inco);
@@ -130,9 +130,9 @@ int Champ_front_calc::initialiser(double temps, const Champ_Inc_base& inco)
   return 1;
 }
 
-/*! @brief Associe le champ inconnue a l'objet
+/*! @brief Associate the unknown field to the object
  *
- * @param (Champ_Inc_base& inco) le champ inconnue dont on prendra la trace
+ * @param (Champ_Inc_base& inco) the unknown field whose trace will be taken
  */
 void Champ_front_calc::associer_ch_inc_base(const Champ_Inc_base& inco)
 {
@@ -140,7 +140,7 @@ void Champ_front_calc::associer_ch_inc_base(const Champ_Inc_base& inco)
 }
 
 
-/*! @brief Non code
+/*! @brief Not implemented
  *
  * @param (Champ_front_base& ch)
  * @return (Champ_front_base&)
@@ -150,24 +150,24 @@ Champ_front_base& Champ_front_calc::affecter_(const Champ_front_base& ch)
   return *this;
 }
 
-/*! @brief Mise a jour en temps du champ On prend juste la trace du champ inconnue au pas de
+/*! @brief Time update of the field. We simply take the trace of the unknown field at the
  *
- *     temps auquel il se situe.
- *     WEC : verifier qu'on prend l'inconnue au bon temps !
+ *     time step at which it is located.
+ *     WEC: verify that we take the unknown at the correct time!
  *
  */
 
-// Precondition: le nom du bord doit etre different de "??"
-// Parametre: double
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
+// Precondition: the boundary name must be different from "??"
+// Parameter: double
+//    Meaning:
+//    Default values:
+//    Constraints:
+//    Access:
+// Return:
+//    Meaning:
+//    Constraints:
 // Exception:
-// Effets de bord:
+// Side effects:
 // Postcondition:
 void Champ_front_calc::mettre_a_jour(double temps)
 {
@@ -177,27 +177,27 @@ void Champ_front_calc::mettre_a_jour(double temps)
   l_inconnue->trace(frontiere_dis_opposee,tab,temps,distant_ /* distant */);
 }
 
-/*! @brief Renvoie le champ inconnue associe
+/*! @brief Returns the associated unknown field
  *
- * @return (Champ_Inc_base&) le champ inconnue associe
+ * @return (Champ_Inc_base&) the associated unknown field
  */
 const Champ_Inc_base& Champ_front_calc::inconnue() const
 {
   return l_inconnue.valeur();
 }
 
-/*! @brief Renvoie le nom du bord sur lequel on calcule la trace.
+/*! @brief Returns the name of the boundary on which the trace is computed.
  *
- * @return (Nom&) le nom du bord sur lequel on calcule la trace
+ * @return (Nom&) the name of the boundary on which the trace is computed
  */
 const Nom& Champ_front_calc::nom_bord_oppose() const
 {
   return nom_autre_bord_;
 }
 
-/*! @brief Renvoie l'equation associee a l'inconnue dont on prend la trace.
+/*! @brief Returns the equation associated with the unknown whose trace is taken.
  *
- * @return (Equation_base&) l'equation associee a l'inconnue dont on prend la trace
+ * @return (Equation_base&) the equation associated with the unknown whose trace is taken
  */
 const Equation_base& Champ_front_calc::equation() const
 {
@@ -209,39 +209,39 @@ const Equation_base& Champ_front_calc::equation() const
   return inconnue().equation();
 }
 
-/*! @brief Renvoie le milieu associe a l'equation qui porte le champ inconnue dont on prend la trace.
+/*! @brief Returns the medium associated with the equation carrying the unknown field whose trace is taken.
  *
- * @return (Milieu_base&) le milieu associe a l'equation qui porte le champ inconnue dont on prend la trace
+ * @return (Milieu_base&) the medium associated with the equation carrying the unknown field whose trace is taken
  */
 const Milieu_base& Champ_front_calc::milieu() const
 {
   return equation().milieu();
 }
 
-/*! @brief Renvoie le domaine discretise associe a l'equation qui porte le champ inconnue dont on prend la trace.
+/*! @brief Returns the discretized domain associated with the equation carrying the unknown field whose trace is taken.
  *
- * @return (Domaine_dis_base&) le domaine discretise associe a l'equation qui porte le champ inconnue dont on prend la trace
+ * @return (Domaine_dis_base&) the discretized domain associated with the equation carrying the unknown field whose trace is taken
  */
 const Domaine_dis_base& Champ_front_calc::domaine_dis() const
 {
   return inconnue().domaine_dis_base();
 }
 
-/*! @brief Renvoie le domaine des conditions au limites discretisees porte par l'equation qui porte le champ inconnue
+/*! @brief Returns the domain of discretized boundary conditions carried by the equation carrying the unknown field
  *
- *     dont on prend la trace
+ *     whose trace is taken
  *
- * @return (Domaine_Cl_dis_base&) le domaine des conditions au limites discretisees porte par l'equation qui porte le champ inconnue dont on prend la trace
+ * @return (Domaine_Cl_dis_base&) the domain of discretized boundary conditions carried by the equation carrying the unknown field whose trace is taken
  */
 const Domaine_Cl_dis_base& Champ_front_calc::domaine_Cl_dis() const
 {
   return equation().domaine_Cl_dis();
 }
 
-/*! @brief Renvoie la frontiere discretisee correspondante au domaine sur lequel prend la trace.
+/*! @brief Returns the discretized boundary corresponding to the domain on which the trace is taken.
  *
- * @return (Frontiere_dis_base&) frontiere discretisee correspondante au domaine sur lequel prend la trace
- * @throws frontiere du nom specifie introuvable
+ * @return (Frontiere_dis_base&) discretized boundary corresponding to the domain on which the trace is taken
+ * @throws boundary with the specified name not found
  */
 const Frontiere_dis_base& Champ_front_calc::front_dis() const
 {

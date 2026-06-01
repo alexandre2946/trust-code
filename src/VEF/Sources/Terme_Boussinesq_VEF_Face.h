@@ -23,7 +23,7 @@ class Convection_Diffusion_std;
 class Domaine_Cl_VEF;
 class Domaine_VEF;
 
-/*! @brief Terme Source de Boussinesq pour une dicretisation VEF
+/*! @brief Boussinesq source term for a VEF discretization.
  *
  */
 class Terme_Boussinesq_VEF_Face : public Terme_Boussinesq_base

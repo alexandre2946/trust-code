@@ -35,10 +35,9 @@ Entree& Sortie_libre_pression_imposee_QC::readOn(Entree& s)
   return s;
 }
 
-/*! @brief Complete les conditions aux limites.
+/*! @brief Completes the boundary conditions.
  *
- * Impose la masse volumique constante du milieu
- *     physique de l'equation a d_rho.
+ * Sets d_rho to the constant density of the physical medium of the equation.
  *
  */
 void Sortie_libre_pression_imposee_QC::completer()
@@ -53,16 +52,14 @@ void Sortie_libre_pression_imposee_QC::completer()
     d_rho = -1;
 }
 
-/*! @brief Renvoie la valeur du flux impose sur la i-eme composante du champ representant le flux a la frontiere.
+/*! @brief Returns the imposed flux value for the i-th component of the field representing the flux at the boundary.
  *
- *     Le champ a la frontiere est considere constant sur tous
- *     les elements de la frontiere.
- *     La valeur du flux impose a la frontiere est egale
- *     a la valeur du champ (considere constant) a la frontiere divise par d_rho.
+ * The boundary field is considered constant over all elements of the boundary.
+ * The imposed flux value equals the (constant) boundary field value divided by d_rho.
  *
- * @param (int i) indice suivant la premiere dimension du champ
- * @return (double) la valeur imposee sur la composante du champ specifiee
- * @throws deuxieme dimension du champ de frontiere superieur a 1
+ * @param i Index along the first dimension of the field.
+ * @return Imposed value for the specified field component.
+ * @throws Second dimension of the boundary field greater than 1.
  */
 double Sortie_libre_pression_imposee_QC::flux_impose(int i) const
 {

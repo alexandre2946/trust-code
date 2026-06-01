@@ -24,9 +24,9 @@ Sortie& Bords_32_64<_SIZE_>::printOn(Sortie& os) const { return LIST(Bord_32_64<
 template <typename _SIZE_>
 Entree& Bords_32_64<_SIZE_>::readOn(Entree& is) { return LIST(Bord_32_64<_SIZE_>)::readOn(is); }
 
-/*! @brief Associe un domaine a tous les bords de la liste.
+/*! @brief Associates a domain to all boundaries in the list.
  *
- * @param (Domaine& un_domaine) le domaine a associer aux bords de la liste
+ * @param (Domaine& un_domaine) the domain to associate to the boundaries in the list
  */
 template <typename _SIZE_>
 void Bords_32_64<_SIZE_>::associer_domaine(const Domaine_t& un_domaine)
@@ -34,9 +34,9 @@ void Bords_32_64<_SIZE_>::associer_domaine(const Domaine_t& un_domaine)
   for (auto &itr : *this) itr.associer_domaine(un_domaine);
 }
 
-/*! @brief Renvoie le nombre total de faces de tous les bords de la liste
+/*! @brief Returns the total number of faces of all boundaries in the list.
  *
- * @return (int) le nombre total de faces de tous les bords de la liste
+ * @return (int) the total number of faces of all boundaries in the list
  */
 template <typename _SIZE_>
 typename Bords_32_64<_SIZE_>::int_t Bords_32_64<_SIZE_>::nb_faces() const
@@ -48,10 +48,10 @@ typename Bords_32_64<_SIZE_>::int_t Bords_32_64<_SIZE_>::nb_faces() const
   return nombre;
 }
 
-/*! @brief Renvoie le nombre total de faces du type specifie, pour tous les bords de la liste.
+/*! @brief Returns the total number of faces of the specified type, for all boundaries in the list.
  *
- * @param (Type_Face type) le type des faces a comptabiliser
- * @return (int) le nombre total de faces du type specifie, pour tous les bords de la liste
+ * @param (Type_Face type) the type of faces to count
+ * @return (int) the total number of faces of the specified type, for all boundaries in the list
  */
 template <typename _SIZE_>
 typename Bords_32_64<_SIZE_>::int_t Bords_32_64<_SIZE_>::nb_faces(Type_Face type) const

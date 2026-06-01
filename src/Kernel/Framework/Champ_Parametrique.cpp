@@ -40,7 +40,7 @@ Entree& Champ_Parametrique::readOn(Entree& is)
   param.ajouter("fichier", &fichier, Param::REQUIRED);  // XD_ADD_P chaine
   // XD_CONT Filename where fields are read
   param.lire_avec_accolades_depuis(is);
-  // Lecture de tous les lignes du fichier parametrique:
+  // Reading of all lines of the parametric file:
   EFichier fic(fichier);
   Motcle motlu;
   fic >> motlu;
@@ -52,10 +52,10 @@ Entree& Champ_Parametrique::readOn(Entree& is)
       champs_.add(ch);
       //Cerr << "[Parameter] Reading: " << ch->que_suis_je() << finl;
       fic >> motlu;
-      // Pour eviter de surcharger plusieurs methodes de Champ_Don_base:
+      // To avoid overloading multiple methods of Champ_Don_base:
       fixer_nb_comp(ch->nb_comp());
     }
-  // On fixe le premier parametre:
+  // We set the first parameter:
   Sortie_Fichier_base::set_root(newCompute());
   return is;
 }

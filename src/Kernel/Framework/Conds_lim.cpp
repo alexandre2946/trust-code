@@ -31,18 +31,18 @@ Sortie& Conds_lim::printOn(Sortie& s ) const { return s << que_suis_je() << " " 
 
 Entree& Conds_lim::readOn(Entree& s ) { return s ; }
 
-/*! @brief Appel Cond_lim::completer() sur chaque condition aux llimites du vecteur.
+/*! @brief Calls Cond_lim::completer() on each boundary condition in the vector.
  *
  */
 void Conds_lim::completer(const Domaine_dis_base& z)
 {
-  if (!size()) return; //rien a faire
-  // Completer les CL.
+  if (!size()) return; // nothing to do
+  // Complete the BCs.
   for (auto& itr : *this) itr->completer();
 
-  // WEC : Fixer le nombre de valeurs temporelles des champ_front
-  // Cela pourrait etre fait dans Cond_lim_base::completer(),
-  // mais il faudrait retoucher a plein de classes derivees...
+  // WEC: Set the number of temporal values of champ_front
+  // This could be done in Cond_lim_base::completer(),
+  // but we would need to modify many derived classes...
   int nb_cases = (*this)[0]->domaine_Cl_dis().equation().schema_temps().nb_valeurs_temporelles();
 
   for (auto& itr : *this) itr->fixer_nb_valeurs_temporelles(nb_cases);

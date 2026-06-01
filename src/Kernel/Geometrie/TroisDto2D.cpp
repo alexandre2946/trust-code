@@ -39,13 +39,13 @@ Entree& TroisDto2D_32_64<_SIZE_>::readOn(Entree& is)
   return Interprete::readOn(is);
 }
 
-/*! @brief Fonction principale de l'interprete Extract_2D_from_3D Structure du jeu de donnee (en dimension 3) :
+/*! @brief Main function of the Extract_2D_from_3D interpreter. Data set structure (in dimension 3):
  *
  *     Extract_2D_from_3D dom3D bord3D dom2D
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree
- * @throws l'objet a mailler n'est pas du type Domaine
+ * @param is Input stream.
+ * @return The input stream.
+ * @throws The object to mesh is not of type Domaine.
  */
 template <typename _SIZE_>
 Entree& TroisDto2D_32_64<_SIZE_>::interpreter_(Entree& is)
@@ -70,8 +70,8 @@ Entree& TroisDto2D_32_64<_SIZE_>::interpreter_(Entree& is)
        << " of domain " << this->domaine().le_nom()
        << " --> " << nom_dom2D << finl;
   {
-    // Si l'objet nom_dom2D n'existe pas encore, on
-    // ajoute un nouvel objet a l'interprete bloc courant
+    // If the object nom_dom2D does not yet exist,
+    // add a new object to the current block interpreter
     Interprete_bloc& interp = Interprete_bloc::interprete_courant();
     if (interp.objet_global_existant(nom_dom2D))
       {
@@ -119,7 +119,7 @@ void TroisDto2D_32_64<_SIZE_>::extraire_2D(const Domaine_t& dom3D, Domaine_t& do
   int nb_som_fac3D=les_faces3D.dimension_int(1);
   Cerr << "number of nodes per faces in 3D :" << nb_som_fac3D << finl;
 
-  // Construction de renum_som3D2D
+  // Build renum_som3D2D
   ArrOfInt_t renum_som3D2D(nb_som3D);
   for (int_t i=0; i<nb_som3D ; i++)
     renum_som3D2D[i]=-1;
@@ -133,7 +133,7 @@ void TroisDto2D_32_64<_SIZE_>::extraire_2D(const Domaine_t& dom3D, Domaine_t& do
       }
 
   int_t nb_som2D=compteur;
-  // Construction de renum_som2D3D
+  // Build renum_som2D3D
   ArrOfInt_t renum_som2D3D(nb_som2D);
 
   for (int_t i=0; i<nb_som3D ; i++)
@@ -156,9 +156,9 @@ void TroisDto2D_32_64<_SIZE_>::extraire_2D(const Domaine_t& dom3D, Domaine_t& do
 
   if (coupe_!=1)
     {
-      // Algorithme general
-      // La frontiere doit etre plane (non verifie), parallele a un axe ou pas
-      // Attention: les coordonnees du domaine 2D sont dans le nouveau repere
+      // General algorithm
+      // The boundary must be planar (not verified), parallel to an axis or not
+      // Warning: the coordinates of the 2D domain are in the new frame
       double xb,yb,zb;
       double xc,yc,zc;
       double ux,uy,uz;
@@ -181,7 +181,7 @@ void TroisDto2D_32_64<_SIZE_>::extraire_2D(const Domaine_t& dom3D, Domaine_t& do
       scalI=0.;
       scalJ=0.;
 
-      // on determine un repere orthonorme (A;IJK) sur le bord a extraire
+      // determine an orthonormal frame (A;IJK) on the boundary to extract
       xa = coord_sommets3D(les_faces3D(0,0),0);
       ya = coord_sommets3D(les_faces3D(0,0),1);
       za = coord_sommets3D(les_faces3D(0,0),2);
@@ -194,7 +194,7 @@ void TroisDto2D_32_64<_SIZE_>::extraire_2D(const Domaine_t& dom3D, Domaine_t& do
       yc = coord_sommets3D(les_faces3D(0,2),1);
       zc = coord_sommets3D(les_faces3D(0,2),2);
 
-      // calcul de I = AB/norme(AB)
+      // compute I = AB/norm(AB)
       Ix=xb-xa;
       Iy=yb-ya;
       Iz=zb-za;
@@ -203,7 +203,7 @@ void TroisDto2D_32_64<_SIZE_>::extraire_2D(const Domaine_t& dom3D, Domaine_t& do
       Iy/=norm;
       Iz/=norm;
 
-      // calcul de K = AB^AC/norme(AB^AC)
+      // compute K = AB^AC/norm(AB^AC)
       ux=xc-xa;
       uy=yc-ya;
       uz=zc-za;
@@ -219,17 +219,17 @@ void TroisDto2D_32_64<_SIZE_>::extraire_2D(const Domaine_t& dom3D, Domaine_t& do
       Ky/=norm;
       Kz/=norm;
 
-      //  calcul de J = K^I
+      //  compute J = K^I
       Jx = Ky*Iz-Iy*Kz;
       Jy = Kz*Ix-Iz*Kx;
       Jz = Kx*Iy-Ky*Ix;
 
-      // produit scalaire OA.I et OA.J
+      // dot products OA.I and OA.J
       scalI = xa*Ix+ya*Iy+za*Iz;
       scalJ = xa*Jx+ya*Jy+za*Jz;
 
-      // on calcule les coordonnees des points du bord dans le nouveau repere 2D (A;I;J)
-      // pour cela changement de repere du repere 3D vers le repere (A;I;J)
+      // compute the coordinates of the boundary points in the new 2D frame (A;I;J)
+      // by performing a change of frame from the 3D frame to (A;I;J)
       for(int_t i=0; i<nb_som2D; i++)
         {
           double x = coord_sommets3D(renum_som2D3D[i],0);
@@ -243,7 +243,7 @@ void TroisDto2D_32_64<_SIZE_>::extraire_2D(const Domaine_t& dom3D, Domaine_t& do
           else
             {
               assert(coupe_==2);
-// on ne ramene pas en 2D
+// do not reduce to 2D
               coord_sommets2D(i,0)=x;
               coord_sommets2D(i,1)=y;
               coord_sommets2D(i,2)=z;
@@ -255,9 +255,9 @@ void TroisDto2D_32_64<_SIZE_>::extraire_2D(const Domaine_t& dom3D, Domaine_t& do
     }
   else
     {
-      // Algorithme de coupe utilise par Xprepro en VDF
-      // Attention: limite a une frontiere plane parallele a un axe
-      // Les coordoonnees du domaine 2D sont conservees
+      // Cutting algorithm used by Xprepro in VDF
+      // Warning: limited to a planar boundary parallel to an axis
+      // The coordinates of the 2D domain are preserved
       int test=0;
       double precision=DMAXFLOAT;
       for (test=2; test>-1; test--)
@@ -300,7 +300,7 @@ void TroisDto2D_32_64<_SIZE_>::extraire_2D(const Domaine_t& dom3D, Domaine_t& do
       les_elems2D(i,j)=renum_som3D2D[les_elems2D(i,j)];
 
   Objet_U::dimension=2;
-  // On recupere les bords :
+  // Retrieve the boundaries:
   for (const auto& itr: dom3D.faces_bord())
     {
       const Frontiere_t& front = itr;
@@ -315,7 +315,7 @@ void TroisDto2D_32_64<_SIZE_>::extraire_2D(const Domaine_t& dom3D, Domaine_t& do
             bord2D.typer_faces("QUADRILATERE_2D_AXI");
           else
             bord2D.typer_faces("segment_2D");
-          // creer les faces de bord 2D ici!
+          // create the 2D boundary faces here!
           int_t compteur2=0;
           const IntTab_t& faces_sommets=faces3D_front.les_sommets();
           int_t nb_faces=faces_sommets.dimension(0);
@@ -323,7 +323,7 @@ void TroisDto2D_32_64<_SIZE_>::extraire_2D(const Domaine_t& dom3D, Domaine_t& do
           IntTab_t& faces_voisins=bord2D.faces().voisins();
 
           aretes.resize(nb_faces, 2);
-          // Boucle sur les faces du domaine 2D
+          // Loop over the faces of the 2D domain
           bool doublons=false;
           for(int_t face=0; face < nb_faces; face++)
             {
@@ -344,9 +344,9 @@ void TroisDto2D_32_64<_SIZE_>::extraire_2D(const Domaine_t& dom3D, Domaine_t& do
                         }
                       if(ok==3)
                         {
-                          // Si 3 sommets de la face appartienne a la frontiere
-                          // il y'a un probleme, on ajoute les 3 aretes et on cherchera
-                          // les doublons qu'il faudra eliminer...
+                          // If 3 vertices of the face belong to the boundary
+                          // there is a problem: add all 3 edges and look for
+                          // the duplicates that will need to be removed...
                           doublons=true;
                           aretes(compteur2,0)=aretes(compteur2-1,1);
                           aretes(compteur2,1)=tmpbis;
@@ -360,7 +360,7 @@ void TroisDto2D_32_64<_SIZE_>::extraire_2D(const Domaine_t& dom3D, Domaine_t& do
             }
           if (doublons)
             {
-              // Recherche des doublons (algo en n^2)
+              // Search for duplicates (O(n^2) algorithm)
               for (int_t i=0; i<compteur2; i++)
                 {
                   int_t& S10=aretes(i,0);
@@ -378,7 +378,7 @@ void TroisDto2D_32_64<_SIZE_>::extraire_2D(const Domaine_t& dom3D, Domaine_t& do
                         }
                     }
                 }
-              // On supprime les doublons
+              // Remove duplicates
               for (int_t i=0; i<compteur2; i++)
                 if (aretes(i,0)==-1)
                   {
@@ -405,7 +405,7 @@ void TroisDto2D_32_64<_SIZE_>::extraire_2D(const Domaine_t& dom3D, Domaine_t& do
         }
     }
 
-  // On recupere les raccords :
+  // Retrieve the connectors:
   for (const auto& itr: dom3D.faces_raccord())
     {
       const Frontiere_t& front = itr;
@@ -421,7 +421,7 @@ void TroisDto2D_32_64<_SIZE_>::extraire_2D(const Domaine_t& dom3D, Domaine_t& do
             bord2D->typer_faces("QUADRILATERE_2D_AXI");
           else
             bord2D->typer_faces("segment_2D");
-          // creer les faces de bord 2D ici!
+          // create the 2D boundary faces here!
           int_t compteur2=0;
           const IntTab_t& faces_sommets=faces3Dfront.les_sommets();
           int_t nb_faces=faces_sommets.dimension(0);

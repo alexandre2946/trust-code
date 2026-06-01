@@ -29,22 +29,20 @@ Implemente_instanciable(Echange_interne_global_impose,"Paroi_echange_interne_glo
 // XD_CONT in W.m-2.K-1.
 // XD attr ch front_field_base ch REQ Boundary field type.
 
-/*! @brief Ecrit le type de l'objet sur un flot de sortie
+/*! @brief Writes the object type to an output stream.
  *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param s Output stream.
+ * @return The modified output stream.
  */
 Sortie& Echange_interne_global_impose::printOn(Sortie& s ) const
 {
   return s << que_suis_je() << finl;
 }
 
-/*! @brief Simple appel a Echange_impose_base::readOn(Entree&) Lit les specifications des conditions aux limites
+/*! @brief Simple delegation to Echange_impose_base::readOn(Entree&). Reads the boundary condition specifications from an input stream.
  *
- *     a partir d'un flot d'entree.
- *
- * @param (Entree& s) un flot d'entree
- * @return (Entree&) le flot de sortie modifie
+ * @param s Input stream.
+ * @return The modified input stream.
  */
 Entree& Echange_interne_global_impose::readOn(Entree& s )
 {

@@ -21,9 +21,9 @@
 
 #include <SFichier.h>
 
-/*! @brief classe Traitement_particulier_EC Cette classe permet de faire les traitements particuliers
+/*! @brief Traitement_particulier_EC This class performs specific post-processing treatments
  *
- *      pour les calculs de  l'energie cinetique totale
+ *      for computations of the total kinetic energy.
  *
  *
  * @sa Navier_Stokes_Turbulent, Traitement_particulier_base, Traitement_particulier_VEF

@@ -18,13 +18,13 @@
 Implemente_base(Frontiere_dis_base,"Frontiere_dis_base",Objet_U);
 
 
-/*! @brief Surcharge Objet_U::printOn(Sortie&) NE FAIT RIEN
+/*! @brief Overrides Objet_U::printOn(Sortie&) DOES NOTHING
  *
- *     A surcharger dans les classes derivees.
- *     Imprime la frontiere discretisee sur un flot de sortie
+ *     To override in derived classes.
+ *     Prints the discretized boundary to an output stream
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Frontiere_dis_base::printOn(Sortie& os ) const
 {
@@ -34,10 +34,10 @@ Sortie& Frontiere_dis_base::printOn(Sortie& os ) const
 
 /*! @brief DOES NOTHING - to override in derived classes.
  *
- *     Lit une frontiere discretisee a partir d'un flot d'entree
+ *     Reads a discretized boundary from an input stream
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
  */
 Entree& Frontiere_dis_base::readOn(Entree& is )
 {
@@ -45,38 +45,38 @@ Entree& Frontiere_dis_base::readOn(Entree& is )
 }
 
 
-/*! @brief Associe l'objet frontiere geometrique a la frontiere discretisee.
+/*! @brief Associates the geometric boundary object with the discretized boundary.
  *
- * @param (Frontiere& fr) la frontiere geometrique
+ * @param (Frontiere& fr) the geometric boundary
  */
 void Frontiere_dis_base::associer_frontiere(const Frontiere& fr)
 {
   la_frontiere=fr;
 }
 
-/*! @brief Renvoie la frontiere geometrique associee.
+/*! @brief Returns the associated geometric boundary.
  *
- * (version const)
+ * (const version)
  *
- * @return (Frontiere&) la frontiere geometrique associee
+ * @return (Frontiere&) the associated geometric boundary
  */
 const Frontiere& Frontiere_dis_base::frontiere() const
 {
   return la_frontiere.valeur();
 }
 
-/*! @brief Renvoie la frontiere geometrique associee.
+/*! @brief Returns the associated geometric boundary.
  *
- * @return (Frontiere&) la frontiere geometrique associee
+ * @return (Frontiere&) the associated geometric boundary
  */
 Frontiere& Frontiere_dis_base::frontiere()
 {
   return la_frontiere.valeur();
 }
 
-/*! @brief Renvoie le nom de la frontiere geometrique.
+/*! @brief Returns the name of the geometric boundary.
  *
- * @return (Nom&) le nom de la frontiere geometrique
+ * @return (Nom&) the name of the geometric boundary
  */
 const Nom& Frontiere_dis_base::le_nom() const
 {

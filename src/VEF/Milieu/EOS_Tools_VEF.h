@@ -24,7 +24,9 @@
 class Fluide_Dilatable_base;
 class Domaine_VEF;
 
-/*! @brief classe EOS_Tools_VEF Cette classe et specifique a discretisation de type VEF.
+/*! @brief class EOS_Tools_VEF
+ *
+ * @brief This class is specific to VEF-type discretization.
  *
  * @sa Fluide_Dilatable_base EOS_Tools_base
  */

@@ -37,7 +37,7 @@ Entree& Assembleur_P_VEF::readOn(Entree& s )
 
 int Assembleur_P_VEF::assembler(Matrice& la_matrice)
 {
-  // Si rho est constant, on resout avec la pression P*=P/rho
+  // If rho is constant, solve with pressure P*=P/rho
   const DoubleVect& volumes_entrelaces_ref=le_dom_VEF->volumes_entrelaces();
   DoubleVect tab_volumes_entrelaces(volumes_entrelaces_ref);
   const DoubleVect& tab_volumes_entrelaces_cl=le_dom_Cl_VEF->volumes_entrelaces_Cl();
@@ -54,7 +54,7 @@ int Assembleur_P_VEF::assembler(Matrice& la_matrice)
   }
 
   tab_volumes_entrelaces.echange_espace_virtuel();
-  // On assemble la matrice
+  // Assemble the matrix
   return assembler_mat(la_matrice,tab_volumes_entrelaces,1,1);
 }
 
@@ -78,8 +78,8 @@ void calculer_inv_volume_special(DoubleTab& tab_inv_volumes_entrelaces, const Do
 }
 void Assembleur_P_VEF::calculer_inv_volume(DoubleTab& inv_volumes_entrelaces, const Domaine_Cl_VEF& domaine_Cl_VEF,const DoubleVect& volumes_entrelaces)
 {
-  // maintenant l 'inverse du volume est un DoubleTab
-  // c'est pour faire fonctionner le Piso
+  // the inverse of the volume is now a DoubleTab
+  // this is to make Piso work
   const DoubleTab* doubleT = dynamic_cast<const DoubleTab*>(&volumes_entrelaces);
   if (doubleT)
     {
@@ -90,9 +90,9 @@ void Assembleur_P_VEF::calculer_inv_volume(DoubleTab& inv_volumes_entrelaces, co
   inv_volumes_entrelaces.resize(taille,Objet_U::dimension);
   if (0)
     {
-      // cette facon de calculer le volume entrelace pourra etre bonne dans
-      // l'avenir a condition de reflechir au pb des porosites
-      // et SURTOUT au pb du simpler ou l'on ne veut pas passer par la
+      // this way of computing the interlaced volume may be good in
+      // the future provided the porosity issue is addressed,
+      // and ESPECIALLY the SIMPLER issue where we do not want to go through this
       DoubleTab tmp;
       tmp=(inv_volumes_entrelaces);
       tmp=1;
@@ -124,7 +124,7 @@ void Assembleur_P_VEF::calculer_inv_volume(DoubleTab& inv_volumes_entrelaces, co
 
 int Assembleur_P_VEF::assembler_mat(Matrice& la_matrice, const DoubleVect& volumes_entrelaces, int incr_pression, int resoudre_en_u)
 {
-  // On fixe les drapeaux de Assembleur_base
+  // Set flags of Assembleur_base
   set_resoudre_increment_pression(incr_pression);
   set_resoudre_en_u(resoudre_en_u);
   const Domaine_Cl_VEF& domaine_Cl_VEF = le_dom_Cl_VEF.valeur();
@@ -138,20 +138,20 @@ int Assembleur_P_VEF::assembler_mat(Matrice& la_matrice, const DoubleVect& volum
 int Assembleur_P_VEF::remplir(Matrice& la_matrice, const DoubleTab& inverse_quantitee_entrelacee)
 {
   has_P_ref=0;
-  // Matrice de pression :matrice creuse de taille nb_poly x nb_poly
-  // Cette fonction range la matrice dans une structure de matrice morse
-  // bien adaptee aux matrices creuses.
-  // On commence par calculer les tailles des tableaux tab1 et tab2
-  // (coeff_ a la meme taille que tab2)
-  //   A chaque polyedre on associe :
-  //   - une liste d'entiers voisins[i] = {j>i t.q Mij est non nul }
-  //   - une liste de reels  valeurs[i] = {Mij pour j dans Voisins[i]}
-  //   - un reel terme_diag
-  // Implementation temporaire:
-  // On assemble une matrice de pression pour une equation d'hydraulique
-  // On injecte dans cette matrice les conditions aux limites
-  // On peut faire cela car a priori la matrice de pression n'est pas
-  // partagee par plusieurs equations sur une meme domaine.
+  // Pressure matrix: sparse matrix of size nb_poly x nb_poly
+  // This function stores the matrix in a Morse matrix structure
+  // well suited for sparse matrices.
+  // First, compute the sizes of arrays tab1 and tab2
+  // (coeff_ has the same size as tab2)
+  //   For each polyhedron, associate:
+  //   - a list of integers neighbors[i] = {j>i such that Mij is nonzero}
+  //   - a list of reals values[i] = {Mij for j in Neighbors[i]}
+  //   - a real diagonal term
+  // Temporary implementation:
+  // Assemble a pressure matrix for a hydraulic equation
+  // Inject boundary conditions into this matrix
+  // This can be done because the pressure matrix is a priori not
+  // shared between several equations on the same domain.
 
   const Domaine_VEF& le_dom = le_dom_VEF.valeur();
   const Domaine_Cl_VEF& le_dom_cl = le_dom_Cl_VEF.valeur();
@@ -160,15 +160,15 @@ int Assembleur_P_VEF::remplir(Matrice& la_matrice, const DoubleTab& inverse_quan
   int n2 = le_dom.domaine().nb_elem();
 
 
-  // Rajout des porosites.
+  // Add porosities.
 
-  la_matrice.typer("Matrice_Bloc"); // En fait Matrice_Bloc_Sym ?
+  la_matrice.typer("Matrice_Bloc"); // Actually Matrice_Bloc_Sym?
   Matrice_Bloc& matrice=ref_cast(Matrice_Bloc, la_matrice.valeur());
   matrice.dimensionner(2,2);
   matrice.get_bloc(0,0).typer("Matrice_Morse_Sym");
   matrice.get_bloc(0,1).typer("Matrice_Morse");
   matrice.get_bloc(1,0).typer("Matrice_Morse");
-  matrice.get_bloc(1,1).typer("Matrice_Morse"); // En fait Matrice_Morse_Sym ?
+  matrice.get_bloc(1,1).typer("Matrice_Morse"); // Actually Matrice_Morse_Sym ?
 
   Matrice_Morse_Sym& MBrr = ref_cast(Matrice_Morse_Sym,matrice.get_bloc(0,0).valeur());
   Matrice_Morse& MBrv = ref_cast (Matrice_Morse,matrice.get_bloc(0,1).valeur());
@@ -178,11 +178,11 @@ int Assembleur_P_VEF::remplir(Matrice& la_matrice, const DoubleTab& inverse_quan
   MBrr.dimensionner(n2,0);
   MBrv.dimensionner(n2,0);
   MBvv.dimensionner(n1-n2,0);
-  // Le sous blocs vr est dimensionne et nul
+  // The sub-block vr is sized and set to zero
   MBvr.dimensionner(n1-n2,n2,0);
   MBvr.get_set_tab1() = 1;
 
-  // On traite les faces internes:
+  // Process internal faces:
   int ndeb = le_dom_VEF->premiere_face_int();
   int nfin = le_dom_VEF->nb_faces_tot();
   int nb_faces = le_dom_VEF->nb_faces();
@@ -197,7 +197,7 @@ int Assembleur_P_VEF::remplir(Matrice& la_matrice, const DoubleTab& inverse_quan
   ArrOfInt rang_voisinVV(n1-n2);
 #endif
   rang_voisinRR=1; // Diagonale
-  rang_voisinRV=0; // Pas de diagonale
+  rang_voisinRV=0; // No diagonal
   rang_voisinVV=1; // Diagonale
 
   CIntTabView face_voisins = le_dom.face_voisins().view_ro();
@@ -240,7 +240,7 @@ int Assembleur_P_VEF::remplir(Matrice& la_matrice, const DoubleTab& inverse_quan
   });
   end_gpu_timer(__KERNEL_NAME__);
 
-  // Prise en compte des conditions de type periodicite
+  // Account for periodic boundary conditions
   const Conds_lim& les_cl = le_dom_cl.les_conditions_limites();
   for (int i=0; i<les_cl.size(); i++)
     {
@@ -425,16 +425,16 @@ int Assembleur_P_VEF::remplir(Matrice& la_matrice, const DoubleTab& inverse_quan
       }
   });
   end_gpu_timer(__KERNEL_NAME__);
-  // On traite les conditions aux limites
+  // Process the boundary conditions
   for (int i=0; i<les_cl.size(); i++)
     {
 
-      // Le traitement depend du type de la condition aux limites :
-      //  - Si condition de Neumann_sortie_libre ou Robin_VEF
-      //  il faut calculer le coefficient sur la face et le prendre
-      //  en compte dans le terme diagonal associe a l'element voisin.
-      // - Si face de Cl avec une autre condition aux limites pas de
-      // contribution a la matrice de pression.
+      // Treatment depends on the type of boundary condition:
+      //  - For Neumann_sortie_libre or Robin_VEF conditions:
+      //    compute the coefficient on the face and account for it
+      //    in the diagonal term of the neighboring element.
+      // - For a BC face with any other condition: no
+      //   contribution to the pressure matrix.
 
       const Cond_lim& la_cl = les_cl[i];
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
@@ -456,7 +456,7 @@ int Assembleur_P_VEF::remplir(Matrice& la_matrice, const DoubleTab& inverse_quan
             int elem = face_voisins(num_face, 0);
             if (elem < n2) Kokkos::atomic_add(&coeffRR(tab1RR_v(elem) - 1), val);
             else           Kokkos::atomic_add(&coeffVV(tab1VV_v(elem - n2) - 1), val);
-            // On stocke les coefficients de pression sur les faces reelles
+            // Store the pressure coefficients on the real faces
             if (num_face < coeff_pression_size)
               coeff_pression(num_face) = val;
           });
@@ -561,7 +561,7 @@ int Assembleur_P_VEF::modifier_secmem(DoubleTab& secmem)
   int nb_cond_lim = le_dom_cl.nb_cond_lim();
   const IntTab& face_voisins = le_dom.face_voisins();
 
-  // Modification du second membre :
+  // Modification of the right-hand side:
   for (int i=0; i<nb_cond_lim; i++)
     {
       const Cond_lim_base& la_cl_base = le_dom_cl.les_conditions_limites(i).valeur();
@@ -570,7 +570,7 @@ int Assembleur_P_VEF::modifier_secmem(DoubleTab& secmem)
       int ndeb = la_front_dis.num_premiere_face();
       int nfin = ndeb + la_front_dis.nb_faces();
 
-      // GF on est passe en increment de pression
+      // GF we switched to pressure increment
       if ((sub_type(Neumann_sortie_libre,la_cl_base)) && (!get_resoudre_increment_pression()))
         {
           const Neumann_sortie_libre& la_cl_Neumann = ref_cast(Neumann_sortie_libre, la_cl_base);
@@ -624,8 +624,8 @@ int Assembleur_P_VEF::modifier_solution(DoubleTab& pression)
   double press_0;
   if(!has_P_ref)
     {
-      // On prend la pression minimale comme pression de reference
-      // afin d'avoir la meme pression de reference en sequentiel et parallele
+      // Take the minimum pressure as the reference pressure
+      // in order to have the same reference pressure in sequential and parallel
       press_0=DMAXFLOAT;
       int nb_elem=le_dom_VEF->domaine().nb_elem();
       ToDo_Kokkos("critical");
@@ -642,19 +642,16 @@ int Assembleur_P_VEF::modifier_solution(DoubleTab& pression)
   return 1;
 }
 
-/*! @brief Modifier eventuellement la matrice pour la rendre definie si elle ne l'est pas Valeurs par defaut:
+/*! @brief Optionally modifies the matrix to make it definite if it is not.
  *
- *     Contraintes:
- *     Acces: entree
- *
- * @return (int) renvoie 1 si la matrice est modifiee 0 sinon
+ * @return 1 if the matrix is modified, 0 otherwise.
  */
 int Assembleur_P_VEF::modifier_matrice(Matrice& matrice)
 {
   int matrice_modifiee=0;
   Matrice_Bloc& mat_bloc = ref_cast(Matrice_Bloc, matrice.valeur());
   Matrice_Morse_Sym& A00RR = ref_cast(Matrice_Morse_Sym,mat_bloc.get_bloc(0,0).valeur());
-  // Recherche de l'element sur lequel on impose la pression de reference
+  // Find the element on which the reference pressure is imposed
   const bool is_first_proc_with_real_elems = Process::me() == Process::mp_min(le_dom_VEF->nb_elem() ? Process::me() : 1e8);
   if (is_first_proc_with_real_elems && !A00RR.get_est_definie())
     {

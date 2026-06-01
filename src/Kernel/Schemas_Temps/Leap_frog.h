@@ -19,11 +19,11 @@
 #include <Schema_Temps_base.h>
 
 
-/*! @brief classe Leap_frog Cette classe represente un schema en temps Leap_Frog.
+/*! @brief Leap_frog This class represents a Leap_Frog time scheme.
  *
- *      Si (n<=4)
+ *      If (n<=4)
  *         U(n+1) = 2*dt*(dU/dt)(n) + U(n)
- *      Si(n>4)
+ *      If(n>4)
  *         U(n+1) = dt*(dU/dt)(n) + gamma*U(n) + (1-2*gamma)*U(n-1)
  *                                             + gamma*U(n-2)
  *
@@ -38,7 +38,7 @@ public :
 
   ////////////////////////////////
   //                            //
-  // Caracteristiques du schema //
+  // Schema characteristics     //
   //                            //
   ////////////////////////////////
 
@@ -49,7 +49,7 @@ public :
 
   /////////////////////////////////////////
   //                                     //
-  // Fin des caracteristiques du schema  //
+  // End of schema characteristics       //
   //                                     //
   /////////////////////////////////////////
 

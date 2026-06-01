@@ -24,9 +24,8 @@ class Domaine_Cl_EF;
 
 /*! @brief class Op_Div_EF
  *
- *   Cette classe represente l'operateur de divergence. La discretisation est EF
- *   On calcule la divergence d'un champ_P1NC (la vitesse)
- *
+ *   Divergence operator for the EF discretization.
+ *   Computes the divergence of a velocity field.
  *
  * @sa Operateur_Div_base
  */

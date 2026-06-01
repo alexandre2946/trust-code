@@ -111,7 +111,7 @@ void Entree_Fichier_base::close()
   if(ifstream_)
     {
       ifstream_->close();
-      // on ne detruit pas ifstream ca sera fait par entree
+      // do not destroy ifstream here, it will be done by Entree
       //      delete ifstream_;
     }
 }

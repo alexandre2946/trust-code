@@ -22,8 +22,8 @@ class Geometrie;
 
 /*! @brief class Domaine_VF_inst
  *
- *       Classe instanciable qui derive de Domaine_VF. Cette classe ne sait rien faire !!!!
- *       Elle permet juste d'appeler des methodes de type Champ_Inc_base::affecter avec un domaine_dis contenant une reference a un domaine.
+ *       Instantiable class derived from Domaine_VF. This class does nothing!!!!
+ *       It simply allows calling methods of type Champ_Inc_base::affecter with a domaine_dis containing a reference to a domain.
  *
  */
 class Domaine_VF_inst : public Domaine_VF

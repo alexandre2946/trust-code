@@ -24,7 +24,7 @@ inline void throw_()
   Process::exit();
 }
 
-/*! @brief : Un tableau de listes de type IntList
+/*! @brief : An array of lists of type IntList
  *
  */
 template<typename _TYPE_>
@@ -42,9 +42,9 @@ public :
       assert(data == 0);
   }
 
-  TRUSTLists() : sz(0), data(0) { } // Construit un tableau vide de listes
+  TRUSTLists() : sz(0), data(0) { } // Builds an empty array of lists
 
-  // Construit un tableau de i listes
+  // Builds an array of i lists
   TRUSTLists(int i) : sz(i)
   {
     if (i == 0) data = 0;
@@ -83,7 +83,7 @@ public :
   inline TRUSTList<_TYPE_>& operator[](int);
 
   inline void dimensionner(int );
-  inline int size() const { return sz; } // retourne le nombre de listes dans le tableau
+  inline int size() const { return sz; } // returns the number of lists in the array
   inline int search(const TRUSTList<_TYPE_>&) const;
 
 protected :
@@ -149,7 +149,7 @@ inline TRUSTList<_TYPE_>& TRUSTLists<_TYPE_>::operator[](int i)
   return data[i];
 }
 
-/*! @brief Redimensionne un tableau de listes
+/*! @brief Resizes an array of lists
  *
  */
 template<typename _TYPE_>

@@ -88,11 +88,11 @@ public:
 };
 
 
-// Macros pour l'encodage de l'idx (meme fonction que build_idx mais pratique
-//  pour ecrire le code de build_refine_...)
-// Sommet fin situe sur le sommet "num" de l'element grossier:
+// Macros for idx encoding (same function as build_idx but convenient
+//  for writing the build_refine_... code)
+// Fine vertex located at vertex "num" of the coarse element:
 #define NODE_ID(num) num
-// Sommet fin situe au milieu de l'arete "num" de l'element grossier:
+// Fine vertex located at the midpoint of edge "num" of the coarse element:
 #define EDGE_ID(num) (-num-1)
 
 namespace
@@ -161,7 +161,7 @@ void fill_tab_3(const int *t, int n, int m, int p, IntTab& tab)
 
 void build_quadrangle_cell_refinement_pattern(IntTab& pattern)
 {
-  const int t[] = {  NODE_ID(0), EDGE_ID(0), EDGE_ID(3), EDGE_ID(4), // triangle defini par sommet0 arete0 arete1
+  const int t[] = {  NODE_ID(0), EDGE_ID(0), EDGE_ID(3), EDGE_ID(4), // quad defined by vertex0 edge0 edge1
                      EDGE_ID(0), NODE_ID(1), EDGE_ID(4),EDGE_ID(1), // etc...
                      EDGE_ID(4), EDGE_ID(1), EDGE_ID(2), NODE_ID(3),
                      EDGE_ID(3), EDGE_ID(4), NODE_ID(2), EDGE_ID(2), -1
@@ -171,7 +171,7 @@ void build_quadrangle_cell_refinement_pattern(IntTab& pattern)
 
 void build_triangle_cell_refinement_pattern(IntTab& pattern)
 {
-  const int t[] = {  NODE_ID(0), EDGE_ID(0), EDGE_ID(1), // triangle defini par sommet0 arete0 arete1
+  const int t[] = {  NODE_ID(0), EDGE_ID(0), EDGE_ID(1), // triangle defined by vertex0 edge0 edge1
                      EDGE_ID(0), NODE_ID(1), EDGE_ID(2), // etc...
                      EDGE_ID(1), EDGE_ID(2), NODE_ID(2),
                      EDGE_ID(2), EDGE_ID(1), EDGE_ID(0), -1
@@ -181,7 +181,7 @@ void build_triangle_cell_refinement_pattern(IntTab& pattern)
 
 void build_tetrahedron_cell_refinement_pattern(IntTab& pattern)
 {
-  const int t[] = {  NODE_ID(0), EDGE_ID(0), EDGE_ID(1), EDGE_ID(2) , // tetraedre defini par sommet0 arete0 arete1 arete2
+  const int t[] = {  NODE_ID(0), EDGE_ID(0), EDGE_ID(1), EDGE_ID(2) , // tetrahedron defined by vertex0 edge0 edge1 edge2
                      EDGE_ID(0), NODE_ID(1), EDGE_ID(3), EDGE_ID(4) , // etc...
                      EDGE_ID(1), EDGE_ID(3), NODE_ID(2), EDGE_ID(5) ,
                      EDGE_ID(2), EDGE_ID(4), EDGE_ID(5), NODE_ID(3) ,
@@ -192,8 +192,8 @@ void build_tetrahedron_cell_refinement_pattern(IntTab& pattern)
                   };
   fill_tab_2(t, 8, 4, pattern);
 }
-// Convention de numerotation
-//    sommets
+// Numbering convention
+//    vertices
 //      6------7
 //     /|     /|
 //    4------5 |
@@ -205,7 +205,7 @@ void build_hexa_cell_refinement_pattern(IntTab& pattern)
 {
   const int t[] =
   {
-    NODE_ID(0),EDGE_ID(0),EDGE_ID(3),EDGE_ID(4),EDGE_ID(5),EDGE_ID(6),EDGE_ID(8),EDGE_ID(9), // tetraedre defini par sommet0 arete0 arete1 arete2
+    NODE_ID(0),EDGE_ID(0),EDGE_ID(3),EDGE_ID(4),EDGE_ID(5),EDGE_ID(6),EDGE_ID(8),EDGE_ID(9), // tetrahedron defined by vertex0 edge0 edge1 edge2
 
     EDGE_ID(0),NODE_ID(1),EDGE_ID(4),EDGE_ID(1),EDGE_ID(6),EDGE_ID(7),EDGE_ID(9),EDGE_ID(10),
     EDGE_ID(3),EDGE_ID(4),NODE_ID(2),EDGE_ID(2),EDGE_ID(8),EDGE_ID(9),EDGE_ID(11),EDGE_ID(12),
@@ -410,8 +410,8 @@ void build_triangle_edges_pattern(IntTab& pattern)
 
 void build_tetrahedron_edges_pattern(IntTab& pattern)
 {
-  const int t[] = {  0, 1 , // L'arete 0 est entre le sommet 0 et le sommet 1 de l'element
-                     0, 2 , // L'arete 1 est entre 0 et 2
+  const int t[] = {  0, 1 , // Edge 0 is between vertex 0 and vertex 1 of the element
+                     0, 2 , // Edge 1 is between 0 and 2
                      0, 3 , // etc...
                      1, 2 ,
                      1, 3 ,
@@ -420,21 +420,21 @@ void build_tetrahedron_edges_pattern(IntTab& pattern)
   fill_tab_2(t, 6, 2, pattern);
 }
 
-// plan haut
+// top plane
 //      6-- 16'---7
 //     /         /
 //    17'  18'  15'
 //   /         /
 //  4---14'---5
 //
-// plan milieu
+// mid plane
 //      11'--12'---13'
 //     /           /
 //    8'    9'   10'
 //   /          /
 //  5'---6'---7'
 //
-// plan bas
+// bottom plane
 //      2--2'---3
 //     /       /
 //    3'  4'  1'
@@ -443,7 +443,7 @@ void build_tetrahedron_edges_pattern(IntTab& pattern)
 void build_hexa_edges_pattern(IntTab& pattern)
 {
 
-  const int t[] = {  2, 0, 1 , // L'arete 0 est entre le sommet 0 et le sommet 1 de l'element
+  const int t[] = {  2, 0, 1 , // Edge 0 is between vertex 0 and vertex 1 of the element
                      2, 1, 3 , // etc...
                      2, 2, 3 ,
                      2, 0, 2 ,
@@ -574,8 +574,8 @@ void Impl_32_64<_SIZE_>::build_edges(const IntTab_t& nodes_of_cells, const IntTa
 
           int_t node_0 = nodes_of_cells(cell,node_in_cell_0);
           int_t node_1 = nodes_of_cells(cell,node_in_cell_1);
-          // En 3D le centre de gravite des faces est defini par les 2 diagonales
-          // pour assurer l'unicite avec la numerotation on prend la diagonale avec l indice de noeuds le grand en premier
+          // In 3D the face centre of gravity is defined by the 2 diagonals
+          // to ensure uniqueness with the numbering we take the diagonal with the largest node index first
           bool quad_2d=false;
 
           if (Objet_U::dimension==3)
@@ -656,7 +656,7 @@ void Impl_32_64<_SIZE_>::build_edges(const IntTab_t& nodes_of_cells, const IntTa
           node_0 = new_node_0;
           node_1 = new_node_1;
         }
-      // la, ya un truc qui m'etonne : dans mon code, c'est plus complexe
+      // note: in my code, this is more complex
       edges_of_cells_array[edge_index] = edges_counter;
     }
 
@@ -793,8 +793,8 @@ void Impl_32_64<_SIZE_>::build_frontier(const Frontiere_t& src,
       find_adjacent_elements(cells_of_nodes_src,nodes_of_current_face,incident_cells);
       if ((incident_cells.size_array() != 1) && (!is_internal_faces))
         {
-          // Cette erreur n'en est pas une pour les "bords internes, groupe_faces ou joints"...
-          // si le cas se presente, faire un test en essayant d'ignorer l'erreur...
+          // This is not an error for "internal boundaries, face groups or joints"...
+          // if this case arises, test by trying to ignore the error...
           Cerr << "Error in Raffiner_Simplexes_32_64.cpp 'build_frontier()'" << finl;
           Cerr << "  The boundary face " << face << " having nodes " << nodes_of_current_face << " has the following incident cells " << incident_cells << finl;
           Process::exit();
@@ -974,21 +974,21 @@ void Raffiner_Simplexes_32_64<_SIZE_>::refine_domain(const Domaine_t& src, Domai
         joint_dest.affecte_PEvoisin(boundaries_src[boundary].PEvoisin());
         joint_dest.affecte_epaisseur(boundaries_src[boundary].epaisseur());
 
-        // creation des SOMMETS communs
+        // creation of COMMON VERTICES
         ArrOfInt_t& liste_sommets = joint_dest.set_joint_item(JOINT_ITEM::SOMMET).set_items_communs();
 
-        // On prend tous les sommets des faces de joint:
+        // Take all vertices of the joint faces:
         const IntTab_t& som_faces = joint_dest.faces().les_sommets();
         liste_sommets = som_faces;
-        // on ajoute les sommets du joint d'origine pour
-        // les sommets isoles
+        // add the vertices from the original joint for
+        // isolated vertices
         const ArrOfInt_t& som_isoles = boundaries_src[boundary].joint_item(JOINT_ITEM::SOMMET).items_communs();
         const int_t n = som_isoles.size_array();
         array_trier_retirer_doublons(liste_sommets);
         ArrOfInt_t liste_sommets_old(liste_sommets);
         for (int_t i = 0; i < n; i++)
           liste_sommets.append_array(som_isoles[i]);
-        // Retirer les doublons de la liste
+        // Remove duplicates from the list
         array_trier_retirer_doublons(liste_sommets);
         int_t n1=liste_sommets.size_array();
 
@@ -998,14 +998,14 @@ void Raffiner_Simplexes_32_64<_SIZE_>::refine_domain(const Domaine_t& src, Domai
           SmallArrOfTID_t sommets_to_find(2);
           SmallArrOfTID_t incident_cells;
 
-          // on doit trouver tous les sommets oublies, c'est ceux en plus.
+          // we must find all forgotten vertices, those that were added.
           ArrOfInt_t oublie;// (n1-n0);
           const ArrOfInt_t& liste_sommets_org= som_isoles;
           int_t norg=som_isoles.size_array();
-          // les liste sont tries
+          // the lists are sorted
           oublie=liste_sommets;
 
-          // pour chaque sommet oblie on regarde si on a une arrete commune en regardant tous les sommets de la liste
+          // for each forgotten vertex check whether we share an edge by examining all vertices of the list
           for (int_t nio=0; nio<n1; nio++)
             {
               int_t io=oublie[nio];

@@ -34,7 +34,7 @@ Entree& Echange_contact_Colburn_VDF::readOn(Entree& is)
 }
 
 /**
- * Calcule le coeff d echange suivant la correlation de Colburn
+ * @brief Computes the heat exchange coefficient using the Colburn correlation.
  */
 double Echange_contact_Colburn_VDF::calculer_coefficient_echange(int i)
 {

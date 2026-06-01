@@ -62,7 +62,7 @@ void Loi_Etat_GP_QC::compute_tab_rho(DoubleTab& tab_rho)
   end_gpu_timer(__KERNEL_NAME__);
 }
 
-/*! @brief Calcule la masse volumique
+/*! @brief Computes the density.
  *
  */
 void Loi_Etat_GP_QC::calculer_masse_volumique()

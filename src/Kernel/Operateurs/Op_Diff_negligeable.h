@@ -22,13 +22,13 @@
 
 class Champ_base;
 
-/*! @brief Classe Op_Diff_negligeable Cette classe represente un operateur de diffusion negligeable.
+/*! @brief Classe Op_Diff_negligeable This class represents a negligible diffusion operator.
  *
- *     Lorsqu'un operateur de ce type est utilise dans une equation
- *     cela revient a negliger le terme de diffusion.
- *     Les methodes de modification et de participation a un calcul de
- *     l'operateur sont en fait des appels aux meme methodes de
- *     Operateur_negligeable qui ne font rien.
+ *     When an operator of this type is used in an equation,
+ *     it amounts to neglecting the diffusion term.
+ *     The methods for modifying and participating in a computation of
+ *     the operator are in fact calls to the same methods of
+ *     Operateur_negligeable which do nothing.
  *
  *
  * @sa Operateur_Diff_base Operateur_negligeable
@@ -77,13 +77,13 @@ class Op_Dift_negligeable: public Op_Diff_negligeable
 };
 
 
-/*! @brief Ajoute la contribution de l'operateur a un tableau passe en parametre.
+/*! @brief Adds the contribution of the operator to an array passed as parameter.
  *
- * Simple appel a Operateur_negligeable::ajouter(const DoubleTab&,DoubleTab&)
+ * Simple call to Operateur_negligeable::ajouter(const DoubleTab&,DoubleTab&)
  *
- * @param (DoubleTab& x) le tableau sur lequel on applique l'operateur
- * @param (DoubleTab& y) tableau auquel on ajoute la contribution de l'operateur
- * @return (DoubleTab&) le parametre d'entree y non modifie
+ * @param (DoubleTab& x) the array on which the operator is applied
+ * @param (DoubleTab& y) array to which the operator contribution is added
+ * @return (DoubleTab&) the input parameter y unchanged
  */
 inline DoubleTab&
 Op_Diff_negligeable::ajouter(const DoubleTab& x, DoubleTab& y) const
@@ -92,13 +92,13 @@ Op_Diff_negligeable::ajouter(const DoubleTab& x, DoubleTab& y) const
 }
 
 
-/*! @brief Initialise le parametre tableau avec la contribution de l'operateur negligeable: initialise le tableau a ZERO.
+/*! @brief Initializes the array parameter with the contribution of the negligible operator: initializes the array to ZERO.
  *
- *     Simple appel a Operateur_negligeable::(calculer(const DoubleTab&, DoubleTab&)
+ *     Simple call to Operateur_negligeable::(calculer(const DoubleTab&, DoubleTab&)
  *
- * @param (DoubleTab& x) le tableau sur lequel on applique l'operateur
- * @param (DoubleTab& y) tableau dans lequel stocke la contribution de l'operateur
- * @return (DoubleTab&) le tableau d'entree y mis a zero
+ * @param (DoubleTab& x) the array on which the operator is applied
+ * @param (DoubleTab& y) array in which the operator contribution is stored
+ * @return (DoubleTab&) the input array y set to zero
  */
 inline DoubleTab&
 Op_Diff_negligeable::calculer(const DoubleTab& x, DoubleTab& y) const
@@ -106,12 +106,12 @@ Op_Diff_negligeable::calculer(const DoubleTab& x, DoubleTab& y) const
   return Operateur_negligeable::calculer(x,y);
 }
 
-/*! @brief Mise a jour en temps d'un operateur negligeable: NE FAIT RIEN Simple appel a Operateur_negligeable::mettre_a_jour(double)
+/*! @brief Time update of a negligible operator: DOES NOTHING. Simple call to Operateur_negligeable::mettre_a_jour(double)
  *
- * @param (double temps)
+ * @param (double temps) the current time
  */
 
-/*! @brief on assemble la matrice.
+/*! @brief Assembles the matrix.
  *
  */
 
@@ -121,7 +121,7 @@ inline void Op_Diff_negligeable::contribuer_a_avec(const DoubleTab& inco,
   ;
 }
 
-/*! @brief on ajoute la contribution du second membre.
+/*! @brief Adds the contribution to the right-hand side.
  *
  */
 
@@ -130,7 +130,7 @@ inline void Op_Diff_negligeable::contribuer_au_second_membre(DoubleTab& resu) co
   ;
 }
 
-// Modification des Cl
+// Modification of boundary conditions
 inline void  Op_Diff_negligeable::modifier_pour_Cl(Matrice_Morse& amatrice, DoubleTab& resu) const
 {
   ;
@@ -147,7 +147,7 @@ inline void Op_Diff_negligeable::mettre_a_jour(double temps)
 }
 
 
-/*! @brief Associe divers objets a un operateurs negligeable: NE FAIT RIEN Simple appel a Operateur_negligeable::associer(const Domaine_dis_base&,
+/*! @brief Associates various objects to a negligible operator: DOES NOTHING Simple call to Operateur_negligeable::associer(const Domaine_dis_base&,
  *
  *                                                      const Domaine_Cl_dis_base&,
  *                                                      const Champ_Inc_base&)
@@ -163,7 +163,7 @@ inline void Op_Diff_negligeable::associer(const Domaine_dis_base& z,
   Operateur_negligeable::associer(z, zcl, ch);
 }
 
-//Surcharge pour que la methode ne fasse rien
+// Override so that the method does nothing
 inline void Op_Diff_negligeable::associer_champ_masse_volumique(const Champ_base&)
 {
 

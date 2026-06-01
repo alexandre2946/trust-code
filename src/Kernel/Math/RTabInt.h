@@ -20,12 +20,7 @@
 #include <TRUSTArray.h>
 
 
-/*! @brief class RTabInt
- *
- *         La classe RTabInt implemente la notion de vecteur
- *         d'entier redimensionnable.
- *
- *
+/*! @brief class RTabInt - Implements a resizable integer vector.
  *
  */
 
@@ -37,10 +32,10 @@ class RTabInt : public Objet_U
 
 public:
 
-  // Constructeurs et destructeur
+  // Constructor and destructor
   RTabInt(int n=0, int x=0);
 
-  // Tailles
+  // Size queries
   inline int size() const;
 
   inline void resize(int);
@@ -61,16 +56,18 @@ private:
   int max_data;
 
 };
-/*! @brief operateur []
+/*! @brief Returns the number of elements in the array.
  *
+ * @return (int) number of elements
  */
 inline int RTabInt::size() const
 {
   return size_r_;
 }
 
-/*! @brief operateur []
+/*! @brief Resizes the array to hold at least n elements, growing by TB_ slots if needed.
  *
+ * @param (int n) new minimum size
  */
 inline void RTabInt::resize(int n)
 {
@@ -85,8 +82,10 @@ inline void RTabInt::resize(int n)
 }
 
 
-/*! @brief operateur []
+/*! @brief Returns a reference to the element at index i.
  *
+ * @param (int i) index
+ * @return (int&) reference to element
  */
 inline int& RTabInt::operator[](int i)
 {
@@ -97,8 +96,10 @@ inline const int& RTabInt::operator[](int i) const
   return data[i];
 }
 
-/*! @brief idem operator[]
+/*! @brief Same as operator[]: returns a reference to the element at index i.
  *
+ * @param (int i) index
+ * @return (int&) reference to element
  */
 inline int& RTabInt::operator()(int i)
 {

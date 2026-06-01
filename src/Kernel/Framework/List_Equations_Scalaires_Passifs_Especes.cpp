@@ -23,7 +23,7 @@ Sortie& List_Equations_Scalaires_Passifs_Especes::printOn(Sortie& os) const { re
 
 Entree& List_Equations_Scalaires_Passifs_Especes::readOn(Entree& is)
 {
-  // Ici se situe un gros piratage
+  // Here is a big hack
   Motcle motlu;
 
   is >> motlu;
@@ -40,16 +40,16 @@ Entree& List_Equations_Scalaires_Passifs_Especes::readOn(Entree& is)
       Eqn_nvelle.typer(motlu);
       Equation_base& Eqn = ref_cast(Equation_base, Eqn_nvelle.valeur());
 
-      // maintenant on associe le pb
+      // now we associate the problem
       Eqn.associer_pb_base(probleme());
       Eqn.associer_milieu_base(mil.valeur());
       Eqn.associer_sch_tps_base(schema_temps());
 
-      // on la discretise (pas fait par discretiser)
+      // we discretize it (not done by discretiser)
       Eqn.associer_domaine_dis(probleme().domaine_dis());
       Eqn.discretiser();
 
-      // on change le nom de l'inconnue et de l equation
+      // we change the name of the unknown and the equation
       Nom nom;
       nom = Eqn.inconnue().le_nom();
       Nom nom_eq;
@@ -62,7 +62,7 @@ Entree& List_Equations_Scalaires_Passifs_Especes::readOn(Entree& is)
       nom_eq += nume;
       Cerr << "The equation name is modified : new name " << nom_eq << finl;
       Eqn.nommer(nom_eq);
-      // enfin on lit
+      // finally we read
       is >> Eqn;
       is >> motlu;
     }

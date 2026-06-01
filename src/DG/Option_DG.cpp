@@ -75,8 +75,10 @@ int Option_DG::Get_order_for(const Nom& n)
   return DEFAULT_ORDER;
 }
 
-/*! @return the number of columns necessary in the unknown vector for a given
+/*! @brief Return the number of columns necessary in the unknown vector for a given
  * method order. For example order 1 and 2D means we deal with the basis {1, X, Y}, so 3 cols.
+ * @param order the polynomial order of the DG method
+ * @return number of columns (basis functions) for the given order and spatial dimension
  */
 int Option_DG::Nb_col_from_order(const int order)
 {

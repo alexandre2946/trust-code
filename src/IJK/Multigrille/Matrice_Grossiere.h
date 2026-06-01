@@ -86,7 +86,7 @@ protected:
 
   MD_Vector md_;
 
-  // renum_(k+1,j+1,i+1) = indice de l'inconnue dans le vecteur inconnue de la matrice
+  // renum_(k+1,j+1,i+1) = index of the unknown in the matrix unknown vector
   double shear_x_time_;
   int defilement_;
   int order_interpolation_poisson_solver_;
@@ -104,7 +104,7 @@ protected:
   IntLists voisins_virt_;
   DoubleLists coeffs_virt_;
 
-  // Pour la matrice complète de pression (trop rigolo)
+  // For the full pressure matrix
   IntLists voisins_2_;
   DoubleLists coeffs_2_;
 

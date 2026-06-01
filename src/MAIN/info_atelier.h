@@ -17,11 +17,11 @@
 #define info_atelier_H
 class Sortie;
 #include <arch.h>
-/*! @brief donne le nombre et le nom des fichiers modifies
+/*! @brief Returns the number and names of modified files.
  *
  */
 int info_atelier(Sortie&);
-/*! @brief permet de stocker l'atelier et de le reecrire
+/*! @brief Stores the atelier state and rewrites it.
  *
  */
 void restore_atelier(Sortie& );

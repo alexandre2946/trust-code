@@ -19,11 +19,11 @@
 #include <TRUST_List.h>
 #include <Source.h>
 
-/*! @brief class Sources Sources represente une liste de Source.
+/*! @brief class Sources Sources represents a list of Source objects.
  *
- *      Une equation contient un membres Equation_base::les_sources de type
- *      Sources. Un objet Sources est un morceaux d'equation, cette classe
- *      herite donc de MorEqn.
+ *      An equation contains a member Equation_base::les_sources of type
+ *      Sources. A Sources object is a piece of an equation, so this class
+ *      inherits from MorEqn.
  *
  * @sa Source MorEqn
  */

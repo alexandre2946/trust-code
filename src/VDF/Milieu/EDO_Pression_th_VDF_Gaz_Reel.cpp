@@ -28,10 +28,10 @@ Sortie& EDO_Pression_th_VDF_Gaz_Reel::printOn(Sortie& os) const { return os << q
 
 Entree& EDO_Pression_th_VDF_Gaz_Reel::readOn(Entree& is) { return is; }
 
-/*! @brief Resoud l'EDO
+/*! @brief Solves the ODE for the thermodynamic pressure.
  *
- * @param (double Pth_n) La pression a l'etape precedente
- * @return (double) La nouvelle valeur de la pression
+ * @param Pth_n pressure at the previous time step
+ * @return new value of the thermodynamic pressure
  */
 double EDO_Pression_th_VDF_Gaz_Reel::resoudre(double Pth_n)
 {
@@ -46,17 +46,17 @@ double EDO_Pression_th_VDF_Gaz_Reel::resoudre(double Pth_n)
 
   double Pth;
   const DoubleTab& tab_vit = ref_cast(Navier_Stokes_std,le_fluide_->vitesse().equation()).vitesse().valeurs();
-  const DoubleTab& tab_hnp1 = le_fluide_->inco_chaleur().valeurs();       //actuel
-  const DoubleTab& tab_hn = le_fluide_->inco_chaleur().passe();        //passe
-  const DoubleTab& tab_rho = le_fluide_->masse_volumique().valeurs();    //actuel
+  const DoubleTab& tab_hnp1 = le_fluide_->inco_chaleur().valeurs();       //current
+  const DoubleTab& tab_hn = le_fluide_->inco_chaleur().passe();        //previous
+  const DoubleTab& tab_rho = le_fluide_->masse_volumique().valeurs();    //current
   const OWN_PTR(Loi_Etat_base)& loi_ = le_fluide_->loi_etat();
   //const DoubleVect& tab_rhon = loi_->rho_n();                       //passe
 
   int elem, nb_elem = dom.nb_elem(), i;
-  double V = 0; //mesure du domaine
-  double Fn = 0; //integrale 1 a l'etape n
-  double Fnp1 = 0; //integrale 1 a l'etape n+1
-  double S = 0; //second membre
+  double V = 0; //domain measure
+  double Fn = 0; //integral 1 at time step n
+  double Fnp1 = 0; //integral 1 at time step n+1
+  double S = 0; //right-hand side
 
   double dt = le_fluide_->vitesse().equation().schema_temps().pas_de_temps();
   double v, al, b, bnp1, hn, hnp1, divu;

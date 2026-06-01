@@ -21,13 +21,13 @@ Implemente_instanciable(Champ_front_uniforme,"Champ_front_uniforme",Champ_front_
 // XD attr val list val REQ Values of field components.
 
 
-/*! @brief Imprime le champ sur flot de sortie.
+/*! @brief Print the field to an output stream.
  *
- * Imprime la taille du champ et la valeur (constante) sur
- *     la frontiere.
+ * Prints the field size and the (constant) value on
+ *     the boundary.
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Champ_front_uniforme::printOn(Sortie& os) const
 {
@@ -39,13 +39,13 @@ Sortie& Champ_front_uniforme::printOn(Sortie& os) const
 }
 
 
-/*! @brief Lit le champ a partir d'un flot d'entree.
+/*! @brief Read the field from an input stream.
  *
  * Format:
  *       Champ_front_uniforme nb_compo vrel_1 ... [vrel_i]
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree& is) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree& is) the modified input stream
  */
 Entree& Champ_front_uniforme::readOn(Entree& is)
 {
@@ -61,19 +61,19 @@ Entree& Champ_front_uniforme::readOn(Entree& is)
 
 
 
-/*! @brief Renvoie l'objet upcaste en Champ_front_base&
+/*! @brief Returns the object upcast to Champ_front_base&
  *
  * @param (Champ_front_base& ch)
- * @return (Champ_front_base&) (*this) upcaste en Champ_front_base&
+ * @return (Champ_front_base&) (*this) upcast to Champ_front_base&
  */
 Champ_front_base& Champ_front_uniforme::affecter_(const Champ_front_base& ch)
 {
   return *this;
 }
 
-/*! @brief Renvoie le vecteur des valeurs du champ pour la face donnee.
+/*! @brief Returns the vector of field values for the given face.
  *
- * @return le tableau des valeurs du champ
+ * @return the field values array
  */
 void Champ_front_uniforme::valeurs_face(int face,DoubleVect& var) const
 {
@@ -83,7 +83,7 @@ void Champ_front_uniforme::valeurs_face(int face,DoubleVect& var) const
     var(i) = valeurs()(0,i);
 }
 
-/*! @brief Renvoie les valeurs sans s'occuper du temps puisque le champ est stationnaire.
+/*! @brief Returns the values without caring about time since the field is stationary.
  *
  */
 DoubleTab& Champ_front_uniforme::valeurs_au_temps(double temps)
@@ -91,7 +91,7 @@ DoubleTab& Champ_front_uniforme::valeurs_au_temps(double temps)
   return les_valeurs->valeurs();
 }
 
-/*! @brief Renvoie les valeurs sans s'occuper du temps puisque le champ est stationnaire.
+/*! @brief Returns the values without caring about time since the field is stationary.
  *
  */
 const DoubleTab& Champ_front_uniforme::valeurs_au_temps(double temps) const
@@ -99,7 +99,7 @@ const DoubleTab& Champ_front_uniforme::valeurs_au_temps(double temps) const
   return les_valeurs->valeurs();
 }
 
-/*! @brief Avance en temps : rien a faire pour un champ stationnaire !
+/*! @brief Advance in time: nothing to do for a stationary field!
  *
  */
 int Champ_front_uniforme::avancer(double temps)
@@ -107,7 +107,7 @@ int Champ_front_uniforme::avancer(double temps)
   return 1;
 }
 
-/*! @brief Recule en temps : rien a faire pour un champ stationnaire !
+/*! @brief Step back in time: nothing to do for a stationary field!
  *
  */
 int Champ_front_uniforme::reculer(double temps)
@@ -115,7 +115,7 @@ int Champ_front_uniforme::reculer(double temps)
   return 1;
 }
 
-/*! @brief rien a faire pour un champ stationnaire !
+/*! @brief Nothing to do for a stationary field!
  *
  */
 void Champ_front_uniforme::changer_temps_futur(double temps,int i)

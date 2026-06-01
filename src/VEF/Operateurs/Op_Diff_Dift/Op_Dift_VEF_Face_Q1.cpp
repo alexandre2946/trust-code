@@ -58,7 +58,7 @@ DoubleTab& Op_Dift_VEF_Face_Q1::ajouter(const DoubleTab& inconnue, DoubleTab& re
   DoubleVect n(dimension);
   DoubleTrav Tgrad(dimension, dimension);
 
-  // On traite les faces bord
+  // Process boundary faces
   if (nb_comp == 1)
     for (int n_bord = 0; n_bord < domaine_VEF.nb_front_Cl(); n_bord++)
       {
@@ -194,8 +194,8 @@ DoubleTab& Op_Dift_VEF_Face_Q1::ajouter(const DoubleTab& inconnue, DoubleTab& re
                       {
                         const int num_face = le_bord.num_face(ind_face);
                         int elem = face_voisins(num_face, 0);
-                        // Calcul du gradient gradU=tau*Ny*N
-                        // Au bord, n toujours oriente vers l'exterieur
+                        // Compute the gradient gradU=tau*Ny*N
+                        // At the boundary, n is always oriented outward
                         n[0] = face_normale(num_face, 0);
                         n[1] = face_normale(num_face, 1);
                         n /= norme_array(n);
@@ -204,19 +204,19 @@ DoubleTab& Op_Dift_VEF_Face_Q1::ajouter(const DoubleTab& inconnue, DoubleTab& re
                         Tgrad(0, 1) = tau_tan_(num_face, 0) * n[1] * n[1];
                         Tgrad(1, 0) = -tau_tan_(num_face, 0) * n[0] * n[0];
                         Tgrad(1, 1) = -tau_tan_(num_face, 0) * n[0] * n[1];
-                        // On determine le sens du frottement parietal :
+                        // Determine the direction of the wall friction:
                         signe = 0;
                         for (int i = 0; i < nb_faces_elem; i++)
                           {
                             const int j = elem_faces(elem, i);
-                            // Calcul du signe de (Utan-Uparoi)*tan :
+                            // Compute the sign of (Utan-Uparoi)*tan:
                             signe += (inconnue(j, 1) - inconnue(num_face, 1)) * face_normale(num_face, 0) - (inconnue(j, 0) - inconnue(num_face, 0)) * face_normale(num_face, 1);
                           }
                         if (signe < 0)
                           signe = -1.;
                         else
                           signe = 1.;
-                        // On calcule la contribution sur chaque face de l'element :
+                        // Compute the contribution on each face of the element:
                         for (int i = 0; i < nb_faces_elem; i++)
                           {
                             const int j = elem_faces(elem, i);
@@ -236,14 +236,14 @@ DoubleTab& Op_Dift_VEF_Face_Q1::ajouter(const DoubleTab& inconnue, DoubleTab& re
                       {
                         const int num_face = le_bord.num_face(ind_face);
                         int elem = face_voisins(num_face, 0);
-                        // Calcul du gradient gradU
-                        // Au bord, n toujours oriente vers l'exterieur
+                        // Compute the gradient gradU
+                        // At the boundary, n is always oriented outward
                         n[0] = face_normale(num_face, 0);
                         n[1] = face_normale(num_face, 1);
                         n[2] = face_normale(num_face, 2);
                         n /= norme_array(n);
-                        // Difference avec le 2D car ici tau_tan est signe !
-                        // A tester malgre tout !
+                        // Difference with 2D because here tau_tan is signed!
+                        // To test nevertheless!
                         Tgrad(0, 0) = tau_tan_(num_face, 0) * n[0];
                         Tgrad(0, 1) = tau_tan_(num_face, 0) * n[1];
                         Tgrad(0, 2) = tau_tan_(num_face, 0) * n[2];
@@ -253,7 +253,7 @@ DoubleTab& Op_Dift_VEF_Face_Q1::ajouter(const DoubleTab& inconnue, DoubleTab& re
                         Tgrad(2, 0) = tau_tan_(num_face, 2) * n[0];
                         Tgrad(2, 1) = tau_tan_(num_face, 2) * n[1];
                         Tgrad(2, 2) = tau_tan_(num_face, 2) * n[2];
-                        // On calcule la contribution sur chaque face de l'element :
+                        // Compute the contribution on each face of the element:
                         for (int i = 0; i < nb_faces_elem; i++)
                           {
                             const int j = elem_faces(elem, i);
@@ -280,7 +280,7 @@ DoubleTab& Op_Dift_VEF_Face_Q1::ajouter(const DoubleTab& inconnue, DoubleTab& re
                 const int num_face = le_bord.num_face(ind_face);
                 int elem = face_voisins(num_face, 0);
                 const double d_mu = mu + mu_turb(elem);
-                // Boucle sur les faces :
+                // Loop over faces:
                 for (int ii = 0; ii < nb_faces_elem; ii++)
                   {
                     const int j = elem_faces(elem, ii);
@@ -303,14 +303,14 @@ DoubleTab& Op_Dift_VEF_Face_Q1::ajouter(const DoubleTab& inconnue, DoubleTab& re
 
   Debog::verifier("Op_Dift_VEF_Face_Q1::ajouter apres bords, resu", resu);
 
-  // On traite les faces internes
+  // Process the internal faces
 
   for (int num_face = domaine_VEF.premiere_face_int(); num_face < n1; num_face++)
     for (int kk = 0; kk < 2; kk++)
       {
         const int elem0 = face_voisins(num_face, kk);
         const double d_mu = mu + mu_turb(elem0);
-        // On elimine les elements avec CL de paroi (rang>=1)
+        // Skip elements with wall boundary conditions (rang>=1)
         int rang = rang_elem_non_std(elem0);
         if (rang < 1)
           {
@@ -381,7 +381,7 @@ void Op_Dift_VEF_Face_Q1::contribuer_a_avec(const DoubleTab& transporte, Matrice
   auto& tab2 = matrice.get_set_tab2();
   auto& coeff = matrice.get_set_coeff();
 
-  // On traite les faces bord
+  // Process boundary faces
   for (int n_bord = 0; n_bord < domaine_VEF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -455,7 +455,7 @@ void Op_Dift_VEF_Face_Q1::contribuer_a_avec(const DoubleTab& transporte, Matrice
           {
             int elembis = face_voisins(num_face, 0);
             const double d_mu = mu + mu_turb(elembis);
-            // Boucle sur les faces :
+            // Loop over faces:
             for (int ii = 0; ii < nb_faces_elem; ii++)
               {
                 const int j = elem_faces(elembis, ii);
@@ -484,13 +484,13 @@ void Op_Dift_VEF_Face_Q1::contribuer_a_avec(const DoubleTab& transporte, Matrice
           }
     }
 
-  // On traite les faces internes
+  // Process the internal faces
   for (int num_face0 = domaine_VEF.premiere_face_int(); num_face0 < n1; num_face0++)
     for (int ll = 0; ll < 2; ll++)
       {
         const int elem = face_voisins(num_face0, ll);
         const double d_mu = mu + mu_turb(elem);
-        // On elimine les elements avec CL de paroi (rang>=1)
+        // Skip elements with wall boundary conditions (rang>=1)
         int rang = rang_elem_non_std(elem);
         if (rang < 1)
           {

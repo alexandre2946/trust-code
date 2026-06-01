@@ -46,7 +46,7 @@ public :
   Entree& lire_fxyzt(Entree& is,const int dim);
   inline const int& isfonction() const;
   Table(const Table&);
-  Table& operator=(const Table& t) = default; // exige par gcc 9 car sinon error: implicitly-declared 'Table& Table::operator=(const Table&)' is deprecated [-Werror=deprecated-copy]
+  Table& operator=(const Table& t) = default; // required by gcc 9 otherwise error: implicitly-declared 'Table& Table::operator=(const Table&)' is deprecated [-Werror=deprecated-copy]
   bool instationnaire() const;
 
 private:
@@ -59,10 +59,10 @@ private:
 
 
 
-/*! @brief Construit un table avec les valeurs val, et les parametres param
+/*! @brief Constructs a table with values val and parameters param.
  *
- * @param (const DoubleVect& param) parametres
- * @param (const DoubleVect& val) valeurs
+ * @param (const DoubleVect& param) parameter values
+ * @param (const DoubleVect& aval) table values
  */
 inline Table::Table(const DoubleVect& param,const DoubleVect& aval)
   :  les_parametres(1)

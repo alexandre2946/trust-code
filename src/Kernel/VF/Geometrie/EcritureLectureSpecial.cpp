@@ -41,16 +41,16 @@ Implemente_instanciable(EcritureLectureSpecial,"EcritureLectureSpecial",Interpre
 
 const DoubleTab& get_ref_coordinates_items(const Domaine_VF& zvf, const MD_Vector& md)
 {
-  // j'aurais pris xv mais il n'a pas de structure parallele !!!
+  // I would have taken xv but it has no parallel structure !!!
   if (md == zvf.face_sommets().get_md_vector())
-    return zvf.xv(); // Descripteur des face
+    return zvf.xv(); // Descriptor for faces
   else if (md == zvf.md_vector_faces_bord())
     return zvf.xv_bord();
-  // j'aurais pris xp mais il n'a pas de structure parallele !!!!!!$&
+  // I would have taken xp but it has no parallel structure !!!!!!$&
   else if (md == zvf.domaine().les_elems().get_md_vector())
-    return zvf.xp(); // Descripteur des elements
+    return zvf.xp(); // Descriptor for elements
   else if (md == zvf.xa().get_md_vector())
-    return zvf.xa(); // Descripteur des aretes
+    return zvf.xa(); // Descriptor for edges
   else if (md == zvf.domaine().les_sommets().get_md_vector())
     return zvf.domaine().les_sommets();
   else
@@ -101,7 +101,7 @@ Entree& EcritureLectureSpecial::interpreter(Entree& is)
   return is;
 }
 
-/*! @brief indique si le format special a ete demande en lecture active par reprise xyz .
+/*! @brief Indicates whether the special format was requested in active reading by xyz restart.
  *
  * ...
  *
@@ -111,12 +111,12 @@ int EcritureLectureSpecial::is_lecture_special()
   return mode_lec;
 }
 
-/*! @brief indique si le format special a ete demande en lecture active par sauvegarde xyz .
+/*! @brief Indicates whether the special format was requested in active writing by xyz save.
  *
  * ...
- *   si le mode ecriture est special c.a.d si format de sauvegarde xyz
- *     alors special =1 a_faire=je_suis_maitre
- *     sinon special=0 , a_faire=1
+ *   if the write mode is special, i.e. if the save format is xyz:
+ *     then special=1, a_faire=je_suis_maitre
+ *     otherwise special=0, a_faire=1
  *
  *
  */
@@ -132,7 +132,7 @@ int EcritureLectureSpecial::is_ecriture_special(int& special,int& a_faire)
     {
       special=0;
       a_faire=1;
-      assert(mode_ecr>=0); // mode_ecr n'est pas positionne
+      assert(mode_ecr>=0); // mode_ecr is not set
       if (mode_ecr)
         {
           special=1;
@@ -142,9 +142,9 @@ int EcritureLectureSpecial::is_ecriture_special(int& special,int& a_faire)
   return mode_ecr;
 }
 
-/*! @brief simple appel a EcritureLectureSpecial::ecriture_special (const Domaine_VF& zvf,Sortie& fich,int nbval,const DoubleTab& val)
+/*! @brief Simple call to EcritureLectureSpecial::ecriture_special (const Domaine_VF& zvf,Sortie& fich,int nbval,const DoubleTab& val)
  *
- *     apres avoir recupere le tableau val
+ *     after retrieving the val array
  *
  */
 int EcritureLectureSpecial::ecriture_special(const Champ_base& ch, Sortie& fich)
@@ -169,9 +169,9 @@ int ecrit(Sortie& fich, const ArrOfBit& items_to_write, const DoubleTab& pos, co
       int j=0;
       for (int p = 0; p < nb_val; p++)
         {
-          // On n'ecrit que les items reels non communs afin d'avoir un fichier .xyz
-          // de meme taille quelque soit le decoupage et surtout de pouvoir le relire
-          // quelque soit le decoupage et les supports
+          // We only write the real non-shared items so as to have a .xyz file
+          // of the same size regardless of the partitioning, and above all to be able to re-read it
+          // regardless of the partitioning and the supports
           if (items_to_write[p])
             {
               for (int k = 0; k < dim; k++)
@@ -193,9 +193,9 @@ int ecrit(Sortie& fich, const ArrOfBit& items_to_write, const DoubleTab& pos, co
       int j = 0;
       for (int p = 0; p < nb_val; p++)
         {
-          // On n'ecrit que les items reels non communs afin d'avoir un fichier .xyz
-          // de meme taille quelque soit le decoupage et surtout de pouvoir le relire
-          // quelque soit le decoupage et les supports
+          // We only write the real non-shared items so as to have a .xyz file
+          // of the same size regardless of the partitioning, and above all to be able to re-read it
+          // regardless of the partitioning and the supports
           if (items_to_write[p])
             {
               for (int k = 0; k < dim; k++)
@@ -208,8 +208,8 @@ int ecrit(Sortie& fich, const ArrOfBit& items_to_write, const DoubleTab& pos, co
               if (j == jmax)
                 {
                   fich.put(tmp.addr(), j, dim + nb_comp /* nb colonnes en ascii */);
-                  // On flushe regulierement en sequentiel car sur certains tres gros maillages
-                  // stack overflow possible...
+                  // We flush regularly in sequential mode because on some very large meshes
+                  // a stack overflow is possible...
                   if (Process::is_sequential()) fich.syncfile();
                   j = 0;
                 }
@@ -221,9 +221,9 @@ int ecrit(Sortie& fich, const ArrOfBit& items_to_write, const DoubleTab& pos, co
   return 8 * (dim + nb_comp) * nb_val; // Bytes
 }
 
-/*! @brief Partie "interieure" de l'ecriture, appellee par la methode en dessous.
+/*! @brief "Inner" part of the write, called by the method below.
  *
- * Methode recursive, si le tableau a ecrire a un descripteur MD_Vector_composite
+ * Recursive method, if the array to write has an MD_Vector_composite descriptor
  *
  */
 static int ecriture_special_part2(const Domaine_VF& zvf, Sortie& fich, const DoubleTab& val)
@@ -232,9 +232,9 @@ static int ecriture_special_part2(const Domaine_VF& zvf, Sortie& fich, const Dou
   int bytes = 0;
   if (sub_type(MD_Vector_composite, md.valeur()))
     {
-      // Champs p1bulles et autres: appel recursif pour les differents sous-tableaux:
+      // p1bubble fields and others: recursive call for the different sub-arrays:
       ConstDoubleTab_parts parts(val);
-      int n = zvf.que_suis_je() == "Domaine_PolyMAC_MPFA" ? 1 : parts.size();//on saute les variables auxiliaires de Champ_{P0,Face}_PolyMAC_MPFA
+      int n = zvf.que_suis_je() == "Domaine_PolyMAC_MPFA" ? 1 : parts.size();//skip auxiliary variables of Champ_{P0,Face}_PolyMAC_MPFA
       for (int i = 0; i < n; i++)
         bytes += ecriture_special_part2(zvf, fich, parts[i]);
     }
@@ -255,7 +255,7 @@ static int ecriture_special_part2(const Domaine_VF& zvf, Sortie& fich, const Dou
   return bytes;
 }
 
-/*! @brief codage de l'ecriture des positions et des valeurs de val
+/*! @brief Encoding of the write of positions and values of val
  *
  */
 int EcritureLectureSpecial::ecriture_special(const Domaine_VF& zvf, Sortie& fich, const DoubleTab& val)
@@ -305,7 +305,7 @@ int EcritureLectureSpecial::ecriture_special(const Domaine_VF& zvf, Sortie& fich
   return bytes;
 }
 
-/*! @brief simple appel a EcritureLectureSpecial::lecture_special (const Domaine_VF& zvf,Entree& fich,int nbval, DoubleTab& val )
+/*! @brief Simple call to EcritureLectureSpecial::lecture_special (const Domaine_VF& zvf,Entree& fich,int nbval, DoubleTab& val )
  *
  */
 void EcritureLectureSpecial::lecture_special(Champ_base& ch, Entree& fich)
@@ -316,12 +316,12 @@ void EcritureLectureSpecial::lecture_special(Champ_base& ch, Entree& fich)
 }
 
 
-/*! @brief Reciproque de la methode ecrit(.
+/*! @brief Reciprocal of the ecrit(.
  *
- * ..), lit uniquement les items sequentiels (donc pas les items communs recus d'un autre processeur)
- *    On verifie a la fin qu'on a bien lu exactement le nombre d'items attendus, s'il en manque
- *    c'est que le epsilon n'est pas bon (ou qu'on a change le maillage...)
- *  Valeur de retour: nombre total d'items sequentiels lus (sur tous les procs)
+ * ..) method, reads only the sequential items (i.e. not the shared items received from another processor).
+ *    We verify at the end that we have read exactly the expected number of items; if any are missing
+ *    it means epsilon is wrong (or the mesh has changed...).
+ *  Return value: total number of sequential items read (across all procs)
  *
  */
 static trustIdType lire_special(Entree& fich, const DoubleTab& coords, DoubleTab& val, const double epsilon)
@@ -331,8 +331,8 @@ static trustIdType lire_special(Entree& fich, const DoubleTab& coords, DoubleTab
   const int nb_comp = (nb_dim == 1) ? 1 : val.dimension(1);
 
   const MD_Vector& md_vect = val.get_md_vector();
-  // Dans un premier temps, 1 si l'item est a lire, 0 s'il est lu par un autre processeur.
-  // Une fois que l'item est lu, on met le flag a 2.
+  // Initially, 1 if the item is to be read, 0 if it is read by another processor.
+  // Once the item is read, the flag is set to 2.
   ArrOfInt items_to_read;
   const int n_to_read = md_vect->get_sequential_items_flags(items_to_read);
   Octree_Double octree;
@@ -340,26 +340,26 @@ static trustIdType lire_special(Entree& fich, const DoubleTab& coords, DoubleTab
   octree.build_nodes(coords, 0 /* do not include virtual elements */, epsilon);
   const ArrOfInt& floor_elements = octree.floor_elements();
 
-  // Le fichier contient ce nombre de lignes pour cette partie du tableau (nombre total d'items sequentiels)
+  // The file contains this number of lines for this part of the array (total number of sequential items)
   const trustIdType ntot = Process::mp_sum(n_to_read);
 
-  // On lit dans le fichier par blocs de buflines_max parce qu'il y a
-  //  un broadcast reseau a chaque comm:
-  const int buflines_max = 2048; // pas trop, histoire d'avoir plusieurs blocs dans les cas tests
+  // We read from the file in blocks of buflines_max because there is
+  //  a network broadcast at each comm:
+  const int buflines_max = 2048; // not too large, so as to have several blocks in test cases
   DoubleTab buffer(buflines_max, dim + nb_comp);
   int bufptr = buflines_max;
   ArrOfInt items;
 
 
   double max_epsilon_needed = epsilon;
-  // Combien de fois on a trouve plusieurs candidats a moins de epsilon ?
+  // How many times did we find multiple candidates within epsilon?
   int error_too_many_matches = 0;
-  // Combien de fois on est tombe plusieurs fois sur le meme sommet a lire ?
+  // How many times did we encounter the same vertex to read multiple times?
   int error_duplicate_read = 0;
-  // Combien d'items a-t-on lu ?
+  // How many items have we read?
   int count_items_read = 0;
 
-  // Boucle sur les items sequentiels du fichier:
+  // Loop over sequential items in the file:
   trustIdType pourcent=0;
   for (trustIdType i = 0; i < ntot; i++)
     {
@@ -380,16 +380,16 @@ static trustIdType lire_special(Entree& fich, const DoubleTab& coords, DoubleTab
       const double x = buffer(bufptr, 0);
       const double y = buffer(bufptr, 1);
       const double z = (dim == 3) ? buffer(bufptr, 2) : 0.;
-      // Recherche des items correspondant potentiellement au point (x,y,z)
+      // Search for items potentially corresponding to the point (x,y,z)
       int index = -1;
       int nb_items_proches = octree.search_elements(x, y, z, index);
       if (nb_items_proches > 0)
         {
           items.resize_array(nb_items_proches, RESIZE_OPTIONS::NOCOPY_NOINIT);
-          // Voir doc de Octree_Double::search_elements: on copie les indices des items proches dans items:
+          // See doc of Octree_Double::search_elements: copy the indices of nearby items into items:
           for (int j = 0; j < nb_items_proches; j++)
             items[j] = floor_elements[index++];
-          // On reduit la liste pour avoir uniquement les items a moins de epsilon
+          // Reduce the list to keep only items within epsilon
           const int item_le_plus_proche = octree.search_nodes_close_to(x, y, z, coords, items, epsilon);
           nb_items_proches = items.size_array();
           if (nb_items_proches == 1)
@@ -397,7 +397,7 @@ static trustIdType lire_special(Entree& fich, const DoubleTab& coords, DoubleTab
               const int flag = items_to_read[item_le_plus_proche];
               if (flag == 1)
                 {
-                  // Ok, il faut lire cette valeur
+                  // Ok, we need to read this value
                   items_to_read[item_le_plus_proche] = 2;
                   count_items_read++;
                   if (nb_dim == 1)
@@ -412,34 +412,34 @@ static trustIdType lire_special(Entree& fich, const DoubleTab& coords, DoubleTab
                 }
               else if (flag == 0)
                 {
-                  // Cet item n'est pas a moi, ne pas le lire
+                  // This item does not belong to me, do not read it
                 }
               else
                 {
-                  // Erreur, on a deja lu cet item !!! epsilon est trop grand (ou erreur a la sauvegarde ???)
+                  // Error, this item has already been read!!! epsilon is too large (or a save error???)
                   error_duplicate_read++;
                 }
             }
           else if (nb_items_proches == 0)
             {
-              // ok, le sommet est sur un autre processeur (ou epsilon trop petit ??)
+              // ok, the vertex is on another processor (or epsilon too small??)
             }
           else
             {
-              // Erreur: epsilon est trop grand, on a plusieurs candidats a moins de epsilon
-              // Calcul de la distance avec le deuxieme plus proche pour afficher un message d'erreur a la fin:
+              // Error: epsilon is too large, we have multiple candidates within epsilon
+              // Compute the distance to the second closest to display an error message at the end:
               for (int ii = 0; ii < nb_items_proches; ii++)
                 {
                   const int i_coord = items[ii];
                   if (i_coord == item_le_plus_proche)
-                    continue; // celui-la est sans doute le bon, il faut un epsilon superieur a cette valeur la...
+                    continue; // that one is probably the correct match, we need an epsilon smaller than this distance...
                   double xx = 0;
                   for (int j = 0; j < dim; j++)
                     {
                       double yy = coords(i_coord, j) - buffer(bufptr, j);
                       xx += yy * yy;
                     }
-                  // On propose de mettre un epsilon au maximum egal a 1/10 de la distance avec le deuxieme point le plus proche:
+                  // We propose to set epsilon at most equal to 1/10 of the distance to the second closest point:
                   xx = sqrt(xx) * 0.1;
                   if (max_epsilon_needed > xx)
                     max_epsilon_needed = xx;
@@ -450,7 +450,7 @@ static trustIdType lire_special(Entree& fich, const DoubleTab& coords, DoubleTab
       bufptr++;
     }
   Cerr << finl;
-  // Erreurs ?
+  // Errors?
   int err = (count_items_read != n_to_read) || (error_too_many_matches > 0) || (error_duplicate_read > 0);
   err = static_cast<int>(Process::mp_sum(err));  // sum of 0 and 1, always 'int'
   if (err)
@@ -488,7 +488,7 @@ static trustIdType lire_special(Entree& fich, const DoubleTab& coords, DoubleTab
   return ntot;
 }
 
-// Valeur de retour: nombre total d'items sequentiels lus (sur tous les procs)
+// Return value: total number of sequential items read (across all procs)
 static trustIdType lecture_special_part2(const Domaine_VF& zvf, Entree& fich, DoubleTab& val)
 {
   const MD_Vector& md = val.get_md_vector();
@@ -496,7 +496,7 @@ static trustIdType lecture_special_part2(const Domaine_VF& zvf, Entree& fich, Do
   trustIdType ntot = 0;
   if (sub_type(MD_Vector_composite, md.valeur()))
     {
-      // Champs p1bulles et autres: appel recursif pour les differents sous-tableaux:
+      // p1bubble fields and others: recursive call for the different sub-arrays:
       DoubleTab_parts parts(val);
       const int n = parts.size();
       for (int i = 0; i < n; i++)
@@ -517,7 +517,7 @@ static trustIdType lecture_special_part2(const Domaine_VF& zvf, Entree& fich, Do
   return ntot;
 }
 
-/*! @brief codage de la relecture d'un champ a partir d'un fichier special positions,valeurs
+/*! @brief Encoding of the re-reading of a field from a special positions/values file
  *
  */
 void EcritureLectureSpecial::lecture_special(const Domaine_VF& zvf, Entree& fich, DoubleTab& val)
@@ -545,13 +545,13 @@ void EcritureLectureSpecial::lecture_special(const Domaine_VF& zvf, Entree& fich
 
   fich >> bidon >> bidon >> bidon >> bidon >> bidon >> bidon >> bidon >> bidon >> bidon >> bidon;
 
-  // On met a jour les parties virtuelles du tableau val
+  // Update the virtual parts of the val array
   val.echange_espace_virtuel();
 }
 
-/*! @brief Renvoie le mode d'ecriture utilise (pour pouvoir le modifier).
+/*! @brief Returns the write mode in use (so it can be modified).
  *
- *   Cette methode est statique.
+ *   This method is static.
  *
  */
 Nom& EcritureLectureSpecial::get_Output()

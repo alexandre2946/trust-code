@@ -114,10 +114,10 @@ Entree& My_Comm_Group::interpreter(Entree& is)
   const int rank = Process::me();
 
   if (nb_groups > nb_procs)
-    nb_groups = nb_procs; // sinon
+    nb_groups = nb_procs; // otherwise
 
   const int base_size = nb_procs / nb_groups;
-  const int extra = nb_procs % nb_groups; // nombre des procs avec 1 de plus !
+  const int extra = nb_procs % nb_groups; // number of groups with one extra proc!
 
   //  ex : 0,1,2,3   4,5,6,7   8,9,10
   //  Total = 11 procs
@@ -135,7 +135,7 @@ Entree& My_Comm_Group::interpreter(Entree& is)
 
           PE_Groups::create_group(tab, my_comm_group);
           PE_Groups::initialize_user_defined_group(my_comm_group.valeur());
-          break; // le groupe a été trouvé, pas besoin de continuer
+          break; // the group was found, no need to continue
         }
 
       count += group_size;

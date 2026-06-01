@@ -22,10 +22,10 @@ Implemente_instanciable(PrecisionGeom,"PrecisionGeom",Interprete);
 // XD attr precision floattant precision REQ New value of precision.
 
 
-/*! @brief Simple appel a: Interprete::printOn(Sortie&)
+/*! @brief Simple call to: Interprete::printOn(Sortie&)
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& PrecisionGeom::printOn(Sortie& os) const
 {
@@ -33,10 +33,10 @@ Sortie& PrecisionGeom::printOn(Sortie& os) const
 }
 
 
-/*! @brief Simple appel a: Interprete::readOn(Entree&)
+/*! @brief Simple call to: Interprete::readOn(Entree&)
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
  */
 Entree& PrecisionGeom::readOn(Entree& is)
 {
@@ -44,10 +44,10 @@ Entree& PrecisionGeom::readOn(Entree& is)
 }
 
 
-/*! @brief Fonction principale de l'interprete PrecisionGeom Lit la dimension d'espace du probleme.
+/*! @brief Main function of the PrecisionGeom interpreter. Reads the space dimension of the problem.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
  */
 Entree& PrecisionGeom::interpreter(Entree& is)
 {

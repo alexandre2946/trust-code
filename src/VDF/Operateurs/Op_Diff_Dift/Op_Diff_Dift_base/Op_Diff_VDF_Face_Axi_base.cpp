@@ -51,13 +51,13 @@ void Op_Diff_VDF_Face_Axi_base::ajouter_elem(const DoubleTab& inco, DoubleTab& r
   for (int num_elem = 0; num_elem < le_dom_vdf->nb_elem(); num_elem++)
     {
       const int fx0 = elem_faces(num_elem,0), fx1 = elem_faces(num_elem,dimension), fy0 = elem_faces(num_elem,1), fy1 = elem_faces(num_elem,1+dimension);
-      // Calcul de tau11
+      // Compute tau11
       const double tau11 = (inco[fx1]-inco[fx0])/(xv(fx1,0) - xv(fx0,0));
-      // Calcul de tau22
+      // Compute tau22
       double R = xp(num_elem,0), d_teta = xv(fy1,1) - xv(fy0,1);
       if (d_teta < 0) d_teta += deux_pi;
       double tau22 =  (inco[fy1]-inco[fy0])/(R*d_teta);
-      tau22 += 0.5*(inco[fx0]+inco[fx1])/R; // termes supplementaires en axi
+      tau22 += 0.5*(inco[fx0]+inco[fx1])/R; // extra terms in axisymmetric
 
       const double flux_X = tau11*nu_(num_elem)*0.5*(surface(fx0)+surface(fx1)), flux_Y = tau22*nu_(num_elem)*0.5*(surface(fy0)+surface(fy1));
       resu[fx0] += flux_X;
@@ -65,7 +65,7 @@ void Op_Diff_VDF_Face_Axi_base::ajouter_elem(const DoubleTab& inco, DoubleTab& r
       resu[fy0] += flux_Y;
       resu[fy1] -= flux_Y;
 
-      // Termes supplementaires dans le laplacien en axi : Ils sont integres comme des termes sources
+      // Extra terms in the axisymmetric Laplacian: integrated as source terms
       const double coef_laplacien_axi = +0.5*tau22*nu_(num_elem);
       resu[fx0] -= coef_laplacien_axi*volumes_entrelaces(fx0)*porosite(fx0)/xv(fx0,0);
       resu[fx1] -= coef_laplacien_axi*volumes_entrelaces(fx1)*porosite(fx1)/xv(fx1,0);
@@ -77,7 +77,7 @@ void Op_Diff_VDF_Face_Axi_base::ajouter_elem_3D(const DoubleTab& inco, DoubleTab
   for (int num_elem = 0; num_elem < le_dom_vdf->nb_elem(); num_elem++)
     {
       const int fz0 = elem_faces(num_elem,2), fz1 = elem_faces(num_elem,2+dimension);
-      // Calcul de tau33
+      // Compute tau33
       const double tau33 = (inco[fz1]-inco[fz0])/(xv(fz1,2) - xv(fz0,2)), flux_Z = tau33*nu_(num_elem)*0.5*(surface(fz0)+surface(fz1));
       resu[fz0] += flux_Z;
       resu[fz1] -= flux_Z;
@@ -101,7 +101,7 @@ void  Op_Diff_VDF_Face_Axi_base::ajouter_aretes_bords(const DoubleTab& inco, Dou
             const int rang1 = fac1 - le_dom_vdf->premiere_face_bord(), rang2 = fac2 - le_dom_vdf->premiere_face_bord();
             double vit_imp, dist3, tps = inconnue->temps();
 
-            if (n_type == TypeAreteBordVDF::PAROI_FLUIDE) // arete paroi_fluide :il faut determiner qui est la face fluide
+            if (n_type == TypeAreteBordVDF::PAROI_FLUIDE) // wall_fluid edge: we must determine which is the fluid face
               {
                 if (est_egal(inco[fac1],0)) vit_imp = Champ_Face_get_val_imp_face_bord(tps,rang2,ori3,la_zcl_vdf.valeur());
                 else vit_imp = Champ_Face_get_val_imp_face_bord(tps,rang1,ori3,la_zcl_vdf.valeur());
@@ -110,10 +110,10 @@ void  Op_Diff_VDF_Face_Axi_base::ajouter_aretes_bords(const DoubleTab& inco, Dou
 
             const double db_diffusivite = nu_mean_2_pts_(face_voisins(fac3,0),face_voisins(fac3,1));
 
-            if (ori1 == 0) // bord d'equation R = cte
+            if (ori1 == 0) // boundary with equation R = const
               {
                 double flux1;
-                if (ori3 == 1)  // flux de tau12 a travers le bord
+                if (ori3 == 1)  // flux of tau12 through the boundary
                   {
                     dist3 = xv(fac3,0)-xv(fac1,0);
                     if (n_type != TypeAreteBordVDF::PAROI_PAROI) dist3 *= 1;
@@ -121,7 +121,7 @@ void  Op_Diff_VDF_Face_Axi_base::ajouter_aretes_bords(const DoubleTab& inco, Dou
                     const double tau12 = (inco[fac3]-vit_imp)/dist3;
                     flux1 = db_diffusivite*tau12*0.25*(surface(fac1)+surface(fac2))*(porosite(fac1)+porosite(fac2));
                   }
-                else //if (ori3 == 2)  flux de tau13 a travers le bord
+                else //if (ori3 == 2)  flux of tau13 through the boundary
                   {
                     assert(ori3 == 2);
                     dist3 = xv(fac3,0)-xv(fac1,0);
@@ -131,38 +131,38 @@ void  Op_Diff_VDF_Face_Axi_base::ajouter_aretes_bords(const DoubleTab& inco, Dou
                   }
                 resu[fac3] += signe*flux1;
               }
-            else if (ori1 == 1) // bord d'equation teta = cte
+            else if (ori1 == 1) // boundary with equation theta = const
               {
                 double R = xv(fac3,0), d_teta = xv(fac3,1) - xv(fac1,1);
                 if (d_teta < 0) d_teta += deux_pi;
 
                 dist3  = R*d_teta;
                 if (n_type != TypeAreteBordVDF::PAROI_PAROI) dist3 *= 1;
-                if (ori3 == 0) // flux de tau21 a travers le bord
+                if (ori3 == 0) // flux of tau21 through the boundary
                   {
                     double tau21 = (inco[fac3]-vit_imp)/dist3;
-                    tau21 -= 0.5*(inco[fac1]+inco[fac2])/R; // Terme supplementaire en axi
+                    tau21 -= 0.5*(inco[fac1]+inco[fac2])/R; // Extra term in axi
                     const double flux2 = db_diffusivite*tau21*0.25*(surface(fac1)+surface(fac2))*(porosite(fac1)+porosite(fac2));
                     resu[fac3]+=signe*flux2;
 
-                    // Termes supplementaires dans le laplacien en axi
-                    // Ils sont integres comme des termes sources
+                    // Extra terms in the axisymmetric Laplacian
+                    // They are integrated as source terms
                     const double coef_laplacien_axi = 0.5*db_diffusivite*tau21;
                     resu(fac1) += coef_laplacien_axi*volumes_entrelaces(fac1)*porosite(fac1)/xv(fac1,0);
                     resu(fac2) += coef_laplacien_axi*volumes_entrelaces(fac2)*porosite(fac2)/xv(fac2,0);
                   }
-                else if (ori3 == 2) // flux de tau23 a travers le bord
+                else if (ori3 == 2) // flux of tau23 through the boundary
                   {
-                    // XXX : attention si ecart : dans le cas constant c'etait tau23 = signe*(vit_imp-inco[fac3])/dist3 (normalement c'est la meme mais bon)
+                    // XXX : beware if discrepancy: in the constant case it was tau23 = signe*(vit_imp-inco[fac3])/dist3 (normally the same but just in case)
                     const double tau23 = (inco[fac3]-vit_imp)/dist3;
                     const double flux3 = db_diffusivite*tau23*0.25*(surface(fac1)+surface(fac2))*(porosite(fac1)+porosite(fac2));
                     resu[fac3] += signe*flux3;
                   }
               }
-            else // (ori1 == 2) bord d'equation Z = cte
+            else // (ori1 == 2) boundary with equation Z = const
               {
                 double flux4;
-                if (ori3 == 0) // flux de tau31 a travers le bord
+                if (ori3 == 0) // flux of tau31 through the boundary
                   {
                     dist3 = xv(fac3,2)-xv(fac1,2);
                     if (n_type != TypeAreteBordVDF::PAROI_PAROI) dist3 *= 1;
@@ -170,7 +170,7 @@ void  Op_Diff_VDF_Face_Axi_base::ajouter_aretes_bords(const DoubleTab& inco, Dou
                     const double tau31 = (inco[fac3]-vit_imp)/dist3;
                     flux4 = db_diffusivite*tau31*0.25*(surface(fac1)+surface(fac2))*(porosite(fac1)+porosite(fac2));
                   }
-                else // if (ori3 == 1)  flux de tau32 a travers le bord
+                else // if (ori3 == 1)  flux of tau32 through the boundary
                   {
                     assert(ori3 == 1) ;
                     dist3 = xv(fac3,2)-xv(fac1,2);
@@ -203,70 +203,70 @@ void Op_Diff_VDF_Face_Axi_base::ajouter_aretes_mixtes_internes(const DoubleTab& 
       const int fac1 = Qdm(n_arete,0), fac2 = Qdm(n_arete,1), fac3 = Qdm(n_arete,2), fac4 = Qdm(n_arete,3), ori1 = orientation(fac1), ori3 = orientation(fac3);
       const double db_diffusivite = nu_mean_4_pts_(fac3,fac4);
 
-      if (ori1 == 1)  // (seule possibilite : ori3 =0)  Arete XY
+      if (ori1 == 1)  // (only possibility: ori3 =0)  XY edge
         {
           double flux1;
-          // Calcul de tau21
+          // Compute tau21
           const double R = xv(fac3,0);
           double d_teta = xv(fac4,1) - xv(fac3,1);
           if (d_teta < 0) d_teta += deux_pi;
           double tau21 = (inco(fac4)-inco(fac3))/(R*d_teta);
 
-          // Terme supplementaire en axi
+          // Extra term in axi
           tau21 -= 0.5*(inco[fac1]+inco[fac2])/R;
 
-          // flux de tau21 sur la facette a cheval sur les faces fac1 et fac2
+          // flux of tau21 on the facet straddling faces fac1 and fac2
           flux1 = db_diffusivite*tau21*0.25*(surface(fac1)+surface(fac2))*(porosite(fac1)+porosite(fac2));
           resu(fac3) += flux1;
           resu(fac4) -= flux1;
 
-          // Termes supplementaires dans le laplacien en axi : Ils sont integres comme des termes sources
+          // Extra terms in the axisymmetric Laplacian: integrated as source terms
           const double coef_laplacien_axi = 0.5*db_diffusivite*tau21;
           resu(fac1) += coef_laplacien_axi*volumes_entrelaces(fac1)*porosite(fac1)/xv(fac1,0);
           resu(fac2) += coef_laplacien_axi*volumes_entrelaces(fac2)*porosite(fac2)/xv(fac2,0);
 
-          // Calcul de tau12
+          // Compute tau12
           const double tau12 = (inco(fac2)-inco(fac1))/(xv(fac2,0) - xv(fac1,0));
-          // flux de tau12 sur la facette a cheval sur les faces fac3 et fac4
+          // flux of tau12 on the facet straddling faces fac3 and fac4
           flux1 = db_diffusivite*tau12*0.25*(surface(fac3)+surface(fac4))*(porosite(fac3)+porosite(fac4));
           resu(fac1) += flux1;
           resu(fac2) -= flux1;
         }
-      else if (ori3 == 1) // (seule possibilite ori1 = 2) arete YZ
+      else if (ori3 == 1) // (only possibility: ori1 = 2) YZ edge
         {
           double flux2;
-          // Calcul de tau32
+          // Compute tau32
           const double tau32 = (inco(fac4)-inco(fac3))/(xv(fac4,2) - xv(fac3,2));
 
-          // flux de tau32 sur la facette a cheval sur les faces fac1 et fac2
+          // flux of tau32 on the facet straddling faces fac1 and fac2
           flux2 = db_diffusivite*tau32*0.25*(surface(fac1)+surface(fac2))*(porosite(fac1)+porosite(fac2));
           resu(fac3) += flux2;
           resu(fac4) -= flux2;
 
-          // Calcul de tau23
+          // Compute tau23
           const double R = xv(fac1,0);
           double d_teta = xv(fac2,1) - xv(fac1,1);
           if (d_teta < 0) d_teta += deux_pi;
           const double tau23 = (inco(fac2)-inco(fac1))/(R*d_teta);
-          // flux de tau23 sur la facette a cheval sur les faces fac3 et fac4
+          // flux of tau23 on the facet straddling faces fac3 and fac4
           flux2 = db_diffusivite*tau23*0.25*(surface(fac3)+surface(fac4))*(porosite(fac3)+porosite(fac4));
           resu(fac1) += flux2;
           resu(fac2) -= flux2;
         }
-      else // seule possibilite ori1 = 2 et ori3 = 0:  arete XZ
+      else // only possibility: ori1 = 2 and ori3 = 0: XZ edge
         {
           double flux3;
-          // Calcul de tau31
+          // Compute tau31
           const double tau31 = (inco(fac4)-inco(fac3))/(xv(fac4,2) - xv(fac3,2));
 
-          // flux de tau31 sur la facette a cheval sur les faces fac1 et fac2
+          // flux of tau31 on the facet straddling faces fac1 and fac2
           flux3 = db_diffusivite*tau31*0.25*(surface(fac1)+surface(fac2))*(porosite(fac1)+porosite(fac2));
           resu(fac3) += flux3;
           resu(fac4) -= flux3;
 
-          // Calcul de tau13
+          // Compute tau13
           const double tau13 = (inco(fac2)-inco(fac1))/(xv(fac2,0) - xv(fac1,0));
-          // flux de tau13 sur la facette a cheval sur les faces fac3 et fac4
+          // flux of tau13 on the facet straddling faces fac3 and fac4
           flux3 = db_diffusivite*tau13*0.25*(surface(fac3)+surface(fac4))*(porosite(fac3)+porosite(fac4));
           resu(fac1) += flux3;
           resu(fac2) -= flux3;
@@ -276,10 +276,10 @@ void Op_Diff_VDF_Face_Axi_base::ajouter_aretes_mixtes_internes(const DoubleTab& 
 
 DoubleTab& Op_Diff_VDF_Face_Axi_base::ajouter(const DoubleTab& inco,  DoubleTab& resu) const
 {
-  ajouter_elem(inco,resu); // Boucle sur les elements
-  if (dimension == 3) ajouter_elem_3D(inco,resu); // Boucle sur les elements supplementaires si 3D
-  ajouter_aretes_bords(inco, resu); // Boucle sur les aretes bord
-  ajouter_aretes_mixtes_internes(inco, resu); // Boucle sur les aretes mixtes et internes
+  ajouter_elem(inco,resu); // Loop over elements
+  if (dimension == 3) ajouter_elem_3D(inco,resu); // Loop over extra elements if 3D
+  ajouter_aretes_bords(inco, resu); // Loop over boundary edges
+  ajouter_aretes_mixtes_internes(inco, resu); // Loop over mixed and internal edges
   return resu;
 }
 
@@ -316,23 +316,23 @@ void Op_Diff_VDF_Face_Axi_base::ajouter_contribution_elem(const DoubleTab& inco,
   for (int num_elem = 0; num_elem < le_dom_vdf->nb_elem(); num_elem++)
     {
       const int fx0 = elem_faces(num_elem,0), fx1 = elem_faces(num_elem,dimension), fy0 = elem_faces(num_elem,1), fy1 = elem_faces(num_elem,1+dimension);
-      // Calcul de tau11
+      // Compute tau11
       const double tau11 = 1/(xv(fx1,0) - xv(fx0,0));
 
-      // Calcul de tau22
+      // Compute tau22
       const double R = xp(num_elem,0);
       double d_teta = xv(fy1,1) - xv(fy0,1);
       if (d_teta < 0) d_teta += deux_pi;
 
       double tau22 = 1/(R*d_teta);
-      // termes supplementaires en axi
+      // extra terms in axi
       tau22 += 0.5/R;
       const double flux_X = tau11*nu_(num_elem)*0.5*(surface(fx0)+surface(fx1));
       const double flux_Y = tau22*nu_(num_elem)*0.5*(surface(fy0)+surface(fy1));
       fill_coeff_matrice_morse(fx0,fx1,flux_X,matrice);
       fill_coeff_matrice_morse(fy0,fy1,flux_Y,matrice);
 
-      // Termes supplementaires dans le laplacien en axi : Ils sont integres comme des termes sources
+      // Extra terms in the axisymmetric Laplacian: integrated as source terms
       const double coef_laplacien_axi = +0.5*tau22*nu_(num_elem);
 
       for (auto k = tab1[fx0]-1; k < tab1[fx0+1]-1; k++)
@@ -348,7 +348,7 @@ void Op_Diff_VDF_Face_Axi_base::ajouter_contribution_elem_3D(Matrice_Morse& matr
   for (int num_elem = 0; num_elem < le_dom_vdf->nb_elem(); num_elem++)
     {
       const int fz0 = elem_faces(num_elem,2), fz1 = elem_faces(num_elem,2+dimension);
-      // Calcul de tau33
+      // Compute tau33
       const double tau33 = 1/(xv(fz1,2) - xv(fz0,2));
       const double flux_Z = tau33*nu_(num_elem)*0.5*(surface(fz0)+surface(fz1));
       fill_coeff_matrice_morse(fz0,fz1,flux_Z,matrice);
@@ -373,17 +373,17 @@ void Op_Diff_VDF_Face_Axi_base::ajouter_contribution_aretes_bords(Matrice_Morse&
             const int fac1 = Qdm(n_arete,0), fac2 = Qdm(n_arete,1), fac3 = Qdm(n_arete,2), signe  = Qdm(n_arete,3), ori1 = orientation(fac1), ori3 = orientation(fac3);
             const double db_diffusivite = nu_mean_2_pts_(face_voisins(fac3,0),face_voisins(fac3,1));
 
-            if (ori1 == 0) // bord d'equation R = cte
+            if (ori1 == 0) // boundary with equation R = const
               {
                 double flux1;
-                if (ori3 == 1)  // flux de tau12 a travers le bord
+                if (ori3 == 1)  // flux of tau12 through the boundary
                   {
                     double dist3 = xv(fac3,0)-xv(fac1,0);
                     if (n_type != TypeAreteBordVDF::PAROI_PAROI) dist3 *= 1;
                     const double tau12 = 1/dist3;
                     flux1 = db_diffusivite*tau12*0.25*(surface(fac1)+surface(fac2))*(porosite(fac1)+porosite(fac2));
                   }
-                else //if (ori3 == 2)  flux de tau13 a travers le bord
+                else //if (ori3 == 2)  flux of tau13 through the boundary
                   {
                     assert (ori3 == 2);
                     double dist3 = xv(fac3,0)-xv(fac1,0);
@@ -395,7 +395,7 @@ void Op_Diff_VDF_Face_Axi_base::ajouter_contribution_aretes_bords(Matrice_Morse&
                 for (auto k = tab1[fac3]-1; k < tab1[fac3+1]-1; k++)
                   if (tab2[k]-1 == fac3) coeff[k] += signe*flux1;
               }
-            else if (ori1 == 1) // bord d'equation teta = cte
+            else if (ori1 == 1) // boundary with equation theta = const
               {
                 const double R = xv(fac3,0);
                 double d_teta = xv(fac3,1) - xv(fac1,1);
@@ -404,11 +404,11 @@ void Op_Diff_VDF_Face_Axi_base::ajouter_contribution_aretes_bords(Matrice_Morse&
                 double dist3  = R*d_teta;
                 if (n_type != TypeAreteBordVDF::PAROI_PAROI) dist3 *= 1;
 
-                if (ori3 == 0) // flux de tau21 a travers le bord
+                if (ori3 == 0) // flux of tau21 through the boundary
                   {
                     double tau21 = 1/dist3;
 
-                    // Terme supplementaire en axi
+                    // Extra term in axi
                     tau21 -= 0.5/R;
 
                     const double flux2 = db_diffusivite*tau21*0.25*(surface(fac1)+surface(fac2))*(porosite(fac1)+porosite(fac2));
@@ -416,7 +416,7 @@ void Op_Diff_VDF_Face_Axi_base::ajouter_contribution_aretes_bords(Matrice_Morse&
                     for (auto k = tab1[fac3]-1; k < tab1[fac3+1]-1; k++)
                       if (tab2[k]-1 == fac3) coeff[k] += signe*flux2;
 
-                    // Termes supplementaires dans le laplacien en axi : Ils sont integres comme des termes sources
+                    // Extra terms in the axisymmetric Laplacian: integrated as source terms
                     const double coef_laplacien_axi = 0.5*db_diffusivite*tau21;
 
                     for (auto k = tab1[fac1]-1; k < tab1[fac1+1]-1; k++)
@@ -425,7 +425,7 @@ void Op_Diff_VDF_Face_Axi_base::ajouter_contribution_aretes_bords(Matrice_Morse&
                     for (auto k = tab1[fac2]-1; k < tab1[fac2+1]-1; k++)
                       if (tab2[k]-1 == fac2) coeff[k] += coef_laplacien_axi*volumes_entrelaces(fac2)*porosite(fac2)/xv(fac2,0);
                   }
-                else // if (ori3 == 2) flux de tau23 a travers le bord
+                else // if (ori3 == 2) flux of tau23 through the boundary
                   {
                     assert(ori3 == 2);
                     const double tau23 = 1/dist3;
@@ -434,17 +434,17 @@ void Op_Diff_VDF_Face_Axi_base::ajouter_contribution_aretes_bords(Matrice_Morse&
                       if (tab2[k]-1 == fac3) coeff[k] += signe*flux3;
                   }
               }
-            else // (ori1 == 2) bord d'equation Z = cte
+            else // (ori1 == 2) boundary with equation Z = const
               {
                 double flux4;
-                if (ori3 == 0) // flux de tau31 a travers le bord
+                if (ori3 == 0) // flux of tau31 through the boundary
                   {
                     double dist3 = xv(fac3,2)-xv(fac1,2);
                     if (n_type != TypeAreteBordVDF::PAROI_PAROI) dist3 *= 1;
                     const double tau31 = 1/dist3;
                     flux4 = db_diffusivite*tau31*0.25*(surface(fac1)+surface(fac2))*(porosite(fac1)+porosite(fac2));
                   }
-                else //if (ori3 == 1) flux de tau32 a travers le bord
+                else //if (ori3 == 1) flux of tau32 through the boundary
                   {
                     assert(ori3 == 1);
                     double dist3 = xv(fac3,2)-xv(fac1,2);
@@ -481,22 +481,22 @@ void Op_Diff_VDF_Face_Axi_base::ajouter_contribution_aretes_mixtes_internes(Matr
       const int fac1 = Qdm(n_arete,0), fac2 = Qdm(n_arete,1), fac3 = Qdm(n_arete,2), fac4 = Qdm(n_arete,3), ori1 = orientation(fac1), ori3 = orientation(fac3);
       const double db_diffusivite = nu_mean_4_pts_(fac3,fac4);
 
-      if (ori1 == 1)  // (seule possibilite : ori3 =0)  Arete XY
+      if (ori1 == 1)  // (only possibility: ori3 =0)  XY edge
         {
           double flux1;
-          // Calcul de tau21
+          // Compute tau21
           const double R = xv(fac3,0);
           double d_teta = xv(fac4,1) - xv(fac3,1);
           if (d_teta < 0) d_teta += deux_pi;
           double tau21 = 1/(R*d_teta);
-          // Terme supplementaire en axi
+          // Extra term in axi
           tau21 -= 0.5/R;
 
-          // flux de tau21 sur la facette a cheval sur les faces fac1 et fac2
+          // flux of tau21 on the facet straddling faces fac1 and fac2
           flux1 = db_diffusivite*tau21*0.25*(surface(fac1)+surface(fac2))*(porosite(fac1)+porosite(fac2));
           fill_coeff_matrice_morse(fac3,fac4,flux1,matrice);
 
-          // Termes supplementaires dans le laplacien en axi : Ils sont integres comme des termes sources
+          // Extra terms in the axisymmetric Laplacian: integrated as source terms
           const double coef_laplacien_axi = 0.5*db_diffusivite*tau21;
           for (auto k = tab1[fac1]-1; k < tab1[fac1+1]-1; k++)
             if (tab2[k]-1 == fac1) coeff[k] += coef_laplacien_axi*volumes_entrelaces(fac1)*porosite(fac1)/xv(fac1,0);
@@ -504,47 +504,47 @@ void Op_Diff_VDF_Face_Axi_base::ajouter_contribution_aretes_mixtes_internes(Matr
           for (auto k = tab1[fac2]-1; k < tab1[fac2+1]-1; k++)
             if (tab2[k]-1 == fac2) coeff[k] += coef_laplacien_axi*volumes_entrelaces(fac2)*porosite(fac2)/xv(fac2,0);
 
-          // Calcul de tau12
+          // Compute tau12
           const double tau12 = 1/(xv(fac2,0) - xv(fac1,0));
 
-          // flux de tau12 sur la facette a cheval sur les faces fac3 et fac4
+          // flux of tau12 on the facet straddling faces fac3 and fac4
           flux1 = db_diffusivite*tau12*0.25*(surface(fac3)+surface(fac4))*(porosite(fac3)+porosite(fac4));
           fill_coeff_matrice_morse(fac1,fac2,flux1,matrice);
         }
-      else if (ori3 == 1) // (seule possibilite ori1 = 2) arete YZ
+      else if (ori3 == 1) // (only possibility: ori1 = 2) YZ edge
         {
           double flux2;
-          // Calcul de tau32
+          // Compute tau32
           const double tau32 = 1/(xv(fac4,2) - xv(fac3,2));
 
-          // flux de tau32 sur la facette a cheval sur les faces fac1 et fac2
+          // flux of tau32 on the facet straddling faces fac1 and fac2
           flux2 = db_diffusivite*tau32*0.25*(surface(fac1)+surface(fac2))*(porosite(fac1)+porosite(fac2));
           fill_coeff_matrice_morse(fac3,fac4,flux2,matrice);
 
-          // Calcul de tau23
+          // Compute tau23
           const double R = xv(fac1,0);
           double d_teta = xv(fac2,1) - xv(fac1,1);
           if (d_teta < 0) d_teta += deux_pi;
           const double tau23 = 1/(R*d_teta);
 
-          // flux de tau23 sur la facette a cheval sur les faces fac3 et fac4
+          // flux of tau23 on the facet straddling faces fac3 and fac4
           flux2 = db_diffusivite*tau23*0.25*(surface(fac3)+surface(fac4))*(porosite(fac3)+porosite(fac4));
           fill_coeff_matrice_morse(fac1,fac2,flux2,matrice);
         }
-      else // seule possibilite ori1 = 2 et ori3 = 0:  arete XZ
+      else // only possibility: ori1 = 2 and ori3 = 0: XZ edge
         {
           double flux3;
-          // Calcul de tau31
+          // Compute tau31
           const double tau31 = 1/(xv(fac4,2) - xv(fac3,2));
 
-          // flux de tau31 sur la facette a cheval sur les faces fac1 et fac2
+          // flux of tau31 on the facet straddling faces fac1 and fac2
           flux3 = db_diffusivite*tau31*0.25*(surface(fac1)+surface(fac2))*(porosite(fac1)+porosite(fac2));
           fill_coeff_matrice_morse(fac3,fac4,flux3,matrice);
 
-          // Calcul de tau13
+          // Compute tau13
           const double tau13 = 1/(xv(fac2,0) - xv(fac1,0));
 
-          // flux de tau13 sur la facette a cheval sur les faces fac3 et fac4
+          // flux of tau13 on the facet straddling faces fac3 and fac4
           flux3 = db_diffusivite*tau13*0.25*(surface(fac3)+surface(fac4))*(porosite(fac3)+porosite(fac4));
           fill_coeff_matrice_morse(fac1,fac2,flux3,matrice);
         }
@@ -553,10 +553,10 @@ void Op_Diff_VDF_Face_Axi_base::ajouter_contribution_aretes_mixtes_internes(Matr
 
 void Op_Diff_VDF_Face_Axi_base::ajouter_contribution(const DoubleTab& inco, Matrice_Morse& matrice ) const
 {
-  ajouter_contribution_elem(inco,matrice); // Boucle sur les elements
-  if (dimension == 3) ajouter_contribution_elem_3D(matrice); // Boucle sur les elements supplementaires si 3D
-  ajouter_contribution_aretes_bords(matrice); // Boucle sur les aretes bord
-  ajouter_contribution_aretes_mixtes_internes(matrice); // Boucle sur les aretes mixtes et internes
+  ajouter_contribution_elem(inco,matrice); // Loop over elements
+  if (dimension == 3) ajouter_contribution_elem_3D(matrice); // Loop over extra elements if 3D
+  ajouter_contribution_aretes_bords(matrice); // Loop over boundary edges
+  ajouter_contribution_aretes_mixtes_internes(matrice); // Loop over mixed and internal edges
 }
 
 void Op_Diff_VDF_Face_Axi_base::contribue_au_second_membre(DoubleTab& resu) const
@@ -575,7 +575,7 @@ void Op_Diff_VDF_Face_Axi_base::contribue_au_second_membre(DoubleTab& resu) cons
             const int ori1 = orientation(fac1), ori3 = orientation(fac3), rang1 = fac1 - le_dom_vdf->premiere_face_bord(), rang2 = fac2 - le_dom_vdf->premiere_face_bord();
             double vit_imp, tps = inconnue->temps();
 
-            if (n_type == TypeAreteBordVDF::PAROI_FLUIDE) // arete paroi_fluide :il faut determiner qui est la face fluide
+            if (n_type == TypeAreteBordVDF::PAROI_FLUIDE) // wall_fluid edge: we must determine which is the fluid face
               {
                 if (est_egal(inconnue->valeurs()(fac1), 0))
                   vit_imp = Champ_Face_get_val_imp_face_bord(tps, rang2, ori3, la_zcl_vdf.valeur());
@@ -586,10 +586,10 @@ void Op_Diff_VDF_Face_Axi_base::contribue_au_second_membre(DoubleTab& resu) cons
 
             const double db_diffusivite =  nu_mean_2_pts_(face_voisins(fac3,0),face_voisins(fac3,1));
 
-            if (ori1 == 0) // bord d'equation R = cte
+            if (ori1 == 0) // boundary with equation R = const
               {
                 double flux1;
-                if (ori3 == 1)  // flux de tau12 a travers le bord
+                if (ori3 == 1)  // flux of tau12 through the boundary
                   {
                     double dist3 = xv(fac3,0)-xv(fac1,0);
                     if (n_type != TypeAreteBordVDF::PAROI_PAROI) dist3 *= 1;
@@ -606,36 +606,36 @@ void Op_Diff_VDF_Face_Axi_base::contribue_au_second_membre(DoubleTab& resu) cons
                   }
                 resu[fac3] += signe*flux1;
               }
-            else if (ori1 == 1) // bord d'equation teta = cte
+            else if (ori1 == 1) // boundary with equation theta = const
               {
                 const double R = xv(fac3,0);
                 double d_teta = xv(fac3,1) - xv(fac1,1);
                 if (d_teta < 0) d_teta += deux_pi;
                 double dist3  = R*d_teta;
                 if (n_type != TypeAreteBordVDF::PAROI_PAROI) dist3 *= 1;
-                if (ori3 == 0) // flux de tau21 a travers le bord
+                if (ori3 == 0) // flux of tau21 through the boundary
                   {
-                    // Terme supplementaire en axi
+                    // Extra term in axi
                     const double tau21 = (-vit_imp)/dist3;
                     const double flux2 = db_diffusivite*tau21*0.25*(surface(fac1)+surface(fac2))*(porosite(fac1)+porosite(fac2));
                     resu[fac3] += signe*flux2;
 
-                    // Termes supplementaires dans le laplacien en axi : Ils sont integres comme des termes sources
+                    // Extra terms in the axisymmetric Laplacian: integrated as source terms
                     const double coef_laplacien_axi = 0.5*db_diffusivite*tau21;
                     resu(fac1) += coef_laplacien_axi*volumes_entrelaces(fac1)*porosite(fac1)/xv(fac1,0);
                     resu(fac2) += coef_laplacien_axi*volumes_entrelaces(fac2)*porosite(fac2)/xv(fac2,0);
                   }
-                else if (ori3 == 2) // flux de tau23 a travers le bord
+                else if (ori3 == 2) // flux of tau23 through the boundary
                   {
                     const double tau23 = (-vit_imp)/dist3;
                     const double flux3 = db_diffusivite*tau23*0.25*(surface(fac1)+surface(fac2))*(porosite(fac1)+porosite(fac2));
                     resu[fac3] += signe*flux3;
                   }
               }
-            else // (ori1 == 2) bord d'equation Z = cte
+            else // (ori1 == 2) boundary with equation Z = const
               {
                 double flux4;
-                if (ori3 == 0)  // flux de tau31 a travers le bord
+                if (ori3 == 0)  // flux of tau31 through the boundary
                   {
                     double dist3 = xv(fac3,2) - xv(fac1,2);
                     if (n_type != TypeAreteBordVDF::PAROI_PAROI) dist3 *= 1;

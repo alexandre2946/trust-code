@@ -19,14 +19,14 @@
 #include <Objet_U.h>
 class MD_Vector;
 
-/*! Options de resize:
-*  RESIZE_OPTIONS::NOCOPY_NOINIT: ne pas copier les anciennes valeurs, ne pas initialiser les nouvelles
-*  RESIZE_OPTIONS::COPY_NOINIT: copier les anciennes, ne pas initialiser les nouvelles
-*  RESIZE_OPTIONS::COPY_INIT: copier les anciennes et initialiser les nouvelles a zero
+/*! Resize options:
+*  RESIZE_OPTIONS::NOCOPY_NOINIT: do not copy old values, do not initialize new ones
+*  RESIZE_OPTIONS::COPY_NOINIT: copy old values, do not initialize new ones
+*  RESIZE_OPTIONS::COPY_INIT: copy old values and initialize new ones to zero
 */
 enum class RESIZE_OPTIONS { NOCOPY_NOINIT, COPY_NOINIT, COPY_INIT };
 
-/*! Options de stockage */
+/*! Storage options */
 enum class STORAGE { STANDARD, TEMP_STORAGE };
 
 /*! GPU Data location */

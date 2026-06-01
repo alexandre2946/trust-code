@@ -18,14 +18,14 @@
 
 #include <Interprete.h>
 
-/*! @brief Classe Axi_2D Cette classe est un interprete qui sert a lire l'attribut 2D_axi.
+/*! @brief Class Axi_2D This class is an interpreter that serves to read the 2D_axi attribute.
  *
  *     Directive:
  *        2D_Axi
- *     Cette directive optionelle permets de faire les calculs en
- *     coordonnees axisymetrique pour des ecoulements ayant une symetrie axiale.
- *      En l'absence de cette directive les calculs
- *     se font en coordonnees cartesiennes.
+ *     This optional directive allows calculations to be done in
+ *     axisymmetric coordinates for flows with axial symmetry.
+ *     In the absence of this directive the calculations
+ *     are done in Cartesian coordinates.
  *
  * @sa Interprete Objet_U
  */

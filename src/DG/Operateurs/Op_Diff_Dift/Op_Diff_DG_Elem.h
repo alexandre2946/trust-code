@@ -59,7 +59,7 @@ class Op_Diff_DG_Elem: public Op_Diff_DG_base
   Declare_instanciable( Op_Diff_DG_Elem );
 
 public:
-  virtual void calculer_flux_bord(const DoubleTab& inco) const = delete; //TODO DG a calculer dans interface_blocs
+  virtual void calculer_flux_bord(const DoubleTab& inco) const = delete; //TODO DG to be computed in interface_blocs
 
   void modifier_pour_Cl(Matrice_Morse& la_matrice, DoubleTab& secmem) const override { }
   void completer() override;

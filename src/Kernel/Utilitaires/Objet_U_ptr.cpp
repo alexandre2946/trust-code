@@ -35,8 +35,8 @@ Sortie& Objet_U_ptr::printOn(Sortie& os) const
 
 Entree& Objet_U_ptr::readOn(Entree& is)
 {
-  detach(); // Efface l'objet existant
-  static Nom nom_type; // static pour le pas creer un Objet_U a chaque fois
+  detach(); // Clear the existing object
+  static Nom nom_type; // static to avoid creating an Objet_U on every call
   is >> nom_type;
   Objet_U * objet = nullptr;
   if (nom_type != "vide")
@@ -46,22 +46,22 @@ Entree& Objet_U_ptr::readOn(Entree& is)
     }
 
   set_Objet_U_ptr(objet);
-  if (objet) is >> (*objet); // On lit
+  if (objet) is >> (*objet); // Read the object
 
   return is;
 }
 
-/*! @brief Destructeur.
+/*! @brief Destructor.
  *
- * Il ne detruit pas l'objet en reference
+ * It does not destroy the referenced object.
  *
  */
 Objet_U_ptr::~Objet_U_ptr()
 {
-  cle_ = -2; // Paranoia : on rend le pointeur invalide
+  cle_ = -2; // Paranoia: invalidate the pointer
 }
 
-/*! @brief construit un pointeur nul (cle a -1)
+/*! @brief Builds a null pointer (key set to -1).
  *
  */
 Objet_U_ptr::Objet_U_ptr() : cle_(-1), ptr_object_id_(-1) { }
@@ -82,13 +82,13 @@ int Objet_U_ptr::associer_(Objet_U& objet)
 }
 
 
-/*! @brief Verifie si le pointeur est valide.
+/*! @brief Checks if the pointer is valid.
  *
- * Le pointeur est valide si cle_==-1
- *      ou si la_memoire().objet_u(cle_) a le meme object_id_ que
- *         celui enregistre dans ptr_object_id_.
- *    Si le pointeur n'est pas valide, arret du programme.
- *  Renvoie l'adresse de l'objet pointe (de type Objet_U)
+ * The pointer is valid if cle_==-1
+ *      or if la_memoire().objet_u(cle_) has the same object_id_ as
+ *         the one registered in ptr_object_id_.
+ *    If the pointer is not valid, the program stops.
+ *  Returns the address of the pointed object (of type Objet_U).
  *
  */
 Objet_U * Objet_U_ptr::get_Objet_U_ptr_check() const
@@ -109,28 +109,28 @@ Objet_U * Objet_U_ptr::get_Objet_U_ptr_check() const
           Cerr << "\n ptr_object_id_ = " << ptr_object_id_;
           Cerr << "\n id             = " << id;
           std::cerr << "\n &la_memoire().objet_u(cle_) = " << addr << std::endl;
-          // Si ca plante a cet endroit, c'est que l'objet en reference
-          // a ete detruit et que la reference est encore utilisee.
+          // If it crashes at this point, it means the referenced object
+          // has been destroyed but the reference is still in use.
           exit();
         }
     }
   return 0;
 }
 
-/*! @brief Verifie que l'objet pointe par ptr est d'un type acceptable pour le pointeur (avec get_info_ptr)
+/*! @brief Verifies that the object pointed to by ptr is of an acceptable type for the pointer (via get_info_ptr).
  *
  */
 int Objet_U_ptr::check_Objet_U_ptr_type(const Objet_U * ptr) const
 {
-  if (ptr == nullptr) return 1; // Le pointeur nul est valide
+  if (ptr == nullptr) return 1; // The null pointer is valid
 
   const Objet_U& objet = *ptr;
-  // On verifie que l'objet est du bon type :
-  // type accepte par le pointeur :
+  // Check that the object is of the correct type:
+  // type accepted by the pointer:
   const Type_info& type_info_ptr = get_info_ptr();
-  // type de l'objet :
+  // type of the object:
   const Type_info& type_info_obj = *(objet.get_info());
-  // Peut-on convertir type_info_obj en type_info_ptr ?
+  // Can we cast type_info_obj to type_info_ptr?
   if (! type_info_ptr.can_cast(&type_info_obj))
     {
       Cerr << "(PE" << me() << ") ";
@@ -148,25 +148,25 @@ int Objet_U_ptr::check_Objet_U_ptr_type(const Objet_U * ptr) const
 
 
 
-/*! @brief Pour mettre a jour les cles lorsque les Objet_U ont etes renumerotes.
+/*! @brief Updates keys when Objet_U objects have been renumbered.
  *
- * @param (const int* const new_ones) tableau de la nouvelle numerotation
- * @return (int) la nouvelle cle du pointeur
+ * @param (const int* const new_ones) array of new numbering
+ * @return (int) the new key of the pointer
  */
 int Objet_U_ptr::change_num(const int* const new_ones)
 {
   Objet_U::change_num(new_ones);
 
-  // Il ne faut pas faire d'appel a une fonction qui fait "verifie"
-  // car la memoire est en cours de modification.
+  // Do not call a function that does "verifie"
+  // because the memory is currently being modified.
   if (cle_ > -1)
     cle_ = new_ones[cle_];
   return cle_;
 }
 
-/*! @brief Duplique l'Objet_U obj puis change le pointeur vers cette copie.
+/*! @brief Duplicates the Objet_U obj and then changes the pointer to this copy.
  *
- * @param (const Objet_U& obj) reference sur l'Objet_U a copier
+ * @param (const Objet_U& obj) reference to the Objet_U to copy
  */
 void Objet_U_ptr::recopie(const Objet_U& obj)
 {
@@ -176,7 +176,7 @@ void Objet_U_ptr::recopie(const Objet_U& obj)
   set_Objet_U_ptr(& objet);
 }
 
-/*! @brief Renvoie un pointeur sur l'Objet_U associe ATTENTION: l'adresse peut etre nulle (si le pointeur est nul)
+/*! @brief Returns a pointer to the associated Objet_U. WARNING: the address may be null (if the pointer is null).
  *
  */
 Objet_U * Objet_U_ptr::get_Objet_U_ptr() const
@@ -195,7 +195,7 @@ Objet_U * Objet_U_ptr::get_Objet_U_ptr() const
   return (Objet_U*) objet;
 }
 
-/*! @brief Fait pointer *this sur l'objet *ptr L'adresse peut etre nulle (pointeur nul).
+/*! @brief Makes *this point to the object *ptr. The address may be null (null pointer).
  *
  */
 void Objet_U_ptr::set_Objet_U_ptr(Objet_U * ptr)
@@ -210,21 +210,21 @@ void Objet_U_ptr::set_Objet_U_ptr(Objet_U * ptr)
       cle_ = -1;
       ptr_object_id_ = -1;
     }
-  // Il suffit de tester le type ici : si le type est bon ici et qu'ensuite l'object_id_ ne change pas, alors le type est toujours bon.
+  // It is sufficient to check the type here: if the type is correct here and object_id_ does not change afterwards, then the type remains correct.
   assert(check_Objet_U_ptr_type(ptr));
   assert(get_Objet_U_ptr_check() == ptr);
 }
 
-/*! @brief Essaie de creer une instance du type "type".
+/*! @brief Tries to create an instance of type "type".
  *
- * si type n'est pas un type ou type n'est pas instanciable=>arret
- *    si type n'est pas un sous-type du type du pointeur=>retour 0
- *    si ok, renvoie l'adresse de l'objet cree.
+ * If type is not a type or type is not instantiable => stop.
+ *    If type is not a subtype of the pointer type => return 0.
+ *    If ok, returns the address of the created object.
  */
 Objet_U * Objet_U_ptr::typer(const char * type)
 {
-  const Type_info * type_info = Type_info::type_info_from_name(type); // Type_info du type demande
-  const Type_info& type_base = get_info_ptr(); // Type de base du OWN_PTR
+  const Type_info * type_info = Type_info::type_info_from_name(type); // Type_info of the requested type
+  const Type_info& type_base = get_info_ptr(); // Base type of the OWN_PTR
 
   if ( get_Objet_U_ptr()) detach();
 
@@ -255,7 +255,7 @@ Objet_U * Objet_U_ptr::typer(const char * type)
   if (! type_info->has_base(&type_base))
     Cerr << "Error in Deriv_::typer_(const char* const type).\n " << type << " is not a subtype of " << type_base.name() << finl;
   else
-    instance = type_info->instance(); // Cree une instance du type decrit dans type_info
+    instance = type_info->instance(); // Creates an instance of the type described in type_info
 
   set_Objet_U_ptr(instance);
   return instance;

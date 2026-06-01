@@ -23,7 +23,7 @@
 #include <vector>
 #include <set>
 
-/*! @brief classe SETS (semi-implicite + etapes de stabilisation, a la TRACE)
+/*! @brief SETS scheme (semi-implicit + stabilisation steps, TRACE-style).
  *
  * SETS ("Stability-Enhancing Two-Step")
  *
@@ -36,62 +36,62 @@ class SETS: public Simpler
   Declare_instanciable_sans_constructeur(SETS);
 public:
   SETS();
-  Entree& lire(const Motcle&, Entree&) override; /* mot-cle "criteres_convergence" */
-  int nb_valeurs_temporelles_pression() const override /* nombres de valeurs temporelles du champ de pression */
+  Entree& lire(const Motcle&, Entree&) override; /* keyword "criteres_convergence" */
+  int nb_valeurs_temporelles_pression() const override /* number of temporal values for the pressure field */
   {
-    return 3; /* autant que les autres variables */
+    return 3; /* same as other variables */
   }
 
   bool iterer_eqn(Equation_base& equation, const DoubleTab& inconnue, DoubleTab& result, double dt, int numero_iteration, int& ok) override;
   void iterer_NS(Equation_base&, DoubleTab& current, DoubleTab& pression, double, Matrice_Morse&, double, DoubleTrav&, int nb_iter, int& converge, int& ok) override;
 
-  /* elimination par blocs d'un systeme lineaire */
-  // entree : ordre -> groupes de (variables, indice de bloc) a eliminer successivement : par ex. { { {"vitesse", 0 } }, { {"alpha", 0 }, {"temperature", 0 } } }
-  //          inco_p -> nom de l'inconnue principale (ex. : "pression")
-  //          mats, sec : matrices / seconds membres du systeme lineaire mats.d{incos} = {secs}
+  /* block elimination of a linear system */
+  // input : order -> groups of (variables, block index) to be successively eliminated: e.g. { { {"vitesse", 0 } }, { {"alpha", 0 }, {"temperature", 0 } } }
+  //         inco_p -> name of the principal unknown (e.g.: "pression")
+  //         mats, sec : matrices / right-hand sides of the linear system mats.d{incos} = {secs}
   //
   //
-  // sortie : A_p / b_p t.q. d{inco} = A_p.d{inco_p} + b_p
-  //          valeur retour -> 1 si eliminsation reussie, 0 si singularite rencontree
-  // contraintes :  - les inconnues du meme bloc doivent partager un meme MD_Vector
-  //                - pour chaque bloc { i_1, i_2 }, la matrice { mats[i_j][i_k] } doit etre diagonale par blocs par rapport a ce MD_Vector
-  //                - hors cette diagonale, les inconnues d'un blocs ne peuvent dependre que des blocs precedents et de inco_p
+  // output : A_p / b_p s.t. d{inco} = A_p.d{inco_p} + b_p
+  //          return value -> 1 if elimination succeeded, 0 if singularity encountered
+  // constraints: - unknowns in the same block must share a common MD_Vector
+  //              - for each block { i_1, i_2 }, the matrix { mats[i_j][i_k] } must be block-diagonal w.r.t. this MD_Vector
+  //              - outside this diagonal, unknowns in a block may only depend on preceding blocks and on inco_p
   static int eliminer(const std::vector<std::set<std::pair<std::string, int>>> ordre, const std::string inco_p, const std::map<std::string, matrices_t>& mats, const ptabs_t& sec,
                       std::map<std::string, Matrice_Morse>& A_p, tabs_t& b_p);
 
-  /* assemblage d'un systeme en inco_p a partir des expressions d.{inco} : A_p[inco].d{inco_p} + b_p[inco] */
-  //entree : - inco_p -> l'inconnue principale
-  //         - A_p, b_p -> expressions des autres inconnues calculees par eliminer()
-  //         - mats, sec -> systeme lineaire contenant une equation sur inco_p (second membre dans sec[inco_p], jacobienne dans mats[inco_p])
+  /* assembly of a system in inco_p from the expressions d.{inco} : A_p[inco].d{inco_p} + b_p[inco] */
+  // input : - inco_p -> the principal unknown
+  //         - A_p, b_p -> expressions for the other unknowns computed by eliminer()
+  //         - mats, sec -> linear system containing an equation on inco_p (right-hand side in sec[inco_p], Jacobian in mats[inco_p])
   //
-  //sortie : systeme matrice.d{inco_p} = secmem
+  // output : system matrice.d{inco_p} = secmem
   //
-  //contraintes : toutes les autres inconnues doivent etre exprimees dans A_p / b_p
+  // constraints : all other unknowns must be expressed in A_p / b_p
   static void assembler(const std::string inco_p, const std::map<std::string, Matrice_Morse>& A_p, const tabs_t& b_p, const std::map<std::string, matrices_t>& mats, const ptabs_t& sec,
                         Matrice_Morse& matrice, DoubleTab& secmem, int p_degen);
 
-  double get_default_growth_factor() const override /* taux de croissance du pas de temps */
+  double get_default_growth_factor() const override /* time step growth factor */
   {
-    return 1.2; /* en cas de pas de temps rate, on remonte doucement */
+    return 1.2; /* in case of a failed time step, we recover slowly */
   }
 
-  int iteration_ = 0;  //numero de l'iteration en cours (pour les operateurs d'evanescence)
-  int p_degen_ = -1;    //1 si la pression est degeneree (milieu incompressible + pas de CLs de pression imposee)
-  int sets_;      // 1 si on fait l'etape de prediction des vitesses
+  int iteration_ = 0;  // current iteration number (for evanescence operators)
+  int p_degen_ = -1;    // 1 if pressure is degenerate (incompressible medium + no imposed pressure BCs)
+  int sets_;      // 1 if the velocity prediction step is performed
 
   double unknown_positivation(const DoubleTab& uk, DoubleTab& incr); // brings to 0 unknowns that should stay positive
 
 #ifdef PETSCKSP_H
-  /* contexte pour le test de convergence */
+  /* context for the convergence test */
   struct cv_test_t
   {
-    void *defctx; //contexte du test de convergence standard
-    SETS *obj;    //l'objet
-    double eps_alpha; //critere de convergence en alpha
-    Vec t, v; //vecteurs Petsc
+    void *defctx; // context of the standard convergence test
+    SETS *obj;    // the object
+    double eps_alpha; // convergence criterion in alpha
+    Vec t, v; // Petsc vectors
   };
-  DoubleVect norm, residu; //chaque ligne vaut norm * sum alpha, espace pour le residu
-  ArrOfTID ix; //indices pour recuperer le residu
+  DoubleVect norm, residu; // each line equals norm * sum alpha, storage for the residual
+  ArrOfTID ix; // indices to retrieve the residual
   cv_test_t *cv_ctx = nullptr;
   void init_cv_ctx(const DoubleTab& secmem, const DoubleVect& norm);
 #if PETSC_VERSION_GE(3,24,0)
@@ -109,23 +109,23 @@ public:
 
 protected:
 
-  int iter_min_ = 1, iter_max_ = 10; //nombre d'iterations min/max de l'etape non-lineaire
-  int first_call_ = 1; //au tout premier appel, P peut etre tres mauvais -> on ne predit pas v en SETS
-  int pressure_reduction_ = 1; //fait-on la reduction en pression?
+  int iter_min_ = 1, iter_max_ = 10; // min/max number of iterations for the nonlinear step
+  int first_call_ = 1; // at the very first call, P can be very poor -> velocity is not predicted in SETS
+  int pressure_reduction_ = 1; // do we perform pressure reduction?
 
-  /* criteres de convergences par inconnue (en norme Linf), modifiables par le mot-cle "criteres_convergence" */
+  /* convergence criteria per unknown (in Linf norm), modifiable via the "criteres_convergence" keyword */
   std::map<std::string, double> crit_conv_;
 
-  /* matrices de la resolution semi-implicite */
-  std::map<std::string, matrices_t> mats_; // matrices : mats[nom de l'inconnue de l'equation][nom de l'autre inconnue] = matrice
-  Matrice_Bloc mat_semi_impl_; //pour stocker les matrices de mats
-  MD_Vector mdv_semi_impl_;    //MD_Vector associe
-  std::map<std::string, Matrice_Morse> mat_pred_; //matrices de prediction
+  /* matrices of the semi-implicit solve */
+  std::map<std::string, matrices_t> mats_; // matrices: mats[equation unknown name][other unknown name] = matrix
+  Matrice_Bloc mat_semi_impl_; // storage for the mats matrices
+  MD_Vector mdv_semi_impl_;    // associated MD_Vector
+  std::map<std::string, Matrice_Morse> mat_pred_; // prediction matrices
 
-  /* elimination en pression dv = A_p[nom de la variable]. dp + b_p[nom de la variable] */
+  /* pressure elimination: dv = A_p[variable name]. dp + b_p[variable name] */
   std::map<std::string, Matrice_Morse> A_p_;
 
-  /* matrice en pression */
+  /* pressure matrix */
   Matrice_Morse matrice_pression_;
 
   /* Newton out file */
@@ -133,7 +133,7 @@ protected:
   std::vector<double> incr_var_convergence_;
 };
 
-/*! @brief classe ICE (semi-implicte ICE, a la CATHARE 3D)
+/*! @brief ICE scheme (semi-implicit ICE, CATHARE 3D style).
  *
  * @sa SETS
  */
@@ -141,13 +141,13 @@ class ICE: public SETS
 {
   Declare_instanciable(ICE);
 public:
-  bool est_compatible_avec_th_mono() const override /* ce solveur est-il  compatible avec une resolution monolithique de la thermique ? */
+  bool est_compatible_avec_th_mono() const override /* is this solver compatible with a monolithic thermal solve? */
   {
-    return 0; /* non: ICE est explicite en la thermique */
+    return 0; /* no: ICE is explicit in the thermal part */
   }
-  double get_default_facsec_max() const override /* facsec_max recommande */
+  double get_default_facsec_max() const override /* recommended facsec_max */
   {
-    return 1; /* SETS est semi-implicite */
+    return 1; /* SETS is semi-implicit */
   }
 };
 

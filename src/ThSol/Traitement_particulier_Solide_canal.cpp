@@ -38,7 +38,7 @@ Entree& Traitement_particulier_Solide_canal::readOn(Entree& is)
 Entree& Traitement_particulier_Solide_canal::lire(Entree& is)
 {
 
-  // FIN Initialisation
+  // END of initialisation
   Motcle accouverte = "{" , accfermee = "}" ;
   Motcle motbidon, motlu;
   is >> motbidon ;
@@ -57,24 +57,24 @@ Entree& Traitement_particulier_Solide_canal::lire(Entree& is)
             {
             case 0 :
               {
-                // Pour spat, ex u_inst
-                is >> dt_post_inst;      // intervalle de temps de sorties des moyennes spatiales
-                // initialisation pour le calcul des stats spat.
+                // Spatial averages, e.g. u_inst
+                is >> dt_post_inst;      // time interval for spatial average output
+                // initialisation for spatial statistics computation
                 Cerr << "Spatial average parameters read..." << finl;
                 Cerr << "dt_post_inst : " << dt_post_inst << finl;
                 break;
               }
             case 1 :
               {
-                // Pour stats
-                is >> temps_deb;     // temps de debut de calcul des stats temp.
-                is >> temps_fin;     // temps de fin de calcul des stats temp.
-                is >> dt_post_stat;  // intervalle de temps de sorties des stats temp.
-                // initialisation pour le calcul des stats temp.
+                // Time statistics
+                is >> temps_deb;     // start time for temporal statistics computation
+                is >> temps_fin;     // end time for temporal statistics computation
+                is >> dt_post_stat;  // time interval for temporal statistics output
+                // initialisation for temporal statistics computation
                 Cerr << "Reading time statitics parameters..." << finl;
                 Cerr << "Initial time : " << temps_deb << " End time : " << temps_fin << finl;
                 Cerr << "Time interval for output : " << dt_post_stat << finl;
-                // Verif ensuite pour voir si on a rentrer les valeurs specifiques aux calculs des stats spat.
+                // Then check whether the values specific to spatial statistics computation were provided.
                 break;
               }
             case 2 :

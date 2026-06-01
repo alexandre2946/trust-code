@@ -21,11 +21,11 @@
 #include <Pb_Dilatable_Proto.h>
 #include <Pb_QC_base.h>
 
-/*! @brief classe Pb_Thermohydraulique_Turbulent Cette classe represente un probleme de thermohydraulique en fluide quasi compressible
+/*! @brief Turbulent thermohydraulics problem for a quasi-compressible fluid.
  *
- *     avec modelisation de la turbulence:
- *      - Equations de Navier_Stokes en regime turbulent
- *      - Equation d'energie en regime turbulent, sous forme generique (equation de la chaleur)
+ *      Couples:
+ *      - Turbulent Navier-Stokes equations
+ *      - Turbulent energy equation (generic heat equation form)
  *
  * @sa Probleme_base Pb_Thermohydraulique_QC Fluide_Quasi_Compressible
  */

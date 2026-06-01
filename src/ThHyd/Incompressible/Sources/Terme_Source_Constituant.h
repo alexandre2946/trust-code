@@ -24,14 +24,13 @@
 class Champ_base;
 class Champ_Don_base;
 
-/*! @brief Classe Terme_Source_Constituant Cette classe represente un terme source de l'equation de transport des constituants
+/*! @brief Classe Terme_Source_Constituant This class represents a source term of the constituent transport equation
  *
- *     de type degagement volumique de puissance thermique.!!!!A MODIFIER
- *     Un objet Terme_Source_Constituant contient la puissance (OWN_PTR(Champ_base) donne
- *     utilisateur) et des references a la masse volumique (rho) et la chaleur.
- *     specifique (Cp).
+ *     of the volumetric thermal power release type.!!!!TO MODIFY
+ *     A Terme_Source_Constituant object contains the power (OWN_PTR(Champ_base) given
+ *     by the user) and references to the density (rho) and the specific heat (Cp).
  *
- * @sa Classe non instanciable., L'implementation des termes dependra de leur discretisation.
+ * @sa Non-instantiable class., The implementation of the terms will depend on their discretization.
  */
 class Terme_Source_Constituant
 {
@@ -61,10 +60,10 @@ protected:
 };
 
 
-/*! @brief Associe les champs donnes rho (masse volumique) et Cp (chaleur specifique) a l'objet.
+/*! @brief Associates the given fields rho (density) and Cp (specific heat) to the object.
  *
- * @param (Champ_Don_base& rho) champ donne representant la masse volumique
- * @param (Champ_Don_base& cp) champ donne representant la chaleur specifique
+ * @param (Champ_Don_base& rho) given field representing density
+ * @param (Champ_Don_base& cp) given field representing specific heat
  */
 inline void Terme_Source_Constituant::associer_champs(const Champ_base& rho)
 {

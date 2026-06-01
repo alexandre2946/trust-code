@@ -19,16 +19,15 @@
 
 #include <Fluide_base.h>
 
-/*! @brief classe Fluide_Incompressible Cette classe represente un d'un fluide incompressible ainsi que
+/*! @brief Represents an incompressible fluid and its properties:
  *
- *     ses proprietes:
- *         - viscosite cinematique, (mu)
- *         - viscosite dynamique,   (nu)
- *         - masse volumique,       (rho)
- *         - diffusivite,           (alpha)
- *         - conductivite,          (lambda)
- *         - capacite calorifique,  (Cp)
- *         - dilatabilite thermique du constituant (beta_co)
+ *         - kinematic viscosity (mu)
+ *         - dynamic viscosity   (nu)
+ *         - density             (rho)
+ *         - diffusivity         (alpha)
+ *         - conductivity        (lambda)
+ *         - specific heat       (Cp)
+ *         - constituent thermal expansion coefficient (beta_co)
  *
  * @sa Milieu_base
  */

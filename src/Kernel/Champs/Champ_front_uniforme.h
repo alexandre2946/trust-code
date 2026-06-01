@@ -21,10 +21,10 @@
 
 
 
-/*! @brief classe Champ_front_uniforme Classe derivee de Champ_front_base qui represente les
+/*! @brief class Champ_front_uniforme Derived class of Champ_front_base representing
  *
- *      champs aux frontieres uniformes en espace et constants dans
- *      le temps
+ *      boundary fields that are spatially uniform and constant in
+ *      time
  *
  * @sa Champ_front_base Champ_Uniforme
  */

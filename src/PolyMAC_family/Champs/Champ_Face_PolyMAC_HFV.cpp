@@ -42,13 +42,13 @@ Entree& Champ_Face_PolyMAC_HFV::readOn(Entree& is) { return is; }
 
 int Champ_Face_PolyMAC_HFV::fixer_nb_valeurs_nodales(int n)
 {
-  // j'utilise le meme genre de code que dans Champ_Fonc_P0_base sauf que je recupere le nombre de faces au lieu du nombre d'elements
-  // je suis tout de meme etonne du code utilise dans Champ_Fonc_P0_base::fixer_nb_valeurs_nodales() pour recuperer le domaine discrete...
+  // use the same kind of code as in Champ_Fonc_P0_base, but retrieve the number of faces instead of the number of elements
+  // note: the code used in Champ_Fonc_P0_base::fixer_nb_valeurs_nodales() to retrieve the discrete domain is somewhat surprising...
 
-  assert(n == domaine_PolyMAC_HFV().nb_faces() || n < 0); //on accepte a la fois les conventions VEF et VDF
+  assert(n == domaine_PolyMAC_HFV().nb_faces() || n < 0); //accept both VEF and VDF conventions
 
-  // Probleme: nb_comp vaut 2 mais on ne veut qu'une dimension !!!
-  // HACK :
+  // Problem: nb_comp equals 2 but we only want one dimension !!!
+  // HACK:
   const int old_nb_compo = nb_compo_;
   if(nb_compo_ >= dimension) nb_compo_ /= dimension;
 
@@ -63,9 +63,9 @@ void Champ_Face_PolyMAC_HFV::init_auxiliary_variables()
     if (futur(n).size_reelle_ok())
       {
         DoubleTab& vals = futur(n);
-        vals.set_md_vector(MD_Vector()); //on enleve le MD_Vector...
-        vals.resize_dim0(domaine_PolyMAC_HFV().mdv_faces_aretes->get_nb_items_tot()); //...on dimensionne a la bonne taille...
-        vals.set_md_vector(domaine_PolyMAC_HFV().mdv_faces_aretes); //...et on remet le bon MD_Vector
+        vals.set_md_vector(MD_Vector()); //remove the MD_Vector...
+        vals.resize_dim0(domaine_PolyMAC_HFV().mdv_faces_aretes->get_nb_items_tot()); //...resize to the correct size...
+        vals.set_md_vector(domaine_PolyMAC_HFV().mdv_faces_aretes); //...and restore the correct MD_Vector
       }
 }
 
@@ -76,12 +76,12 @@ int Champ_Face_PolyMAC_HFV::reprendre(Entree& fich)
   const Pb_Multiphase * pbm = mon_equation_non_nul() ? (sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()) : nullptr) : nullptr;
   if (pbm) return Champ_Inc_base::reprendre(fich);
 
-  // sinon on fait ca ...
+  // otherwise do this ...
   init_auxiliary_variables();
   return Champ_Inc_base::reprendre(fich);
 }
 
-/* vitesse aux elements */
+/* velocity at elements */
 void Champ_Face_PolyMAC_HFV::interp_ve(const DoubleTab& inco, DoubleTab& val, bool is_vit) const
 {
   const Domaine_PolyMAC_HFV& domaine = domaine_PolyMAC_HFV();
@@ -99,7 +99,7 @@ void Champ_Face_PolyMAC_HFV::interp_ve(const DoubleTab& inco, DoubleTab& val, bo
       }
 }
 
-/* vitesse aux elements sur une liste d'elements */
+/* velocity at elements over a list of elements */
 void Champ_Face_PolyMAC_HFV::interp_ve(const DoubleTab& inco, const IntVect& les_polys, DoubleTab& val, bool is_vit) const
 {
   const Domaine_PolyMAC_HFV& domaine = domaine_PolyMAC_HFV();
@@ -173,5 +173,5 @@ DoubleTab& Champ_Face_PolyMAC_HFV::trace(const Frontiere_dis_base& fr, DoubleTab
 
 int Champ_Face_PolyMAC_HFV::nb_valeurs_nodales() const
 {
-  return domaine_PolyMAC_HFV().nb_faces(); //on ignore les variables auxiliaires
+  return domaine_PolyMAC_HFV().nb_faces(); //ignore auxiliary variables
 }

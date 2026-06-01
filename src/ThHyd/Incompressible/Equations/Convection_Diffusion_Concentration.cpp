@@ -30,10 +30,10 @@ Convection_Diffusion_Concentration::Convection_Diffusion_Concentration():nb_cons
 
 Sortie& Convection_Diffusion_Concentration::printOn(Sortie& is) const { return Convection_Diffusion_std::printOn(is); }
 
-/*! @brief Verifie si l'equation a une concentration et un constituant associe et appelle Convection_Diffusion_std::readOn(Entree&).
+/*! @brief Verifies that the equation has an associated concentration and constituent, then calls Convection_Diffusion_std::readOn(Entree&).
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree& is) le flot d'entree modifie
+ * @param is an input stream
+ * @return the modified input stream
  */
 Entree& Convection_Diffusion_Concentration::readOn(Entree& is)
 {
@@ -42,7 +42,7 @@ Entree& Convection_Diffusion_Concentration::readOn(Entree& is)
   if (terme_convectif.op_non_nul())
     {
       Nom nom="Convection_";
-      nom+=inconnue().le_nom(); // On ajoute le nom de l'inconnue pour prevoir une equation de scalaires passifs
+      nom+=inconnue().le_nom(); // append the unknown name to plan for passive scalar equations
       terme_convectif.set_fichier(nom);
       terme_convectif.set_description((Nom)"Convective mass transfer rate=Integral(-C*u*ndS)[m"+(Nom)(dimension+bidim_axi)+".Mol.s-1]");
     }
@@ -66,7 +66,7 @@ Entree& Convection_Diffusion_Concentration::readOn(Entree& is)
   return is;
 }
 
-// renvoit la masse_molaire, celle ci doit avoir ete lue avant
+// returns the molar mass; it must have been read beforehand
 const double& Convection_Diffusion_Concentration::masse_molaire() const
 {
   assert(masse_molaire_>0);
@@ -93,7 +93,7 @@ int Convection_Diffusion_Concentration::lire_motcle_non_standard(const Motcle& m
 {
   if (mot=="nom_inconnue")
     {
-      Motcle nom; // Question: veut-on le mettre en majuscules ?
+      Motcle nom; // Question: should it be uppercased?
       is >> nom;
       Cerr << "The unknow of a Convection_Diffusion_Concentration equation is renamed"
            << "\n Old name : " << inconnue().le_nom()
@@ -122,10 +122,10 @@ int Convection_Diffusion_Concentration::lire_motcle_non_standard(const Motcle& m
     return Convection_Diffusion_std::lire_motcle_non_standard(mot,is);
 }
 
-/*! @brief Associe un milieu physique a l'equation, le milieu est en fait caste en Constituant et associe a l'equation.
+/*! @brief Associates a physical medium to the equation; the medium is cast to Constituant and associated with the equation.
  *
- * @param (Milieu_base& un_milieu)
- * @throws diffusivite du constituant dans le fluide non definie
+ * @param un_milieu the physical medium to associate
+ * @throws diffusivity of the constituent in the fluid not defined
  */
 void Convection_Diffusion_Concentration::associer_milieu_base(const Milieu_base& un_milieu)
 {
@@ -138,7 +138,7 @@ const Champ_Don_base& Convection_Diffusion_Concentration::diffusivite_pour_trans
   return constituant().diffusivite_constituant();
 }
 
-/*! @brief Discretise l'equation.
+/*! @brief Discretizes the equation.
  *
  */
 void Convection_Diffusion_Concentration::discretiser()
@@ -152,12 +152,12 @@ void Convection_Diffusion_Concentration::discretiser()
   Equation_base::discretiser();
 }
 
-/*! @brief Renvoie le milieu physique de l'equation.
+/*! @brief Returns the physical medium of the equation.
  *
- * (un Constituant upcaste en Milieu_base)
- *     (version const)
+ * (a Constituant upcast to Milieu_base)
+ *     (const version)
  *
- * @return (Milieu_base&) le Constituant upcaste en Milieu_base
+ * @return the Constituant upcast to Milieu_base
  */
 const Milieu_base& Convection_Diffusion_Concentration::milieu() const
 {
@@ -165,11 +165,11 @@ const Milieu_base& Convection_Diffusion_Concentration::milieu() const
 }
 
 
-/*! @brief Renvoie le milieu physique de l'equation.
+/*! @brief Returns the physical medium of the equation.
  *
- * (un Constituant upcaste en Milieu_base)
+ * (a Constituant upcast to Milieu_base)
  *
- * @return (Milieu_base&) le Constituant upcaste en Milieu_base
+ * @return the Constituant upcast to Milieu_base
  */
 Milieu_base& Convection_Diffusion_Concentration::milieu()
 {
@@ -177,11 +177,11 @@ Milieu_base& Convection_Diffusion_Concentration::milieu()
 }
 
 
-/*! @brief Renvoie le constituant (si il a ete associe).
+/*! @brief Returns the constituent (if one has been associated).
  *
- * (version const)
+ * (const version)
  *
- * @return (Constituant&) le constituant associe a l'equation
+ * @return the constituent associated with the equation
  */
 const Constituant& Convection_Diffusion_Concentration::constituant() const
 {
@@ -194,9 +194,9 @@ const Constituant& Convection_Diffusion_Concentration::constituant() const
 }
 
 
-/*! @brief Renvoie le constituant (si il a ete associe).
+/*! @brief Returns the constituent (if one has been associated).
  *
- * @return (Constituant&) le constituant associe a l'equation
+ * @return the constituent associated with the equation
  */
 Constituant& Convection_Diffusion_Concentration::constituant()
 {
@@ -223,28 +223,27 @@ void Convection_Diffusion_Concentration::mettre_a_jour(double temps)
   constituant().mettre_a_jour(temps);
 }
 
-/*! @brief Impression des flux sur les bords sur un flot de sortie.
+/*! @brief Prints the boundary fluxes to an output stream.
  *
- * Appelle Equation_base::impr(Sortie&)
+ * Calls Equation_base::impr(Sortie&)
  *
- * @param (Sortie& os) un flot de sortie
- * @return (int) code de retour propage
+ * @param os an output stream
+ * @return propagated return code
  */
 int Convection_Diffusion_Concentration::impr(Sortie& os) const
 {
   return Equation_base::impr(os);
 }
 
-/*! @brief Renvoie 1 si le mot clef specifie designe un type de champ inconnue de l'equation.
+/*! @brief Returns 1 if the specified keyword designates an unknown field type of the equation.
  *
- *     Renvoie 1 si mot = "concentration"
- *     Renvoie 0 sinon
- *     Si la methode renvoie 1 ch_ref fait reference au champ, dont
- *     le type a ete specifie.
+ *     Returns 1 if mot = "concentration"
+ *     Returns 0 otherwise.
+ *     If the method returns 1, ch_ref holds a reference to the field of the specified type.
  *
- * @param (Motcle& mot) le type du champ dont on veut recuperer la reference
- * @param (OBS_PTR(Champ_base)& ch_ref) la reference sur le champ du type specifie
- * @return (int) renvoie 1 si le champ a ete trouve, 0 sinon
+ * @param mot the field type keyword to look up
+ * @param ch_ref reference to the field of the specified type
+ * @return 1 if the field was found, 0 otherwise
  */
 inline int string2int(char* digit, int& result)
 {
@@ -268,11 +267,11 @@ inline int string2int(char* digit, int& result)
 
 
 
-/*! @brief Renvoie le nom du domaine d'application de l'equation.
+/*! @brief Returns the name of the application domain of the equation.
  *
- * Ici "Concentration".
+ * Here "Concentration".
  *
- * @return (Motcle&) le nom du domaine d'application de l'equation
+ * @return the name of the application domain of the equation
  */
 const Motcle& Convection_Diffusion_Concentration::domaine_application() const
 {

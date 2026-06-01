@@ -19,11 +19,11 @@
 #include <Convection_Diffusion_Chaleur_Fluide_Dilatable_base.h>
 #include <Operateur_Grad.h>
 
-/*! @brief classe Convection_Diffusion_Chaleur_WC Cas particulier de Convection_Diffusion_Chaleur_Fluide_Dilatable_base pour un fluide quasi conpressible
+/*! @brief @brief Particular case of Convection_Diffusion_Chaleur_Fluide_Dilatable_base for a weakly compressible fluid
  *
- *      quand le scalaire subissant le transport est la temperature en gaz parfaits,
- *      ou l'enthalpie en gaz reels.
- *      (generalisation de Convection_Diffusion_Temperature pour les gaz reels)
+ *      when the transported scalar is the temperature for ideal gases,
+ *      or the enthalpy for real gases.
+ *      (generalisation of Convection_Diffusion_Temperature for real gases)
  *
  * @sa Conv_Diffusion_std Convection_Diffusion_Temperature
  */
@@ -41,9 +41,9 @@ public :
   int sauvegarder(Sortie&) const override;
   int reprendre(Entree&) override;
 
-  // l'equation Convection_Diffusion_Chaleur_WC a un terme source supplementaire
+  // the Convection_Diffusion_Chaleur_WC equation has an additional source term:
   //  d P_tot / d t = del P / del t + u.grad(P_tot)
-  // Il faut donc un operateur grad
+  // therefore a gradient operator is needed
   inline const Operateur_Grad& operateur_gradient_WC() const { return Op_Grad_WC_;}
   inline bool is_generic() const override { return true; }
 

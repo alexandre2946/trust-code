@@ -26,7 +26,7 @@ class Equation_base;
 class Conduction;
 class Champ_base;
 
-/*! @brief classe Traitement_particulier_Solide_base
+/*! @brief Base class for special post-processing treatments on solid equations.
  *
  * @sa Conduction
  */
@@ -40,7 +40,7 @@ public :
   virtual Entree& lire(Entree& is) = 0;
   virtual void en_cours_de_resolution(int , DoubleTab& , DoubleTab& ,double)  = 0;
 
-  //Methodes de l interface des champs postraitables
+  //Methods from the postprocessable fields interface
   /////////////////////////////////////////////////////
   void creer_champ(const Motcle&) override;
   const Champ_base& get_champ(const Motcle& nom) const override;

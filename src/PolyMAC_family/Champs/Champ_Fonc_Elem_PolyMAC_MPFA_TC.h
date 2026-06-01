@@ -20,7 +20,7 @@
 #include <Champ_Face_PolyMAC_MPFA.h>
 #include <TRUST_Ref.h>
 
-/*! @brief class Champ_Fonc_Elem_PolyMAC_MPFA_TC for the calculation of the shear rate (taux de cisaillement)
+/*! @brief class Champ_Fonc_Elem_PolyMAC_MPFA_TC for the calculation of the shear rate
  *
  *    This field is a Champ_Fonc_Elem_PolyMAC_MPFA with 1 value per element and per phase :
  *

@@ -22,11 +22,10 @@
 #include <Motcle.h>
 /*! @brief class Op_Conv_VEF_Face
  *
- *   Cette classe represente l'operateur de convection associe a une equation de
- *   transport d'un scalaire.
- *   La discretisation est VEF
- *   Le champ convecte est scalaire ou vecteur de type Champ_P1NC
- *   Le schema de convection est du type Decentre ou Centre
+ *   This class represents the convection operator associated with a scalar transport equation.
+ *   The discretization is VEF.
+ *   The convected field is a scalar or vector of type Champ_P1NC.
+ *   The convection scheme is of upwind or centered type.
  *
  *
  * @sa Operateur_Conv_base
@@ -41,7 +40,7 @@ public:
   void completer() override;
   DoubleTab& ajouter(const DoubleTab& , DoubleTab& ) const override;
   void remplir_fluent() const override;
-  // Methodes pour l implicite.
+  // Methods for implicit scheme.
   inline void dimensionner(Matrice_Morse& ) const override;
   inline void modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const override;
   inline void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override;
@@ -75,7 +74,7 @@ protected:
 };
 
 
-/*! @brief on dimensionne notre matrice au moyen de la methode dimensionner de la classe Op_VEF_Face.
+/*! @brief Size the matrix using the dimensionner method of class Op_VEF_Face.
  *
  */
 inline void Op_Conv_VEF_Face::dimensionner(Matrice_Morse& matrice) const
@@ -83,7 +82,7 @@ inline void Op_Conv_VEF_Face::dimensionner(Matrice_Morse& matrice) const
   Op_VEF_Face::dimensionner(le_dom_vef.valeur(), la_zcl_vef.valeur(), matrice);
 }
 
-/*! @brief On modifie le second membre et la matrice dans le cas des conditions de dirichlet.
+/*! @brief Modify the right-hand side and the matrix for Dirichlet conditions.
  *
  */
 inline void Op_Conv_VEF_Face::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const
@@ -91,7 +90,7 @@ inline void Op_Conv_VEF_Face::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab
   Op_VEF_Face::modifier_pour_Cl(le_dom_vef.valeur(), la_zcl_vef.valeur(), matrice, secmem);
 }
 
-/*! @brief on assemble la matrice des inconnues implicite.
+/*! @brief Assemble the implicit unknown matrix.
  *
  */
 inline void Op_Conv_VEF_Face::contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& matrice) const
@@ -99,7 +98,7 @@ inline void Op_Conv_VEF_Face::contribuer_a_avec(const DoubleTab& inco, Matrice_M
   ajouter_contribution(inco, matrice);
 }
 
-/*! @brief on ajoute la contribution du second membre.
+/*! @brief Add the contribution to the right-hand side.
  *
  */
 inline void Op_Conv_VEF_Face::contribuer_au_second_membre(DoubleTab& resu) const

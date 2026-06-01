@@ -28,8 +28,8 @@ public :
   void residu(const Domaine_dis_base& z, const Champ_Inc_base& ch_inco, OWN_PTR(Champ_Fonc_base)& champ ) const override ;
 
   bool is_PolyMAC_MPFA() const override { return true; }
-  bool is_PolyMAC_HFV() const override { return false; } // attention heritage !
-  bool is_PolyMAC_CDO() const override { return false; } // attention heritage !
+  bool is_PolyMAC_HFV() const override { return false; } // note: inheritance!
+  bool is_PolyMAC_CDO() const override { return false; } // note: inheritance!
 };
 
 #endif /* PolyMAC_MPFA_discretisation_included */

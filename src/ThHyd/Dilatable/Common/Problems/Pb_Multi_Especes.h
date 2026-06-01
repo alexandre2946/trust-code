@@ -22,7 +22,7 @@
 
 /// \cond DO_NOT_DOCUMENT
 class Pb_Multi_Especes
-{ /* pour check sources */ };
+{ /* for source checking */ };
 /// \endcond
 
 class Pb_Thermohydraulique_Especes_QC : public TRUSTProblem_sup_eqns<Pb_Thermohydraulique_QC>

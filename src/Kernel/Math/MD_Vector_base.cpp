@@ -72,7 +72,7 @@ int MD_Vector_base::get_sequential_items_flags(ArrOfBit& flags, int line_size) c
 {
   const int sz = get_nb_items_tot() * line_size;
   flags.resize_array(sz);
-  flags = 1; // valeur par defaut la plus courante (0 est le cas particulier)
+  flags = 1; // most common default value (0 is the special case)
   return get_seq_flags_impl(flags, line_size);
 }
 
@@ -83,7 +83,7 @@ int MD_Vector_base::get_sequential_items_flags(ArrOfInt& flags, int line_size) c
   flags.resize_array(sz);
 
   ArrOfBit flgs_bits(sz);
-  flgs_bits = 1; // valeur par defaut la plus courante (0 est le cas particulier)
+  flgs_bits = 1; // most common default value (0 is the special case)
   int n = get_seq_flags_impl(flgs_bits, line_size);
   for (int i=0; i<sz; i++)
     flags[i] = flgs_bits[i];
@@ -92,18 +92,18 @@ int MD_Vector_base::get_sequential_items_flags(ArrOfInt& flags, int line_size) c
 }
 
 
-/*! @brief methode outil pour ajouter un item a un tableau du genre "blocs" contenant des series de blocs.
+/*! @brief Helper method to append an item to a "blocs"-type array containing series of blocks.
  *
- * .. alonge le bloc precedent ou commence un nouveau bloc si l'item n'est pas contigu avec le bloc precedent.
+ * Extends the previous block or starts a new block if the item is not contiguous with the previous block.
  */
 void MD_Vector_base::append_item_to_blocs(ArrOfInt& blocs, int item)
 {
   int n = blocs.size_array();
-  assert(n % 2 == 0); // le tableau contient des blocs, donc un nombre pair d'elements
-  assert(n == 0 || item >= blocs[n - 1]); // les items doivent etre ajoutes dans l'ordre croissant
+  assert(n % 2 == 0); // the array contains blocks, so an even number of elements
+  assert(n == 0 || item >= blocs[n - 1]); // items must be added in ascending order
   if (n == 0 || blocs[n - 1] != item)
     {
-      // nouveau bloc
+      // new block
       blocs.append_array(item);
       blocs.append_array(item + 1);
     }
@@ -141,12 +141,11 @@ int MD_Vector_base::get_seq_flags_impl(ArrOfBit& flags, int line_size) const
   int j = 0;
   for (int i = nblocs; i; i--)
     {
-      // On pourrait optimiser pour les ArrOfBit en ajoutant a cette classe
-      //  une methode setflag/clearflag(range_begin, range_end);
-      int jmax = (*(ptr++)) * line_size; // debut du prochain bloc d'items sequentiels
+      // Could be optimised for ArrOfBit by adding a setflag/clearflag(range_begin, range_end) method to this class;
+      int jmax = (*(ptr++)) * line_size; // start of the next block of sequential items
       for (; j < jmax; j++)
         flags.clearbit(j);
-      jmax = (*(ptr++)) * line_size; // fin du bloc d'items sequentiels
+      jmax = (*(ptr++)) * line_size; // end of the block of sequential items
       assert(jmax > j);
       count += jmax - j;
       for (; j < jmax; j++)
@@ -154,7 +153,7 @@ int MD_Vector_base::get_seq_flags_impl(ArrOfBit& flags, int line_size) const
           assert(flags[j] == 1); // was already set by default in caller
         }
     }
-  // Fin du remplissage
+  // End of filling
   int sz = get_nb_items_tot() * line_size;
   for (; j < sz; j++)
     flags.clearbit(j);

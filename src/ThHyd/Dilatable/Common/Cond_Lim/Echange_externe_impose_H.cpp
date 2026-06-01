@@ -31,7 +31,7 @@ Entree& Echange_externe_impose_H::readOn(Entree& s)
   return Echange_externe_impose::readOn(s);
 }
 
-/*! @brief Complete les conditions aux limites.
+/*! @brief Complete the boundary conditions.
  *
  */
 void Echange_externe_impose_H::completer()
@@ -41,10 +41,10 @@ void Echange_externe_impose_H::completer()
   modifier_val_imp = 1;
 }
 
-/*! @brief Renvoie la valeur de la temperature imposee sur la i-eme composante du champ de frontiere.
+/*! @brief Returns the imposed temperature value for the i-th component of the boundary field.
  *
- * @param (int i) l'indice de la composante du champ de de frontiere
- * @return (double)
+ * @param i Index of the boundary field component.
+ * @return Imposed temperature value.
  */
 double Echange_externe_impose_H::T_ext(int i) const
 {

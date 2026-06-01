@@ -26,7 +26,9 @@ class Probleme_base;
 class Domaine_Cl_VEF;
 class Domaine_VEF;
 
-/*! @brief class Terme_Source_Canal_RANS_LES_VEF_Face Cette classe concerne un terme source calcule en partie grace a un calcul RANS preliminaire et applique au calcul LES en cours
+/*! @brief class Terme_Source_Canal_RANS_LES_VEF_Face
+ *
+ * @brief This class concerns a source term computed partly using a preliminary RANS calculation and applied to the ongoing LES computation.
  *
  */
 class Terme_Source_Canal_RANS_LES_VEF_Face : public Source_base
@@ -48,9 +50,9 @@ protected :
   OBS_PTR(Domaine_Cl_VEF) le_dom_Cl_VEF;
 
 private :
-  int moyenne= 0; //type de moyenne
+  int moyenne= 0; //averaging type
   int dir = -10; //direction
-  Nom dir_nom; // axe
+  Nom dir_nom; // axis
   double alpha_tau = -100., Ly= -100., u_tau= -100., nu= -100., rayon= -100.;
   double t_moy_start= -100.,f_start= 0.,f_tot= -100.;
   int u_target= 0;

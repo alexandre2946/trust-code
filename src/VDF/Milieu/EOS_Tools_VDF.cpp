@@ -50,9 +50,9 @@ void  EOS_Tools_VDF::associer_domaines(const Domaine_dis_base& dds, const Domain
   tab_rho_face_np1=toto.valeurs();
 }
 
-/*! @brief Calcule la moyenne volumique de la grandeur P0 donnee
+/*! @brief @brief Computes the volumetric average of the given P0 quantity.
  *
- * @return (DoubleTab&) rho discretise par face
+ * @return rho discretized per face.
  */
 double EOS_Tools_VDF::moyenne_vol(const DoubleTab& tab) const
 {
@@ -99,25 +99,25 @@ void EOS_Tools_VDF::calculer_rho_face_np1(const DoubleTab& tab_rhoP0)
     tab_rho_face_demi(face)=(tab_rho_face_np1(face)+tab_rho_face(face))/2.;
 }
 
-/*! @brief Renvoie rho avec la meme discretisation que la vitesse : une valeur par face en VDF
+/*! @brief @brief Returns rho with the same discretization as the velocity: one value per face in VDF.
  *
- * @return (DoubleTab&) rho discretise par face
+ * @return rho discretized per face.
  */
 const DoubleTab& EOS_Tools_VDF::rho_discvit() const
 {
   return tab_rho_face_demi;
 }
 
-/*! @brief Renvoie div(u) avec la meme discretisation que la vitesse : une valeur par face en VDF
+/*! @brief @brief Returns div(u) with the same discretization as the velocity: one value per face in VDF.
  *
- * @return div(u) discretise par face
+ * @return div(u) discretized per face.
  */
 void EOS_Tools_VDF::divu_discvit(const DoubleTab& secmem1, DoubleTab& secmem2)
 {
   assert_espace_virtuel_vect(secmem1);
   int nb_faces_tot = le_dom->nb_faces_tot();
   IntTab& face_voisins = le_dom->face_voisins();
-  //remplissage de div(u) sur les faces
+  //filling div(u) on the faces
   for (int face=0 ; face<nb_faces_tot; face++)
     {
       int nb_comp=0;
@@ -136,9 +136,9 @@ void EOS_Tools_VDF::divu_discvit(const DoubleTab& secmem1, DoubleTab& secmem2)
   secmem2.echange_espace_virtuel();
 }
 
-/*! @brief Calcule le second membre de l'equation de continuite : div(rhoU) = W = -dZ/dT    avec Z=rho
+/*! @brief @brief Computes the right-hand side of the continuity equation: div(rhoU) = W = -dZ/dT with Z=rho.
  *
- * @return rho discretise par face
+ * @return rho discretized per face.
  */
 void EOS_Tools_VDF::secmembre_divU_Z(DoubleTab& tab_W) const
 {
@@ -155,7 +155,7 @@ void EOS_Tools_VDF::secmembre_divU_Z(DoubleTab& tab_W) const
   for (elem=0 ; elem<nb_elem ; elem++)
     tab_dZ(elem) = (tab_rhonp1P0(elem)-tab_rhonP0(elem))/dt;
 
-  // Ajout des termes sources speciaux de l'equation de masse:
+  // Adding special source terms from the mass equation:
   const bool has_mass_flux = (sub_type(Navier_Stokes_Fluide_Dilatable_base, le_fluide().vitesse().equation())) ?
                              ref_cast(Navier_Stokes_Fluide_Dilatable_base, le_fluide().vitesse().equation()).has_source_masse() : false;
 

@@ -22,9 +22,9 @@
 
 class Pb_rayo_semi_transp;
 
-/*! @brief classe Cond_lim_rayo_semi_transp
+/*! @brief Base class for semi-transparent radiation boundary conditions.
  *
- * @sa Ce n'est pas une classe de l'arbre TRUST a elle seule., Cette classe est faite etre une classe mere d'une classe, qui heritera par ailleurs d'Objet_U
+ * @sa This is not a standalone TRUST class on its own. It is designed to be a base class for a class that also inherits from Objet_U.
  */
 class Cond_lim_rayo_semi_transp
 {

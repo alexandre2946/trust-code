@@ -20,7 +20,7 @@
 
 class Matrice_Base;
 //
-// AJOUTER ICI
+// ADD HERE
 
 class Testeur : public Interprete
 {

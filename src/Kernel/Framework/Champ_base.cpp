@@ -42,11 +42,11 @@ Entree& Champ_base::readOn(Entree& is)
   return is >> nom_;
 }
 
-/*! @brief Constructeur par defaut d'un Champ_base.
+/*! @brief Default constructor of a Champ_base.
  *
- * Mets le champ au temps 0, specifie une unite vide,
- *     donne le nom "anonyme" au champ et lui donne une nature
- *     scalaire.
+ * Sets the field at time 0, specifies an empty unit,
+ *     gives the name "anonymous" to the field and gives it a
+ *     scalar nature.
  *
  */
 Champ_base::Champ_base()
@@ -55,17 +55,17 @@ Champ_base::Champ_base()
   fixer_unite(".");
   nommer("anonyme");
   fixer_nature_du_champ(scalaire);
-  nb_compo_ = 1; // Par defaut, champ scalaire
+  nb_compo_ = 1; // By default, scalar field
 }
 
-/*! @brief Calcule les "valeurs" du champ au point de coordonnees "pos".
+/*! @brief Computes the "values" of the field at the point with coordinates "pos".
  *
- * Dans cette classe de base, l'implementation appelle
+ * In this base class, the implementation calls
  *   valeur_aux(const DoubleTab &, DoubleTab &)
  *
- * @param (DoubleVect&) les coordonnees du point ou evaluer le champ
- * @param (DoubleVect& valeurs) En entree: doit avoir la bonne taille (nb_comp), en sortie contient les composantes du champ.
- * @return (reference a "valeurs")
+ * @param (DoubleVect&) the coordinates of the point where to evaluate the field
+ * @param (DoubleVect& valeurs) On input: must have the right size (nb_comp), on output contains the components of the field.
+ * @return (reference to "valeurs")
  */
 DoubleVect& Champ_base::valeur_a(const DoubleVect& pos, DoubleVect& les_valeurs) const
 {
@@ -80,17 +80,17 @@ DoubleVect& Champ_base::valeur_a(const DoubleVect& pos, DoubleVect& les_valeurs)
   return les_valeurs;
 }
 
-/*! @brief provoque une erreur ! doit etre surchargee par les classes derivees
+/*! @brief Causes an error! Must be overridden by derived classes
  *
- *     non virtuelle pure par commodite de developpement !
- *     Renvoie la valeur du champ au point specifie
- *     par ses coordonnees, en indiquant que ce point est
- *     situe dans un element specifie.
+ *     Not pure virtual for convenience of development!
+ *     Returns the value of the field at the point specified
+ *     by its coordinates, indicating that this point is
+ *     located in a specified element.
  *
- * @param (DoubleVect&) les coordonnees du point de calcul
- * @param (DoubleVect& les_valeurs) la valeur du champ au point specifie
- * @param (int) l'element dans lequel est situe le point de calcul
- * @return (DoubleVect&) la valeur du champ au point specifie
+ * @param (DoubleVect&) the coordinates of the calculation point
+ * @param (DoubleVect& les_valeurs) the value of the field at the specified point
+ * @param (int) the element in which the calculation point is located
+ * @return (DoubleVect&) the value of the field at the specified point
  */
 DoubleVect& Champ_base::valeur_a_elem(const DoubleVect& ,
                                       DoubleVect& les_valeurs,
@@ -102,13 +102,13 @@ DoubleVect& Champ_base::valeur_a_elem(const DoubleVect& ,
   return les_valeurs;
 }
 
-/*! @brief Calcule la valeur ponctuelle de la composante "compo" du champ au point de coordonnees pos.
+/*! @brief Computes the point value of the component "compo" of the field at the point with coordinates pos.
  *
- *     Dans la classe de base, l'implementation appelle
+ *     In the base class, the implementation calls
  *     valeur_a(const DoubleVect &, DoubleVect &)
  *
- * @param (DoubleVect&) les coordonnees du point de calcul
- * @param (int) l'index de la composante du champ a calculer
+ * @param (DoubleVect&) the coordinates of the calculation point
+ * @param (int) the index of the component of the field to calculate
  * @return (double)
  */
 double Champ_base::valeur_a_compo(const DoubleVect& pos, int compo) const
@@ -119,9 +119,9 @@ double Champ_base::valeur_a_compo(const DoubleVect& pos, int compo) const
   return x;
 }
 
-/*! @brief provoque une erreur ! doit etre surchargee par les classes derivees
+/*! @brief Causes an error! Must be overridden by derived classes
  *
- *  non virtuelle pure par commodite de developpement !
+ *  Not pure virtual for convenience of development!
  *
  */
 double Champ_base::valeur_a_elem_compo(const DoubleVect&, int ,int ) const
@@ -132,8 +132,8 @@ double Champ_base::valeur_a_elem_compo(const DoubleVect&, int ,int ) const
   return 0;
 }
 
-/*! @brief Cette methode, generique mais lente (calcul des centres de gravite, remplissage les_poly, utilisation des fonctions de forme dans le Champ discretise)
- * peut etre surchargee par le champ dicretise pour une implementation beaucoup plus rapide
+/*! @brief This method, generic but slow (calculation of gravity centers, filling les_poly, use of shape functions in the discretized field)
+ * can be overridden by the discretized field for a much faster implementation
  */
 DoubleTab& Champ_base::valeur_aux_centres_de_gravite(const Domaine& dom, DoubleTab& les_valeurs) const
 {
@@ -145,12 +145,12 @@ DoubleTab& Champ_base::valeur_aux_centres_de_gravite(const Domaine& dom, DoubleT
   if(sub_type(Champ_Inc_base, *this))
     {
       const Domaine_VF& zvf = ref_cast(Domaine_VF,ref_cast(Champ_Inc_base, *this).domaine_dis_base());
-      // PL: ToDo Kokkos kernel host garde car bug difficile a trouver (cas decroissance_ktau_jdd1 avec TrioCFD):
-      // stencil.append_line() alloue de la memoire via un resize() sur une memoire HOST deja allouee sur le DEVICE !
-      // Probablement, une memoire DEVICE non correctement desallouee dans un mecanisme PolyMAC_CDO non utilise en VEF...
+      // PL: ToDo Kokkos kernel host kept because difficult-to-find bug (case decroissance_ktau_jdd1 with TrioCFD):
+      // stencil.append_line() allocates memory via a resize() on HOST memory already allocated on DEVICE!
+      // Probably, DEVICE memory not properly deallocated in a PolyMAC_CDO mechanism not used in VEF...
       if (zvf.xp().isDataOnDevice())
         {
-          // Pour eviter un resize par nb_elem_tot par appel a xp()
+          // To avoid a resize by nb_elem_tot per call to xp()
           CDoubleTabView xp = zvf.xp().view_ro();
           DoubleTabView positions_v = positions.view_wo();
           Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__),
@@ -186,15 +186,15 @@ DoubleTab& Champ_base::valeur_aux_centres_de_gravite(const Domaine& dom, DoubleT
   return valeur_aux_elems(positions, les_polys, les_valeurs);
 }
 
-/*! @brief Provoque une erreur ! Doit etre surchargee par les classes derivees
+/*! @brief Causes an error! Must be overridden by derived classes
  *
- *     non virtuelle pure par commodite de developpement !
- *     Renvoie les valeurs du champ aux points specifies
- *     par leurs coordonnees.
+ *     Not pure virtual for convenience of development!
+ *     Returns the values of the field at the specified points
+ *     by their coordinates.
  *
- * @param (DoubleTab&) le tableau des coordonnees des points de calcul
- * @param (DoubleTab& les_valeurs) le tableau des valeurs du champ aux points specifies
- * @return (DoubleTab&) le tableau des valeurs du champ aux points specifies
+ * @param (DoubleTab&) the array of coordinates of the calculation points
+ * @param (DoubleTab& les_valeurs) the array of field values at the specified points
+ * @return (DoubleTab&) the array of field values at the specified points
  */
 DoubleTab& Champ_base::valeur_aux(const DoubleTab& ,
                                   DoubleTab& les_valeurs) const
@@ -205,23 +205,23 @@ DoubleTab& Champ_base::valeur_aux(const DoubleTab& ,
   return les_valeurs;
 }
 
-/*! @brief Idem que valeur_aux(const DoubleTab &, DoubleTab &), mais calcule uniquement la composante compo du champ.
+/*! @brief Same as valeur_aux(const DoubleTab &, DoubleTab &), but computes only the component compo of the field.
  *
- *   Dans l'implementation de champ_base, on appelle
+ *   In the implementation of champ_base, we call
  *   valeur_aux(const DoubleTab &, DoubleTab &)
  *
- * @param (pos) le tableau des coordonnees des points de calcul (on ne traite pas l'espace virtuel du tableau)
- * @param (les_valeurs) tableau destination des valeurs a calculer. Le tableau valeurs doit avoir la bonne taille en entree, soit les_valeurs.size() == pos.dimension(0)
- * @param (compo) l'index de la composante du champ a calculer
- * @return (reference au tableau les_valeurs)
+ * @param (pos) the array of coordinates of the calculation points (we do not process the virtual space of the array)
+ * @param (les_valeurs) destination array of values to calculate. The values array must have the right size on input, i.e. les_valeurs.size() == pos.dimension(0)
+ * @param (compo) the index of the component of the field to calculate
+ * @return (reference to the array les_valeurs)
  */
 DoubleVect& Champ_base::valeur_aux_compo(const DoubleTab& pos ,
                                          DoubleVect& les_valeurs,
                                          int compo) const
 {
-  // Pas optimal mais fonctionne
+  // Not optimal but works
   int nb_val=pos.dimension(0);
-  // Le tableau les_valeurs doit avoir la bonne taille en entree:
+  // The array les_valeurs must have the right size on input:
 //  assert(les_valeurs.size() == nb_val);
   DoubleTrav prov(nb_val,nb_comp());
   valeur_aux(pos,prov);
@@ -230,17 +230,17 @@ DoubleVect& Champ_base::valeur_aux_compo(const DoubleTab& pos ,
   return les_valeurs;
 }
 
-/*! @brief provoque une erreur ! doit etre surchargee par les classes derivees
+/*! @brief Causes an error! Must be overridden by derived classes
  *
- *     non virtuelle pure par commodite de developpement !
- *     Renvoie les valeurs du champ aux points specifies
- *     par leurs coordonnees, en indiquant que les points de
- *     calculs sont situes dans les elements indiques.
+ *     Not pure virtual for convenience of development!
+ *     Returns the values of the field at the specified points
+ *     by their coordinates, indicating that the calculation
+ *     points are located in the specified elements.
  *
- * @param (DoubleTab&) le tableau des coordonnees des points de calcul
- * @param (IntVect&) le tableau des elements dans lesquels sont situes les points de calcul
- * @param (DoubleTab& les_valeurs) le tableau des valeurs du champ aux points specifies
- * @return (DoubleTab&) le tableau des valeurs du champ aux points specifies
+ * @param (DoubleTab&) the array of coordinates of the calculation points
+ * @param (IntVect&) the array of elements in which the calculation points are located
+ * @param (DoubleTab& les_valeurs) the array of field values at the specified points
+ * @return (DoubleTab&) the array of field values at the specified points
  */
 DoubleTab& Champ_base::valeur_aux_elems(const DoubleTab&,
                                         const IntVect& ,
@@ -252,18 +252,18 @@ DoubleTab& Champ_base::valeur_aux_elems(const DoubleTab&,
   return les_valeurs;
 }
 
-/*! @brief provoque une erreur ! doit etre surchargee par les classes derivees
+/*! @brief Causes an error! Must be overridden by derived classes
  *
- *     non virtuelle pure par commodite de developpement !
- *     Renvoie les valeurs d'une composante du champ aux points specifies
- *     par leurs coordonnees, en indiquant que les points de
- *     calculs sont situes dans les elements indiques.
+ *     Not pure virtual for convenience of development!
+ *     Returns the values of a component of the field at the specified points
+ *     by their coordinates, indicating that the calculation
+ *     points are located in the specified elements.
  *
- * @param (DoubleTab&) le tableau des coordonnees des points de calcul
- * @param (IntVect&) le tableau des elements dans lesquels sont situes les points de calcul
- * @param (DoubleVect& les_valeurs) le tableau des valeurs de la composante du champ aux points specifies
- * @param (int) l'index de la composante du champ a calculer
- * @return (DoubleVect&) le tableau des valeurs de la composante du champ aux points specifies
+ * @param (DoubleTab&) the array of coordinates of the calculation points
+ * @param (IntVect&) the array of elements in which the calculation points are located
+ * @param (DoubleVect& les_valeurs) the array of values of the component of the field at the specified points
+ * @param (int) the index of the component of the field to calculate
+ * @return (DoubleVect&) the array of values of the component of the field at the specified points
  */
 DoubleVect& Champ_base::valeur_aux_elems_compo(const DoubleTab&,
                                                const IntVect&,
@@ -299,11 +299,11 @@ DoubleVect& Champ_base::valeur_aux_elems_compo_smooth(const DoubleTab&,
   return les_valeurs;
 }
 
-/*! @brief Mise a jour en temps.
+/*! @brief Time update.
  *
- * NE FAIT RIEN (dans la classe de base)
+ * DOES NOTHING (in the base class)
  *
- * @param (double) temps de mise a jour
+ * @param (double) update time
  */
 DoubleVect& Champ_base::valeur_a_sommet(int sommet, const Domaine& dom, DoubleVect& val) const
 {
@@ -315,7 +315,7 @@ DoubleVect& Champ_base::valeur_a_sommet(int sommet, const Domaine& dom, DoubleVe
   return valeur_a(position, val);
 }
 
-/*! @brief renvoi la compo eme corrdonne des valeurs a l'element le_poly au sommet sommet
+/*! @brief Returns the compo-th coordinate of the values at the element le_poly at the vertex sommet
  *
  */
 double Champ_base::valeur_a_sommet_compo(int sommet, int le_poly, int compo) const
@@ -326,7 +326,7 @@ double Champ_base::valeur_a_sommet_compo(int sommet, int le_poly, int compo) con
   return -1;
 }
 
-/*! @brief renvoie les valeurs aux sommets du Domaine dom
+/*! @brief Returns the values at the vertices of the Domain dom
  *
  */
 DoubleTab& Champ_base::valeur_aux_sommets(const Domaine& dom, DoubleTab& val) const
@@ -337,7 +337,7 @@ DoubleTab& Champ_base::valeur_aux_sommets(const Domaine& dom, DoubleTab& val) co
   return valeur_aux_elems(positions, les_polys, val);
 }
 
-/*! @brief renvoie la compo eme valeur aux sommets de dom.
+/*! @brief Returns the compo-th value at the vertices of dom.
  *
  */
 DoubleVect& Champ_base::valeur_aux_sommets_compo(const Domaine& dom,
@@ -349,7 +349,7 @@ DoubleVect& Champ_base::valeur_aux_sommets_compo(const Domaine& dom,
   return valeur_aux_elems_compo(positions, les_polys, val, compo);
 }
 
-/*! @brief renvoie la valeur du champ aux faces
+/*! @brief Returns the field value at the faces
  *
  */
 DoubleTab& Champ_base::valeur_aux_faces(DoubleTab& result) const
@@ -357,7 +357,7 @@ DoubleTab& Champ_base::valeur_aux_faces(DoubleTab& result) const
   return valeur_aux(ref_cast(Domaine_VF, domaine_dis_base()).xv(), result);
 }
 
-/*! @brief renvoie la valeur du champ aux faces de bord
+/*! @brief Returns the field value at the boundary faces
  *
  */
 DoubleTab Champ_base::valeur_aux_bords() const
@@ -367,7 +367,7 @@ DoubleTab Champ_base::valeur_aux_bords() const
   return valeur_aux(xv_bord, result);
 }
 
-/*! @brief mettre_a_jour de la classe de base Champ_base :ne fait rien !
+/*! @brief Update of the base class Champ_base: does nothing!
  *
  */
 void Champ_base::mettre_a_jour(double)
@@ -378,12 +378,12 @@ void Champ_base::abortTimeStep()
 {
 }
 
-/*! @brief Affecter un champ dans un autre.
+/*! @brief Assign a field to another.
  *
- * Rebvoie le resultat de l'affectation.
+ * Returns the result of the assignment.
  *
- * @param (Champ_base& ch) partie droite de l'affectation
- * @return (Champ_base&) le resultat de l'affectation (*this)
+ * @param (Champ_base& ch) right side of the assignment
+ * @return (Champ_base&) the result of the assignment (*this)
  */
 Champ_base& Champ_base::affecter(const Champ_base& ch)
 {
@@ -392,8 +392,8 @@ Champ_base& Champ_base::affecter(const Champ_base& ch)
   return *this;
 }
 
-//Factorise le message d erreur pour les champs
-//dont la methode affecter n a pas de sens.
+// Factorize the error message for fields
+// whose affecter method has no meaning.
 void Champ_base::affecter_erreur()
 {
   Nom message;
@@ -404,7 +404,7 @@ void Champ_base::affecter_erreur()
   Process::exit(message);
 }
 
-/*! @brief cette methode va fixer les unites et le nom des compos elle n'est pas const en realite !!!
+/*! @brief This method will set the units and the name of components, it is not actually const!!!
  *
  */
 void Champ_base::corriger_unite_nom_compo()
@@ -526,7 +526,7 @@ void Champ_base::calculer_valeurs_elem_compo_post(DoubleTab& les_valeurs,int nco
       if(sub_type(Champ_Inc_base, *this) )
         {
           const Domaine_VF& zvf = ref_cast(Domaine_VF,ref_cast(Champ_Inc_base, *this).equation().domaine_dis());
-          // Pour eviter un resize par nb_elem_tot par appel a xp()
+          // To avoid a resize by nb_elem_tot per call to xp()
           for (int i=0; i<nb_elem; i++)
             for (int k=0; k<dimension; k++)
               centres_de_gravites(i,k) = zvf.xp(i,k);
@@ -552,7 +552,7 @@ void Champ_base::calculer_valeurs_elem_compo_post(DoubleTab& les_valeurs,int nco
   nom_post+= nom_dom;
 }
 
-// Ajoute la contribution des autres processeurs a valeurs et compteur
+// Adds the contribution of other processors to values and counter
 inline void add_sommets_communs(const Domaine& dom, DoubleTab& les_valeurs, IntTab& compteur)
 {
 
@@ -562,7 +562,7 @@ inline void add_sommets_communs(const Domaine& dom, DoubleTab& les_valeurs, IntT
     return;
   int nb_compo_ = les_valeurs.line_size();
 
-  // On balaie les joints
+  // Iterate over joints
   const Joints& joints = dom.faces_joint();
   const int nb_joints = joints.size();
   for (int i_joint = 0; i_joint < nb_joints; i_joint++)
@@ -572,7 +572,7 @@ inline void add_sommets_communs(const Domaine& dom, DoubleTab& les_valeurs, IntT
       const Joint_Items& joint_item = joint.joint_item(JOINT_ITEM::SOMMET);
       const ArrOfInt& sommets_communs = joint_item.items_communs();
 
-      // Tableaux temporaires
+      // Temporary arrays
       IntTab envoie_sommets;
       DoubleTab envoie_valeurs;
       IntTab envoie_compteur;
@@ -580,19 +580,19 @@ inline void add_sommets_communs(const Domaine& dom, DoubleTab& les_valeurs, IntT
       DoubleTab recoit_valeurs;
       IntTab recoit_compteur;
       int size=0;
-      // On balaie les sommets communs
+      // Iterate over common vertices
       int size_sommets_communs = sommets_communs.size_array();
       for (int j=0; j<size_sommets_communs; j++)
         {
           int sommet = sommets_communs[j];
-          // Si ce sommet commun appartient a la liste des sommets Dirichlet:
+          // If this common vertex belongs to the list of Dirichlet vertices:
           if ( compteur(sommet)>0)
             {
-              // Le numero du sommet voisin distant est:
+              // The index of the remote neighboring vertex is:
               int sommet_voisin = joint_item.renum_items_communs()(j,0);
-              // On verifie que le sommet local est bien sommet:
+              // Verify that the local vertex is indeed a vertex:
               assert(joint_item.renum_items_communs()(j,1)==sommet);
-              // On redimensionne les tableaux d'envoi et on les remplit
+              // Resize the send arrays and fill them
               size++;
               envoie_sommets.resize(size);
               envoie_sommets(size-1) = sommet_voisin;
@@ -605,38 +605,38 @@ inline void add_sommets_communs(const Domaine& dom, DoubleTab& les_valeurs, IntT
         }
       if (Process::me()<PEvoisin)
         {
-          // On envoie les tableaux a PEvoisin
+          // Send arrays to PEvoisin
           envoyer(envoie_sommets,Process::me(),PEvoisin,Process::me()+1000);
           envoyer(envoie_valeurs,Process::me(),PEvoisin,Process::me()+2000);
           envoyer(envoie_compteur,Process::me(),PEvoisin,Process::me()+3000);
-          // On recoit les tableaux de PEvoisin
+          // Receive arrays from PEvoisin
           recevoir(recoit_sommets,PEvoisin,Process::me(),PEvoisin+1000);
           recevoir(recoit_valeurs,PEvoisin,Process::me(),PEvoisin+2000);
           recevoir(recoit_compteur,PEvoisin,Process::me(),PEvoisin+3000);
         }
       else
         {
-          // On recoit les tableaux de PEvoisin
+          // Receive arrays from PEvoisin
           recevoir(recoit_sommets,PEvoisin,Process::me(),PEvoisin+1000);
           recevoir(recoit_valeurs,PEvoisin,Process::me(),PEvoisin+2000);
           recevoir(recoit_compteur,PEvoisin,Process::me(),PEvoisin+3000);
-          // On envoie les tableaux a PEvoisin
+          // Send arrays to PEvoisin
           envoyer(envoie_sommets,Process::me(),PEvoisin,Process::me()+1000);
           envoyer(envoie_valeurs,Process::me(),PEvoisin,Process::me()+2000);
           envoyer(envoie_compteur,Process::me(),PEvoisin,Process::me()+3000);
 
         }
-      // On ajoute la contribution de PEvoisin aux tableaux valeurs et compteur
-      // si les compteurs de part et d'autre ne sont pas nuls
+      // Add the contribution of PEvoisin to the values and counter arrays
+      // if the counters on both sides are non-zero
       int recoit_size = recoit_sommets.size_array();
       for (int i=0; i<recoit_size; i++)
         {
           int sommet = recoit_sommets(i);
 
-          // Contribution recu d'un sommet Dirichlet
+          // Contribution received from a Dirichlet vertex
           if (recoit_compteur(i))
             {
-              // Si le sommet local n'est pas Dirichlet, on annulle valeurs
+              // If the local vertex is not Dirichlet, zero out values
               if (compteur(sommet)==0)
                 for(int compo=0; compo<nb_compo_; compo++)
                   les_valeurs(sommet,compo)=0;
@@ -693,7 +693,7 @@ void Champ_base::calculer_valeurs_som_post(DoubleTab& les_valeurs,int nb_som,Nom
       }
   }
 
-  // Prise en compte des conditions aux limites :
+  // Taking boundary conditions into account:
   if (sub_type(Champ_Inc_base, *this)&&impose_cl_diri)
     {
       const Champ_Inc_base& chi=ref_cast(Champ_Inc_base, *this);
@@ -708,7 +708,7 @@ void Champ_base::calculer_valeurs_som_post(DoubleTab& les_valeurs,int nb_som,Nom
       const Champ_Inc_base& chi=ref_cast(Champ_Inc_base, *this);
 
       const Equation_base& eqn=chi.equation();
-      // GF on ne veut pas prendre en compte les CL en EF
+      // GF we do not want to take into account the BCs in EF
       if (eqn.discretisation().que_suis_je()!="EF")
         if((eqn.inconnue().le_nom() == le_nom())
             && (sub_type(Champ_Inc_base, *this))
@@ -725,8 +725,8 @@ void Champ_base::calculer_valeurs_som_post(DoubleTab& les_valeurs,int nb_som,Nom
                 const Frontiere_dis_base& frontiere_dis=la_cl->frontiere_dis();
                 const Frontiere& frontiere=frontiere_dis.frontiere();
                 const Faces& faces=frontiere.faces();
-                // modif bm: les faces frontieres ont maintenant des faces virtuelles,
-                //  il ne faut pas boucler sur les faces virtuelles (ancien code: nb_faces_tot())
+                // modif bm: boundary faces now have virtual faces,
+                //  we must not loop over virtual faces (old code: nb_faces_tot())
                 int nb_faces=faces.nb_faces();
                 int nb_som_faces=faces.nb_som_faces();
                 if(sub_type(Dirichlet, la_cl.valeur()))
@@ -779,7 +779,7 @@ void Champ_base::calculer_valeurs_som_post(DoubleTab& les_valeurs,int nb_som,Nom
                         int nb_faces_tot=faces.nb_faces_tot();
                         for(int num_face=0; num_face<nb_faces_tot ; num_face++)
                           {
-                            // calcul de la normale :
+                            // compute the normal:
                             int sommet0=faces.sommet(num_face, 0);
                             for (int k=1; k<dimension; k++)
                               {
@@ -813,7 +813,7 @@ void Champ_base::calculer_valeurs_som_post(DoubleTab& les_valeurs,int nb_som,Nom
 
                                 if (sommet < 0) continue;
 
-                                if (sommet<dom.nb_som()) // Sommet reel
+                                if (sommet<dom.nb_som()) // Real vertex
                                   {
                                     double psc=0;
                                     for(int k=0; k< dimension; k++)
@@ -826,13 +826,13 @@ void Champ_base::calculer_valeurs_som_post(DoubleTab& les_valeurs,int nb_som,Nom
                       }
                   }
               }
-            // Ajoute la contribution des autres processeurs a valeurs et compteur
+            // Adds the contribution of other processors to values and counter
             add_sommets_communs(dom, les_valeurs, compteur);
 
-            // On termine le calcul de la moyenne pour les cas qui ont ete modifies
-            // par une condition de type Dirichlet
+            // Finish computing the average for cases that were modified
+            // by a Dirichlet boundary condition
             int nb_som_l = dom.nb_som();
-            //assert (nb_som_l==nb_som_l); // GF je ne suis pas sur de l'assert c'est pour voir
+            //assert (nb_som_l==nb_som_l); // GF not sure about the assert, just to check
             for (int sommet = 0; sommet<nb_som_l; sommet++)
               for(int compo=0; compo<nb_compo_; compo++)
                 if (compteur(sommet) != 0)
@@ -841,7 +841,7 @@ void Champ_base::calculer_valeurs_som_post(DoubleTab& les_valeurs,int nb_som,Nom
           }
     }
 
-  // Prise en compte de l'axi:
+  // Taking axisymmetry into account:
   if((axi) && (nb_compo_==dimension))
     {
       double teta, vR, vT;
@@ -894,8 +894,8 @@ void Champ_base::calculer_valeurs_som_compo_post(DoubleTab& les_valeurs,int ncom
 
   if (appliquer_cl)
     {
-      // Liste des sommets de bord au contact d'une face de Dirichlet:
-      // Prise en compte des conditions aux limites :
+      // List of boundary vertices in contact with a Dirichlet face:
+      // Taking boundary conditions into account:
       if (sub_type(Champ_Inc_base, *this))
         {
           const Champ_Inc_base& chi=ref_cast(Champ_Inc_base, *this);
@@ -951,13 +951,13 @@ void Champ_base::calculer_valeurs_som_compo_post(DoubleTab& les_valeurs,int ncom
                         }
                     }
                 }
-              // Ajoute la contribution des autres processeurs a les_valeurs et compteur
+              // Adds the contribution of other processors to les_valeurs and counter
               add_sommets_communs(dom, les_valeurs, compteur);
 
-              // On termine le calcul de la moyenne pour les cas qui ont ete modifies
-              // par une condition de type Dirichlet
+              // Finish computing the average for cases that were modified
+              // by a Dirichlet boundary condition
               int nb_som_l = dom.nb_som();
-              assert (nb_som==nb_som_l); // GF je ne suis pas sur de l'assert c'est pour voir
+              assert (nb_som==nb_som_l); // GF not sure about the assert, just to check
               for (int sommet = 0; sommet<nb_som_l; sommet++)
                 if (compteur(sommet) != 0)
                   les_valeurs(sommet) /= compteur(sommet);
@@ -981,25 +981,25 @@ int Champ_base::completer_post_champ(const Domaine& dom,const int is_axi,const N
   return 1;
 }
 
-//Fixe les conditions de prise en compte des conditions limites
-//pour les operations de filtrage-postraitement du champ
+// Sets the conditions for taking boundary conditions into account
+// during field filtering/postprocessing operations
 void Champ_base::completer(const Domaine_Cl_dis_base& zcl)
 {
 }
 
-/*! @brief Fixe le temps auquel se situe le champ
+/*! @brief Sets the time at which the field is defined
  *
- * @param (double& t) le nouveau temps auquel se situe le champ
- * @return (double) le nouveau temps auquel se situe le champ
+ * @param (double& t) the new time at which the field is defined
+ * @return (double) the new time at which the field is defined
  */
 double Champ_base::changer_temps(const double t)
 {
   return temps_ = t ;
 }
 
-/*! @brief Renvoie le temps du champ
+/*! @brief Returns the time of the field
  *
- * @return (double) le temps du champ
+ * @return (double) the time of the field
  */
 double Champ_base::temps() const
 {
@@ -1016,8 +1016,8 @@ int Champ_base::fixer_nb_valeurs_nodales(int n)
   return 0;
 }
 
-// Tous les champs n'ont pas de domaine_dis_base. Pour ceux qui
-// n'en ont pas, l'appel est invalide.
+// Not all fields have a domaine_dis_base. For those that
+// do not, the call is invalid.
 void Champ_base::associer_domaine_dis_base(const Domaine_dis_base& domaine_dis)
 {
   Cerr << "Error in Champ_base::associer_domaine_dis_base\n";
@@ -1028,8 +1028,8 @@ void Champ_base::associer_domaine_dis_base(const Domaine_dis_base& domaine_dis)
   exit();
 }
 
-// Tous les champs n'ont pas de domaine_dis_base. Pour ceux qui
-// n'en ont pas, l'appel est invalide.
+// Not all fields have a domaine_dis_base. For those that
+// do not, the call is invalid.
 const Domaine_dis_base& Champ_base::domaine_dis_base() const
 {
   Cerr << "Error in Champ_base::domaine_dis_base\n";
@@ -1042,25 +1042,25 @@ const Domaine_dis_base& Champ_base::domaine_dis_base() const
 }
 
 
-/*! @brief Calcule la trace d'un champ sur une frontiere au temps tps
+/*! @brief Computes the trace of a field on a boundary at time tps
  *
- *     WEC :
- *     La frontiere passee en parametre doit faire partie du domaine
- *     sur lequel s'appuie le champ
- *     Le resultat est calcule sur cette frontiere et la taille du
- *     DoubleTab x correspond au nombre de faces de la frontiere.
- *     x peut avoir un espace virtuel, la fonction trace apelle
+ *     WEC:
+ *     The boundary passed as a parameter must be part of the domain
+ *     on which the field is based.
+ *     The result is computed on this boundary and the size of
+ *     the DoubleTab x corresponds to the number of faces of the boundary.
+ *     x can have a virtual space; the trace function calls
  *     echange_espace_virtuel.
  *
- *     Cas particulier (malheureusement) du Champ_P0_VDF :
- *     Si la frontiere est un raccord, le resultat est calcule sur le
- *     raccord associe. Dans ce cas, le DoubleTab x doit etre
- *     dimensionne sur le raccord associe.
+ *     Special case (unfortunately) of Champ_P0_VDF:
+ *     If the boundary is a connector, the result is computed on the
+ *     associated connector. In this case, the DoubleTab x must be
+ *     dimensioned on the associated connector.
  *
  *
- * @param (Frontiere_dis_base&) frontiere discretisee sur laquelle on veut calculer la trace du champ au temps tps
- * @param (DoubleTab& x , double tps) les valeurs du champ sur la frontiere au temps tps
- * @return (DoubleTab&) les valeurs du champ sur la frontiere au temps tps
+ * @param (Frontiere_dis_base&) discretized boundary on which we want to compute the trace of the field at time tps
+ * @param (DoubleTab& x , double tps) the values of the field on the boundary at time tps
+ * @return (DoubleTab&) the values of the field on the boundary at time tps
  */
 DoubleTab& Champ_base::trace(const Frontiere_dis_base& , DoubleTab& x , double tps,int distant) const
 {

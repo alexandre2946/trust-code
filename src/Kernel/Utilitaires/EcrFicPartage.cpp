@@ -29,7 +29,7 @@ EcrFicPartage::EcrFicPartage() : SFichier()
   set_bin(false);
 }
 
-/*! @brief Ouvre le fichier avec les parametres mode et prot donnes Ces parametres sont les parametres de la methode open standard
+/*! @brief Opens the file with the given mode and prot parameters. These parameters are the parameters of the standard open method
  *
  */
 EcrFicPartage::EcrFicPartage(const char* name,IOS_OPEN_MODE mode)
@@ -47,12 +47,12 @@ inline OBuffer& EcrFicPartage::get_obuffer()
   return *obuffer_ptr_;
 }
 
-/*! @brief Ouvre le fichier avec les parametres mode et prot donnes Ces parametres sont les parametres de la methode open standard
+/*! @brief Opens the file with the given mode and prot parameters. These parameters are the parameters of the standard open method
  *
  */
 int EcrFicPartage::ouvrir(const char* name,IOS_OPEN_MODE mode)
 {
-  // Verification sanitaire : tous les processeurs sont la ?
+  // Sanity check: are all processors present?
   barrier();
 
   int ok = 1;
@@ -65,19 +65,19 @@ int EcrFicPartage::ouvrir(const char* name,IOS_OPEN_MODE mode)
 #else
       nom_fic_ = name;
 #endif
-      // Seul le maitre ouvre le fichier
+      // Only the master opens the file
       ok = SFichier::ouvrir((const char *)nom_fic_, mode);
     }
   syncfile();
 
-  // Modif B.Math. 22/09/2004: tous les processeurs passent par le buffer,
-  //  y compris le maitre.
+  // Modif B.Math. 22/09/2004: all processors go through the buffer,
+  //  including the master.
   get_obuffer().new_buffer();
   return ok;
 }
 
 
-/*! @brief ferme le fichier
+/*! @brief Closes the file
  *
  */
 EcrFicPartage::~EcrFicPartage()
@@ -89,7 +89,7 @@ EcrFicPartage::~EcrFicPartage()
 
 void EcrFicPartage::close()
 {
-  // Verification sanitaire : tout le monde est la ?
+  // Sanity check: is everyone present?
   barrier();
   const int buflen = get_obuffer().len();
   if(buflen > 0)
@@ -100,7 +100,7 @@ void EcrFicPartage::close()
       Cerr<<get_obuffer().str()<<finl;
     }
 #ifndef NDEBUG
-  // Y a-t-il un processeur sur lequel il reste des donnees
+  // Is there a processor on which data still remains
   const trustIdType maxbuflen = mp_sum(buflen);
   if (maxbuflen > 0)
     syncfile();
@@ -117,10 +117,10 @@ void EcrFicPartage::close()
     }
 #endif
 }
-/*! @brief Permet au processus appelant de bloquer en attente de la ressource commune a tous les processus qui est le fichier partage.
+/*! @brief Allows the calling process to block waiting for the common resource shared by all processes, which is the shared file.
  *
- * Si le processus appelant cette methode n'est pas le premier, il atend du processus precedent l'endroit ou il doit se positionner dans le fichier pour effectuer sa prochaine ecriture.
- *     Cette methode est systematiquement appelee avant toute nouvelle ecriture dans le fichier.
+ * If the calling process is not the first, it waits for the previous process to indicate the position in the file where it should write next.
+ *     This method is systematically called before any new write to the file.
  *
  * @return (Sortie&) *this
  */
@@ -130,11 +130,11 @@ Sortie& EcrFicPartage::lockfile()
 }
 
 
-/*! @brief Permet de debloquer la ressource critique pour leprocessus suivant.
+/*! @brief Releases the critical resource for the next process.
  *
- * Le processus appelant, sauf si c'est le premier processus du groupe, envoie
- *     sa position courante au precessus suivant dans le groupe. Cette methode est
- *     a appeler apres chaque ecriture dans le fichier.
+ * The calling process, unless it is the first process of the group, sends
+ *     its current position to the next process in the group. This method should
+ *     be called after each write to the file.
  *
  * @return (Sortie&) *this
  */
@@ -143,23 +143,23 @@ Sortie& EcrFicPartage::unlockfile()
   return *this;
 }
 
-/*! @brief Provoque l'ecriture sur disque des donnees accumulees sur les differents processeurs depuis le dernier appel a syncfile().
+/*! @brief Triggers writing to disk of the data accumulated on the different processors since the last call to syncfile().
  *
- *   Les donnees sont ecrites dans l'ordre croissant des processeurs.
- *   Cette fonction doit etre appelee le meme nombre de fois sur tous les processeurs !
+ *   Data is written in ascending processor order.
+ *   This function must be called the same number of times on all processors!
  *
- *   Exemple:
- *    processeur 0:                         processeur 1:
+ *   Example:
+ *    processor 0:                           processor 1:
  *     file << "pe0 : 1" << finl;            file << "pe1 : 1" << finl;
  *     file << "pe0 : 2" << finl;            file << "pe1 : 2" << finl;
- *     file.syncfile();                            file.syncfile();
+ *     file.syncfile();                      file.syncfile();
  *     file << "pe0 : 3" << finl;            file << "pe1 : 3" << finl;
  *     file << "pe0 : 4" << finl;
  *     file.syncfile();                      file.syncfile();
- *     file << "pe0 : end" << finl;          // le processeur 1 n'ecrit pas de donnees
+ *     file << "pe0 : end" << finl;          // processor 1 writes no data
  *     file.syncfile();                      file.syncfile();
  *
- *   Contenu du fichier :
+ *   File contents:
  *     pe0 : 1
  *     pe0 : 2
  *     pe1 : 1
@@ -172,16 +172,16 @@ Sortie& EcrFicPartage::unlockfile()
  */
 Sortie& EcrFicPartage::syncfile()
 {
-  // En mode ascii, les donnees sont converties en ascii lors de l'ecriture dans
-  //  le buffer. Une deuxieme conversion a lieu lors de l'ecriture sur disque
-  //  (selon le systeme d'exploitation, '\n' est code differemment par exemple)
-  // Donc, en ascii, on utilisera
+  // In ASCII mode, data is converted to ASCII when written to the buffer.
+  //  A second conversion occurs when writing to disk
+  //  (depending on the operating system, '\n' may be encoded differently for example).
+  // So, in ASCII mode, we use:
   //   file << buffer;
-  // et en binaire
+  // and in binary mode:
   //   file.write(buffer, size);
-  // Or file << buffer determine la longueur du buffer en cherchant de caractere '\0'
-  // Par consequent, en ascii, il faut que le buffer finisse par un caractere '\0'
-  // que l'on ajoute ici:
+  // Because file << buffer determines the buffer length by looking for the '\0' character,
+  // in ASCII mode the buffer must end with a '\0' character,
+  // which is added here:
 
   if (! bin_)
     {
@@ -199,20 +199,20 @@ Sortie& EcrFicPartage::syncfile()
           char * allocated_buffer = 0;
           int buf_size;
 
-          // On recupere les donnees du processeur p, soit directement (p==me()),
-          //  soit par communication :
+          // We retrieve data from processor p, either directly (p==me()),
+          //  or via communication:
           if (p == me())
             {
-              // Ecriture de mes propres donnees : je les prends dans le buffer.
-              // Ce pointeur peut etre nul:
+              // Writing my own data: I take it from the buffer.
+              // This pointer may be null:
               buffer_data = get_obuffer().str();
               buf_size = get_obuffer().len();
             }
           else
             {
-              // Ecriture des donnees d'un autre processeur, je les recupere.
+              // Writing data from another processor; retrieve it.
               int dummy = 0;
-              envoyer(dummy, p, 100); // Faire coucou au processeur p pour qu'il envoie ses donnees
+              envoyer(dummy, p, 100); // Signal processor p so it sends its data
               recevoir(buf_size, p, 100);
               if (buf_size > 0)
                 {
@@ -220,44 +220,44 @@ Sortie& EcrFicPartage::syncfile()
                   group.recv(p, allocated_buffer, buf_size, 100);
                 }
             }
-          // Ecriture dans le fichier disque
+          // Write to disk file
           if (buf_size > 0)
             {
               assert(buffer_data);
               ostream& os = get_ostream();
               if (bin_)
                 {
-                  // Ecriture binaire sans conversion :
+                  // Binary write without conversion:
                   statistics().begin_count(STD_COUNTERS::IO_EcrireFicPartageBin,statistics().get_last_opened_counter_level()+1);
                   os.write(buffer_data, buf_size);
                   statistics().end_count(STD_COUNTERS::IO_EcrireFicPartageBin,1,buf_size);
                 }
               else
                 {
-                  // On verifie que le buffer finit bien par un caractere 0 :
+                  // Verify that the buffer indeed ends with a 0 character:
                   assert(buffer_data[buf_size-1] == 0);
-                  // Ecriture de buffer_data comme une chaine
-                  // (conversion des \n sur certains systemes, etc...)
+                  // Write buffer_data as a string
+                  // (conversion of \n on certain systems, etc...)
                   os << buffer_data;
                 }
             }
           if (allocated_buffer)
             delete[] allocated_buffer;
         }
-      // Force a tout ecrire sur le disque tout de suite:
-      // (appel a la fonction flush de bas niveau, pas celle de trio).
+      // Force everything to be written to disk immediately:
+      // (call to the low-level flush function, not trio's).
       get_ostream().flush();
     }
   else
     {
-      // Envoi du buffer au processeur maitre:
-      // On attend qu'il demande les donnees pour ne pas engorger le reseau :
-      // (sinon tous les processeurs envoient simultanement leurs donnees)
+      // Send the buffer to the master processor:
+      // We wait for it to request the data to avoid congesting the network:
+      // (otherwise all processors send their data simultaneously)
       int dummy;
       recevoir(dummy, 0, 100);
       int buf_size = get_obuffer().len();
       envoyer(buf_size, 0, 100);
-      // Si la taille est non nulle, on envoie le buffer :
+      // If the size is non-zero, send the buffer:
       if (buf_size > 0)
         {
           const char * buffer_data = get_obuffer().str();
@@ -265,7 +265,7 @@ Sortie& EcrFicPartage::syncfile()
         }
     }
 
-  // On vide le buffer :
+  // Empty the buffer:
   get_obuffer().new_buffer();
   return *this;
 }

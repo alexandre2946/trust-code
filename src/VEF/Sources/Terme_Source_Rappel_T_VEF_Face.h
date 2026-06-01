@@ -55,9 +55,9 @@ private :
   Nom nom_pb, nom_autre_pb;
   Motcle nom_inco;
 
-  ArrOfInt corresp_fin_gros; // correspondance elem de l'autre pb vers elem du pb courant
-  ArrOfInt nb_fin; // nb d'elements de l'autre pb par element du pb courant
-  ArrOfDouble vol_fin_tot; // volume totale des elements fins s'appuyant un element grossier
+  ArrOfInt corresp_fin_gros; // correspondence from element of other pb to element of current pb
+  ArrOfInt nb_fin; // number of elements of the other pb per element of the current pb
+  ArrOfDouble vol_fin_tot; // total volume of fine elements supported by a coarse element
 
 };
 #endif

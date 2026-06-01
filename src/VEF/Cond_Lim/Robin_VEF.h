@@ -79,8 +79,8 @@ protected :
   double beta_robin_cl_ = -123.   ;
   // Champ_front_normal_robin champ_normal_robin_cl_;
   // Champ_front_tangentiel_robin champ_tangent_robin_cl_;
-  mutable DoubleTab flux_normal_impose_; // Stocke toutes les valeurs du flux sur toutes les faces de la frontiere (pas d'hypothese sur un champ uniforme). Utile pour le GPU.
-  mutable DoubleTab flux_tangentiel_impose_; // Stocke toutes les valeurs du flux sur toutes les faces de la frontiere (pas d'hypothese sur un champ uniforme). Utile pour le GPU.
+  mutable DoubleTab flux_normal_impose_; // Stores all flux values on all boundary faces (no assumption of a uniform field). Useful for GPU.
+  mutable DoubleTab flux_tangentiel_impose_; // Stores all flux values on all boundary faces (no assumption of a uniform field). Useful for GPU.
 };
 
 #endif /* Robin_VEF_included */

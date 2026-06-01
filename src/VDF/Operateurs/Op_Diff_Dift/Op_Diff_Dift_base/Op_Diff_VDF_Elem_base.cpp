@@ -27,20 +27,19 @@ Entree& Op_Diff_VDF_Elem_base::readOn(Entree& s ) { return s ; }
 
 double Op_Diff_VDF_Elem_base::calculer_dt_stab() const
 {
-  // Calcul du pas de temps de stabilite :
+  // Computation of the stability time step:
   //
-  //  - La  diffusivite est uniforme donc :
+  //  - The diffusivity is uniform, therefore:
   //
   //     dt_stab = 1/(2*diffusivite*Max(coef(elem)))
   //
-  //     avec:
+  //     where:
   //           coef = 1/(dx*dx) + 1/(dy*dy) + 1/(dz*dz)
   //
-  //           i decrivant l'ensemble des elements du maillage
+  //           i ranging over all mesh elements
   //
-  // Rq : On ne balaie pas l'ensemble des elements puisque
-  //      le max de coeff est atteint sur l'element qui realise
-  //      a la fois le min de dx le min de dy et le min de dz
+  // Note: we do not sweep all elements since the max of coeff is reached
+  //       on the element that simultaneously realizes the min of dx, dy and dz
   double dt_stab = DMAXFLOAT;
   const Domaine_VDF& domaine_VDF = iter_->domaine();
   const DoubleTab& diffu = has_champ_masse_volumique() ? diffusivite().valeurs() : diffusivite_pour_pas_de_temps().valeurs();
@@ -91,11 +90,11 @@ void Op_Diff_VDF_Elem_base::contribuer_termes_croises(const DoubleTab& inco, con
   const Domaine_Cl_VDF& zcl = iter_->domaine_Cl();
   int l;
 
-  // boucle sur les cl pour trouver un paroi_contact
+  // loop over boundary conditions to find a wall contact
   for (int i = 0; i < domaine.nb_front_Cl(); i++)
     {
       const Cond_lim& la_cl = zcl.les_conditions_limites(i);
-      if (!la_cl->que_suis_je().debute_par("Paroi_Echange_contact")) continue; //pas un Echange_contact
+      if (!la_cl->que_suis_je().debute_par("Paroi_Echange_contact")) continue; //not an Echange_contact
       const Echange_contact_VDF& cl = ref_cast(Echange_contact_VDF, la_cl.valeur());
       if (cl.nom_autre_pb() != autre_pb.le_nom()) continue; //not our problem
 
@@ -146,13 +145,13 @@ void Op_Diff_VDF_Elem_base::dimensionner_termes_croises(Matrice_Morse& matrice, 
 void Op_Diff_VDF_Elem_base::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   const std::string nom_inco = equation().inconnue().le_nom().getString();
-  if (semi_impl.count(nom_inco)) return; //semi-implicite -> rien a dimensionner
+  if (semi_impl.count(nom_inco)) return; //semi-implicit -> nothing to dimension
 
   if (!op_ext_init_) init_op_ext();
-  int n_ext = (int)op_ext.size(); //pour la thermique monolithique
+  int n_ext = (int)op_ext.size(); //for monolithic thermics
 
   std::vector<Matrice_Morse *> mat(n_ext);
-  std::vector<int> N(n_ext); //nombre de composantes par probleme de op_ext
+  std::vector<int> N(n_ext); //number of components per problem in op_ext
   for (int i = 0; i < n_ext; i++)
     {
       N[i] = op_ext[i]->equation().inconnue().valeurs().line_size();
@@ -176,22 +175,22 @@ void Op_Diff_VDF_Elem_base::ajouter_blocs(matrices_t matrices, DoubleTab& secmem
 {
   if (!op_ext_init_) init_op_ext();
 
-  // On commence par l'operateur locale; i.e. *this !
+  // Start with the local operator; i.e. *this!
   iter_->ajouter_blocs(matrices, secmem, semi_impl);
 
-  // On ajoute des termes si axi ...
+  // Add extra terms if axisymmetric ...
   Op_Diff_VDF_base::ajoute_terme_pour_axi(matrices, secmem, semi_impl);
 
-  // On ajoute contribution si monolithique
+  // Add contribution if monolithic
   if ((int) op_ext.size() > 1) ajouter_blocs_pour_monolithique(matrices, secmem, semi_impl);
 }
 
 void Op_Diff_VDF_Elem_base::ajouter_blocs_pour_monolithique(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const std::string& nom_inco = equation().inconnue().le_nom().getString();
-  int n_ext = (int)op_ext.size() - 1; // pour la thermique monolithique, -1 car 1er (i.e. *this) est deja fait via ajouter_blocs
+  int n_ext = (int)op_ext.size() - 1; // for monolithic thermics, -1 because 1st (i.e. *this) is already handled via ajouter_blocs
   std::vector<Matrice_Morse *> mat(n_ext);
-  std::vector<const DoubleTab *> inco(n_ext); //inconnues
+  std::vector<const DoubleTab *> inco(n_ext); //unknowns
 
   for (int i = 0; i < n_ext; i++)
     {

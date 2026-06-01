@@ -66,21 +66,21 @@ public:
     return coord_barycentrique_P1_tetraedre(sommet_poly, coord, x, y, z, le_poly, face);
   }
 
-  // Retourne dans val la valeur du champ interpole aux coordonnees position de l'element le_poly
+  // Returns in val the interpolated field value at coordinates position in element le_poly
   DoubleVect& valeur_a_elem(const DoubleVect& position, DoubleVect& val, int le_poly) const override;
-  // Retourne la valeur de la composante ncomp du champ interpole aux coordonnees position de l'element le_poly
+  // Returns the value of component ncomp of the interpolated field at coordinates position in element le_poly
   double valeur_a_elem_compo(const DoubleVect& position, int le_poly, int ncomp) const override;
-  // Retourne dans valeurs les valeurs du champ interpolees aux centres de gravite
+  // Returns in valeurs the field values interpolated at element centroids
   DoubleTab& valeur_aux_centres_de_gravite(const Domaine&, DoubleTab& valeurs) const;
-  // Retourne dans valeurs les valeurs du champ interpolees aux coordonnees positions des elements les_polys
+  // Returns in valeurs the field values interpolated at coordinates positions of elements les_polys
   DoubleTab& valeur_aux_elems(const DoubleTab& positions, const IntVect& les_polys, DoubleTab& valeurs) const override;
-  // Retourne les valeurs de la composante ncomp du champ interpolees aux coordonnees positions des elements les_polys
+  // Returns the values of component ncomp of the field interpolated at coordinates positions of elements les_polys
   DoubleVect& valeur_aux_elems_compo(const DoubleTab& positions, const IntVect& les_polys, DoubleVect& valeurs, int ncomp) const override ;
-  // Retourne dans ch_som les valeurs du champ interpole aux sommets
+  // Returns in ch_som the field values interpolated at vertices
   DoubleTab& valeur_aux_sommets(const Domaine& dom, DoubleTab& ch_som) const override;
-  // Retourne dans ch_som les valeurs de la composante ncomp du champ interpole aux sommets
+  // Returns in ch_som the values of component ncomp of the field interpolated at vertices
   DoubleVect& valeur_aux_sommets_compo(const Domaine& dom, DoubleVect& ch_som, int ncomp) const override;
-  // Retourne la valeur de la composante ncomp du champ au sommet num_som sur l'element le_poly
+  // Returns the value of component ncomp of the field at vertex num_som on element le_poly
   double valeur_a_sommet_compo(int num_som, int le_poly, int ncomp) const;
   KOKKOS_INLINE_FUNCTION
   double valeur_a_sommet_compo(int num_som, int num_elem, int ncomp, CIntTabView elem_faces, CIntTabView sommet_elem, CDoubleTabView ch) const;
@@ -113,7 +113,7 @@ public:
 
 protected :
   Matrice_Morse_Sym MatP1NC2P1_L2;
-  // Matrice pour le parallele
+  // Matrix for parallel computation
   Matrice MatP1NC2P1_L2_Parallele;
 
   SolveurSys  solveur_L2;

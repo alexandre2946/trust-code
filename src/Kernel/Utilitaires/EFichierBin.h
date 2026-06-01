@@ -21,7 +21,7 @@
 #include <EntreeSortie.h>
 #include <Process.h>
 
-/*! @brief Lecture dans un fichier d'objets ecrits au format binaire
+/*! @brief Reading from a file of objects written in binary format.
  *
  * @sa SFichierBin EFichier
  */

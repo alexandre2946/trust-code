@@ -34,7 +34,7 @@ Sortie& Modele_turbulence_scal_Prandtl::printOn(Sortie& s) const { return Modele
 Entree& Modele_turbulence_scal_Prandtl::readOn(Entree& is)
 {
   Modele_turbulence_scal_diffturb_base::readOn(is);
-  // si on  a lu une fonction, on initialise le Parser
+  // if a function was read, initialize the Parser
   if (definition_fonction_ != Nom())
     {
       fonction_.setNbVar(2);
@@ -71,9 +71,9 @@ void Modele_turbulence_scal_Prandtl::set_param(Param& param) const
   Modele_turbulence_scal_base::set_param(param);
 }
 
-/*! @brief Calcule la diffusivite turbulente et la loi de paroi.
+/*! @brief Computes the turbulent diffusivity and applies the wall law.
  *
- * @param (double)
+ * @param Unused time parameter.
  */
 void Modele_turbulence_scal_Prandtl::mettre_a_jour(double)
 {
@@ -108,13 +108,12 @@ void Modele_turbulence_scal_Prandtl::mettre_a_jour(double)
   diffusivite_turbulente_->valeurs().echange_espace_virtuel();
 }
 
-/*! @brief Calcule la diffusivite turbulente.
+/*! @brief Computes the turbulent diffusivity.
  *
- * diffusivite_turbulente = viscosite_turbulente / Prdt_turbulent
+ * turbulent_diffusivity = turbulent_viscosity / turbulent_Prandtl_number
  *
- * @return (Champ_Fonc_base&) la diffusivite turbulente nouvellement calculee
- * @throws les champs diffusivite_turbulente et viscosite_turbulente
- * doivent avoir le meme nombre de valeurs nodales
+ * @return The newly computed turbulent diffusivity field.
+ * @throws If diffusivite_turbulente and viscosite_turbulente fields do not have the same number of nodal values.
  */
 Champ_Fonc_base& Modele_turbulence_scal_Prandtl::calculer_diffusivite_turbulente()
 {

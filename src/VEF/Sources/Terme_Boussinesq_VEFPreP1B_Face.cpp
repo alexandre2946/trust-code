@@ -44,31 +44,31 @@ Entree& Terme_Boussinesq_VEFPreP1B_Face::readOn(Entree& s )
 DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& tab_resu) const
 {
   const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_VEF.valeur());
-  // Si seulement support P0 on appelle en VEF
+  // If only P0 support, call VEF version
   if (domaine_VEF.get_alphaE() && !domaine_VEF.get_alphaS() && !domaine_VEF.get_alphaA())
     return Terme_Boussinesq_VEF_Face::ajouter(tab_resu);
 
-  // Verifie la validite de T0:
+  // Check the validity of T0:
   check();
 
-  int nbpts=-1; // nombre de points d'integration
+  int nbpts=-1; // number of integration points
   // static variable can't be used on kernel devices:
   int dim = Objet_U::dimension;
   assert(dim==2 || dim==3);
   if(dim==2)
     {
-      nbpts=3; // ordre 2
+      nbpts=3; // order 2
     }
   else if(dim==3)
     {
-      nbpts=4; // ordre 2
+      nbpts=4; // order 2
     }
 
-  // On remplit les Poids et les coord_bary :
+  // Fill Poids and coord_bary:
   double Poids = 1./(dim+1);
   if (tab_coord_bary_.dimension(0)!=nbpts)
     {
-      tab_coord_bary_.resize(nbpts, dim + 1); // lambda_i des points
+      tab_coord_bary_.resize(nbpts, dim + 1); // lambda_i of the points
       if (dim == 2)
         {
           tab_coord_bary_(0, 0) = 0.5;
@@ -111,7 +111,7 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& tab_resu) const
     }
 
   const Champ_Inc_base& le_scalaire = equation_scalaire().inconnue();
-  int nb_comp = le_scalaire.nb_comp(); // Vaut 1 si temperature, nb_constituents si concentration
+  int nb_comp = le_scalaire.nb_comp(); // equals 1 if temperature, nb_constituents if concentration
   int nb_elem_tot = domaine_VEF.nb_elem_tot();
   // XXXTrav to not reallocate on the host/device each time:
   IntTrav tab_les_polygones(nb_elem_tot * nbpts);
@@ -122,7 +122,7 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& tab_resu) const
   CDoubleTabView coord_sommets = domaine_VEF.domaine().les_sommets().view_ro();
   IntArrView les_polygones = static_cast<ArrOfInt&>(tab_les_polygones).view_wo();
   DoubleTabView les_positions = tab_les_positions.view_wo();
-  // Remplissage des tableaux de travail:
+  // Fill work arrays:
   Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__),
                        Kokkos::RangePolicy<>(0, nb_elem_tot), KOKKOS_LAMBDA(
                          const int elem)
@@ -130,7 +130,7 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& tab_resu) const
     for (int pt = 0; pt < nbpts; pt++)
       les_polygones(elem * nbpts  + pt) = elem;
 
-    //On remplit la matrice de changement d'element  :
+    //Fill the element change matrix:
     double a0[3], a0a1[3], a0a2[3], a0a3[3];
     const int som_glob = elem_sommets(elem,0);
     for (int d=0; d<dim; d++)
@@ -151,7 +151,7 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& tab_resu) const
           a0a3[d]=coord_sommets(som_glob3,d)-a0[d];
       }
 
-    //On remplit les_positions :
+    //Fill les_positions:
     for (int pt = 0; pt < nbpts; pt++)
       {
         int point = elem * nbpts  + pt;
@@ -173,13 +173,13 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& tab_resu) const
   DoubleTrav tab_valeurs_scalaire(nb_elem_tot * nbpts, nb_comp);
   DoubleTrav tab_valeurs_beta(nb_elem_tot * nbpts, nb_comp);
 
-  // Calcul du terme source aux points d'integration :
+  // Compute the source term at integration points:
   le_scalaire.valeur_aux_elems(tab_les_positions, tab_les_polygones, tab_valeurs_scalaire);
   beta().valeur_aux_elems(tab_les_positions, tab_les_polygones, tab_valeurs_beta);
 
-  // Extension possible des volumes de controle:
+  // Possible extension of control volumes:
   //int modif_traitement_diri=( sub_type(Domaine_VEF,domaine_VEF) ? ref_cast(Domaine_VEF,domaine_VEF).get_modif_div_face_dirichlet() : 0);
-  //modif_traitement_diri = 0; // Forcee a 0 car ne marche pas d'apres essais Ulrich&Thomas
+  //modif_traitement_diri = 0; // Forced to 0 as it does not work according to Ulrich&Thomas tests
 
   const Domaine_Cl_VEF& domaine_Cl_VEF = le_dom_Cl_VEF.valeur();
 
@@ -194,7 +194,7 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& tab_resu) const
   CDoubleArrView Scalaire0 = getScalaire0().view_ro();
   // indice_diri
   DoubleTabView resu = tab_resu.view_rw();
-  // Boucle sur les elements:
+  // Loop over elements:
   Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__),
                        Kokkos::RangePolicy<>(0, nb_elem_tot), KOKKOS_LAMBDA(
                          const int elem)
@@ -211,12 +211,12 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& tab_resu) const
 
     double volume=volumes(elem);
 
-    // Boucle sur les faces de l'element:
+    // Loop over element faces:
     for(int face=0; face<=dim; face++)
       {
         int num_face=elem_faces(elem, face);
         double valeurs_Psi[4];
-        // Integration sur les nbpts points:
+        // Integration over the nbpts points:
         for (int pt=0; pt<nbpts; pt++)
           {
             int point = elem * nbpts + pt;
@@ -255,7 +255,7 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& tab_resu) const
   });
   end_gpu_timer(__KERNEL_NAME__);
 
-  // modif pour periodique
+  // periodic correction
   for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);

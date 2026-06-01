@@ -19,10 +19,10 @@
 Implemente_instanciable_32_64(Point_32_64,"Point",Elem_geom_base_32_64<_T_>);
 // XD point points point NO_BRACE Point as class-daughter of Points.
 
-/*! @brief NE FAIT RIEN
+/*! @brief Does nothing.
  *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie
+ * @param (Sortie& s) an output stream
+ * @return (Sortie&) the output stream
  */
 template<typename _SIZE_>
 Sortie& Point_32_64<_SIZE_>::printOn(Sortie& s ) const
@@ -31,10 +31,10 @@ Sortie& Point_32_64<_SIZE_>::printOn(Sortie& s ) const
 }
 
 
-/*! @brief NE FAIT RIEN
+/*! @brief Does nothing.
  *
- * @param (Entree& s) un flot d'entree
- * @return (Entree&) le flot d'entree
+ * @param (Entree& s) an input stream
+ * @return (Entree&) the input stream
  */
 template<typename _SIZE_>
 Entree& Point_32_64<_SIZE_>::readOn(Entree& s )
@@ -42,9 +42,9 @@ Entree& Point_32_64<_SIZE_>::readOn(Entree& s )
   return s;
 }
 
-/*! @brief Renvoie le nom LML d'un triangle = "VOXEL8".
+/*! @brief Returns the LML name of a point element = "VOXEL8".
  *
- * @return (Nom&) toujours egal a "VOXEL8"
+ * @return (Nom&) always equal to "VOXEL8"
  */
 template<typename _SIZE_>
 const Nom& Point_32_64<_SIZE_>::nom_lml() const
@@ -54,14 +54,14 @@ const Nom& Point_32_64<_SIZE_>::nom_lml() const
 }
 
 
-/*! @brief Renvoie 1 si l'element ielem du dom associe a l'element geometrique contient le point
+/*! @brief Returns 1 if element ielem of the domain associated with the geometric element contains the point
  *
- *               de coordonnees specifiees par le parametre "pos".
- *     Renvoie 0 sinon.
+ *               with coordinates specified by parameter "pos".
+ *     Returns 0 otherwise.
  *
- * @param (DoubleVect& pos) coordonnees du point que l'on cherche a localiser
- * @param (int element) le numero de l'element du dom dans lequel on cherche le point.
- * @return (int) 1 si le point de coordonnees specifiees appartient a l'element "element" 0 sinon
+ * @param (DoubleVect& pos) coordinates of the point to locate
+ * @param (int element) the index of the domain element in which the point is searched.
+ * @return (int) 1 if the point belongs to element "element", 0 otherwise
  */
 template<typename _SIZE_>
 int Point_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t element ) const
@@ -80,13 +80,13 @@ int Point_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t element ) const
   return ok;
 }
 
-/*! @brief Renvoie 1 si les sommets specifies par le parametre "pos" sont les sommets de l'element "element" du dom associe a
+/*! @brief Returns 1 if the vertices specified by parameter "pos" are the vertices of element "element" of the domain associated with
  *
- *     l'element geometrique.
+ *     the geometric element.
  *
- * @param (IntVect& pos) les numeros des sommets a comparer avec ceux de l'elements "element"
- * @param (int element) le numero de l'element du dom dont on veut comparer les sommets
- * @return (int) 1 si les sommets passes en parametre sont ceux de l'element specifie, 0 sinon
+ * @param (IntVect& pos) the vertex indices to compare with those of element "element"
+ * @param (int element) the index of the domain element whose vertices are to be compared
+ * @return (int) 1 if the vertices passed as parameter are those of the specified element, 0 otherwise
  */
 template<typename _SIZE_>
 int Point_32_64<_SIZE_>::contient(const SmallArrOfTID_t& pos, int_t element ) const

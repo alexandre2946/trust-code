@@ -64,7 +64,7 @@ int Echange_contact_PolyMAC_CDO::initialiser(double temps)
   int i, j, k, l, e, f, N = ch.nb_comp(), o_n_f = o_e_f.dimension(1);
   //Nom nom_racc1=frontiere_dis().frontiere().le_nom();
 
-  //tableaux lies a la stabilisation de Le Potier / Mahamane (cf. Op_Diff_PolyMAC_CDO_Elem)
+  //arrays related to the Le Potier / Mahamane stabilization (see Op_Diff_PolyMAC_CDO_Elem)
   stab_ = ref_cast(Op_Diff_PolyMAC_CDO_Elem, o_eqn.operateur(0).l_op_base()).stab_;
 
   h_imp_.typer("Champ_front_fonc");
@@ -76,7 +76,7 @@ int Echange_contact_PolyMAC_CDO::initialiser(double temps)
 
   monolithic = sub_type(Schema_Euler_Implicite, o_eqn.schema_temps()) ?
                ref_cast(Schema_Euler_Implicite, o_eqn.schema_temps()).resolution_monolithique(o_eqn.domaine_application()) : 0;
-  if (!monolithic) return 1; //pas besoin du reste
+  if (!monolithic) return 1; //rest not needed
   o_domaine.init_m2(), o_domaine.init_virt_ef_map();
 
   /* src(i) = (proc, j) : source de l'item i de mdv_elem_faces */
@@ -85,11 +85,11 @@ int Echange_contact_PolyMAC_CDO::initialiser(double temps)
   for (i = 0; i < src.dimension_tot(0); i++) src(i, 0) = Process::me(), src(i, 1) = i;
   src.echange_espace_virtuel();
 
-  /* o_proc, o_item -> processeur/item de l'element, puis des autres faces utilisees dans W2(f,.) pour chaque face de la frontiere */
+  /* o_proc, o_item -> processor/item of the element, then of the other faces used in W2(f,.) for each face of the boundary */
   DoubleTrav o_proc(0, o_n_f), o_item(0, o_n_f), proc(0, o_n_f), l_item(0, o_n_f);
   o_domaine.creer_tableau_faces(o_proc), o_domaine.creer_tableau_faces(o_item);
   fvf.frontiere().creer_tableau_faces(proc), fvf.frontiere().creer_tableau_faces(l_item);
-  int c_max = 1; //nombre max d'items/coeffs a echanger par face
+  int c_max = 1; //maximum number of items/coefficients to exchange per face
   for (i = 0; i < o_fvf.nb_faces(); i++)
     {
       f = o_fvf.num_face(i), e = o_f_e(f, 0);
@@ -100,30 +100,30 @@ int Echange_contact_PolyMAC_CDO::initialiser(double temps)
           int idx = o_domaine.nb_elem_tot() + o_e_f(e, o_domaine.w2j(k));
           o_proc(f, l) = src(idx, 0), o_item(f, l) = src(idx, 1);
         }
-      for (c_max = std::max(c_max, l); l < o_n_f; l++) o_proc(f, l) = o_item(f, l) = -1; //on finit avec des -1
+      for (c_max = std::max(c_max, l); l < o_n_f; l++) o_proc(f, l) = o_item(f, l) = -1; //fill remaining entries with -1
     }
   c_max = Process::mp_max(c_max);
 
-  //projection sur la frontiere locale
+  //projection onto the local boundary
   if (o_fvf.frontiere().que_suis_je() == "Raccord_distant_homogene")
     o_fvf.frontiere().trace_face_distant(o_proc, proc), o_fvf.frontiere().trace_face_distant(o_item, l_item);
   else o_fvf.frontiere().trace_face_local(o_proc, proc), o_fvf.frontiere().trace_face_local(o_item, l_item);
 
-  //remplissage
+  //filling
   item.resize(fvf.nb_faces(), c_max), item = -1;
   for (i = 0; i < fvf.nb_faces(); i++)
     for (j = 0; j < c_max && l_item(i, j) >= 0; j++)
-      if (proc(i, j) == Process::me()) item(i, j) = (int)std::lrint(l_item(i, j));                     //item local (reel)
+      if (proc(i, j) == Process::me()) item(i, j) = (int)std::lrint(l_item(i, j));                     //local item (real)
       else
         {
-          if (o_domaine.virt_ef_map.count({{ (int) proc(i, j), (int) l_item(i, j) }}))   //item local (virtuel)
+          if (o_domaine.virt_ef_map.count({{ (int) proc(i, j), (int) l_item(i, j) }}))   //local item (virtual)
           {
             item(i, j) = o_domaine.virt_ef_map.at({{ (int) proc(i, j),  (int) l_item(i, j) }});
           }
           else Process::exit(Nom("Echange_contact_PolyMAC_CDO: missing item opposite face ") + Nom(fvf.num_face(i)) + " on " + fvf.le_nom() + " ! Have you used Decouper_multi?");
         }
 
-  //coeff : 1 coeff de plus que item -> celui de la face elle-meme (mis au debut)
+  //coeff: 1 coefficient more than item -> the one for the face itself (placed at the beginning)
   coeff.resize(0, 1 + item.dimension(1), N), delta_int.resize(0, N, 2),
                fvf.frontiere().creer_tableau_faces(coeff);
 
@@ -139,7 +139,7 @@ int Echange_contact_PolyMAC_CDO::initialiser(double temps)
 void Echange_contact_PolyMAC_CDO::update_coeffs()
 {
   if (coeffs_a_jour_) return;
-  //objets de l'autre cote : equation, domaine, inconnue (prefix o_), frontiere (pour faire trace_face_distant)
+  //objects on the other side: equation, domain, unknown (prefix o_), boundary (for trace_face_distant)
   Champ_front_calc& ch=ref_cast(Champ_front_calc, T_autre_pb());
   const Domaine_PolyMAC_CDO& o_domaine = ref_cast(Domaine_PolyMAC_CDO, ch.domaine_dis());
   const Equation_base&    o_eqn  = ch.equation();
@@ -149,11 +149,11 @@ void Echange_contact_PolyMAC_CDO::update_coeffs()
   const IntTab& e_f = o_domaine.elem_faces();
   const DoubleVect& fs = o_domaine.face_surfaces(), &ve = o_domaine.volumes();
 
-  //tableaux "nu_faces" utilises par les operateurs de diffusion de chaque cote
+  //"nu_faces" arrays used by the diffusion operators on each side
   o_op_diff.update_nu(), o_op_diff.update_delta_int();
   int ne_tot = o_domaine.nb_elem_tot(), N = ch.nb_comp();
 
-  //tableaux aux faces de l'autre cote, a transmettre par o_fr.trace_face_{distant,local} : on ne les remplit que sur les faces de o_fr
+  //arrays at faces on the other side, to be transmitted via o_fr.trace_face_{distant,local}: filled only for faces of o_fr
   o_domaine.init_m2();
   DoubleTrav o_Text, o_Himp, o_coeff, o_delta_int, nu_ef(e_f.dimension(1), N);
   if (monolithic) o_coeff.resize(o_domaine.nb_faces(), 1 + item.dimension(1), N), o_delta_int.resize(o_domaine.nb_faces(), N, 2);
@@ -162,10 +162,10 @@ void Echange_contact_PolyMAC_CDO::update_coeffs()
     {
       int f = o_fvf.num_face(i), e = o_domaine.face_voisins(f, 0), fb, j, k, n, i_f = 0, idx;
       for (j = 0; j < e_f.dimension(1) && (fb = e_f(e, j)) >= 0; j++)
-        if (fb == f) i_f = j; //numero de la face f dans l'element e
+        if (fb == f) i_f = j; //index of face f within element e
       o_op_diff.remplir_nu_ef(e, nu_ef);
 
-      /* construction du flux de chaleur sortant, en mettant la partie en T_f dans H_imp et le reste dans T_ext */
+      /* build the outgoing heat flux, putting the T_f part in H_imp and the rest in T_ext */
       for (j = o_domaine.w2i(o_domaine.m2d(e) + i_f), idx = 0; j < o_domaine.w2i(o_domaine.m2d(e) + i_f + 1); j++, idx++)
         for (fb = e_f(e, o_domaine.w2j(j)), n = 0; n < N; n++)
           {
@@ -182,8 +182,8 @@ void Echange_contact_PolyMAC_CDO::update_coeffs()
       for (n = 0; stab_ && monolithic && n < N; n++)
         for (k = 0; k < 2; k++) o_delta_int(f, n, k) = o_op_diff.delta_f_int(f, n, k);
       for (n = 0; !monolithic && n < N; n++)
-        if (o_Himp(f, n) > 1e-10) o_Text(f, n) /= o_Himp(f, n); //passage au vrai T_ext
-      for (n = 0; h_paroi < 1e9 && n < N; n++) //prise en compte de la resistance de la paroi
+        if (o_Himp(f, n) > 1e-10) o_Text(f, n) /= o_Himp(f, n); //convert to actual T_ext
+      for (n = 0; h_paroi < 1e9 && n < N; n++) //account for the wall thermal resistance
         {
           double fac = h_paroi / (h_paroi + (monolithic ? o_coeff(f, 0, n) / fs(f) : o_Himp(f, n)));
           if (monolithic)
@@ -195,7 +195,7 @@ void Echange_contact_PolyMAC_CDO::update_coeffs()
         }
     }
 
-  //transmission : soit par Raccord_distant_homogene, soit copie simple
+  //transmission: either via Raccord_distant_homogene, or simple copy
   if (o_fvf.frontiere().que_suis_je() == "Raccord_distant_homogene")
     {
       if (monolithic) o_fvf.frontiere().trace_face_distant(o_coeff, coeff);
@@ -217,7 +217,7 @@ void Echange_contact_PolyMAC_CDO::update_coeffs()
 
 void Echange_contact_PolyMAC_CDO::update_delta() const
 {
-  if (!monolithic || delta_a_jour_) return; //deja fait
+  if (!monolithic || delta_a_jour_) return; //already done
   const Champ_front_calc& ch=ref_cast(Champ_front_calc, T_autre_pb());
   const Front_VF& o_fvf = ref_cast(Front_VF, ch.front_dis());
   const Domaine_PolyMAC_CDO& o_domaine = ref_cast(Domaine_PolyMAC_CDO, ch.domaine_dis());
@@ -225,7 +225,7 @@ void Echange_contact_PolyMAC_CDO::update_delta() const
   const Op_Diff_PolyMAC_CDO_Elem& o_op_diff = ref_cast(Op_Diff_PolyMAC_CDO_Elem, o_eqn.operateur(0).l_op_base());
   const IntTab& e_f = o_domaine.elem_faces();
 
-  //remplissage
+  //filling
   o_op_diff.update_delta();
   int i, j, n, N = ch.nb_comp();
   DoubleTrav o_delta(o_domaine.nb_faces(), item.dimension(1), N);
@@ -233,9 +233,9 @@ void Echange_contact_PolyMAC_CDO::update_delta() const
     {
       int f = o_fvf.num_face(i), fb, e = o_domaine.face_voisins(f, 0), i_f = 0, idx;
       for (j = 0; j < e_f.dimension(1) && (fb = e_f(e, j)) >= 0; j++)
-        if (fb == f) i_f = j; //numero de la face f dans l'element e
+        if (fb == f) i_f = j; //index of face f within element e
       for (n = 0; n < N; n++) o_delta(f, 0, n) = o_op_diff.delta_e(e, n);
-      for (j = o_domaine.w2i(o_domaine.m2d(e) + i_f) + 1, idx = 1; j < o_domaine.w2i(o_domaine.m2d(e) + i_f + 1); j++, idx++) //on saute le premier coeff (diagonale)
+      for (j = o_domaine.w2i(o_domaine.m2d(e) + i_f) + 1, idx = 1; j < o_domaine.w2i(o_domaine.m2d(e) + i_f + 1); j++, idx++) //skip the first coefficient (diagonal)
         for (n = 0; n < N; n++) o_delta(f, idx, n) = o_op_diff.delta_f(e_f(e, o_domaine.w2j(j)), n);
     }
 

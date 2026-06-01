@@ -37,7 +37,7 @@ Entree& Champ_Fonc_Tabule_Morceaux_Interp::readOn(Entree& is)
 
 int Champ_Fonc_Tabule_Morceaux_Interp::initialiser(const double tps)
 {
-  /* remplissage de ch_param_interp (champ_fonc_interp) et des i_ch (champs utilises par chaque morceau) */
+  /* fill ch_param_interp (champ_fonc_interp) and i_ch (fields used by each piece) */
   std::vector<std::array<std::string, 3>> v_pb_ch(s_pb_ch.begin(), s_pb_ch.end()); //set -> vector
 
   ch_param_interp.resize(v_pb_ch.size());
@@ -65,8 +65,8 @@ void Champ_Fonc_Tabule_Morceaux_Interp::mettre_a_jour(double time)
 {
 
   DoubleTab& tab = valeurs();
-  std::vector<const DoubleTab* > pval; /* valeurs des parametres */
-  std::vector<bool> is_multi; /* true si le champ correspondant est multi_composantes */
+  std::vector<const DoubleTab* > pval; /* parameter values */
+  std::vector<bool> is_multi; /* true if the corresponding field is multi-component */
   pval.reserve(ch_param_interp.size()), is_multi.reserve(ch_param_interp.size());
   for (auto &&pch : ch_param_interp)
     {
@@ -83,7 +83,7 @@ void Champ_Fonc_Tabule_Morceaux_Interp::mettre_a_jour(double time)
         tab(e, 0) = mor.la_table.val_simple((*pval[mor.i_ch[0]])(e, 0));
       else for (int n = 0, m; n < N; n++)
           {
-            for (vals.clear(), m = 0; m < M; m++) vals.push_back((*pval[mor.i_ch[m]])(e, n * is_multi[mor.i_ch[m]])); /* si le champ parametre est multi-compo, on prend la meme que celle du champ */
+            for (vals.clear(), m = 0; m < M; m++) vals.push_back((*pval[mor.i_ch[m]])(e, n * is_multi[mor.i_ch[m]])); /* if the parameter field is multi-component, take the same component as the field */
             tab(e, n) = mor.la_table.val(vals, n);
           }
     }

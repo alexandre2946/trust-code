@@ -21,14 +21,14 @@
 #include <TRUSTTabs_forward.h>
 #include <Domaine_forward.h>
 
-/*! @brief Classe ExtrudeParoi Cette classe est un interprete qui sert a lire et executer
+/*! @brief class ExtrudeParoi This class is an interpreter used to read and execute
  *
- *     la directive ExtrudeParoi:
- *         ExtrudeParoi nom_domaine
- *     Cette directive est a utiliser en discretisation VEF 2D pour obtenir
- *     un maillage 3D par extrusion puis decoupage.
+ *     the ExtrudeParoi directive:
+ *         ExtrudeParoi domain_name
+ *     This directive is intended for VEF 2D discretization to obtain
+ *     a 3D mesh by extrusion followed by cutting.
  *
- * @sa Interprete ExtrudeParoi, Cette classe est utilisable en 3D
+ * @sa Interprete ExtrudeParoi, this class is also usable in 3D
  */
 class ExtrudeParoi : public Interprete_geometrique_base
 {
@@ -45,7 +45,7 @@ protected:
   Nom nom_front;
   int nb_couche;
   ArrOfDouble epaisseur;
-  bool type = false; // false (par defaut) : epaisseur relative | true : epaisseur absolue
+  bool type = false; // false (default): relative thickness | true: absolute thickness
   int projection_normale_bord;
 
 private:

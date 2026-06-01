@@ -56,15 +56,15 @@ Entree& Op_Conv_Centre_PolyMAC_HFV_Elem::readOn(Entree& is) { return Op_Conv_EF_
 Entree& Op_Conv_EF_Stab_PolyMAC_HFV_Elem::readOn(Entree& is)
 {
   Op_Conv_PolyMAC_CDO_base::readOn(is);
-  if (que_suis_je().debute_par("Op_Conv_EF_Stab") or que_suis_je().debute_par("Op_Conv_ALE")) //on n'est pas dans Op_Conv_Amont/Centre
+  if (que_suis_je().debute_par("Op_Conv_EF_Stab") or que_suis_je().debute_par("Op_Conv_ALE")) //not in Op_Conv_Amont/Centre
     {
       Param param(que_suis_je());
       param.ajouter("alpha", &alpha_);            // XD_ADD_P double
-      // XD_CONT parametre ajustant la stabilisation de 0 (schema centre) a 1 (schema amont)
+      // XD_CONT parameter adjusting stabilization from 0 (centered scheme) to 1 (upwind scheme)
       param.lire_avec_accolades_depuis(is);
     }
 
-  if (sub_type(Masse_Multiphase, equation())) //convection dans Masse_Multiphase -> champs de debit / titre
+  if (sub_type(Masse_Multiphase, equation())) //convection in Masse_Multiphase -> mass flow / title fields
     {
       const Pb_Multiphase& pb = ref_cast(Pb_Multiphase, equation().probleme());
       noms_cc_phases_.dimensionner(pb.nb_phases());
@@ -90,7 +90,7 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::preparer_calcul()
 {
   Op_Conv_PolyMAC_CDO_base::preparer_calcul();
 
-  /* au cas ou... */
+  /* just in case... */
   const Domaine_Poly_base& domaine = le_dom_poly_.valeur();
   equation().init_champ_convecte();
   flux_bords_.resize(domaine.premiere_face_int(), (le_champ_inco ? le_champ_inco->valeurs() : equation().inconnue().valeurs()).line_size());
@@ -119,7 +119,7 @@ double Op_Conv_EF_Stab_PolyMAC_HFV_Elem::calculer_dt_stab_gen(const DoubleTab& v
   const IntTab& e_f = domaine.elem_faces(), &f_e = domaine.face_voisins(), &fcl = ref_cast(Champ_Elem_PolyMAC_CDO, equation().inconnue()).fcl();
   const int N = std::min(vit.line_size(), equation().inconnue().valeurs().line_size());
 
-  DoubleTrav flux(N); //somme des flux pf * |f| * vf
+  DoubleTrav flux(N); //sum of fluxes pf * |f| * vf
   double dt = 1.e10;
 
   for (int e = 0; e < domaine.nb_elem(); e++)
@@ -135,12 +135,12 @@ double Op_Conv_EF_Stab_PolyMAC_HFV_Elem::calculer_dt_stab_gen(const DoubleTab& v
             for (int n = 0; n < N; n++)
               {
                 const int idx_phase = idx_phase_transportante_ > -1 ? idx_phase_transportante_ : n;
-                flux(n) += pf(f) * fs(f) * std::max((e == f_e(f, 1) ? 1 : -1) * vit(f, idx_phase), 0.); //seul le flux entrant dans e compte
+                flux(n) += pf(f) * fs(f) * std::max((e == f_e(f, 1) ? 1 : -1) * vit(f, idx_phase), 0.); //only the flux entering e counts
               }
         }
 
       for (int n = 0; n < N; n++)
-        if ((!alp || (*alp)(e, n) > 1e-3) && std::abs(flux(n)) > 1e-12 /* eviter les valeurs 'tres proches de 0 mais pas completement nulles' */)
+        if ((!alp || (*alp)(e, n) > 1e-3) && std::abs(flux(n)) > 1e-12 /* avoid values 'very close to 0 but not completely zero' */)
           dt = std::min(dt, poro_vol / flux(n));
     }
 
@@ -157,7 +157,7 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::dimensionner_blocs(matrices_t mats, const
 
   for (const auto &i_m : mats)
     {
-      // Verification des conditions sur "vitesse" ou les derivees semi-implicites
+      // Check conditions on "vitesse" or semi-implicit derivatives
       if (i_m.first == "vitesse" || (cc.derivees().count(i_m.first) && !semi_impl.count(cc.le_nom().getString())))
         {
           Matrice_Morse mat;
@@ -167,9 +167,9 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::dimensionner_blocs(matrices_t mats, const
 
           if (i_m.first == "vitesse")
             {
-              // Traitement specifique pour "vitesse"
+              // Specific treatment for "vitesse"
               for (int f = 0; f < domaine.nb_faces_tot(); f++)
-                if (fcl_v(f, 0) < 2) // CL mais pas dirichlet ou face interne
+                if (fcl_v(f, 0) < 2) // boundary condition but not Dirichlet, or internal face
                   for (int i = 0; i < 2; i++)
                     {
                       int e = f_e(f, i);
@@ -185,7 +185,7 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::dimensionner_blocs(matrices_t mats, const
             }
           else
             {
-              // Traitement pour les inconnues scalaires
+              // Treatment for scalar unknowns
               for (int f = 0; f < domaine.nb_faces_tot(); f++)
                 for (int i = 0; i < 2; i++)
                   {
@@ -205,13 +205,13 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::dimensionner_blocs(matrices_t mats, const
                   }
             }
 
-          // Suppression des doublons et allocation de la matrice
+          // Remove duplicates and allocate the matrix
           tableau_trier_retirer_doublons(stencil);
           Matrix_tools::allocate_morse_matrix(equation().inconnue().valeurs().size_totale(),
                                               (i_m.first == "vitesse" ? vitesse_->valeurs().size_totale() : cc.derivees().at(i_m.first).size_totale()),
                                               stencil, mat);
 
-          // Mise a jour de la matrice dans la collection
+          // Update the matrix in the collection
           if (i_m.second->nb_colonnes())
             *i_m.second += mat;
           else
@@ -226,8 +226,8 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::ajouter_blocs(matrices_t mats, DoubleTab&
   ajouter_blocs_gen(mats, secmem, vit, semi_impl);
 }
 
-// ajoute la contribution de la convection au second membre resu
-// renvoie resu
+// adds the convection contribution to the right-hand side resu
+// returns resu
 void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::ajouter_blocs_gen(matrices_t mats, DoubleTab& secmem, const DoubleTab& vit, const tabs_t& semi_impl) const
 {
   const Domaine_Poly_base& domaine = le_dom_poly_.valeur();
@@ -243,16 +243,16 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::ajouter_blocs_gen(matrices_t mats, Double
   const DoubleTab& vcc = semi_impl.count(nom_cc) ? semi_impl.at(nom_cc) : cc.valeurs(), bcc = cc.valeur_aux_bords();
   const int N = vcc.line_size(), Mv = vit.line_size();
 
-  std::vector<std::tuple<const DoubleTab*, Matrice_Morse*, int>> d_cc; //liste des derivees de cc a renseigner : couples (derivee de cc, matrice, nb de compos de la variable)
+  std::vector<std::tuple<const DoubleTab*, Matrice_Morse*, int>> d_cc; //list of cc derivatives to fill: pairs (cc derivative, matrix, number of variable components)
 
   if (!semi_impl.count(nom_cc))
     for (auto &i_m : mats)
       if (cc.derivees().count(i_m.first))
         d_cc.push_back(std::make_tuple(&cc.derivees().at(i_m.first), i_m.second, equation().probleme().get_champ(i_m.first.c_str()).valeurs().line_size()));
 
-  DoubleTrav dv_flux(N), dc_flux(2, N); //derivees du flux convectif a la face par rapport a la vitesse / au champ convecte amont / aval
+  DoubleTrav dv_flux(N), dc_flux(2, N); //derivatives of the convective flux at the face with respect to velocity / upwind / downwind convected field
 
-  // Convection aux faces internes, Neumann_val_ext ou Dirichlet
+  // Convection at internal faces, Neumann_val_ext or Dirichlet
   for (int f = 0; f < domaine.nb_faces(); f++)
     {
       const bool traiter_face = (fcl(f, 0) == 0 || (fcl(f, 0) > 4 && fcl(f, 0) < 7));
@@ -261,7 +261,7 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::ajouter_blocs_gen(matrices_t mats, Double
           dv_flux = 0.;
           dc_flux = 0.;
 
-          // Calcul de dv_flux et dc_flux
+          // Compute dv_flux and dc_flux
           for (int i = 0; i < 2; i++)
             {
               int e = f_e(f, i);
@@ -274,12 +274,12 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::ajouter_blocs_gen(matrices_t mats, Double
                   const double v = vit_f ? vit_f : DBL_MIN;
                   const double fac = pf(f) * fs(f) * (1. + (v * (i ? -1 : 1) > 0 ? 1. : -1) * alpha_) / 2;
 
-                  dv_flux(n) += fac * (e >= 0 ? vcc(e, n) : bcc(f, n));  // f est reelle -> indice trivial dans bcc
+                  dv_flux(n) += fac * (e >= 0 ? vcc(e, n) : bcc(f, n));  // f is real -> trivial index in bcc
                   dc_flux(i, n) = e >= 0 ? fac * vit_f : 0;
                 }
             }
 
-          // Mise a jour du second membre
+          // Update the right-hand side
           for (int i = 0; i < 2; i++)
             {
               int e = f_e(f, i);
@@ -296,7 +296,7 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::ajouter_blocs_gen(matrices_t mats, Double
                 }
             }
 
-          // Mise a jour des derivees : vitesse
+          // Update derivatives: velocity
           if (m_vit && fcl_v(f, 0) < 2)
             for (int i = 0; i < 2; i++)
               {
@@ -314,7 +314,7 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::ajouter_blocs_gen(matrices_t mats, Double
                   }
               }
 
-          // Mise a jour des derivees : champ convecte
+          // Update derivatives: convected field
           for (auto &&d_m_i : d_cc)
             {
               int M = std::get<2>(d_m_i);
@@ -413,9 +413,9 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::mettre_a_jour_gen(double temps, const Dou
     balp = equation().inconnue().valeur_aux_bords();
 
   const int  D = dimension,  N = vcc.line_size(), M = vit.line_size();
-  DoubleTrav cc_f(N); //valeur du champ convecte aux faces
+  DoubleTrav cc_f(N); //value of the convected field at faces
 
-  /* flux aux bords */
+  /* boundary fluxes */
   for (int f = 0; f < domaine.premiere_face_int(); f++)
     {
       cc_f = 0.;
@@ -442,7 +442,7 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::mettre_a_jour_gen(double temps, const Dou
     {
       int m = 0;
       for (int n = 0; n < N; n++, m += (M > 1))
-        if (cc_phases_[n]) /* mise a jour des champs de debit */
+        if (cc_phases_[n]) /* update flow rate fields */
           {
             Champ_Face_PolyMAC_HFV& c_ph = ref_cast(Champ_Face_PolyMAC_HFV, cc_phases_[n].valeur());
             DoubleTab& v_ph = c_ph.valeurs();
@@ -472,13 +472,13 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::mettre_a_jour_gen(double temps, const Dou
     {
       int m = 0;
       for (int n = 0; n < N; n++, m += (M > 1))
-        if (vd_phases_[n]) /* mise a jour des champs de vitesse debitante */
+        if (vd_phases_[n]) /* update superficial velocity fields */
           {
             const DoubleTab& alp = equation().inconnue().valeurs();
             Champ_Face_PolyMAC_HFV& c_ph = ref_cast(Champ_Face_PolyMAC_HFV, vd_phases_[n].valeur());
             DoubleTab& v_ph = c_ph.valeurs();
 
-            /* on remplit la partie aux faces, puis on demande au champ d'interpoler aux elements */
+            /* fill the face part, then ask the field to interpolate to elements */
             for (int f = 0; f < domaine.nb_faces(); f++)
               {
                 v_ph(f) = 0.;
@@ -504,7 +504,7 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Elem::mettre_a_jour_gen(double temps, const Dou
   double Gt;
 
   if (x_phases_.size())
-    for (int e = 0; e < domaine.nb_elem(); e++) // titre : aux elements
+    for (int e = 0; e < domaine.nb_elem(); e++) // void fraction: at elements
       {
         v = 0.;
         for (int i = 0; i < e_f.dimension(1); i++)

@@ -27,84 +27,84 @@ class Op_Diff_VEF_Face_Penalise : public Op_Diff_VEF_Face
   Declare_instanciable(Op_Diff_VEF_Face_Penalise);
 
 public :
-  /* Fonction membre calculant la diffusion penalisee.
-   * Elle est surchargee par rapport a sa classe mere.
+  /* Member function computing the penalised diffusion.
+   * Overrides the base class version.
    */
   DoubleTab& ajouter(const DoubleTab& inconnue, DoubleTab& resu) const override;
   DoubleTab& calculer(const DoubleTab& inconnue, DoubleTab& resu) const override;
 
 protected:
 
-  /* Fonction membre qui renvoie dans la liste Voisinage, l'ensemble
-   * des numeros des faces voisines de la face Numero_face.
-   * On entend par faces voisines, des faces appartenant aux triangles
-   * contenant la face Numero_face.
-   * Rem: Voisinage contient egalement la face Numero_face.
+  /* Member function returning in the list Voisinage the set
+   * of face indices neighbouring face Numero_face.
+   * Neighbouring faces are those belonging to elements
+   * that contain face Numero_face.
+   * Note: Voisinage also contains face Numero_face itself.
    */
   void voisinage(const int Numero_face, IntList& Voisinage) const;
 
-  /* Fonction membre qui renvoie dans la liste Voisinage,
-   * l'ensemble des faces qui constitue le voisinage de la liste
+  /* Member function returning in the list Voisinage
+   * the set of faces constituting the neighbourhood of the list
    * Ensemble_faces.
-   * Rem: Voisinage contient egalement les elements de Ensemble_faces.
+   * Note: Voisinage also contains the elements of Ensemble_faces.
    */
   void voisinage(const IntList& Ensemble_faces, IntList& Voisinage) const;
 
-  /* Fonction membre qui renvoie le signe adequat pour
-   * le calcul des interactions des fonctions de base des faces
-   * Face1 et Face2 le long d'une autre face.
+  /* Member function returning the appropriate sign for
+   * computing the interactions of the basis functions of faces
+   * Face1 and Face2 along another face.
    */
   double signe(const int Face1, const int Face2 ) const;
 
-  /* Fonction membre qui renvoie le coefficient de penalisation
-   * a passer sur chaque arete du maillage primaire.
+  /* Member function returning the penalisation coefficient
+   * to be applied on each edge of the primary mesh.
    */
   double coefficient_penalisation(const int Numero_face) const;
 
-  /* Fonction membre qui renvoie la liste Faces_communes des faces
-   * qui appartiennent au voisinage de Face1 ET de Face2
+  /* Member function returning the list Faces_communes of faces
+   * that belong to the neighbourhood of both Face1 AND Face2.
    */
   void faces_communes(const int Face1,const int Face2,
                       IntList& Face_commune) const;
 
-  /* Fonction membre qui renvoie la liste Liste_reduite qui est
-   * la soustraction des listes Liste1, Liste2.
-   * Rem: cette fonction regarde dynamiquement les longueurs de
-   * chacune des listes Liste1 et Liste2 avant de s'executer
+  /* Member function returning the list Liste_reduite which is
+   * the set difference of Liste1 and Liste2.
+   * Note: the function dynamically checks the lengths of
+   * Liste1 and Liste2 before executing.
    */
   void reduction(const IntList& Liste1,const IntList& Liste2,
                  IntList& Liste_reduite) const;
 
-  /* Fonction membre qui renvoie le numero de l'element commun
-   * a Face1 et a Face2 s'il existe et renvoie -1 sinon
+  /* Member function returning the index of the element shared by
+   * Face1 and Face2 if it exists, or -1 otherwise.
    */
   int element_commun(const int Face1,const int Face2) const;
 
-  /* Fonction membre qui retourne le numero de la 3eme face
-   * d'un element, si Face1 et Face2 appartiennent au meme element.
-   * Sinon retourne -1.
+  /* Member function returning the index of the 3rd face
+   * of an element, if Face1 and Face2 belong to the same element.
+   * Returns -1 otherwise.
    */
   int autre_face(const int Face1, const int Face2) const;
 
-  /* Fonction membre qui retourne le diametre de l'element Element
-   * Rem: on considere que l'on opere en 2D.
+  /* Member function returning the diameter of element Element.
+   * Note: assumed to operate in 2D.
    */
   inline double diametre(const int Element) const;
 
-  /* Fonction membre qui renvoie la longueur de la face Face
-   * Rem: on considere que l'on opere en 2D.
+  /* Member function returning the length of face Face.
+   * Note: assumed to operate in 2D.
    */
   inline double longueur(const int Face) const;
 
 
 private:
-  /* Fonction membre qui retourne le Domaine_VEF du domaine. */
+  /* Member function returning the Domaine_VEF of the domain. */
   inline const Domaine_VEF& domaine_vef() const;
 
-  /* Fonction membre qui retourne le Domaine du probleme. */
+  /* Member function returning the Domaine of the problem. */
   inline const Domaine&  domaine() const;
 
-  /* Fonction membre qui renvoie le domaine de conditions aux limitex. */
+  /* Member function returning the boundary conditions domain. */
   inline const Domaine_Cl_VEF& domaine_cl() const;
 
 };

@@ -19,7 +19,7 @@
 #include <Interprete_geometrique_base.h>
 #include <Domaine_forward.h>
 
-/*! @brief Classe NettoieNoeuds x->alpha x
+/*! @brief Class NettoieNoeuds x->alpha x
  *
  * @sa Interprete Pave
  */

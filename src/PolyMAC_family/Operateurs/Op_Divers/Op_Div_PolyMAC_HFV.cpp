@@ -45,15 +45,15 @@ void Op_Div_PolyMAC_HFV::dimensionner_blocs(matrices_t matrices, const tabs_t& s
                   matv2, matp2;
 
   Stencil sten_v(0, 2), sten_p(0, 2);
-  DoubleTab w2; //matrice w2 aux elements (la meme que dans Op_Grad et Assembleur_P)
+  DoubleTab w2; //w2 matrix at elements (same as in Op_Grad and Assembleur_P)
 
-  // Dependance en v : divergence par element et v = v_imp aux faces de Dirichlet
+  // Dependence on v: divergence per element and v = v_imp at Dirichlet faces
   if (matv)
     for (int f = 0; f < domaine.nb_faces(); f++)
       {
-        if (fcl(f, 0) > 1) // v impose par les conditions limites
+        if (fcl(f, 0) > 1) // v imposed by boundary conditions
           sten_v.append_line(ne_tot + f, f);
-        else // v calcule : contribution a la divergence aux elements
+        else // v computed: contribution to element divergence
           for (int i = 0; i < 2; i++)
             {
               const int e = f_e(f, i);
@@ -64,21 +64,21 @@ void Op_Div_PolyMAC_HFV::dimensionner_blocs(matrices_t matrices, const tabs_t& s
             }
       }
 
-  // Dependance en p : equation sur p_f
+  // Dependence on p: equation on p_f
   if (matp)
     {
       for (int e = 0; e < domaine.nb_elem_tot(); e++)
         {
-          domaine.W2(nullptr, e, w2); // Calcul de la matrice W2
+          domaine.W2(nullptr, e, w2); // Compute the W2 matrix
 
           for (int i = 0; i < w2.dimension(0); i++)
             {
               int f = e_f(e, i);
-              if (fcl(f, 0) == 1) // Aux faces de Neumann : p_f = p_imp
+              if (fcl(f, 0) == 1) // At Neumann faces: p_f = p_imp
                 sten_p.append_line(ne_tot + f, ne_tot + f);
               else if (!fcl(f, 0))
                 {
-                  // Aux faces internes : egalite des deux gradients
+                  // At internal faces: equality of the two gradients
                   sten_p.append_line(ne_tot + f, e);
                   for (int j = 0; j < w2.dimension(1); j++)
                     if (w2(i, j, 0))
@@ -87,12 +87,12 @@ void Op_Div_PolyMAC_HFV::dimensionner_blocs(matrices_t matrices, const tabs_t& s
             }
         }
 
-      // Diagonale du vide pour matp
+      // Empty diagonal for matp
       for (int e = 0; e < domaine.nb_elem(); e++)
         sten_p.append_line(e, e);
     }
 
-  // Allocation des matrices pour matv
+  // Allocate matrices for matv
   if (matv)
     {
       tableau_trier_retirer_doublons(sten_v);
@@ -104,7 +104,7 @@ void Op_Div_PolyMAC_HFV::dimensionner_blocs(matrices_t matrices, const tabs_t& s
         *matv = matv2;
     }
 
-  // Allocation des matrices pour matp
+  // Allocate matrices for matp
   if (matp)
     {
       tableau_trier_retirer_doublons(sten_p);
@@ -128,20 +128,20 @@ void Op_Div_PolyMAC_HFV::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matr
   const int ne_tot = domaine.nb_elem_tot(), D = dimension, has_f = secmem.dimension_tot(0) > ne_tot;
   Matrice_Morse *matv = matrices.count("vitesse") ? matrices["vitesse"] : nullptr, *matp = matrices.count("pression") ? matrices["pression"] : nullptr; //, matv2, matp2;
 
-  DoubleTrav w2; //matrice w2 aux elements (la meme que dans Op_Grad et Assembleur_P)
+  DoubleTrav w2; //w2 matrix at elements (same as in Op_Grad and Assembleur_P)
 
 
   DoubleTab& tab_flux_bords = flux_bords_;
   tab_flux_bords.resize(domaine.nb_faces_bord(), 1);
 
-  for (int f = 0; f < domaine.nb_faces(); f++) /* divergence aux elements + equations aux bords */
+  for (int f = 0; f < domaine.nb_faces(); f++) /* divergence at elements + equations at boundaries */
     {
       for (int i = 0; i < 2; i++)
         {
           const int e = f_e(f, i);
           if (e < 0) continue;
 
-          if (e < domaine.nb_elem()) /* divergence aux elems */
+          if (e < domaine.nb_elem()) /* divergence at elements */
             {
               secmem(e) -= (i ? 1 : -1) * fs(f) * pf(f) * vit(f);
               if (fcl(f, 0) < 2 && matv)
@@ -152,7 +152,7 @@ void Op_Div_PolyMAC_HFV::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matr
       if (f < domaine.premiere_face_int())
         tab_flux_bords(f) = fs(f) * pf(f) * vit(f);
 
-      /* equations v = v_imp ou p = p_imp aux faces de bord */
+      /* equations v = v_imp or p = p_imp at boundary faces */
       if (has_f && fcl(f, 0) > 1)
         {
           if (fcl(f, 0) == 3)
@@ -162,14 +162,14 @@ void Op_Div_PolyMAC_HFV::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matr
           if (matv)
             (*matv)(ne_tot + f, f) += fs(f) * pf(f);
         }
-      else if (has_f && matp && fcl(f, 0) == 1) // si appel depuis ajouter(vpoint, div) alors on ne fait rien ici
+      else if (has_f && matp && fcl(f, 0) == 1) // if called from ajouter(vpoint, div) then do nothing here
         {
           secmem(ne_tot + f) += ref_cast(Neumann, cls[fcl(f, 1)].valeur()).flux_impose(fcl(f, 2), 0) - press(ne_tot + f);
           (*matp)(ne_tot + f, ne_tot + f) += 1;
         }
     }
 
-  /* equations aux faces internes : egalite des gradients */
+  /* equations at internal faces: gradient equality */
   if (!has_f || matrices.size() == 0) return; // already done in assembleur_pression
   for (int e = 0; e < domaine.nb_elem_tot(); e++)
     {

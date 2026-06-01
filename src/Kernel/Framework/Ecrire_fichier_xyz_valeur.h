@@ -26,7 +26,7 @@ class Operateur_Statistique_tps_base;
 class Equation_base;
 class Champ_base;
 
-/*! @brief classe Ecrire_fichier_xyz_valeur This class allows to dump fields values on some boundaries into a dedicated text file.
+/*! @brief class Ecrire_fichier_xyz_valeur This class allows to dump fields values on some boundaries into a dedicated text file.
  */
 class Ecrire_fichier_xyz_valeur : public Objet_U
 {

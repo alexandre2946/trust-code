@@ -16,7 +16,7 @@
 #ifndef Modif_bord_to_raccord_included
 #define Modif_bord_to_raccord_included
 
-/*! @brief class Modif_bord_to_raccord transforme un bord en raccord local homogene
+/*! @brief class Modif_bord_to_raccord transforms a boundary into a local homogeneous connector
  *
  *
  *

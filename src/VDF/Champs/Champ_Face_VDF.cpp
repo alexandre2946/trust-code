@@ -29,7 +29,7 @@
 #include <Option_VDF.h>
 #include <Navier.h>
 
-// XXX : Elie Saikali : je garde Champ_Face aussi sinon faut changer typer et reprise dans bcp des endroits ...
+// XXX : Elie Saikali : keeping Champ_Face as well, otherwise typer and reprise would need to be changed in many places ...
 Implemente_instanciable(Champ_Face_VDF,"Champ_Face|Champ_Face_VDF",Champ_Face_base);
 
 Sortie& Champ_Face_VDF::printOn(Sortie& s) const { return s << que_suis_je() << " " << le_nom(); }
@@ -44,7 +44,7 @@ int Champ_Face_VDF::fixer_nb_valeurs_nodales(int nb_noeuds)
 {
   assert(nb_noeuds == domaine_vdf().nb_faces());
   const MD_Vector& md = domaine_vdf().md_vector_faces();
-  // Probleme: nb_comp vaut 2 mais on ne veut qu'une dimension !!!
+  // Problem: nb_comp equals 2 but only one dimension is wanted !!!
   // HACK :
   int old_nb_compo = nb_compo_;
   if(nb_compo_ >= dimension) nb_compo_ /= dimension;
@@ -209,12 +209,11 @@ void Champ_Face_VDF::verifie_valeurs_cl()
   ch_tab.echange_espace_virtuel();
 }
 
-/*! @brief Renvoie la valeur que devrait avoir le champ sur une face de bord, si on en croit les conditions aux limites.
+/*! @brief Returns the value the field should have on a boundary face, according to the boundary conditions.
  *
- * Le numero est compte
- *  dans la liste des faces de bord reelles. Le temps considere est le
- *  present du Champ_Face
- *  L'implementation a change : ces valeurs ne sont plus stockees dans le champ.
+ * @brief The index is counted in the list of real boundary faces. The time considered is the
+ *  current time of the Champ_Face.
+ *  The implementation has changed: these values are no longer stored in the field.
  *
  */
 double Champ_Face_VDF::val_imp_face_bord_private(int face, int comp) const
@@ -223,7 +222,7 @@ double Champ_Face_VDF::val_imp_face_bord_private(int face, int comp) const
   return Champ_Face_get_val_imp_face_bord_sym(valeurs(), temps(), face, comp, zclo);
 }
 
-// WEC : jamais appele !!
+// WEC : never called !!
 double Champ_Face_VDF::val_imp_face_bord_private(int face, int comp1, int comp2) const
 {
   Cerr << "Champ_Face_VDF::val_imp_face_bord(,,) exit" << finl;
@@ -231,15 +230,15 @@ double Champ_Face_VDF::val_imp_face_bord_private(int face, int comp1, int comp2)
   return 0; // For compilers
 }
 
-// Cette fonction retourne :
-//   1 si le fluide est sortant sur la face num_face
-//   0 si la face correspond a une reentree de fluide
+// This function returns:
+//   1 if the fluid is outgoing on face num_face
+//   0 if the face corresponds to a fluid re-entry
 int Champ_Face_VDF::compo_normale_sortante(int num_face) const
 {
   int signe = 1;
   double vit_norm;
-  // signe vaut -1 si face_voisins(num_face,0) est a l'exterieur
-  // signe vaut  1 si face_voisins(num_face,1) est a l'exterieur
+  // signe is -1 if face_voisins(num_face,0) is on the outside
+  // signe is  1 if face_voisins(num_face,1) is on the outside
   if (domaine_vdf().face_voisins(num_face, 0) == -1)
     signe = -1;
   vit_norm = valeurs()(num_face) * signe;
@@ -312,10 +311,10 @@ void Champ_Face_VDF::calcul_critere_Q(DoubleTab& Q, const Domaine_Cl_VDF& domain
 
 void Champ_Face_VDF::calcul_y_plus(DoubleTab& y_plus, const Domaine_Cl_VDF& domaine_Cl_VDF)
 {
-  // On initialise le champ y_plus avec une valeur negative,
-  // comme ca lorsqu'on veut visualiser le champ pres de la paroi,
-  // on n'a qu'a supprimer les valeurs negatives et n'apparaissent
-  // que les valeurs aux parois.
+  // Initialize the y_plus field with a negative value,
+  // so that when visualizing the field near the wall,
+  // one only needs to remove negative values and only
+  // wall values remain.
 
   int ndeb, nfin, elem, ori, l_unif;
   double norm_tau, u_etoile, norm_v = 0, dist, val0, val1, val2, d_visco = 0, visco = 1.;
@@ -339,8 +338,8 @@ void Champ_Face_VDF::calcul_y_plus(DoubleTab& y_plus, const Domaine_Cl_VDF& doma
   else
     l_unif = 0;
 
-  // Changer uniquement les valeurs < DMINFLOAT (l'ancien code n'est pas parallele)
-  /* GF on a pas a change tab_visco ici !
+  // Only change values < DMINFLOAT (the old code is not parallel)
+  /* GF we should not change tab_visco here!
    if (!l_unif)
    {
    const int n = tab_visco.size_array();
@@ -412,7 +411,7 @@ void Champ_Face_VDF::calcul_y_plus(DoubleTab& y_plus, const Domaine_Cl_VDF& doma
                   else
                     d_visco = tab_visco[elem];
 
-                  // PQ : 01/10/03 : corrections par rapport a la version premiere
+                  // PQ : 01/10/03 : corrections relative to the original version
                   norm_tau = d_visco * norm_v / dist;
 
                   u_etoile = sqrt(norm_tau);
@@ -420,14 +419,18 @@ void Champ_Face_VDF::calcul_y_plus(DoubleTab& y_plus, const Domaine_Cl_VDF& doma
 
                 } // else yplus already computed
             } // loop on faces
-        } // Fin paroi fixe
-    } // Fin boucle sur les bords
+        } // End fixed wall
+    } // End loop over boundaries
 }
 
-/*! @brief Methode qui renvoie gij aux elements a partir de la vitesse aux faces (gij represente la derivee partielle dui/dxj)
+/*! @brief Returns gij at elements from the face velocity (gij represents the partial derivative dui/dxj).
  *
- *  A partir de gij, on peut calculer Sij = 0.5(gij(i,j)+gij(j,i))
+ *  @brief From gij, one can compute Sij = 0.5(gij(i,j)+gij(j,i)).
  *
+ * @param vitesse Velocity field at faces.
+ * @param gij Output velocity gradient tensor at elements.
+ * @param domaine_Cl_VDF Boundary condition domain.
+ * @return Reference to gij.
  */
 DoubleTab& Champ_Face_VDF::calcul_duidxj(const DoubleTab& vitesse, DoubleTab& gij, const Domaine_Cl_VDF& domaine_Cl_VDF) const
 {
@@ -443,18 +446,18 @@ DoubleTab& Champ_Face_VDF::calcul_duidxj(const DoubleTab& vitesse, DoubleTab& gi
   IntVect element(4);
   gij = 0.;
 
-  // On parcourt toutes les aretes qui permettent de calculer les termes croises du_i/dx_j
-  // (les termes non-croises sont calcules en bouclant sur les elements)
+  // Loop over all edges that allow computing the cross terms du_i/dx_j
+  // (the non-cross terms are computed by looping over elements)
 
 
-  // On commence par les bords
+  // Start with the boundary edges
   int ndeb = domaine_VDF.premiere_arete_bord(), nfin = ndeb + domaine_VDF.nb_aretes_bord();
   for (int num_arete = ndeb; num_arete < nfin; num_arete++)
     for (int n=0; n<N; n++)
       {
         const int n_type = domaine_Cl_VDF.type_arete_bord(num_arete - ndeb);
 
-        if (n_type == 4) // arete de type periodicite
+        if (n_type == 4) // periodic edge type
           {
             const int num0 = Qdm(num_arete, 0), num1 = Qdm(num_arete, 1), num2 = Qdm(num_arete, 2), num3 = Qdm(num_arete, 3);
             const int i = orientation(num0), j = orientation(num2);
@@ -469,8 +472,8 @@ DoubleTab& Champ_Face_VDF::calcul_duidxj(const DoubleTab& vitesse, DoubleTab& gi
 
             for (int k = 0; k < 4; k++)
               {
-                // 1) 0.5 : pour la periodicite, car on distribuera deux fois sur les elements qui "touchent" cette arete puisqu'elle existe en double.
-                // 2) 0.25 : on distribue le gradient de vitesse sur les 4 elements qui l'entourent.
+                // 1) 0.5 : for periodicity, because we will distribute twice over elements touching this edge since it exists twice.
+                // 2) 0.25 : distribute the velocity gradient over the 4 surrounding elements.
                 gij(element(k), i, j, n) += temp1 * 0.5 * 0.25;
                 gij(element(k), j, i, n) += temp2 * 0.5 * 0.25;
               }
@@ -489,22 +492,22 @@ DoubleTab& Champ_Face_VDF::calcul_duidxj(const DoubleTab& vitesse, DoubleTab& gi
 
             for (int k = 0; k < 2; k++)
               {
-                // 1) 0.25 : on distribue le gradient de vitesse sur les 4 elements qui l'entourent.
+                // 1) 0.25 : distribute the velocity gradient over the 4 surrounding elements.
                 gij(element(k), i, j, n) += temp1 * 0.25;
                 gij(element(k), j, i, n) += temp2 * 0.25;
               }
           }
         else if (Option_VDF::traitement_gradients && (n_type == 5 || n_type == 6))
           Process::exit("Issue in Champ_Face_VDF::calcul_duidxj ... This case is not yet considered. Contact the TRUST team.");
-        else /* les autres aretes bords ... */
+        else /* other boundary edges ... */
           {
             const int num0 = Qdm(num_arete, 0), num1 = Qdm(num_arete, 1), num2 = Qdm(num_arete, 2), signe = Qdm(num_arete, 3);
             const int i = orientation(num0), j = orientation(num2);
 
             const double temp1 = (vitesse(num1, n) - vitesse(num0, n)) / domaine_VDF.dist_face_period(num0, num1, j); // du_i / dx_j
-            const double vit_imp = 0.5 * (vit.val_imp_face_bord_private(num0, N*j+n) + vit.val_imp_face_bord_private(num1, N*j+n)); // vitesse tangentielle
+            const double vit_imp = 0.5 * (vit.val_imp_face_bord_private(num0, N*j+n) + vit.val_imp_face_bord_private(num1, N*j+n)); // tangential velocity
 
-            //Dans cette partie, on conserve le codage de Hyd_SGE_Wale_VDF (num1 et non num2) pour calculer la distance entre le centre de la maille et le bord.
+            //In this part, we keep the coding of Hyd_SGE_Wale_VDF (num1 not num2) to compute the distance between the cell center and the boundary.
             const double temp2 = -signe * (vitesse(num2, n) - vit_imp) / domaine_VDF.dist_norm_bord(num1);
 
             element(0) = face_voisins(num2, 0);
@@ -512,14 +515,14 @@ DoubleTab& Champ_Face_VDF::calcul_duidxj(const DoubleTab& vitesse, DoubleTab& gi
 
             for (int k = 0; k < 2; k++)
               {
-                // 1) 0.25 : on distribue le gradient de vitesse sur les 4 elements qui l'entourent.
+                // 1) 0.25 : distribute the velocity gradient over the 4 surrounding elements.
                 gij(element(k), i, j, n) += temp1 * 0.25;
                 gij(element(k), j, i, n) += temp2 * 0.25;
               }
           }
       }
 
-  // On continue avec les coins
+  // Continue with corners
   ndeb = domaine_VDF.premiere_arete_coin(), nfin = ndeb + domaine_VDF.nb_aretes_coin();
 
   for (int num_arete = ndeb; num_arete < nfin; num_arete++)
@@ -527,7 +530,7 @@ DoubleTab& Champ_Face_VDF::calcul_duidxj(const DoubleTab& vitesse, DoubleTab& gi
       {
         const int n_type = domaine_Cl_VDF.type_arete_coin(num_arete - ndeb);
 
-        if (n_type == 0) // arete de type perio-perio
+        if (n_type == 0) // perio-perio edge type
           {
             const int num0 = Qdm(num_arete, 0), num1 = Qdm(num_arete, 1), num2 = Qdm(num_arete, 2), num3 = Qdm(num_arete, 3);
             const int i = orientation(num0), j = orientation(num2);
@@ -542,21 +545,21 @@ DoubleTab& Champ_Face_VDF::calcul_duidxj(const DoubleTab& vitesse, DoubleTab& gi
 
             for (int k = 0; k < 4; k++)
               {
-                // 1) 0.5 : pour la periodicite, car on distribuera deux fois sur les elements qui "touchent" cette arete puisqu'elle existe en double.
-                // 2) 0.5 : idem ci-dessus, car cette fois-ci on a un coin perio-perio.
-                // 3) 0.25 : on distribue le gradient de vitesse sur les 4 elements qui l'entourent.
+                // 1) 0.5 : for periodicity, because we will distribute twice over elements touching this edge since it exists twice.
+                // 2) 0.5 : same as above, because this is a perio-perio corner.
+                // 3) 0.25 : distribute the velocity gradient over the 4 surrounding elements.
                 gij(element(k), i, j, n) += temp1 * 0.5 * 0.5 * 0.25;
                 gij(element(k), j, i, n) += temp2 * 0.5 * 0.5 * 0.25;
               }
           }
 
-        if (n_type == 1) // arete de type perio-paroi
+        if (n_type == 1) // perio-wall edge type
           {
             const int num0 = Qdm(num_arete, 0), num1 = Qdm(num_arete, 1), num2 = Qdm(num_arete, 2), signe = Qdm(num_arete, 3);
             const int i = orientation(num1), j = orientation(num2);
 
             const double temp1 = (vitesse(num1, n) - vitesse(num0, n)) / domaine_VDF.dist_face_period(num0, num1, j); // du_i / dx_j
-            const double vit_imp = 0.5 * (vit.val_imp_face_bord_private(num0, N*j+n) + vit.val_imp_face_bord_private(num1, N*j+n)); // vitesse tangentielle
+            const double vit_imp = 0.5 * (vit.val_imp_face_bord_private(num0, N*j+n) + vit.val_imp_face_bord_private(num1, N*j+n)); // tangential velocity
 
             const double temp2 = -signe * (vitesse(num2, n) - vit_imp) / domaine_VDF.dist_norm_bord(num1);
 
@@ -565,24 +568,24 @@ DoubleTab& Champ_Face_VDF::calcul_duidxj(const DoubleTab& vitesse, DoubleTab& gi
 
             for (int k = 0; k < 2; k++)
               {
-                // 1) 0.5 : pour la periodicite, car on distribuera deux fois sur les elements qui "touchent" cette arete puisqu'elle existe en double.
-                // 2) 0.25 : on distribue le gradient de vitesse sur les 4 elements qui l'entourent.
+                // 1) 0.5 : for periodicity, because we will distribute twice over elements touching this edge since it exists twice.
+                // 2) 0.25 : distribute the velocity gradient over the 4 surrounding elements.
                 gij(element(k), i, j, n) += temp1 * 0.5 * 0.25;
                 gij(element(k), j, i, n) += temp2 * 0.5 * 0.25;
               }
           }
 
-        // XXX : Elie Saikali : j'ajoute ca pour les coins juste si option_vdf active pour le moment ...
+        // XXX : Elie Saikali : adding this for corners only if option_vdf is active for now ...
 
         if (Option_VDF::traitement_gradients && Option_VDF::traitement_coins)
           {
-            if (n_type == 14 || n_type == 15) // arete de type fluide-paroi ou paroi-fluide
+            if (n_type == 14 || n_type == 15) // fluid-wall or wall-fluid edge type
               {
                 const int num0 = Qdm(num_arete, 0), num1 = Qdm(num_arete, 1), num2 = Qdm(num_arete, 2), signe = Qdm(num_arete, 3);
                 const int i = orientation(num1), j = orientation(num2);
 
                 const double temp1 = (vitesse(num1, n) - vitesse(num0, n)) / domaine_VDF.dist_face_period(num0, num1, j); // du_i / dx_j
-                const double vit_imp = 0.5 * (vit.val_imp_face_bord_private(num0, N*j+n) + vit.val_imp_face_bord_private(num1, N*j+n)); // vitesse tangentielle
+                const double vit_imp = 0.5 * (vit.val_imp_face_bord_private(num0, N*j+n) + vit.val_imp_face_bord_private(num1, N*j+n)); // tangential velocity
 
                 const double temp2 = -signe * (vitesse(num2, n) - vit_imp) / domaine_VDF.dist_norm_bord(num1);
 
@@ -596,7 +599,7 @@ DoubleTab& Champ_Face_VDF::calcul_duidxj(const DoubleTab& vitesse, DoubleTab& gi
                       gij(element(k), j, i, n) += temp2 * 0.25;
                     }
               }
-            else if (n_type == 3 || n_type == 4 || n_type == 8) // arete de type fluide-navier
+            else if (n_type == 3 || n_type == 4 || n_type == 8) // fluid-navier edge type
               {
                 const int num0 = Qdm(num_arete, 0),  num1 = Qdm(num_arete, 1), num2 = Qdm(num_arete, 2), num3 = Qdm(num_arete, 3);
                 const int f1 = num0 > -1 ? num0 : num1, f2 = num2 > -1 ? num2 : num3;
@@ -624,7 +627,7 @@ DoubleTab& Champ_Face_VDF::calcul_duidxj(const DoubleTab& vitesse, DoubleTab& gi
           }
       }
 
-  // On continue avec les aretes mixtes
+  // Continue with mixed edges
 
   for (int num_arete = prem_am; num_arete < dern_am; num_arete++)
     for (int n=0; n<N; n++)
@@ -643,14 +646,14 @@ DoubleTab& Champ_Face_VDF::calcul_duidxj(const DoubleTab& vitesse, DoubleTab& gi
         for (int k = 0; k < 4; k++)
           if (element(k) != -1)
             {
-              // 1) 0.25 : on distribue le gradient de vitesse sur les 3 elements qui l'entourent.
-              // C'est pour cela que l'on regarde si element(k)!=-1, car dans ce cas la, c'est qu'il s'agit de "la case qui manque" !
+              // 1) 0.25 : distribute the velocity gradient over the 3 surrounding elements.
+              // We check element(k)!=-1 because in that case it is the "missing cell"!
               gij(element(k), i, j, n) += temp1 * 0.25;
               gij(element(k), j, i, n) += temp2 * 0.25;
             }
       }
 
-  // On continue avec les aretes internes
+  // Continue with internal edges
 
   for (int num_arete = prem_ai; num_arete < dern_ai; num_arete++)
     for (int n=0; n<N; n++)
@@ -671,17 +674,17 @@ DoubleTab& Champ_Face_VDF::calcul_duidxj(const DoubleTab& vitesse, DoubleTab& gi
 
         for (int k = 0; k < 4; k++)
           {
-            // 1) 0.25 : on distribue le gradient de vitesse sur les 4 elements qui l'entourent.
+            // 1) 0.25 : distribute the velocity gradient over the 4 surrounding elements.
             gij(element(k), i, j, n) += temp1 * 0.25;
             gij(element(k), j, i, n) += temp2 * 0.25;
           }
       }
 
 
-  // XXX : Elie Saikali : HACK pour coins fluides-fluides
-  // pour ce cas (j'avoue cas rare), attention soucis avec les valeurs de la vitesse sur les coins ... par exemple un champ_fonc_xyz x+y+z donne pas le bon truc sur les coins
+  // XXX : Elie Saikali : HACK for fluid-fluid corners
+  // for this case (admittedly rare), beware of issues with velocity values at corners ... e.g. a champ_fonc_xyz x+y+z does not give the correct value at corners
 
-  // On continue avec les coins
+  // Continue with corners
 
   ndeb = domaine_VDF.premiere_arete_coin(), nfin = ndeb + domaine_VDF.nb_aretes_coin();
 
@@ -691,7 +694,7 @@ DoubleTab& Champ_Face_VDF::calcul_duidxj(const DoubleTab& vitesse, DoubleTab& gi
         const int n_type = domaine_Cl_VDF.type_arete_coin(num_arete - ndeb);
 
         if (Option_VDF::traitement_gradients && Option_VDF::traitement_coins)
-          if (n_type == 16 ) // arete de type fluide-fluide
+          if (n_type == 16 ) // fluid-fluid edge type
             {
               const int num1 = Qdm(num_arete, 1), num2 = Qdm(num_arete, 2);
               const int i = orientation(num1), j = orientation(num2);
@@ -702,15 +705,15 @@ DoubleTab& Champ_Face_VDF::calcul_duidxj(const DoubleTab& vitesse, DoubleTab& gi
               for (int k = 0; k < 2; k++)
                 if (element(k) != -1)
                   {
-                    // XXX : 1/3 car on veut un truc comme ca : (a+b+c+d)/4 = (a+b+c)/3 => d = (a+b+c)/3
+                    // XXX : 1/3 because we want something like: (a+b+c+d)/4 = (a+b+c)/3 => d = (a+b+c)/3
                     gij(element(k), i, j, n) += gij(element(k), i, j, n) / 3.;
                     gij(element(k), j, i, n) += gij(element(k), j, i, n) / 3.;
                   }
             }
       }
 
-  // 2eme partie : boucle sur les elements et remplissage de Sij pour les derivees non croisees (du_i / dx_i).
-  // En fait dans ces cas la, on calcul directement le gradient dans l'element et on ne redistribue pas.
+  // 2nd part: loop over elements and fill Sij for the non-cross derivatives (du_i / dx_i).
+  // In these cases, the gradient is computed directly within the element and not redistributed.
 
   for (int elem = 0; elem < nb_elem; elem++)
     for (int n=0; n<N; n++)
@@ -723,10 +726,13 @@ DoubleTab& Champ_Face_VDF::calcul_duidxj(const DoubleTab& vitesse, DoubleTab& gi
   return gij;
 }
 
-/*! @brief Methode qui renvoie gij aux elements a partir de la vitesse aux elements (gij represente la derivee partielle dui/dxj)
+/*! @brief Returns gij at elements from the element velocity (gij represents the partial derivative dui/dxj).
  *
- *  A partir de gij, on peut calculer Sij = 0.5(gij(i,j)+gij(j,i))
+ *  @brief From gij, one can compute Sij = 0.5(gij(i,j)+gij(j,i)).
  *
+ * @param in_vel Input velocity field at elements.
+ * @param gij Output velocity gradient tensor at elements.
+ * @return Reference to gij.
  */
 DoubleTab& Champ_Face_VDF::calcul_duidxj(const DoubleTab& in_vel, DoubleTab& gij) const
 {
@@ -823,12 +829,12 @@ DoubleTab& Champ_Face_VDF::calcul_duidxj(const DoubleTab& in_vel, DoubleTab& gij
 
 }
 
-/*! @brief Methode qui renvoie SMA_barre aux elements a partir de la vitesse aux faces
+/*! @brief Returns SMA_barre at elements from the face velocity.
  *
- *  SMA_barre = Sij*Sij (sommation sur les indices i et j)
+ *  @brief SMA_barre = Sij*Sij (summation over indices i and j).
  *
- *  On calcule directement S_barre(num_elem)!!!!!!!!!!
- *  Le parametre contribution_paroi (ici fixe a 0) permet de ne pas prendre en compte la contribution de la paroi au produit SMA_barre = Sij*Sij
+ *  S_barre(num_elem) is computed directly.
+ *  The contribution_paroi parameter (here fixed to 0) allows excluding the wall contribution from the product SMA_barre = Sij*Sij.
  *
  */
 DoubleVect& Champ_Face_VDF::calcul_S_barre_sans_contrib_paroi(const DoubleTab& vitesse, DoubleVect& SMA_barre, const Domaine_Cl_VDF& domaine_Cl_VDF) const
@@ -852,7 +858,7 @@ DoubleVect& Champ_Face_VDF::calcul_S_barre_sans_contrib_paroi(const DoubleTab& v
     {
       int n_type = domaine_Cl_VDF.type_arete_bord(num_arete - ndeb);
 
-      if (n_type == 4) // arete de type periodicite
+      if (n_type == 4) // periodic edge type
         {
           const int num0 = Qdm(num_arete, 0), num1 = Qdm(num_arete, 1), num2 = Qdm(num_arete, 2), num3 = Qdm(num_arete, 3);
           const int i = orientation(num0), j = orientation(num2);
@@ -865,9 +871,9 @@ DoubleVect& Champ_Face_VDF::calcul_S_barre_sans_contrib_paroi(const DoubleTab& v
           element[2] = face_voisins(num1, 0);
           element[3] = face_voisins(num1, 1);
 
-          // on calcule la somme des termes croises : 2*( (0.5*Sij)^2+(0.5*Sji)^2)
-          // Comme on est sur les aretes et qu on distribue sur l'element il faut multiplier par 0.25, d ou : 0.25*(2*(2*0.5^2))=0.25*4*0.25=0.25!!!!!!
-          // le 0.5 devant vient du fait que nous parcourons les faces de periodicite comme les aretes periodiques sont les "memes", on ajoute deux fois ce qu il faut aux elements -> 0.5!!!
+          // compute the sum of cross terms: 2*( (0.5*Sij)^2+(0.5*Sji)^2)
+          // Since we are on edges distributing over elements, multiply by 0.25: 0.25*(2*(2*0.5^2))=0.25*4*0.25=0.25
+          // The 0.5 factor comes from traversing periodic faces: periodic edges are "the same", so we add twice what is needed -> 0.5
           for (int k = 0; k < 4; k++)
             SMA_barre[element[k]] += 0.5 * (temp1 + temp2) * (temp1 + temp2) * 0.25;
         }
@@ -877,7 +883,7 @@ DoubleVect& Champ_Face_VDF::calcul_S_barre_sans_contrib_paroi(const DoubleTab& v
           const int j = orientation(num2);
 
           const double temp1 = (vitesse[num1] - vitesse[num0]) / domaine_VDF.dist_face_period(num0, num1, j);        // dv/dx
-          double vit_imp = 0.5 * (vit.val_imp_face_bord_private(num0, j) + vit.val_imp_face_bord_private(num1, j));                // vitesse tangentielle
+          double vit_imp = 0.5 * (vit.val_imp_face_bord_private(num0, j) + vit.val_imp_face_bord_private(num1, j));                // tangential velocity
 
           double temp2;
 
@@ -889,9 +895,9 @@ DoubleVect& Champ_Face_VDF::calcul_S_barre_sans_contrib_paroi(const DoubleTab& v
           element[0] = face_voisins(num2, 0);
           element[1] = face_voisins(num2, 1);
 
-          // on calcule la somme des termes croises : 2*( (0.5*Sij)^2+(0.5*Sji)^2)
-          // Comme on est sur les aretes et qu on distribue sur l'element il faut multiplier par 0.25 d ou : 0.25*(2*(2*0.5^2))=0.25*4*0.25=0.25!!!!!!
-          // Prise en compte des 2 termes symetriques : SijSij+SjiSji
+          // compute the sum of cross terms: 2*( (0.5*Sij)^2+(0.5*Sji)^2)
+          // Since we are on edges distributing over elements, multiply by 0.25: 0.25*(2*(2*0.5^2))=0.25*4*0.25=0.25
+          // Account for both symmetric terms: SijSij+SjiSji
           for (int k = 0; k < 2; k++)
             SMA_barre[element[k]] += (temp1 + temp2) * (temp1 + temp2) * 0.25;
         }
@@ -903,7 +909,7 @@ DoubleVect& Champ_Face_VDF::calcul_S_barre_sans_contrib_paroi(const DoubleTab& v
     {
       int n_type = domaine_Cl_VDF.type_arete_coin(num_arete - ndeb);
 
-      if (n_type == 0) // arete de type perio-perio
+      if (n_type == 0) // perio-perio edge type
         {
           const int num0 = Qdm(num_arete, 0), num1 = Qdm(num_arete, 1), num2 = Qdm(num_arete, 2), num3 = Qdm(num_arete, 3);
           const int i = orientation(num0), j = orientation(num2);
@@ -916,21 +922,21 @@ DoubleVect& Champ_Face_VDF::calcul_S_barre_sans_contrib_paroi(const DoubleTab& v
           element[2] = face_voisins(num1, 0);
           element[3] = face_voisins(num1, 1);
 
-          // on calcule la somme des termes croises : 2*( (0.5*Sij)^2+(0.5*Sji)^2)
-          // Comme on est sur les aretes et qu on distribue sur l'element il faut multiplier par 0.25 d ou : 0.25*(2*(2*0.5^2))=0.25*4*0.25=0.25!!!!!!
-          // le 0.5 devant vient du fait que nous parcourons les faces de periodicite comme les aretes periodiques sont les "memes", on ajoute deux fois ce qu il faut aux elements -> 0.5!!!
-          // encore un *0.5 car ce sont des aretes perio perio donc que l on parcourt 4 fois!!!!
+          // compute the sum of cross terms: 2*( (0.5*Sij)^2+(0.5*Sji)^2)
+          // Since we are on edges distributing over elements, multiply by 0.25: 0.25*(2*(2*0.5^2))=0.25*4*0.25=0.25
+          // The 0.5 factor comes from traversing periodic faces: periodic edges are "the same", so we add twice what is needed -> 0.5
+          // another *0.5 because these are perio-perio edges traversed 4 times
           for (int k = 0; k < 4; k++)
             SMA_barre[element[k]] += 0.5 * 0.5 * (temp1 + temp2) * (temp1 + temp2) * 0.25;
         }
 
-      if (n_type == 1) // arete de type perio-paroi
+      if (n_type == 1) // perio-wall edge type
         {
           const int num0 = Qdm(num_arete, 0), num1 = Qdm(num_arete, 1), num2 = Qdm(num_arete, 2), signe = Qdm(num_arete, 3);
           const int j = orientation(num2);
 
           const double temp1 = (vitesse[num1] - vitesse[num0]) / domaine_VDF.dist_face_period(num0, num1, j);        // dv/dx
-          const double vit_imp = 0.5 * (vit.val_imp_face_bord_private(num0, j) + vit.val_imp_face_bord_private(num1, j));             // vitesse tangentielle
+          const double vit_imp = 0.5 * (vit.val_imp_face_bord_private(num0, j) + vit.val_imp_face_bord_private(num1, j));             // tangential velocity
 
           double temp2;
 
@@ -947,13 +953,13 @@ DoubleVect& Champ_Face_VDF::calcul_S_barre_sans_contrib_paroi(const DoubleTab& v
         }
 
       if (Option_VDF::traitement_gradients && Option_VDF::traitement_coins)
-        if (n_type == 14 || n_type == 15 || n_type == 16) // arete de type fluide-paroi ou paroi-fluide ou fluide-fluide
+        if (n_type == 14 || n_type == 15 || n_type == 16) // fluid-wall, wall-fluid or fluid-fluid edge type
           {
             const int num0 = Qdm(num_arete, 0), num1 = Qdm(num_arete, 1), num2 = Qdm(num_arete, 2), signe = Qdm(num_arete, 3);
             const int j = orientation(num2);
 
             const double temp1 = (vitesse[num1] - vitesse[num0]) / domaine_VDF.dist_face_period(num0, num1, j);        // dv/dx
-            const double vit_imp = 0.5 * (vit.val_imp_face_bord_private(num0, j) + vit.val_imp_face_bord_private(num1, j));                // vitesse tangentielle
+            const double vit_imp = 0.5 * (vit.val_imp_face_bord_private(num0, j) + vit.val_imp_face_bord_private(num1, j));                // tangential velocity
 
             double temp2;
 
@@ -1006,7 +1012,7 @@ DoubleVect& Champ_Face_VDF::calcul_S_barre_sans_contrib_paroi(const DoubleTab& v
         SMA_barre[element[k]] += (temp1 + temp2) * (temp1 + temp2) * 0.25;
     }
 
-  // 2eme partie: boucle sur les elements et remplissage de Sij pour les derivees non croisees (du/dx et dv/dy)
+  // 2nd part: loop over elements and fill Sij for the non-cross derivatives (du/dx and dv/dy)
 
   for (int elem = 0; elem < nb_elem; elem++)
     {
@@ -1017,7 +1023,7 @@ DoubleVect& Champ_Face_VDF::calcul_S_barre_sans_contrib_paroi(const DoubleTab& v
         }
     }
 
-  // On prend la racine carre!!!!!  ATTENTION SMA_barre=invariant au carre!!!
+  // We take the square root!!!!!  WARNING SMA_barre=squared invariant!!!
   //  racine_carree(SMA_barre)
   return SMA_barre;
 }
@@ -1117,8 +1123,8 @@ void Champ_Face_VDF::calculer_dscald_centre_element(DoubleTab& dscald) const
     caldscaldcentelemdim3(dscald, val, domaine_VDF, nb_elem, face_voisins, elem_faces);
 }
 
-// Fonctions de calcul des composantes du tenseur GradU (derivees covariantes de la vitesse)
-// dans le repere des coordonnees cylindriques
+// Functions to compute the components of the GradU tensor (covariant velocity derivatives)
+// in the cylindrical coordinate frame
 void Champ_Face_VDF::calculer_dercov_axi(const Domaine_Cl_VDF& domaine_Cl_VDF)
 {
   const Domaine_VDF& domaine_VDF = domaine_vdf();
@@ -1133,7 +1139,7 @@ void Champ_Face_VDF::calculer_dercov_axi(const Domaine_Cl_VDF& domaine_Cl_VDF)
   double d_teta, R;
   double deux_pi = M_PI * 2.0;
 
-  // Remplissage de tau_diag_ : termes diagonaux du tenseur GradU
+  // Fill tau_diag_: diagonal terms of the GradU tensor
 
   int fx0, fx1, fy0, fy1;
   int num_elem;
@@ -1144,10 +1150,10 @@ void Champ_Face_VDF::calculer_dercov_axi(const Domaine_Cl_VDF& domaine_Cl_VDF)
       fy0 = elem_faces(num_elem, 1);
       fy1 = elem_faces(num_elem, 1 + dimension);
 
-      // Calcul de tau11
+      // Compute tau11
       tau_diag_(num_elem, 0) = (inco[fx1] - inco[fx0]) / (xv(fx1, 0) - xv(fx0, 0));
 
-      // Calcul de tau22
+      // Compute tau22
       R = xp(num_elem, 0);
       d_teta = xv(fy1, 1) - xv(fy0, 1);
       if (d_teta < 0)
@@ -1163,21 +1169,21 @@ void Champ_Face_VDF::calculer_dercov_axi(const Domaine_Cl_VDF& domaine_Cl_VDF)
           fz0 = elem_faces(num_elem, 2);
           fz1 = elem_faces(num_elem, 2 + dimension);
 
-          // Calcul de tau33
+          // Compute tau33
           tau_diag_(num_elem, 2) = (inco[fz1] - inco[fz0]) / (xv(fz1, 2) - xv(fz0, 2));
 
         }
     }
 
-  // Remplissage de tau_croises_ : termes extradiagonaux du tenseur GradU
-  // Les derivees croisees de la vitesse (termes extradiagonaux du tenseur
-  // GradU) sont calculees sur les aretes.
-  // Il y a deux derivees par arete:
-  //    Pour une arete XY : tau12 et tau21
-  //    Pour une arete YZ : tau23 et tau32
-  //    Pour une arete XZ : tau13 et tau31
+  // Fill tau_croises_: off-diagonal terms of the GradU tensor
+  // The cross derivatives of the velocity (off-diagonal terms of the
+  // GradU tensor) are computed on edges.
+  // There are two derivatives per edge:
+  //    For an XY edge: tau12 and tau21
+  //    For a YZ edge: tau23 and tau32
+  //    For an XZ edge: tau13 and tau31
 
-  // Boucle sur les aretes bord
+  // Loop over boundary edges
 
   int n_arete;
   int ndeb = domaine_VDF.premiere_arete_bord();
@@ -1195,11 +1201,11 @@ void Champ_Face_VDF::calculer_dercov_axi(const Domaine_Cl_VDF& domaine_Cl_VDF)
       switch(n_type)
         {
         case TypeAreteBordVDF::PAROI_PAROI:
-          // paroi-paroi
+          // wall-wall
         case TypeAreteBordVDF::FLUIDE_FLUIDE:
-          // fluide-fluide
+          // fluid-fluid
         case TypeAreteBordVDF::PAROI_FLUIDE:
-          // paroi-fluide
+          // wall-fluid
           {
             fac1 = Qdm(n_arete, 0);
             fac2 = Qdm(n_arete, 1);
@@ -1212,7 +1218,7 @@ void Champ_Face_VDF::calculer_dercov_axi(const Domaine_Cl_VDF& domaine_Cl_VDF)
             double vit_imp;
 
             if (n_type == TypeAreteBordVDF::PAROI_FLUIDE)
-              // arete paroi_fluide :il faut determiner qui est la face fluide
+              // wall-fluid edge: need to determine which is the fluid face
               {
                 if (est_egal(inco[fac1], 0))
                   vit_imp = val_imp_face_bord_private(rang2, ori3);
@@ -1222,7 +1228,7 @@ void Champ_Face_VDF::calculer_dercov_axi(const Domaine_Cl_VDF& domaine_Cl_VDF)
             else
               vit_imp = 0.5 * (val_imp_face_bord_private(rang1, ori3) + val_imp_face_bord_private(rang2, ori3));
 
-            if (ori1 == 0) // bord d'equation R = cte
+            if (ori1 == 0) // boundary with equation R = const
               {
                 dist3 = xv(fac3, 0) - xv(fac1, 0);
                 if (n_type != TypeAreteBordVDF::PAROI_PAROI)
@@ -1230,10 +1236,10 @@ void Champ_Face_VDF::calculer_dercov_axi(const Domaine_Cl_VDF& domaine_Cl_VDF)
 
                 if (ori3 == 1)
                   {
-                    // calcul de tau12
+                    // compute tau12
                     tau_croises_(n_arete, 0) = signe * (vit_imp - inco[fac3]) / dist3;
 
-                    // calcul de tau21
+                    // compute tau21
                     R = xv(fac1, 0);
                     d_teta = xv(fac2, 1) - xv(fac1, 1);
                     if (d_teta < 0)
@@ -1242,13 +1248,13 @@ void Champ_Face_VDF::calculer_dercov_axi(const Domaine_Cl_VDF& domaine_Cl_VDF)
                   }
                 else if (ori3 == 2)
                   {
-                    // calcul de tau13
+                    // compute tau13
                     tau_croises_(n_arete, 0) = signe * (vit_imp - inco[fac3]) / dist3;
-                    // calcul de tau31
+                    // compute tau31
                     tau_croises_(n_arete, 1) = (inco[fac2] - inco[fac1]) / (xv(fac2, 2) - xv(fac1, 2));
                   }
               }
-            else if (ori1 == 1) // bord d'equation teta = cte
+            else if (ori1 == 1) // boundary with equation theta = const
               {
                 R = xv(fac3, 0);
                 d_teta = xv(fac3, 1) - xv(fac1, 1);
@@ -1260,20 +1266,20 @@ void Champ_Face_VDF::calculer_dercov_axi(const Domaine_Cl_VDF& domaine_Cl_VDF)
 
                 if (ori3 == 0)
                   {
-                    // calcul de tau21
+                    // compute tau21
                     tau_croises_(n_arete, 0) = signe * (vit_imp - inco[fac3]) / dist3 - 0.5 * (inco[fac1] + inco[fac2]) / R;
-                    // calcul de tau12
+                    // compute tau12
                     tau_croises_(n_arete, 1) = (inco[fac2] - inco[fac1]) / (xv(fac2, 0) - xv(fac1, 0));
                   }
                 else if (ori3 == 2)
                   {
-                    // calcul de tau23
+                    // compute tau23
                     tau_croises_(n_arete, 0) = signe * (vit_imp - inco[fac3]) / dist3;
-                    // calcul de tau32
+                    // compute tau32
                     tau_croises_(n_arete, 1) = (inco[fac2] - inco[fac1]) / (xv(fac2, 2) - xv(fac1, 2));
                   }
               }
-            else // (ori1 == 2) bord d'equation Z = cte
+            else // (ori1 == 2) boundary with equation Z = const
               {
                 dist3 = xv(fac3, 2) - xv(fac1, 2);
                 if (n_type != TypeAreteBordVDF::PAROI_PAROI)
@@ -1281,17 +1287,17 @@ void Champ_Face_VDF::calculer_dercov_axi(const Domaine_Cl_VDF& domaine_Cl_VDF)
 
                 if (ori3 == TypeAreteBordVDF::PAROI_PAROI)
                   {
-                    // calcul de tau31
+                    // compute tau31
                     tau_croises_(n_arete, 0) = signe * (vit_imp - inco[fac3]) / dist3;
-                    // calcul de tau13
+                    // compute tau13
                     tau_croises_(n_arete, 1) = (inco[fac2] - inco[fac1]) / (xv(fac2, 0) - xv(fac1, 0));
                   }
                 else if (ori3 == 1)
                   {
-                    // calcul de tau32
+                    // compute tau32
                     tau_croises_(n_arete, 0) = signe * (vit_imp - inco[fac3]) / dist3;
 
-                    // calcul de tau23
+                    // compute tau23
                     R = xv(fac1, 0);
                     d_teta = xv(fac2, 1) - xv(fac1, 1);
                     if (d_teta < 0)
@@ -1318,7 +1324,7 @@ void Champ_Face_VDF::calculer_dercov_axi(const Domaine_Cl_VDF& domaine_Cl_VDF)
         }
     }
 
-  // Boucle sur les aretes mixtes et internes
+  // Loop over mixed and internal edges
   ndeb = domaine_VDF.premiere_arete_mixte();
   nfin = domaine_VDF.nb_aretes();
   for (n_arete = ndeb; n_arete < nfin; n_arete++)
@@ -1329,49 +1335,49 @@ void Champ_Face_VDF::calculer_dercov_axi(const Domaine_Cl_VDF& domaine_Cl_VDF)
       fac4 = Qdm(n_arete, 3);
       ori1 = orientation(fac1);
       ori3 = orientation(fac3);
-      if (ori1 == 1)  // (seule possibilite : ori3 =0)  Arete XY
+      if (ori1 == 1)  // (only possibility: ori3 = 0)  XY edge
         {
-          // Calcul de tau21
+          // Compute tau21
           R = xv(fac3, 0);
           d_teta = xv(fac4, 1) - xv(fac3, 1);
           if (d_teta < 0)
             d_teta += deux_pi;
           tau_croises_(n_arete, 1) = (inco(fac4) - inco(fac3)) / (R * d_teta) - 0.5 * (inco[fac1] + inco[fac2]) / R;
-          // Calcul de tau12
+          // Compute tau12
           tau_croises_(n_arete, 0) = (inco(fac2) - inco(fac1)) / (xv(fac2, 0) - xv(fac1, 0));
         }
-      else if (ori3 == 1) // (seule possibilite ori1 = 2) arete YZ
+      else if (ori3 == 1) // (only possibility: ori1 = 2) YZ edge
         {
-          // Calcul de tau32
+          // Compute tau32
           tau_croises_(n_arete, 1) = (inco(fac4) - inco(fac3)) / (xv(fac4, 2) - xv(fac3, 2));
-          // Calcul de tau23
+          // Compute tau23
           R = xv(fac1, 0);
           d_teta = xv(fac2, 1) - xv(fac1, 1);
           if (d_teta < 0)
             d_teta += deux_pi;
           tau_croises_(n_arete, 0) = (inco(fac2) - inco(fac1)) / (R * d_teta);
         }
-      else // seule possibilite ori1 = 2 et ori3 = 0:  arete XZ
+      else // only possibility: ori1 = 2 and ori3 = 0: XZ edge
         {
-          // Calcul de tau31
+          // Compute tau31
           tau_croises_(n_arete, 1) = (inco(fac4) - inco(fac3)) / (xv(fac4, 2) - xv(fac3, 2));
-          // Calcul de tau13
+          // Compute tau13
           tau_croises_(n_arete, 0) = (inco(fac2) - inco(fac1)) / (xv(fac2, 0) - xv(fac1, 0));
         }
     }
 }
 
 /* ***************************************************** */
-/*           METHODES UTILES MAIS HORS CLASSE            */
+/*           USEFUL METHODS OUTSIDE THE CLASS            */
 /* ***************************************************** */
 
 double Champ_Face_get_val_imp_face_bord_sym(const DoubleTab& tab_valeurs, const double temp, int face, int comp, const Domaine_Cl_VDF& zclo)
 {
   const Domaine_VDF& domaine_vdf = zclo.domaine_VDF();
   int face_locale = -123;
-  const int face_globale = face + domaine_vdf.premiere_face_bord(); // Maintenant numero dans le tableau global des faces.
+  const int face_globale = face + domaine_vdf.premiere_face_bord(); // Now index in the global face array.
   const Domaine_Cl_dis_base& zcl = zclo; //equation().domaine_Cl_dis();
-  // On recupere la CL associee a la face et le numero local de la face dans la frontiere.
+  // Retrieve the BC associated with the face and the local face index within the boundary.
   //assert(equation().domaine_Cl_dis()==zclo);
 
   const Cond_lim_base& cl = (face < domaine_vdf.nb_faces()) ? zcl.condition_limite_de_la_face_reelle(face_globale, face_locale) :
@@ -1401,7 +1407,7 @@ double Champ_Face_get_val_imp_face_bord_sym(const DoubleTab& tab_valeurs, const 
         }
     }
 
-  if (!cl.champ_front().has_valeurs_au_temps(temp)) // si pas encore initialise !!
+  if (!cl.champ_front().has_valeurs_au_temps(temp)) // not yet initialized
     return 0.;
 
   const DoubleTab& vals = cl.champ_front().valeurs_au_temps(temp);
@@ -1421,9 +1427,9 @@ double Champ_Face_get_val_imp_face_bord(const double temp, int face, int comp, c
 {
   const Domaine_VDF& domaine_vdf = zclo.domaine_VDF();
   int face_locale = -123;
-  const int face_globale = face + domaine_vdf.premiere_face_bord(); // Maintenant numero dans le tableau global des faces.
+  const int face_globale = face + domaine_vdf.premiere_face_bord(); // Now index in the global face array.
   const Domaine_Cl_dis_base& zcl = zclo; //equation().domaine_Cl_dis();
-  // On recupere la CL associee a la face et le numero local de la face dans la frontiere.
+  // Retrieve the BC associated with the face and the local face index within the boundary.
   //assert(equation().domaine_Cl_dis()==zclo);
 
   const Cond_lim_base& cl = (face < domaine_vdf.nb_faces()) ? zcl.condition_limite_de_la_face_reelle(face_globale, face_locale) :
@@ -1441,7 +1447,7 @@ double Champ_Face_get_val_imp_face_bord(const double temp, int face, int comp, c
         }
     }
 
-  if (!cl.champ_front().has_valeurs_au_temps(temp)) // si pas encore initialise !!
+  if (!cl.champ_front().has_valeurs_au_temps(temp)) // not yet initialized
     return 0.;
 
   const DoubleTab& vals = cl.champ_front().valeurs_au_temps(temp);
@@ -1467,7 +1473,7 @@ double Champ_Face_coeff_frottement_face_bord(const int f, const int n, const Dom
 {
   const Domaine_VDF& domaine_vdf = zclo.domaine_VDF();
   const Domaine_Cl_dis_base& zcl = zclo;
-  const int face_globale = f + domaine_vdf.premiere_face_bord(); // Maintenant numero dans le tableau global des faces.
+  const int face_globale = f + domaine_vdf.premiere_face_bord(); // Now index in the global face array.
 
   int face_locale = -123;
   const Cond_lim_base& cl = (f < domaine_vdf.nb_faces()) ? zcl.condition_limite_de_la_face_reelle(face_globale, face_locale) :
@@ -1480,7 +1486,7 @@ double Champ_Face_coeff_frottement_grad_face_bord(const int f, const int n, cons
 {
   const Domaine_VDF& domaine_vdf = zclo.domaine_VDF();
   const Domaine_Cl_dis_base& zcl = zclo;
-  const int face_globale = f + domaine_vdf.premiere_face_bord(); // Maintenant numero dans le tableau global des faces.
+  const int face_globale = f + domaine_vdf.premiere_face_bord(); // Now index in the global face array.
 
   int face_locale = -123;
   const Cond_lim_base& cl = (f < domaine_vdf.nb_faces()) ? zcl.condition_limite_de_la_face_reelle(face_globale, face_locale) :

@@ -41,7 +41,7 @@ int Paroi_negligeable_VEF::init_lois_paroi()
 {
   init_lois_paroi_();
 
-  // Dimensionnement du tableau elem_paroi
+  // Size the elem_paroi array
   int num_cl, fac, i;
   const Conds_lim& les_cl = le_dom_Cl_dis_->les_conditions_limites();
   //  const IntTab& elem_faces = le_dom_VEF->elem_faces();
@@ -164,7 +164,7 @@ int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_k_eps)
                         num[1] = elem_faces(elem, 2);
 
                       dist = distance_2D(num_face, elem, domaine_VEF);
-                      dist *= 3. / 2.; // pour se ramener a distance paroi / milieu de num[0]-num[1]
+                      dist *= 3. / 2.; // to convert to wall distance / midpoint of num[0]-num[1]
                       //norm_v=norm_2D_vit1_lp(vit,num_face,num[0],num[1],domaine_VEF,val1,val2);
                       norm_v = norm_2D_vit1(vit, num[0], num[1], num_face, domaine_VEF, val1, val2);
 
@@ -184,7 +184,7 @@ int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_k_eps)
                         num[2] = elem_faces(elem, 3);
 
                       dist = distance_3D(num_face, elem, domaine_VEF);
-                      dist *= 4. / 3.; // pour se ramener a distance paroi / milieu de num[0]-num[1]-num[2]
+                      dist *= 4. / 3.; // to convert to wall distance / midpoint of num[0]-num[1]-num[2]
                       //norm_v=norm_3D_vit1_lp(vit, num_face, num[0], num[1], num[2], domaine_VEF, val1, val2, val3);
                       norm_v = norm_3D_vit1(vit, num_face, num[0], num[1], num[2], domaine_VEF, val1, val2, val3);
 
@@ -201,16 +201,16 @@ int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_k_eps)
 
                 }                      // loop on faces
 
-            }                      // Fin de paroi fixe
+            }                      // End of fixed wall
 
-        }                      // Fin boucle sur les bords
+        }                      // End of loop over boundaries
 
     }
 
   return 1;
 }
 
-// C est celle la qui nous interesse!!!
+// This is the one we are interested in!!!
 int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_nu_t, DoubleTab& tab_k)
 {
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
@@ -273,7 +273,7 @@ int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_nu_t, DoubleTab& tab_k)
                     fac++;
                   }
                 double dist = distance(dim, num_face, elem, xp, xv, face_normale);
-                dist *= (dim + 1.) / dim;                      // pour se ramener a distance paroi / milieu de num[0]-num[1]
+                dist *= (dim + 1.) / dim;                      // to convert to wall distance / midpoint of num[0]-num[1]
                 double norm_v = norm_vit1(dim, vit, num_face, nfac, num, face_normale, val);
                 double d_visco = l_unif ? visco0 : visco[elem];
                 double norm_tau = d_visco * norm_v / dist;
@@ -281,8 +281,8 @@ int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_nu_t, DoubleTab& tab_k)
                 tab_u_star(num_face) = u_etoile;
               });          // loop on faces
               end_gpu_timer(__KERNEL_NAME__);
-            }                      // Fin de paroi fixe
-        }                      // Fin boucle sur les bords
+            }                      // End of fixed wall
+        }                      // End of loop over boundaries
     }
   return 1;
 }

@@ -38,7 +38,7 @@ Entree& Segment_32_64<_SIZE_>::readOn(Entree& s )
   return s;
 }
 
-/*! @brief Reordonne les sommets du segment.
+/*! @brief Reorders the vertices of the segment.
  *
  */
 template <typename _SIZE_>
@@ -68,9 +68,9 @@ void Segment_32_64<_SIZE_>::reordonner()
 }
 
 
-/*! @brief Renvoie le nom LML d'un triangle = "VOXEL8".
+/*! @brief Returns the LML name of a segment.
  *
- * @return (Nom&) toujours egal a "VOXEL8"
+ * @return Always equal to "SEGMENT" (or "QUADRANGLE_3D" in 2D).
  */
 template <typename _SIZE_>
 const Nom& Segment_32_64<_SIZE_>::nom_lml() const
@@ -82,14 +82,13 @@ const Nom& Segment_32_64<_SIZE_>::nom_lml() const
 }
 
 
-/*! @brief Renvoie 1 si l'element ielem du domaine associe a l'element geometrique contient le point
+/*! @brief Returns 1 if element "element" of the domain associated with this geometric element contains the point
  *
- *               de coordonnees specifiees par le parametre "pos".
- *     Renvoie 0 sinon.
+ * with coordinates specified by parameter "pos". Returns 0 otherwise.
  *
- * @param (DoubleVect& pos) coordonnees du point que l'on cherche a localiser
- * @param (int element) le numero de l'element du domaine dans lequel on cherche le point.
- * @return (int) 1 si le point de coordonnees specifiees appartient a l'element "element" 0 sinon
+ * @param pos Coordinates of the point to locate.
+ * @param element Index of the domain element in which to search for the point.
+ * @return 1 if the point belongs to element "element", 0 otherwise.
  */
 template <typename _SIZE_>
 int Segment_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t element ) const
@@ -120,13 +119,13 @@ int Segment_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t element ) cons
 }
 
 
-/*! @brief Renvoie 1 si les sommets specifies par le parametre "pos" sont les sommets de l'element "element" du domaine associe a
+/*! @brief Returns 1 if the vertices specified by parameter "pos" are the vertices of element "element"
  *
- *     l'element geometrique.
+ * in the domain associated with this geometric element. Returns 0 otherwise.
  *
- * @param (IntVect& pos) les numeros des sommets a comparer avec ceux de l'elements "element"
- * @param (int element) le numero de l'element du domaine dont on veut comparer les sommets
- * @return (int) 1 si les sommets passes en parametre sont ceux de l'element specifie, 0 sinon
+ * @param pos Vertex indices to compare with those of element "element".
+ * @param element Index of the domain element whose vertices are to be compared.
+ * @return 1 if the specified vertices are those of the given element, 0 otherwise.
  */
 template <typename _SIZE_>
 int Segment_32_64<_SIZE_>::contient(const SmallArrOfTID_t& pos, int_t element ) const
@@ -140,9 +139,9 @@ int Segment_32_64<_SIZE_>::contient(const SmallArrOfTID_t& pos, int_t element ) 
     return 0;
 }
 
-/*! @brief Calcule les volumes des elements du domaine associe.
+/*! @brief Computes the volumes of the elements of the associated domain.
  *
- * @param (DoubleVect& volumes) le vecteur contenant les valeurs  des des volumes des elements du domaine
+ * @param volumes Vector to fill with the volumes of domain elements.
  */
 template <typename _SIZE_>
 void Segment_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const
@@ -168,7 +167,7 @@ void Segment_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const
     }
 }
 
-/*! @brief voir ElemGeomBase::get_tab_faces_sommets_locaux
+/*! @brief See ElemGeomBase::get_tab_faces_sommets_locaux.
  */
 template <typename _SIZE_>
 int Segment_32_64<_SIZE_>::get_tab_faces_sommets_locaux(IntTab& faces_som_local) const

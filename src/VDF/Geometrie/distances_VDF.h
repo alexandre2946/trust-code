@@ -33,7 +33,7 @@ void calcul_interne3D(int num_elem, int elx0, int elx1, int ely0, int ely1, int 
 void calcul_bord3D(int num_elem, int elx0, int elx1, int ely0, int ely1, int elz0, int elz1, const Domaine_VDF& domaine_VDF, const DoubleTab& val, DoubleTab& rot);
 void calrotord2centelemdim3(DoubleTab& rot, const DoubleTab& val, const Domaine_VDF& domaine_VDF, int nb_elem, const IntTab& face_voisins, const IntTab& elem_faces);
 
-// Calcul du produit scalaire du tenseur des vitesses de deformation en coordonnees cartesiennes : calcul 2D puis 3D.
+// Compute the scalar product of the strain rate tensor in Cartesian coordinates: 2D then 3D computation.
 void calcul_dscald_interne2D(int num_elem, int elx0, int elx1, int ely0, int ely1, const Domaine_VDF& domaine_VDF, const DoubleTab& val, DoubleTab& dscald);
 void calcul_dscald_interne3D(int num_elem, int elx0, int elx1, int ely0, int ely1, int elz0, int elz1, const Domaine_VDF& domaine_VDF, const DoubleTab& val, DoubleTab& dscald);
 void calcul_dscald_bord2D(int num_elem, int elx0, int elx1, int ely0, int ely1, const Domaine_VDF& domaine_VDF, const DoubleTab& val, DoubleTab& dscald);

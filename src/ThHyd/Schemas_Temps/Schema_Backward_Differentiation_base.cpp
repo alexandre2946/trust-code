@@ -28,10 +28,10 @@
 Implemente_base(Schema_Backward_Differentiation_base,"Schema_Backward_Differentiation_base",Schema_Implicite_Multi_TimeStep_base);
 
 
-/*! @brief Simple appel a: Schema_Temps_base::printOn(Sortie& ) Ecrit le schema en temps sur un flot de sortie.
+/*! @brief Simple call to Schema_Temps_base::printOn(Sortie&). Writes the time scheme to an output stream.
  *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param s The output stream.
+ * @return The modified output stream.
  */
 Sortie& Schema_Backward_Differentiation_base::printOn(Sortie& s) const
 {
@@ -39,12 +39,12 @@ Sortie& Schema_Backward_Differentiation_base::printOn(Sortie& s) const
 }
 
 
-/*! @brief Lit le schema en temps a partir d'un flot d'entree.
+/*! @brief Reads the time scheme from an input stream.
  *
- * Simple appel a: Schema_Temps_base::readOn(Entree& )
+ * Simple call to Schema_Temps_base::readOn(Entree&).
  *
- * @param (Entree& s) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param s The input stream.
+ * @return The modified input stream.
  */
 Entree& Schema_Backward_Differentiation_base::readOn(Entree& s)
 {

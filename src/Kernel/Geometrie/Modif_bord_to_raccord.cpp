@@ -51,7 +51,7 @@ Entree& Modif_bord_to_raccord_32_64<_SIZE_>::interpreter_(Entree& is)
   racc_base.typer("Raccord_local_homogene");
   Raccord_base_t& racc=racc_base.valeur();
 
-  // on caste en Frontiere pour pouvoir faire la copie ...
+  // cast to Frontiere to allow copying ...
   ref_cast(Frontiere_t,racc)=ref_cast(Frontiere_t,bord);
   listrac.add(racc_base);
 

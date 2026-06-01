@@ -29,13 +29,16 @@ Sortie& Pb_Thermohydraulique_Turbulent_QC::printOn(Sortie& os) const { return Pr
 
 Entree& Pb_Thermohydraulique_Turbulent_QC::readOn(Entree& is) { return Probleme_base::readOn(is); }
 
-/*! @brief Renvoie 2 car il y a 2 equations : Navier_Stokes_Turbulent_QC et Convection_Diffusion_Chaleur_Turbulent_QC
+/*! @brief Returns 2 because there are 2 equations: Navier_Stokes_Turbulent_QC and Convection_Diffusion_Chaleur_Turbulent_QC.
  *
+ * @return Number of equations (2).
  */
 int Pb_Thermohydraulique_Turbulent_QC::nombre_d_equations() const { return 2; }
 
-/*! @brief Renvoie l'equation d'hydraulique de type Navier_Stokes_Turbulent_QC si i=0 Renvoie l'equation de chaleur de type Convection_Diffusion_Chaleur_Turbulent_QC si i=1
+/*! @brief Returns the hydraulic equation of type Navier_Stokes_Turbulent_QC if i=0, returns the heat equation of type Convection_Diffusion_Chaleur_Turbulent_QC if i=1.
  *
+ * @param i Index of the equation to return.
+ * @return The equation corresponding to the given index.
  */
 const Equation_base& Pb_Thermohydraulique_Turbulent_QC::equation(int i) const
 {

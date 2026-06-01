@@ -50,17 +50,17 @@ void Loi_paroi_base::completer()
       {
         Cond_lim& cond_lim_loc = pb_->equation(i).domaine_Cl_dis().les_conditions_limites(j);
         if (sub_type(Dirichlet_loi_paroi, cond_lim_loc.valeur()))
-          ref_cast(Dirichlet_loi_paroi, cond_lim_loc.valeur()).liste_faces_loi_paroi(Faces_a_calculer_);  // met des 1 si doit remplir la table
+          ref_cast(Dirichlet_loi_paroi, cond_lim_loc.valeur()).liste_faces_loi_paroi(Faces_a_calculer_);  // sets 1 where the table must be filled
         else if (sub_type(Frottement_impose_base, cond_lim_loc.valeur()))
-          ref_cast(Frottement_impose_base, cond_lim_loc.valeur()).liste_faces_loi_paroi(Faces_a_calculer_);  // met des 1 si doit remplir la table
+          ref_cast(Frottement_impose_base, cond_lim_loc.valeur()).liste_faces_loi_paroi(Faces_a_calculer_);  // sets 1 where the table must be filled
         else if (sub_type(Echange_global_impose_turbulent, cond_lim_loc.valeur()))
-          ref_cast(Echange_global_impose_turbulent, cond_lim_loc.valeur()).liste_faces_loi_paroi(Faces_a_calculer_);  // met des 1 si doit remplir la table
+          ref_cast(Echange_global_impose_turbulent, cond_lim_loc.valeur()).liste_faces_loi_paroi(Faces_a_calculer_);  // sets 1 where the table must be filled
       }
   Faces_a_calculer_.echange_espace_virtuel();
 
-  valeurs_loi_paroi_["y_plus"] = DoubleTab(nf_tot, 1); // pour l'instant, turbulence dans seulement une phase
+  valeurs_loi_paroi_["y_plus"] = DoubleTab(nf_tot, 1); // for now, turbulence in one phase only
   valeurs_loi_paroi_["u_tau"] = DoubleTab(nf_tot, 1);
-  valeurs_loi_paroi_["y"] = DoubleTab(nf_tot, 1); // Attention : pour un meme maillage, depuis PolyMAC_MPFA_vec le y n'est pas le meme en vdf et en PolyMAC_CDO pour le meme maillage a cause de l'histoire de la vitesse non nulle a la face de bord.
+  valeurs_loi_paroi_["y"] = DoubleTab(nf_tot, 1); // Note: for the same mesh, since PolyMAC_MPFA_vec, y differs between VDF and PolyMAC_CDO due to the non-zero boundary face velocity convention.
 
   DoubleTab& tab_y_p = valeurs_loi_paroi_["y_plus"];
   for (int i = 0; i < tab_y_p.dimension_tot(0); i++)

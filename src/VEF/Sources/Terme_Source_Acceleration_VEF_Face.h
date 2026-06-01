@@ -22,7 +22,7 @@
 class Domaine_VEF;
 class Domaine_Cl_VEF;
 
-/*! @brief Terme source d'acceleration specialise pour la discretisation VDF
+/*! @brief Acceleration source term specialized for the VEF discretization.
  *
  * @sa Terme_Source_Acceleration
  */
@@ -40,11 +40,11 @@ protected:
   void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override;
 
 private:
-  // References remplies par associer_champ_rho
+  // References filled by associer_champ_rho
   OBS_PTR(Domaine_VEF) le_dom_VEF_;
   OBS_PTR(Domaine_Cl_VEF)  le_dom_Cl_VEF_;
-  // Reference remplie par associer_champ_rho() et utilisee par ajouter()
-  // La reference peut rester nulle (monophasique).
+  // Reference filled by associer_champ_rho() and used by ajouter()
+  // The reference may remain null (single-phase).
   OBS_PTR(Champ_base)  ref_rho_;
 };
 

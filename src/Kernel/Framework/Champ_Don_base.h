@@ -20,11 +20,11 @@
 #include <Champ_base.h>
 #include <TRUSTTab.h>
 
-/*! @brief classe Champ_Don_base classe de base des Champs donnes (non calcules)
+/*! @brief class Champ_Don_base base class of Given Fields (not calculated)
  *
- *      les proprietes physiques sont des Champs donnes
- *      mais peuvent etre variables dans le temps dans l'espace
- *      fonctions d'autres champs ...
+ *      physical properties are Given Fields
+ *      but can be variable in time and space
+ *      functions of other fields ...
  *
  * @sa Champ_base OWN_PTR(Champ_Don_base) Champ_Fonc_base
  */
@@ -42,9 +42,9 @@ public:
   int sauvegarder(Sortie&) const override;
   void resetTime(double time) override;
 
-  /*! @brief Surcharge Champ_base::valeurs() Renvoie le tableau des valeurs
+  /*! @brief Overrides Champ_base::valeurs() Returns the array of values
    *
-   * @return (DoubleTab&) le tableau des valeurs du champs
+   * @return (DoubleTab&) the array of field values
    */
   inline DoubleTab& valeurs() override { return valeurs_; }
   const inline DoubleTab& valeurs() const override { return valeurs_; }
@@ -54,7 +54,7 @@ public:
   virtual int initialiser(const double temps);
   virtual void set_instationnaire(bool flag) { instationnaire_ = flag; }
   virtual bool instationnaire() const { return instationnaire_; }
-  /*! @brief Renvoie le nombre de degre de liberte par composante: le nombre de noeuds.
+  /*! @brief Returns the number of degrees of freedom per component: the number of nodes.
    *
    */
   inline int nb_valeurs_nodales() const override { return valeurs_.dimension(0); }
@@ -66,11 +66,11 @@ public:
 protected :
   DoubleTab valeurs_;
 
-  /* XXX Elie Saikali : je rendre cette methode protected ! Interdit de l'appeler en public */
+  /* XXX Elie Saikali : make this method protected! Forbidden to call it publicly */
   Champ_base& affecter_(const Champ_base&) override;
 
 private:
-  bool instationnaire_ = false; // Par defaut champ stationnaire
+  bool instationnaire_ = false; // By default, stationary field
 };
 
 inline void erreur_champ_(const char *nom_methode)

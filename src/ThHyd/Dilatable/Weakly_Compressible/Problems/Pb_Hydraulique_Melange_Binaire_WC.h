@@ -21,10 +21,10 @@
 #include <Navier_Stokes_WC.h>
 #include <Pb_WC_base.h>
 
-/*! @brief classe Pb_Hydraulique_Melange_Binaire_WC Cette classe represente un probleme de hydraulique binaire en fluide weakly compressible:
+/*! @brief Pb_Hydraulique_Melange_Binaire_WC class This class represents a binary hydraulic problem for a weakly compressible fluid:
  *
- *       - Equations de Navier_Stokes en regime laminaire
- *       - Equation de conv/diff fraction massique en regime laminaire
+ *       - Navier-Stokes equations in laminar regime
+ *       - Convection/diffusion equation for mass fraction in laminar regime
  *
  * @sa Probleme_base Navier_Stokes_WC Convection_Diffusion_Espece_Binaire_WC
  */

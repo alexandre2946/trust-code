@@ -68,7 +68,7 @@ int Conservation_Euler_base::lire_motcle_non_standard(const Motcle& mot, Entree&
 void Conservation_Euler_base::add_missing_nconserv_op()
 {
   assert(sub_type(Pb_Euler, probleme()));
-  // si monophasique et termes_non_conservatifs non-lu ... on type sans error !
+  // if single-phase and termes_non_conservatifs not read ... type without error!
   const bool is_single_phase = (ref_cast(Pb_Euler, probleme()).nb_phases() == 1);
   if (is_single_phase && !terme_nconserv_)
     {

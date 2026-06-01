@@ -38,9 +38,9 @@ bool Comm_Group_MPI::must_mpi_initialize_ = true;
 
 namespace
 {
-/*! @brief Partie non inline du traitement d'erreur mpi.
+/*! @brief Non-inline part of the MPI error handler.
  *
- * Affichage d'un code d'erreur mpi avec MPI_Error_string.
+ * Displays an MPI error code using MPI_Error_string.
  *
  */
 void mpi_print_error(int error_code)
@@ -55,17 +55,17 @@ void mpi_print_error(int error_code)
       Cerr << message << finl;
       Process::Journal() << message << finl;
     }
-  // Normalement on aurait pris trio_u_world_, mais on n'y a pas acces ici.
-  // Pour faire abort, en l'occurence, c'est pas grave mais merci de ne pas
-  // prendre comme exemple...
+  // Normally we would have used trio_u_world_, but it is not accessible here.
+  // For calling abort, in this case it does not matter, but please do not
+  // use this as an example...
   assert(0);
   MPI_Abort(MPI_COMM_WORLD,-1);
   Process::exit();
 }
 
-/*! @brief Partie inline du traitement d'erreur mpi (on inline le test: sauf exception, il n'y a pas d'appel de fonction
+/*! @brief Inline part of the MPI error handler (the test is inlined: except in error cases, there is no additional
  *
- *  supplementaire.
+ *  function call.
  *
  */
 inline void mpi_error(int error_code)
@@ -90,16 +90,16 @@ Entree& Comm_Group_MPI::readOn(Entree& is)
   return is;
 }
 
-/*! @brief Constructeur par defaut.
+/*! @brief Default constructor.
  *
- * Il faut ensuite appeler init_group() ou init_group_trio() pour finir la construction du groupe.
+ * You must then call init_group() or init_group_trio() to finish constructing the group.
  *
  */
 Comm_Group_MPI::Comm_Group_MPI()
 #ifdef MPI_
   : mpi_group_(MPI_GROUP_NULL),
     mpi_comm_(MPI_COMM_NULL),
-    must_finalize_(-1) // -1 indique que le groupe n'a pas ete initialise
+    must_finalize_(-1) // -1 indicates that the group has not been initialized
 #endif
 {
 }
@@ -107,8 +107,8 @@ Comm_Group_MPI::Comm_Group_MPI()
 Comm_Group_MPI::~Comm_Group_MPI()
 {
 #ifdef MPI_
-  // Si groupe non initialise, ne rien faire:
-  // Modif par BM (20/08/2012): ne detruire ces membres statiques que si c'est le groupe principal (fin de l'execution)
+  // If group not initialized, do nothing:
+  // Modified by BM (20/08/2012): only destroy these static members if this is the main group (end of execution)
   if ((mpi_comm_!=MPI_COMM_NULL) && (mpi_comm_ == trio_u_world_))
     {
       delete [] mpi_status_;
@@ -126,11 +126,11 @@ Comm_Group_MPI::~Comm_Group_MPI()
       mpi_requests_=0;
     }
 
-  else // on detruit les groupes non prinicpaux
+  else // destroy non-principal groups
     {
       if (mpi_comm_!=MPI_COMM_NULL)
         {
-          // on detruit le group puis le mpi_comm
+          // destroy the group then the mpi_comm
           mpi_error(MPI_Comm_free(&mpi_comm_));
           assert(mpi_comm_==MPI_COMM_NULL);
         }
@@ -143,7 +143,7 @@ Comm_Group_MPI::~Comm_Group_MPI()
 #endif
 }
 
-/*! @brief appel a MPI_Abort et rend la main
+/*! @brief Calls MPI_Abort and returns.
  *
  */
 void Comm_Group_MPI::abort() const
@@ -189,7 +189,7 @@ void Comm_Group_MPI::mp_collective_op_template(const _TYPE_ *x, _TYPE_ *resu, in
       internal_collective(x, resu, n, &op, -1 /* only one operation */, 0 /* recursion level */);
       break;
     }
-  if (s>0) // Affichage
+  if (s>0) // Display
     {
       std::string clock(Process::is_parallel() ? "[clock]#" + std::to_string(Process::me()) : "[clock]  ");
       std::string mpi_reduce = "mp_sum";
@@ -270,12 +270,12 @@ void Comm_Group_MPI::mp_collective_op(const trustIdType *x, trustIdType *resu, c
 #endif
 
 
-/*! @brief Point de synchronisation de tous les processeurs du groupe (permet de verifier que tout le monde est la.
+/*! @brief Synchronization point for all processors in the group (allows checking that everyone is present.
  *
- * ..). Si check_enabled() est
- *  non nul, on utilise le tag pour verifier que tous les processeurs
- *  sont bien en train d'attendre le meme tag, sinon c'est une barriere
- *  simple. Le tag doit verifier 0 <= tag < max_tag (soit 32).
+ * ..). If check_enabled() is
+ *  non-zero, the tag is used to verify that all processors
+ *  are waiting on the same tag, otherwise it is a simple barrier.
+ *  The tag must satisfy 0 <= tag < max_tag (i.e. 32).
  *
  */
 void Comm_Group_MPI::barrier(int tag) const
@@ -286,9 +286,9 @@ void Comm_Group_MPI::barrier(int tag) const
   assert(tag >= 0 && tag < max_tag);
   if (check_enabled())
     {
-      // On fait la barriere avec des mpmin et mpmax pour verifier
-      // que le tag est le meme sur tous les processeurs :
-      // ATTENTION : il faut "int" et pas "entier" !!!
+      // We perform the barrier with mpmin and mpmax to verify
+      // that the tag is the same on all processors:
+      // WARNING: we need "int" and not "entier" !!!
       int tag_complet = get_new_tag() * max_tag + tag;
       int min_tag, amax_tag;
       mpi_error(MPI_Allreduce(& tag_complet, & min_tag, 1, MPI_ENTIER, MPI_MIN, mpi_comm_));
@@ -305,22 +305,22 @@ void Comm_Group_MPI::barrier(int tag) const
     }
   else
     {
-      // Barriere simple sans le tag :
+      // Simple barrier without the tag:
       mpi_error(MPI_Barrier(mpi_comm_));
     }
   statistics().end_count(STD_COUNTERS::mpi_barrier);
 #endif
 }
 
-/*! @brief Demarre l'envoi et la reception des buffers.
+/*! @brief Starts sending and receiving buffers.
  *
- * Les buffers doivent rester valide jusqu'au retour de send_recv_finish().
- *  Le graphe de communication et la taille des buffers doivent etre corrects !
+ * Buffers must remain valid until send_recv_finish() returns.
+ *  The communication graph and buffer sizes must be correct!
  *
- *  send_list : liste des processeurs (numerotation sur groupe courant) a qui envoyer
- *  send_size : taille en octets de chaque message
- *  send_buffers : adresse des donnees a envoyer.
- *  recv_...  : idem pour les donnees en reception.
+ *  send_list : list of processors (numbered within the current group) to send to
+ *  send_size : size in bytes of each message
+ *  send_buffers : address of data to send.
+ *  recv_...  : same for data to receive.
  *
  *
  */
@@ -343,7 +343,7 @@ void Comm_Group_MPI::send_recv_start(const ArrOfInt& send_list,
 
   int divisor = 0;
   MPI_Datatype datatype = MPI_CHAR;
-  assert(sizeof(int) == sizeof(int)); // Sinon il faut changer MPI_ENTIER !!!
+  assert(sizeof(int) == sizeof(int)); // Otherwise MPI_ENTIER must be changed !!!
   switch(typehint)
     {
     case CHAR:
@@ -365,8 +365,8 @@ void Comm_Group_MPI::send_recv_start(const ArrOfInt& send_list,
       Process::exit();
     }
 
-  // Astuce pour maximiser les chances que ca marche : on declare
-  // la reception d'abord et l'envoi ensuite.
+  // Trick to maximize the chances of success: we declare
+  // the reception first and the send afterwards.
   n = recv_list.size_array();
   for (i = 0; i < n; i++)
     {
@@ -403,7 +403,7 @@ void Comm_Group_MPI::send_recv_start(const ArrOfInt& send_list,
 #endif
 }
 
-/*! @brief Attend que l'ensemble des communications lancees par send_recv_start soient finie.
+/*! @brief Waits until all communications started by send_recv_start are finished.
  *
  */
 void Comm_Group_MPI::send_recv_finish() const
@@ -411,7 +411,7 @@ void Comm_Group_MPI::send_recv_finish() const
 #ifdef MPI_
   assert(mpi_nrequests_ >= 0);
   mpi_error(MPI_Waitall(mpi_nrequests_, mpi_requests_, mpi_status_));
-  if (statistics().is_gpu_verbose_on() && Process::je_suis_maitre()) // Affichage
+  if (statistics().is_gpu_verbose_on() && Process::je_suis_maitre()) // Display
     {
       std::string clock(Process::is_parallel() ? "[clock]#" + std::to_string(Process::me()) : "[clock]  ");
       double ms = 0.001 * statistics().get_time_since_last_open(STD_COUNTERS::mpi_sendrecv) ;
@@ -434,12 +434,12 @@ void Comm_Group_MPI::send_recv_finish() const
 }
 
 
-/*! @brief Envoi blocant.
+/*! @brief Blocking send.
  *
- * Pour etre bien certain que le code est safe, on force
- *  une communication synchrone pour forcer le blocage en mode check (voir check_enabled()).
- *  Sinon, on utilise MPI_Send qui est en general non blocant pour les petits messages
- *  (donc de meilleures performances).
+ * To be sure the code is safe, we force
+ *  a synchronous communication to enforce blocking in check mode (see check_enabled()).
+ *  Otherwise, we use MPI_Send which is generally non-blocking for small messages
+ *  (hence better performance).
  *
  */
 void Comm_Group_MPI::send(int pe, const void *buffer, int size, int tag) const
@@ -449,8 +449,8 @@ void Comm_Group_MPI::send(int pe, const void *buffer, int size, int tag) const
   assert(mpi_nrequests_ < 0);
   int dest = pe;
   assert(dest >= 0 && dest < nproc());
-  // Probleme: oblige de faire un cast de (const void*) en (void*) a cause
-  // du prototype de MPI_Send
+  // Problem: forced to cast (const void*) to (void*) because of
+  // the MPI_Send prototype
   if (check_enabled())
     mpi_error(MPI_Ssend ((void*)buffer, size, MPI_CHAR, dest, tag, mpi_comm_));
   else
@@ -459,7 +459,7 @@ void Comm_Group_MPI::send(int pe, const void *buffer, int size, int tag) const
 #endif
 }
 
-/*! @brief Reception blocante d'un message.
+/*! @brief Blocking reception of a message.
  *
  */
 void Comm_Group_MPI::recv(int pe, void *buffer, int size, int tag) const
@@ -490,7 +490,7 @@ void Comm_Group_MPI::all_to_all(const void *src_buffer, void *dest_buffer, int d
 #ifdef MPI_
   statistics().begin_count(STD_COUNTERS::mpi_alltoall);
   assert(src_buffer != dest_buffer);
-  void * ptr = (void *) src_buffer; // Cast a cause de l'interface de MPI_Alltoall
+  void * ptr = (void *) src_buffer; // Cast needed because of the MPI_Alltoall interface
   mpi_error(MPI_Alltoall(ptr, data_size, MPI_CHAR, dest_buffer, data_size, MPI_CHAR, mpi_comm_));
   statistics().end_count(STD_COUNTERS::mpi_alltoall,1,data_size);
 #endif
@@ -500,7 +500,7 @@ void Comm_Group_MPI::gather(const void *src_buffer, void *dest_buffer, int data_
 {
 #ifdef MPI_
   statistics().begin_count(STD_COUNTERS::mpi_gather);
-  void * ptr = (void *) src_buffer; // Cast a cause de l'interface de MPI_Alltoall
+  void * ptr = (void *) src_buffer; // Cast needed because of the MPI_Alltoall interface
   mpi_error(MPI_Gather(ptr, data_size, MPI_CHAR, dest_buffer, data_size, MPI_CHAR, root, mpi_comm_));
   statistics().end_count(STD_COUNTERS::mpi_gather,1,data_size);
 #endif
@@ -510,7 +510,7 @@ void Comm_Group_MPI::all_gather(const void *src_buffer, void *dest_buffer, int d
 {
 #ifdef MPI_
   statistics().begin_count(STD_COUNTERS::mpi_allgather);
-  void * ptr = (void *) src_buffer; // Cast a cause de l'interface de MPI_Alltoall
+  void * ptr = (void *) src_buffer; // Cast needed because of the MPI_Alltoall interface
   mpi_error(MPI_Allgather(ptr, data_size, MPI_CHAR, dest_buffer, data_size, MPI_CHAR, mpi_comm_));
   statistics().end_count(STD_COUNTERS::mpi_allgather,1,data_size);
 #endif
@@ -520,7 +520,7 @@ void Comm_Group_MPI::all_gatherv(const void *src_buffer, void *dest_buffer, int 
 {
 #ifdef MPI_
   statistics().begin_count(STD_COUNTERS::mpi_allgather);
-  void * ptr = (void *) src_buffer; // Cast a cause de l'interface de MPI_Alltoall
+  void * ptr = (void *) src_buffer; // Cast needed because of the MPI_Alltoall interface
   mpi_error(MPI_Allgatherv(ptr, send_size, MPI_CHAR, dest_buffer, recv_size, displs, MPI_CHAR, mpi_comm_));
   statistics().end_count(STD_COUNTERS::mpi_allgather,1,send_size);
 #endif
@@ -529,12 +529,12 @@ void Comm_Group_MPI::all_gatherv(const void *src_buffer, void *dest_buffer, int 
 
 #ifdef MPI_
 
-/*! @brief constructeur du groupe "tous" Attention, ce constructeur ne doit etre appele qu'une seule fois.
+/*! @brief Constructor for the "all" group. Warning: this constructor must only be called once.
  *
- *   Le groupe est associe a trio_u_world_
- *   Si must_mpi_initialize_==false, on suppose que MPI_Init a deja ete appele.
- *   Apres l'appel a init_group_trio, il faut enregistrer le groupe dans PE_Groups
- *   Voir PE_Groups::initialize()
+ *   The group is associated with trio_u_world_.
+ *   If must_mpi_initialize_==false, it is assumed that MPI_Init has already been called.
+ *   After calling init_group_trio, the group must be registered in PE_Groups.
+ *   See PE_Groups::initialize().
  *
  */
 void Comm_Group_MPI::init_group_trio()
@@ -559,7 +559,7 @@ void Comm_Group_MPI::init_group_trio()
       int argc=0;
       char** argv=nullptr;
       int errcode = MPI_Init(&argc, &argv);
-      //int errcode = MPI_Init(0,0); Message d'erreur sur MPI Voltaire
+      //int errcode = MPI_Init(0,0); Error message on MPI Voltaire
       if (errcode != MPI_SUCCESS)
         {
           Cerr << "Error in Comm_Group_MPI::init_group_trio()\n"
@@ -579,9 +579,9 @@ void Comm_Group_MPI::init_group_trio()
   mpi_comm_ = trio_u_world_;
   MPI_Comm_group(mpi_comm_, &mpi_group_);
 
-  // Initialisation des variables statiques de la classe
-  // Un buffer a envoyer et un a recevoir par processeur
-  // d'ou le maximum...
+  // Initialization of the static member variables of the class
+  // One send buffer and one receive buffer per processor,
+  // hence the maximum...
   mpi_maxrequests_ = nbproc * 2;
   mpi_status_ = new MPI_Status[mpi_maxrequests_];
   mpi_requests_ = new MPI_Request[mpi_maxrequests_];
@@ -633,7 +633,7 @@ void Comm_Group_MPI::all_to_allv(const void *src_buffer, int *send_data_size, in
 {
   statistics().begin_count(STD_COUNTERS::mpi_alltoall);
   assert(src_buffer != dest_buffer);
-  void * ptr = (void *) src_buffer; // Cast a cause de l'interface de MPI_Alltoall
+  void * ptr = (void *) src_buffer; // Cast needed because of the MPI_Alltoall interface
 
   const int n = nproc();
   int size;
@@ -662,9 +662,9 @@ void Comm_Group_MPI::all_to_allv(const void *src_buffer, int *send_data_size, in
   statistics().end_count(STD_COUNTERS::mpi_alltoall,1,size);
 }
 
-/*! @brief pour que trio_u n'utilise qu'une partie des processeurs de MPI_COMM_WORLD, il faut donner un communicateur a utiliser avant
+/*! @brief So that trio_u uses only a subset of MPI_COMM_WORLD processors, a communicator must be provided before
  *
- *   d'appeler init_group_trio.
+ *   calling init_group_trio.
  *
  */
 void Comm_Group_MPI::set_trio_u_world(MPI_Comm world)
@@ -724,8 +724,8 @@ void Comm_Group_MPI::ptop_send_recv(const void * send_buf, int send_buf_size, in
     {
       assert(dest >= 0 && dest < nproc());
       assert(src >= 0 && src < nproc());
-      // Probleme: oblige de faire un cast de (const void*) en (void*) a cause
-      // du prototype de MPI_Send
+      // Problem: forced to cast (const void*) to (void*) because of
+      // the MPI_Send prototype
       mpi_error(MPI_Sendrecv((void*)send_buf, send_buf_size, MPI_CHAR, dest, tag,
                              recv_buf, recv_buf_size, MPI_CHAR, src, tag, mpi_comm_,
                              &status));
@@ -733,29 +733,29 @@ void Comm_Group_MPI::ptop_send_recv(const void * send_buf, int send_buf_size, in
   statistics().end_count(STD_COUNTERS::mpi_sendrecv, 1, send_buf_size + recv_buf_size);
 }
 
-/*! @brief Construction du groupe de processeurs a partir de la liste.
+/*! @brief Builds the processor group from the list.
  *
- * Voir Comm_Group::init_group(const ArrOfInt &)
- *  Methode appelee par PE_Groups::create_group()
+ * See Comm_Group::init_group(const ArrOfInt &)
+ *  Method called by PE_Groups::create_group()
  *
  */
 void Comm_Group_MPI::init_group(const ArrOfInt& pe_list)
 {
   must_finalize_ = 0;
-  // Le groupe "tous" doit exister
+  // The "all" group must exist
   assert(mpi_status_);
 
   Comm_Group::init_group(pe_list);
 
   const Comm_Group_MPI& cg = ref_cast(Comm_Group_MPI, PE_Groups::current_group());
-  // On stocke une reference au groupe pere : c'est le groupe courant au moment
-  // de l'appel a init_group. Le destructeur devra etre appele simultanement
-  // sur tous les processeurs du meme groupe.
+  // Store a reference to the parent group: it is the current group at the time
+  // of the call to init_group. The destructor must be called simultaneously
+  // on all processors in the same group.
   groupe_pere_ = PE_Groups::current_group();
-  // Construction du groupe MPI
+  // Build the MPI group
   const MPI_Group& current_mpi_group = cg.mpi_group_;
   const MPI_Comm& current_mpi_comm  = cg.mpi_comm_;
-  // Copie de pe_list au cas ou int != int...
+  // Copy pe_list in case int != int...
   const int nbproc = this->nproc();
   int *ranks = new int[nbproc];
   for (int i = 0; i < nbproc; i++)
@@ -763,9 +763,9 @@ void Comm_Group_MPI::init_group(const ArrOfInt& pe_list)
   assert(mpi_group_==MPI_GROUP_NULL);
   mpi_error(MPI_Group_incl(current_mpi_group, nbproc, ranks, & mpi_group_));
   delete[] ranks;
-  // Construction du communicator
-  // MPI_Comm_create renvoie MPI_COMM_NULL si le processeur courant
-  // n'est pas dans le groupe.
+  // Build the communicator
+  // MPI_Comm_create returns MPI_COMM_NULL if the current processor
+  // is not in the group.
   mpi_error(MPI_Comm_create(current_mpi_comm, mpi_group_, & mpi_comm_));
 }
 
@@ -777,13 +777,13 @@ void Comm_Group_MPI::init_group(const ArrOfInt& pe_list)
 void Comm_Group_MPI::init_comm_on_numa_node()
 {
   must_finalize_ = 0;
-  // Le groupe "tous" doit exister
+  // The "all" group must exist
   assert(mpi_status_);
   assert(mpi_group_==MPI_GROUP_NULL);
 
   groupe_pere_ = PE_Groups::current_group();
 
-  // Construction du communicator
+  // Build the communicator
   const Comm_Group_MPI& cg = ref_cast(Comm_Group_MPI, PE_Groups::current_group());
   const MPI_Comm& current_mpi_comm  = cg.mpi_comm_;
   int current_rank = cg.rank();
@@ -823,13 +823,13 @@ void Comm_Group_MPI::init_comm_on_numa_node()
 void Comm_Group_MPI::init_comm_on_node_master()
 {
   must_finalize_ = 0;
-  // Le groupe "tous" doit exister
+  // The "all" group must exist
   assert(mpi_status_);
   assert(mpi_group_==MPI_GROUP_NULL);
 
   groupe_pere_ = PE_Groups::get_node_group();
 
-  // Construction du communicateur + groupe MPI
+  // Build the MPI communicator and group
   const Comm_Group_MPI& cg = ref_cast(Comm_Group_MPI, PE_Groups::get_node_group());
   const MPI_Comm& current_mpi_comm  = cg.mpi_comm_;
   const MPI_Group& current_mpi_group  = cg.mpi_group_;
@@ -844,7 +844,7 @@ void Comm_Group_MPI::init_comm_on_node_master()
 
 void Comm_Group_MPI::internal_collective(const int *x, int *resu, int nx, const Collective_Op *op, int nop, int level) const
 {
-  // Pour l'instant algo bourrin, a optimiser...
+  // For now, brute-force algorithm, to be optimized...
   for (int i = 0; i < nx; i++)
     {
       int j = (nop < 0) ? 0 : i;
@@ -861,7 +861,7 @@ void Comm_Group_MPI::internal_collective(const int *x, int *resu, int nx, const 
 #if INT_is_64_ == 2
 void Comm_Group_MPI::internal_collective(const trustIdType *x, trustIdType *resu, int nx, const Collective_Op *op, int nop, int level) const
 {
-  // Pour l'instant algo bourrin, a optimiser...
+  // For now, brute-force algorithm, to be optimized...
   for (int i = 0; i < nx; i++)
     {
       int j = (nop < 0) ? 0 : i;
@@ -876,7 +876,7 @@ void Comm_Group_MPI::internal_collective(const trustIdType *x, trustIdType *resu
 
 void Comm_Group_MPI::internal_collective(const double *x, double *resu, int nx, const Collective_Op *op, int nop, int level) const
 {
-  // Pour l'instant algo bourrin, a optimiser...
+  // For now, brute-force algorithm, to be optimized...
   for (int i = 0; i < nx; i++)
     {
       int j = (nop < 0) ? 0 : i;
@@ -892,7 +892,7 @@ void Comm_Group_MPI::internal_collective(const double *x, double *resu, int nx, 
 
 void Comm_Group_MPI::internal_collective(const float *x, float *resu, int nx, const Collective_Op *op, int nop, int level) const
 {
-  // Pour l'instant algo bourrin, a optimiser...
+  // For now, brute-force algorithm, to be optimized...
   for (int i = 0; i < nx; i++)
     {
       int j = (nop < 0) ? 0 : i;
@@ -906,11 +906,11 @@ void Comm_Group_MPI::internal_collective(const float *x, float *resu, int nx, co
     }
 }
 
-/*! @brief Renvoie la somme des x sur les processeurs precedents du groupe (moi non compris).
+/*! @brief Returns the sum of x over the preceding processors in the group (not including self).
  *
- * Le resultat sur le premier processeur du groupe est donc toujours 0.
- *  Le resultat depend de l'ordre dans lequel les processeurs ont ete
- *  fournis dans le constructeur.
+ * The result on the first processor of the group is therefore always 0.
+ *  The result depends on the order in which the processors were
+ *  provided in the constructor.
  *
  */
 trustIdType Comm_Group_MPI::mppartial_sum_impl(trustIdType x) const
@@ -924,7 +924,7 @@ trustIdType Comm_Group_MPI::mppartial_sum_impl(trustIdType x) const
 
   if (rang > 0)
     {
-      // Recoit la somme partielle du precedent
+      // Receives the partial sum from the previous processor
 #ifndef INT_is_64_
       mpi_error(MPI_Recv(& somme, 1, MPI_INT, rang-1, tag, mpi_comm_, &status));
 #else
@@ -933,7 +933,7 @@ trustIdType Comm_Group_MPI::mppartial_sum_impl(trustIdType x) const
     }
   if (rang+1 < np)
     {
-      // Envoie la somme partielle au suivant
+      // Sends the partial sum to the next processor
       trustIdType s = somme + x;
 #ifndef INT_is_64_
       mpi_error(MPI_Send(& s, 1, MPI_INT, rang+1, tag, mpi_comm_));

@@ -20,7 +20,7 @@
 
 void debug(StringTokenizer*);
 
-/* Les identificateurs suivants doivent etre definis de maniere unique pour chaque fonction */
+/* The following identifiers must be defined uniquely for each function */
 
 Parser::Parser()
 {
@@ -273,7 +273,7 @@ void Parser::parserState0(StringTokenizer* tokenizer, PSTACK(PNode)* ob, STACK(i
           trouv = searchFunc(func);
           if (trouv>-1)
             {
-              op->push(-trouv); // OC 01/2005 : Attention, on stocke l'oppose de l'indice trouve afin de bien dissocier les operateurs binaires des fonctions unaires.
+              op->push(-trouv); // OC 01/2005: Note, we store the opposite of the found index to clearly distinguish binary operators from unary functions.
               state = 0;
             }
           else
@@ -292,7 +292,7 @@ void Parser::parserState0(StringTokenizer* tokenizer, PSTACK(PNode)* ob, STACK(i
                   Cerr << "Error in Parser::parserState0 during interpretation of the following string :\n ";
                   Cerr << str << "\n";
                   Cerr << " identifier " << func << " unknown " << finl;
-                  // permet d avoir 0 erreur valgrind avec cppunit
+                  // allows zero valgrind errors with cppunit
                   root=(PNode*) *(ob->getBase());
                   Cerr << "List of known var "<<finl;
                   for (auto name : les_var_names)
@@ -610,7 +610,7 @@ int Parser::searchFunc(const std::string& f)
   std::transform(function_name.begin(), function_name.end(), function_name.begin(), ::toupper);
   auto it = map_function_.find(function_name);
   if (it != map_function_.end())
-    return it->second + 1; // OC: pour ne pas utiliser le zero car sinon conflit avec la nouvelle numerotation des operateurs binaires.
+    return it->second + 1; // OC: do not use zero to avoid conflicts with the new binary operator numbering.
   else
     return -1;
 }

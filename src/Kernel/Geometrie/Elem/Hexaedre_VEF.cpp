@@ -19,10 +19,10 @@
 Implemente_instanciable_32_64(Hexaedre_VEF_32_64,"Hexaedre_VEF",Elem_geom_base_32_64<_T_>);
 
 
-/*! @brief NE FAIT RIEN
+/*! @brief Does nothing.
  *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie
+ * @param (Sortie& s) an output stream
+ * @return (Sortie&) the output stream
  */
 template <typename _SIZE_>
 Sortie& Hexaedre_VEF_32_64<_SIZE_>::printOn(Sortie& s ) const
@@ -31,10 +31,10 @@ Sortie& Hexaedre_VEF_32_64<_SIZE_>::printOn(Sortie& s ) const
 }
 
 
-/*! @brief NE FAIT RIEN
+/*! @brief Does nothing.
  *
- * @param (Entree& s) un flot d'entree
- * @return (Entree&) le flot d'entree
+ * @param (Entree& s) an input stream
+ * @return (Entree&) the input stream
  */
 template <typename _SIZE_>
 Entree& Hexaedre_VEF_32_64<_SIZE_>::readOn(Entree& s )
@@ -42,9 +42,9 @@ Entree& Hexaedre_VEF_32_64<_SIZE_>::readOn(Entree& s )
   return s;
 }
 
-/*! @brief Renvoie le nom LML d'un Hexaedre_VEF = "HEXA8".
+/*! @brief Returns the LML name of a Hexaedre_VEF = "HEXA8".
  *
- * @return (Nom&) toujours egal a "HEXA8"
+ * @return (Nom&) always equal to "HEXA8"
  */
 template <typename _SIZE_>
 const Nom& Hexaedre_VEF_32_64<_SIZE_>::nom_lml() const
@@ -63,7 +63,7 @@ bool Hexaedre_VEF_32_64<_SIZE_>::entre_faces(const ArrOfDouble& pos, int_t Asom0
   double prodA,prodB;
   const DoubleTab_t& coord=dom.les_sommets();
 
-  // pour A
+  // for A
   double vecA1[3], vecA2[3], AP[3];
   double normaleA[3];
   for (int i=0; i<3; i++)
@@ -80,7 +80,7 @@ bool Hexaedre_VEF_32_64<_SIZE_>::entre_faces(const ArrOfDouble& pos, int_t Asom0
   for (int i=0; i<3; i++)
     prodA+=normaleA[i]*AP[i];
 
-  // pour B
+  // for B
   double vecB1[3], vecB2[3], BP[3];
   double normaleB[3];
   for (int i=0; i<3; i++)
@@ -101,7 +101,7 @@ bool Hexaedre_VEF_32_64<_SIZE_>::entre_faces(const ArrOfDouble& pos, int_t Asom0
     return true;
   else
     {
-      // on regarde si on n'est pas limite
+      // check if we are not at the boundary
       double rap=prodA/prodB;
       if (rap>1) rap=prodB/prodA;
       if (rap< Objet_U::precision_geom) return true;
@@ -168,8 +168,8 @@ bool Hexaedre_VEF_32_64<_SIZE_>::contient_Tetra(const ArrOfDouble& pos, int_t so
           break;
         }
 
-      //algo : les produits mixtes (som0, som1, som2,som3) et (pos, som1, som2,som3) doivent a voir le meme signe
-      //construction des vecteurs
+      //algo: the mixed products (som0, som1, som2,som3) and (pos, som1, som2,som3) must have the same sign
+      //construction of vectors
       vec0[0] = dom.coord(som1,0) - dom.coord(som0,0);
       vec0[1] = dom.coord(som1,1) - dom.coord(som0,1);
       vec0[2] = dom.coord(som1,2) - dom.coord(som0,2);
@@ -241,14 +241,14 @@ bool Hexaedre_VEF_32_64<_SIZE_>::contient_Tetra(const ArrOfDouble& pos, int_t so
   return 1;
 }
 
-/*! @brief Renvoie 1 si l'element ielem du domaine associe a l'element geometrique contient le point
+/*! @brief Returns 1 if element ielem of the domain associated with the geometric element contains the point
  *
- *               de coordonnees specifiees par le parametre "pos".
- *     Renvoie 0 sinon.
+ *               whose coordinates are specified by parameter "pos".
+ *     Returns 0 otherwise.
  *
- * @param (DoubleVect& pos) coordonnees du point que l'on cherche a localiser
- * @param (int ielem) le numero de l'element du domaine dans lequel on cherche le point.
- * @return (int) 1 si le point de coordonnees specifiees appartient a l'element ielem 0 sinon
+ * @param (DoubleVect& pos) coordinates of the point to locate
+ * @param (int ielem) the index of the domain element in which to search for the point.
+ * @return (int) 1 if the point with the specified coordinates belongs to element ielem, 0 otherwise
  */
 template <typename _SIZE_>
 int Hexaedre_VEF_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t element ) const
@@ -264,7 +264,7 @@ int Hexaedre_VEF_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t element )
   int_t som6 = dom.sommet_elem(element,6);
   int_t som7 = dom.sommet_elem(element,7);
 
-  // GF on teste si le point est boen entre les 2 faces
+  // GF check if the point is indeed between the 2 faces
   bool new_algo = true;
   if (new_algo)
     {
@@ -294,13 +294,13 @@ int Hexaedre_VEF_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t element )
 }
 
 
-/*! @brief Renvoie 1 si les sommets specifies par le parametre "pos" sont les sommets de l'element "element" du domaine associe a
+/*! @brief Returns 1 if the vertices specified by parameter "pos" are the vertices of element "element" of the domain associated with
  *
- *     l'element geometrique.
+ *     the geometric element.
  *
- * @param (IntVect& pos) les numeros des sommets a comparer avec ceux de l'elements "element"
- * @param (int element) le numero de l'element du domaine dont on veut comparer les sommets
- * @return (int) 1 si les sommets passes en parametre sont ceux de l'element specifie, 0 sinon
+ * @param (IntVect& pos) the vertex indices to compare with those of element "element"
+ * @param (int element) the index of the domain element whose vertices are to be compared
+ * @return (int) 1 if the vertices passed as parameter are those of the specified element, 0 otherwise
  */
 template <typename _SIZE_>
 int Hexaedre_VEF_32_64<_SIZE_>::contient(const SmallArrOfTID_t& som, int_t element ) const
@@ -319,9 +319,9 @@ int Hexaedre_VEF_32_64<_SIZE_>::contient(const SmallArrOfTID_t& som, int_t eleme
     return 0;
 }
 
-/*! @brief Calcule les volumes des elements du domaine associe.
+/*! @brief Computes the volumes of the elements of the associated domain.
  *
- * @param (DoubleVect& volumes) le vecteur contenant les valeurs  des des volumes des elements du domaine
+ * @param (DoubleVect& volumes) the vector containing the volume values of the domain elements
  */
 template <typename _SIZE_>
 void Hexaedre_VEF_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const
@@ -344,13 +344,13 @@ void Hexaedre_VEF_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const
   assert(volumes.size_totale()==size_tot);
   for (int_t num_poly=0; num_poly<size_tot; num_poly++)
     {
-      // on initialise le volume
+      // initialize the volume
       // volumes[num_poly] =0;
-      // pour chaque elem on le decoupe en tetra.
-      // On calcul le volume par somme des volumes des tetras.
+      // for each element, split it into tetrahedra.
+      // Compute the volume as the sum of the volumes of the tetrahedra.
 
-      // on definit les sommets de l'elem
-      // on recupere le centre de l'element.
+      // define the vertices of the element
+      // retrieve the center of the element.
 
       som0 = dom.sommet_elem(num_poly,0);
       som1 = dom.sommet_elem(num_poly,1);
@@ -365,9 +365,9 @@ void Hexaedre_VEF_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const
       //  Cerr << " som4 " << som4 << " som5 " << som5 << " som6 " << som6 << " som7 " << som7 <<   finl;
 
 
-      // on construit le tableau de travail face_sommet_global
-      // les faces seront ordonnee suivant Xmin, Xmax, Ymin, Ymax, Zmin,Zmax
-      // toujours en gardant la numerotation de TRUST
+      // build the working array face_sommet_global
+      // faces will be ordered as Xmin, Xmax, Ymin, Ymax, Zmin, Zmax
+      // always preserving the TRUST numbering
       face_sommet_global(0,0) =som0;
       face_sommet_global(0,1) =som1;
       face_sommet_global(0,2) =som2;
@@ -486,7 +486,7 @@ int Hexaedre_VEF_32_64<_SIZE_>::reordonne(int i0,int i1,int i2,int i3,const Doub
       v(i-1,dir)=coord(s[i],dir)-coord(s[0],dir);
   //ArrOfDouble prod_(3);
   int opp=-1;
-  // avant tout on teste si on a bien un plan
+  // first check that we actually have a plane
   {
 
     // ArrOfDouble prod_v(3);
@@ -503,7 +503,7 @@ int Hexaedre_VEF_32_64<_SIZE_>::reordonne(int i0,int i1,int i2,int i3,const Doub
           dist[j]+=prod_v[dir]*(coord(elem(num_poly,j),dir)-coord(s[0],dir));
       }
     //Cerr<<"ici "<<i0 <<" i1 " <<i1<<" i2 "<<i2 << " i3 "<<i3 <<" "<<dist<<finl;
-    // sommet le plus proche du plan
+    // vertex closest to the plane
     int s_plan=0;
     double min_dist=1e25;
     for (int j=0; j<8; j++)
@@ -517,7 +517,7 @@ int Hexaedre_VEF_32_64<_SIZE_>::reordonne(int i0,int i1,int i2,int i3,const Doub
       }
     if (s_plan!=i3)
       {
-        // pas un plan
+        // not a plane
         if (test)
           {
             //Cerr<<"ici pb"<<finl;
@@ -529,7 +529,7 @@ int Hexaedre_VEF_32_64<_SIZE_>::reordonne(int i0,int i1,int i2,int i3,const Doub
             Process::Process::exit();
           }
       }
-    // doit on tester  si les 4 autres points sont du meme cote ???
+    // should we test if the 4 other points are on the same side ???
 
   }
   for (int op=0; op<3; op++)
@@ -567,7 +567,7 @@ int Hexaedre_VEF_32_64<_SIZE_>::reordonne(int i0,int i1,int i2,int i3,const Doub
             {
               op=3;
               if (test) return 1;
-              // on a deux produits negatifs on ne fait rien
+              // we have two negative products, do nothing
             }
           opp=op;
 
@@ -601,23 +601,23 @@ template <typename _SIZE_>
 void Hexaedre_VEF_32_64<_SIZE_>::reordonner()
 {
   /*
-    22/12/04 : Generalisation de la methode (mais c'est plus lent!)
-    Numerotation d'un hexa VEF:
+    22/12/04: Generalization of the method (but slower!)
+    Numbering of a VEF hexahedron:
     6--------7
     | \       |\
     4   2-----3  5
     \ /       \ |
     0---------1
-    On boucle sur chacune des faces et on fait le produit scalaire 03.12/|03||12|
-    et on le compare a 02.13/|02||13|
-    S'il est plus grand on intervertit les sommets 2 et 3.
-    L'algorithme fonctionne si 0123 et 4567 sont deja sur une meme face
+    Loop over each face and compute the dot product 03.12/|03||12|
+    and compare it with 02.13/|02||13|
+    If it is larger, swap vertices 2 and 3.
+    The algorithm works if 0123 and 4567 are already on the same face
   */
   Domaine_t& dom=this->mon_dom.valeur();
   IntTab_t& elem=dom.les_elems();
   int_t nb_elem=dom.nb_elem();
   DoubleTab_t& coord=dom.les_sommets();
-  // tableau contenant les permutations valides d'un quadrangle
+  // array containing valid permutations of a quadrangle
   IntTab perm(8,4);
   perm( 0 , 0 )= 0 ;
   perm( 0 , 1 )= 1 ;
@@ -663,12 +663,12 @@ void Hexaedre_VEF_32_64<_SIZE_>::reordonner()
     {
       int permutations=-1;
       //     int niter=0;
-      // on commence par remettre correctement les 2 plans opposes
+      // start by correctly repositioning the 2 opposite planes
       permutations+=reordonne(0,1,2,3,coord,elem,num_poly,0, v,prod_, prod_v, dist, prod_v2);
       permutations+=reordonne(4,5,6,7,coord,elem,num_poly,0, v,prod_, prod_v, dist, prod_v2);
       for (int i=0; i<8; i++)
         sa[i]=elem(num_poly,i);
-      // on teste les 8 possibilites
+      // test the 8 possibilities
       int j;
       int n=0;
       int perm_valid=-1;
@@ -678,7 +678,7 @@ void Hexaedre_VEF_32_64<_SIZE_>::reordonner()
           int test=1;
           for (int i=4; i<8; i++)
             elem(num_poly,i)=sa[perm(j,i-4)+4];
-          // on regarde si les 6 plans sont valides
+          // check if the 6 planes are valid
           permutations=0;
           permutations+=reordonne(2,0,3,1,coord,elem,num_poly,test, v,prod_, prod_v, dist, prod_v2);
           permutations+=reordonne(3,1,7,5,coord,elem,num_poly,test, v,prod_, prod_v, dist, prod_v2);

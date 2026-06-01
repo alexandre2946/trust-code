@@ -22,11 +22,10 @@
 
 class Domaine_dis_base;
 
-/*! @brief classe Frontiere_dis_base Classe representant une frontiere discretisee.
+/*! @brief class Frontiere_dis_base Class representing a discretized boundary.
  *
- * Les objets
- *      Frontiere_dis_base contiennent un reference vers l'objet
- *      geometrique Frontiere.
+ * Frontiere_dis_base objects contain a reference to the
+ *      geometric Frontiere object.
  *
  * @sa Frontiere Domaine_dis
  */

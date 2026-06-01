@@ -19,10 +19,9 @@
 #include <Modele_turbulence_scal_diffturb_base.h>
 #include <Parser_U.h>
 
-/*! @brief Classe Modele_turbulence_scal_Prandtl Cette classe represente le modele de calcul suivant
+/*! @brief Scalar turbulence model using the turbulent Prandtl number to compute turbulent diffusivity:
  *
- *     pour la diffusivite turbulente:
- *                   alpha_turb = visco_turb / Prdt_turb;
+ *                   alpha_turb = visco_turb / Prdt_turb
  *
  * @sa Mod_Turb_scal_diffuturb_base
  */
@@ -35,10 +34,10 @@ public:
 
 protected:
   double LePrdt_ = 0.9;
-  Nom LePrdt_fct_; // stockage de la chaine de caractere pour le prandtl du jdd
-  Nom definition_fonction_; // stockage de la chaine du jdd
-  Parser_U fonction_; // fonction de calcul de alpha_t
-  Parser_U fonction1_; // fonction de calcul de Prandtl variant en espace
+  Nom LePrdt_fct_; // string storing the Prandtl expression from the data file
+  Nom definition_fonction_; // string storing the function definition from the data file
+  Parser_U fonction_; // function to compute alpha_t
+  Parser_U fonction1_; // function to compute spatially varying Prandtl number
   public_for_cuda
   virtual Champ_Fonc_base& calculer_diffusivite_turbulente();
 };

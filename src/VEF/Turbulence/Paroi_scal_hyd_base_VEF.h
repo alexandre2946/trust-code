@@ -37,7 +37,7 @@ public:
   DoubleVect& equivalent_distance_name(DoubleVect& d_eq, const Nom& nom_bord) const override;
 
 protected:
-  DoubleVect tab_d_reel_;   // tableau des distances (dimenssionnelles) du
+  DoubleVect tab_d_reel_;   // array of (dimensional) distances from
 };
 
 #endif /* Paroi_scal_hyd_base_VEF_included */

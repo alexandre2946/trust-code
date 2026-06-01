@@ -23,10 +23,12 @@
 
 class Fluide_Quasi_Compressible;
 
-/*! @brief classe Champ_front_debit_QC_fonc_t Classe derivee de Champ_front_base qui represente les
+/*! @brief class Champ_front_debit_QC_fonc_t
  *
- *      champs aux frontieres debit_QCs : ch(*,i)=m(i)+alea*amplitude(i)
- *      ou alea est une variable aleatoire de loi uniforme sur [0,1]
+ * @brief Derived from Champ_front_base, represents boundary fields of type
+ *        debit_QC: ch(*,i) = m(i) + random * amplitude(i), where random is
+ *        a uniformly distributed random variable on [0,1]. The flow rate
+ *        can be a constant or a function of time.
  *
  * @sa Champ_front_base
  */

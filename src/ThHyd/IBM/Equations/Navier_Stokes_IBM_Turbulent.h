@@ -20,11 +20,11 @@
 #include <Navier_Stokes_IBM.h>
 
 
-/*! @brief classe Navier_Stokes_IBM_Turbulent Cette classe represente l'equation de la dynamique pour un fluide
+/*! @brief Turbulent IBM Navier-Stokes equation.
  *
- *      visqueux verifiant la condition d'incompressibilite div U = 0 avec
- *      modelisation de la turbulence.
- *      Un membre de type OWN_PTR(Modele_turbulence_hyd_base)  representera le modele de turbulence.
+ *      This class represents the momentum equation for a viscous fluid satisfying
+ *      the incompressibility condition div U = 0 with turbulence modelling.
+ *      A member of type OWN_PTR(Modele_turbulence_hyd_base) represents the turbulence model.
  *
  * @sa Navier_Stokes_IBM OWN_PTR(Modele_turbulence_hyd_base)  Pb_Hydraulique_Turbulent, Pb_Thermohydraulique_Turbulent
  */

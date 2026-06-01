@@ -28,10 +28,10 @@ Implemente_base(Source_base,"Source_base",Objet_U);
 
 /*! @brief DOES NOTHING - to override in derived classes.
  *
- *     Imprime la source sur un flot de sortie.
+ *     Prints the source to an output stream.
  *
- * @param (Sortie& os) le flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) the output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Source_base::printOn(Sortie& os) const
 {
@@ -40,10 +40,10 @@ Sortie& Source_base::printOn(Sortie& os) const
 
 /*! @brief DOES NOTHING - to override in derived classes.
  *
- *     Lecture d'un terme source sur un flot d'entree.
+ *     Reading of a source term from an input stream.
  *
- * @param (Entree& is) le flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) the input stream
+ * @return (Entree&) the modified input stream
  */
 Entree& Source_base::readOn(Entree& is)
 {
@@ -52,8 +52,8 @@ Entree& Source_base::readOn(Entree& is)
 
 /*! @brief DOES NOTHING - to override in derived classes.
  *
- * Mise a jour en temps du terme source.
- * @param (double) le pas de temps de mise a jour
+ * Time update of the source term.
+ * @param (double) the time step of the update
  */
 void Source_base::mettre_a_jour(double )
 {
@@ -78,9 +78,9 @@ void Source_base::resetTime(double t)
   exit();
 }
 
-/*! @brief Met a jour les references internes a l'objet Source_base.
+/*! @brief Updates internal references of the Source_base object.
  *
- * Appelle 2 methodes virtuelles pures protegees:
+ * Calls 2 protected pure virtual methods:
  *        Source_base::associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base&)
  *        Source_base::associer_pb(const Probleme_base&)
  *
@@ -99,18 +99,18 @@ void Source_base::completer()
     col_width_ = std::max(col_width_, itr.longueur());
 }
 
-/*! @brief Cette methode (ou la methode de la classe derivee) est appelee par Sources::associer_champ_rho pour chaque source de la liste
+/*! @brief This method (or the method of the derived class) is called by Sources::associer_champ_rho for each source in the list
  *
- *   (par exemple, a l'initialisation d'un calcul front-tracking).
- *   Cette methode doit etre reimplementee dans les classes derivees
- *   utilisees dans les problemes a rho variable.
+ *   (for example, at the initialization of a front-tracking calculation).
+ *   This method must be re-implemented in the derived classes
+ *   used in problems with variable rho.
  *
- *   La methode ajouter calcule le terme suivant:
- *     INTEGRALE            (terme source)
- *     sur volume entrelace
+ *   The ajouter method calculates the following term:
+ *     INTEGRAL            (source term)
+ *     over interleaved volume
  *
- *   Dans les problemes ou rho est variable, "terme source" homogene a rho*v.
- *   Sinon, "terme source" est homogene a v.
+ *   In problems where rho is variable, "source term" homogeneous to rho*v.
+ *   Otherwise, "source term" is homogeneous to v.
  *
  */
 void Source_base::associer_champ_rho(const Champ_base& champ_rho)
@@ -124,14 +124,14 @@ void Source_base::associer_champ_rho(const Champ_base& champ_rho)
   exit();
 }
 
-/*! @brief Si la source comprend le motcle "mot", elle remplit la reference a ch_ref et renvoie 1, sinon renvoie 0 (voir Source_Translation par ex.
+/*! @brief If the source understands the keyword "mot", it fills the reference to ch_ref and returns 1, otherwise returns 0 (see Source_Translation for example)
  *
  * )
  *
  */
 int Source_base::a_pour_Champ_Fonc(const Motcle& mot, OBS_PTR(Champ_base) &ch_ref) const
 {
-  // La classe de base ne comprend aucun motcle
+  // The base class understands no keywords
   return 0;
 }
 
@@ -160,11 +160,11 @@ void Source_base::get_noms_champs_postraitables(Noms& nom, Option opt) const
 
 /*! @brief DOES NOTHING - to override in derived classes.
  *
- *     Mise a jour en temps du terme source.
+ *     Time update of the source term.
  *
- * @param (double) le pas de temps de mise a jour
+ * @param (double) the time step of the update
  */
-static std::map<std::string, int> counters; // ToDo provisoire
+static std::map<std::string, int> counters; // Todo provisional
 int Source_base::impr(Sortie& os) const
 {
   if (out_=="??")
@@ -207,9 +207,9 @@ int Source_base::impr(Sortie& os) const
     }
   return 1;
 }
-/*! @brief Dimensionnement de la matrice implicite des termes sources.
+/*! @brief Sizing of the implicit matrix of source terms.
  *
- * Par defaut ne fait rien.
+ * By default does nothing.
  *
  */
 void Source_base::dimensionner(Matrice_Morse& mat) const
@@ -235,7 +235,7 @@ DoubleTab& Source_base::calculer(DoubleTab& secmem) const
   return ajouter(secmem);
 }
 
-/*! @brief contribution a la matrice implicite des termes sources par defaut pas de contribution
+/*! @brief contribution to the implicit matrix of source terms, by default no contribution
  *
  */
 void Source_base::contribuer_a_avec(const DoubleTab&, Matrice_Morse& mat) const
@@ -245,9 +245,9 @@ void Source_base::contribuer_a_avec(const DoubleTab&, Matrice_Morse& mat) const
   ajouter_blocs({{ equation().inconnue().le_nom().getString(), &mat}}, secmem, {});
 }
 
-/*! @brief contribution au second membres des termes sources en implicite par defaut erreur
+/*! @brief contribution to the right-hand side of source terms implicitly, by default error
  *
- *  methode presente par coherence avec Operateur_base
+ *  method presented for consistency with Operateur_base
  *
  */
 void Source_base::contribuer_au_second_membre(DoubleTab& ) const
@@ -256,7 +256,7 @@ void Source_base::contribuer_au_second_membre(DoubleTab& ) const
   exit();
 }
 
-/* par defaut erreur */
+/* by default error */
 void Source_base::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   Process::exit(que_suis_je() + " : dimensionner_blocs() not coded!");
@@ -266,10 +266,10 @@ void Source_base::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const ta
   Process::exit(que_suis_je() + " : ajouter_blocs() not coded!");
 }
 
-/*! @brief Contrairement aux methodes mettre_a_jour, les methodes initialiser des sources ne peuvent pas dependre de l'exterieur
+/*! @brief Unlike the mettre_a_jour methods, the initializer methods of sources cannot depend on the outside
  *
- *     (lui-meme peut ne pas etre initialise)
- *     Par defaut, mettre_a_jour
+ *     (itself may not be initialized)
+ *     By default, mettre_a_jour
  *
  */
 int Source_base::initialiser(double temps)
@@ -279,16 +279,16 @@ int Source_base::initialiser(double temps)
 }
 
 
-/*! @brief Ouverture/creation d'un fichier d'impression d'un terme source A surcharger dans les classes derivees.
+/*! @brief Opening/creation of a file for printing a source term. To override in derived classes.
  *
- * @throws methode a surcharger
+ * @throws method to override
  */
 void Source_base::ouvrir_fichier(SFichier& os,const Nom& type, const int flag) const
 {
-  // flag nul on n'ouvre pas le fichier
+  // null flag means we don't open the file
   if (flag==0)
     return ;
-  // ToDo provisoire:
+  // Todo provisional:
   counters[type.getString()]++;
   if (counters[type.getString()]>1 && type!="")
     {
@@ -304,7 +304,7 @@ void Source_base::ouvrir_fichier(SFichier& os,const Nom& type, const int flag) c
   if (type!="") nomfichier+=(Nom)"_"+type;
   nomfichier+=".out";
 
-  // On cree le fichier a la premiere impression avec l'en tete
+  // Create the file on the first printing with the header
   if (sch.nb_impr()==1 && !pb.reprise_effectuee())
     {
       os.ouvrir(nomfichier);
@@ -320,7 +320,7 @@ void Source_base::ouvrir_fichier(SFichier& os,const Nom& type, const int flag) c
         fic.add_col(col_names_[i]);
       fic << finl;
     }
-  // Sinon on l'ouvre
+  // Otherwise open it
   else
     {
       os.ouvrir(nomfichier,ios::app);

@@ -17,7 +17,7 @@
 
 Implemente_instanciable_32_64(Domaine_bord_32_64,"Domaine_bord",Domaine_32_64<_T_>);
 
-/*! @brief pour l'instant exit()
+/*! @brief for now exit()
  *
  */
 template <typename _SIZE_>
@@ -27,7 +27,7 @@ Entree& Domaine_bord_32_64<_SIZE_>::readOn(Entree& is)
   return is;
 }
 
-/*! @brief pour l'instant exit()
+/*! @brief for now exit()
  *
  */
 template <typename _SIZE_>
@@ -37,7 +37,7 @@ Sortie& Domaine_bord_32_64<_SIZE_>::printOn(Sortie& os) const
   return os;
 }
 
-/*! @brief construit le domaine en appelant extraire_domaine_bord()
+/*! @brief builds the domain by calling extraire_domaine_bord()
  *
  */
 template <typename _SIZE_>
@@ -48,7 +48,7 @@ void Domaine_bord_32_64<_SIZE_>::construire_domaine_bord(const Domaine_bord_32_6
   extraire_domaine_bord(source, nom_bord, *this, renum_som_);
 }
 
-/*! @brief renvoie une reference au domaine source
+/*! @brief returns a reference to the source domain
  *
  */
 template <typename _SIZE_>
@@ -57,7 +57,7 @@ const Domaine_32_64<_SIZE_>& Domaine_bord_32_64<_SIZE_>::get_domaine_source() co
   return domaine_source_;
 }
 
-/*! @brief renvoie le nom du bord source
+/*! @brief returns the name of the source boundary
  *
  */
 template <typename _SIZE_>
@@ -66,7 +66,7 @@ const Nom& Domaine_bord_32_64<_SIZE_>::get_nom_bord_source() const
   return bord_source_;
 }
 
-/*! @brief renvoie renum_som (pour chaque sommet du domaine_bord, indice du meme sommet dans le domaine)
+/*! @brief returns renum_som (for each vertex of domaine_bord, index of the same vertex in the domain)
  *
  */
 template <typename _SIZE_>
@@ -75,7 +75,7 @@ const ArrOfInt_T<_SIZE_>& Domaine_bord_32_64<_SIZE_>::get_renum_som() const
   return renum_som_;
 }
 
-/*! @brief methode pour convertir un type de face en type d'element (a deplacer dans la classe Faces ?)
+/*! @brief method to convert a face type to an element type (to be moved to the Faces class ?)
  *
  */
 template <typename _SIZE_>
@@ -112,11 +112,11 @@ void type_face_to_type_elem(const Elem_geom_base_32_64<_SIZE_>& type_elem, const
     }
 }
 
-/*! @brief remplit le domaine "dest" avec les sommets et les faces du bord "nom_bord" du domaine "src".
+/*! @brief fills the domain "dest" with the vertices and faces of the boundary "nom_bord" of the domain "src".
  *
- * Les sommets du domaine dest sont uniquement les sommets qui sont sur
- *   une face du bord. Le tableau renum_som est dimensionne a dest.nb_som() et rempli comme
- *   suit: renum_som[i] est l'indice dans le domaine "src" du sommet i du domaine "dest".
+ * The vertices of the dest domain are only the vertices that are on a boundary face.
+ *   The renum_som array is sized to dest.nb_som() and filled as follows:
+ *   renum_som[i] is the index in the domain "src" of vertex i of the domain "dest".
  *
  */
 template <typename _SIZE_>
@@ -131,12 +131,12 @@ void Domaine_bord_32_64<_SIZE_>::extraire_domaine_bord(const Domaine_t& src,
            << " (this will be done one day... ask to B.Mathieu)" << finl;
     }
 
-  // Le domaine destination doit etre vide:
+  // The destination domain must be empty:
   assert(dest.nb_elem() == 0);
-  // Initialisation du domaine:
-  // On choisit un nom pour le domaine
+  // Domain initialization:
+  // Choose a name for the domain
   dest.nommer(src.le_nom() + Nom("_") + nom_bord);
-  // Type des elements du domaine dest:
+  // Element type of the dest domain:
   Motcle type_elem;
   type_face_to_type_elem(src.type_elem().valeur(), src.type_elem()->type_face(), type_elem);
   const std::string suff = !std::is_same<_SIZE_, int>::value ? "_64" : "";
@@ -152,7 +152,7 @@ void Domaine_bord_32_64<_SIZE_>::extraire_domaine_bord(const Domaine_t& src,
   elem_dest.resize(nb_faces, nb_som_face);
   renum_som.reset();
 
-  // renum_inverse: pour chaque sommet du domaine source, son indice dans le domaine destination:
+  // renum_inverse: for each vertex of the source domain, its index in the destination domain:
   ArrOfInt_t renum_inverse(src.nb_som());
   renum_inverse= -1;
   int_t nb_som_dest = 0;
@@ -161,7 +161,7 @@ void Domaine_bord_32_64<_SIZE_>::extraire_domaine_bord(const Domaine_t& src,
       for (int j = 0; j < nb_som_face; j++)
         {
           const int_t som = faces_src(i, j);
-          // Si le sommet n'a pas encore ete rencontre, lui donner un indice dans le domaine dest:
+          // If the vertex has not yet been encountered, assign it an index in the dest domain:
           if (renum_inverse[som] < 0)
             {
               renum_som.append_array(som);
@@ -170,7 +170,7 @@ void Domaine_bord_32_64<_SIZE_>::extraire_domaine_bord(const Domaine_t& src,
           elem_dest(i, j) = renum_inverse[som];
         }
     }
-  // Copie des sommets utilises dans le domaine destination
+  // Copy of vertices used in the destination domain
   DoubleTab_t& som_dest = dest.les_sommets();
   const DoubleTab_t& som_src = src.les_sommets();
   const int dim = static_cast<int>(som_src.dimension(1));
@@ -182,8 +182,8 @@ void Domaine_bord_32_64<_SIZE_>::extraire_domaine_bord(const Domaine_t& src,
         som_dest(i, j) = som_src(som, j);
     }
 
-  // A faire si besoin: initialiser le joint des sommets pour avoir les items communs,
-  //  et autres si necessaire.
+  // TODO if needed: initialize the vertex joint to have the common items,
+  //  and others if necessary.
 }
 
 template class Domaine_bord_32_64<int>;

@@ -74,15 +74,15 @@ void check_frontiere(const LIST_FRONTIERE& list, const char *msg)
     }
 }
 
-// S'il y a un proc qui a un type different de vide_OD, on type les faces sur tous
-// les processeurs avec ce type:
+// If there is a proc with a type different from vide_OD, set the face type on all
+// processors to that type:
 template <class _SIZE_>
 void corriger_type(Faces_32_64<_SIZE_>& faces, const OWN_PTR(Elem_geom_base_32_64<_SIZE_>)& type_elem)
 {
   Type_Face typ = faces.type_face();
   const int pe = (faces.type_face() == Type_Face::vide_0D) ? Process::nproc() - 1 : Process::me();
   const int min_pe = Process::mp_min(pe);
-  // Le processeur min_pe envoie son type a tous les autres
+  // Processor min_pe broadcasts its type to all others
   int typ_commun_i = static_cast<int>(typ);
   envoyer_broadcast(typ_commun_i, min_pe);
   Type_Face typ_commun = static_cast<Type_Face>(typ_commun_i);
@@ -141,14 +141,14 @@ void Domaine_32_64<_SZ_>::clear()
   volume_total_ = -1;
 }
 
-/*! @brief Ecrit la Domaine sur un flot de sortie.
+/*! @brief Writes the Domain to an output stream.
  *
- * On ecrit le nom, le type des elements, les elements
- *     et les bords, les bords periodiques, les joints, les
- *     raccords et les bords internes.
+ * Writes the name, element type, elements,
+ *     boundaries, periodic boundaries, joints,
+ *     connections and internal boundaries.
  *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& s) an output stream
+ * @return (Sortie&) the modified output stream
  */
 template<typename _SZ_>
 Sortie& Domaine_32_64<_SZ_>::printOn(Sortie& s) const
@@ -196,14 +196,13 @@ Entree& Domaine_32_64<_SZ_>::readOn(Entree& s)
   return readOn_has_perio(s, dnu);
 }
 
-/*! @brief Lit les objets constituant un Domaine a partir d'un flot d'entree.
+/*! @brief Reads the objects constituting a Domain from an input stream.
  *
- * Une fois les objets
- *     lus on les associe au domaine.
+ * Once the objects are read they are associated to the domain.
  *
- * @param (Entree& s) un flot d'entree
+ * @param (Entree& s) an input stream
  * @param (bool& has_perio) set to True if periodic boundaries were read, false otherwise.
- * @return (Entree&) le flot d'entree modifie
+ * @return (Entree&) the modified input stream
  */
 template<typename _SZ_>
 Entree& Domaine_32_64<_SZ_>::readOn_has_perio(Entree& s, bool& has_perio)
@@ -213,19 +212,19 @@ Entree& Domaine_32_64<_SZ_>::readOn_has_perio(Entree& s, bool& has_perio)
   s.precision(20);
 #endif
   has_perio = false;
-  // Ajout BM: reset de la structure (a pour effet de debloquer la structure parallele)
+  // BM addition: reset the structure (this has the effect of unlocking the parallel structure)
   sommets_.reset();
   renum_som_perio_.reset();
-  // ne pas faire reset du nom (deja lu)
-  // pour deformable je ne sais pas...
+  // do not reset the name (already read)
+  // for deformable I don't know...
 
   Nom tmp;
   s >> tmp;
-  // Si le domaine n'est pas nomme, on prend celui lu
+  // If the domain is not yet named, use the name that was read
   if (nom_=="??") nom_=tmp;
   Cerr << "Reading domain " << le_nom() << finl;
   s >> sommets_;
-  // PL : pas tout a fait exact le nombre affiche de sommets, on compte plusieurs fois les sommets des joints...
+  // PL : not quite exact the number of nodes displayed, joint nodes are counted multiple times...
   trustIdType nbsom = mp_sum(sommets_.dimension(0));
   Cerr << " Number of nodes: " << nbsom << finl;
 
@@ -243,7 +242,7 @@ Entree& Domaine_32_64<_SZ_>::readOn_has_perio(Entree& s, bool& has_perio)
       Cerr << " Number of nodes after node-cleanup: " << nbsom << finl;
     }
 
-  // On initialise les descripteurs "sequentiels" (attention, cela bloque le resize des tableaux sommets et elements !)
+  // Initialize the "sequential" descriptors (warning: this blocks the resize of the vertex and element arrays!)
   Scatter::init_sequential_domain(*this);
   check_domaine();
   return s;
@@ -340,7 +339,7 @@ void check_frontiere_own_ptr(const LIST_FRONTIERE& list, const char *msg)
 template<typename _SZ_>
 void Domaine_32_64<_SZ_>::check_domaine()
 {
-  // remplacer Type_Face::vide_0D par le bon type pour les procs qui n'ont pas de faces de bord:
+  // replace Type_Face::vide_0D with the correct type for processors that have no boundary faces:
   {
     int i;
     int n = nb_front_Cl();
@@ -362,22 +361,22 @@ void Domaine_32_64<_SZ_>::check_domaine()
   const trustIdType nb_elem = mp_sum(mes_elems_.dimension(0));
   Cerr << "  Number of elements: " << nb_elem << finl;
 
-  // Verifications sanitaires:
-  // On doit avoir le meme nombre de frontieres et les memes noms sur tous les procs
+  // Sanity checks:
+  // All processors must have the same number of boundaries and the same names
   ::check_frontiere(mes_faces_bord_, "(Bord)");
   ::check_frontiere_own_ptr(mes_faces_raccord_, "(Raccord)");
   ::check_frontiere(mes_bords_int_, "(Bord_Interne)");
   ::check_frontiere(mes_groupes_faces_, "(Groupe_Faces)");
 }
 
-/*! @brief Cherche les numeros (indices) des elements contenants les sommets specifies par le parametre "sommets".
+/*! @brief Searches the indices of elements containing the vertices specified by the "sommets" parameter.
  *
- *     Utilise:
+ *     Uses:
  *      ArrOfInt_t& Domaine_32_64<_SZ_>::chercher_elements(const DoubleTab&,ArrOfInt_t&) const
  *
- * @param (IntTab& sommets) le tableau des numeros des sommets dont on cherche les elements correspondants
- * @param (ArrOfInt_t& elem_) le tableau contenant les numeros des elements contenant les sommets specifies
- * @return (ArrOfInt_t&) le tableau des numeros des sommets dont on cherche les elements correspondants
+ * @param (IntTab& sommets) the array of vertex indices whose containing elements are searched
+ * @param (ArrOfInt_t& elem_) the array containing the indices of elements containing the specified vertices
+ * @return (ArrOfInt_t&) the array of vertex indices whose containing elements are searched
  */
 template<typename _SZ_>
 typename Domaine_32_64<_SZ_>::SmallArrOfTID_t& Domaine_32_64<_SZ_>::indice_elements(const IntTab& sommets, SmallArrOfTID_t& elem, int reel) const
@@ -395,29 +394,29 @@ typename Domaine_32_64<_SZ_>::SmallArrOfTID_t& Domaine_32_64<_SZ_>::indice_eleme
   return chercher_elements(xg, elem, reel);
 }
 
-/*! @brief Recherche des elements contenant les points dont les coordonnees sont specifiees.
+/*! @brief Searches for the elements containing the points whose coordinates are specified.
  *
- * @param (DoubleTab& positions) les coordonnees des points dont on veut connaitre l'element correspondant
- * @param (ArrOfInt_t& elements) le tableau des numeros des elements contenant les points specifies
- * @return (ArrOfInt_t&) le tableau des numeros des elements contenant les points specifies
+ * @param (DoubleTab& positions) the coordinates of the points whose containing element is sought
+ * @param (ArrOfInt_t& elements) the array of indices of the elements containing the specified points
+ * @return (ArrOfInt_t&) the array of indices of the elements containing the specified points
  */
 template<typename _SZ_>
 typename Domaine_32_64<_SZ_>::SmallArrOfTID_t& Domaine_32_64<_SZ_>::chercher_elements(const DoubleTab& positions, SmallArrOfTID_t& elements, int reel) const
 {
   bool set_cache = false;
-  // PL: On devrait faire un appel a chercher_elements(x,y,z,elem) si positions.dimension(0)=1 ...
+  // PL: We should call chercher_elements(x,y,z,elem) if positions.dimension(0)=1 ...
   if (!deformable() && positions.dimension(0) > 1)
     {
       set_cache = true;
       if (!deriv_octree_ || !deriv_octree_->construit())
         {
-          // Vide le cache
+          // Flush the cache
           cached_elements_.reset();
           cached_positions_.reset();
         }
       else
         {
-          // Recherche dans le cache:
+          // Search in the cache:
           for (int i = 0; i < cached_positions_.size(); i++)
             if (sameDoubleTab(positions, cached_positions_[i]))
               {
@@ -425,7 +424,7 @@ typename Domaine_32_64<_SZ_>::SmallArrOfTID_t& Domaine_32_64<_SZ_>::chercher_ele
                 if (elements.size_array() != size)
                   elements.resize_tab(size);
                 elements = cached_elements_[i];
-                // elements.ref_array(cached_elements_[i]); // Non Provoque un assert (ex Sondes.data) et en parallele aussi, normal elements est modifie dans les sondes....
+                // elements.ref_array(cached_elements_[i]); // No - triggers an assert (ex Sondes.data) and also in parallel, elements is modified in probes....
                 return elements;
               }
         }
@@ -433,8 +432,8 @@ typename Domaine_32_64<_SZ_>::SmallArrOfTID_t& Domaine_32_64<_SZ_>::chercher_ele
   const OctreeRoot_t& octree = construit_octree(reel);
   int sz = positions.dimension(0);
   const int dim = positions.dimension_int(1);
-  // resize_tab est virtuelle, si c'est un Vect ou un Tab elle appelle le
-  // resize de la classe derivee:
+  // resize_tab is virtual; if it is a Vect or a Tab it calls the resize
+  // method of the derived class:
   elements.resize_tab(sz, RESIZE_OPTIONS::NOCOPY_NOINIT);
   double y = 0, z = 0;
   for (int i = 0; i < sz; i++)
@@ -448,11 +447,11 @@ typename Domaine_32_64<_SZ_>::SmallArrOfTID_t& Domaine_32_64<_SZ_>::chercher_ele
     }
   if (set_cache)
     {
-      // Securite car vu sur un calcul FT (cache qui augmente indefiniment, nombre de particules variables...)
+      // Safety measure: observed on an FT calculation (cache growing indefinitely, variable number of particles...)
       // if (cached_memory>1e8) // 100Mo/proc
       if (cached_positions_.size()>100) // Change heuristic cause 100Mo on GPU is tiny !
         {
-          // Vide le cache
+          // Flush the cache
           Cerr << "Warning, cache flushed in Domaine_32_64<_SZ_>::chercher_elements() cause too much lines used !" << finl;
           cached_elements_.reset();
           cached_positions_.reset();
@@ -460,7 +459,7 @@ typename Domaine_32_64<_SZ_>::SmallArrOfTID_t& Domaine_32_64<_SZ_>::chercher_ele
         }
       else
         {
-          // Met en cache
+          // Store in cache
           cached_positions_.add(positions);
           cached_elements_.add(elements);
           // Send cached arrays to device:
@@ -482,11 +481,11 @@ typename Domaine_32_64<_SZ_>::SmallArrOfTID_t& Domaine_32_64<_SZ_>::chercher_ele
   return elements;
 }
 
-/*! @brief Recherche des elements contenant les points dont les coordonnees sont specifiees.
+/*! @brief Searches for the elements containing the points whose coordinates are specified.
  *
- * @param (DoubleVect_t<_SZ_>& positions) les coordonnees du point dont on veut connaitre l'element correspondant
- * @param (ArrOfInt_t& elements) le tableau des numeros des elements contenant les points specifies
- * @return (ArrOfInt_t&) le tableau des numeros des elements contenant les points specifies
+ * @param (DoubleVect_t<_SZ_>& positions) the coordinates of the point whose containing element is sought
+ * @param (ArrOfInt_t& elements) the array of indices of the elements containing the specified points
+ * @return (ArrOfInt_t&) the array of indices of the elements containing the specified points
  */
 template<typename _SZ_>
 typename Domaine_32_64<_SZ_>::SmallArrOfTID_t& Domaine_32_64<_SZ_>::chercher_elements(const DoubleVect& positions, SmallArrOfTID_t& elements, int reel) const
@@ -506,11 +505,11 @@ typename Domaine_32_64<_SZ_>::SmallArrOfTID_t& Domaine_32_64<_SZ_>::chercher_ele
 }
 
 
-/*! @brief Renvoie -1 si face n'est pas une face de bord interne Renvoie le numero de la face dupliquee sinon.
+/*! @brief Returns -1 if face is not an internal boundary face, or the index of the duplicated face otherwise.
  *
- * @param (int face) le numero de la face de bord interne a chercher
- * @return (int) -1 si la face specifiee n'est pas une face de bord interne le numero de la face dupliquee sinon
- * @throws erreur TRUST (face non trouvee)
+ * @param (int face) the index of the internal boundary face to search for
+ * @return (int) -1 if the specified face is not an internal boundary face, or the index of the duplicated face otherwise
+ * @throws TRUST error (face not found)
  */
 template<typename _SZ_>
 typename Domaine_32_64<_SZ_>::int_t Domaine_32_64<_SZ_>::face_bords_interne_conjuguee(int_t face) const
@@ -541,20 +540,20 @@ typename Domaine_32_64<_SZ_>::int_t Domaine_32_64<_SZ_>::face_bords_interne_conj
   return -1;
 }
 
-/*! @brief Concatene les bords de meme nom et ceci pour: les bords, les bords periodiques, les bords internes et les groupes de faces.
+/*! @brief Merges boundaries with the same name for: boundaries, periodic boundaries, internal boundaries and face groups.
  */
 template<typename _SZ_>
 int Domaine_32_64<_SZ_>::comprimer()
 {
   {
-    // Les Bords
+    // Boundaries
     auto& list = mes_faces_bord_.get_stl_list();
 
     // first loop over list elements
     for (auto it = list.begin(); it != list.end(); ++it)
       {
         Frontiere_t& front = *it;
-        front.associer_domaine(*this); // Au cas ou le domaine de la frontiere n'est pas la bonne domaine
+        front.associer_domaine(*this); // In case the boundary's domain is not the correct one
         Journal() << "Domaine_32_64<_SZ_>::comprimer() bord : " << front.le_nom() << finl;
 
         // second loop over list elements, starting from an incremented position
@@ -563,20 +562,20 @@ int Domaine_32_64<_SZ_>::comprimer()
             Frontiere_t& front2 = *it2;
             if (front.le_nom() == front2.le_nom())
               {
-                Journal() << "On agglomere le bord : " << front.le_nom() << finl;
+                Journal() << "Merging boundary: " << front.le_nom() << finl;
                 front.add(front2);
                 it2 = list.erase(it2);
               }
             else
               ++it2;
 
-            Journal() << front.le_nom() << " est associee a : " << front.domaine().le_nom() << finl;
+            Journal() << front.le_nom() << " is associated with: " << front.domaine().le_nom() << finl;
           }
       }
   }
 
   {
-    // Les Bords Internes :
+    // Internal boundaries:
     auto& list = mes_bords_int_.get_stl_list();
     for (auto it = list.begin(); it != list.end(); ++it)
       {
@@ -596,7 +595,7 @@ int Domaine_32_64<_SZ_>::comprimer()
   }
 
   {
-    // Les Groupes de faces :
+    // Face groups:
     auto& list = mes_groupes_faces_.get_stl_list();
     for (auto it = list.begin(); it != list.end(); ++it)
       {
@@ -616,7 +615,7 @@ int Domaine_32_64<_SZ_>::comprimer()
   }
 
   {
-    // Les Raccords
+    // Connections
     auto& list = mes_faces_raccord_.get_stl_list();
     for (auto it = list.begin(); it != list.end(); ++it)
       {
@@ -638,12 +637,12 @@ int Domaine_32_64<_SZ_>::comprimer()
   return 1;
 }
 
-/*! @brief Renvoie le rang de l'element contenant le point dont les coordonnees sont specifiees.
+/*! @brief Returns the index of the element containing the point whose coordinates are specified.
  *
- * @param (double x) coordonnee en X
- * @param (double y) coordonnee en Y
- * @param (double z) coordonnee en Z
- * @return (int) le rang de l'element contenant le point dont les coordonnees sont specifiees.
+ * @param (double x) X coordinate
+ * @param (double y) Y coordinate
+ * @param (double z) Z coordinate
+ * @return (int) the index of the element containing the point whose coordinates are specified.
  */
 template<typename _SZ_>
 typename Domaine_32_64<_SZ_>::int_t Domaine_32_64<_SZ_>::chercher_elements(double x, double y, double z, int reel) const
@@ -670,8 +669,8 @@ typename Domaine_32_64<_SZ_>::SmallArrOfTID_t& Domaine_32_64<_SZ_>::chercher_som
 /*! @brief
  *
  * @param (DoubleTab& pos)
- * @param (IntTab& aretes_som) la definition des aretes par leurs sommets
- * @return (ArrOfInt_t& aretes) Liste des aretes trouvees
+ * @param (IntTab& aretes_som) the definition of edges by their vertices
+ * @return (ArrOfInt_t& aretes) list of edges found
  */
 template<typename _SZ_>
 typename Domaine_32_64<_SZ_>::SmallArrOfTID_t& Domaine_32_64<_SZ_>::chercher_aretes(const DoubleTab& pos, SmallArrOfTID_t& aretes, int reel) const
@@ -683,9 +682,9 @@ typename Domaine_32_64<_SZ_>::SmallArrOfTID_t& Domaine_32_64<_SZ_>::chercher_are
 
 /*! @brief
  *
- * @param (double x) coordonnee en X
- * @param (double y) coordonnee en Y
- * @param (double z) coordonnee en Z
+ * @param (double x) X coordinate
+ * @param (double y) Y coordinate
+ * @param (double z) Z coordinate
  */
 template<typename _SZ_>
 typename Domaine_32_64<_SZ_>::int_t Domaine_32_64<_SZ_>::chercher_sommets(double x, double y, double z, int reel) const
@@ -694,11 +693,11 @@ typename Domaine_32_64<_SZ_>::int_t Domaine_32_64<_SZ_>::chercher_sommets(double
   return octree.rang_sommet(x, y, z);
 }
 
-/*! Construction du tableau elem_virt_pe_num_ a partir du tableau mes_elems
-* (on se sert des espaces distants et virtuels de mes_elems).
-* Algorithme non optimal en memoire : on duplique mes_elems alors qu'on a
-* besoin que d'un tableau a deux colonnes.
-* Voir Domaine.h : elem_virt_pe_num_
+/*! Builds the elem_virt_pe_num_ array from the mes_elems array
+* (using the distant and virtual spaces of mes_elems).
+* Non-optimal memory algorithm: mes_elems is duplicated whereas only
+* a two-column array is needed.
+* See Domaine.h: elem_virt_pe_num_
 */
 template<typename _SZ_>
 void Domaine_32_64<_SZ_>::construire_elem_virt_pe_num()
@@ -730,7 +729,7 @@ void Domaine_32_64<_SZ_>::construire_elem_virt_pe_num(IntTab_t& elem_virt_pe_num
 }
 
 
-/*! @brief Calcule le centre de gravite du domaine
+/*! @brief Computes the center of gravity of the domain
  */
 template<typename _SZ_>
 void Domaine_32_64<_SZ_>::calculer_mon_centre_de_gravite(ArrOfDouble& c)
@@ -749,23 +748,23 @@ void Domaine_32_64<_SZ_>::calculer_mon_centre_de_gravite(ArrOfDouble& c)
         c[j] += xp(i, j) * volumes(i);
         volume += volumes(i);
       }
-  // Cas de Domaine vide:
+  // Case of an empty Domain:
   if (volume > 0)
     c /= volume;
   cg_moments_ = c;
   volume_total_ = mp_somme_vect(volumes);
 }
 
-/*! @brief Calcule les volumes des elements du domaine.
+/*! @brief Computes the volumes of the domain elements.
  *
- * @param (DoubleVect& volumes) le tableau contenant les volumes des elements du domaine
+ * @param (DoubleVect& volumes) the array containing the volumes of the domain elements
  */
 template<typename _SZ_>
 void Domaine_32_64<_SZ_>::calculer_volumes(DoubleVect_t& volumes, DoubleVect_t& inverse_volumes) const
 {
   if (!volumes.get_md_vector())
     creer_tableau_elements(volumes, RESIZE_OPTIONS::NOCOPY_NOINIT);
-  elem_->calculer_volumes(volumes); // Dimensionne et calcule le DoubleVect volumes
+  elem_->calculer_volumes(volumes); // Sizes and computes the DoubleVect volumes
   // Check and fill inverse_volumes
   if (!inverse_volumes.get_md_vector())
     creer_tableau_elements(inverse_volumes, RESIZE_OPTIONS::NOCOPY_NOINIT);
@@ -784,15 +783,15 @@ void Domaine_32_64<_SZ_>::calculer_volumes(DoubleVect_t& volumes, DoubleVect_t& 
     }
 }
 
-/*! @brief Calcule les centres de gravites des aretes du domaine.
+/*! @brief Computes the centers of gravity of the domain edges.
  *
- * @param (DoubleTab& xa) le tableau contenant les centres de gravites des aretes du domaine
+ * @param (DoubleTab& xa) the array containing the centers of gravity of the domain edges
  */
 template<typename _SZ_>
 void Domaine_32_64<_SZ_>::calculer_centres_gravite_aretes(DoubleTab_t& xa) const
 {
   const DoubleTab_t& coord = sommets_;
-  // Calcule les centres de gravite des aretes reelles seulement
+  // Computes the centers of gravity of real edges only
   xa.resize(nb_aretes(), dimension);
   for (int_t i = 0; i < nb_aretes(); i++)
     for (int j = 0; j < dimension; j++)
@@ -827,7 +826,7 @@ const typename Domaine_32_64<_SZ_>::OctreeRoot_t& Domaine_32_64<_SZ_>::construit
   return octree;
 }
 
-/*! @brief construction de l'octree si pas deja fait
+/*! @brief Build the octree if not already done
  */
 template<typename _SZ_>
 const typename Domaine_32_64<_SZ_>::OctreeRoot_t& Domaine_32_64<_SZ_>::construit_octree(int& reel) const
@@ -843,9 +842,9 @@ const typename Domaine_32_64<_SZ_>::OctreeRoot_t& Domaine_32_64<_SZ_>::construit
   return octree;
 }
 
-/*! @brief creation d'un tableau parallele de valeurs aux elements.
+/*! @brief Creates a parallel array of values at elements.
  *
- * Voir MD_Vector_tools::creer_tableau_distribue()
+ * See MD_Vector_tools::creer_tableau_distribue()
  */
 template<typename _SZ_>
 void Domaine_32_64<_SZ_>::creer_tableau_elements(Array_base& x, RESIZE_OPTIONS opt) const
@@ -854,7 +853,7 @@ void Domaine_32_64<_SZ_>::creer_tableau_elements(Array_base& x, RESIZE_OPTIONS o
   MD_Vector_tools::creer_tableau_distribue(md, x, opt);
 }
 
-/*! @brief renvoie le descripteur parallele des tableaux aux elements du domaine
+/*! @brief Returns the parallel descriptor of element arrays of the domain
  */
 template<typename _SZ_>
 const MD_Vector& Domaine_32_64<_SZ_>::md_vector_elements() const
@@ -868,15 +867,15 @@ const MD_Vector& Domaine_32_64<_SZ_>::md_vector_elements() const
            << "  Scatter ; " << le_nom() << finl;
       Process::exit();
     }
-  // Pour l'instant je prends le descripteur dans le tableau mes_elems, mais on
-  // pourrait en stocker une copie dans le domaine si ca a un interet...
+  // For now the descriptor is taken from the mes_elems array, but we could
+  // store a copy in the domain if that would be useful...
   return md;
 }
 
 template<typename _SZ_>
 double Domaine_32_64<_SZ_>::volume_total() const
 {
-  assert(volume_total_ >= 0.); // Pas calcule ???
+  assert(volume_total_ >= 0.); // Not computed yet ???
   return volume_total_;
 }
 
@@ -901,9 +900,9 @@ DoubleTab Domaine_32_64<_SZ_>::getBoundingBox() const
   return BB;
 }
 
-/*! @brief Ajoute des noeuds (ou sommets) au domaine (sans verifier les doublons)
+/*! @brief Adds nodes (or vertices) to the domain (without checking for duplicates)
  *
- * @param (DoubleTab& soms) le tableau contenant les coordonnees des noeuds a ajouter au domaine
+ * @param (DoubleTab& soms) the array containing the coordinates of the nodes to add to the domain
  */
 template<typename _SZ_>
 void Domaine_32_64<_SZ_>::ajouter(const DoubleTab_t& soms)
@@ -917,13 +916,13 @@ void Domaine_32_64<_SZ_>::ajouter(const DoubleTab_t& soms)
       sommets_(oldsz+i,k)=soms(i,k) ;
 }
 
-/*! @brief Ajoute des noeuds au domaine avec elimination des noeuds double au retour nums contient les nouveaux numeros des noeuds de soms
+/*! @brief Adds nodes to the domain with elimination of duplicate nodes. On return, nums contains the new indices of the nodes from soms
  *
- *     apres elimination des doublons.
+ *     after elimination of duplicates.
  *
- * @param (DoubleTab& soms) le tableau contenant les coordonnees des noeuds a ajouter au domaine
- * @param (IntVect& nums) le tableau des nouveaux numeros apres ajout des nouveaux noeuds et elimination des doublons.
- * @throws des noeuds double ont ete trouve
+ * @param (DoubleTab& soms) the array containing the coordinates of the nodes to add to the domain
+ * @param (IntVect& nums) the array of new indices after adding new nodes and eliminating duplicates.
+ * @throws duplicate nodes were found
  */
 template<typename _SZ_>
 void Domaine_32_64<_SZ_>::ajouter(const DoubleTab_t& soms, IntVect_t& nums)
@@ -937,7 +936,7 @@ void Domaine_32_64<_SZ_>::ajouter(const DoubleTab_t& soms, IntVect_t& nums)
     {
       assert(dim==sommets_.dimension(1));
       Octree_Double_32_64<_SZ_> octree;
-      octree.build_nodes(les_sommets(), 0 /* ne pas inclure les sommets virtuels */);
+      octree.build_nodes(les_sommets(), 0 /* do not include virtual vertices */);
 
       int compteur=0;
       ArrOfDouble tab_coord(dim);
@@ -951,20 +950,20 @@ void Domaine_32_64<_SZ_>::ajouter(const DoubleTab_t& soms, IntVect_t& nums)
           const int_t nb_sommets_proches = liste_sommets.size_array();
           if (nb_sommets_proches == 0)
             {
-              // Aucun sommet du premier domaine n'est proche du sommet i.
-              // Garder i.
+              // No vertex of the first domain is close to vertex i.
+              // Keep i.
             }
           else if (nb_sommets_proches == 1)
             {
-              // Un sommet est confondu avec le sommet i a epsilon_ pres.
-              // Ne pas garder le sommet
+              // One vertex coincides with vertex i within epsilon_.
+              // Do not keep the vertex
               nums(i) = liste_sommets[0];
               compteur++;
             }
           else
             {
-              // Plusieurs sommets du domaine initial sont dans un rayon de epsilon.
-              // epsilon est trop grand.
+              // Several vertices of the initial domain are within radius epsilon.
+              // epsilon is too large.
               Cerr << "Error : several nodes of the domain 1 are within radius epsilon="
                    << epsilon_ << " of point " << tab_coord << ". We must reduce epsilon. " << finl;
               Process::exit();
@@ -992,9 +991,9 @@ void Domaine_32_64<_SZ_>::ajouter(const DoubleTab_t& soms, IntVect_t& nums)
     }
 }
 
-/*! @brief Cree un tableau ayant une "ligne" par sommet du maillage.
+/*! @brief Creates an array with one "row" per mesh vertex.
  *
- * Voir MD_Vector_tools::creer_tableau_distribue()
+ * See MD_Vector_tools::creer_tableau_distribue()
  */
 template<typename _SZ_>
 void Domaine_32_64<_SZ_>::creer_tableau_sommets(Array_base& v, RESIZE_OPTIONS opt) const
@@ -1009,41 +1008,41 @@ void Domaine_32_64<_SZ_>::creer_tableau_sommets(Array_base& v, RESIZE_OPTIONS op
 template<typename _SZ_>
 void Domaine_32_64<_SZ_>::read_vertices(Entree& s)
 {
-  // Ajout BM: reset de la structure (a pour effet de debloquer la structure parallele)
+  // BM addition: reset the structure (this has the effect of unlocking the parallel structure)
   sommets_.reset();
   renum_som_perio_.reset();
 
   Nom tmp;
   s >> tmp;
-  // Si le domaine n'est pas nomme, on prend celui lu
+  // If the domain is not yet named, use the name that was read
   if (nom_=="??") nom_=tmp;
   Cerr << "Reading vertices for domain " << le_nom() << finl;
   s >> sommets_;
 }
 
 
-/*! @brief Ecriture des noms des bords sur un flot de sortie
+/*! @brief Writes the boundary names to an output stream.
  *
- * Ecrit les noms des: bords, bords periodiques, raccords et groupes de faces.
+ * Writes the names of: boundaries, periodic boundaries, connections and face groups.
  *
- * @param (Sortie& os) un flot de sortie
+ * @param (Sortie& os) an output stream
  */
 template <typename _SZ_>
 void Domaine_32_64<_SZ_>::ecrire_noms_bords(Sortie& os) const
 {
-  // Les Bords
+  // Boundaries
   for (const auto &itr : mes_faces_bord_)
     os << itr.le_nom() << finl;
 
-  // Les Raccords :
+  // Connections:
   for (const auto &itr : mes_faces_raccord_)
     os << itr->le_nom() << finl;
 
-  // Les Bords Internes :
+  // Internal boundaries:
   for (const auto &itr : mes_bords_int_)
     os << itr.le_nom() << finl;
 
-  // Les Groupes de faces :
+  // Face groups:
   for (const auto &itr : mes_groupes_faces_)
     os << itr.le_nom() << finl;
 }
@@ -1107,20 +1106,20 @@ void Domaine_32_64<_SZ_>::fixer_premieres_faces_frontiere()
     {
       itr.fixer_num_premiere_face(compteur);
       compteur += itr.nb_faces();
-      Journal() << "Le bord " << itr.le_nom() << " commence a la face : " << itr.num_premiere_face() << finl;
+      Journal() << "Boundary " << itr.le_nom() << " starts at face: " << itr.num_premiere_face() << finl;
     }
   for (auto &itr : mes_faces_raccord_)
     {
       itr->fixer_num_premiere_face(compteur);
       compteur += itr->nb_faces();
-      Journal() << "Le raccord " << itr->le_nom() << " commence a la face : " << itr->num_premiere_face() << finl;
+      Journal() << "Connection " << itr->le_nom() << " starts at face: " << itr->num_premiere_face() << finl;
     }
   if (std::is_same<_SZ_, int>::value)
     for (auto &itr : mes_faces_joint_)
       {
         itr.fixer_num_premiere_face((int)compteur);
         compteur += itr.nb_faces();
-        Journal() << "Le joint " << itr.le_nom() << " commence a la face : " << itr.num_premiere_face() << finl;
+        Journal() << "Joint " << itr.le_nom() << " starts at face: " << itr.num_premiere_face() << finl;
       }
   for (auto &itr : mes_groupes_faces_)
     itr.fixer_num_premiere_face(-1);
@@ -1185,7 +1184,7 @@ void Domaine_32_64<_SZ_>::imprimer() const
 {
   Cerr << "==============================================" << finl;
   Cerr << "The extreme coordinates of the domain " << le_nom() << " are:" << finl;
-  // Il n'existe pas de recherche du min et du max dans DoubleTab donc je code:
+  // There is no min/max search method in DoubleTab so it is coded here:
   DoubleTab BB = getBoundingBox();
   ArrOfDouble bb_min(dimension), bb_max(dimension);
   for (int j=0; j<dimension; j++)
@@ -1287,14 +1286,13 @@ void Domaine_32_64<_SZ_>::merge_wo_vertices_with(Domaine_32_64<_SZ_>& dom2)
   invalide_octree();
 }
 
-/*! @brief Association d'un Sous_Domaine au Domaine.
+/*! @brief Associates a Sous_Domaine to the Domain.
  *
- * L'interface permet de passer n'importe quel
- *     Objet_U mais ne gere (dynamiquement) que
- *     l'association d'un objet derivant Sous_Domaine.
+ * The interface accepts any Objet_U but only handles (dynamically) the
+ *     association of an object derived from Sous_Domaine.
  *
- * @param (Objet_U& ob) l'objet a associer
- * @return (int) 1 si l'association a reussie 0 sinon (l'objet n'etait pas derive Sous_Domaine)
+ * @param (Objet_U& ob) the object to associate
+ * @return (int) 1 if the association succeeded, 0 otherwise (the object was not derived from Sous_Domaine)
  */
 template<typename _SZ_>
 int Domaine_32_64<_SZ_>::associer_(Objet_U& ob)
@@ -1361,7 +1359,7 @@ void Domaine_32_64<_SZ_>::build_mc_mesh(bool virt) const
   int_t ncells = virt ? mes_elems_.dimension_tot(0) : mes_elems_.dimension(0);
   int nverts = (int)mes_elems_.dimension(1);
 
-  // Connectivite TRUST -> MED
+  // TRUST -> MED connectivity
   IntTab_t les_elems2(mes_elems_);
   conn_trust_to_med(les_elems2, type_ele, true);
 
@@ -1540,12 +1538,11 @@ void Domaine_32_64<_SIZE_>::fill_from_list(std::list<Domaine_32_64*>& lst)
   Cerr << "Filling from list - End!" << finl;
 }
 
-/*! @brief Renumerotation des noeuds et des elements presents dans les items communs des joints
+/*! @brief Renumbers the nodes and elements present in the common items of joints.
 *
-* Le noeud de numero k devient le noeud de numero Les_Nums[k] l'element de
-* numero e devient l'element de numero e+elem_offset
+* Node number k becomes node number Les_Nums[k], and element number e becomes element number e+elem_offset.
 *
-* @param (IntVect& Les_Nums) le vecteur contenant la nouvelle numerotation Nouveau_numero_noeud_i = Les_Nums[Ancien_numero_noeud_i]
+* @param (IntVect& Les_Nums) the vector containing the new numbering: New_node_number_i = Les_Nums[Old_node_number_i]
 */
 template <typename _SIZE_>
 void Domaine_32_64<_SIZE_>::renum_joint_common_items(const IntVect_t& Les_Nums, const int_t elem_offset)
@@ -1561,7 +1558,7 @@ void Domaine_32_64<_SIZE_>::renum_joint_common_items(const IntVect_t& Les_Nums, 
     }
 }
 
-/*! @brief Concatene les joints de meme nom
+/*! @brief Merges joints with the same name
  *
  */
 template <typename _SIZE_>
@@ -1594,10 +1591,9 @@ int Domaine_32_64<_SIZE_>::comprimer_joints()
 namespace  // Anonymous namespace - only 32 bits stuff here
 {
 
-/*! @brief Cette methode permet de faire un echange espace virtuel d'un tableau aux aretes sans passer par le descripteur des aretes.
+/*! @brief This method performs a virtual space exchange of an edge array without going through the edge descriptor.
  *
- * On utilise le tableau elem_aretes et l'echange
- *   espace virtuel des elements
+ * The elem_aretes array and the virtual space exchange of elements are used.
  *
  */
 void echanger_tableau_aretes(const IntTab& elem_aretes, int nb_aretes_reelles, ArrOfInt& tab_aretes)
@@ -1610,70 +1606,70 @@ void echanger_tableau_aretes(const IntTab& elem_aretes, int nb_aretes_reelles, A
   int i;
 
   // **********************
-  // I) Echange pour mettre a jour les items communs
-  //  Algo un peu complique pour mettre a jour les items communs: pour chaque arete reele,
-  //  la valeur de tab_aretes doit etre egale a la valeur initiale de tab_arete donnee par
-  //  le processeur de rang le plus petit parmi ceux qui partagent l'arete (c'est a dire
-  //  les processeurs qui ont un element adjacent a cette arete).
+  // I) Exchange to update common items
+  //  Slightly complex algorithm to update common items: for each real edge,
+  //  the value of tab_aretes must equal the initial value of tab_arete given by
+  //  the processor with the smallest rank among those sharing the edge (i.e.
+  //  processors that have an element adjacent to this edge).
 
-  // Tableau permettant de connaitre le processeur proprietaire d'une arete reele
+  // Array to identify the owner processor of a real edge
   ArrOfInt pe_arete(nb_aretes_reelles);
   pe_arete = moi;
-  // Tableau qui donne, pour chaque element, le processeur proprietaire
+  // Array giving, for each element, the owner processor
   IntVect pe_elem(nb_elem_tot);
-  pe_elem = moi; // initialise avec "moi"
+  pe_elem = moi; // initialized with "me"
   {
     pe_elem.set_md_vector(elem_aretes.get_md_vector());
     pe_elem.echange_espace_virtuel();
-    // On range dans pe_arete le numero du plus petit processeur proprietaire des
-    // elements adjacents a cette arete
-    // Inutile de parcourir les elements reels, on va trouver pe_elem[i]==moi...
-    // Si l'arete se trouve sur un processeur de rang inferieur, on lui attribue
+    // Store in pe_arete the number of the smallest-rank owner processor among
+    // the processors owning elements adjacent to this edge.
+    // No need to iterate over real elements, we would find pe_elem[i]==moi...
+    // If the edge is on a processor with a lower rank, assign it that rank
     for (i = nb_elem; i < nb_elem_tot; i++)
       for (int pe = pe_elem[i], j = 0, a; j < nb_aretes_elem && (a = elem_aretes(i, j)) >= 0; j++)
         if (a < nb_aretes_reelles && pe_arete[a] > pe)
           pe_arete[a] = pe;
   }
-  // On suppose que l'espace virtuel des elements contient au moins une couche d'elements virtuels
-  //   (tous les voisins des elements reels par des sommets) alors les aretes reelles sont
-  //   echangees (pas encore les aretes virtuelles)
-  // Dans ce cas, pe_arete est maintenant correctement rempli pour les aretes reelles.
+  // Assuming the virtual element space contains at least one layer of virtual elements
+  //   (all neighbors of real elements through vertices), the real edges are exchanged
+  //   (virtual edges not yet).
+  // In this case, pe_arete is now correctly filled for real edges.
 
   IntTab tmp;
-  tmp.copy(elem_aretes, RESIZE_OPTIONS::NOCOPY_NOINIT); // copier uniquement la structure
+  tmp.copy(elem_aretes, RESIZE_OPTIONS::NOCOPY_NOINIT); // copy structure only
 
-  // Copier tab_aretes dans la structure tmp (on sait echanger tmp, pas tab_aretes)
+  // Copy tab_aretes into the tmp structure (we can exchange tmp, not tab_aretes)
   for (i = 0; i < nb_elem; i++)
     for (int j = 0, a; j < nb_aretes_elem && (a = elem_aretes(i, j)) >= 0; j++)
       tmp(i, j) = tab_aretes[a];
 
-  // 2) Echange du tableau
+  // 2) Exchange the array
   tmp.echange_espace_virtuel();
 
-  // 3) On reverse dans la partie reelle de tab_aretes les valeurs prises dans tmp:
-  //    pour une arete partagee par plusieurs procs, c'est le proc de rang le plus petit
-  //    qui donne la valeur
-  // Inutile de parcourir les elements reels, la valeur ne changerait pas
+  // 3) Copy back into the real part of tab_aretes the values taken from tmp:
+  //    for an edge shared by several procs, the proc with the smallest rank
+  //    provides the value.
+  // No need to iterate over real elements, the value would not change
   for (i = nb_elem; i < nb_elem_tot; i++)
     for (int pe = pe_elem[i], j = 0, a; j < nb_aretes_elem && (a = elem_aretes(i, j)) >= 0; j++)
       if (a < nb_aretes_reelles && pe_arete[a] == pe)
         tab_aretes[a] = tmp(i, j);
 
-  // tab_aretes contient maintenant des valeurs correctes pour toutes les aretes reeles
-  //  (les items communs sont a jour). On fait encore un echange en passant par tmp pour
-  //  mettre a jour les items virtuels:
+  // tab_aretes now contains correct values for all real edges
+  //  (common items are up to date). We do one more exchange via tmp to
+  //  update the virtual items:
 
   // ******************
-  // II) echange pour mettre a jour l'espace virtuel des aretes
+  // II) Exchange to update the virtual space of edges
 
-  // Copier encore une fois tab_aretes dans la structure tmp
+  // Copy tab_aretes into the tmp structure again
   for (i = 0; i < nb_elem; i++)
     for (int j = 0, a; j < nb_aretes_elem && (a = elem_aretes(i, j)) >= 0; j++)
       tmp(i, j) = tab_aretes[a];
 
-  // Echange du tableau
+  // Exchange the array
   tmp.echange_espace_virtuel();
-  // Recopie de tmp dans tab_aretes
+  // Copy tmp back into tab_aretes
   for (i = nb_elem; i < nb_elem_tot; i++)
     for (int j = 0, a; j < nb_aretes_elem && (a = elem_aretes(i, j)) >= 0; j++)
       tab_aretes[a] = tmp(i, j);
@@ -1681,13 +1677,13 @@ void echanger_tableau_aretes(const IntTab& elem_aretes, int nb_aretes_reelles, A
 
 } // end anonymous namespace
 
-/*! Selection d'un item unique (sommet, face ...) parmi une liste (item_possible)
-* afin d'assurer le parallelisme de certains algorithmes
-* La selection est faite en testant la distance entre les coordonnees (coord_possible)
-* localisant ces items par rapport aux coordonnes (coord_ref) d'un point de reference.
-* L'item retenu est celui qui presente la distance minimum par rapport au point de reference.
-* S'il reste plusieurs items se trouvant a la meme distance du point de reference
-* alors on repete le test en translatant le point de reference
+/*! Selects a unique item (vertex, face ...) from a list (item_possible)
+* in order to ensure the parallelism of certain algorithms.
+* The selection is made by testing the distance between the coordinates (coord_possible)
+* locating these items with respect to the coordinates (coord_ref) of a reference point.
+* The retained item is the one with the minimum distance to the reference point.
+* If several items remain at the same distance from the reference point,
+* the test is repeated by translating the reference point.
 */
 template <>
 int Domaine_32_64<int>::identifie_item_unique(IntList& item_possible, DoubleTab& coord_possible, const DoubleVect& coord_ref)
@@ -1704,7 +1700,7 @@ int Domaine_32_64<int>::identifie_item_unique(IntList& item_possible, DoubleTab&
   // decentre_face(2,0:dim)={0,1,0}
   // decentre_face(3,0:dim)={0,0,1}
 
-  //Au premier passage (t=0) pas de translation effectuee
+  //At the first pass (t=0) no translation is performed
   DoubleVect dist;
   assert(item_possible.size() != 0);
   int t = 0;
@@ -1763,14 +1759,14 @@ int Domaine_32_64<_SIZE_>::identifie_item_unique(IntList& item_possible, DoubleT
   throw;
 }
 
-/*! @brief Methode appelee par Domaine_VF::discretiser().
+/*! @brief Method called by Domaine_VF::discretiser().
  *
- * Construction du descripteur pour les faces de bord
- *   Remplissage de ind_faces_virt_bord et des tableaux get_faces_virt() des frontieres
- *   a partir du descripteur parallele des faces.
- *   Note B.M.: le fait d'avoir mis les faces dans le Domaine_VF, les aretes dans le Domaine,
- *    certaines parties des proprietes des faces de bord dans le Domaine_VF et d'autres dans le Domaine
- *    fait que l'initialisation passe par des chemins un peu tordus... il faudra nettoyer ca.
+ * Builds the descriptor for boundary faces.
+ *   Fills ind_faces_virt_bord and the get_faces_virt() arrays of the boundaries
+ *   from the parallel descriptor of faces.
+ *   Note B.M.: having placed faces in Domaine_VF, edges in Domaine,
+ *    some face boundary properties in Domaine_VF and others in Domaine
+ *    makes the initialization follow somewhat convoluted paths... this should be cleaned up.
  *
  */
 template <>
@@ -1782,18 +1778,18 @@ void Domaine_32_64<int>::init_faces_virt_bord(const MD_Vector& md_vect_faces, MD
       MD_Vector_seq mdseq(nb_faces_frontiere());
       md_vect_faces_front.copy(mdseq);
 
-      // Constructrion des MD_Vector_seq de chaque frontiere:
+      // Build the MD_Vector_seq of each boundary:
       const int nb_frontieres = nb_front_Cl() + nb_groupes_faces();
       for (int i_frontiere = 0; i_frontiere < nb_frontieres; i_frontiere++)
         {
           Frontiere& front = frontiere(i_frontiere);
           IntTab& faces_sommets_frontiere = front.les_sommets_des_faces();
-          // Certains problemes ont plusieurs objets Domaine_VF attaches a la meme Domaine (rayonnement)
-          // Si on est deja passe par ici, ne pas refaire le travail:
+          // Some problems have multiple Domaine_VF objects attached to the same Domaine (radiation)
+          // If we already went through here, don't redo the work:
           if (faces_sommets_frontiere.get_md_vector())
             continue;
           const int nb_faces_front = front.nb_faces();
-          // Construction d'un descripteur contenant le sous-ensemble des faces de cette frontiere
+          // Build a descriptor containing the subset of faces of this boundary
           MD_Vector md_frontiere;
           MD_Vector_seq mdseq_front(nb_faces_front);
           md_frontiere.copy(mdseq_front);
@@ -1804,10 +1800,10 @@ void Domaine_32_64<int>::init_faces_virt_bord(const MD_Vector& md_vect_faces, MD
     }
 
   // ***************************************
-  // 1) Construction des structures de tableaux pour toutes les faces de bord
-  //   (faces de 0 a nb_faces_frontiere())
+  // 1) Build array structures for all boundary faces
+  //   (faces from 0 to nb_faces_frontiere())
   const int nb_faces_fr = nb_faces_frontiere();
-  //  Marquage des faces de bord (-1=>pas une face de bord, 0=>face de bord)
+  //  Mark boundary faces (-1=>not a boundary face, 0=>boundary face)
   IntVect vect_renum;
   MD_Vector_tools::creer_tableau_distribue(md_vect_faces, vect_renum, RESIZE_OPTIONS::NOCOPY_NOINIT);
   vect_renum = -1;
@@ -1815,12 +1811,12 @@ void Domaine_32_64<int>::init_faces_virt_bord(const MD_Vector& md_vect_faces, MD
     vect_renum[i] = 0;
   vect_renum.echange_espace_virtuel();
 
-  // Creation du descripteur pour les faces de bord (par extraction d'un sous ensemble du descripteur
-  //  des faces). On utilise la numerotation par defaut dans l'ordre croissant:
+  // Create the descriptor for boundary faces (by extracting a subset of the face descriptor).
+  // The default numbering in ascending order is used:
   MD_Vector_tools::creer_md_vect_renum_auto(vect_renum, md_vect_faces_front);
 
-  //  Remplissage du tableau ind_faces_virt_bord. C'est juste la partie virtuelle du tableau renum.
-  //  (la partie reelle est triviale: c'est une numerotation contigue de 0 a nb_faces_frontiere()
+  //  Fill the ind_faces_virt_bord array. It is just the virtual part of the renum array.
+  //  (the real part is trivial: it is a contiguous numbering from 0 to nb_faces_frontiere())
   const int nb_faces = vect_renum.size();
   const int nb_faces_tot = vect_renum.size_totale();
   const int nb_faces_virt = nb_faces_tot - nb_faces;
@@ -1829,28 +1825,28 @@ void Domaine_32_64<int>::init_faces_virt_bord(const MD_Vector& md_vect_faces, MD
     ind_faces_virt_bord_[i] = vect_renum[nb_faces + i];
 
   // **************************************
-  // 2) Construction des structures de tableaux pour chaque frontiere
+  // 2) Build array structures for each boundary
 
-  // Remplissage des tableaux
-  //   frontiere(i).get_faces_virt() pour 0 <= i < nb_front_Cl()
-  // Ce tableau contient les indices dans la Domaine_VF des faces virtuelles
-  // qui sont sur la frontiere i.
-  // Calcul de l'espace virtuel des faces de chaque frontiere
+  // Fill the arrays
+  //   frontiere(i).get_faces_virt() for 0 <= i < nb_front_Cl()
+  // This array contains the indices in Domaine_VF of the virtual faces
+  // that are on boundary i.
+  // Compute the virtual space of faces for each boundary
 
-  // Nombre de frontieres:
+  // Number of boundaries:
   const int nb_frontieres = nb_front_Cl();
   int i_frontiere;
-  // Remplissage des tableaux get_faces_virt():
-  // et constructrion des MD_Vector de chaque frontiere (associe au tableau des faces)
+  // Fill the get_faces_virt() arrays:
+  // and build the MD_Vector of each boundary (associated with the face array)
   for (i_frontiere = 0; i_frontiere < nb_frontieres; i_frontiere++)
     {
       Frontiere& front = frontiere(i_frontiere);
       IntTab& faces_sommets_frontiere = front.les_sommets_des_faces();
-      // Certains problemes ont plusieurs objets Domaine_VF attaches a la meme Domaine (rayonnement)
-      // Si on est deja passe par ici, ne pas refaire le travail:
+      // Some problems have multiple Domaine_VF objects attached to the same Domaine (radiation)
+      // If we already went through here, don't redo the work:
       if (faces_sommets_frontiere.get_md_vector())
         continue;
-      //les tableaux faces_sommets_frontiere doivent faire la meme largeur sur tous les procs avant echange
+      //the faces_sommets_frontiere arrays must have the same width on all procs before exchange
       int nb_som_faces = Process::mp_max(faces_sommets_frontiere.dimension(1));
       if (faces_sommets_frontiere.dimension(1) < nb_som_faces)
         {
@@ -1866,38 +1862,38 @@ void Domaine_32_64<int>::init_faces_virt_bord(const MD_Vector& md_vect_faces, MD
       vect_renum = -1;
       const int i_premiere_face = front.num_premiere_face();
       const int nb_faces_front = front.nb_faces();
-      // Marquage des faces de cette frontiere
+      // Mark the faces of this boundary
       for (int i = i_premiere_face; i < i_premiere_face + nb_faces_front; i++)
         vect_renum[i] = 0;
       vect_renum.echange_espace_virtuel();
-      // Construction d'un descripteur contenant le sous-ensemble des faces de cette frontiere
+      // Build a descriptor containing the subset of faces of this boundary
       MD_Vector md_frontiere;
       MD_Vector_tools::creer_md_vect_renum_auto(vect_renum, md_frontiere);
 
-      // Creation de l'espace virtuel des faces de la frontiere
-      // (c'est ici qu'on associe le descripteur md_frontiere au tableau des faces)
+      // Create the virtual space of boundary faces
+      // (this is where the md_frontiere descriptor is associated with the face array)
       const MD_Vector& md_sommets = les_sommets().get_md_vector();
-      Scatter::construire_espace_virtuel_traduction(md_frontiere, /* tableau indexe par des numeros de faces de bord */
-                                                    md_sommets, /* contenant des indices de sommets du domaine */
-                                                    faces_sommets_frontiere, /* tableau a traiter */
-                                                    1 /* erreur fatale: si un sommet est manquant, c'est une erreur */);
+      Scatter::construire_espace_virtuel_traduction(md_frontiere, /* array indexed by boundary face numbers */
+                                                    md_sommets, /* containing vertex indices of the domain */
+                                                    faces_sommets_frontiere, /* array to process */
+                                                    1 /* fatal error: if a vertex is missing, it is an error */);
 
-      // On recupere dans renum l'indice renumerote de chaque face:
-      //  on extrait les indices des faces virtuelles de cette frontiere
+      // Retrieve from renum the renumbered index of each face:
+      //  extract the indices of the virtual faces of this boundary
       ArrOfInt& tab = front.get_faces_virt();
       assert(faces_sommets_frontiere.dimension(0) == nb_faces_front);
       const int nb_faces_tot_frontiere = faces_sommets_frontiere.dimension_tot(0);
       const int nb_faces_virt_frontiere = nb_faces_tot_frontiere - nb_faces_front;
       tab.resize_array(nb_faces_virt_frontiere);
-      const int ndebut = nb_faces; // nombre de faces du Domaine !
-      const int nfin = nb_faces_tot; // idem !
+      const int ndebut = nb_faces; // number of faces in the Domain!
+      const int nfin = nb_faces_tot; // idem!
       for (int i = ndebut; i < nfin; i++)
         {
           const int j = vect_renum[i];
           if (j >= 0)
             {
               assert(j >= nb_faces_front && j < nb_faces_tot_frontiere);
-              // La face i est virtuelle et sur cette frontiere
+              // Face i is virtual and on this boundary
               tab[j - nb_faces_front] = i;
             }
         }
@@ -1911,38 +1907,38 @@ void Domaine_32_64<_SIZE_>::init_faces_virt_bord(const MD_Vector& md_vect_faces,
   throw;
 }
 
-/*! Version de creer_aretes compatible avec les polyedres
+/*! Version of creer_aretes compatible with polyhedra
   */
 template <>
 void Domaine_32_64<int>::creer_aretes()
 {
   const IntTab& elem_som = les_elems();
-  // Nombre d'elements reels:
+  // Number of real elements:
   const int nbelem = elem_som.dimension(0);
-  // Les elements virtuels sont deja construits:
+  // Virtual elements are already built:
   const int nbelem_tot = elem_som.dimension_tot(0);
 
   aretes_som_.resize(0, 2);
   bool is_poly = sub_type(Poly_geom_base, type_elem().valeur());
 
-  std::vector<std::vector<int> > v_e_a(nbelem_tot);  //liste des aretes de chaque element
+  std::vector<std::vector<int> > v_e_a(nbelem_tot);  //list of edges for each element
   int nb_aretes_reelles = 0, i;
   int j;
   {
-    // Une liste chainee pour retrouver, pour chaque sommet, la liste des aretes
-    // attachees a ce sommet. Le tableau est de meme taille que Aretes_som.dimension(0)
-    // chaine_aretes_sommets[i] contient l'indice de la prochaine arete attachee au
-    // meme sommet ou -1 si c'est la derniere
+    // A linked list to retrieve, for each vertex, the list of edges
+    // attached to that vertex. The array has the same size as Aretes_som.dimension(0).
+    // chaine_aretes_sommets[i] contains the index of the next edge attached to
+    // the same vertex, or -1 if it is the last one.
     ArrOfInt chaine_aretes_sommets;
-    // Indice de la premiere arete attachee a chaque sommet dans chaine_aretes_sommets
+    // Index of the first edge attached to each vertex in chaine_aretes_sommets
     ArrOfInt premiere_arete_som(nb_som_tot());
     premiere_arete_som = -1;
 
-    std::map<std::array<double, 3>, std::array<int, 2> > aretes_loc; //aretes de l'element considere : aretes_loc[{xa, ya, za}] = { s1, s2}
-    //l'utilisation d'un map permet de s'assurer que les aretes soient dans le meme ordre sur tous les procs!
+    std::map<std::array<double, 3>, std::array<int, 2> > aretes_loc; //edges of the current element: aretes_loc[{xa, ya, za}] = { s1, s2}
+    //using a map ensures that edges are in the same order on all procs!
     for (int i_elem = 0; i_elem < nbelem_tot; aretes_loc.clear(), i_elem++)
       {
-        /* 1. on retrouve les aretes de l'element en iterant sur ses faces */
+        /* 1. retrieve the edges of the element by iterating over its faces */
         const Elem_geom_base& elem_g = ref_cast(Elem_geom_base, type_elem().valeur());
         IntTab f_e_r;
         if (is_poly)
@@ -1965,33 +1961,33 @@ void Domaine_32_64<int>::creer_aretes()
 
         for (auto &&kv : aretes_loc)
           {
-            //a-t-on deja vu cette arete ?
+            //have we already seen this edge ?
             int k = premiere_arete_som[kv.second[0]];
             while (k >= 0 && (aretes_som_(k, 0) != kv.second[0] || aretes_som_(k, 1) != kv.second[1]))
               k = chaine_aretes_sommets[k];
-            if (k < 0) //on n'a pas encore trouve l'arete -> maj de premiere_arete_som et chaine_arete_sommets
+            if (k < 0) //edge not yet found -> update premiere_arete_som and chaine_arete_sommets
               {
-                // L'arete n'existe pas encore
+                // The edge does not exist yet
                 k = chaine_aretes_sommets.size_array();
                 assert(k == aretes_som_.dimension(0));
                 aretes_som_.append_line(kv.second[0], kv.second[1]);
-                // Insertion de l'arete en tete de la liste chainee
+                // Insert the edge at the head of the linked list
                 int old_head = premiere_arete_som[kv.second[0]];
-                // Indice de la nouvelle arete
+                // Index of the new edge
                 int new_head = chaine_aretes_sommets.size_array();
                 chaine_aretes_sommets.append_array(old_head);
                 premiere_arete_som[kv.second[0]] = new_head;
               }
-            v_e_a[i_elem].push_back(k); //ajout de l'arete a la liste des aretes de l'element
+            v_e_a[i_elem].push_back(k); //add the edge to the element's edge list
           }
         if (i_elem == nbelem - 1)
           {
-            // On vient de finir les aretes reelles
+            // We have just finished the real edges
             nb_aretes_reelles = aretes_som_.dimension(0);
           }
       }
   }
-  /* remplissage du tableau elem_aretes a l'aide de v_e_a */
+  /* fill the elem_aretes array using v_e_a */
   int nb_aretes_elem = 0;
   for (i = 0; i < nbelem_tot; i++)
     nb_aretes_elem = std::max(nb_aretes_elem, (int) v_e_a[i].size());
@@ -2002,29 +1998,29 @@ void Domaine_32_64<int>::creer_aretes()
     for (j = 0; j < (int) v_e_a[i].size(); j++)
       elem_aretes_(i, j) = v_e_a[i][j];
 
-  // Ajuste la taille du tableau Aretes_som
-  const int n_aretes_tot = aretes_som_.dimension(0); // attention, nb_aretes_tot est une methode !
-  aretes_som_.append_line(-1, -1); // car le resize suivant ne fait quelque chose que si on change de taille
+  // Adjust the size of the Aretes_som array
+  const int n_aretes_tot = aretes_som_.dimension(0); // note: nb_aretes_tot is a method!
+  aretes_som_.append_line(-1, -1); // because the following resize only does something if the size changes
   aretes_som_.resize(n_aretes_tot, 2);
 
   Journal() << "Domaine " << le_nom() << " nb_aretes=" << nb_aretes_reelles << " nb_aretes_tot=" << n_aretes_tot << finl;
 
-  // Construction du descripteur parallele
+  // Build the parallel descriptor
   {
-    // Pour chaque arete, indice du processeur proprietaire de l'arete
+    // For each edge, index of the processor owning the edge
     const int moi = Process::me();
     ArrOfInt pe_aretes(n_aretes_tot);
     pe_aretes = moi;
     echanger_tableau_aretes(elem_aretes_, nb_aretes_reelles, pe_aretes);
 
-    // Pour chaque arete, indice de l'arete sur le processeur proprietaire
+    // For each edge, index of the edge on the owning processor
     ArrOfInt indice_aretes_owner;
     indice_aretes_owner.resize_array(n_aretes_tot, RESIZE_OPTIONS::NOCOPY_NOINIT);
     for (i = 0; i < nb_aretes_reelles; i++)
       indice_aretes_owner[i] = i;
     echanger_tableau_aretes(elem_aretes_, nb_aretes_reelles, indice_aretes_owner);
 
-    // Construction de pe_voisins
+    // Build pe_voisins
     ArrOfInt pe_voisins;
     for (i = 0; i < n_aretes_tot; i++)
       if (pe_aretes[i] != moi)
@@ -2033,7 +2029,7 @@ void Domaine_32_64<int>::creer_aretes()
     ArrOfInt liste_pe;
     reverse_send_recv_pe_list(pe_voisins, liste_pe);
 
-    // On concatene les deux listes.
+    // Concatenate the two lists.
     for (i = 0; i < liste_pe.size_array(); i++)
       pe_voisins.append_array(liste_pe[i]);
     array_trier_retirer_doublons(pe_voisins);
@@ -2047,8 +2043,8 @@ void Domaine_32_64<int>::creer_aretes()
     ArrsOfInt aretes_communes_to_recv(nb_voisins);
     ArrsOfInt blocs_aretes_virt(nb_voisins);
     ArrsOfInt aretes_to_send(nb_voisins);
-    // Parcours des aretes: recherche des aretes a recevoir d'un autre processeur.
-    // Aretes reeles (items communs)
+    // Iterate over edges: look for edges to receive from another processor.
+    // Real edges (common items)
     for (i = 0; i < nb_aretes_reelles; i++)
       {
         const int pe = pe_aretes[i];
@@ -2062,13 +2058,13 @@ void Domaine_32_64<int>::creer_aretes()
                 Cerr << "You could also try another partitioned mesh to get around this issue." << finl;
                 Process::exit();
               }
-            // Je recois cette arete d'un autre proc
+            // I receive this edge from another proc
             const int indice_distant = indice_aretes_owner[i];
-            aretes_to_send[indice_pe].append_array(indice_distant); // indice sur le pe voisin
-            aretes_communes_to_recv[indice_pe].append_array(i); // indice local de l'arete
+            aretes_to_send[indice_pe].append_array(indice_distant); // index on the neighboring pe
+            aretes_communes_to_recv[indice_pe].append_array(i); // local index of the edge
           }
       }
-// Aretes virtuelles
+// Virtual edges
     for (i = nb_aretes_reelles; i < n_aretes_tot; i++)
       {
         const int pe = pe_aretes[i];
@@ -2082,25 +2078,25 @@ void Domaine_32_64<int>::creer_aretes()
             Process::exit();
           }
         const int indice_distant = indice_aretes_owner[i];
-        aretes_to_send[indice_pe].append_array(indice_distant); // indice sur le pe voisin
+        aretes_to_send[indice_pe].append_array(indice_distant); // index on the neighboring pe
         MD_Vector_base::append_item_to_blocs(blocs_aretes_virt[indice_pe], i);
       }
     {
       Schema_Comm schema;
       schema.set_send_recv_pe_list(pe_voisins, pe_voisins);
       schema.begin_comm();
-      // On empile le tableau aretes_to_send et le nombre d'aretes commune avec ce pe:
+      // Push the aretes_to_send array and the number of edges shared with this pe:
       for (i = 0; i < nb_voisins; i++)
         schema.send_buffer(pe_voisins[i]) << aretes_to_send[i];
       schema.echange_taille_et_messages();
-      // Reception
+      // Receive
       for (i = 0; i < nb_voisins; i++)
         schema.recv_buffer(pe_voisins[i]) >> aretes_to_send[i];
       schema.end_comm();
     }
 
     MD_Vector md;
-    // Construit l'objet descripteur
+    // Build the descriptor object
     if (Process::is_parallel())
       {
         MD_Vector_std md_aretes(n_aretes_tot, nb_aretes_reelles, pe_voisins, aretes_to_send, aretes_communes_to_recv, blocs_aretes_virt);
@@ -2113,7 +2109,7 @@ void Domaine_32_64<int>::creer_aretes()
       }
     Cerr << "Total number of edges = " << md->get_nb_items_tot() << finl;
 
-    // Attache le descripteur au tableau
+    // Attach the descriptor to the array
     aretes_som_.set_md_vector(md);
   }
 }
@@ -2125,9 +2121,9 @@ void Domaine_32_64<_SIZE_>::creer_aretes()
   throw;
 }
 
-/*! Creation des domaines frontieres (appele lors de la discretisation)
- * Actuellement une liste statique de Domaines ou l'on a besoin pour
- * chaque domaine de connaitre le premier element
+/*! Creation of boundary domains (called during discretisation).
+ * Currently a static list of Domains where we need to know
+ * the first element for each domain.
  */
 template <>
 void Domaine_32_64<int>::creer_mes_domaines_frontieres(const Domaine_VF& domaine_vf)
@@ -2139,10 +2135,10 @@ void Domaine_32_64<int>::creer_mes_domaines_frontieres(const Domaine_VF& domaine
 
   for (int i=0; i<nb_frontieres; i++)
     {
-      // Nom de la frontiere
+      // Name of the boundary
       Noms nom_frontiere(1);
       nom_frontiere[0]=frontiere(i).le_nom();
-      // Nom du domaine surfacique que l'on va construire
+      // Name of the surface domain to be built
       Nom nom_domaine_surfacique=le_nom();
       nom_domaine_surfacique+="_boundaries_";
       nom_domaine_surfacique+=frontiere(i).le_nom();
@@ -2180,9 +2176,9 @@ void Domaine_32_64<_SIZE_>::creer_mes_domaines_frontieres(const Domaine_VF& doma
 }
 
 
-/*! @brief Renumerotation des noeuds: Le noeud de numero k devient le noeud de numero Les_Nums[k]
+/*! @brief Renumbering of nodes: node number k becomes node number Les_Nums[k]
  *
- * @param (IntVect& Les_Nums) le vecteur contenant la nouvelle numerotation Nouveau_numero_noeud_i = Les_Nums[Ancien_numero_noeud_i]
+ * @param (IntVect& Les_Nums) vector containing the new numbering: New_node_number_i = Les_Nums[Old_node_number_i]
  */
 template <typename _SIZE_>
 void Domaine_32_64<_SIZE_>::renum(const IntVect_t& Les_Nums)
@@ -2229,7 +2225,7 @@ void Domaine_32_64<int>::construire_renum_som_perio(const Conds_lim& les_cl, con
     }
 
   Reordonner_faces_periodiques::renum_som_perio(*this, renum_som_perio_,
-                                                1 /* Calculer les valeurs pour les sommets virtuels */);
+                                                1 /* Compute values for virtual vertices */);
 }
 
 

@@ -19,20 +19,20 @@
 #include <Octree_Int.h>
 #include <TRUSTTab.h>
 
-/*! @brief : Un octree permettant de chercher dans l'espace des elements ou des points decrits par des coordonnees reeles.
+/*! @brief : An octree allowing to search in space for elements or points described by real-valued coordinates.
  *
- * Cet objet est base sur Octree_Int.
- *   Astuces:
- *    Pour chercher des points a epsilon pres on peut faire:
+ * This object is based on Octree_Int.
+ *   Tips:
+ *    To search for points up to epsilon tolerance one can do:
  *     1)  build_nodes(coord, include_virt, 0.)
- *       suivi de
+ *       followed by
  *         search_elements_box(center, epsilon, elements);
  *
  *     2)  build_nodes(coord, include_virt, epsilon)
- *       suivi de
+ *       followed by
  *         search_elements(x,y,z,...)
- *     La premiere solution prend plus de temps pour construire l'octree mais la recherche est plus rapide
- *     La deuxieme, c'est inverse... et on peut choisir epsilon pour chaque point.
+ *     The first solution takes more time to build the octree but the search is faster.
+ *     The second is the reverse... and one can choose epsilon for each point.
  *
  */
 template <typename _SIZE_>
@@ -71,25 +71,25 @@ protected:
   void compute_origin_factors(const _TAB_TYPE_& coords, const double epsilon, const int include_virtual);
 
   Octree_Int_32_64<_SIZE_> octree_int_;
-  // Ces deux tableaux sont toujours de taille 3 par commodite
+  // These two arrays are always of size 3 for convenience
   ArrOfDouble origin_, factor_;
   int dim_ = 0;
 };
 
 //////////////////// INLINE METHODS /////////////////////////////
 
-/*! @brief Convertit une coordonnee reelle en coordonnee entiere pour l'octree_int
+/*! @brief Converts a real coordinate to an integer coordinate for the octree_int.
  *
- * Valeur de retour: 1 si ok, 0 si coordonnee hors de l'octree
+ * Return value: 1 if ok, 0 if coordinate is outside the octree
  */
 template <typename _SIZE_>
 inline bool Octree_Double_32_64<_SIZE_>::integer_position(double x, int direction, int& ix) const
 {
   const double coord_max = (double) Octree_Int_32_64<_SIZE_>::coord_max_;
   double rnd_x = (x - origin_[direction]) * factor_[direction];
-  // 0.49 permet d'accepter une coordonnee x egale a xmin ou xmax de l'octree,
-  //  sinon pour un octree cree a partir de sommets, il y a un risque
-  //  de ne pas trouver les coordonnees des points qu'on avait mis au bord de l'octree.
+  // 0.49 allows accepting a coordinate x equal to xmin or xmax of the octree,
+  //  otherwise for an octree built from nodes, there is a risk
+  //  of not finding the coordinates of points placed at the edge of the octree.
   if (rnd_x >= -0.49 && rnd_x <= coord_max + 0.49)
     {
       ix = (int) floor(rnd_x + 0.5);
@@ -98,7 +98,7 @@ inline bool Octree_Double_32_64<_SIZE_>::integer_position(double x, int directio
   return false;
 }
 
-// Valeur de retour: 1 s'il y a une intersection non vide avec l'octree, 0 sinon
+// Return value: 1 if there is a non-empty intersection with the octree, 0 otherwise
 template <typename _SIZE_>
 inline bool Octree_Double_32_64<_SIZE_>::integer_position_clip(double xmin, double xmax,
                                                                int& x0, int& x1,
@@ -107,8 +107,8 @@ inline bool Octree_Double_32_64<_SIZE_>::integer_position_clip(double xmin, doub
   const double coord_max = (double) Octree_Int_32_64<_SIZE_>::coord_max_;
   xmin = (xmin - origin_[direction]) * factor_[direction];
   xmax = (xmax - origin_[direction]) * factor_[direction];
-  // pas de marge ici comme on cherche avec une boite, l'epsilon est deja
-  // dans la dimension de la boite.
+  // no margin here since we search with a box, the epsilon is already
+  // included in the dimension of the box.
   if (xmin > coord_max || xmax < 0.)
     return false;
   if (xmin < .0)

@@ -40,16 +40,16 @@ void TRUSTProblem_Cloned_Concentration_Gen<_DERIVED_TYPE_, _EQUATION_TYPE_, _MED
   this->lire_resize_medium(is);
   this->create_constituants_echaines();
 
-  associer_milieu_base(this->mil_constituants_[0]); // 1er eq concentration pour le moment
+  associer_milieu_base(this->mil_constituants_[0]); // 1st concentration equation for now
 
-  // Milieux lus ... Lets go ! On discretise les equations
+  // Media read ... Lets go! Discretize the equations
   _DERIVED_TYPE_::discretiser_equations();
 
-  // remontee de l'inconnue vers le milieu
+  // propagate the unknown back to the medium
   for (int i = 0; i < this->nombre_d_equations(); i++)
     this->equation(i).associer_milieu_equation();
 
-  // On discretise les milieux !
+  // Discretize the media!
   this->equation(0).milieu().discretiser((*this), _DERIVED_TYPE_::discretisation()); // NS
 
   const Nom nom_const = this->nb_consts_ > 1 ? "coefficient_diffusion0" : "coefficient_diffusion";
@@ -80,7 +80,7 @@ void TRUSTProblem_Cloned_Concentration_Gen<_DERIVED_TYPE_, _EQUATION_TYPE_, _MED
           eqn.associer_sch_tps_base(_DERIVED_TYPE_::schema_temps());
           eqn.associer_domaine_dis(_DERIVED_TYPE_::domaine_dis());
 
-          associer_milieu_base(this->mil_constituants_[i]); // 1er eq concentration pour le moment
+          associer_milieu_base(this->mil_constituants_[i]); // 1st concentration equation for now
           eqn.associer_milieu_equation();
           const Nom nom_const = Nom("coefficient_diffusion") + Nom(i);
           ref_cast(_MEDIUM_TYPE_, eqn.milieu()).discretiser_multi_concentration(nom_const, (*this), _DERIVED_TYPE_::discretisation()); // Conc

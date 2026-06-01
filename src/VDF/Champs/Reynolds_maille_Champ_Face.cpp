@@ -30,15 +30,15 @@ void Reynolds_maille_Champ_Face::associer_champ(const Champ_Face_VDF& la_vitesse
   nu_ = la_viscosite_cinematique;
 }
 
-// Methode de calcul de la valeur sur une face d'un champ uniforme ou non a plusieurs composantes
+// Method to compute the value on a face for a uniform or multi-component field
 inline double valeur(const DoubleTab& champ, const int face, const int compo, const Domaine_VDF& le_dom_VDF)
 {
-  if (champ.dimension(0) == 1) return champ(0, compo); // Champ uniforme
+  if (champ.dimension(0) == 1) return champ(0, compo); // Uniform field
   else
     {
       int elem0 = le_dom_VDF.face_voisins(face, 0), elem1 = le_dom_VDF.face_voisins(face, 1);
-      if (elem0 < 0) elem0 = elem1; // face frontiere
-      if (elem1 < 0) elem1 = elem0; // face frontiere
+      if (elem0 < 0) elem0 = elem1; // boundary face
+      if (elem1 < 0) elem1 = elem0; // boundary face
       return 0.5 * (champ(elem0, compo) + champ(elem1, compo));
     }
 }
@@ -46,14 +46,14 @@ inline double valeur(const DoubleTab& champ, const int face, const int compo, co
 void Reynolds_maille_Champ_Face::mettre_a_jour(double tps)
 {
   const int nb_faces = domaine_vdf().nb_faces();
-  DoubleTab& re = valeurs(); // Reynolds de maille
+  DoubleTab& re = valeurs(); // Cell Reynolds number
   for (int face = 0; face < nb_faces; face++)
     {
-      // Calcul de la viscosite face
+      // Compute the face viscosity
       double nu_face = valeur(nu_->valeurs(), face, 0, domaine_vdf());
-      // Calcul de la taille de maille entourant la face
+      // Compute the cell size surrounding the face
       double taille_maille = domaine_vdf().volumes_entrelaces()(face) / domaine_vdf().face_surfaces(face);
-      // Calcul du Reynolds de maille
+      // Compute the cell Reynolds number
       re(face) = std::fabs(vitesse_->valeurs()(face)) * taille_maille / nu_face; // Reynolds_maille = |Uface| * taille_maille / nu_face
     }
 

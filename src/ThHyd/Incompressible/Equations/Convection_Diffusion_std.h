@@ -25,19 +25,19 @@
 
 class Champ_Inc_base;
 
-/*! @brief classe Convection_Diffusion_std Cette classe est la base des equations modelisant le transport
+/*! @brief Convection_Diffusion_std This class is the base for equations modelling the transport
  *
- *      d'un scalaire.
- *      Cette classe porte les termes communs a l'equation
- *      de transport d'un scalaire en regime laminaire.
- *      On se place sous l'hypothese de fluide incompressible.
- *          DT/dt = div(terme visqueux) + termes sources/rho_0
- *      avec DT/dt : derivee particulaire du scalaire
- *      Rq: l'implementation de la classe permet bien sur de negliger
- *          certains termes de l'equation (le terme diffusif,
- *          le terme convectif,tel ou tel terme source).
+ *      of a scalar.
+ *      This class carries the terms common to the scalar
+ *      transport equation in laminar regime.
+ *      The incompressible fluid hypothesis is assumed.
+ *          DT/dt = div(viscous term) + source terms/rho_0
+ *      where DT/dt: material derivative of the scalar
+ *      Note: the class implementation allows neglecting
+ *          certain terms of the equation (diffusive term,
+ *          convective term, any given source term).
  *
- * @sa Equation_base, Classe abstraite, Methodes abstraites:, Entree& lire(const Motcle&, Entree&), const Champ_Inc_base& inconnue() const, Champ_Inc_base& inconnue()
+ * @sa Equation_base, Abstract class, Abstract methods:, Entree& lire(const Motcle&, Entree&), const Champ_Inc_base& inconnue() const, Champ_Inc_base& inconnue()
  */
 class Convection_Diffusion_std : public Equation_base
 {
@@ -57,7 +57,7 @@ public :
   virtual const Champ_Don_base& diffusivite_pour_transport() const;
   virtual const Champ_base& diffusivite_pour_pas_de_temps() const;
   virtual const Champ_base& vitesse_pour_transport() const;
-  // E. Saikali : Methodes utiles pour un heritage V
+  // E. Saikali: useful methods for virtual inheritance (diamond inheritance)
   int sauvegarder_base(Sortie&) const;
   int reprendre_base(Entree&);
   std::vector<YAML_data> data_a_sauvegarder_base() const;
@@ -71,9 +71,10 @@ protected :
 };
 
 
-/*! @brief Renvoie une reference sur le champ representant la vitesse transportante.
+/*! @brief Returns a reference to the field representing the transporting velocity.
  *
- * @return (Champ_Inc_base&) le champ representant la vitesse transportante
+ * @brief Returns a reference to the transporting velocity field.
+ * @return (Champ_Inc_base&) the field representing the transporting velocity
  */
 inline const Champ_Inc_base& Convection_Diffusion_std::vitesse_transportante() const
 {
@@ -81,9 +82,9 @@ inline const Champ_Inc_base& Convection_Diffusion_std::vitesse_transportante() c
 }
 
 
-/*! @brief Associe la vitesse transportante a l'equation.
+/*! @brief Associates the transporting velocity with the equation.
  *
- * @param (Champ_Inc_base& vit) le champ a affecter a la vitesse transportante
+ * @param vit the field to assign as the transporting velocity
  */
 inline void Convection_Diffusion_std::associer_vitesse(const Champ_base& vit)
 {

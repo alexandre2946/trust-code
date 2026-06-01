@@ -42,15 +42,15 @@ Entree& Transport_turbulent_GGDH::readOn(Entree& is)
 
 void Transport_turbulent_GGDH::modifier_mu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const
 {
-  const DoubleTab& mu0 = eq.diffusivite_pour_transport().passe(), &nu0 = eq.diffusivite_pour_pas_de_temps().passe(), //viscosites moleculaires
-                   *alp = sub_type(Pb_Multiphase, pb_.valeur()) ? &pb_->get_champ("alpha").passe() : nullptr; //produit par alpha si Pb_Multiphase
+  const DoubleTab& mu0 = eq.diffusivite_pour_transport().passe(), &nu0 = eq.diffusivite_pour_pas_de_temps().passe(), //molecular viscosities
+                   *alp = sub_type(Pb_Multiphase, pb_.valeur()) ? &pb_->get_champ("alpha").passe() : nullptr; //multiplied by alpha if Pb_Multiphase
   int i, nl = nu.dimension(0), n, N = nu.dimension(1), d, db, D = dimension;
-  //par la viscosite turbulente : tenseur de Reynolds, facteur k / eps
+  //using turbulent viscosity: Reynolds stress tensor, factor k / eps
   DoubleTrav Rij(0, N, D, D), k_sur_eps(0, N);
   MD_Vector_tools::creer_tableau_distribue(nu.get_md_vector(), Rij);
   MD_Vector_tools::creer_tableau_distribue(nu.get_md_vector(), k_sur_eps);
   visc_turb.reynolds_stress(Rij), visc_turb.k_over_eps(k_sur_eps);
-  //formule pour passer de nu a mu : mu0 / nu0 * C_s * k / eps * <u'i u'_j>
+  //formula to convert nu to mu: mu0 / nu0 * C_s * k / eps * <u'i u'_j>
   for (i = 0; i < nl; i++)
     for (n = 0; n < N; n++)
       for (d = 0; d < D; d++)

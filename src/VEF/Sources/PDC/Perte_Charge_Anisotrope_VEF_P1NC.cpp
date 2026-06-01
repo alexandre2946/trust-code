@@ -78,7 +78,7 @@ int Perte_Charge_Anisotrope_VEF_P1NC::lire_motcle_non_standard(const Motcle& mot
 
 ////////////////////////////////////////////////////////////////
 //                                                            //
-//           Fonction principale : perte_charge               //
+//           Main function: pressure drop coefficients        //
 //                                                            //
 ////////////////////////////////////////////////////////////////
 
@@ -86,7 +86,7 @@ void Perte_Charge_Anisotrope_VEF_P1NC::coeffs_perte_charge(const DoubleVect& u, 
                                                            double t, double norme_u, double dh, double nu, double reynolds, double& coeff_ortho, double& coeff_long,double& u_l, DoubleVect& v_valeur) const
 {
 
-  // Calcul de lambda
+  // Compute lambda
   lambda.setVar(0,reynolds);
   lambda.setVar(1,t);
   lambda.setVar(2,pos[0]);
@@ -95,7 +95,7 @@ void Perte_Charge_Anisotrope_VEF_P1NC::coeffs_perte_charge(const DoubleVect& u, 
   if (dimension>2)
     lambda.setVar(4,pos[2]);
 
-  // Calcul de lambda_ortho
+  // Compute lambda_ortho
   lambda_ortho.setVar(0,reynolds);
   lambda_ortho.setVar(1,t);
   lambda_ortho.setVar(2,pos[0]);
@@ -103,21 +103,21 @@ void Perte_Charge_Anisotrope_VEF_P1NC::coeffs_perte_charge(const DoubleVect& u, 
     lambda_ortho.setVar(3,pos[1]);
   if (dimension>2)
     lambda_ortho.setVar(4,pos[2]);
-  double l_ortho=lambda_ortho.eval(); // Pour ne pas evaluer 2 fois le parser
+  double l_ortho=lambda_ortho.eval(); // To avoid evaluating the parser twice
 
-  // Calcul de v et ||v||^2
+  // Compute v and ||v||^2
   //  DoubleVect v_valeur(dimension);
   double vcarre=0;
   v->valeur_a(pos,v_valeur);
   for (int dim=0; dim<dimension; dim++)
     vcarre+=v_valeur[dim]*v_valeur[dim];
   v_valeur/=sqrt(vcarre);
-  // Calcul de u.v
+  // Compute u.v
   double scal=0;
   for (int dim=0; dim<dimension; dim++)
     scal+=u[dim]*v_valeur[dim];
 
-  // Calcul du resultat
+  // Compute result
   /*
     for (int dim=0;dim<dimension;dim++)
     p_charge[dim] = -l_ortho*norme_u/2./dh*u[dim]

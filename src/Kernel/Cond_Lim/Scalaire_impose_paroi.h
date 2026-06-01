@@ -18,7 +18,7 @@
 
 #include <Dirichlet.h>
 
-/*! @brief classe Scalaire_impose_paroi Impose un scalaire a la paroi dans une equation de type Convection-Difussion d'un scalaire
+/*! @brief Scalaire_impose_paroi Imposes a scalar at the wall in a Convection-Diffusion equation for a scalar.
  *
  * @sa Dirichlet
  */

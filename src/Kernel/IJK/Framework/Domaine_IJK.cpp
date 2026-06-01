@@ -318,9 +318,9 @@ void Domaine_IJK::initialize_from_unstructured(const Domaine& domaine,
   Cout << "Domaine_IJK::initialize_from_unstructured maps x->" <<  direction_for_x
        << " y->" << direction_for_y << " z->" << direction_for_z << finl;
 
-  find_unique_coord(coord_som, 0 /* coordonnees y */, node_coordinates_xyz_[direction_for_x]);
-  find_unique_coord(coord_som, 1 /* coordonnees y */, node_coordinates_xyz_[direction_for_y]);
-  find_unique_coord(coord_som, 2 /* coordonnees z (swap y et z) */, node_coordinates_xyz_[direction_for_z]);
+  find_unique_coord(coord_som, 0 /* x coordinates */, node_coordinates_xyz_[direction_for_x]);
+  find_unique_coord(coord_som, 1 /* y coordinates */, node_coordinates_xyz_[direction_for_y]);
+  find_unique_coord(coord_som, 2 /* z coordinates (swap y and z) */, node_coordinates_xyz_[direction_for_z]);
   const double eps = Objet_U::precision_geom;
 
   for (int dir = 0; dir < 3; dir++)
@@ -717,18 +717,18 @@ void Domaine_IJK::init_subregion(const Domaine_IJK& src, int ni, int nj, int nk,
                                  const Nom& subregion_name,
                                  bool perio_x, bool perio_y, bool perio_z )
 {
-  /* methode difficile a ecrire pour etre generale
-     traiter proprement les differentes localisation, par exemple les faces de bord est un casse-tete
-     Pour l'instant, en dur on suppose que la sous region ne peut etre partiel que dans la direction K
-     (on garde les plans entiers en i et j)
-     et que le decoupage en processeurs ne peut etre fait qu'en I et J, et que la localisation est toujours
-     ELEM
+  /* Method difficult to write in a general way.
+     Properly handling the different localisations — e.g., boundary faces — is a real puzzle.
+     For now, it is hard-coded to assume that the sub-region can only be partial in the K direction
+     (full planes in i and j are kept),
+     that the processor splitting can only be done along I and J, and that the localisation is always
+     ELEM.
    */
   assert(src.nproc_per_direction_[0] == 1 || (ni == src.get_nb_elem_tot(0) && offset_i == 0));
   assert(src.nproc_per_direction_[1] == 1 || (nj == src.get_nb_elem_tot(1) && offset_j == 0));
   assert(src.nproc_per_direction_[2] == 1 || (nk == src.get_nb_elem_tot(2) && offset_k == 0));
 
-  // La construction de la geometrie ne necessite pas les prerequis: c'est general
+  // Building the geometry does not require the prerequisites: it is general
   double x0 = src.get_node_coordinates(0)[offset_i];
   double y0 = src.get_node_coordinates(1)[offset_j];
   double z0 = src.get_node_coordinates(2)[offset_k];
@@ -742,7 +742,7 @@ void Domaine_IJK::init_subregion(const Domaine_IJK& src, int ni, int nj, int nk,
   initialize_origin_deltas(x0, y0, z0, dx, dy, dz, perio_x, perio_y, perio_z);
 
   nommer(subregion_name);
-  // Pour le decoupage, on recopie:
+  // For the splitting, copy:
 
   int nproc_i = src.nproc_per_direction_[0];
   int nproc_j = src.nproc_per_direction_[1];
@@ -899,7 +899,7 @@ void Domaine_IJK::initialize_with_mapping(const ArrOfInt& slice_size_i,
             << " right:" << print_vect(neighbour_processors_[1]) << finl;
 }
 
-/*! @brief renvoie new(Faces) ! elle est surchargee par Domaine_VDF par ex.
+/*! @brief returns new(Faces)! overridden by Domaine_VDF for example.
  */
 Faces* Domaine_IJK::creer_faces()
 {
@@ -1407,8 +1407,8 @@ int Domaine_IJK::periodic_get_processor_by_ijk(int slice_i, int slice_j, int sli
   int periodic_slice_j = slice_j;
   int periodic_slice_k = slice_k;
 
-  // Correction du processeur a chercher dans le cas periodique,
-  // si le slice est plus petit que zero ou plus grand que le nombre maximal.
+  // Correct the target processor index in the periodic case,
+  // if the slice index is less than zero or greater than the maximum.
   if (get_periodic_flag(0) && (slice_i < 0))
     periodic_slice_i += get_nprocessor_per_direction(0);
   else if (get_periodic_flag(0) && (slice_i >= get_nprocessor_per_direction(0)))
@@ -1424,7 +1424,7 @@ int Domaine_IJK::periodic_get_processor_by_ijk(int slice_i, int slice_j, int sli
   else if (get_periodic_flag(2) && (slice_k >= get_nprocessor_per_direction(2)))
     periodic_slice_k -= get_nprocessor_per_direction(2);
 
-  // Si on est pas periodique dans une direction, on retourne -1 pour indiquer l'absence de processeur
+  // If not periodic in a direction, return -1 to indicate no neighbouring processor
   if ((!get_periodic_flag(0)) && (slice_i < 0))
     return -1;
   else if ((!get_periodic_flag(0)) && (slice_i >= get_nprocessor_per_direction(0)))
@@ -1440,7 +1440,7 @@ int Domaine_IJK::periodic_get_processor_by_ijk(int slice_i, int slice_j, int sli
   else if ((!get_periodic_flag(2)) && (slice_k >= get_nprocessor_per_direction(2)))
     return -1;
   else
-    // Sinon, on retourne le numero du processeur
+    // Otherwise, return the processor number
     return get_processor_by_ijk(periodic_slice_i, periodic_slice_j, periodic_slice_k);
 }
 

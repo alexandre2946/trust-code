@@ -18,10 +18,10 @@
 
 #include <EChaine.h>
 
-/*! @brief Cette classe se comporte comme EChaine tant que l'on n'est pas a la fin de la chaine.
+/*! @brief This class behaves like EChaine until the end of the string is reached.
  *
- * La suite est lue dans entree2 passee en parametre.
- *   check_types() et error_action() sont identiques a ceux de entree2
+ * The remainder is read from entree2 passed as parameter.
+ *   check_types() and error_action() are identical to those of entree2.
  *
  */
 
@@ -56,11 +56,11 @@ public:
 
 protected:
   Entree& get_input();
-  // Si num_entree_ == 0, on est en train de lire dans chaine_str, sinon dans entree2_
+  // If num_entree_ == 0, we are reading from chaine_str, otherwise from entree2_
   int num_entree_;
   int str_size_;
   EChaine chaine_str_;
-  // Reference a la deuxieme entree (on n'est pas proprietaire de l'objet pointe)
+  // Reference to the second input (we do not own the pointed object)
   Entree *entree2_;
 
 private:
@@ -74,7 +74,7 @@ private:
 template<typename _TYPE_>
 int Entree_complete::get_template(_TYPE_ *ob, std::streamsize n)
 {
-  // Je fais une boucle pour permettre au tableau de valeurs d'etre a cheval sur les deux entrees:
+  // Loop to allow the value array to span across both inputs:
   for (std::streamsize i = 0; i < n; i++)
     {
       Entree& is = get_input();

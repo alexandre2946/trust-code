@@ -19,7 +19,7 @@
 #include <TRUST_List.h>
 #include <Joint.h>
 
-/*! @brief Classe Joints Cette classe represente une liste d'objet de type Joint
+/*! @brief Joints class — represents a list of Joint objects.
  *
  * @sa Joint
  */

@@ -20,16 +20,16 @@
 #include <TRUST_Vector.h>
 #include <Parser_U.h>
 
-/*! @brief classe Champ_front_softanalytique Classe derivee de Champ_front_var qui represente les
+/*! @brief Champ_front_softanalytique Class derived from Champ_front_var representing boundary
  *
- *      champs aux frontieres analytiques en espace et constants dans
- *      le temps
- *    Nouveau champ frontiere
- *    il permet de mettre en champ frontiere un parametre qui depend d'une
- *    fonction. Cette fonction est rentree dans le jeu de donnees sous
- *    la forme d'une chaine de caracteres. Pas besoin de recompilation
- *    comme avec la classe Champ_front_analytique qui utilise une
- *    fonction codee en dur.
+ *      fields that are analytical in space and constant in
+ *      time.
+ *    New boundary field class.
+ *    It allows setting a boundary field parameter that depends on a
+ *    function. This function is entered in the data file as
+ *    a character string. No recompilation needed,
+ *    unlike the Champ_front_analytique class which uses a
+ *    hard-coded function.
  *
  * @sa Champ_front_base Champ_front_var
  */

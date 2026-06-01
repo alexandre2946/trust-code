@@ -20,13 +20,12 @@
 #include <Interprete.h>
 #include <Motcle.h>
 
-/*! @brief classe EcritureLetureSpecial Classe static qui permet de faire une sauvegarde ou/et une lecture
+/*! @brief @brief class EcritureLetureSpecial Static class that enables a special save and/or read:
  *
- *    particuliere :
- *         un seul fichier binaire contenant les positions + les valeurs
- *     Permet de faire une reprise sur un nbre different de proc
+ *         a single binary file containing positions + values,
+ *     allowing a restart with a different number of processors.
  *
- * @sa Si le format est active (en lecture ou en ecriture) sur un probleme, il doit l'etre sur tous.
+ * @sa If the format is activated (for reading or writing) on one problem, it must be activated on all.
  */
 
 class Sortie;

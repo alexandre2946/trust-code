@@ -20,14 +20,14 @@
 #include <Matrice_Base.h>
 #include <TRUST_Deriv.h>
 
-/*! @brief Classe Matrice Classe generique de la hierarchie des matrices.
+/*! @brief Matrice class - Generic class in the matrix hierarchy.
  *
- *     Un objet de type Matrice peut referencer n'importe quel objet derivant
- *     de Matrice_Base.
- *     La plupart des methodes appellent les methodes de l'objet Probleme
- *     sous-jacent via la methode valeur()
+ *     An object of type Matrice can reference any object deriving
+ *     from Matrice_Base.
+ *     Most methods call the methods of the underlying object
+ *     via the valeur() method.
  *
- *     Dans les commentaires des methodes A represente un objet Matrice.
+ *     In the method comments, A represents a Matrice object.
  */
 
 class Matrice : public OWN_PTR(Matrice_Base)

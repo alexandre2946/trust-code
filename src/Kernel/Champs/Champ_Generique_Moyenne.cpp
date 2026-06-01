@@ -34,9 +34,9 @@ Entree& Champ_Generique_Moyenne::readOn(Entree& s )
   return Champ_Generique_Statistiques_base::readOn(s);
 }
 
-//condition_initiale : pour fixer la valeur de l integrale
-//de l operateur moyenne en utilisant Champ_Fonc_reprise
-//pour lire la moyenne recuperee depuis un fichier .xyz
+//condition_initiale : to set the value of the integral
+//of the mean operator using Champ_Fonc_reprise
+//to read the mean recovered from a .xyz file
 void Champ_Generique_Moyenne::set_param(Param& param) const
 {
   Champ_Generique_Statistiques_base::set_param(param);
@@ -90,7 +90,7 @@ const Champ_base& Champ_Generique_Moyenne::get_champ_without_evaluation(OWN_PTR(
 
 const Champ_base& Champ_Generique_Moyenne::get_champ(OWN_PTR(Champ_base)&) const
 {
-  // Creation de l'espace_stockage
+  // Creation of the storage space
   const OBS_PTR(Champ_Generique_base)& mon_champ = integrale().le_champ();
   OWN_PTR(Champ_base) espace_stockage_source;
   const Champ_base& source = mon_champ->get_champ(espace_stockage_source);
@@ -109,7 +109,7 @@ const Champ_base& Champ_Generique_Moyenne::get_champ(OWN_PTR(Champ_base)&) const
 const Noms Champ_Generique_Moyenne::get_property(const Motcle& query) const
 {
 
-  //Creation des composantes serait a faire de maniere dynamique (Moyenne_...)
+  //Component creation should be done dynamically (Moyenne_...)
 
   Motcles motcles(1);
   motcles[0] = "composantes";
@@ -120,11 +120,11 @@ const Noms Champ_Generique_Moyenne::get_property(const Motcle& query) const
 
     case 0:
       {
-        //On fixe les composantes specifiques pour le Champ_Generique_Moyenne
-        //car dans Format_Post_Lml::ecrire_champ_lml() dans le cas d une localisation ELEM
-        //elles sont utilisees
+        //We set the specific components for Champ_Generique_Moyenne
+        //because in Format_Post_Lml::ecrire_champ_lml() in the case of ELEM localisation
+        //they are used
 
-        //Actuellement choix fait d ajouter simplement numero de composante
+        //Currently the choice is simply to add the component number
         /*
           const Noms compo_cibles = get_source(0).get_property("composantes");
           int size = compo_cibles.size();
@@ -155,7 +155,7 @@ const Noms Champ_Generique_Moyenne::get_property(const Motcle& query) const
   return Champ_Gen_de_Champs_Gen::get_property(query);
 }
 
-//Nomme le champ en tant que source par defaut
+//Name the field as a source by default
 //"Moyenne_"+nom_champ_source
 void Champ_Generique_Moyenne::nommer_source()
 {
@@ -187,7 +187,7 @@ bool Champ_Generique_Moyenne::has_champ_post(const Motcle& nom) const
   if (nom_champ_moyenne == nom)
     return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 const Champ_Generique_base& Champ_Generique_Moyenne::get_champ_post(const Motcle& nom) const
@@ -221,7 +221,7 @@ int Champ_Generique_Moyenne::comprend_champ_post(const Motcle& identifiant) cons
   if (Champ_Gen_de_Champs_Gen::comprend_champ_post(identifiant))
     return 1;
 
-  //Nom supplementaire teste car c est le nom utilise par :
+  //Additional name tested because it is the name used by:
   //Champ_Generique_Ecart_Type::completer()
   //Champ_Generique_Correlation::completer()
   Noms nom_source = get_source(0).get_property("nom");

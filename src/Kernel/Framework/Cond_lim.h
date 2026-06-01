@@ -19,11 +19,11 @@
 #include <Cond_lim_base.h>
 #include <TRUST_Deriv.h>
 
-/*! @brief classe Cond_lim Classe generique servant a representer n'importe quelle classe
+/*! @brief class Cond_lim Generic class used to represent any class
  *
- *     derivee de la classe Cond_lim_base
- *     La plupart des methodes appellent les methodes de l'objet Probleme
- *     sous-jacent via la methode valeur() declaree grace a la macro
+ *     derived from the Cond_lim_base class
+ *     Most methods call the methods of the underlying object Problem
+ *     through the valeur() method declared thanks to the macro
  *
  * @sa Cond_lim_base
  */

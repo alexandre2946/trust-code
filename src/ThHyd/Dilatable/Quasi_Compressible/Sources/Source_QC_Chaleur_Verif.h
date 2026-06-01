@@ -25,8 +25,8 @@ class Fluide_Quasi_Compressible;
 
 /*! @brief class Source_QC_Chaleur_Verif
  *
- *  Cette classe represente un terme source supplementaire a prendre en compte dans
- *  les equations de la chaleur dans le cas ou le fluide est quasi compressible
+ *  This class represents an additional source term to account for in
+ *  the heat equations when the fluid is quasi-compressible
  *
  *
  * @sa Source_Chaleur_Fluide_Dilatable_base Fluide_Quasi_Compressible

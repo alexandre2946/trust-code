@@ -35,17 +35,17 @@ Sortie&  Extruder_32_64<_SIZE_>::printOn(Sortie& os) const { return Interprete::
 template <typename _SIZE_>
 Entree&  Extruder_32_64<_SIZE_>::readOn(Entree& is) { return Interprete::readOn(is); }
 
-/*! @brief Fonction principale de l'interprete Extruder Triangule 1 a 1 toutes les domaines du domaine
+/*! @brief Main function of the Extruder interpreter. Extrudes the domain
  *
- *     specifie par la directive.
- *     On triangule le domaine grace a la methode:
+ *     specified by the directive, element by element.
+ *     The domain is extruded using the method:
  *       void Extruder_32_64<_SIZE_>::extruder(Domaine_t& domaine) const
- *     Extruder signifie ici transformer en triangle des
- *     elements geometrique d'un domaine.
+ *     Extruding here means transforming geometric elements of a domain
+ *     into 3D elements by translation.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree
- * @throws l'objet a mailler n'est pas du type Domaine
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the input stream
+ * @throws the object to mesh is not of type Domaine
  */
 template <typename _SIZE_>
 Entree&  Extruder_32_64<_SIZE_>::interpreter_(Entree& is)
@@ -67,7 +67,7 @@ Entree&  Extruder_32_64<_SIZE_>::interpreter_(Entree& is)
 
 inline void check_boundary_name(const Nom& name)
 {
-// On verifie que le bord ne se nomme pas deja devant ou derriere
+// Check that the boundary is not already named "devant" or "derriere"
   if (name=="devant" || name=="derriere")
     {
       Cerr << "Problem : you must change the name of the boundary  : " <<name<<finl;
@@ -76,12 +76,11 @@ inline void check_boundary_name(const Nom& name)
       Process::exit();
     }
 }
-/*! @brief Triangule tous les element d'un domaine: transforme les elements goemetriques du domaine en triangles.
+/*! @brief Extrudes all elements of a domain: transforms the geometric elements of the domain into 3D elements.
  *
- *     Pour l'instant on ne sait raffiner que des Rectangles
- *     (on les coupe en 4).
+ * Currently only Rectangles/Quadrangles and Triangles can be extruded.
  *
- * @param (Domaine_t& domaine) le domaine dont on veut raffiner les elements
+ * @param dom The domain whose elements are to be extruded.
  */
 template <typename _SIZE_>
 void Extruder_32_64<_SIZE_>::extruder(Domaine_t& dom)
@@ -105,7 +104,7 @@ void Extruder_32_64<_SIZE_>::extruder(Domaine_t& dom)
       Faces_t les_faces;
       //domaine.creer_faces(les_faces);
       {
-        // bloc a factoriser avec Domaine_VF.cpp :
+        // block to be factored out with Domaine_VF.cpp:
         Type_Face type_face = dom.type_elem()->type_face(0);
         les_faces.typer(type_face);
         les_faces.associer_domaine(dom);
@@ -120,7 +119,7 @@ void Extruder_32_64<_SIZE_>::extruder(Domaine_t& dom)
                                          1 /* include virtual elements */);
 
         Faces_builder_t faces_builder;
-        IntTab_t elem_faces; // Tableau dont on aura pas besoin
+        IntTab_t elem_faces; // Array that will not be needed
         faces_builder.creer_faces_reeles(dom,
                                          connectivite_som_elem,
                                          les_faces,
@@ -135,7 +134,7 @@ void Extruder_32_64<_SIZE_>::extruder(Domaine_t& dom)
       Objet_U::dimension=3;
 
 
-      // les sommets du maillage 2D sont translates en premier
+      // vertices of the 2D mesh are translated first
       for (int i=0; i<oldnbsom; i++)
         {
           double x = coord_sommets(i,0);
@@ -157,7 +156,7 @@ void Extruder_32_64<_SIZE_>::extruder(Domaine_t& dom)
         }
 
 
-      // puis on cree les centres de gravite des elements 2D puis translation de ces points
+      // then create the centroids of the 2D elements and translate these points
       for (int_t i=0; i<oldsz; i++)
         {
           int_t i0=les_elems(i,0);
@@ -183,7 +182,7 @@ void Extruder_32_64<_SIZE_>::extruder(Domaine_t& dom)
         }
 
 
-      // enfin, on cree les centres des faces du maillage 2D puis translation de ces points
+      // finally, create the face centers of the 2D mesh and translate these points
       for (int i=0; i<nbfaces2D; i++)
         {
           int_t i0=les_faces.sommet(i,0);
@@ -211,11 +210,11 @@ void Extruder_32_64<_SIZE_>::extruder(Domaine_t& dom)
       dom.ajouter(new_soms);
 
       int_t newnbelem = 14*NZ*oldsz;
-      IntTab_t new_elems(newnbelem, 4); // les nouveaux elements
+      IntTab_t new_elems(newnbelem, 4); // the new elements
       int_t cpt=0;
 
 
-      // en premier, on stocke les tetra du haut et du bas : NZ*nb_triangle*2 tetra
+      // first, store the top and bottom tetrahedra: NZ*nb_triangle*2 tetrahedra
       for (int_t i=0; i<oldsz; i++)
         {
           int_t i0=les_elems(i,0);
@@ -249,7 +248,7 @@ void Extruder_32_64<_SIZE_>::extruder(Domaine_t& dom)
 
 
 
-      // puis les autres tetras
+      // then the remaining tetrahedra
       for (int_t i=0; i<nbfaces2D; i++)
         {
           for (int ivois=0; ivois<2; ivois++)
@@ -298,7 +297,7 @@ void Extruder_32_64<_SIZE_>::extruder(Domaine_t& dom)
 
       les_elems.ref(new_elems);
 
-      // Reconstruction de l'octree
+      // Rebuild the octree
       dom.invalide_octree();
       dom.typer("Tetraedre");
 
@@ -329,7 +328,7 @@ void Extruder_32_64<_SIZE_>::traiter_faces_dvt(Faces_t& les_faces_bord, Faces_t&
       //double x01 = 0.5*(coord_sommets(i0,0)+coord_sommets(i1,0));
       //double y01 = 0.5*(coord_sommets(i0,1)+coord_sommets(i1,1));
 
-      // on recherche le numero de cette face de bord: pas top!
+      // find the index of this boundary face: not optimal!
       int_t jface=-1;
       for (int_t iface=0; iface<nbfaces2D; iface++)
         {
@@ -453,7 +452,7 @@ void Extruder_32_64<_SIZE_>::extruder_hexa(Domaine_t& dom)
 
   Faces_t les_faces;
   {
-    // bloc a factoriser avec Domaine_VF.cpp :
+    // block to be factored out with Domaine_VF.cpp :
     Type_Face type_face = dom.type_elem()->type_face(0);
     les_faces.typer(type_face);
     les_faces.associer_domaine(dom);
@@ -468,7 +467,7 @@ void Extruder_32_64<_SIZE_>::extruder_hexa(Domaine_t& dom)
                                      1 /* include virtual elements */);
 
     Faces_builder_t faces_builder;
-    IntTab_t elem_faces; // Tableau dont on aura pas besoin
+    IntTab_t elem_faces; // Array that will not be needed
     faces_builder.creer_faces_reeles(dom,
                                      connectivite_som_elem,
                                      les_faces,
@@ -481,7 +480,7 @@ void Extruder_32_64<_SIZE_>::extruder_hexa(Domaine_t& dom)
   Objet_U::dimension=3;
 
   int_t i;
-  // les sommets du maillage 2D sont translates
+  // vertices of the 2D mesh are translated
   for (i=0; i<oldnbsom; i++)
     {
       double x = coord_sommets(i,0);
@@ -506,10 +505,10 @@ void Extruder_32_64<_SIZE_>::extruder_hexa(Domaine_t& dom)
   dom.ajouter(new_soms);
 
   int_t newnbelem = NZ*oldsz;
-  IntTab_t new_elems(newnbelem, 8); // les nouveaux elements
+  IntTab_t new_elems(newnbelem, 8); // the new elements
 
 
-  // definition des nouveaux hexas
+  // define the new hexahedra
   for (i=0; i<oldsz; i++)
     {
       int_t i0=les_elems(i,0);
@@ -539,7 +538,7 @@ void Extruder_32_64<_SIZE_>::extruder_hexa(Domaine_t& dom)
 
   les_elems.ref(new_elems);
 
-  // Reconstruction de l'octree
+  // Rebuild the octree
   dom.invalide_octree();
   if ((dom.type_elem()->que_suis_je()) ==  "Quadrangle")
     dom.typer("Hexaedre_VEF");

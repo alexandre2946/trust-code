@@ -18,9 +18,9 @@
 
 #include <Dirichlet_homogene.h>
 
-/*! @brief classe Dirichlet_paroi_fixe Represente une paroi immobile dans une equation de type Navier_Stokes.
+/*! @brief Dirichlet_paroi_fixe Represents a fixed wall in a Navier-Stokes type equation.
  *
- * @sa Dirichlet_homogene, Objet compatible avec des equations du domaine de l'Hydraulique, ou indetermine. (voir compatible_avec_eqn(const Equation_base&) const)
+ * @sa Dirichlet_homogene, Object compatible with equations in the hydraulic domain, or undetermined. (see compatible_avec_eqn(const Equation_base&) const)
  */
 class Dirichlet_paroi_fixe: public Dirichlet_homogene
 {

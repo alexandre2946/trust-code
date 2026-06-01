@@ -19,7 +19,7 @@
 #include <Frottement_interfacial_base.h>
 #include <Correlation_base.h>
 
-/*! @brief classe Frottement_interfacial_Zenit coefficients de frottement interfacial d'un ecoulement a bulles en prennant en compte la densite
+/*! @brief Interfacial friction coefficients for bubbly flow, accounting for density effects (Zenit correlation).
  *
  */
 class Frottement_interfacial_Zenit : public Frottement_interfacial_base

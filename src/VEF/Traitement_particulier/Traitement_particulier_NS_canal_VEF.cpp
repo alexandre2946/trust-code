@@ -35,9 +35,9 @@ Entree& Traitement_particulier_NS_canal_VEF::lire(Entree& is)
 
 void Traitement_particulier_NS_canal_VEF::remplir_Y(DoubleVect& tabY,  DoubleVect& tabcompt, int& aNy) const
 {
-  // On va initialiser les differents parametres membres de la classe
-  // utiles au calcul des differentes moyennes
-  // Initialisation de : Y, compt
+  // Initialize the various class member parameters
+  // used for computing the different averages
+  // Initialize: Y, compt
 
   const Domaine_dis_base& zdisbase = mon_equation->inconnue().domaine_dis_base();
   const Domaine_VF& domaine_VF=ref_cast(Domaine_VF, zdisbase);
@@ -57,12 +57,12 @@ void Traitement_particulier_NS_canal_VEF::remplir_Y(DoubleVect& tabY,  DoubleVec
   tabY = -100.;
   tabcompt = 0;
 
-  //Remplissage du tableau Y
+  //Fill the Y array
   ////////////////////////////////////////////////////////
 
-  // GF PQ. on ajoute 2 a compt dans le cas des faces standards, 1 pour les faces doubles
-  // et on divise compt a la fin par 2.
-  // pour etre coherent sur le nombre de faces vis a vis de calculer_moyenne_spatiale_vitesse_rho_mu
+  // GF PQ. we add 2 to compt for standard faces, 1 for double faces
+  // and divide compt by 2 at the end.
+  // to be consistent on the number of faces with calculer_moyenne_spatiale_vitesse_rho_mu
 
   for (num_face=0; num_face<nb_faces; num_face++)
     {
@@ -143,7 +143,7 @@ void Traitement_particulier_NS_canal_VEF::calculer_moyenne_spatiale_vitesse_rho_
       val_moy(i,4) += c*v*v;
       val_moy(i,6) += c*u*v;
 
-      if(dimension==2)   val_moy(i,9) += c*sqrt(u*u);      //vitesse tangentielle pour calcul du frottement
+      if(dimension==2)   val_moy(i,9) += c*sqrt(u*u);      //tangential velocity for friction computation
 
       if(dimension==3)
         {
@@ -154,7 +154,7 @@ void Traitement_particulier_NS_canal_VEF::calculer_moyenne_spatiale_vitesse_rho_
           val_moy(i,5) += c*wl*wl;
           val_moy(i,7) += c*u*wl;
           val_moy(i,8) += c*v*wl;
-          val_moy(i,9) += c*sqrt(u*u+wl*wl);      //vitesse tangentielle pour calcul du frottement
+          val_moy(i,9) += c*sqrt(u*u+wl*wl);      //tangential velocity for friction computation
         }
 
 

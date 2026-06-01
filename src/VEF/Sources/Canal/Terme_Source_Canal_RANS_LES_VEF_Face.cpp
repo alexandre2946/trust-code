@@ -26,8 +26,8 @@ Implemente_instanciable_sans_destructeur(Terme_Source_Canal_RANS_LES_VEF_Face,"S
 
 Terme_Source_Canal_RANS_LES_VEF_Face::~Terme_Source_Canal_RANS_LES_VEF_Face()
 {
-  //Le destructeur est appele a l'initialisation alors
-  //la sauvegarde du champ se fait hors initialisation
+  //The destructor is called at initialization, so
+  //the field saving is done outside initialization
 
   if(utemp.size()!=0)
     {
@@ -225,7 +225,7 @@ void Terme_Source_Canal_RANS_LES_VEF_Face::init()
     }
 
 
-  if(u_target==1) // Ecriture du champ target
+  if(u_target==1) // Write target field
     {
       SFichier fic ("utarget.dat");
 
@@ -234,7 +234,7 @@ void Terme_Source_Canal_RANS_LES_VEF_Face::init()
           fic << vitesse(num_face,0) << vitesse(num_face,1) << vitesse(num_face,2);
         }
     }
-  if(u_target==2) // Lecture du champ target
+  if(u_target==2) // Read target field
     {
       EFichier fic ("vitesse_RANS.dat");
       SFichier ficv ("verif_target.dat");
@@ -245,7 +245,7 @@ void Terme_Source_Canal_RANS_LES_VEF_Face::init()
           ficv << U_RANS(num_face,0) << " " << U_RANS(num_face,1) << " " << U_RANS(num_face,2) << finl;
         }
     }
-  else // champ target : fonction analytique
+  else // target field: analytical function
     {
       if(dir==0)
         {
@@ -334,13 +334,13 @@ void Terme_Source_Canal_RANS_LES_VEF_Face::mettre_a_jour(double temps)
 
 
       //***********************************************************
-      //*************** FIN MOYENNE TEMPORELLE  ***************
+      //*************** END TEMPORAL AVERAGE  *****************
       //*******************************************************
     }
   else if(moyenne==3)
     {
       //********************************************************************************
-      //*************** MOYENNE TEMPORELLE (debut t=0 ou presque...) *******************
+      //*************** TIME AVERAGE (starting at t=0 or close...) *******************
       //********************************************************************************
 
       if(tps>0)
@@ -469,7 +469,7 @@ DoubleTab& Terme_Source_Canal_RANS_LES_VEF_Face::ajouter(DoubleTab& resu) const
         }
 
 
-    }//fin if f_start
+    }//end if f_start
 
   return resu;
 }

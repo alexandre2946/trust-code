@@ -88,7 +88,7 @@ void PolyMAC_MPFA_discretisation::grad_u(const Domaine_dis_base& z, const Domain
           ch_grad_u.fixer_nom_compo(dimension * n + 2, Nom("dW_") + phase); // dW
         }
     }
-  ch_grad_u.fixer_nature_du_champ(multi_scalaire); // tensoriel pour etre precis
+  ch_grad_u.fixer_nature_du_champ(multi_scalaire); // more precisely: tensorial
   ch_grad_u.fixer_nb_valeurs_nodales(-1);
   ch_grad_u.fixer_unite("s-1");
   ch_grad_u.changer_temps(-1); // so it is calculated at time 0
@@ -128,7 +128,7 @@ void PolyMAC_MPFA_discretisation::taux_cisaillement(const Domaine_dis_base& z, c
       Nom phase = Nom(n);
       ch_grad_u.fixer_nom_compo(n, Nom("Taux_cisaillement_") + phase);
     }
-  ch_grad_u.fixer_nature_du_champ(scalaire); // tensoriel pour etre precis
+  ch_grad_u.fixer_nature_du_champ(scalaire); // more precisely: tensorial
   ch_grad_u.fixer_nb_valeurs_nodales(domaine.nb_elem());
   ch_grad_u.fixer_unite("s-1");
   ch_grad_u.changer_temps(-1); // so it is calculated at time 0

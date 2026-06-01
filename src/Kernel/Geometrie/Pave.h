@@ -18,9 +18,9 @@
 #include <Domaine.h>
 
 
-/*! @brief Classe Pave Un domaine particulierement facile a mailler!
+/*! @brief Class Pave A domain that is particularly easy to mesh!
  *
- *     La structure du jeu de donnee pour specifier un Pave est:
+ *     The data set structure to specify a Pave is:
  *     Pave nom_pave
  *      {
  *      Origine OX OY (OZ)
@@ -42,7 +42,7 @@
  *      ...
  *      }
  *
- * @sa Domaine Mailler, Actuellemnt c'est le seul type d'objet reconnu par Trio-U pour mailler, un domaine
+ * @sa Domaine Mailler, Currently this is the only object type recognized by TRUST for meshing a domain
  */
 template <typename _SIZE_>
 class Pave_32_64 : public Domaine_32_64<_SIZE_>
@@ -89,20 +89,20 @@ protected:
   IntVect nb_noeuds_;
 
   int Nx = -1, Ny = -1, Nz = -1, Mx = -1, My = -1, Mz = -1;
-  double a_tanh= 10.;  // a pour le maillage en tanh dans la diry!!
+  double a_tanh= 10.;  // a for the tanh mesh in the y direction!!
   int tanh_dilatation=0;  // can be -1,0 or 1
-  double xa_tanh= 10.;  // xa pour le maillage en tanh dans la dirx!!
+  double xa_tanh= 10.;  // xa for the tanh mesh in the x direction!!
   int xtanh_dilatation=0; // can be -1,0 or 1
-  double za_tanh= 10.;  // za pour le maillage en tanh dans la dirz!!
+  double za_tanh= 10.;  // za for the tanh mesh in the z direction!!
   int ztanh_dilatation=0; // can be -1,0 or 1
   bool rep_VEF=false;
   bool tour_complet = false;
 };
 
-/*! @brief Renvoie le numero de la i-ieme maille (suivant X)
+/*! @brief Returns the index of the i-th cell (along X)
  *
- * @param (int i) le rang de la maille suivant X dont on veut le numero
- * @return (int) le numero de la maille cherchee
+ * @param (int i) the rank of the cell along X whose index is requested
+ * @return (int) the index of the requested cell
  */
 template <typename _SIZE_>
 inline typename Pave_32_64<_SIZE_>::int_t Pave_32_64<_SIZE_>::numero_maille(int i)
@@ -112,11 +112,11 @@ inline typename Pave_32_64<_SIZE_>::int_t Pave_32_64<_SIZE_>::numero_maille(int 
   return i;
 }
 
-/*! @brief Renvoie le numero de la (i,j)-ieme maille (suivant (X,Y)).
+/*! @brief Returns the index of the (i,j)-th cell (along (X,Y)).
  *
- * @param (int i) le rang de la maille suivant X
- * @param (int j) le rang de la maille suivant Y
- * @return (int) le numero de la maille cherchee
+ * @param (int i) the rank of the cell along X
+ * @param (int j) the rank of the cell along Y
+ * @return (int) the index of the requested cell
  */
 template <typename _SIZE_>
 inline typename Pave_32_64<_SIZE_>::int_t Pave_32_64<_SIZE_>::numero_maille(int i, int j)
@@ -127,12 +127,12 @@ inline typename Pave_32_64<_SIZE_>::int_t Pave_32_64<_SIZE_>::numero_maille(int 
   return j*Nx+i;
 }
 
-/*! @brief Renvoie le numero de la (i,j,k)-ieme maille (suivant (X,Y,Z)).
+/*! @brief Returns the index of the (i,j,k)-th cell (along (X,Y,Z)).
  *
- * @param (int i) le rang de la maille suivant X
- * @param (int j) le rang de la maille suivant Y
- * @param (int k) le rang de la maille suivant Z
- * @return (int) le numero de la maille cherchee
+ * @param (int i) the rank of the cell along X
+ * @param (int j) the rank of the cell along Y
+ * @param (int k) the rank of the cell along Z
+ * @return (int) the index of the requested cell
  */
 template <typename _SIZE_>
 inline typename Pave_32_64<_SIZE_>::int_t Pave_32_64<_SIZE_>::numero_maille(int i, int j, int k)
@@ -144,10 +144,10 @@ inline typename Pave_32_64<_SIZE_>::int_t Pave_32_64<_SIZE_>::numero_maille(int 
   return k*Ny*Nx+j*Nx+i;
 }
 
-/*! @brief Renvoie le numero du i-ieme sommet (suivant X)
+/*! @brief Returns the index of the i-th vertex (along X)
  *
- * @param (int i) le rang du sommet suivant X dont on veut le numero
- * @return (int) le numero du sommet cherche
+ * @param (int i) the rank of the vertex along X whose index is requested
+ * @return (int) the index of the requested vertex
  */
 template <typename _SIZE_>
 inline typename Pave_32_64<_SIZE_>::int_t Pave_32_64<_SIZE_>::numero_sommet(int i)
@@ -156,11 +156,11 @@ inline typename Pave_32_64<_SIZE_>::int_t Pave_32_64<_SIZE_>::numero_sommet(int 
   return i;
 }
 
-/*! @brief Renvoie le numero du (i,j)-ieme sommet (suivant (X,Y)).
+/*! @brief Returns the index of the (i,j)-th vertex (along (X,Y)).
  *
- * @param (int i) le rang du sommet suivant X
- * @param (int j) le rang du sommet suivant Y
- * @return (int) le numero du sommet cherche
+ * @param (int i) the rank of the vertex along X
+ * @param (int j) the rank of the vertex along Y
+ * @return (int) the index of the requested vertex
  */
 template <typename _SIZE_>
 inline typename Pave_32_64<_SIZE_>::int_t Pave_32_64<_SIZE_>::numero_sommet(int i, int j)
@@ -172,12 +172,12 @@ inline typename Pave_32_64<_SIZE_>::int_t Pave_32_64<_SIZE_>::numero_sommet(int 
   return j*Mx+i;
 }
 
-/*! @brief Renvoie le numero du (i,j,k)-ieme sommet (suivant (X,Y,Z)).
+/*! @brief Returns the index of the (i,j,k)-th vertex (along (X,Y,Z)).
  *
- * @param (int i) le rang du sommet suivant X
- * @param (int j) le rang du sommet suivant Y
- * @param (int k) le rang du sommet suivant Z
- * @return (int) le numero du sommet cherche
+ * @param (int i) the rank of the vertex along X
+ * @param (int j) the rank of the vertex along Y
+ * @param (int k) the rank of the vertex along Z
+ * @return (int) the index of the requested vertex
  */
 template <typename _SIZE_>
 inline typename Pave_32_64<_SIZE_>::int_t Pave_32_64<_SIZE_>::numero_sommet(int i, int j, int k  )
@@ -191,11 +191,11 @@ inline typename Pave_32_64<_SIZE_>::int_t Pave_32_64<_SIZE_>::numero_sommet(int 
   return k*My*Mx+j*Mx+i;
 }
 
-/*! @brief Renvoie une reference sur le numero du l-ieme sommet de la i-ieme maille (suivant X) du pave.
+/*! @brief Returns a reference to the index of the l-th vertex of the i-th cell (along X) of the pave.
  *
- * @param (int i) le rang de la maille suivant X
- * @param (int l) le rang du sommet cherche
- * @return (int&) reference sur le numero du sommet cherche
+ * @param (int i) the rank of the cell along X
+ * @param (int l) the rank of the requested vertex
+ * @return (int&) reference to the index of the requested vertex
  */
 template <typename _SIZE_>
 inline typename Pave_32_64<_SIZE_>::int_t& Pave_32_64<_SIZE_>::maille_sommet(int i, int l)
@@ -204,12 +204,12 @@ inline typename Pave_32_64<_SIZE_>::int_t& Pave_32_64<_SIZE_>::maille_sommet(int
   return this->mes_elems_(numero_maille(i),l);
 }
 
-/*! @brief Renvoie une reference sur le numero du l-ieme sommet de la (i,j)-ieme maille (suivant (X,Y)) du pave.
+/*! @brief Returns a reference to the index of the l-th vertex of the (i,j)-th cell (along (X,Y)) of the pave.
  *
- * @param (int i) le rang de la maille suivant X
- * @param (int j) le rang de la maille suivant Y
- * @param (int l) le rang du sommet cherche
- * @return (int&) reference sur le numero du sommet cherche
+ * @param (int i) the rank of the cell along X
+ * @param (int j) the rank of the cell along Y
+ * @param (int l) the rank of the requested vertex
+ * @return (int&) reference to the index of the requested vertex
  */
 template <typename _SIZE_>
 inline typename Pave_32_64<_SIZE_>::int_t& Pave_32_64<_SIZE_>::maille_sommet(int i, int j, int l)
@@ -218,13 +218,13 @@ inline typename Pave_32_64<_SIZE_>::int_t& Pave_32_64<_SIZE_>::maille_sommet(int
   return this->mes_elems_(numero_maille(i, j),l);
 }
 
-/*! @brief Renvoie une reference sur le numero du l-ieme sommet de la (i,j,k)-ieme maille (suivant (X,Y,Z)) du pave.
+/*! @brief Returns a reference to the index of the l-th vertex of the (i,j,k)-th cell (along (X,Y,Z)) of the pave.
  *
- * @param (int i) le rang de la maille suivant X
- * @param (int j) le rang de la maille suivant Y
- * @param (int j) le rang de la maille suivant Z
- * @param (int l) le rang du sommet cherche
- * @return (int&) reference sur le numero du sommet cherche
+ * @param (int i) the rank of the cell along X
+ * @param (int j) the rank of the cell along Y
+ * @param (int k) the rank of the cell along Z
+ * @param (int l) the rank of the requested vertex
+ * @return (int&) reference to the index of the requested vertex
  */
 template <typename _SIZE_>
 inline typename Pave_32_64<_SIZE_>::int_t& Pave_32_64<_SIZE_>::maille_sommet(int i, int j, int k, int l)
@@ -233,10 +233,10 @@ inline typename Pave_32_64<_SIZE_>::int_t& Pave_32_64<_SIZE_>::maille_sommet(int
   return this->mes_elems_(numero_maille(i, j, k), l);
 }
 
-/*! @brief Renvoie une reference sur les coordonnees du i-ieme noeud.
+/*! @brief Returns a reference to the coordinates of the i-th node.
  *
- * @param (int i) le rang du noeud suivant X
- * @return (double&) reference sur les coordonnees du noeud cherche
+ * @param (int i) the rank of the node along X
+ * @return (double&) reference to the coordinates of the requested node
  */
 template <typename _SIZE_>
 inline double& Pave_32_64<_SIZE_>::coord_noeud(int i)
@@ -245,11 +245,11 @@ inline double& Pave_32_64<_SIZE_>::coord_noeud(int i)
   return this->sommets_(numero_sommet(i));
 }
 
-/*! @brief Renvoie une reference sur les coordonnees du (i,j)-ieme noeud.
+/*! @brief Returns a reference to the coordinates of the (i,j)-th node.
  *
- * @param (int i) le rang du noeud suivant X
- * @param (int j) le rang du noeud suivant Y
- * @return (double&) reference sur les coordonnees du noeud cherche
+ * @param (int i) the rank of the node along X
+ * @param (int j) the rank of the node along Y
+ * @return (double&) reference to the coordinates of the requested node
  */
 template <typename _SIZE_>
 inline double& Pave_32_64<_SIZE_>::coord_noeud(int i, int j, int l)
@@ -258,12 +258,12 @@ inline double& Pave_32_64<_SIZE_>::coord_noeud(int i, int j, int l)
   return this->sommets_(numero_sommet(i, j),l);
 }
 
-/*! @brief Renvoie une reference sur les coordonnees du (i,j,k)-ieme noeud.
+/*! @brief Returns a reference to the coordinates of the (i,j,k)-th node.
  *
- * @param (int i) le rang du noeud suivant X
- * @param (int j) le rang du noeud suivant Y
- * @param (int k) le rang du noeud suivant Z
- * @return (double&) reference sur les coordonnees du noeud cherche
+ * @param (int i) the rank of the node along X
+ * @param (int j) the rank of the node along Y
+ * @param (int k) the rank of the node along Z
+ * @return (double&) reference to the coordinates of the requested node
  */
 template <typename _SIZE_>
 inline double& Pave_32_64<_SIZE_>::coord_noeud(int i, int j, int k, int l)

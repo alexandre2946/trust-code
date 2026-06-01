@@ -24,7 +24,7 @@ class Fluide_Dilatable_base;
 class Domaine_dis_base;
 class Domaine_Cl_dis_base;
 
-/*! @brief classe Abstraite EOS_Tools_base
+/*! @brief Abstract base class for EOS tools used with dilatable fluids.
  *
  */
 
@@ -34,7 +34,7 @@ class EOS_Tools_base : public Objet_U
 public :
   void associer_fluide(const Fluide_Dilatable_base&);
   inline virtual void mettre_a_jour(double ) { }
-  // Methodes virtuelles pure
+  // Pure virtual methods
   virtual const DoubleTab& rho_discvit() const=0;
   virtual const DoubleTab& rho_face_n() const=0;
   virtual const DoubleTab& rho_face_np1() const=0;

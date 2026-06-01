@@ -19,10 +19,10 @@
 Implemente_base_sans_constructeur(Operateur_Conv_base,"Operateur_Conv_base",Operateur_base);
 
 
-/*! @brief NE FAIT RIEN A surcharger dans les classes derivees
+/*! @brief DOES NOTHING To be overridden in derived classes.
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the output stream
  */
 Sortie& Operateur_Conv_base::printOn(Sortie& os) const
 {
@@ -30,16 +30,16 @@ Sortie& Operateur_Conv_base::printOn(Sortie& os) const
 }
 
 
-/*! @brief NE FAIT RIEN A surcharger dans les classes derivees
+/*! @brief DOES NOTHING To be overridden in derived classes.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the input stream
  */
 Entree& Operateur_Conv_base::readOn(Entree& is)
 {
   return is;
 }
-/*! @brief initialise dt_stab_conv a -123
+/*! @brief Initializes dt_stab_conv to -123.
  *
  */
 Operateur_Conv_base::Operateur_Conv_base():dt_stab_conv_(-123.) {}

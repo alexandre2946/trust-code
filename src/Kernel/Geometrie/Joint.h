@@ -21,11 +21,11 @@
 
 enum class JOINT_ITEM { SOMMET, ELEMENT, FACE, ARETE, FACE_FRONT };
 
-/*! @brief La classe Joint est une Frontiere qui contient les faces et les sommets de joint avec le
- *  domaine PEvoisin() (pour les maillages distribues en parallele).
+/*! @brief The Joint class is a Frontiere that contains the joint faces and vertices with the
+ *  neighboring domain PEvoisin() (for meshes distributed in parallel).
  *
- * Elle porte en plus dans les Joint_Items les informations permettant de construire les tableaux
- * distribues indexes par les items geometriques (sommets, faces, elements, aretes, faces_frontieres)
+ * It additionally carries in the Joint_Items the information needed to build
+ * distributed arrays indexed by geometric items (vertices, faces, elements, edges, boundary faces).
  *
  * @sa Scatter Joint_Item
  */
@@ -52,22 +52,22 @@ public:
   void dimensionner(int);
   void ajouter_faces(const IntTab_t&);
 
-  // Accesseurs pour compatibilite avec la version precedente
-  // (supprimes bientot)
+  // Accessors for compatibility with the previous version
+  // (to be removed soon)
   const IntTab_t&    renum_virt_loc() const { return joint_item(JOINT_ITEM::SOMMET).renum_items_communs(); }
   const ArrOfInt_t& esp_dist_elems() const   { return joint_item(JOINT_ITEM::ELEMENT).items_distants(); }
   const ArrOfInt_t& esp_dist_sommets() const { return joint_item(JOINT_ITEM::SOMMET).items_distants(); }
   const ArrOfInt_t& esp_dist_faces() const   { return joint_item(JOINT_ITEM::FACE).items_distants(); }
 
-  // Nouvelle interface pour acceder aux donnees de joint:
+  // New interface to access joint data:
   Joint_Items_t&        set_joint_item(JOINT_ITEM type);
   const Joint_Items_t& joint_item(JOINT_ITEM type) const;
 
 private:
-  // Numero du PEvoisin correspondant au joint
+  // Index of the neighboring PE corresponding to this joint
   int PEvoisin_=-1;
 
-  // Epaisseur de joint, utilise par Scatter::calculer_espace_distant_elements
+  // Joint thickness, used by Scatter::calculer_espace_distant_elements
   int epaisseur_=-1;
 
   Joint_Items_t joint_sommets_;

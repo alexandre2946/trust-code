@@ -38,10 +38,10 @@ void Champ_Generique_refChamp_special::set_param(Param& param) const
 
 const DoubleTab& Champ_Generique_refChamp_special::get_ref_values() const
 {
-  // Appel a get_localisation pour verifier que le champ est bien un champ discret
-  // (multi-support ou non)
+  // Call to get_localisation to verify that the field is indeed a discrete field
+  // (multi-support or not)
   get_localisation(0);
-  // Renvoie les valeurs du champ
+  // Returns the field values
   const DoubleTab& val = ref_cast(Champ_Inc_base,ref_champ_.valeur()).futur(case_);
   return val;
 }

@@ -20,9 +20,9 @@
 #include <TRUSTTabs_forward.h>
 #include <Domaine_forward.h>
 
-/*! @brief Cet interprete permet de reordonner les faces d'un bord periodique selon la convention utilisee dans le decoupeur.
+/*! @brief This interpreter reorders the faces of a periodic boundary according to the convention used in the partitioner.
  *
- * D'abord les faces d'une extremite du domaine, puis dans le meme ordre, les faces jumelles sur le bord oppose.
+ * First the faces at one end of the domain, then in the same order, the twin faces on the opposite boundary.
  */
 template <typename _SIZE_>
 class Reordonner_faces_periodiques_32_64 : public Interprete_geometrique_base_32_64<_SIZE_>

@@ -32,13 +32,13 @@ class Front_dis_base;
 class Equation_base;
 class Milieu_base;
 
-/*! @brief classe Champ_front_contact_VEF Permet le couplage scalaire (temperature ou concentration) entre problemes en calculant
+/*! @brief class Champ_front_contact_VEF Enables scalar coupling (temperature or concentration) between problems by computing
  *
- *      la valeur a la paroi qui permet d'egaliser les flux.
- *      calculer_coeffs_echange stocke grad_num_local et grad_fro_local tels que (aux signes pres?)
+ *      the wall value that equalizes the fluxes.
+ *      calculer_coeffs_echange stores grad_num_local and grad_fro_local such that (up to sign?)
  *      flux = grad_num_local + Scal_paroi*grad_fro_local
- *      mettre_a_jour recupere les grad* d'en face et calcule Scal_paroi de
- *      facon a egaliser les flux.
+ *      mettre_a_jour retrieves the grad* from the opposite side and computes Scal_paroi
+ *      so as to equalize the fluxes.
  *
  * @sa Champ_front_var_instationnaire Champ_Inc
  */
@@ -98,7 +98,7 @@ public:
   inline const IntVect& get_faces_coin() const;
 
 protected :
-  int is_conduction=0; // Est-on dans un probleme conduction ?
+  int is_conduction=0; // Are we in a conduction problem?
   OBS_PTR(Champ_Inc_base) l_inconnue1;
   OBS_PTR(Champ_Inc_base) l_inconnue2;
   OBS_PTR(Champ_Inc_base) l_inconnue;
@@ -111,7 +111,7 @@ protected :
   Nom nom_pb1;
   Nom nom_pb2;
 
-  IntVect connect_bords; // Tableau de connectivite des faces de bord des deux bord conjugues (en sequentiel)
+  IntVect connect_bords; // Connectivity array of the boundary faces of the two conjugate boundaries (sequential)
   int connect_est_remplit = -1;
 
   DoubleVect gradient_num_local;
@@ -123,8 +123,8 @@ protected :
   DoubleVect coeff_amort_num;
   DoubleVect coeff_amort_denum;
 
-  IntVect elems_voisin_bord_; //Contient le numero de l element voisin pour chaque face de bord
-  IntVect faces_coin;         //Prend la valeur 1 si la face de bord est une face de coin (0 sinon)
+  IntVect elems_voisin_bord_; //Contains the index of the neighboring element for each boundary face
+  IntVect faces_coin;         //Takes the value 1 if the boundary face is a corner face (0 otherwise)
   int verification_faces_coin=0;
 };
 

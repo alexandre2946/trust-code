@@ -61,10 +61,10 @@ void Fluide_reel_base::discretiser(const Probleme_base& pb, const Discretisation
   if (!res_en_T_ && is_incompressible())
     Process::exit("Incompressible fluid :: NOT YET PORTED TO ENTHALPY EQUATION (BUG DEDANS) ! TODO FIXME !!");
 
-  /* masse volumique, energie interne, enthalpie : champ_inc */
+  /* density, internal energy, enthalpy: champ_inc */
   OWN_PTR(Champ_Inc_base) rho_inc, ei_inc, h_ou_T_inc;
   int nc = pb.equation(0).inconnue().nb_valeurs_temporelles();
-  if (is_incompressible()) /* cas incompressible  -> rho champ uniforme */
+  if (is_incompressible()) /* incompressible case -> rho as a uniform field */
     {
       Nom val_rho;
       val_rho = res_en_T_ ? Nom(_rho_(T_ref_, P_ref_)) : Nom(_rho_h_(h_ref_, P_ref_) /* point-to-point */);
@@ -135,7 +135,7 @@ int Fluide_reel_base::initialiser(const double temps)
   ch_e.resize_val_bord();
   ch_e.set_val_bord_fluide_multiphase(true);
 
-  // XXX Elie Saikali : utile pour cas reprise !
+  // XXX Elie Saikali : useful for restart case!
   ch_e.changer_temps(temps);
   ch_h_ou_T.changer_temps(temps);
 
@@ -152,7 +152,7 @@ int Fluide_reel_base::initialiser(const double temps)
 
   if (is_incompressible())
     {
-      mettre_a_jour(temps); // ne depend pas de p et T : on peut terminer l'initialisation
+      mettre_a_jour(temps); // does not depend on p and T: initialization can be completed
       Cerr << "The defined fluid_reel with T_ref = " << T_ref_ << " and P_ref = " << P_ref_ << " is equivalent to :" << finl;
       Cerr << "fluide_incompressible" << finl;
       Cerr << "{" << finl;
@@ -177,9 +177,9 @@ void Fluide_reel_base::preparer_calcul() { mettre_a_jour(t_init_); }
 
 void Fluide_reel_base::mettre_a_jour(double t)
 {
-  double tp = ref_cast(Champ_Inc_base, ch_e_int_.valeur()).temps(); //pour savoir si on va tourner la roue
+  double tp = ref_cast(Champ_Inc_base, ch_e_int_.valeur()).temps(); // to know if we will advance the time wheel
 
-  // XXX Elie Saikali : cas reprise car ch_rho_, ch_e_int_ et ch_h_ou_T_ pas dans les .sauvs !
+  // XXX Elie Saikali : restart case since ch_rho_, ch_e_int_ and ch_h_ou_T_ are not in the .sav files!
   if (t > ch_rho_->temps() && first_maj_)
     {
       ch_rho_->changer_temps(t);
@@ -191,7 +191,7 @@ void Fluide_reel_base::mettre_a_jour(double t)
   ch_e_int_->mettre_a_jour(t);
   ch_h_ou_T_->mettre_a_jour(t);
 
-  // on calcule les props (EOS)
+  // compute the properties (EOS)
   if (res_en_T_)
     is_incompressible() ? calculate_fluid_properties_incompressible() : calculate_fluid_properties();
   else
@@ -238,7 +238,7 @@ void Fluide_reel_base::mettre_a_jour(double t)
       else
         {
           assert(pres.line_size() == 1 && tab_Cp.line_size() == 1 && tab_mu.line_size() == 1 && tab_lambda.line_size() == 1 && tab_beta.line_size() == 1);
-          const int n_comp = temp_ou_enthalp.line_size(); /* on a temp(xx,id_composite_) */
+          const int n_comp = temp_ou_enthalp.line_size(); /* we have temp(xx,id_composite_) */
           MSpanD spans_input;
 
           if (res_en_T_)
@@ -269,7 +269,7 @@ int Fluide_reel_base::check_unknown_range() const
 {
   if (is_incompressible()) return 1;
 
-  int ok = 1, zero = 0, nl = ch_e_int_->valeurs().dimension_tot(0); //on n'impose pas de contraintes aux lignes correspondant a des variables auxiliaires (eg pressions aux faces dans PolyMAC_HFV)
+  int ok = 1, zero = 0, nl = ch_e_int_->valeurs().dimension_tot(0); // no constraints imposed on rows corresponding to auxiliary variables (e.g. face pressures in PolyMAC_HFV)
   for (auto &&i_r : res_en_T_ ? unknown_range() : unknown_range_h())
     {
       const DoubleTab& vals = i_r.first == "pression" ? ref_cast(Navier_Stokes_std, equation("vitesse")).pression().valeurs() : equation(i_r.first).inconnue().valeurs();
@@ -295,10 +295,10 @@ void Fluide_reel_base::abortTimeStep()
 
 bool Fluide_reel_base::initTimeStep(double dt)
 {
-  if (!equation_.size()) return true; //pas d'equation associee -> ???
-  const Schema_Temps_base& sch = equation_.begin()->second->schema_temps(); //on recupere le schema en temps par la 1ere equation
+  if (!equation_.size()) return true; // no associated equation -> ???
+  const Schema_Temps_base& sch = equation_.begin()->second->schema_temps(); // retrieve the time scheme from the first equation
 
-  /* champs dont on doit creer des cases */
+  /* fields for which time levels must be created */
   std::vector<Champ_Inc_base *> vch = { sub_type(Champ_Inc_base, ch_rho_.valeur()) ?& ref_cast(Champ_Inc_base, ch_rho_.valeur()) : nullptr,
                                         &ref_cast(Champ_Inc_base, ch_e_int_.valeur()), &ref_cast(Champ_Inc_base, ch_h_ou_T_.valeur())
                                       };
@@ -330,25 +330,25 @@ void Fluide_reel_base::calculate_fluid_properties_incompressible()
   dT_h.resize(Ni, 1);
   dT_e.resize(Ni, 1);
 
-  VectorD H_REF_(Ni), dTH_(Ni), bH_REF_(Nb), bdTH_(Nb); // Je suis desole ...
+  VectorD H_REF_(Ni), dTH_(Ni), bH_REF_(Nb), bdTH_(Nb); // temporary local vectors
   MLoiSpanD spans_interne = { { Loi_en_T::H, SpanD(H_REF_) }, { Loi_en_T::H_DT, SpanD(dTH_) } };
   MLoiSpanD spans_bord = { { Loi_en_T::H, SpanD(bH_REF_) }, { Loi_en_T::H_DT, SpanD(bdTH_) } };
   _compute_all_pb_multiphase_(spans_interne, spans_bord);
 
   /*
-   * On rempli h et e
-   * En incompressible, on suppose e = h = h*ref + cp * (T -T_ref)
-   * On a aussi cp = dh / dT
+   * Fill h and e.
+   * For incompressible: e = h = h_ref + cp * (T - T_ref)
+   * Also: cp = dh / dT
    */
-  for (int i = 0; i < Ni; i++) /* interne */
+  for (int i = 0; i < Ni; i++) /* internal */
     {
       val_h(i) = H_REF_[i] + dTH_[i] * (T(i, n) - T_ref_);
       val_e(i) = val_h(i);
-      dT_h(i) = dTH_[i]; /* la seule derivee en incompressible */
+      dT_h(i) = dTH_[i]; /* the only derivative for incompressible */
       dT_e(i) = dT_h(i);
     }
 
-  for (int i = 0; i < Nb; i++) /* bord */
+  for (int i = 0; i < Nb; i++) /* boundary */
     {
       bval_h(i) = bH_REF_[i] + bdTH_[i] * (bT(i, n) - T_ref_);
       bval_e(i) = bval_h(i);
@@ -379,19 +379,19 @@ void Fluide_reel_base::calculate_fluid_properties_enthalpie_incompressible()
   _compute_all_pb_multiphase_h_(spans_interne, spans_bord);
 
   /*
-   * On rempli T et e
-   * En incompressible, on suppose e = h
+   * Fill T and e.
+   * For incompressible: e = h
    * T = ( h - h_ref ) / cp + T_ref
    */
-  for (int i = 0; i < Ni; i++) /* interne */
+  for (int i = 0; i < Ni; i++) /* internal */
     {
       val_temp(i,n) = T_REF_[i] + (( enth(i,n) - h_ref_ ) / Cp_[i] - 273.15);
       val_e(i) = enth(i);
-      dh_T(i) = 1. / Cp_[i]; /* la seule derivee en incompressible */
+      dh_T(i) = 1. / Cp_[i]; /* the only derivative for incompressible */
       dh_e(i) = 1.;
     }
 
-  for (int i = 0; i < Nb; i++) /* bord */
+  for (int i = 0; i < Nb; i++) /* boundary */
     {
       bval_temp(i,n) = bT_REF_[i] + (( benth(i,n) - h_ref_ ) / bCp_[i] - 273.15);
       bval_e(i) = benth(i);
@@ -430,13 +430,13 @@ void Fluide_reel_base::calculate_fluid_properties()
   MSpanD spans_input = { { "temperature", T.get_span_tot() }, { "pressure", p.get_span_tot() }, { "bord_temperature", bT.get_span_tot() }, { "bord_pressure", bp.get_span_tot() } };
   MLoiSpanD spans_interne = { }, spans_bord = { };
 
-  // pour rho
+  // for rho
   spans_interne.insert( { Loi_en_T::RHO, val_rho.get_span_tot() });
   spans_interne.insert( { Loi_en_T::RHO_DP, dp_rho.get_span_tot() });
   spans_interne.insert( { Loi_en_T::RHO_DT, dT_rho.get_span_tot() });
   spans_bord.insert( { Loi_en_T::RHO, bval_rho.get_span_tot() });
 
-  // pour h
+  // for h
   spans_interne.insert( { Loi_en_T::H, val_h.get_span_tot() });
   spans_interne.insert( { Loi_en_T::H_DP, dp_h.get_span_tot() });
   spans_interne.insert( { Loi_en_T::H_DT, dT_h.get_span_tot() });
@@ -444,15 +444,15 @@ void Fluide_reel_base::calculate_fluid_properties()
 
   compute_all_pb_multiphase_(spans_input, spans_interne, spans_bord, n_comp, n);
 
-  // energie_interne
-  for (int i = 0; i < Ni; i++) /* interne */
+  // internal energy
+  for (int i = 0; i < Ni; i++) /* internal */
     {
       val_e(i) = val_h(i) - p(i, m) / val_rho(i);
       dp_e(i) = dp_h(i) - 1. / val_rho(i) + p(i, m) * dp_rho(i) / std::pow(val_rho(i) , 2);
       dT_e(i) = dT_h(i) + p(i, m) * dT_rho(i) / std::pow(val_rho(i) , 2);
     }
 
-  for (int i = 0; i < Nb; i++) bval_e(i) = bval_h(i) -  bp(i, m) / bval_rho(i); /* bord */
+  for (int i = 0; i < Nb; i++) bval_e(i) = bval_h(i) -  bp(i, m) / bval_rho(i); /* boundary */
 }
 
 void Fluide_reel_base::calculate_fluid_properties_enthalpie()
@@ -492,13 +492,13 @@ void Fluide_reel_base::calculate_fluid_properties_enthalpie()
   MSpanD spans_input = { { "enthalpie", enth.get_span_tot() }, { "pressure", p.get_span_tot() }, { "bord_enthalpie", benth.get_span_tot() }, { "bord_pressure", bp.get_span_tot() } };
   MLoiSpanD_h spans_interne = { }, spans_bord = { };
 
-  // pour rho
+  // for rho
   spans_interne.insert( { Loi_en_h::RHO, val_rho.get_span_tot() });
   spans_interne.insert( { Loi_en_h::RHO_DP, dp_rho.get_span_tot() });
   spans_interne.insert( { Loi_en_h::RHO_DH, dh_rho.get_span_tot() });
   spans_bord.insert( { Loi_en_h::RHO, bval_rho.get_span_tot() });
 
-  // pour h
+  // for h (enthalpy-based)
   spans_interne.insert( { Loi_en_h::T, val_temp.get_span_tot() });
   spans_interne.insert( { Loi_en_h::T_DP, dp_T.get_span_tot() });
   spans_interne.insert( { Loi_en_h::T_DH, dh_T.get_span_tot() });
@@ -506,24 +506,24 @@ void Fluide_reel_base::calculate_fluid_properties_enthalpie()
 
   compute_all_pb_multiphase_h_(spans_input, spans_interne, spans_bord, n_comp, n);
 
-  // energie_interne
-  for (int i = 0; i < Ni; i++) /* interne */
+  // internal energy
+  for (int i = 0; i < Ni; i++) /* internal */
     {
       val_e(i) = enth(i, n) - p(i, m) / val_rho(i);
       dp_e(i) =  - 1. / val_rho(i) + p(i, m) * dp_rho(i) / std::pow(val_rho(i) , 2);
       dh_e(i) = 1.0 + p(i, m) * dh_rho(i) / std::pow(val_rho(i) , 2);
     }
 
-  for (int i = 0; i < Nb; i++) bval_e(i) = benth(i, n) -  bp(i, m) / bval_rho(i); /* bord */
+  for (int i = 0; i < Nb; i++) bval_e(i) = benth(i, n) -  bp(i, m) / bval_rho(i); /* boundary */
 }
 
 /*
  * *********************
- * Pour l'incompressible
+ * For the incompressible case
  * *********************
  */
 
-/* Lois en T */
+/* Laws in T */
 void Fluide_reel_base::_compute_CPMLB_pb_multiphase_(MLoiSpanD prop) const
 {
   assert((int )prop.size() == 4);
@@ -544,7 +544,7 @@ void Fluide_reel_base::_compute_all_pb_multiphase_(MLoiSpanD inter, MLoiSpanD bo
   _dT_h_(T_ref_, P_ref_, bdTH);
 }
 
-/* Lois en h */
+/* Laws in h */
 void Fluide_reel_base::_compute_CPMLB_pb_multiphase_h_(MLoiSpanD_h prop) const
 {
   assert((int )prop.size() == 4);
@@ -568,11 +568,11 @@ void Fluide_reel_base::_compute_all_pb_multiphase_h_(MLoiSpanD_h inter, MLoiSpan
 
 /*
  * *****************
- * Pour compressible
+ * For the compressible case
  * *****************
  */
 
-/* Lois en T */
+/* Laws in T */
 void Fluide_reel_base::compute_CPMLB_pb_multiphase_(const MSpanD input, MLoiSpanD prop, int ncomp, int id) const
 {
   assert((int )prop.size() == 4);
@@ -624,7 +624,7 @@ void Fluide_reel_base::compute_all_pb_multiphase_(const MSpanD input, MLoiSpanD 
   dT_h_(T, P, dTH, ncomp, id);
 }
 
-/* Lois en h */
+/* Laws in h */
 void Fluide_reel_base::compute_CPMLB_pb_multiphase_h_(const MSpanD input, MLoiSpanD_h prop, int ncomp, int id) const
 {
   assert((int )prop.size() == 4);
@@ -682,7 +682,7 @@ void Fluide_reel_base::compute_all_pb_multiphase_h_(const MSpanD input, MLoiSpan
  */
 
 /*
- * Methodes utiles pour convertir les derivees en h a T (pour Pb_Multiphase).
+ * Helper methods to convert derivatives from h to T (for Pb_Multiphase).
  */
 void Fluide_reel_base::H_to_T::dX_dP_T(const SpanD dX_dP_h, const SpanD dX_dh_P, SpanD dX_dP)
 {
@@ -701,7 +701,7 @@ void Fluide_reel_base::H_to_T::dX_dT_P(const SpanD dX_dP_h, const SpanD dX_dh_P,
 }
 
 /*
- * Methodes utiles pour convertir les derivees en T a h (pour Pb_Multiphase).
+ * Helper methods to convert derivatives from T to h (for Pb_Multiphase).
  */
 void Fluide_reel_base::T_to_H::dX_dP_h(const SpanD dX_dP_T, const SpanD dX_dT_P, SpanD dX_dP)
 {

@@ -26,10 +26,10 @@ Implemente_base(Source_Generique_base,"Source_Generique_base",Source_base);
 
 /*! @brief DOES NOTHING - to override in derived classes.
  *
- *     Imprime la source sur un flot de sortie.
+ *     Prints the source term to an output stream.
  *
- * @param (Sortie& os) le flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) the output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Source_Generique_base::printOn(Sortie& os) const
 {
@@ -38,10 +38,10 @@ Sortie& Source_Generique_base::printOn(Sortie& os) const
 
 /*! @brief DOES NOTHING - to override in derived classes.
  *
- *     Lecture d'un terme source sur un flot d'entree.
+ *     Reads a source term from an input stream.
  *
- * @param (Entree& is) le flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) the input stream
+ * @return (Entree&) the modified input stream
  */
 Entree& Source_Generique_base::readOn(Entree& is)
 {

@@ -79,7 +79,7 @@ void Partitionneur_Union::associer_domaine(const Domaine& domaine)
   ref_domaine_ = domaine;
 }
 
-/*! @brief Lit le contenu du fichier "filename_" et stocke le resultat dans elem_part
+/*! @brief Reads the content of the file "filename_" and stores the result in elem_part
  *
  */
 void Partitionneur_Union::construire_partition(IntVect& elem_part, int& nb_parts_tot) const
@@ -91,7 +91,7 @@ void Partitionneur_Union::construire_partition(IntVect& elem_part, int& nb_parts
     {
       Nom subdomain = Nom(p.first);
       const std::string& filename = p.second;
-      //on recupere le sous-domaine par son nom et le decoupage en ouvrant le fichier...
+      //retrieve the sub-domain by name and the partitioning by opening the file...
       const Objet_U& ref = Interprete::objet(subdomain); // need this or compiler complains of 'possibly' dangling ref
       const Sous_Domaine& ssz = ref_cast(Sous_Domaine, ref);
       EFichier file;
@@ -99,7 +99,7 @@ void Partitionneur_Union::construire_partition(IntVect& elem_part, int& nb_parts
       IntVect dec_ssz;
       file >> dec_ssz;
       file.close();
-      //... et on remplit un morceau de elem_part avec
+      //... and fill a portion of elem_part with it
       if (dec_ssz.size_array() != ssz.nb_elem_tot())
         {
           Cerr << "Partitionneur_Union : incoherent element number for sub-domaine " <<subdomain << finl;

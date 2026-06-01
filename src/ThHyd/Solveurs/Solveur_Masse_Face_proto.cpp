@@ -36,7 +36,7 @@ DoubleTab& Solveur_Masse_Face_proto::appliquer_impl_proto(DoubleTab& sm) const
   int i, e, f, n, N = solv_mass_->equation().inconnue().valeurs().line_size();
   double fac;
 
-  //vitesses aux faces
+  //face velocities
   for (f = 0; f < domaine.nb_faces(); f++)
     for (n = 0; n < N; n++)
       {
@@ -44,9 +44,9 @@ DoubleTab& Solveur_Masse_Face_proto::appliquer_impl_proto(DoubleTab& sm) const
           if ((e = f_e(f, i)) >= 0)
             fac += vfd(f, i) / vf(f) * (a_r ? (*a_r)(e, n) : 1);
         if (fac > 1e-10)
-          sm(f, n) /= pf(f) * vf(f) * fac; //vitesse calculee
+          sm(f, n) /= pf(f) * vf(f) * fac; //computed velocity
         else
-          sm(f, n) = 0; //cas d'une evanescence
+          sm(f, n) = 0; //evanescence case
       }
 
   sm.echange_espace_virtuel();
@@ -56,7 +56,7 @@ DoubleTab& Solveur_Masse_Face_proto::appliquer_impl_proto(DoubleTab& sm) const
 void Solveur_Masse_Face_proto::dimensionner_blocs_proto(matrices_t matrices, const tabs_t& semi_impl, const bool allocate, Stencil& sten) const
 {
   const std::string& nom_inc = solv_mass_->equation().inconnue().le_nom().getString();
-  if (!matrices.count(nom_inc)) return; //rien a faire
+  if (!matrices.count(nom_inc)) return; //nothing to do
 
   Matrice_Morse& mat = *matrices.at(nom_inc), mat2;
   const Domaine_VF& domaine = le_dom_.valeur();
@@ -66,7 +66,7 @@ void Solveur_Masse_Face_proto::dimensionner_blocs_proto(matrices_t matrices, con
   int i, f, m, n, N = inco.line_size();
 
   for (f = 0, i = 0; f < domaine.nb_faces(); f++)
-    for (n = 0; n < N; n++, i++) //faces reelles
+    for (n = 0; n < N; n++, i++) //real faces
       if (corr)
         for (m = 0; m < N; m++) sten.append_line(i, N * f + m);
       else sten.append_line(i, i);
@@ -81,7 +81,7 @@ void Solveur_Masse_Face_proto::dimensionner_blocs_proto(matrices_t matrices, con
 void Solveur_Masse_Face_proto::ajouter_blocs_proto(matrices_t matrices, DoubleTab& secmem, double dt, const tabs_t& semi_impl, int resoudre_en_increments) const
 {
   const DoubleTab& inco = solv_mass_->equation().inconnue().valeurs(), &passe = solv_mass_->equation().inconnue().passe();
-  Matrice_Morse *mat = matrices[solv_mass_->equation().inconnue().le_nom().getString()]; //facultatif
+  Matrice_Morse *mat = matrices[solv_mass_->equation().inconnue().le_nom().getString()]; //optional
   const Domaine_VF& domaine = le_dom_.valeur();
   const IntTab& f_e = domaine.face_voisins();
   const DoubleVect& pf = solv_mass_->equation().milieu().porosite_face(), &vf = domaine.volumes_entrelaces();
@@ -91,19 +91,19 @@ void Solveur_Masse_Face_proto::ajouter_blocs_proto(matrices_t matrices, DoubleTa
   const Masse_ajoutee_base *corr = pbm && pbm->has_correlation("masse_ajoutee") ? &ref_cast(Masse_ajoutee_base, pbm->get_correlation("masse_ajoutee")) : nullptr;
   int i, e, f, m, n, N = inco.line_size(), cR = rho.dimension_tot(0) == 1;
 
-  /* faces : si CLs, pas de produit par alpha * rho en multiphase */
-  DoubleTrav masse(N, N), masse_e(N, N); //masse alpha * rho, contribution
-  for (f = 0; f < domaine.nb_faces(); f++) //faces reelles
+  /* faces: if BCs, no alpha * rho product in multiphase */
+  DoubleTrav masse(N, N), masse_e(N, N); //alpha * rho mass, contribution
+  for (f = 0; f < domaine.nb_faces(); f++) //real faces
     {
       if (!pbm)
-        for (masse = 0, n = 0; n < N; n++) masse(n, n) = vf(f); //pas Pb_Multiphase ou CL -> pas de alpha * rho
+        for (masse = 0, n = 0; n < N; n++) masse(n, n) = vf(f); //not Pb_Multiphase or BC -> no alpha * rho
       else for (masse = 0, i = 0; i < 2; i++)
           if ((e = f_e(f, i)) >= 0)
             {
-              for (masse_e = 0, n = 0; n < N; n++) masse_e(n, n) = (*a_r)(e, n); //partie diagonale
-              if (corr) corr->ajouter(&(*alpha)(e, 0), &rho(!cR * e, 0), masse_e); //partie masse ajoutee
+              for (masse_e = 0, n = 0; n < N; n++) masse_e(n, n) = (*a_r)(e, n); //diagonal part
+              if (corr) corr->ajouter(&(*alpha)(e, 0), &rho(!cR * e, 0), masse_e); //added mass part
               for (n = 0; n < N; n++)
-                for (m = 0; m < N; m++) masse(n, m) += vfd(f, i) * masse_e(n, m); //contribution au alpha * rho de la face
+                for (m = 0; m < N; m++) masse(n, m) += vfd(f, i) * masse_e(n, m); //contribution to face alpha * rho
             }
       for (n = 0; n < N; n++)
         {

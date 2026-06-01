@@ -21,10 +21,10 @@
 #include <TRUSTArray.h>
 #include <assert.h>
 
-/*! @brief Espace distant utilise pour la gestion des tableaux distribues Cette classe permet de decrire un espace distant d'un vecteur de donnees.
+/*! @brief Distant space used for managing distributed arrays. This class describes a distant space of a data vector.
  *
- *     Elle porte un int representant le numero de processeur a qui est destine le domaine decrite.
- *     La description de cet espace distant consiste en un vecteur d'entiers contenant les indices des elements a envoyer.
+ *     It holds an int representing the processor number to which the described domain is destined.
+ *     The description of this distant space consists of an integer vector containing the indices of elements to be sent.
  *
  */
 class Esp_Dist : public TRUSTArray<int>

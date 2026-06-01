@@ -31,7 +31,7 @@ class Terme_Puissance_Thermique_Echange_Impose_Elem_base: public Source_base
 public:
   int has_interface_blocs() const override { return 1; }
   int lire_motcle_non_standard(const Motcle& mot, Entree& is) override;
-  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override { } //rien
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override { } // nothing
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
   void associer_pb(const Probleme_base& ) override { }
   void mettre_a_jour(double ) override;

@@ -20,10 +20,10 @@
 
 Implemente_base(Convection_Diffusion_std,"Convection_Diffusion_standard",Equation_base);
 
-/*! @brief Simple appel a Equation_base::printOn(Sortie&)
+/*! @brief Simple call to Equation_base::printOn(Sortie&)
  *
- * @param (Sortie& is) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& is) output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Convection_Diffusion_std::printOn(Sortie& is) const
 {
@@ -33,10 +33,10 @@ Sortie& Convection_Diffusion_std::printOn(Sortie& is) const
 
 /*! @brief cf Equation_base::readOn(Entree&)
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws terme diffusif non specifie
- * @throws terme convectif non specifie
+ * @param (Entree& is) input stream
+ * @return (Entree&) the modified input stream
+ * @throws diffusive term not specified
+ * @throws convective term not specified
  */
 Entree& Convection_Diffusion_std::readOn(Entree& is)
 {
@@ -77,24 +77,24 @@ int Convection_Diffusion_std::lire_motcle_non_standard(const Motcle& mot, Entree
   else
     return Equation_base::lire_motcle_non_standard(mot,is);
 }
-/*! @brief Renvoie le nombre d'operateurs de l'equation: 2 pour une equation de diffusion.
+/*! @brief Returns the number of operators in the equation: 2 for a diffusion equation.
  *
- * @return (int) le nombre d'operateurs de l'equation
+ * @return (int) the number of operators in the equation
  */
 int Convection_Diffusion_std::nombre_d_operateurs() const
 {
   return 2;
 }
 
-/*! @brief Renvoie l'operateur specifie par son index: renvoie terme_diffusif si i = 0
+/*! @brief Returns the operator at the given index: returns terme_diffusif if i = 0,
  *
- *      renvoie terme_convectif si i = 1
- *      exit si i>1
- *     (version const)
+ *      returns terme_convectif if i = 1,
+ *      exits if i > 1.
+ *      (const version)
  *
- * @param (int i) l'index de l'operateur a renvoyer
- * @return (Operateur&) l'operateur specifie
- * @throws l'equation n'a pas plus de 2 operateurs
+ * @param (int i) the index of the operator to return
+ * @return (Operateur&) the specified operator
+ * @throws the equation has no more than 2 operators
  */
 const Operateur& Convection_Diffusion_std::operateur(int i) const
 {
@@ -110,18 +110,18 @@ const Operateur& Convection_Diffusion_std::operateur(int i) const
       Cerr << "and you are trying to access the " << i <<" th one."<< finl;
       exit();
     }
-  // Pour les compilos!!
+  // For compilers!
   return terme_diffusif;
 }
 
-/*! @brief Renvoie l'operateur specifie par son index: renvoie terme_diffusif si i = 0
+/*! @brief Returns the operator at the given index: returns terme_diffusif if i = 0,
  *
- *      renvoie terme_convectif si i = 1
- *      exit si i>1
+ *      returns terme_convectif if i = 1,
+ *      exits if i > 1.
  *
- * @param (int i) l'index de l'operateur a renvoyer
- * @return (Operateur&) l'operateur specifie
- * @throws l'equation n'a pas plus de 2 operateurs
+ * @param (int i) the index of the operator to return
+ * @return (Operateur&) the specified operator
+ * @throws the equation has no more than 2 operators
  */
 Operateur& Convection_Diffusion_std::operateur(int i)
 {
@@ -137,7 +137,7 @@ Operateur& Convection_Diffusion_std::operateur(int i)
       Cerr << "and you are trying to access the " << i <<" th one."<< finl;
       exit();
     }
-  // Pour les compilos!!
+  // For compilers!
   return terme_diffusif;
 }
 
@@ -156,7 +156,7 @@ const Champ_base& Convection_Diffusion_std::vitesse_pour_transport() const
   return probleme().get_champ("vitesse");
 }
 
-// E. Saikali : Methodes utiles pour un heritage V
+// E. Saikali: useful methods for virtual inheritance (diamond inheritance)
 int Convection_Diffusion_std::sauvegarder_base(Sortie& os) const
 {
   return Equation_base::sauvegarder(os);

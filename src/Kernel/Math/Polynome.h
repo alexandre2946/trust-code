@@ -19,7 +19,7 @@
 #include <TRUSTTab.h>
 
 
-/*! @brief Polynome a n variables, n <= 4 Implementation des coefficients a l'aide d'un DoubleTab
+/*! @brief Polynomial in n variables, n <= 4. Coefficients are stored using a DoubleTab.
  *
  */
 class Polynome : public Objet_U
@@ -71,55 +71,55 @@ private :
 
 
 
-/*! @brief Construction d'un polynome a une variable de degre n1
+/*! @brief Constructs a polynomial in one variable of degree n1.
  *
- * @param (int n1) degre du polynome
+ * @param (int n1) degree of the polynomial
  */
 inline Polynome::Polynome(int n1) : coeff_(++n1) {}
 
-/*! @brief Construction d'un polynome a 2 variables de degres n1 et n2
+/*! @brief Constructs a polynomial in 2 variables of degrees n1 and n2.
  *
- * @param (int n1) degre de la premiere variable
- * @param (int n2) degre de la deuxieme variable
+ * @param (int n1) degree of the first variable
+ * @param (int n2) degree of the second variable
  */
 inline Polynome::Polynome(int n1, int n2) : coeff_(++n1, ++n2) {}
 
-/*! @brief Construction d'un polynome a 3 variables de degres n1, n2 et n3
+/*! @brief Constructs a polynomial in 3 variables of degrees n1, n2 and n3.
  *
- * @param (int n1) degre de la premiere variable
- * @param (int n2) degre de la deuxieme variable
- * @param (int n3) degre de la troisieme variable
+ * @param (int n1) degree of the first variable
+ * @param (int n2) degree of the second variable
+ * @param (int n3) degree of the third variable
  */
 inline Polynome::Polynome(int n1, int n2, int n3) : coeff_(++n1, ++n2, ++n3) {}
 
-/*! @brief Construction d'un polynome a 4 variables de degres n1, n2, n3 et n4
+/*! @brief Constructs a polynomial in 4 variables of degrees n1, n2, n3 and n4.
  *
- * @param (int n1) degre de la premiere variable
- * @param (int n2) degre de la deuxieme variable
- * @param (int n3) degre de la troisieme variable
- * @param (int n4) degre de la quatrieme variable
+ * @param (int n1) degree of the first variable
+ * @param (int n2) degree of the second variable
+ * @param (int n3) degree of the third variable
+ * @param (int n4) degree of the fourth variable
  */
 inline Polynome::Polynome(int n1, int n2, int n3, int n4) : coeff_(++n1, ++n2, ++n3, ++n4) {}
 
-/*! @brief Construction d'un polynome a partir du tableau de ses coefficients
+/*! @brief Constructs a polynomial from its coefficient array.
  *
- * @param (const DoubleTab& t) le tableau des coefficients du polynome (1 a 4 dimensions)
+ * @param (const DoubleTab& t) the coefficient array of the polynomial (1 to 4 dimensions)
  */
 inline Polynome::Polynome(const DoubleTab& t) : coeff_(t) {}
 
-/*! @brief Retourne le degre du polynome par rapport a la ieme variable
+/*! @brief Returns the degree of the polynomial with respect to the i-th variable.
  *
- * @param (int i) l'indice de la variable consideree
- * @return (int) degre du polynome
+ * @param (int i) index of the variable
+ * @return (int) degree of the polynomial
  */
 inline int Polynome::degre(int i) const
 {
   return coeff_.dimension(i)-1;
 }
 
-/*! @brief Retourne le coefficient du terme de degre n1
+/*! @brief Returns the coefficient of the term of degree n1.
  *
- * @param (int n1) degre
+ * @param (int n1) degree
  * @return (double&) coefficient
  */
 inline double& Polynome::coeff(int n1)
@@ -127,10 +127,10 @@ inline double& Polynome::coeff(int n1)
   return coeff_(n1);
 }
 
-/*! @brief Retourne le coefficient du terme de degre n1,n2
+/*! @brief Returns the coefficient of the term of degree (n1, n2).
  *
- * @param (int n1) degre
- * @param (int n2) degre
+ * @param (int n1) degree in first variable
+ * @param (int n2) degree in second variable
  * @return (double&) coefficient
  */
 inline double& Polynome::coeff(int n1, int n2)
@@ -138,11 +138,11 @@ inline double& Polynome::coeff(int n1, int n2)
   return coeff_(n1, n2);
 }
 
-/*! @brief Retourne le coefficient du terme de degre n1,n2,n3
+/*! @brief Returns the coefficient of the term of degree (n1, n2, n3).
  *
- * @param (int n1) degre
- * @param (int n2) degre
- * @param (int n3) degre
+ * @param (int n1) degree in first variable
+ * @param (int n2) degree in second variable
+ * @param (int n3) degree in third variable
  * @return (double&) coefficient
  */
 inline double& Polynome::coeff(int n1, int n2, int n3)
@@ -150,12 +150,12 @@ inline double& Polynome::coeff(int n1, int n2, int n3)
   return coeff_(n1, n2, n3);
 }
 
-/*! @brief Retourne le coefficient du terme de degre n1,n2,n3,n4
+/*! @brief Returns the coefficient of the term of degree (n1, n2, n3, n4).
  *
- * @param (int n1) degre
- * @param (int n2) degre
- * @param (int n3) degre
- * @param (int n4) degre
+ * @param (int n1) degree in first variable
+ * @param (int n2) degree in second variable
+ * @param (int n3) degree in third variable
+ * @param (int n4) degree in fourth variable
  * @return (double&) coefficient
  */
 inline double& Polynome::coeff(int n1, int n2, int n3, int n4)
@@ -163,9 +163,9 @@ inline double& Polynome::coeff(int n1, int n2, int n3, int n4)
   return coeff_(n1, n2, n3, n4);
 }
 
-/*! @brief Retourne le coefficient du terme de degre n1
+/*! @brief Returns the coefficient of the term of degree n1 (const).
  *
- * @param (int n1) degre
+ * @param (int n1) degree
  * @return (double) coefficient
  */
 inline double Polynome::coeff(int n1) const
@@ -173,10 +173,10 @@ inline double Polynome::coeff(int n1) const
   return coeff_(n1);
 }
 
-/*! @brief Retourne le coefficient du terme de degre n1,n2
+/*! @brief Returns the coefficient of the term of degree (n1, n2) (const).
  *
- * @param (int n1) degre
- * @param (int n2) degre
+ * @param (int n1) degree in first variable
+ * @param (int n2) degree in second variable
  * @return (double) coefficient
  */
 inline double Polynome::coeff(int n1, int n2) const
@@ -184,11 +184,11 @@ inline double Polynome::coeff(int n1, int n2) const
   return coeff_(n1, n2);
 }
 
-/*! @brief Retourne le coefficient du terme de degre n1,n2,n3
+/*! @brief Returns the coefficient of the term of degree (n1, n2, n3) (const).
  *
- * @param (int n1) degre
- * @param (int n2) degre
- * @param (int n3) degre
+ * @param (int n1) degree in first variable
+ * @param (int n2) degree in second variable
+ * @param (int n3) degree in third variable
  * @return (double) coefficient
  */
 inline double Polynome::coeff(int n1, int n2, int n3) const
@@ -196,12 +196,12 @@ inline double Polynome::coeff(int n1, int n2, int n3) const
   return coeff_(n1, n2, n3);
 }
 
-/*! @brief Retourne le coefficient du terme de degre n1,n2,n3,n4
+/*! @brief Returns the coefficient of the term of degree (n1, n2, n3, n4) (const).
  *
- * @param (int n1) degre
- * @param (int n2) degre
- * @param (int n3) degre
- * @param (int n4) degre
+ * @param (int n1) degree in first variable
+ * @param (int n2) degree in second variable
+ * @param (int n3) degree in third variable
+ * @param (int n4) degree in fourth variable
  * @return (double) coefficient
  */
 inline double Polynome::coeff(int n1, int n2, int n3, int n4) const

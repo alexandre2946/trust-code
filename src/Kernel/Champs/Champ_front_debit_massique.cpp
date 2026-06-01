@@ -42,7 +42,7 @@ void Champ_front_debit_massique::initialiser_coefficient(const Champ_Inc_base& i
 {
   Champ_front_debit::initialiser_coefficient(inco, temps);
   ch_rho = &inco.equation().milieu().masse_volumique();
-  if (sub_type(Champ_Uniforme, *ch_rho)) //rho constant : on calcule le coeff maintenant, puis on ne le fait plus
+  if (sub_type(Champ_Uniforme, *ch_rho)) //rho constant: we compute the coefficient now and will not do it again
     update_coeff(temps), update_coeff_ = false;
   else update_coeff_ = true;
 }
@@ -50,7 +50,7 @@ void Champ_front_debit_massique::initialiser_coefficient(const Champ_Inc_base& i
 void Champ_front_debit_massique::update_coeff(double temps)
 {
   int i, fb, n, N = coeff_.line_size(), cR = sub_type(Champ_Uniforme, *ch_rho);
-  DoubleTab rho_bord = cR ? ch_rho->valeurs() : ch_rho->valeur_aux_bords(); /* si rho uniforme, on ne peut pas appeler valeur_aux_bords() */
+  DoubleTab rho_bord = cR ? ch_rho->valeurs() : ch_rho->valeur_aux_bords(); /* if rho is uniform, valeur_aux_bords() cannot be called */
   const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_dis());
   const Front_VF& le_bord= ref_cast(Front_VF,frontiere_dis());
   for(i = 0; i < le_bord.nb_faces_tot(); i++)

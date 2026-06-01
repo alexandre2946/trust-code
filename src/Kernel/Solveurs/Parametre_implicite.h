@@ -21,9 +21,9 @@
 #include <SolveurSys.h>
 #include <Parser_U.h>
 
-/*! @brief classe Parametre_implicite Un objet Parametre_implicite est un objet regroupant les differentes
+/*! @brief class Parametre_implicite A Parametre_implicite object groups together the various
  *
- *      options specifiques pour piso ou simpler
+ *      options specific to piso or simpler
  *
  *
  *

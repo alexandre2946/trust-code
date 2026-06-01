@@ -18,7 +18,7 @@
 
 Implemente_base(Solveur_non_lineaire,"Solveur_non_lineaire",Solveur_Implicite_base);
 
-/*! @brief voir Solveur::printOn
+/*! @brief see Solveur::printOn
  *
  */
 

@@ -72,12 +72,12 @@ std::vector<YAML_data> Convection_Diffusion_Chaleur_Turbulent_QC::data_a_sauvega
   return data;
 }
 
-/*! @brief Sauvegarde sur un flot de sortie, double appel a: Convection_Diffusion_Temperature::sauvegarder(Sortie& );
+/*! @brief Saves to an output stream via a double call to: Convection_Diffusion_Chaleur_QC::sauvegarder(Sortie&);
  *
- *       Convection_Diffusion_Turbulent::sauvegarder(Sortie& );
+ *       and Convection_Diffusion_Turbulent::sauvegarder(Sortie&);
  *
- * @param (Sortie& os) un flot de sortie
- * @return (int) renvoie toujours 1
+ * @param os Output stream.
+ * @return Always returns 1.
  */
 int Convection_Diffusion_Chaleur_Turbulent_QC::sauvegarder(Sortie& os) const
 {
@@ -87,12 +87,12 @@ int Convection_Diffusion_Chaleur_Turbulent_QC::sauvegarder(Sortie& os) const
   return bytes;
 }
 
-/*! @brief Reprise a partir d'un flot d'entree, double appel a: Convection_Diffusion_Temperature::reprendre(Entree& );
+/*! @brief Restores from an input stream via a double call to: Convection_Diffusion_Chaleur_QC::reprendre(Entree&);
  *
- *       Convection_Diffusion_Turbulent::reprendre(Entree&);
+ *       and Convection_Diffusion_Turbulent::reprendre(Entree&);
  *
- * @param (Entree& is) un flot d'entree
- * @return (int) renvoie toujours 1
+ * @param is Input stream.
+ * @return Always returns 1.
  */
 int Convection_Diffusion_Chaleur_Turbulent_QC::reprendre(Entree& is)
 {
@@ -101,9 +101,9 @@ int Convection_Diffusion_Chaleur_Turbulent_QC::reprendre(Entree& is)
   return 1;
 }
 
-/*! @brief Double appel a: Convection_Diffusion_Turbulent::completer()
+/*! @brief Double call to: Convection_Diffusion_Turbulent::completer()
  *
- *      Convection_Diffusion_Temperature::completer()
+ *      and Convection_Diffusion_Chaleur_QC::completer()
  *
  */
 void Convection_Diffusion_Chaleur_Turbulent_QC::completer()
@@ -112,11 +112,11 @@ void Convection_Diffusion_Chaleur_Turbulent_QC::completer()
   Convection_Diffusion_Chaleur_QC::completer();
 }
 
-/*! @brief Mise a jour en temps de l'equation, double appel a: Convection_Diffusion_Temperature::mettre_a_jour(double );
+/*! @brief Time update of the equation: calls Convection_Diffusion_Chaleur_QC::mettre_a_jour(double).
  *
- *       Convection_Diffusion_Turbulent::mettre_a_jour(double );
+ * The turbulence model update is called separately via mettre_a_jour_modele().
  *
- * @param (double temps) le temps de mise a jour
+ * @param temps Current time.
  */
 void Convection_Diffusion_Chaleur_Turbulent_QC::mettre_a_jour(double temps)
 {
@@ -145,7 +145,7 @@ bool Convection_Diffusion_Chaleur_Turbulent_QC::has_champ(const Motcle& nom, OBS
     if (le_modele_turbulence->has_champ(nom, ref_champ))
       return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 bool Convection_Diffusion_Chaleur_Turbulent_QC::has_champ(const Motcle& nom) const
@@ -157,7 +157,7 @@ bool Convection_Diffusion_Chaleur_Turbulent_QC::has_champ(const Motcle& nom) con
     if (le_modele_turbulence->has_champ(nom))
       return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 const Champ_base& Convection_Diffusion_Chaleur_Turbulent_QC::get_champ(const Motcle& nom) const
@@ -182,11 +182,11 @@ void Convection_Diffusion_Chaleur_Turbulent_QC::get_noms_champs_postraitables(No
     le_modele_turbulence->get_noms_champs_postraitables(nom, opt);
 }
 
-/*! @brief Double appel a: Convection_Diffusion_Turbulent::preparer_calcul()
+/*! @brief Double call to: Convection_Diffusion_Turbulent::preparer_calcul()
  *
- *       Convection_Diffusion_Temperature::preparer_calcul()
+ *       and Convection_Diffusion_Chaleur_QC::preparer_calcul()
  *
- * @return (int) renvoie toujours 1
+ * @return Always returns 1.
  */
 int Convection_Diffusion_Chaleur_Turbulent_QC::preparer_calcul()
 {

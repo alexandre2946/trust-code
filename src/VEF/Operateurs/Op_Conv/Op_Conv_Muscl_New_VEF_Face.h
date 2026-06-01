@@ -25,14 +25,13 @@ class Sous_domaine_VF;
 
 /*! @brief class Op_Conv_Muscl_New_VEF_Face
  *
- *   Cette classe represente l'operateur de convection associe a une equation de
- *   transport d'un scalaire.
- *   La discretisation est VEF
- *   Le champ convecte est scalaire ou vecteur de type Champ_P1NC
- *   Le schema de convection est issu du papier
+ *   This class represents the convection operator associated with a scalar transport equation.
+ *   The discretization is VEF.
+ *   The convected field is a scalar or vector of type Champ_P1NC.
+ *   The convection scheme is derived from the paper
  *   "High-resolution FEM-TVD schemes based on a fully multidimensional flux limiter"
  *    D.Kuzmin and S.Turek.
- *   On herite de Op pour recuperer l'implicitation amont
+ *   Inherits from Op to recover upwind implicitation.
  *
  *
  * @sa Operateur_Conv_base
@@ -46,17 +45,17 @@ class Op_Conv_Muscl_New_VEF_Face : public Op_Conv_VEF_Face
 
 public:
 
-  //Methodes annexes
+  //Auxiliary methods
   void remplir_fluent() const override;
   //int is_compressible() const { return 1;/* is_compressible_; */ }
 
   void completer() override;
 
-  //Methodes pour l'explicite
+  //Methods for explicit assembly
   DoubleTab& ajouter(const DoubleTab& , DoubleTab& ) const override;
   double calculer_dt_stab() const override;
 
-  //Methodes pour l'implicite
+  //Methods for implicit assembly
   void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override;
   void ajouter_contribution(const DoubleTab&, Matrice_Morse&) const override;
 
@@ -75,9 +74,9 @@ public:
 
 private :
 
-  //Methodes annexes
+  //Auxiliary methods
 
-  //Methodes pour l'explicite
+  //Methods for explicit assembly
 
   void modifier_flux_operateur_centre(DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const int,const DoubleTab&,const DoubleTab&) const;
 
@@ -87,13 +86,13 @@ private :
   KOKKOS_INLINE_FUNCTION void calculer_senseur(CDoubleTabView3, CDoubleTabView4, CDoubleArrView, const int, const int, const int, CIntTabView, CIntTabView, CIntTabView, double&, double&, double&, double&) const;
   void calculer_data_pour_dirichlet();
 
-  //Attributs de la classe
+  //Class attributes
   IntTab is_element_for_upwinding_;
   IntVect is_dirichlet_faces_;
 
   //ArrOfDouble alpha_tab;
-  //ArrOfDouble beta_; // vaut zero pour les faces ou l'on souhaite degenerer en Amont.
-  //  mutable DoubleTab limiteurs_;//tableau stockant pour chaque face la moyenne algebrique du limiteur
+  //ArrOfDouble beta_; // zero on faces where upwind (Amont) degeneration is desired.
+  //  mutable DoubleTab limiteurs_;//array storing for each face the algebraic mean of the limiter
 
   double max_limiteur_ = 1.;
   int centered_ = 1;
@@ -103,7 +102,7 @@ private :
   int version_ = 2;
   int facsec_auto_ = 0;
 
-  // bool sous_domaine;  // Cas d'un sous-domaine a definir pour que l'EF_Stab degenere en Amont
+  // bool sous_domaine;  // Sub-domain case to define so that EF_Stab degenerates to upwind (Amont)
   Nom nom_sous_domaine;
   //OBS_PTR(Sous_domaine_VF) le_sous_domaine_dis;
 

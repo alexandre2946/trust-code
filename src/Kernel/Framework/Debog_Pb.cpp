@@ -51,9 +51,9 @@ Sortie& Debog_Pb::printOn(Sortie& os) const
   return os;
 }
 
-/*! @brief methode appelee des qu'une erreur est trouvee dans l'espace reel.
+/*! @brief Method called as soon as an error is found in real space.
  *
- * (utile pour poser un breakpoint dans gdb)
+ * (useful for setting a breakpoint in gdb)
  *
  */
 void Debog_Pb::error_function()
@@ -98,7 +98,7 @@ Entree& Debog_Pb::readOn(Entree& is)
 
   if (mode_db_ == 0)
     {
-      // Ecriture:
+      // Writing:
       write_geometry_data();
       write_debog_data_file_.ouvrir(fichier_debog_);
       write_debog_data_file_.setf(ios::scientific);
@@ -131,7 +131,7 @@ void Debog_Pb::goto_msg(const char *const message)
   Nom dummy;
   Nom n;
   int num;
-  Nom msg(message); // copie sans les espaces avant/apres
+  Nom msg(message); // copy without leading/trailing spaces
   while (msg.debute_par(" "))
     msg.suffix(" ");
   while (msg.finit_par(" "))
@@ -224,8 +224,8 @@ void Debog_Pb::add_renum_item(const DoubleTab& coord_ref, const DoubleTab& coord
 
   const double epsilon = Objet_U::precision_geom;
 
-  // On cree un octree contenant les points du domaine de reference
-  // et on cherche chaque point du domaine local dans cet octree.
+  // We create an octree containing the points of the reference domain
+  // and we search for each point of the local domain in this octree.
   Octree_Double octree;
   octree.build_nodes(coord_ref, 1 /* include_virtual_items */);
 
@@ -249,8 +249,8 @@ void Debog_Pb::add_renum_item(const DoubleTab& coord_ref, const DoubleTab& coord
       for (int j = 0; j < dim; j++)
         center[j] = coord_par(i,j);
       octree.search_elements_box(center, epsilon, elements);
-      // la premiere recherche renvoie tous les sommets potentiellement proches.
-      // il faut faire ensuite un test sur chaque sommet:
+      // the first search returns all potentially close vertices.
+      // a test must then be performed on each vertex:
       octree.search_nodes_close_to(center, coord_ref, elements, epsilon);
       const int k = elements.size_array();
       if (k != 1)
@@ -282,12 +282,12 @@ void Debog_Pb::read_geometry_data()
   const Domaine_dis_base& zd = ref_pb_->domaine_dis();
   const Domaine_VF& zvf = ref_cast(Domaine_VF, zd);
   {
-    DoubleTab coord_som_seq; // sommets
-    DoubleTab xp_seq; // centres des elements
-    // Il faut passer dans un groupe monoprocesseur pour Domaine::readOn:
+    DoubleTab coord_som_seq; // vertices
+    DoubleTab xp_seq; // element centers
+    // We must enter a single-processor group for Domaine::readOn:
     {
       OWN_PTR(Comm_Group) group;
-      ArrOfInt liste_procs(1); // Liste de 1 processeur contenant le proc 0
+      ArrOfInt liste_procs(1); // List of 1 processor containing proc 0
       PE_Groups::create_group(liste_procs, group, 1);
       if (PE_Groups::enter_group(group.valeur()))
         {
@@ -300,20 +300,20 @@ void Debog_Pb::read_geometry_data()
           PE_Groups::exit_group();
         }
     }
-    // Tous les processeurs recoivent les coordonnees des sommets de reference
-    // (detruire le descripteur sinon printOn refuse d'envoyer le vecteur)
+    // All processors receive the coordinates of the reference vertices
+    // (destroy the descriptor otherwise printOn refuses to send the vector)
     coord_som_seq.set_md_vector(MD_Vector());
     envoyer_broadcast(coord_som_seq, 0);
-    // Idem avec les centres des elements
+    // Same for element centers
     xp_seq.set_md_vector(MD_Vector());
     envoyer_broadcast(xp_seq, 0);
 
-    // Calculer les renumerotations:
+    // Compute the renumberings:
     const DoubleTab& coord_som = dom.coord_sommets();
     const MD_Vector& md_som = dom.coord_sommets().get_md_vector();
     add_renum_item(coord_som_seq, coord_som, md_som, "SOM");
     const DoubleTab& xp = zvf.xp();
-    // Le tableau xp n'a pas de structure parallele, on la prend dans les elements...
+    // The xp array has no parallel structure, we take it from the elements...
     const MD_Vector& md_elem = dom.les_elems().get_md_vector();
     add_renum_item(xp_seq, xp, md_elem, "ELEM");
   }
@@ -327,12 +327,12 @@ void Debog_Pb::read_geometry_data()
         f.precision(20);
         {
           IntTab elem_faces;
-          f >> elem_faces; // non utilise
+          f >> elem_faces; // not used
         }
         f >> xv_seq;
         {
           IntTab face_voisins;
-          f >> face_voisins; // non utilise
+          f >> face_voisins; // not used
         }
         f.set_error_action(Entree::ERROR_EXCEPTION);
         try
@@ -383,24 +383,24 @@ void Debog_Pb::set_nom_pb_actuel(const Nom& nom)
   nom_pb_actuel_ = nom;
 }
 
-/*! @brief md_lignes: descripteur des indices de lignes (cad descripteur du vecteur b dans A*x=b) mb_colonnes: idem, indices colonnes (cad descripteur du vecteur x dans A*x=b)
+/*! @brief md_lignes: descriptor of row indices (i.e. descriptor of vector b in A*x=b) md_colonnes: same, column indices (i.e. descriptor of vector x in A*x=b)
  *
  */
 void Debog_Pb::verifier_matrice(const char *const msg, const Matrice_Base& matrice, const MD_Vector& md_lignes, const MD_Vector& md_colonnes)
 {
-  // Attention: cette implementation ne marche que pour les types md_colonnes enregistres dans renum_array_
-  //  (cad types simples sommets, elements, faces, aretes, et pas les MD_Vector_composite)
-  // et uniquement pour linesize==1 (une ligne et une colonne de la matrice par item)
+  // Warning: this implementation only works for md_colonnes types registered in renum_array_
+  //  (i.e. simple types: vertices, elements, faces, edges, and not MD_Vector_composite)
+  // and only for linesize==1 (one row and one column of the matrix per item)
 
-  // Pour chaque colonne i de la matrice, ecriture du produit matrice * vecteur_i
-  //  avec vecteur_i[j] = (i==j);
+  // For each column i of the matrix, writing the product matrix * vector_i
+  //  with vector_i[j] = (i==j);
   DoubleVect vecteur_i;
   DoubleVect tmp;
   MD_Vector_tools::creer_tableau_distribue(md_colonnes, vecteur_i);
   MD_Vector_tools::creer_tableau_distribue(md_lignes, tmp);
   Nom id;
 
-  // Boucle sur les items sequentiels du vecteur x de A*x=b
+  // Loop over the sequential items of the vector x in A*x=b
   const trustIdType nbc0 = md_colonnes->nb_items_seq_tot();
   if (nbc0 > std::numeric_limits<int>::max())
     Process::exit("Debog_Pb::verifier_matrice() - total number of items too big!");
@@ -415,11 +415,11 @@ void Debog_Pb::verifier_matrice(const char *const msg, const Matrice_Base& matri
         }
       else
         {
-          // Recherche l'indice local correspondant a l'indice sequentiel i
-          // Si i est un item virtuel on le prend quand meme: vecteur_i aura son espace virtuel a jour
-          // Si i n'existe pas sur ce processeur, on met -1
+          // Search for the local index corresponding to the sequential index i
+          // If i is a virtual item we take it anyway: vecteur_i will have its virtual space up to date
+          // If i does not exist on this processor, we set -1
           renum_i = -1;
-          // Renum_colonnes[j] est l'indice dans le vecteur de reference sequentiel de l'item j sur ce processeur
+          // Renum_colonnes[j] is the index in the sequential reference vector of item j on this processor
           const IntVect& renum_colonnes = find_renum_vector(md_colonnes, id);
           const int sz = renum_colonnes.size_totale();
           for (int j = 0; j < sz; j++)
@@ -445,7 +445,7 @@ void Debog_Pb::verifier_matrice(const char *const msg, const Matrice_Base& matri
 
 void Debog_Pb::verifier_Mat_elems(const char* const msg, const Matrice_Base& la_matrice)
 {
-  // Cherche le md_vecteur des elements
+  // Search for the md_vector of elements
 
   const int n = renum_id_.size();
   int i;

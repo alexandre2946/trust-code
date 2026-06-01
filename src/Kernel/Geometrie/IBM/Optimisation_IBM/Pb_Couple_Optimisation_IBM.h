@@ -57,9 +57,9 @@ protected:
   OBS_PTR(Probleme_base) pb_etat_opt_;
   OBS_PTR(Probleme_base) pb_adjt_opt_;
   OBS_PTR(Probleme_base) pb_projection_opt_;
-  OWN_PTR(Champ_Don_base) source_derivee_forme_; // Second membre scalaire equ projection (scalaire par element)
-  OWN_PTR(Champ_Don_base) normal_derivee_forme_; // Second membre scalaire equ projection (vecteur norme par element)
-  OWN_PTR(Champ_Don_base) fonction_cout_lu_,fonction_cout_; // Fonction cout scalaire (par element)
+  OWN_PTR(Champ_Don_base) source_derivee_forme_; // Scalar right-hand side of the projection equation (scalar per element)
+  OWN_PTR(Champ_Don_base) normal_derivee_forme_; // Scalar right-hand side of the projection equation (normalized vector per element)
+  OWN_PTR(Champ_Don_base) fonction_cout_lu_,fonction_cout_; // Scalar cost function (per element)
   double alpha_ = 1.;
   double pond_shap_deriv_for_proj_ = 1.;
   int regul_PDF_shape_deriv_ = 0 ;

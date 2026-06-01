@@ -61,10 +61,10 @@ Sortie& Champ_Generique_Extraction::printOn(Sortie& os) const
   return os;
 }
 
-//  domaine           : lecture du nom du domaine d extraction pour initialiser la reference domaine_
-//  nom_frontiere : lecture du nom de la frontiere sur laquelle on veut faire l extraction
-//  methode           : specification de la methode choisie pour extraire les valeurs
-//                    (optionnel : trace par defaut ou champ_frontiere)
+//  domaine           : read the name of the extraction domain to initialize the reference domaine_
+//  nom_frontiere : read the name of the boundary on which the extraction is to be performed
+//  methode           : specification of the chosen method to extract the values
+//                    (optional: trace by default or champ_frontiere)
 void Champ_Generique_Extraction::set_param(Param& param) const
 {
   Champ_Gen_de_Champs_Gen::set_param(param);
@@ -75,9 +75,9 @@ void Champ_Generique_Extraction::set_param(Param& param) const
   param.ajouter("methode",&methode_);                      // XD attr methode chaine(into=["trace","champ_frontiere"]) methode OPT name of the extraction method (trace by_default or champ_frontiere)
 }
 
-//Renvoie la directive (champ_elem, champ_sommets, champ_face ou pression)
-//pour lancer la discretisation de l espace de stockage rendu par
-//la methode get_champ() du Champ_Generique_base qui a lance l appel de cette methode
+//Returns the directive (champ_elem, champ_sommets, champ_face or pression)
+//to launch the discretisation of the storage space returned by
+//the get_champ() method of the Champ_Generique_base that triggered the call
 const Motcle Champ_Generique_Extraction::get_directive_pour_discr() const
 {
   Motcle directive;
@@ -96,7 +96,7 @@ const Champ_base& Champ_Generique_Extraction::get_champ_without_evaluation(OWN_P
   espace_stockage = creer_espace_stockage(nature_source,nb_comp,es_tmp);
   return espace_stockage;
 }
-/*! @brief Extraction des valeurs d un champ (trace ou champ frontiere) sur un bord du domaine
+/*! @brief Extraction of the values of a field (trace or boundary field) on a boundary of the domain
  *
  */
 const Champ_base& Champ_Generique_Extraction::get_champ(OWN_PTR(Champ_base)& espace_stockage) const
@@ -110,7 +110,7 @@ const Champ_base& Champ_Generique_Extraction::get_champ(OWN_PTR(Champ_base)& esp
   const Domaine_dis_base& domaine_dis_source = source.get_ref_domaine_dis_base();
   const Nature_du_champ& nature_source = source_stockage.nature_du_champ();
 
-  //Le test suivant n est pas dans completer() car utilise equation() : la reference doit etre initialisee
+  //The following test is not in completer() because it uses equation(): the reference must be initialized
   if (methode_=="champ_frontiere")
     {
       int num_bord =  domaine_dis_source.rang_frontiere(nom_fr_);
@@ -127,7 +127,7 @@ const Champ_base& Champ_Generique_Extraction::get_champ(OWN_PTR(Champ_base)& esp
     }
 
 
-  //Probleme pour discretisation du domaine d extraction (dimension)
+  //Problem for discretization of the extraction domain (dimension)
   ////const Domaine_dis_base& domaine_dis = get_ref_domaine_dis_base();
 
   int nb_comp_source = source_stockage.nb_comp();
@@ -158,15 +158,15 @@ const Champ_base& Champ_Generique_Extraction::get_champ(OWN_PTR(Champ_base)& esp
   else
     nb_comp = nb_comp_source;
 
-  //La trace rend systematiquement un tableau de valeurs aux faces de depart
-  //et un champ frontiere discretise est dimensionne par rapport au nombre de faces
-  //de la frontiere : dans les deux cas nb_ddl = nb_faces
+  //The trace systematically returns an array of values at the source faces
+  //and a discretized boundary field is dimensioned relative to the number of faces
+  //of the boundary: in both cases nb_ddl = nb_faces
   const Frontiere_dis_base& fr_dis = domaine_dis_source.frontiere_dis(nom_fr_);
   const Frontiere& la_frontiere = fr_dis.frontiere();
   nb_ddl = la_frontiere.nb_faces();
 
-  //le Domaine discretise a associer n est actuellement pas disponible
-  //On associe pas de domaine_discretisee et on ne fixe pas nb_valeurs_nodales
+  //the discretized domain to associate is currently not available
+  //We do not associate a domaine_discretisee and do not set nb_valeurs_nodales
   espace_stockage.typer(type_espace_stockage);
   ////espace_stockage.associer_domaine_dis_base(domaine_dis);
   espace_stockage->fixer_nb_comp(nb_comp);
@@ -177,11 +177,11 @@ const Champ_base& Champ_Generique_Extraction::get_champ(OWN_PTR(Champ_base)& esp
   const int N = source_valeurs.line_size();
   espace_valeurs.resize(nb_ddl,nb_comp);
 
-  if (methode_=="trace")                         //On prend la trace du champ sur un bord
+  if (methode_=="trace")                         //We take the trace of the field on a boundary
     {
       source_stockage.trace(fr_dis,espace_valeurs,temps,0);
     }
-  else if (methode_=="champ_frontiere")                //On recupere le champ frontiere
+  else if (methode_=="champ_frontiere")                //We retrieve the boundary field
     {
       int num_bord =  domaine_dis_source.rang_frontiere(nom_fr_);
       const Champ_Inc_base& source_inconnue = ref_cast(Champ_Inc_base,source_stockage);
@@ -197,7 +197,7 @@ const Champ_base& Champ_Generique_Extraction::get_champ(OWN_PTR(Champ_base)& esp
         espace_valeurs = champ_fr.valeurs();
     }
 
-  //L espace de stockage n a pas actuellement d espace virtuel
+  //The storage space currently has no virtual space
   ////espace_valeurs.echange_espace_virtuel();
 
   return espace_stockage;
@@ -231,7 +231,7 @@ const Noms Champ_Generique_Extraction::get_property(const Motcle& query) const
   return Champ_Gen_de_Champs_Gen::get_property(query);
 
 }
-//Nomme le champ en tant que source par defaut
+//Name the field as a source by default
 //"Extraction_" + nom_champ_source
 void Champ_Generique_Extraction::nommer_source()
 {
@@ -246,11 +246,11 @@ void Champ_Generique_Extraction::nommer_source()
     }
 }
 
-// La methode completer complete le domaine d extraction declare dans le jeu de donnes
-// auquel la classe fait reference:
-// - ajout d un domaine (de type Pave)
-// - on determine les coordonnees des sommets contenus dans le plan d extraction
-// Actuellement on ne procede pas a la discretisation du domaine d extraction (pb dimension)
+// The completer method completes the extraction domain declared in the dataset
+// to which the class refers:
+// - addition of a domain (of type Pave)
+// - we determine the coordinates of the vertices contained in the extraction plane
+// Currently we do not proceed to the discretization of the extraction domain (dimension issue)
 void Champ_Generique_Extraction::completer(const Postraitement_base& post)
 {
   Champ_Gen_de_Champs_Gen::completer(post);
@@ -296,7 +296,7 @@ void Champ_Generique_Extraction::completer(const Postraitement_base& post)
     }
   const Domaine_dis_base& domaine_dis_source = source.get_ref_domaine_dis_base();
   const Domaine_VF& zvf_source = ref_cast(Domaine_VF,domaine_dis_source);
-  // Pour eviter un crash:
+  // To avoid a crash:
   if (zvf_source.nb_frontiere_dis()==0)
     {
       Cerr << "You can't extract a field onto a boundary of the domain " << dom.le_nom() << finl;
@@ -323,16 +323,16 @@ void Champ_Generique_Extraction::completer(const Postraitement_base& post)
 
   Nom type_elem;
   if (type_face_source==Type_Face::segment_2D || type_face_source==Type_Face::segment_2D_axi)
-    type_elem = "Segment"; // Pour MC2
+    type_elem = "Segment"; // For MC2
   else if (type_face_source==Type_Face::quadrilatere_2D_axi)
-    type_elem = "Segment"; // Pour MC2
+    type_elem = "Segment"; // For MC2
   else if (type_face_source==Type_Face::quadrangle_3D)
     type_elem = "Quadrangle";
   else if (type_face_source==Type_Face::triangle_3D)
     type_elem = "Triangle";
   else if (type_face_source==Type_Face::point_1D)
     type_elem = "Point";
-  //Cas suivant possible en parallele
+  //The following case is possible in parallel
   else if ((type_face_source==Type_Face::vide_0D) && (nb_faces==0))
     {
       if (source.get_discretisation().is_vdf())
@@ -352,7 +352,7 @@ void Champ_Generique_Extraction::completer(const Postraitement_base& post)
       exit();
     }
 
-  // Verification que le domaine d'extraction utilise est correct:
+  // Check that the extraction domain used is correct:
   if (domaine_->nb_som()!=0)
     {
       if (domaine_->les_elems().dimension(0) != nb_faces ||
@@ -369,7 +369,7 @@ void Champ_Generique_Extraction::completer(const Postraitement_base& post)
   mes_elems_domaine.reset();
   mes_elems_domaine.resize(nb_faces, nb_som_faces);
 
-  // Destruction du descripteur parallele, et on reconstruit...
+  // Destroy the parallel descriptor and rebuild it...
   domaine_->les_sommets().reset();
   domaine_->les_sommets() = sommets_source;
   for (int face = 0; face < nb_faces; face++)
@@ -377,7 +377,7 @@ void Champ_Generique_Extraction::completer(const Postraitement_base& post)
       mes_elems_domaine(face, s) = face_sommets(num_premiere_face + face, s);
   NettoieNoeuds::nettoie(domaine_);
 
-  // Discretisation du domaine d'extraction
+  // Discretise the extraction domain
   discretiser_domaine();
 }
 
@@ -390,7 +390,7 @@ const Domaine& Champ_Generique_Extraction::get_ref_domain() const
       Cerr<<"There is no extraction domain created to this Champ_Generique_Extraction"<<finl;
       exit();
     }
-  //Pour compilation
+  //For compilation
   return get_ref_domain();
 }
 
@@ -409,7 +409,7 @@ const Domaine_dis_base& Champ_Generique_Extraction::get_ref_domaine_dis_base() c
       Cerr<<"There is no domain associated to this Champ_Generique_Extraction"<<finl;
       exit();
     }
-  //Pour compilation
+  //For compilation
   return get_ref_domaine_dis_base();
 }
 
@@ -421,9 +421,9 @@ Entity Champ_Generique_Extraction::get_localisation(const int index) const
 }
 
 
-//Discretisation du domaine d extraction
-//Cette discretisation est necessaire pour associer un domaine discretise
-//a l espace de stockage dans la methode get_champ()
+//Discretisation of the extraction domain
+//This discretisation is necessary to associate a discretized domain
+//to the storage space in the get_champ() method
 void Champ_Generique_Extraction::discretiser_domaine()
 {
   if (domaine_)

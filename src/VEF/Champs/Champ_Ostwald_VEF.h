@@ -23,14 +23,15 @@
 class Navier_Stokes_std;
 class Domaine_VEF;
 
-/*! @brief classe Champ_Ostwald_VEF Represente un champ en discretisation VEF qui varie en fonction
+/*! @brief class Champ_Ostwald_VEF
  *
- *         de la consistance et de l'indice de structure.
- *     Champ utilise pour le fluide d'Ostwald et la discretisation VEF.
- *     Fait reference a domaine_VEF pou utiliser la bonne domaine avec domaine_dis_base
- *                     Champ_P1NC pour calculer D:D
- *                     Navier_Stokes_std pour avoir l'equation thermo_hydraulique
- *                     et pouvoir utiliser une de ses inconnues: la vitesse.
+ *  @brief Represents a field in VEF discretization that varies as a function
+ *         of the consistency and the structure index.
+ *         Field used for the Ostwald fluid with VEF discretization.
+ *         References domaine_VEF to use the correct domain with domaine_dis_base,
+ *                    Champ_P1NC to compute D:D,
+ *                    Navier_Stokes_std to access the thermo-hydraulic equation
+ *                    and use one of its unknowns: the velocity.
  *
  * @sa Champ_Ostwald
  */

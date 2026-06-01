@@ -28,9 +28,9 @@ Loi_Fermeture_base::Loi_Fermeture_base()
   status_ = INITIAL;
 }
 
-/*! @brief Cette methode est la premiere appelee par le probleme pour construire l'objet au moment ou on l'associe au probleme.
+/*! @brief This method is the first called by the problem to construct the object when it is associated with the problem.
  *
- *   On verifie qu'on est pas encore associe.
+ *   We check that it is not already associated.
  *
  */
 void Loi_Fermeture_base::associer_pb_base(const Probleme_base& pb)
@@ -48,12 +48,12 @@ void Loi_Fermeture_base::associer_pb_base(const Probleme_base& pb)
   status_ = PB_ASSOCIE;
 }
 
-/*! @brief Cette methode est appelee par le probleme apres la discretisation des equations et du milieu et avant
+/*! @brief This method is called by the problem after the discretization of equations and medium and before
  *
- *   l'appel a readOn() pour lecture des parametres.
- *   Dans les classes derivees elle doit discretiser au minimum les champs
- *   qui seront requis dans le readOn() des equations ou des autres
- *   lois de fermeture.
+ *   the call to readOn() for reading parameters.
+ *   In derived classes it must at least discretize the fields
+ *   that will be required in the readOn() of equations or other
+ *   closure laws.
  *
  */
 void Loi_Fermeture_base::discretiser(const Discretisation_base&)
@@ -62,10 +62,10 @@ void Loi_Fermeture_base::discretiser(const Discretisation_base&)
   status_ = DISCRETISE;
 }
 
-/*! @brief Cette methode appelle la methode set_param() pour initialiser les parametres, puis lit les parametres.
+/*! @brief This method calls the set_param() method to initialize the parameters, then reads the parameters.
  *
- *   Dans l'implementation des classes derivees on peut se contenter
- *   d'appeler la methode de la classe de base et verifier les parametres.
+ *   In the implementation of derived classes we can simply
+ *   call the base class method and check the parameters.
  *
  */
 Entree& Loi_Fermeture_base::readOn(Entree& is)
@@ -111,7 +111,7 @@ void Loi_Fermeture_base::completer()
   status_ = COMPLET;
 }
 
-/*! @brief Renvoie le probleme (j'ai cree cette methode pour ne pas donner acces au probleme en ecriture par la REF)
+/*! @brief Returns the problem (this method was created to avoid giving write access to the problem via the REF)
  *
  */
 const Probleme_base& Loi_Fermeture_base::mon_probleme() const
@@ -119,11 +119,10 @@ const Probleme_base& Loi_Fermeture_base::mon_probleme() const
   return mon_probleme_.valeur();
 }
 
-/*! @brief Cette methode est appelee par le probleme apres preparer_calcul() des equations et du milieu.
+/*! @brief This method is called by the problem after preparer_calcul() of equations and medium.
  *
- * Elle doit mettre
- *   a jour tous les champs qu'elle gere en fonction des autres
- *   champs du probleme.
+ * It must update all fields it manages based on the other
+ *   fields of the problem.
  *
  */
 void Loi_Fermeture_base::preparer_calcul()
@@ -133,11 +132,10 @@ void Loi_Fermeture_base::preparer_calcul()
   mettre_a_jour(temps);
 }
 
-/*! @brief Cette methode est appelee par le probleme apres mettre_a_jour() des equations et du milieu.
+/*! @brief This method is called by the problem after mettre_a_jour() of equations and medium.
  *
- * Elle doit mettre
- *   a jour tous les champs qu'elle gere en fonction des autres
- *   champs du probleme.
+ * It must update all fields it manages based on the other
+ *   fields of the problem.
  *
  */
 void Loi_Fermeture_base::mettre_a_jour(double temps)
@@ -145,9 +143,9 @@ void Loi_Fermeture_base::mettre_a_jour(double temps)
   assert(status_ == COMPLET);
 }
 
-/*! @brief Cette methode renvoie le champ de nom "nom" s'il est compris par la classe, sinon appelle la methode get_champ de l'ancetre.
+/*! @brief This method returns the field named "nom" if it is understood by the class, otherwise calls the get_champ method of the ancestor.
  *
- *   Dans la classe de base, on leve l'exception Champ_compris_erreur.
+ *   In the base class, the Champ_compris_erreur exception is raised.
  *
  */
 const Champ_base& Loi_Fermeture_base::get_champ(const Motcle& nom) const

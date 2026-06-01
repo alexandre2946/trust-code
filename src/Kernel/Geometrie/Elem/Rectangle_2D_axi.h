@@ -18,11 +18,11 @@
 
 #include <Rectangle.h>
 
-/*! @brief Classe Rectangle_axi Cette classe represente la deformee du rectangle dans
+/*! @brief Class Rectangle_2D_axi: represents the deformed rectangle in
  *
- *     le cas d'un maillage en coordonnees cylindriques
- *     Les methodes de la classe Rectangle dont Rectangle_axi derive sont
- *     surchargees pour effectuer les calculs en coordonnees cylindrique.
+ *     the case of a mesh in cylindrical coordinates.
+ *     The methods of the Rectangle class from which Rectangle_2D_axi derives are
+ *     overridden to perform calculations in cylindrical coordinates.
  *
  * @sa Rectangle Elem_geom_base Elem_geom
  */
@@ -52,12 +52,12 @@ protected:
 };
 
 
-/*! @brief Renvoie le i-ieme type de face.
+/*! @brief Returns the i-th face type.
  *
- * Un rectangle (2D_Axi) n'a qu'un seul type de face.
+ * A rectangle (2D_Axi) has only one face type.
  *
- * @param (int i) le rang du type de face a renvoyer
- * @return (Type_Face) un type de face
+ * @param i the rank of the face type to return
+ * @return a face type
  */
 template <typename _SIZE_>
 inline Type_Face Rectangle_2D_axi_32_64<_SIZE_>::type_face(int i) const

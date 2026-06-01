@@ -51,9 +51,9 @@ void Op_Evanescence_Homogene_Face_base::dimensionner_blocs(matrices_t matrices, 
   const DoubleTab& inco = ch.valeurs();
   const IntTab& fcl = ch.fcl();
 
-  /* on doit pouvoir ajouter / soustraire les equations entre composantes */
+  /* we must be able to add / subtract equations between components */
   int i, f, n, N = inco.line_size();
-  if (N == 1) return; //pas d'evanescence en simple phase!
+  if (N == 1) return; //no evanescence in single-phase flow!
   for (auto &&n_m : matrices)
     if (n_m.second->nb_colonnes())
       {
@@ -62,7 +62,7 @@ void Op_Evanescence_Homogene_Face_base::dimensionner_blocs(matrices_t matrices, 
 
         std::set<int> idx;
         Matrice_Morse& mat = *n_m.second, mat2;
-        /* equations aux faces : celles calculees seulement */
+        /* face equations: only those computed */
         for (f = 0; f < domaine.nb_faces(); f++, idx.clear())
           if (fcl(f, 0) < 2)
             {
@@ -81,7 +81,7 @@ void Op_Evanescence_Homogene_Face_base::dimensionner_blocs(matrices_t matrices, 
         dimensionner_blocs_aux(idx, sten, mat);
 
         Matrix_tools::allocate_morse_matrix(mat.nb_lignes(), mat.nb_colonnes(), sten, mat2);
-        mat = mat2; //pour forcer l'ordre des coefficients dans la matrice (accelere les operations ligne a ligne)
+        mat = mat2; //to force the ordering of coefficients in the matrix (speeds up row-by-row operations)
       }
 }
 
@@ -108,19 +108,19 @@ void Op_Evanescence_Homogene_Face_base::ajouter_blocs(matrices_t matrices, Doubl
   int e, f, k, l, n, m, N = inco.line_size(), Nk = (k_turb) ? (*k_turb).line_size() : 0, d, D = dimension, cR = (rho.dimension_tot(0) == 1), cM = (mu.dimension_tot(0) == 1), Np = press.line_size(),
                         iter = sub_type(SETS, equation().schema_temps()) ? 0 * ref_cast(SETS, equation().schema_temps()).iteration_ : 0;
 
-  if (N == 1) return; //pas d'evanescence en simple phase!
+  if (N == 1) return; //no evanescence in single-phase flow!
 
-  double a_eps = alpha_res_, a_eps_min = alpha_res_min_, a_m, a_max; //seuil de declenchement du traitement de l'evanescence
+  double a_eps = alpha_res_, a_eps_min = alpha_res_min_, a_m, a_max; //threshold for triggering evanescence treatment
 
-  /* recherche de phases evanescentes et traitement des seconds membres */
-  IntTrav maj(inco.dimension_tot(0)); //maj(i) : phase majoritaire de la ligne i
-  DoubleTrav coeff(inco.dimension_tot(0), inco.line_size(), 2); //coeff(i, n, 0/1) : coeff a appliquer a l'equation existante / a l'eq. "inco = v_maj"
+  /* search for evanescent phases and treatment of right-hand sides */
+  IntTrav maj(inco.dimension_tot(0)); //maj(i): dominant phase for row i
+  DoubleTrav coeff(inco.dimension_tot(0), inco.line_size(), 2); //coeff(i, n, 0/1): coefficient to apply to the existing equation / to the eq. "inco = v_maj"
   Matrice_Morse& mat_diag = *matrices.at(ch.le_nom().getString());
 
-  DoubleTab dvr_face(domaine.nb_faces(), N, N, N); // Derivee de vr(n,k) en f par rapport a la phase l ; pour l'instant toujours selon d2=d
-  // On se le trimballe parce que quelqu'un a separe la boucle sur les matrices de celle sur le secmem
+  DoubleTab dvr_face(domaine.nb_faces(), N, N, N); // Derivative of vr(n,k) at f with respect to phase l; for now always along d2=d
+  // Carried along because someone separated the matrix loop from the right-hand-side loop
 
-  /* calcul de la vitesse de derive : on va chercher les quantites intermediaires requises */
+  /* compute the drift velocity: retrieve the required intermediate quantities */
   Vitesse_relative_base::input_t in;
   Vitesse_relative_base::output_t out;
   out.vr.resize(N, N, D), out.dvr.resize(N, N, D, N*D);
@@ -145,14 +145,14 @@ void Op_Evanescence_Homogene_Face_base::ajouter_blocs(matrices_t matrices, Doubl
       if (is_turb)
         {
           nut.resize(domaine.nb_elem_tot(), N);
-          ref_cast(Viscosite_turbulente_base, (*ref_cast(Operateur_Diff_base, equation().operateur(0).l_op_base()).correlation_viscosite_turbulente())).eddy_viscosity(nut); //remplissage par la correlation
+          ref_cast(Viscosite_turbulente_base, (*ref_cast(Operateur_Diff_base, equation().operateur(0).l_op_base()).correlation_viscosite_turbulente())).eddy_viscosity(nut); //filled by the correlation
         }
     }
 
   for (f = 0; f < domaine.nb_faces(); f++)
     if (fcl(f, 0) < 2)
       {
-        /* phase majoritaire : avec alpha interpole par defaut, avec alpha amont pour les ierations de SETS / ICE */
+        /* dominant phase: with interpolated alpha by default, with upwind alpha for SETS / ICE iterations */
         for (a_max = 0, k = -1, n = 0; n < N; n++)
           {
             if (iter) a_m = alpha(f_e(f, f_e(f, 1) >= 0 && inco(f, n) < 0), n);
@@ -185,7 +185,7 @@ void Op_Evanescence_Homogene_Face_base::ajouter_blocs(matrices_t matrices, Doubl
                     for (m = n+1; m < N; m++)
                       if (milc.has_interface(n, m))
                         {
-                          const int ind_trav = (n*(N-1)-(n-1)*(n)/2) + (m-n-1); // Et oui ! matrice triang sup !
+                          const int ind_trav = (n*(N-1)-(n-1)*(n)/2) + (m-n-1); // upper triangular matrix indexing!
                           Interface_base& sat = milc.get_interface(n, m);
                           in.sigma(ind_trav) = reso_en_T ? sat.sigma(temp_ou_enth(e, n), press(e, n * (Np > 1))) : sat.sigma_h(temp_ou_enth(e, n), press(e, n * (Np > 1)));
                         }
@@ -202,7 +202,7 @@ void Op_Evanescence_Homogene_Face_base::ajouter_blocs(matrices_t matrices, Doubl
             correlation_vd->vitesse_relative(in, out);
           }
 
-        /* phases evanescentes : avec alpha amont. La phase majoritaire ne peut pas etre evanescente! */
+        /* evanescent phases: with upwind alpha. The dominant phase cannot be evanescent! */
         for (n = 0; n < N; n++)
           {
             if (iter) a_m = alpha(f_e(f, f_e(f, 1) >= 0 && inco(f, n) < 0), n);
@@ -232,7 +232,7 @@ void Op_Evanescence_Homogene_Face_base::ajouter_blocs(matrices_t matrices, Doubl
   for (auto &&n_m : matrices)
     if (n_m.second->nb_colonnes())
       {
-        int diag = (n_m.first == ch.le_nom().getString()); //est-on sur le bloc diagonal?
+        int diag = (n_m.first == ch.le_nom().getString()); //are we on the diagonal block?
         Matrice_Morse& mat = *n_m.second;
         /* faces */
         for (f = 0; f < domaine.nb_faces(); f++)
@@ -244,7 +244,7 @@ void Op_Evanescence_Homogene_Face_base::ajouter_blocs(matrices_t matrices, Doubl
                   for (auto i = mat.get_tab1()(N * f + n) - 1, j = mat.get_tab1()(N * f + k) - 1; i < mat.get_tab1()(N * f + n + 1) - 1; i++, j++)
                     {
                       assert(mat.get_tab2()(i) == mat.get_tab2()(j));
-                      int c = diag * mat.get_tab2()(i) - 1; //indice de colonne (commun aux deux lignes grace au dimensionner_blocs())
+                      int c = diag * mat.get_tab2()(i) - 1; //column index (shared by both rows thanks to dimensionner_blocs())
                       mat.get_set_coeff()(j) +=  coeff(f, n, 0) * mat.get_set_coeff()(i) - coeff(f, n, 1) * ((c == N * f + n) - (c == N * f + k));
                       mat.get_set_coeff()(i) += -coeff(f, n, 0) * mat.get_set_coeff()(i) + coeff(f, n, 1) * ((c == N * f + n) - (c == N * f + k));
 
@@ -254,7 +254,7 @@ void Op_Evanescence_Homogene_Face_base::ajouter_blocs(matrices_t matrices, Doubl
                 }
       }
 
-  // si var aux :
+  // if auxiliary variables:
   ajouter_blocs_aux(maj, coeff, matrices, secmem);
 }
 

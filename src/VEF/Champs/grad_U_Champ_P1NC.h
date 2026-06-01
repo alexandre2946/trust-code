@@ -23,7 +23,7 @@
 class Domaine_Cl_VEF;
 class Champ_P1NC;
 
-/*! @brief classe grad_U_Champ_P1NC
+/*! @brief class grad_U_Champ_P1NC
  *
  */
 class grad_U_Champ_P1NC: public Champ_Fonc_P0_VEF

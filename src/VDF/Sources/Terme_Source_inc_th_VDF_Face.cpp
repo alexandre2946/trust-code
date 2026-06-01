@@ -990,14 +990,14 @@ void Terme_Source_inc_th_VDF_Face::ajouter_blocs(matrices_t matrices, DoubleTab&
   double inc_s=0;
   //   Cerr << "Force de volume (gradient de pression moteur) = " << source << finl;
 
-  // Boucle sur les conditions limites pour traiter les faces de bord
+  // Loop over boundary conditions to process boundary faces
   //   Cerr << me() << " cond lims " << finl;
   for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
 
-      // pour chaque Condition Limite on regarde son type
-      // Si face de Dirichlet ou de Symetrie on ne fait rien
-      // Si face de Neumann on calcule la contribution au terme source
+      // for each boundary condition, check its type
+      // if Dirichlet or Symmetry face, do nothing
+      // if Neumann face, compute the contribution to the source term
 
       const Cond_lim& la_cl = domaine_Cl_VDF.les_conditions_limites(n_bord);
 
@@ -1052,7 +1052,7 @@ void Terme_Source_inc_th_VDF_Face::ajouter_blocs(matrices_t matrices, DoubleTab&
         }
     }
 
-  // Boucle sur les faces internes
+  // Loop over internal faces
   Cerr << me() << " faces internes thermique" << ch_beta.valeurs()(0,0) << finl;
 
   double min_inc=1.e6, max_inc=-1.e6;

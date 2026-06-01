@@ -27,7 +27,7 @@ Sortie& Precond_local::printOn(Sortie& s ) const
 Entree& Precond_local::readOn(Entree& is )
 {
   is >> le_precond_local_;
-  // Pour eviter trop d'affichage (Convergence)
+  // To avoid excessive output (Convergence)
   if (!le_precond_local_->limpr())
     le_precond_local_->fixer_limpr(-1);
   return is;
@@ -41,7 +41,7 @@ void Precond_local::prepare_(const Matrice_Base& la_matrice, const DoubleVect& s
     {
       const Matrice_Bloc_Sym& m = ref_cast(Matrice_Bloc_Sym, la_matrice);
       m.BlocSymToMatMorseSym(matrice_de_travail_);
-      // La matrice est t'elle definie ? On regarde son bloc(0,0)
+      // Is the matrix defined? Check its block(0,0)
       const Matrice_Bloc&       bloc     = ref_cast(Matrice_Bloc, m.get_bloc(0,0).valeur());
       const Matrice_Morse_Sym& sous_bloc= ref_cast(Matrice_Morse_Sym, bloc.get_bloc(0,0).valeur());
       int ok = sous_bloc.get_est_definie();
@@ -100,8 +100,8 @@ int Precond_local::precond(const Matrice_Base& mat,
       else
         {
           Cerr << "Cases still not supported in Precond_local::preconditionner." << finl;
-          // PL: Il suffit de generaliser res_syst_loc_hybride comme dans NP une
-          // taille nb_struct quelconque...pour supporter P0+P1+Pa (pas le temps de le faire).
+          // PL: One just needs to generalize res_syst_loc_hybride as in NP for arbitrary
+          // nb_struct size to support P0+P1+Pa (not done yet due to time constraints).
           exit();
         }
 #endif
@@ -263,7 +263,7 @@ void Precond_local::res_syst_loc_hybride(const Matrice_Morse_Sym& mat,
                 {
                   coeff_reel(j-1) = 0. ;
                 }
-              // On parcourt les lignes au-dessus pour annuler la colonne k
+              // Iterate over the rows above to zero out column k
               for(j=0; j<k; j++)
                 {
                   for(l=tab1_reel[j]+1; l<tab1_reel[j+1]; l++)

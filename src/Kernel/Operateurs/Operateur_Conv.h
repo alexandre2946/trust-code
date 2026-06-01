@@ -23,10 +23,10 @@
 
 class Champ_base;
 
-/*! @brief classe Operateur_Conv Classe generique de la hierarchie des operateurs representant un terme
+/*! @brief Operateur_Conv Generic class of the hierarchy of operators representing a convection term.
  *
- *     de convection. Un objet Operateur_Conv peut referencer n'importe quel
- *     objet derivant de Operateur_Conv_base.
+ *     An Operateur_Conv object can reference any object
+ *     derived from Operateur_Conv_base.
  *
  * @sa Operateur_Conv_base Operateur
  */
@@ -50,36 +50,36 @@ protected :
   OBS_PTR(Champ_base) la_vitesse;
 };
 
-/*! @brief Renvoie l'objet sous-jacent upcaste en Operateur_base
+/*! @brief Returns the underlying object upcast to Operateur_base.
  *
- * @return (Operateur_base&) l'objet sous-jacent upcaste en Operateur_base
+ * @return (Operateur_base&) the underlying object upcast to Operateur_base
  */
 inline Operateur_base& Operateur_Conv::l_op_base()
 {
   return valeur();
 }
-/*! @brief Renvoie l'objet sous-jacent upcaste en Operateur_base (version const)
+/*! @brief Returns the underlying object upcast to Operateur_base (const version).
  *
- * @return (Operateur_base&) l'objet sous-jacent upcaste en Operateur_base
+ * @return (Operateur_base&) the underlying object upcast to Operateur_base
  */
 inline const Operateur_base& Operateur_Conv::l_op_base() const
 {
   return valeur();
 }
 
-/*! @brief Associe la vitesse (en tant que vitesse transportante) a l'operateur de convection.
+/*! @brief Associates the velocity (as the transporting velocity) to the convection operator.
  *
- * @param (Champ_Inc_base& vit) le champ inconnue representant la vitesse
- * @return le champ inconnue representant la vitesse transportante
+ * @param (Champ_Inc_base& vit) the unknown field representing the velocity
+ * @return the unknown field representing the transporting velocity
  */
 inline void Operateur_Conv::associer_vitesse(const Champ_base& vit)
 {
   la_vitesse = vit;
 }
 
-/*! @brief Renvoie la vitesse transportante de l'operateur
+/*! @brief Returns the transporting velocity of the operator.
  *
- * @return (Champ_Inc_base&) le champ inconnue representant la vitesse transportante
+ * @return (Champ_Inc_base&) the unknown field representing the transporting velocity
  */
 inline const Champ_base& Operateur_Conv::vitesse() const
 {
@@ -88,9 +88,9 @@ inline const Champ_base& Operateur_Conv::vitesse() const
 
 
 
-/*! @brief Type l'operateur.
+/*! @brief Types the operator.
  *
- * @param (Nom& typ) le nom representant le type de l'operateur
+ * @param (Nom& typ) the name representing the type of the operator
  */
 inline void Operateur_Conv::typer(const Nom& a_type)
 {

@@ -37,7 +37,7 @@ Entree& Convection_Diffusion_Espece_Binaire_base::readOn(Entree& is)
   terme_diffusif.set_fichier("Diffusion_Espece_Binaire");
   terme_diffusif.set_description((Nom)"Diffusive flux=Integral(rho*D*grad(Y)*ndS) [kg/s] if SI units used");
 
-  //On modifie le nom ici pour que le champ puisse etre reconnu si une sonde de fraction_massique est demandee
+  // Rename the field here so it can be recognized if a mass fraction probe is requested.
   if (le_fluide->type_fluide()=="Melange_Binaire") l_inco_ch->nommer("fraction_massique");
   else
     {

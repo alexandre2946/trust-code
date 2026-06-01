@@ -16,7 +16,8 @@
 #ifndef Lata_2_CGNS_included
 #define Lata_2_CGNS_included
 
-/*! @brief Classe Lata_2_CGNS  Converts lata file to med
+/*! @brief class Lata_2_CGNS
+ * @brief Converts lata file to CGNS
  *
  */
 #include <Interprete.h>

@@ -22,19 +22,18 @@
 #include <TRUSTTabs_forward.h>
 #include <Matrice_Base.h>
 
-/*! @brief Classe Matrice_Sym Cette classe est la classe de base pour la representantion des
+/*! @brief Matrice_Sym class - Base class for the representation of symmetric matrices.
  *
- *     matrices symetriques. Cette classe est en fait une classe "interface"
- *     qui donne acces a des methodes de resolutions de systemes lineaires
- *     dont la matrice est symetrique: Gradient conjugue (preconditionne),
- *     solveur SSOR, precondtionneur polynomial.
- *     Cette classe ne contient pas de membre de donnee (hors mis ceux herites de
- *     Process) car elle sera utilisee par heritage multiple.
- *     Elle "accede" a la matrice via la methode de multiplication matrice-vecteur
+ *     This class is in fact an "interface" class that provides access to
+ *     methods for solving linear systems with a symmetric matrix:
+ *     conjugate gradient (preconditioned), SSOR solver, polynomial preconditioner.
+ *     This class contains no data members (other than those inherited from Process)
+ *     because it is used via multiple inheritance.
+ *     It "accesses" the matrix through the matrix-vector multiplication method
  *     DoubleVect& multvect(const DoubleVect&, DoubleVect& resu) const
- *     qui est une methode abstraite.
+ *     which is an abstract method.
  *
- * @sa Matrice_Morse_Sym, Cette classe n'herite pas d'objet U car elle est utilisee par, heritage multiple avec d'autre classe heritant deja d'objet U., Classe abstraite
+ * @sa Matrice_Morse_Sym, This class does not inherit from Objet_U because it is used via multiple inheritance with other classes already inheriting from Objet_U., Abstract class
  */
 
 class Matrice_Sym

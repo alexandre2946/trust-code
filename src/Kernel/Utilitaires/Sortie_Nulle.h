@@ -18,9 +18,9 @@
 
 #include <Sortie.h>
 
-/*! @brief Classe derivee de Sortie qui ne sort les donnees nulle part (c'est une poubelle) Classe utilisee dans le Journal() si celui-ci est desactive.
+/*! @brief Derived class of Sortie that sends data nowhere (it is a sink). Used in Journal() when logging is disabled.
  *
- * Le pointeur ostream_ est nul.
+ * The ostream_ pointer is null.
  *
  */
 class Sortie_Nulle : public Sortie

@@ -112,7 +112,7 @@ double Champ_Q1NC_implementation::calcule_valeur_a_elem_compo(double xs, double 
     val = 0;
   else
     {
-      // Calcul d'apres les fonctions de forme sur le quadrangle ou son extension en 3D
+      // Compute using shape functions on the quadrilateral or its 3D extension
       val = 0;
       for (int i = 0; i < 2 * D; i++)
         {
@@ -137,9 +137,9 @@ double Champ_Q1NC_implementation::valeur_a_elem_compo(const DoubleVect& position
 double Champ_Q1NC_implementation::valeur_a_sommet_compo(int num_som, int le_poly, int ncomp) const
 {
   //Cerr << "Champ_Q1NC_implementation::valeur_a_sommet_compo" << finl;
-  // Contrairement au Champ_P1NC les fonctions de forme
-  // ne sont pas triviales au sommet des hexas... On repasse
-  // par calcule_valeur_a_elem_compo
+  // Unlike Champ_P1NC, the shape functions
+  // are not trivial at hexa vertices... fall back
+  // to calcule_valeur_a_elem_compo
   double xs, ys, zs = 0;
   const Domaine& dom = get_domaine_geom();
   xs = dom.coord(num_som, 0);
@@ -222,7 +222,7 @@ DoubleVect& Champ_Q1NC_implementation::valeur_aux_elems_compo(const DoubleTab& p
         val(rang_poly) = 0;
       else
         {
-          // Calcul d'apres les fonctions de forme sur le quadrangle ou son extension en 3D
+          // Compute using shape functions on the quadrilateral or its 3D extension
           val = 0;
           xs = positions(rang_poly, 0);
           ys = positions(rang_poly, 1);
@@ -339,9 +339,9 @@ int Champ_Q1NC_implementation::remplir_coord_noeuds_et_polys(DoubleTab& position
 }
 
 //
-// cree un tableau des parametres geometrique
-// (tab_param) au debut du calcul pour le fonction_form
-// (vois les inlines dans Champ_Q1NC_implementation.h)
+// Creates an array of geometric parameters
+// (tab_param) at the start of the computation for the shape functions
+// (see the inlines in Champ_Q1NC_implementation.h)
 //
 void Champ_Q1NC_implementation::transforme_coord2D()
 {
@@ -370,7 +370,7 @@ void Champ_Q1NC_implementation::transforme_coord2D()
           le_coord1(i) = 0.5 * (coords(som0, 1) + coords(som1, 1));
         }
       //
-      // calcul de ksi
+      // compute ksi
       //
       // ksi = a_ksi x + b_ksi y + c_ksi
       // ksi = [ (x2-x0) x + (y2-y0) y ] alpha + beta
@@ -381,7 +381,7 @@ void Champ_Q1NC_implementation::transforme_coord2D()
       // ou ksi(x0,y0) = -1     eqn(1)
       // et ksi(x2,y2) = 1      eqn(2)
       //
-      // donc (2)-(1) donne
+      // so (2)-(1) gives
       // alpha = 2/[ (x2-x0)x2 - (x2-x0)x0 + (y2-y0)y2 - (y2-y0)y0 ]
       // beta  = 1 - [(x2-x0)x2 + (y2-y0)y2] alpha
       //
@@ -396,7 +396,7 @@ void Champ_Q1NC_implementation::transforme_coord2D()
       tab_param(poly, 1) = alpha * (le_coord1(2) - le_coord1(0));
       tab_param(poly, 2) = beta;
       //
-      // calcul de eta
+      // compute eta
       //
       lec0 = carre(le_coord0(3)) + carre(le_coord0(1)) - 2. * le_coord0(3) * le_coord0(1);
       lec1 = carre(le_coord1(3)) + carre(le_coord1(1)) - 2. * le_coord1(3) * le_coord1(1);
@@ -442,7 +442,7 @@ void Champ_Q1NC_implementation::transforme_coord3D()
           le_coord2(i) = 0.25 * (coords(som0, 2) + coords(som1, 2) + coords(som2, 2) + coords(som3, 2));
         }
       //
-      // calcul de ksi
+      // compute ksi
       //
       lec0 = carre(le_coord0(3)) + carre(le_coord0(0)) - 2. * le_coord0(3) * le_coord0(0);
       lec1 = carre(le_coord1(3)) + carre(le_coord1(0)) - 2. * le_coord1(3) * le_coord1(0);
@@ -458,7 +458,7 @@ void Champ_Q1NC_implementation::transforme_coord3D()
       tab_param(poly, 2) = alpha * (le_coord2(3) - le_coord2(0));
       tab_param(poly, 3) = beta;
       //
-      // calcul de eta
+      // compute eta
       //
       lec0 = carre(le_coord0(4)) + carre(le_coord0(1)) - 2. * le_coord0(4) * le_coord0(1);
       lec1 = carre(le_coord1(4)) + carre(le_coord1(1)) - 2. * le_coord1(4) * le_coord1(1);
@@ -474,7 +474,7 @@ void Champ_Q1NC_implementation::transforme_coord3D()
       tab_param(poly, 6) = alpha * (le_coord2(4) - le_coord2(1));
       tab_param(poly, 7) = beta;
       //
-      // calcul de psi
+      // compute psi
       //
       lec0 = carre(le_coord0(5)) + carre(le_coord0(2)) - 2. * le_coord0(5) * le_coord0(2);
       lec1 = carre(le_coord1(5)) + carre(le_coord1(2)) - 2. * le_coord1(5) * le_coord1(2);

@@ -68,7 +68,7 @@ void Domaine_PolyMAC_HFV::calculer_volumes_entrelaces()
   const IntTab& fsom = face_sommets();
   const DoubleTab& xs = domaine().coord_sommets();
 
-  //volumes_entrelaces_ et volumes_entrelaces_dir : par projection de l'amont/aval sur la normale a la face
+  //volumes_entrelaces_ and volumes_entrelaces_dir: by projection of the upstream/downstream element onto the face normal
   for (int f = 0, e; f < nb_faces(); f++)
     {
       const bool axis_face = bidim_axi && (face_voisins_(f, 0) < 0 || face_voisins_(f, 1) < 0) && std::fabs(xv_(f, 0)) <= tol_r;
@@ -98,30 +98,30 @@ void Domaine_PolyMAC_HFV::calculer_volumes_entrelaces()
 
 const DoubleTab& Domaine_PolyMAC_HFV::surf_elem_arete() const
 {
-  if (surf_elem_arete_.nb_dim() == 2) return surf_elem_arete_; //deja fait
+  if (surf_elem_arete_.nb_dim() == 2) return surf_elem_arete_; //already done
   int e, f, a, s, sb, i, j, k, d, D = dimension, sgn;
-  const IntTab& ea_d = elem_arete_d(), e_f = elem_faces(), &f_s = face_sommets(), &e_a = D < 3 ? e_f : domaine().elem_aretes();//en 2D, les aretes sont les faces!
+  const IntTab& ea_d = elem_arete_d(), e_f = elem_faces(), &f_s = face_sommets(), &e_a = D < 3 ? e_f : domaine().elem_aretes();//in 2D, edges are faces!
   const DoubleTab& xe = xp(), &xf = xv(), &xs = domaine().coord_sommets();
   surf_elem_arete_.resize(ea_d(nb_elem_tot()), D);
   double vecz[3] = { 0, 0, 1 };
   for (e = 0; e < nb_elem_tot(); e++)
     if (D < 3)
-      for (i = 0, j = ea_d(e); j < ea_d(e + 1); i++, j++) //2D : arete <-> face, avec orientation du premier au second sommet de f_s
+      for (i = 0, j = ea_d(e); j < ea_d(e + 1); i++, j++) //2D: edge <-> face, oriented from the first to the second vertex of f_s
         {
-          auto vec = cross(D, 3, &xf(f = e_f(e, i), 0), vecz, &xe(e, 0)); //rotation de (xf - xe)
-          for (sgn = dot(&xs(f_s(f, 1), 0), &vec[0], &xs(f_s(f, 0), 0)) > 0 ? 1 : -1, d = 0; d < D; d++) surf_elem_arete_(j, d) = sgn * vec[d]; //avec la bonne orientation
+          auto vec = cross(D, 3, &xf(f = e_f(e, i), 0), vecz, &xe(e, 0)); //rotation of (xf - xe)
+          for (sgn = dot(&xs(f_s(f, 1), 0), &vec[0], &xs(f_s(f, 0), 0)) > 0 ? 1 : -1, d = 0; d < D; d++) surf_elem_arete_(j, d) = sgn * vec[d]; //with correct orientation
         }
     else for (i = 0; i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++)
-        for (j = 0; j < f_s.dimension(1) && (s = f_s(f, j)) >= 0; j++) //3D: une contribution par couple (f, a)
+        for (j = 0; j < f_s.dimension(1) && (s = f_s(f, j)) >= 0; j++) //3D: one contribution per (f, a) pair
           {
-            sb = f_s(f, j + 1 < f_s.dimension(1) && f_s(f, j + 1) >= 0 ? j + 1 : 0); //autre sommet
-            a = som_arete[s].at(sb), k = (int)(std::find(&e_a(e, 0), &e_a(e, 0) + ea_d(e + 1) - ea_d(e), a) - &e_a(e, 0) + ea_d(e)); //arete, son indice dans e_a
-            auto vec = cross(D, D, &xf(f, 0), &xa_(a, 0), &xe(e, 0), &xe(e, 0)); //non oriente
+            sb = f_s(f, j + 1 < f_s.dimension(1) && f_s(f, j + 1) >= 0 ? j + 1 : 0); //other vertex
+            a = som_arete[s].at(sb), k = (int)(std::find(&e_a(e, 0), &e_a(e, 0) + ea_d(e + 1) - ea_d(e), a) - &e_a(e, 0) + ea_d(e)); //edge and its index in e_a
+            auto vec = cross(D, D, &xf(f, 0), &xa_(a, 0), &xe(e, 0), &xe(e, 0)); //unoriented
             for (sgn = dot(&vec[0], &ta_(a, 0)) >= 0 ? 1 : -1, d = 0; d < D; d++) surf_elem_arete_(k, d) += sgn * vec[d] / 2;
           }
   return surf_elem_arete_;
 }
-/* "clamping" a 0 des coeffs petits dans M1/W1/M2/W2 */
+/* "clamping" to 0 of small coefficients in M1/W1/M2/W2 */
 inline void clamp(DoubleTab& m)
 {
   for (int i = 0; i < m.dimension(0); i++)
@@ -130,57 +130,57 @@ inline void clamp(DoubleTab& m)
         if (1e6 * std::abs(m(i, j, n)) < std::abs(m(i, i, n)) + std::abs(m(j, j, n))) m(i, j, n) = 0;
 }
 
-//normales aux aretes duales -> tangentes aux aretes : (nu|a|t_a.v)   = m1 (S_ea.v)
+//dual edge normals -> edge tangentials: (nu|a|t_a.v)   = m1 (S_ea.v)
 void Domaine_PolyMAC_HFV::M1(const DoubleTab *nu, int e, DoubleTab& m1) const
 {
-  const IntTab& e_f = elem_faces(), &f_s = face_sommets(), &e_a = dimension < 3 ? e_f : domaine().elem_aretes(), &a_s = dimension < 3 ? f_s : domaine().aretes_som(), &ea_d = elem_arete_d(); //en 2D, les aretes sont les faces!
+  const IntTab& e_f = elem_faces(), &f_s = face_sommets(), &e_a = dimension < 3 ? e_f : domaine().elem_aretes(), &a_s = dimension < 3 ? f_s : domaine().aretes_som(), &ea_d = elem_arete_d(); //in 2D, edges are faces!
   const DoubleTab& xs = domaine().coord_sommets(), &S_ea = surf_elem_arete();
   const DoubleVect& ve = volumes();
   int i, j, k, a, s, sb, n, N = nu ? nu->dimension(1) : 1, e_nu = nu && nu->dimension_tot(0) == 1 ? 0 : e, n_a = ea_d(e + 1) - ea_d(e), d, D = dimension, idx;
-  double prefac, fac, beta = 1 || n_a == 3 * D - 3 ? 1. / D : D == 2 ? 1. / sqrt(2) : 1. / sqrt(3); //stabilisation : DGA sur simplexes, SUSHI sinon
+  double prefac, fac, beta = 1 || n_a == 3 * D - 3 ? 1. / D : D == 2 ? 1. / sqrt(2) : 1. / sqrt(3); //stabilization: DGA on simplices, SUSHI otherwise
   m1.resize(n_a, n_a, N), m1 = 0;
-  DoubleTrav v_e(n_a, D), v_ea(n_a, n_a, D); //interpolations non stabilisees / stabilisees
-  //v_e (interpolation non stabilisee)
+  DoubleTrav v_e(n_a, D), v_ea(n_a, n_a, D); //non-stabilized / stabilized interpolations
+  //v_e (non-stabilized interpolation)
   for (i = 0; i < n_a; i++)
     for (a = e_a(e, i), s = a_s(a, 0), sb = a_s(a, 1), d = 0; d < D; d++) v_e(i, d) = (xs(sb, d) - xs(s, d)) / ve(e);
-  //v_ea (interpolation stabilisee)
+  //v_ea (stabilized interpolation)
   for (i = 0, idx = ea_d(e); i < n_a; i++, idx++)
     for (a = e_a(e, i), s = a_s(a, 0), sb = a_s(a, 1), prefac = D * beta / dot(&xs(sb, 0), &S_ea(idx, 0), &xs(s, 0)), j = 0; j < n_a; j++)
       for (fac = prefac * ((j == i) - dot(&S_ea(idx, 0), &v_e(j, 0))), d = 0; d < D; d++)
         v_ea(i, j, d) = v_e(j, d) + fac * (xs(sb, d) - xs(s, d));
-  //matrice!
+  //matrix!
   for (i = 0; i < n_a; i++)
     for (j = 0; j < n_a; j++)
       if (j < i)
-        for (n = 0; n < N; n++) m1(i, j, n) = m1(j, i, n); //sous-diagonale -> on copie l'autre cote
+        for (n = 0; n < N; n++) m1(i, j, n) = m1(j, i, n); //below diagonal -> copy from the other side
       else for (k = 0, idx = ea_d(e); k < n_a; k++, idx++)
           for (a = e_a(e, k), s = a_s(a, 0), sb = a_s(a, 1), fac = dot(&xs(sb, 0), &S_ea(idx, 0), &xs(s, 0)) / D, n = 0; n < N; n++)
             m1(i, j, n) += fac * nu_dot(nu, e_nu, n, &v_ea(k, i, 0), &v_ea(k, j, 0));
   clamp(m1);
 }
 
-//tangentes aux aretes -> normales aux aretes duales : (nuS_ea.v) = w1 (|a|t_a.v)
+//edge tangentials -> dual edge normals: (nuS_ea.v) = w1 (|a|t_a.v)
 void Domaine_PolyMAC_HFV::W1(const DoubleTab *nu, int e, DoubleTab& w1, DoubleTab& v_e, DoubleTab& v_ea) const
 {
-  const IntTab& e_f = elem_faces(), &f_s = face_sommets(), &e_a = dimension < 3 ? e_f : domaine().elem_aretes(), &a_s = dimension < 3 ? f_s : domaine().aretes_som(), &ea_d = elem_arete_d(); //en 2D, les aretes sont les faces!
+  const IntTab& e_f = elem_faces(), &f_s = face_sommets(), &e_a = dimension < 3 ? e_f : domaine().elem_aretes(), &a_s = dimension < 3 ? f_s : domaine().aretes_som(), &ea_d = elem_arete_d(); //in 2D, edges are faces!
   const DoubleTab& xs = domaine().coord_sommets(), &S_ea = surf_elem_arete();
   const DoubleVect& ve = volumes();
   int i, j, k, a, s, sb, n, N = nu ? nu->dimension(1) : 1, e_nu = nu && nu->dimension_tot(0) == 1 ? 0 : e, n_a = ea_d(e + 1) - ea_d(e), d, D = dimension, idx;
-  double prefac, fac, beta = n_a == 3 * D - 3 ? 1. / D : D == 2 ? 1. / sqrt(2) : 1. / sqrt(3); //stabilisation : DGA sur simplexes, SUSHI sinon
-  w1.resize(n_a, n_a, N), w1 = 0, v_e.resize(n_a, D), v_ea.resize(n_a, n_a, D); //interpolations non stabilisees / stabilisees
-  //v_e (interpolation non stabilisee)
+  double prefac, fac, beta = n_a == 3 * D - 3 ? 1. / D : D == 2 ? 1. / sqrt(2) : 1. / sqrt(3); //stabilization: DGA on simplices, SUSHI otherwise
+  w1.resize(n_a, n_a, N), w1 = 0, v_e.resize(n_a, D), v_ea.resize(n_a, n_a, D); //non-stabilized / stabilized interpolations
+  //v_e (non-stabilized interpolation)
   for (i = 0, idx = ea_d(e); i < n_a; i++, idx++)
     for (d = 0; d < D; d++) v_e(i, d) = S_ea(idx, d) / ve(e);
-  //v_ea (interpolation stabilisee)
+  //v_ea (stabilized interpolation)
   for (i = 0, idx = ea_d(e); i < n_a; i++, idx++)
     for (a = e_a(e, i), s = a_s(a, 0), sb = a_s(a, 1), prefac = D * beta / dot(&xs(sb, 0), &S_ea(idx, 0), &xs(s, 0)), j = 0; j < n_a; j++)
       for (fac = prefac * ((j == i) - dot(&xs(sb, 0), &v_e(j, 0), &xs(s, 0))), d = 0; d < D; d++)
         v_ea(i, j, d) = v_e(j, d) + fac * S_ea(idx, d);
-  //matrice!
+  //matrix!
   for (i = 0; i < n_a; i++)
     for (j = 0; j < n_a; j++)
       if (j < i)
-        for (n = 0; n < N; n++) w1(i, j, n) = w1(j, i, n); //sous-diagonale -> on copie l'autre cote
+        for (n = 0; n < N; n++) w1(i, j, n) = w1(j, i, n); //below diagonal -> copy from the other side
       else for (k = 0, idx = ea_d(e); k < n_a; k++, idx++)
           for (a = e_a(e, k), s = a_s(a, 0), sb = a_s(a, 1), fac = dot(&xs(sb, 0), &S_ea(idx, 0), &xs(s, 0)) / D, n = 0; n < N; n++)
             w1(i, j, n) += fac * nu_dot(nu, e_nu, n, &v_ea(k, i, 0), &v_ea(k, j, 0));

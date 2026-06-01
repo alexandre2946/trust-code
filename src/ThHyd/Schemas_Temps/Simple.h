@@ -28,35 +28,35 @@ class Operateur_Grad ;
 // C. T. Shaw
 
 // A = (M/dt + C(Uk) + D)
-// Bt et -B designent respectivement les operateurs gradient et divergence
+// Bt and -B denote the gradient and divergence operators respectively
 
-// Une solution (U,P) est recherchee sous la forme suivante :
+// A solution (U,P) is sought in the form:
 // U = U* + u'
 // P = P* + p'
-// ou (U*,P*) est solution de l'equation de q.d.m. et (u',p') est une correction apportee
-// a celle-ci pour satisfaire l equation de continuite
+// where (U*,P*) satisfies the momentum equation and (u',p') is a correction
+// applied to satisfy the continuity equation.
 
-// (U*,P*) satisfait l equation de q.d.m. :
+// (U*,P*) satisfies the momentum equation:
 //        A[Uk-1]U*k = -BtP* + Sv + Ss + (M/dt)Uk-1                -> U*k
 //
-// En retranchant cette equation a l equation de q.d.m pour (U,P) on a une equation sur  u' et p'
+// Subtracting this from the full momentum equation for (U,P) gives an equation on u' and p':
 //        A[Uk-1]u' = -Btp'
 
-// En ne conservant que la partie diagonale (Da) de A la relation s ecrit :
+// Keeping only the diagonal part (Da) of A, this becomes:
 //        u' = -Da-1Btp'
 
-//Le champ complet U satisfait l equation de continuite ce qui donne la relation :
+// The full velocity field U satisfies the continuity equation, giving:
 //        -Bu' = BU*
-// soit (BDa-1Bt)p' = BU*                                         -> p' puis u'
+// hence (BDa-1Bt)p' = BU*                                         -> p' then u'
 
-// En fin d iteration la solution s ecrit :
+// At the end of the iteration, the solution is:
 //        U = U* + beta_u u'
 //        P = P* + beta_p p'
-// beta_u et beta_p sont des coefficients de relaxation compris entre 0 et 1.
-// En pratique on applique une relaxation uniquement pour la pression
+// beta_u and beta_p are relaxation coefficients between 0 and 1.
+// In practice, relaxation is applied only to the pressure.
 
-// L algorithme peut etre repete jusqu a convergence du systeme ||Uk-Uk-1|| < seuil_convergence_implicite_
-// en pratique on peut ne faire qu une seule iteration (seuil_convergence_implicite_ = 1e6)
+// The algorithm can be repeated until convergence ||Uk-Uk-1|| < seuil_convergence_implicite_.
+// In practice, only one iteration is needed (seuil_convergence_implicite_ = 1e6).
 
 
 class Simple : public Simpler_Base
@@ -70,14 +70,14 @@ public :
   void iterer_NS(Equation_base&, DoubleTab& current, DoubleTab& pression, double, Matrice_Morse&, double, DoubleTrav&,int nb_iter,int& converge, int& ok) override;
   bool iterer_eqs(LIST(OBS_PTR(Equation_base)) eqs, int compteur, int& ok) override;
 
-  /* memoization de iterer_eqs: public pour que la puissance iteree de TRUST-NK puisse la partager */
+  /* memoization of iterer_eqs: public so that the iterated power of TRUST-NK can share it */
   using list_of_eq_ptr_t = std::vector<intptr_t>;  // a list of pointers to equations.
   std::map<list_of_eq_ptr_t, Matrice_Bloc> mbloc;
 
 protected :
 
-  DoubleTab Ustar_old;        //U* = alpha_ U*_new + (1-alpha_)*U*_old   en pratique alpha = 1
-  double alpha_,beta_;  //beta_ coefficient de relaxation pour la pression  P = P* + beta_*P'  0<beta_<=1
+  DoubleTab Ustar_old;        // U* = alpha_ U*_new + (1-alpha_)*U*_old   in practice alpha = 1
+  double alpha_,beta_;  // beta_ : pressure relaxation coefficient  P = P* + beta_*P'  0<beta_<=1
   int with_d_rho_dt_;
 
   Entree& lire(const Motcle&, Entree&) override;

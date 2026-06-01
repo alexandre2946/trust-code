@@ -24,10 +24,10 @@ Implemente_instanciable(Champ_Tabule_Temps,"Champ_Tabule_Temps",Champ_Uniforme_i
 
 
 
-/*! @brief NE FAIT RIEN
+/*! @brief Does nothing.
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the output stream
  */
 Sortie& Champ_Tabule_Temps::printOn(Sortie& os) const
 {
@@ -35,17 +35,17 @@ Sortie& Champ_Tabule_Temps::printOn(Sortie& os) const
 }
 
 
-/*! @brief Lit les valeurs du champ tabule en temps a partir d'un flot d'entree.
+/*! @brief Reads the values of the time-tabulated field from an input stream.
  *
- *     On lit le nombre de composante du champ (nb_comp) et on
- *     remplit une table a partir des nval couples (vrel_i, tps_i).
+ *     Reads the number of field components (nb_comp) and fills
+ *     a table from the nval pairs (vrel_i, tps_i).
  *     Format:
  *      Champ_Tabule_Temps nb_comp { nval tps_1...tps_nval  vrel_1...vrel_nval }
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws accolade ouvrante attendue
- * @throws accolade fermante attendue
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
+ * @throws opening brace expected
+ * @throws closing brace expected
  */
 Entree& Champ_Tabule_Temps::readOn(Entree& is)
 {
@@ -94,9 +94,9 @@ Entree& Champ_Tabule_Temps::readOn(Entree& is)
 }
 
 
-/*! @brief Mise a jour en temps des valeurs tabulees du champ.
+/*! @brief Updates the tabulated field values in time.
  *
- * @param (double tps) le temps de mise a jour
+ * @param (double tps) the update time
  */
 void Champ_Tabule_Temps::me_calculer(double tps)
 {

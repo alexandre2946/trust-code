@@ -49,7 +49,7 @@ class Terme_Source_Qdm_Elem_DG : public Source_base, public Terme_Source_Qdm
 public:
   int has_interface_blocs() const override { return 1; }
 
-  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override { } //rien
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override { } //nothing
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
 
   void associer_pb(const Probleme_base& ) override  { }

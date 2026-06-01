@@ -50,35 +50,35 @@ void Solv_Externe::construit_matrice_morse_intermediaire(const Matrice_Base& la_
 {
   if (sub_type(Matrice_Morse_Sym, la_matrice))
     {
-      // Exemple: matrice de pression en VEFPreP1B
+      // Example: pressure matrix in VEFPreP1B
       const Matrice_Morse_Sym& matrice_morse_sym = ref_cast(Matrice_Morse_Sym, la_matrice);
       assert(matrice_morse_sym.get_est_definie());
       MorseSymToMorse(matrice_morse_sym, matrice_morse_intermediaire);
     }
   else if (sub_type(Matrice_Bloc_Sym, la_matrice))
     {
-      // Exemple : matrice de pression en VEF P0+P1+Pa
+      // Example: pressure matrix in VEF P0+P1+Pa
       const Matrice_Bloc_Sym& matrice = ref_cast(Matrice_Bloc_Sym, la_matrice);
-      // Conversion de la matrice Matrice_Bloc_Sym au format Matrice_Morse_Sym
+      // Convert the Matrice_Bloc_Sym to Matrice_Morse_Sym format
       Matrice_Morse_Sym matrice_morse_sym;
       matrice.BlocSymToMatMorseSym(matrice_morse_sym);
       MorseSymToMorse(matrice_morse_sym, matrice_morse_intermediaire);
-      matrice_morse_sym.dimensionner(0, 0); // Destruction de la matrice morse sym desormais inutile
+      matrice_morse_sym.dimensionner(0, 0); // Destroy the Morse sym matrix now that it is no longer needed
     }
   else if (sub_type(Matrice_Morse, la_matrice))
     {
-      // Exemple : matrice implicite
+      // Example: implicit matrix
       matrice_symetrique_ = false;
     }
   else if (sub_type(Matrice_Bloc, la_matrice))
     {
-      // Exemple : matrice de pression en VDF
+      // Example: pressure matrix in VDF
       const Matrice_Bloc& matrice_bloc = ref_cast(Matrice_Bloc, la_matrice);
       if (!sub_type(Matrice_Morse_Sym, matrice_bloc.get_bloc(0, 0).valeur()))
         matrice_symetrique_ = false;
       else
         {
-          // Pour un solveur direct, operation si la matrice n'est pas definie (en incompressible VDF, rien n'etait fait...)
+          // For a direct solver: fix the matrix if it is not defined (in incompressible VDF, nothing was done before...)
           Matrice_Morse_Sym& mat00 = ref_cast_non_const(Matrice_Morse_Sym, matrice_bloc.get_bloc(0, 0).valeur());
           if (solveur_direct() && mat00.get_est_definie() == 0 && Process::je_suis_maitre())
             mat00(0, 0) *= 2;

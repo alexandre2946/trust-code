@@ -16,9 +16,9 @@
 #ifndef SolveurSys_included
 #define SolveurSys_included
 
-/*! @brief class SolveurSys Un SolveurSys represente n'importe qu'elle classe
+/*! @brief class SolveurSys A SolveurSys represents any class
  *
- *   derivee de la classe SolveurSys_base
+ *   derived from the SolveurSys_base class
  *
  *
  * @sa Jacobi Gauss_Seidel SOR SolveurSys_base

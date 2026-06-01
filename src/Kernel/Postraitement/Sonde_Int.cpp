@@ -25,7 +25,7 @@ Sortie& Sonde_Int::printOn(Sortie& s ) const
   return s << que_suis_je();
 }
 
-/*! @brief Lit les specifications d'une sonde a partir d'un flot d'entree.
+/*! @brief Reads the specifications of a probe from an input stream.
  *
  * Format:
  *     Sonde_Ints
@@ -35,11 +35,11 @@ Sortie& Sonde_Int::printOn(Sortie& s ) const
  *        ...
  *      }
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws donnees de la sonde non definies
- * @throws erreur de format, mot clef inconnus
- * @throws donnees de la sonde pas definies correctement
+ * @param is an input stream
+ * @return the modified input stream
+ * @throws probe data not defined
+ * @throws format error, unknown keyword
+ * @throws probe data not correctly defined
  */
 Entree& Sonde_Int::readOn(Entree& is )
 {
@@ -50,8 +50,8 @@ Entree& Sonde_Int::readOn(Entree& is )
   Motcle accolade_fermee("}");
   int nbre_points;
 
-  // Recherche du tableau sonde
-  // Remplissage de la reference au tableau
+  // Search for the probed array
+  // Fill the reference to the array
 
   is >> motlu;
   Noms liste_noms;
@@ -71,7 +71,7 @@ Entree& Sonde_Int::readOn(Entree& is )
         }
     }
 
-  // Lecture des caracteristiques de la sonde
+  // Read the probe characteristics
 
   IntVect fait(2);
 
@@ -238,9 +238,9 @@ Entree& Sonde_Int::readOn(Entree& is )
 }
 
 
-/*! @brief Associer le postraitement a la sonde.
+/*! @brief Associates a post-processing object with the probe.
  *
- * @param (Postraitement& le_post) le postraitement a associer
+ * @param le_post the post-processing object to associate
  */
 void Sonde_Int::associer_post(const Postraitement& le_post)
 {
@@ -257,13 +257,12 @@ void Sonde_Int::associer_post(const Postraitement& le_post)
 }
 
 
-/*! @brief Initialise la sonde.
+/*! @brief Initialises the probe.
  *
- * Dimensionne les tableaux, de valeurs, verifie si les points specifies sont
- *     bien dans le domaine de calcul.
+ * Sizes the value arrays and checks that the specified points lie within the computation domain.
  *
- * @param (Domaine& domaine_geom) le domaine de calcul qui sera sondee
- * @throws point de sondage en dehors du domaine de calcul
+ * @param domaine_geom the computation domain to be probed
+ * @throws probe point outside the computation domain
  */
 void Sonde_Int::initialiser(const Domaine& domaine_geom)
 {
@@ -287,7 +286,7 @@ void Sonde_Int::initialiser(const Domaine& domaine_geom)
 }
 
 
-/*! @brief Ouvre le fichier associe a la sonde.
+/*! @brief Opens the file associated with the probe.
  *
  * (*.son)
  *
@@ -307,7 +306,7 @@ void Sonde_Int::ouvrir_fichier()
       s.setf(ios::scientific);
       s.precision(8);
 
-      // Ecriture de l'en tete des fichiers sondes :
+      // Write the header of the probe files:
       if (dim==0 || dim==1)
         {
           const DoubleTab& p=les_positions();
@@ -431,10 +430,10 @@ void Sonde_Int::ouvrir_fichier()
 }
 
 
-/*! @brief Effectue une mise a jour en temps de la sonde effectue le postraitement.
+/*! @brief Updates the probe in time and performs post-processing.
  *
- * @param (double temps) le temps de mise a jour
- * @param (double tinit) le temps initial de la sonde
+ * @param un_temps the update time
+ * @param tinit the initial time of the probe
  */
 void Sonde_Int::mettre_a_jour(double un_temps, double tinit)
 {
@@ -448,11 +447,11 @@ void Sonde_Int::mettre_a_jour(double un_temps, double tinit)
 }
 
 
-/*! @brief Effectue un postraitement.
+/*! @brief Performs post-processing.
  *
- * Imprime les valeurs du tableau aux positions demandees
- *     sur le fichier associe.
+ * Writes the array values at the requested positions to the associated file.
  *
+ * @param un_temps the current time
  */
 void Sonde_Int::postraiter(double un_temps)
 {
@@ -498,9 +497,9 @@ void Sonde_Int::postraiter(double un_temps)
               fichier() << finl;
             }
 
-          // Pour les sondes type plan, impression au format lml :
+          // For plan-type probes, output in lml format:
           // num_sommet comp1 [comp2] [comp3]
-          // et dans la troisieme direction :
+          // and in the third direction:
           else if (dim==2 || dim==3)
             {
               Nom unite;
@@ -520,10 +519,10 @@ void Sonde_Int::postraiter(double un_temps)
                   fichier() << i+1;
                   for(int j=0; j<valeurs.dimension(1); j++)
                     fichier() << " " << valeurs(i,j);
-                  // Pour ne pas flusher :
+                  // Avoid flushing:
                   fichier() << "\n";
                 }
-              // Pour le 2D, on rajoute une direction
+              // For 2D, add an extra direction
               if (dim==2)
                 {
                   for(i=0; i<nbre_points; i++)
@@ -531,7 +530,7 @@ void Sonde_Int::postraiter(double un_temps)
                       fichier() << nbre_points+i+1;
                       for(int j=0; j<valeurs.dimension(1); j++)
                         fichier() << " " << valeurs(i,j);
-                      // Pour ne pas flusher :
+                      // Avoid flushing:
                       fichier() << "\n";
                     }
                 }
@@ -578,9 +577,9 @@ void Sonde_Int::postraiter(double un_temps)
               fichier() << finl;
             }
 
-          // Pour les sondes type plan, impression au format lml :
+          // For plan-type probes, output in lml format:
           // num_sommet comp1 [comp2] [comp3]
-          // et dans la troisieme direction :
+          // and in the third direction:
           else if (dim==2 || dim==3)
             {
               Nom unite;
@@ -599,17 +598,17 @@ void Sonde_Int::postraiter(double un_temps)
                 {
                   fichier() << i+1;
                   fichier() << " " << valeurs(i);
-                  // Pour ne pas flusher :
+                  // Avoid flushing:
                   fichier() << "\n";
                 }
-              // Pour le 2D, on rajoute une direction
+              // For 2D, add an extra direction
               if (dim==2)
                 {
                   for(int i=0; i<nbre_points; i++)
                     {
                       fichier() << nbre_points+i+1;
                       fichier() << " " << valeurs(i);
-                      // Pour ne pas flusher :
+                      // Avoid flushing:
                       fichier() << "\n";
                     }
                 }

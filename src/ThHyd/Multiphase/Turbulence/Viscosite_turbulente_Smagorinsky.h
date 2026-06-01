@@ -18,11 +18,11 @@
 
 #include <Viscosite_turbulente_LES_base.h>
 
-/*! @brief classe Viscosite_turbulente_Smagorinsky
+/*! @brief Smagorinsky SGS turbulent viscosity model:
  *
- *    visc_SGS = (Cs * delta)^2 * ( 2 * Sij_bar * Sij_bar)^0.5,
+ *    visc_SGS = (Cs * delta)^2 * ( 2 * Sij_bar * Sij_bar)^0.5
  *
- *    avec
+ *    where
  *
  *        Sij_bar = 0.5 * (du_i / dx_j + du_j / dx_i)
  *

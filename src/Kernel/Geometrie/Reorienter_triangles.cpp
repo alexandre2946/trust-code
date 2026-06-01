@@ -66,12 +66,12 @@ Sens_Orient Reorienter_triangles_32_64<_SIZE_>::test_orientation_triangle(IntTab
   double ZA1 = coord_sommets(som_A,1) - coord_sommets(som_Z,1);
   double ZB1 = coord_sommets(som_B,1) - coord_sommets(som_Z,1);
 
-  //calcul pdt vect ZAxZB
+  //compute cross product ZAxZB
   double pdtvect = ZA0*ZB1 - ZA1*ZB0;
 
   if (pdtvect<0.)
     {
-      //le pdt scalaire est negatif : il s'agit d'un triangle mal oriente
+      //the cross product is negative: this is a badly oriented triangle
 #ifdef _AFFDEBUG
       {
         Process::Journal<<"  element "<<num_element<<"  indirect"<<finl;
@@ -94,7 +94,7 @@ Sens_Orient Reorienter_triangles_32_64<_SIZE_>::reorienter_triangle(IntTab_t& le
   static const int SOM_A = 1;
   static const int SOM_B = 2;
 
-  //pour reorienter le triangle, on va permuter les sommets 1 et 2
+  //to reorient the triangle, swap vertices 1 and 2
   int_t tmp;
   tmp = les_elems(num_element,SOM_A);
   les_elems(num_element,SOM_A) = les_elems(num_element,SOM_B);
@@ -103,7 +103,8 @@ Sens_Orient Reorienter_triangles_32_64<_SIZE_>::reorienter_triangle(IntTab_t& le
 }
 
 /*!
- * Cette methode permet de reorienter les triangles dans le sens direct
+ * @brief This method reorients triangles to the direct (positive) orientation.
+ * @param dom the domain whose triangles are to be reoriented
  */
 template <typename _SIZE_>
 void Reorienter_triangles_32_64<_SIZE_>::reorienter(Domaine_t& dom) const
@@ -112,16 +113,16 @@ void Reorienter_triangles_32_64<_SIZE_>::reorienter(Domaine_t& dom) const
 
   if (dom.type_elem()->que_suis_je() == "Triangle" )
     {
-      //domaine de triangles
+      //domain of triangles
       IntTab_t& les_elems = dom.les_elems();
       int_t nb_elems = les_elems.dimension(0);
 
-      //balaye les triangles
+      //sweep over triangles
       for (int_t ielem=0 ; ielem<nb_elems ; ielem++)
         {
           if (test_orientation_triangle(les_elems, ielem, coord_sommets)==Sens_Orient::INDIRECT)
             {
-              //triangle oriente en sens indirect -> a reorienter
+              //triangle oriented in indirect sense -> needs reorienting
               reorienter_triangle(les_elems, ielem);
 
 #ifdef _AFFDEBUG

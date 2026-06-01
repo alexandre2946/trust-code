@@ -22,7 +22,7 @@ Implemente_instanciable_sans_constructeur(Op_Dift_Multiphase_VDF_Elem,"Op_Diff_V
 Sortie& Op_Dift_Multiphase_VDF_Elem::printOn(Sortie& s ) const { return s << que_suis_je() ; }
 Entree& Op_Dift_Multiphase_VDF_Elem::readOn(Entree& is)
 {
-  //lecture de la correlation de diffusivite turbulente
+  //reading the turbulent diffusivity correlation
   Correlation_base::typer_lire_correlation(corr_, equation().probleme(), "transport_turbulent", is);
   associer_corr_impl<Type_Operateur::Op_DIFT_MULTIPHASE_ELEM, Eval_Dift_Multiphase_VDF_Elem>(corr_);
   associer_proto(equation().probleme(), champs_compris_);
@@ -69,8 +69,8 @@ void Op_Dift_Multiphase_VDF_Elem::mettre_a_jour(double temps)
       Process::exit();
     }
 
-  // on calcule d_t_
-  nu_ou_lambda_turb_ = 0.; // XXX : pour n'avoir pas la partie laminaire
+  // compute d_t_
+  nu_ou_lambda_turb_ = 0.; // XXX : to exclude the laminar part
   call_compute_diff_turb(ref_cast(Convection_Diffusion_std, equation()), ref_cast(Viscosite_turbulente_base, corr_visc_qdm));
   set_nut_impl<Type_Operateur::Op_DIFT_MULTIPHASE_ELEM, Eval_Dift_Multiphase_VDF_Elem>(nu_ou_lambda_turb_);
   mettre_a_jour_proto_elem(temps);
@@ -108,7 +108,7 @@ double Op_Dift_Multiphase_VDF_Elem::calculer_dt_stab() const
           //if (elem==0) cout << "ncomp "<< ncomp << " nu_ou_lambda_turb = alpha * nut * sigma "<< nu_ou_lambda_turb_(elem, ncomp) << endl;
           alfa = (alp ? (*alp)(elem, ncomp) : 1.0);
           mu_turbulent = rho(!cR * elem, ncomp) * nu_ou_lambda_turb_(elem, ncomp);
-          //if (elem==0) cout << "ncomp "<< ncomp << " mu_turbulent avec alpha "<< mu_turbulent << endl;
+          //if (elem==0) cout << "ncomp "<< ncomp << " mu_turbulent with alpha "<< mu_turbulent << endl;
           if (alfa != 0.0 ) mu_turbulent = mu_turbulent/alfa;
           //if (elem==0) cout << "ncomp "<< ncomp << " mu_turbulent sans alpha "<< mu_turbulent << endl;
           mu_physique = rho(!cR * elem, ncomp) * lambda(!cL * elem, ncomp);
@@ -116,7 +116,7 @@ double Op_Dift_Multiphase_VDF_Elem::calculer_dt_stab() const
           //if (elem==0) cout << "ncomp "<< ncomp << " mu_physique "<< mu_physique << endl;
           //if (elem==0) cout << "ncomp "<< ncomp << " nu_physique "<< nu_physique << endl;
 
-          // le pas de temps de stab est alpha(nu+nu_t), on calcule a(mu+mu_t)*(nu/mu)=a(mu+mu_t)/rho=a(nu+nu_t) (avantage par rapport a la division par rho ca marche aussi pour alpha et lambda et en VEF
+          // the stability time step is alpha(nu+nu_t); compute a(mu+mu_t)*(nu/mu)=a(mu+mu_t)/rho=a(nu+nu_t) (advantage over dividing by rho: also works for alpha and lambda and in VEF)
           diflo = deltax * (mu_physique + mu_turbulent) * (nu_physique / mu_physique);
           //if (elem==0) cout << "ncomp "<< ncomp << " dt "<< 0.5 / (diflo + DMINFLOAT) << endl;
           coef = std::max(coef, diflo);

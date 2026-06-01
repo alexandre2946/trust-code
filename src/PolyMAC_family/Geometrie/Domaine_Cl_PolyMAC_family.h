@@ -16,8 +16,8 @@
 #ifndef Domaine_Cl_PolyMAC_family_included
 #define Domaine_Cl_PolyMAC_family_included
 
-//  Cette classe porte les tableaux qui servent a mettre en oeuvre
-//  les condition aux limites dans la formulation PolyMAC_CDO
+//  This class holds the arrays used to implement
+//  the boundary conditions in the PolyMAC_CDO formulation
 #include <Domaine_Cl_dis_base.h>
 
 

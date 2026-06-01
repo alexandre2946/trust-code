@@ -20,10 +20,10 @@
 #include <Terme_Source_VDF_base.h>
 #include <Eval_Gravite_VDF_Face.h>
 
-/*! @brief class Terme_Gravite_VDF_Face Cette classe represente le terme de gravite qui figure dans l'equation
+/*! @brief class Terme_Gravite_VDF_Face This class represents the gravity term appearing in the
  *
- *  de la dynamique divisee par la masse volumique;la masse volumique est
- *  supposee constante.
+ *  momentum equation divided by the density; the density is
+ *  assumed constant.
  *
  */
 class Terme_Gravite_VDF_Face : public Terme_Source_VDF_base

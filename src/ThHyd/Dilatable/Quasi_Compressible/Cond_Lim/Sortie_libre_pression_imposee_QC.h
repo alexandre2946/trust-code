@@ -18,11 +18,10 @@
 
 #include <Neumann_sortie_libre.h>
 
-/*! @brief classe Sortie_libre_pression_imposee Cette classe derive de Neumann_sortie_libre
+/*! @brief Open boundary with imposed pressure condition, derived from Neumann_sortie_libre.
  *
- *     Elle represente une frontiere ouverte avec condition de pression imposee.
- *     L'objet de type Champ_bord le_champ_bord contient la pression et la fonction flux_impose() renvoie les valeurs de cette pression.
- *     champ_ext contient une valeur de la vitesse du fluide a l'exterieur accessible par la methode val_ext()
+ * The le_champ_bord object of type Champ_bord holds the pressure, and flux_impose() returns its values.
+ * champ_ext holds the external fluid velocity, accessible via val_ext().
  *
  * @sa Neumann_sortie_libre
  */
@@ -35,11 +34,11 @@ public :
   double flux_impose(int i) const override;
   double flux_impose(int i,int j) const override;
 
-  inline double get_Pth() { return Pthn; }// retourne la pression thermohydraulique
-  inline void set_Pth(double P) { Pthn = P; } // fixe la pression  thermohydraulique
+  inline double get_Pth() { return Pthn; } // returns the thermohydraulic pressure
+  inline void set_Pth(double P) { Pthn = P; } // sets the thermohydraulic pressure
 
 protected:
-  double Pthn, d_rho; // pression thermohydraulique au temps n, rho out
+  double Pthn, d_rho; // thermohydraulic pressure at time n, density outside
 };
 
 #endif /* Sortie_libre_pression_imposee_QC_included */

@@ -378,9 +378,9 @@ void Ecrire_MED_32_64<_SIZE_>::fill_faces_and_boundaries()
   mfumesh_->setGroupsAtLevel(-1, grps);
 }
 
-/*! @brief Ecrit le domaine dom dans le fichier nom_fichier_
+/*! @brief Writes the domain dom to the file nom_fichier_
  *
- * @param append = false nouveau fichier, append = true ajout du domaine dans le fichier
+ * @param append = false new file, append = true adds the domain to an existing file
  */
 template <typename _SIZE_>
 void Ecrire_MED_32_64<_SIZE_>::ecrire_domaine_dis(bool append)
@@ -425,13 +425,13 @@ void Ecrire_MED_32_64<trustIdType>::ecrire_domaine_dis(bool append)
 }
 #endif
 
-/*! @brief Permet d'ecrire le tableau de valeurs val comme un champ dans le fichier med de nom nom_fichier_, avec pour support le domaine de nom nom_dom.
+/*! @brief Writes the value array val as a field in the MED file named nom_fichier_, supported on the domain named nom_dom.
  *
- *   @param type: CHAMPPOINT,CHAMPMAILLE,CHAMPFACES
- *   @param nom_cha1 le nom du champ
- *   @param unite : les unites
- *   @param type_elem le type des elems du domaine
- *   @param time le temps
+ *   @param type: CHAMPPOINT, CHAMPMAILLE, CHAMPFACES
+ *   @param nom_cha1 field name
+ *   @param unite : units
+ *   @param type_elem element type of the domain
+ *   @param time time value
  */
 template <typename _SIZE_>
 void Ecrire_MED_32_64<_SIZE_>::ecrire_champ(const Nom& type, const Nom& nom_cha1, const DoubleTab& val, const Noms& unite,

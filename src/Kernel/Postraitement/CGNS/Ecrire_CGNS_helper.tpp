@@ -162,7 +162,7 @@ inline void Ecrire_CGNS_helper::cgns_sol_write(const int nb_zones_to_write, cons
     {
       solname_som += solname;
 
-      // on boucle seulement sur les procs qui n'ont pas des nb_elem 0
+      // loop only over procs that have a non-zero nb_elem
       for (int ii = 0; ii != nb_zones_to_write; ii++)
         {
           if (cg_sol_write(fileId, baseId, zoneId[is_PAR_OVER ? ii : ind], solname.c_str(), CGNS_ENUMV(Vertex), &flowId_som) != CG_OK)
@@ -181,7 +181,7 @@ inline void Ecrire_CGNS_helper::cgns_sol_write(const int nb_zones_to_write, cons
     {
       solname_elem += solname;
 
-      // on boucle seulement sur les procs qui n'ont pas des nb_elem 0
+      // loop only over procs that have a non-zero nb_elem
       for (int ii = 0; ii != nb_zones_to_write; ii++)
         {
           if (cg_sol_write(fileId, baseId, zoneId[is_PAR_OVER ? ii : ind], solname.c_str(), CGNS_ENUMV(CellCenter), &flowId_elem) != CG_OK)
@@ -200,7 +200,7 @@ inline void Ecrire_CGNS_helper::cgns_sol_write(const int nb_zones_to_write, cons
     {
       solname_faces += solname;
 
-      // on boucle seulement sur les procs qui n'ont pas des nb_elem 0
+      // loop only over procs that have a non-zero nb_elem
       for (int ii = 0; ii != nb_zones_to_write; ii++)
         {
           if (cg_sol_write(fileId, baseId, zoneId[is_PAR_OVER ? ii : ind], solname.c_str(), CGNS_ENUMV(CellCenter), &flowId_faces) != CG_OK)
@@ -373,14 +373,14 @@ inline void Ecrire_CGNS_helper::cgns_write_iters_deformable(const bool is_deform
   const cgsize_t nuse = static_cast<cgsize_t>(nsteps);
   assert (nsteps > 0);
 
-  // helper local : supprimer TOUTES les occurrences d'un DataArray_t <name> sous le noeud courant
+  // local helper: delete ALL occurrences of a DataArray_t <name> under the current node
   auto delete_all_arrays_named = [](const char *arrname)
   {
     for (;;)
       {
-        if (cg_delete_node(const_cast<char*>(arrname)) == CG_OK) continue; // recommence tant qu'il en trouve
+        if (cg_delete_node(const_cast<char*>(arrname)) == CG_OK) continue; // keep going as long as nodes are found
 
-        break; // plus de noeud de ce nom
+        break; // no more nodes with this name
       }
   };
 

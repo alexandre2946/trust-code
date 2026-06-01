@@ -59,19 +59,17 @@ Sortie& Navier_Stokes_std::printOn(Sortie& is) const
   return Equation_base::printOn(is);
 }
 
-/*! @brief Appel Equation_base::readOn(Entree& is) En sortie verifie que l'on a bien lu:
+/*! @brief Calls Equation_base::readOn(Entree& is). On exit, verifies that the following have been read:
  *
- *         - le terme diffusif,
- *         - le terme convectif,
- *         - le solveur en pression
+ *         - the diffusive term,
+ *         - the convective term,
+ *         - the pressure solver
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws terme diffusif non specifie dans jeu de donnees, specifier
- * un type negligeable pour l'operateur si il est a negliger
- * @throws terme convectif non specifie dans jeu de donnees, specifier
- * un type negligeable pour l'operateur si il est a negliger
- * @throws solveur pression non defini dans jeu de donnees
+ * @param (Entree& is) input stream
+ * @return (Entree&) the modified input stream
+ * @throws diffusive term not specified in data file; specify a negligeable type if it should be neglected
+ * @throws convective term not specified in data file; specify a negligeable type if it should be neglected
+ * @throws pressure solver not defined in data file
  */
 Entree& Navier_Stokes_std::readOn(Entree& is)
 {
@@ -136,7 +134,7 @@ int Navier_Stokes_std::lire_motcle_non_standard(const Motcle& mot, Entree& is)
       Cerr << "Reading and typing of the diffusion operator : " << finl;
       terme_diffusif.associer_diffusivite(diffusivite_pour_transport());
       is >> terme_diffusif;
-      // le champ pour le dt_stab est le meme que celui de l'operateur
+      // the field for dt_stab is the same as that of the operator
       terme_diffusif.associer_diffusivite_pour_pas_de_temps(diffusivite_pour_pas_de_temps());
       return 1;
     }
@@ -277,11 +275,11 @@ const Champ_base& Navier_Stokes_std::vitesse_pour_transport() const
 }
 
 
-/*! @brief S'associe au probleme: apelle Equation_base::associer_pb_base(const Probleme_base&)
+/*! @brief Associates with the problem: calls Equation_base::associer_pb_base(const Probleme_base&)
  *
- *      s'associe avec les operateurs de divergence et de gradient.
+ *      and associates with the divergence and gradient operators.
  *
- * @param (Probleme_base& pb) le probleme auquel s'associer
+ * @param (Probleme_base& pb) the problem to associate with
  */
 void Navier_Stokes_std::associer_pb_base(const Probleme_base& pb)
 {
@@ -290,14 +288,14 @@ void Navier_Stokes_std::associer_pb_base(const Probleme_base& pb)
   gradient.associer_eqn(*this);
 }
 
-/*! @brief Complete l'equation base, associe la pression a l'equation,
+/*! @brief Completes the base equation, associates the pressure with the equation,
  *
- *     complete la divergence, le gradient et le solveur pression.
- *     Ajout de 2 termes sources: l'un representant la force centrifuge
- *     dans le cas axi-symetrique,l'autre intervenant dans la resolution
- *     en 2D axisymetrique
- *     Association d une equation de transport d interface a l ensemble
- *     de points suivis si le fluide est marque
+ *     completes the divergence, gradient and pressure solver.
+ *     Adds 2 source terms: one representing the centrifugal force
+ *     in the axisymmetric case, the other involved in the resolution
+ *     in 2D axisymmetric.
+ *     Associates an interface transport equation with the set
+ *     of tracked points if the fluid is marked.
  *
  */
 void Navier_Stokes_std::completer()
@@ -321,7 +319,7 @@ void Navier_Stokes_std::completer()
 
   Equation_base::completer();
 
-  // On ne decline pas le residu par composantes pour la vitesse:
+  // Do not split the residual by components for the velocity:
   initialise_residu(1);
 
   la_pression->associer_eqn(*this);
@@ -339,7 +337,7 @@ void Navier_Stokes_std::completer()
   assembleur_pression_->associer_domaine_cl_dis_base(domaine_Cl_dis());
   assembleur_pression_->completer(*this);
 
-  if (distance_paroi_globale)// On initialize la distance au bord au debut du calcul si on en a besoin, ce ne sera plus mis a jour par la suite car le maillage est fixe ; on le fait tard car il faut avoir lu les CL
+  if (distance_paroi_globale)// Initialize the wall distance at the start of the computation if needed; it will no longer be updated since the mesh is fixed; done late because boundary conditions must be read first.
     {
       Domaine_dis_base& domaine = domaine_dis();
       domaine.init_dist_paroi_globale(domaine_Cl_dis().les_conditions_limites());
@@ -356,7 +354,7 @@ int Navier_Stokes_std::verif_Cl() const
   return Equation_base::verif_Cl();
 }
 
-/*! @brief Dicretise l'equation.
+/*! @brief Discretizes the equation.
  *
  */
 void Navier_Stokes_std::discretiser()
@@ -388,7 +386,7 @@ void Navier_Stokes_std::discretiser()
   champs_compris_.ajoute_champ(divergence_U);
 
 
-  // Appel a la methode virtuelle de discretisation de l'assembleur pression:
+  // Call the virtual method for pressure assembler discretization:
   discretiser_assembleur_pression();
 
   Equation_base::discretiser();
@@ -407,12 +405,12 @@ void Navier_Stokes_std::discretiser_grad_p()
   champs_compris_.ajoute_champ(gradient_P);
 }
 
-/*! @brief Typage de l'assembleur pression.
+/*! @brief Types the pressure assembler.
  *
- * Le nom de l'assembleur utilise est construit comme :
- *   Assembleur_P_xxx" ou "xxx" est le nom de la discretisation.
- *   Cette methode est virtuelle et surchargee dans le front-tracking.
- *   Elle est appelee par Navier_Stokes_std::discretiser()
+ * The assembler name is built as:
+ *   "Assembleur_P_xxx" where "xxx" is the name of the discretization.
+ *   This method is virtual and overridden in front-tracking.
+ *   It is called by Navier_Stokes_std::discretiser()
  *
  */
 
@@ -437,9 +435,9 @@ void Navier_Stokes_std::reassembler_pression_si_necessaire()
   solveur_pression_->reinit();
 }
 
-/*! @brief Renvoie le nombre d'operateurs de l'equation: Pour Navier Stokes Standard c'est 2.
+/*! @brief Returns the number of operators in the equation: 2 for the standard Navier-Stokes equations.
  *
- * @return (int) le nombre d'operateur de l'equation
+ * @return (int) the number of operators in the equation
  */
 int Navier_Stokes_std::nombre_d_operateurs() const
 {
@@ -451,14 +449,14 @@ int Navier_Stokes_std::nombre_d_operateurs_tot() const
   return 4;
 }
 
-/*! @brief Renvoie le i-eme operateur de l'equation: - le terme_diffusif si i = 0
+/*! @brief Returns the i-th operator of the equation: - terme_diffusif if i = 0
  *
- *       - le terme_convectif si i = 1
- *      exit si i>1
- *     (version const)
+ *       - terme_convectif if i = 1
+ *      exits if i > 1
+ *      (const version)
  *
- * @param (int i) l'index de l'operateur a renvoyer
- * @return (Operateur&) l'operateur indexe par i
+ * @param (int i) the index of the operator to return
+ * @return (Operateur&) the operator at index i
  */
 const Operateur& Navier_Stokes_std::operateur(int i) const
 {
@@ -474,17 +472,17 @@ const Operateur& Navier_Stokes_std::operateur(int i) const
       Cerr << "and you are trying to access the " << i <<" th one."<< finl;
       exit();
     }
-  // Pour les compilos!!
+  // For compilers!
   return terme_diffusif;
 }
 
-/*! @brief Renvoie le i-eme operateur de l'equation: - le terme_diffusif si i = 0
+/*! @brief Returns the i-th operator of the equation: - terme_diffusif if i = 0
  *
- *       - le terme_convectif si i = 1
- *      exit si i>1
+ *       - terme_convectif if i = 1
+ *      exits if i > 1
  *
- * @param (int i) l'index de l'operateur a renvoyer
- * @return (Operateur&) l'operateur indexe par i
+ * @param (int i) the index of the operator to return
+ * @return (Operateur&) the operator at index i
  */
 Operateur& Navier_Stokes_std::operateur(int i)
 {
@@ -500,7 +498,7 @@ Operateur& Navier_Stokes_std::operateur(int i)
       Cerr << "and you are trying to access the " << i <<" th one."<< finl;
       exit();
     }
-  // Pour les compilos!!
+  // For compilers!
   return terme_diffusif;
 }
 
@@ -518,7 +516,7 @@ const Operateur& Navier_Stokes_std::operateur_fonctionnel(int i) const
       Cerr << "and you are trying to access the " << i <<" th one."<< finl;
       exit();
     }
-  // Pour les compilos!!
+  // For compilers!
   return Navier_Stokes_std::operateur_fonctionnel(i);
 }
 
@@ -536,34 +534,34 @@ Operateur& Navier_Stokes_std::operateur_fonctionnel(int i)
       Cerr << "and you are trying to access the " << i <<" th one."<< finl;
       exit();
     }
-  // Pour les compilos!!
+  // For compilers!
   return Navier_Stokes_std::operateur_fonctionnel(i);
 }
 
 
-/*! @brief Renvoie l'operateur de calcul de la divergence associe a l'equation.
+/*! @brief Returns the divergence operator associated with the equation.
  *
- * @return (Operateur_Div&) l'operateur de calcul de la divergence.
+ * @return (Operateur_Div&) the divergence operator.
  */
 Operateur_Div& Navier_Stokes_std::operateur_divergence()
 {
   return divergence;
 }
 
-/*! @brief Renvoie l'operateur de calcul de la divergence associe a l'equation.
+/*! @brief Returns the divergence operator associated with the equation.
  *
- *     (version const)
+ *     (const version)
  *
- * @return (Operateur_Div&) l'operateur de calcul de la divergence
+ * @return (Operateur_Div&) the divergence operator
  */
 const Operateur_Div& Navier_Stokes_std::operateur_divergence() const
 {
   return divergence;
 }
 
-/*! @brief Renvoie l'operateur de calcul du gradient associe a l'equation.
+/*! @brief Returns the gradient operator associated with the equation.
  *
- * @return (Operateur_Grad&) l'operateur de calcul du gradient
+ * @return (Operateur_Grad&) the gradient operator
  */
 Operateur_Grad& Navier_Stokes_std::operateur_gradient()
 {
@@ -580,11 +578,11 @@ const Operateur_Diff& Navier_Stokes_std::operateur_diff() const
   return terme_diffusif;
 }
 
-/*! @brief Renvoie l'operateur de calcul du gradient associe a l'equation.
+/*! @brief Returns the gradient operator associated with the equation.
  *
- *     (version const)
+ *     (const version)
  *
- * @return (Operateur_Grad&) l'operateur de calcul du gradient
+ * @return (Operateur_Grad&) the gradient operator
  */
 const Operateur_Grad& Navier_Stokes_std::operateur_gradient() const
 {
@@ -592,38 +590,38 @@ const Operateur_Grad& Navier_Stokes_std::operateur_gradient() const
 }
 
 
-/*! @brief Renvoie la vitesse (champ inconnue de l'equation) (version const)
+/*! @brief Returns the velocity (unknown field of the equation) (const version)
  *
- * @return (Champ_Inc_base&) le champ inconnue representant la vitesse
+ * @return (Champ_Inc_base&) the unknown field representing the velocity
  */
 const Champ_Inc_base& Navier_Stokes_std::inconnue() const
 {
   return la_vitesse.valeur();
 }
 
-/*! @brief Renvoie la vitesse (champ inconnue de l'equation)
+/*! @brief Returns the velocity (unknown field of the equation)
  *
- * @return (Champ_Inc_base&) le champ inconnue representant la vitesse
+ * @return (Champ_Inc_base&) the unknown field representing the velocity
  */
 Champ_Inc_base& Navier_Stokes_std::inconnue()
 {
   return la_vitesse.valeur();
 }
 
-/*! @brief Renvoie le solveur en pression (version const)
+/*! @brief Returns the pressure solver (const version)
  *
- * @return (SolveurSys&) le solveur en pression
+ * @return (SolveurSys&) the pressure solver
  */
 SolveurSys& Navier_Stokes_std::solveur_pression()
 {
   return solveur_pression_;
 }
 
-/*! @brief Renvoie le fluide incompressible (milieu physique de l'equation) associe a l'equation.
+/*! @brief Returns the incompressible fluid (physical medium of the equation) associated with the equation.
  *
- *     (version const)
+ *     (const version)
  *
- * @return (Fluide_base&) le fluide incompressible associe a l'equation
+ * @return (Fluide_base&) the incompressible fluid associated with the equation
  */
 const Fluide_base& Navier_Stokes_std::fluide() const
 {
@@ -631,9 +629,9 @@ const Fluide_base& Navier_Stokes_std::fluide() const
 }
 
 
-/*! @brief Renvoie le fluide incompressible (milieu physique de l'equation) associe a l'equation.
+/*! @brief Returns the incompressible fluid (physical medium of the equation) associated with the equation.
  *
- * @return (Fluide_base&) le fluide incompressible associe a l'equation
+ * @return (Fluide_base&) the incompressible fluid associated with the equation
  */
 Fluide_base& Navier_Stokes_std::fluide()
 {
@@ -694,10 +692,10 @@ DoubleTab& Navier_Stokes_std::corriger_derivee_expl(DoubleTab& derivee)
 {
   if (assembleur_pression_->get_resoudre_increment_pression())
     {
-      // PL: Pour ne pas calculer ce gradient, il faut
+      // PL: To avoid computing this gradient, the following must hold:
       // A) postraitement_gradient_P_==0 car sinon grad contient alors M-1BtP
-      // B) les conditions en pression soient stationnaires (pas facile a detecter: Orlansky, P(t), gradient_pression impose...)
-      // En outre, cela fait des ecarts avec le schema CN iteratif
+      // B) pressure boundary conditions are stationary (hard to detect: Orlansky, P(t), imposed pressure gradient...)
+      // Moreover, this causes discrepancies with the iterative CN scheme
       const DoubleTab& tab_pression = la_pression->valeurs();
       DoubleTab& gradP = gradient_P->valeurs();
       gradient.calculer(tab_pression, gradP);
@@ -729,8 +727,8 @@ DoubleTab& Navier_Stokes_std::corriger_derivee_impl(DoubleTab& derivee)
   const double dt = schema_temps().pas_de_temps();
   if (div_u_nul_et_non_dsurdt_divu_)
     {
-      // on veut div u =0 et non d/dt (div u)=0 pour eviter de cumuler les erreurs
-      // cela ne marche qu'avec les schema type euler_explicite
+      // we want div u = 0 rather than d/dt(div u) = 0 to avoid accumulating errors
+      // this only works with explicit Euler-type schemes
       DoubleTab derivee2(derivee);
       derivee2*=dt;
       derivee2+=la_vitesse->passe();
@@ -755,8 +753,8 @@ DoubleTab& Navier_Stokes_std::corriger_derivee_impl(DoubleTab& derivee)
   else
     divergence.calculer(derivee, secmemP); // Div(M-1(F - BtP))
 
-  secmemP *= -1; // car div =-B
-  // Correction du second membre d'apres les conditions aux limites :
+  secmemP *= -1; // because div = -B
+  // Correction of the right-hand side according to the boundary conditions:
   assembleur_pression_->modifier_secmem(secmemP);
 
   // Set print of the linear system solve according to dt_impr:
@@ -804,15 +802,15 @@ DoubleTab& Navier_Stokes_std::corriger_derivee_impl(DoubleTab& derivee)
   return derivee;
 }
 
-/*! @brief Calcule la solution U des equations: | M(U-V)/dt + BtP = 0
+/*! @brief Computes the solution U of the equations: | M(U-V)/dt + BtP = 0
  *
  *           |-BU=0
- *     On resoud le probleme en pression: -BM-1BtP = -BV/dt
- *     sachant que -BV represente le calcul de la divergence de V
- *     On resoud le probleme en vitesse en appliquant le solveur
- *     de masse au gradient de P:  U=V - dt*M-1BtP
+ *     The pressure problem is solved: -BM-1BtP = -BV/dt
+ *     where -BV represents the divergence of V.
+ *     The velocity problem is solved by applying the mass solver
+ *     to the gradient of P:  U=V - dt*M-1BtP
  *
- * @throws pas de temps trop petit
+ * @throws time step too small
  */
 void Navier_Stokes_std::projeter()
 {
@@ -835,8 +833,8 @@ void Navier_Stokes_std::projeter()
 
       DoubleTrav secmem(la_pression->valeurs());
       divergence.calculer(tab_vitesse, secmem);
-      // Desormais on calcule le pas de temps avant la projection
-      // Avant, on avait dt=dt_min au debut du calcul
+      // The time step is now computed before the projection.
+      // Previously, dt=dt_min at the start of the computation.
       double dt = std::max(le_schema_en_temps->pas_temps_min(),calculer_pas_de_temps());
       dt = std::min(dt, le_schema_en_temps->pas_temps_max());
 
@@ -855,10 +853,10 @@ void Navier_Stokes_std::projeter()
           solv_iter.set_seuil(seuil_projection);
         }
 
-      // Correction du second membre d'apres les conditions aux limites :
-      // Cela ne sert a rien d'initialiser lagrange avec la pression
-      // voir ca penalise le calcul en p1B et CL p<>0
-      // On prend un DoubleTrav au lieu d'un DoubleTab pour avoir lagrange=0
+      // Correction of the right-hand side according to the boundary conditions:
+      // There is no point initializing lagrange with the pressure;
+      // it actually penalizes the computation in p1B with CL p<>0.
+      // Use a DoubleTrav instead of a DoubleTab to initialize lagrange=0.
       DoubleTrav lagrange(la_pression->valeurs());
       solveur_pression_.resoudre_systeme(matrice_pression_.valeur(),secmem,lagrange);
       assembleur_pression_->modifier_solution(lagrange);
@@ -904,11 +902,11 @@ void Navier_Stokes_std::projeter()
 
 int Navier_Stokes_std::projection_a_faire()
 {
-  // Pas de projection si l'equation n'est pas resolue
+  // No projection if the equation is not solved
   // if (equation_non_resolue()) return 0;
 
   double temps = le_schema_en_temps->temps_courant()+le_schema_en_temps->pas_de_temps();
-  // Voir Schema_Temps_base::limpr pour information sur modf
+  // See Schema_Temps_base::limpr for information on modf
   double nb_proj_int;
   modf(temps/dt_projection, &nb_proj_int);
   static double nb_proj = nb_proj_int;
@@ -922,13 +920,13 @@ int Navier_Stokes_std::projection_a_faire()
   return 0;
 }
 
-/*! @brief cf Equation_base::preparer_calcul() Assemblage du solveur pression et
+/*! @brief cf Equation_base::preparer_calcul() Assembly of the pressure solver and
  *
- *      initialisation de la pression.
+ *      initialization of the pressure.
  *
- *      assemblage du systeme en pression
+ *      Assembly of the pressure system.
  *
- * @return (int) renvoie toujours 1
+ * @return (int) always returns 1
  */
 int Navier_Stokes_std::preparer_calcul()
 {
@@ -996,20 +994,20 @@ int Navier_Stokes_std::preparer_calcul()
       solveur_pression_.resoudre_systeme(matrice_pression_.valeur(), secmem, inc_pre);
       Cerr << "Pressure increment computed successfully" << finl;
 
-      // On veut que l'espace virtuel soit a jour, donc all_items
+      // We want the virtual space to be up-to-date, hence all_items
       operator_add(la_pression->valeurs(), inc_pre, VECT_ALL_ITEMS);
     }
-  // Mise a jour pression
+  // Update pressure
   la_pression->changer_temps(temps);
   calculer_la_pression_en_pa();
-  // Calcul des forces de pression:
+  // Compute pressure forces:
   gradient->calculer_flux_bords();
 
-  // Calcul gradient_P (ToDo rendre coherent avec ::mettre_a_jour()):
+  // Compute gradient_P (ToDo: make consistent with ::mettre_a_jour()):
   gradient.calculer(la_pression->valeurs(), gradient_P->valeurs());
   gradient_P->changer_temps(temps);
 
-  // Calcul divergence_U
+  // Compute divergence_U
   divergence.calculer(la_vitesse->valeurs(), divergence_U->valeurs());
   divergence_U->changer_temps(temps);
 
@@ -1022,24 +1020,24 @@ int Navier_Stokes_std::preparer_calcul()
   return 1;
 }
 
-/*! @brief Effectue une mise a jour en temps de l'equation.
+/*! @brief Performs a time update of the equation.
  *
- * Appelle Equation_base::mettre_a_jour(double)
- *      et met a jour la pression.
- *      Integration des points suivis si le fluide est marque
- *      Mise a jour du champ postraitable correspondant
+ * Calls Equation_base::mettre_a_jour(double)
+ *      and updates the pressure.
+ *      Integrates tracked points if the fluid is marked.
+ *      Updates the corresponding post-processable field.
  *
- * @param (double temps) le temps de mise a jour
+ * @param (double temps) the update time
  */
 void Navier_Stokes_std::mettre_a_jour(double temps)
 {
-  // Mise a jour de la classe mere (on tourne la roue).
+  // Update the parent class (advance the time wheel).
   Equation_base::mettre_a_jour(temps);
 
-  // Mise a jour de la pression
+  // Update pressure
   la_pression->mettre_a_jour(temps);
   calculer_la_pression_en_pa();
-  // Calcul des forces de pression:
+  // Compute pressure forces:
   gradient->calculer_flux_bords();
 
   // Update the divergence of the velocity div(U)
@@ -1048,7 +1046,7 @@ void Navier_Stokes_std::mettre_a_jour(double temps)
   //statistics().begin_count(STD_COUNTERS::update_variables,statistics().get_last_opened_counter_level()+1);
   divergence_U->mettre_a_jour(temps);
 
-  // Pour le postraitement, on veut M-1BtP et non BtP
+  // For post-processing, we want M-1BtP and not BtP
   if (postraitement_gradient_P_)
     {
       gradient.calculer(la_pression->valeurs(), gradient_P->valeurs());
@@ -1057,10 +1055,10 @@ void Navier_Stokes_std::mettre_a_jour(double temps)
       gradient_P->mettre_a_jour(temps);
     }
 
-  // PQ : 04/03 : procedure de determination dynamique du seuil de convergence en pression
+  // PQ: 04/03: procedure for dynamic determination of the pressure convergence threshold
   if(sub_type(solv_iteratif,solveur_pression_.valeur()) && seuil_divU < 1.)
     {
-      // Calcul dynamique d'un seuil sur le solveur iteratif de pression
+      // Dynamic threshold computation for the iterative pressure solver
       solv_iteratif& solv_iter=ref_cast(solv_iteratif,solveur_pression_.valeur());
       double seuil_dyn=solv_iter.get_seuil();
 
@@ -1072,7 +1070,7 @@ void Navier_Stokes_std::mettre_a_jour(double temps)
       seuil_dyn=std::max(seuil_dyn,seuil_dyn_max);
       solv_iter.set_seuil(seuil_dyn);
     }
-  // fin procedure de determination du seuil dynamique de convergence en pression
+  // end of the dynamic pressure convergence threshold procedure
 
   if (projection_a_faire())
     projeter();
@@ -1099,9 +1097,9 @@ double Navier_Stokes_std::LocalFlowRateRelativeError() const
 
 void Navier_Stokes_std::abortTimeStep()
 {
-  // On reprend la pression du debut du pas de temps
-  // Utile si on reprend le pas de temps parce que la pression a diverge (sinon tres mauvaise precision)
-  // et si on est en Piso (suppose pression juste au debut du pas de temps).
+  // Restore the pressure from the beginning of the time step.
+  // Useful if the time step is retried because the pressure diverged (otherwise very poor accuracy)
+  // and when using Piso (which assumes correct pressure at the start of the time step).
   pression().valeurs()=P_n;
   //pression().valeurs()=0;
   Equation_base::abortTimeStep();
@@ -1119,8 +1117,8 @@ bool Navier_Stokes_std::initTimeStep(double dt)
 {
   P_n=pression().valeurs();
 
-  // Verification que dt_max est correctement fixe pour un champ
-  // de vitesse nul et diffusion_implicite active <=> dt_conv=INF
+  // Check that dt_max is correctly set for a zero
+  // velocity field with active implicit diffusion <=> dt_conv=INF
   const Schema_Temps_base& sch_tps = le_schema_en_temps.valeur();
   bool ddt = Equation_base::initTimeStep(dt);
 
@@ -1128,7 +1126,7 @@ bool Navier_Stokes_std::initTimeStep(double dt)
     if (i <= pression().nb_valeurs_temporelles())
       {
         double tps=sch_tps.temps_futur(i);
-        // Mise a jour du temps dans les champs de pression
+        // Update time in pressure fields
         pression().changer_temps_futur(tps,i);
         pression_pa().changer_temps_futur(tps,i);
         pression().futur(i)=pression().valeurs();
@@ -1138,12 +1136,12 @@ bool Navier_Stokes_std::initTimeStep(double dt)
   return ddt;
 }
 
-/*! @brief Calcul de "la_pression_en_pa" en fonction de "la_pression".
+/*! @brief Computes "la_pression_en_pa" from "la_pression".
  *
- * Si le champ milieu().masse_volumique() est uniforme, on suppose que
- *   la_pression est P* = P/rho, et on multiplie par rho. Sinon,
- *   la_pression est deja en Pa.
- *   Cette methode est surchargee en front-tracking.
+ * If the field milieu().masse_volumique() is uniform, it is assumed that
+ *   la_pression is P* = P/rho, and the value is multiplied by rho. Otherwise,
+ *   la_pression is already in Pa.
+ *   This method is overridden in front-tracking.
  *
  */
 void Navier_Stokes_std::calculer_la_pression_en_pa()
@@ -1152,14 +1150,14 @@ void Navier_Stokes_std::calculer_la_pression_en_pa()
   DoubleTab& tab_pression=la_pression->valeurs();
   const Champ_base& rho=milieu().masse_volumique();
   if (Pa.get_md_vector() == tab_pression.get_md_vector())
-    Pa = tab_pression; //Pa et tab_pression ont le meme support
+    Pa = tab_pression; //Pa and tab_pression share the same support
   else
     {
       ConstDoubleTab_parts ppart(tab_pression);
       assert(Pa.get_md_vector() == ppart[0].get_md_vector());
-      Pa = ppart[0]; //tab_pression a un morceau en plus
+      Pa = ppart[0]; //tab_pression has one extra piece
     }
-  // On multiplie par rho si uniforme sinon deja en Pa...
+  // Multiply by rho if uniform, otherwise already in Pa...
   if (sub_type(Champ_Uniforme,rho))
     Pa *= rho.valeurs()(0,0);
   la_pression_en_pa->mettre_a_jour(pression().temps());
@@ -1176,31 +1174,31 @@ std::vector<YAML_data> Navier_Stokes_std::data_a_sauvegarder() const
   return data;
 }
 
-/*! @brief Appelle Equation_base::sauvegarder(Sortie&) et sauvegarde la pression sur un flot de sortie.
+/*! @brief Calls Equation_base::sauvegarder(Sortie&) and saves the pressure to an output stream.
  *
- * @param (Sortie& os) un flot de sortie sur lequel sauvegarder
- * @return (int) renvoie toujours 1
+ * @param (Sortie& os) output stream to save to
+ * @return (int) always returns 1
  */
 int Navier_Stokes_std::sauvegarder(Sortie& os) const
 {
   int bytes=0;
   bytes += Equation_base::sauvegarder(os);
   bytes += la_pression->sauvegarder(os);
-  //La methode sauver() assurant la sauvegarde pour le traitement particulier
-  //est maintenant appelee ici au lieu d etre appelee dans des problemes particuliers
+  // The sauver() method ensuring save for the particular treatment
+  // is now called here instead of being called in specific problems.
   sauver();
 
   return bytes;
 }
 
-/*! @brief Effectue une reprise a partir d'un flot d'entree.
+/*! @brief Performs a restart from an input stream.
  *
- * Appelle Equation_base::reprendre()
- *      et reprend la pression.
+ * Calls Equation_base::reprendre()
+ *      and restores the pressure.
  *
- * @param (Entree& is) un flot d'entree
- * @return (int) renvoie toujours 1
- * @throws la reprise a echoue, identificateur de la pression non trouve
+ * @param (Entree& is) input stream
+ * @return (int) always returns 1
+ * @throws restart failed, pressure identifier not found
  */
 int Navier_Stokes_std::reprendre(Entree& is)
 {
@@ -1229,11 +1227,11 @@ int Navier_Stokes_std::reprendre(Entree& is)
   return 1;
 }
 
-/*! @brief Associe un mileu physique a l'equation en construisant dynamiquement (cast) un objet de type Fluide_base
+/*! @brief Associates a physical medium with the equation by dynamically constructing (casting) an object of type Fluide_base
  *
- *     a partir de l'objet Milieu_base passe en parametre.
+ *     from the Milieu_base object passed as parameter.
  *
- * @param (Milieu_base& un_milieu) le milieu a associer a l'equation
+ * @param (Milieu_base& un_milieu) the medium to associate with the equation
  */
 void Navier_Stokes_std::associer_milieu_base(const Milieu_base& un_milieu)
 {
@@ -1249,9 +1247,9 @@ void Navier_Stokes_std::associer_milieu_base(const Milieu_base& un_milieu)
     }
 }
 
-/*! @brief Renvoie le milieu physique de l'equation (le Fluide_base upcaste en Milieu_base)
+/*! @brief Returns the physical medium of the equation (Fluide_base upcast to Milieu_base)
  *
- * @return (Milieu_base&) le Fluide_base de l'equation upcaste en Milieu_base
+ * @return (Milieu_base&) the Fluide_base of the equation upcast to Milieu_base
  */
 const Milieu_base& Navier_Stokes_std::milieu() const
 {
@@ -1263,11 +1261,11 @@ const Milieu_base& Navier_Stokes_std::milieu() const
   return le_fluide.valeur();
 }
 
-/*! @brief Renvoie le milieu physique de l'equation (le Fluide_base upcaste en Milieu_base)
+/*! @brief Returns the physical medium of the equation (Fluide_base upcast to Milieu_base)
  *
- *     (version const)
+ *     (const version)
  *
- * @return (Milieu_base&) le Fluide_base de l'equation upcaste en Milieu_base
+ * @return (Milieu_base&) the Fluide_base of the equation upcast to Milieu_base
  */
 Milieu_base& Navier_Stokes_std::milieu()
 {
@@ -1466,7 +1464,7 @@ bool Navier_Stokes_std::has_champ(const Motcle& nom, OBS_PTR(Champ_base)& ref_ch
     if (le_traitement_particulier->has_champ(nom, ref_champ))
       return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 bool Navier_Stokes_std::has_champ(const Motcle& nom) const
@@ -1505,7 +1503,7 @@ bool Navier_Stokes_std::has_champ(const Motcle& nom) const
     if (le_traitement_particulier->has_champ(nom))
       return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 const Champ_base& Navier_Stokes_std::get_champ(const Motcle& nom) const
@@ -1640,19 +1638,19 @@ void Navier_Stokes_std::get_noms_champs_postraitables(Noms& nom, Option opt) con
     nom.add(noms_compris);
 }
 
-/*! @brief Effectue quelques impressions sur un flot de sortie: - maximum de div U
+/*! @brief Prints some information to an output stream: - maximum of div U
  *
- *        - terme convectif
- *        - terme diffusif
+ *        - convective term
+ *        - diffusive term
  *        - divergence
  *        - gradient
  *
- * @param (Sortie& os) un flot de sortie
- * @return (int) renvoie toujours 1
+ * @param (Sortie& os) output stream
+ * @return (int) always returns 1
  */
 int Navier_Stokes_std::impr(Sortie& os) const
 {
-  // Affichage des bilans volumiques si on n'est pas en QC, ni en Front Tracking
+  // Display volumetric balance if not in quasi-compressible mode or Front Tracking
   if (!probleme().is_dilatable() && probleme().que_suis_je()!="Probleme_FT_Disc_gen")
     {
       double LocalFlowRateError=mp_max_abs_vect(divergence_U->valeurs());
@@ -1667,7 +1665,7 @@ int Navier_Stokes_std::impr(Sortie& os) const
       double global = mp_somme_vect(divergence_U->valeurs()) / ( probleme().domaine().volume_total() / dt );
       cumulative_ += global;
       os << "time step continuity errors : sum local = " << local << ", global = " << global << ", cumulative = " << cumulative_ << finl;
-      // Nouveau 1.6.1, arret si bilans de masse mauvais et seuil<1.e20
+      // New in 1.6.1: stop if mass balance is bad and threshold < 1.e20
       if (local>0.01 && sub_type(solv_iteratif,solveur_pression_.valeur()))
         {
           if (ref_cast(solv_iteratif,solveur_pression_.valeur()).get_seuil()<1e10)
@@ -1693,7 +1691,7 @@ int Navier_Stokes_std::impr(Sortie& os) const
   if ((seuil_divU < 1.) && (sub_type(solv_iteratif,solveur_pression_.valeur())))
     {
       const solv_iteratif& solv_iter=ref_cast(solv_iteratif,solveur_pression_.valeur());
-      os << " seuil de convergence du solveur iteratif  : " << solv_iter.get_seuil() << finl;
+      os << " convergence threshold of the iterative solver  : " << solv_iter.get_seuil() << finl;
     }
   Equation_base::impr(os);
   divergence.impr(os);
@@ -1702,9 +1700,9 @@ int Navier_Stokes_std::impr(Sortie& os) const
 }
 
 
-/*! @brief Renvoie le nom du domaine d'application: "Hydraulique".
+/*! @brief Returns the name of the application domain: "Hydraulique".
  *
- * @return (Motcle&) lenom representant le domaine d'application
+ * @return the name representing the application domain
  */
 const Motcle& Navier_Stokes_std::domaine_application() const
 {
@@ -1729,23 +1727,23 @@ static void construire_matrice_implicite(Operateur_base& op,
       solv_masse.ajouter_masse(dt, matrice);
       matrice *= dt;
 
-      // Si le solveur est cholesky ou gcp, on attend une matrice de type
-      // Matrice_Morse_Sym. Transformation du type de la matrice:
+      // If the solver is Cholesky or GCP, a matrix of type
+      // Matrice_Morse_Sym is expected. Convert the matrix type:
       const Nom& type_solveur = op.get_solveur()->que_suis_je();
       if(type_solveur == "Solv_Cholesky" || type_solveur == "Solv_GCP")
         {
           Matrice_Morse_Sym new_mat(matrice);
           new_mat.set_est_definie(1);
-          // mat est detruite puis reconstruite:
+          // mat is destroyed and then rebuilt:
           mat = new_mat;
-          // Reinitialisation du solveur (recalcul des preconditionnements, factorisation, etc...)
+          // Reinitialize the solver (recompute preconditioners, factorization, etc...)
           //ref_cast_non_const(SolveurSys_base,op.get_solveur().valeur()).reinit();
           op.set_solveur()->reinit();
         }
     }
 }
 
-/* dans PolyMAC_HFV, le gradient contribue a la matrice de l'equation de N-S */
+/* In PolyMAC_HFV, the gradient contributes to the N-S equation matrix */
 void Navier_Stokes_std::dimensionner_matrice_sans_mem(Matrice_Morse& matrice)
 {
   Equation_base::dimensionner_matrice_sans_mem(matrice);
@@ -1774,16 +1772,16 @@ void Navier_Stokes_std::assembler_blocs(matrices_t matrices, DoubleTab& secmem, 
 DoubleTab& Navier_Stokes_std::derivee_en_temps_inco(DoubleTab& derivee)
 {
   reassembler_pression_si_necessaire();
-  // Calcul de la derivee en temps:
+  // Computation of the time derivative:
   if(!implicite_)
     {
-      // Calcul explicite, on utilise la derivee en temps standard:
+      // Explicit computation, use the standard time derivative:
       return Equation_base::derivee_en_temps_inco(derivee);
     }
   else
     {
-      // Calcul implicite d'un ou plusieurs operateurs (peu utilise)
-      // Syntaxe jeu de donnees: operateur { implicite solveur cholesky|gcp ... }
+      // Implicit computation of one or more operators (rarely used)
+      // Dataset syntax: operateur { implicite solveur cholesky|gcp ... }
       derivee = 0;
       for(int i=0; i<nombre_d_operateurs(); i++)
         operateur(i).ajouter(derivee);
@@ -1805,9 +1803,9 @@ DoubleTab& Navier_Stokes_std::derivee_en_temps_inco(DoubleTab& derivee)
             {
               if(sys_invariant_ && dt!=dt_old)
                 {
-                  // La matrice ne change pas mais on change le pas de temps.
-                  // La matrice s'ecrit A =
-                  // Mise a jour simplifiee de la matrice
+                  // The matrix does not change but the time step changes.
+                  // The matrix is written A =
+                  // Simplified update of the matrix
                   Matrice_Morse& matrice=ref_cast(Matrice_Morse, op.set_matrice().valeur());
                   matrice/=dt_old;
                   solv_masse().ajouter_masse(-dt_old, op.set_matrice().valeur());
@@ -1818,7 +1816,7 @@ DoubleTab& Navier_Stokes_std::derivee_en_temps_inco(DoubleTab& derivee)
               Matrice_Morse& matrice=ref_cast(Matrice_Morse, op.set_matrice().valeur());
               if(implicite_==1)
                 {
-                  // Un seul operateur implicite.
+                  // A single implicit operator.
                   DoubleTrav secmem(derivee);
                   secmem=derivee;
                   DoubleTrav incre_pre(la_pression->valeurs());
@@ -1846,14 +1844,14 @@ void Navier_Stokes_std::uzawa(const DoubleTab& secmem, const Matrice_Base& A, So
 {
   // A U + Bt P = secmem
   // B U        = G
-  // On part de la pression courante et
-  // secmem = inertie + conv + sources + cl diff
-  // On part de P0 et U0 verifiant les C.L. et BU0=G
+  // Start from the current pressure and
+  // secmem = inertia + conv + sources + diff BCs
+  // Start from P0 and U0 satisfying BCs and BU0=G
 
   // AU + Bt Cp = secmem
   // BU         = 0
 
-  // On ecrit un GC sur B(A-1)Bt Cp = B(A-1)(secmem)
+  // Write a CG on B(A-1)Bt Cp = B(A-1)(secmem)
 
   DoubleTrav Cu(U);
   DoubleTrav grad(U);
@@ -1870,7 +1868,7 @@ void Navier_Stokes_std::uzawa(const DoubleTab& secmem, const Matrice_Base& A, So
   gradient->multvect(P, grad0);
   solveur.nommer("uzawa_solver");
   solveur.resoudre_systeme(A, secmem, U);
-  solv_masse().corriger_solution(U,Cu); // pour les C.L. de Dirichlet!
+  solv_masse().corriger_solution(U,Cu); // for Dirichlet boundary conditions!
 
   // residu=BCu
   divergence->multvect(U, resu);
@@ -1883,7 +1881,7 @@ void Navier_Stokes_std::uzawa(const DoubleTab& secmem, const Matrice_Base& A, So
   Cp*=-1;
   Cp.echange_espace_virtuel();
 
-  // Carre de la norme
+  // Square of the norm
   dold = mp_norme_vect(residu);
   dold = dold * dold;
   dnew = dold;
@@ -1899,7 +1897,7 @@ void Navier_Stokes_std::uzawa(const DoubleTab& secmem, const Matrice_Base& A, So
       grad-=grad0;
       grad*=-1;
       solveur.resoudre_systeme(A, grad, Cu);
-      solv_masse().corriger_solution(Cu,U); // pour les C.L. de Dirichlet!
+      solv_masse().corriger_solution(Cu,U); // for Dirichlet boundary conditions!
       divergence->multvect(Cu, resu);
       resu*=-1;
 

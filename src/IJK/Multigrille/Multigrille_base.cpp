@@ -220,7 +220,7 @@ void Multigrille_base::solve_ijk_in_storage_template<float>()
   IJK_Field_float& ijk_residu = get_storage_float(STORAGE_RESIDUE, 0);
 
   prepare_secmem(ijk_b);
-  //pas sur de devoir echanger espace virtuel pour le second membre dans le cas du shear_perio...
+  //not sure whether the ghost space exchange is needed for the right-hand side in the shear_perio case...
   if (IJK_Shear_Periodic_helpler::defilement_==0)
     {
       ijk_b.echange_espace_virtuel(ijk_b.ghost());
@@ -244,7 +244,7 @@ void Multigrille_base::solve_ijk_in_storage_template<double>()
   IJK_Field_double& ijk_residu = get_storage_double(STORAGE_RESIDUE, 0);
 
   prepare_secmem(ijk_b);
-  //pas sur de devoir echanger espace virtuel pour le second membre dans le cas du shear_perio...
+  //not sure whether the ghost space exchange is needed for the right-hand side in the shear_perio case...
   if (IJK_Shear_Periodic_helpler::defilement_==0)
     {
       ijk_b.echange_espace_virtuel(ijk_b.ghost());
@@ -313,7 +313,7 @@ void Multigrille_base::solve_ijk_in_storage_template<double>()
           // Launch multigrid solver in single precision:
           float_x.data() = 0.;
           prepare_secmem(float_b);
-          //pas sur de devoir echanger espace virtuel pour le second membre dans le cas du shear_perio...
+          //not sure whether the ghost space exchange is needed for the right-hand side in the shear_perio case...
           if (IJK_Shear_Periodic_helpler::defilement_==0)
             float_b.echange_espace_virtuel(float_b.ghost());
           float_x.shift_k_origin(needed_kshift_for_jacobi(0) - float_x.k_shift());

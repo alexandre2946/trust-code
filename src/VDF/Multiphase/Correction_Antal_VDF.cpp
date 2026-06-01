@@ -32,16 +32,16 @@ Entree& Correction_Antal_VDF::readOn(Entree& is)
   param.ajouter("Cw2", &Cw2_);
   param.lire_avec_accolades_depuis(is);
 
-  //identification des phases
+  //identification of phases
   Pb_Multiphase *pbm = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()) : nullptr;
 
   if (!pbm || pbm->nb_phases() == 1) Process::exit(que_suis_je() + " : not needed for single-phase flow!");
-  for (int n = 0; n < pbm->nb_phases(); n++) //recherche de n_l, n_g : phase {liquide,gaz}_continu en priorite
+  for (int n = 0; n < pbm->nb_phases(); n++) //search for n_l, n_g : {liquid,gas}_continuous phase in priority
     if (pbm->nom_phase(n).debute_par("liquide") && (n_l < 0 || pbm->nom_phase(n).finit_par("continu")))  n_l = n;
 
   if (n_l < 0) Process::exit(que_suis_je() + " : liquid phase not found!");
 
-  pbm->creer_champ("distance_paroi_globale"); // Besoin de distance a la paroi
+  pbm->creer_champ("distance_paroi_globale"); // Wall distance field required
 
   return is;
 }

@@ -20,7 +20,7 @@
 #include <Interprete.h>
 
 
-/*! @brief class Lire_Fichier Lecture d'un fichier
+/*! @brief class Lire_Fichier: reads a file.
  *
  */
 class Lire_Fichier : public Interprete

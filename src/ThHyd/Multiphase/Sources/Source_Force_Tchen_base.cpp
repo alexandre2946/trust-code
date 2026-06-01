@@ -26,11 +26,11 @@ Sortie& Source_Force_Tchen_base::printOn(Sortie& os) const { return os; }
 
 Entree& Source_Force_Tchen_base::readOn(Entree& is)
 {
-  //identification des phases
+  // phase identification
   const Pb_Multiphase *pbm = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()) : nullptr;
 
   if (!pbm || pbm->nb_phases() == 1) Process::exit(que_suis_je() + " : not needed for single-phase flow!");
-  for (int n = 0; n < pbm->nb_phases(); n++) //recherche de n_l, n_g : phase {liquide,gaz}_continu en priorite
+  for (int n = 0; n < pbm->nb_phases(); n++) // search for n_l, n_g: {liquid,gas}_continuous phase in priority
     if (pbm->nom_phase(n).debute_par("liquide") && (n_l < 0 || pbm->nom_phase(n).finit_par("continu")))  n_l = n;
 
   if (n_l < 0) Process::exit(que_suis_je() + " : liquid phase not found!");
@@ -41,14 +41,14 @@ Entree& Source_Force_Tchen_base::readOn(Entree& is)
 void Source_Force_Tchen_base::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   const Champ_Face_base& ch = ref_cast(Champ_Face_base, equation().inconnue());
-  if (!matrices.count(ch.le_nom().getString())) return; //rien a faire
+  if (!matrices.count(ch.le_nom().getString())) return; // nothing to do
 
   Matrice_Morse& mat = *matrices.at(ch.le_nom().getString()), mat2;
   const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis());
   const DoubleTab& inco = ch.valeurs();
   const IntTab& fcl = ch.fcl();
 
-  /* stencil : diagonal par bloc pour les vitesses aux faces, puis chaque composante des vitesses aux elems */
+  /* stencil: block-diagonal for face velocities, then each component of element velocities */
   Stencil stencil(0, 2);
 
   int N = inco.line_size(), nf = domaine.nb_faces();
@@ -57,7 +57,7 @@ void Source_Force_Tchen_base::dimensionner_blocs(matrices_t matrices, const tabs
   for (int f = 0; f < nf; f++)
     if (fcl(f, 0) < 2)
       for (int k = 0 ; k<N ; k++)
-        if (k != n_l) //phase gazeuse
+        if (k != n_l) // gas phase
           stencil.append_line( N * f +  k , N * f + n_l) ;
 
   /* elements si aux */
@@ -88,7 +88,7 @@ void Source_Force_Tchen_base::ajouter_blocs(matrices_t matrices, DoubleTab& secm
   for (int f = 0; f < nf; f++)
     if (fcl(f, 0) < 2)
       for (int k = 0 ; k<N ; k++)
-        if (k != n_l) //phase gazeuse
+        if (k != n_l) // gas phase
           {
             double alpha_loc = f_e(f, 1)>=0 ? alpha(f_e(f, 0), k) * vf_dir(f, 0)/vf(f) +  alpha(f_e(f, 1), k) * vf_dir(f, 1)/vf(f) : alpha(f_e(f, 0), k) ;
             double rho_loc   = f_e(f, 1)>=0 ? rho(f_e(f, 0), n_l) * vf_dir(f, 0)/vf(f) + rho(f_e(f, 1), n_l)  * vf_dir(f, 1)/vf(f) : rho(f_e(f, 0), n_l) ;

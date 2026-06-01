@@ -22,20 +22,20 @@
 class Objet_U;
 class Nom;
 
-/*! @brief Soit une classe _CLASSE_ qui derive de Objet_U.
+/*! @brief Template reference class for any class _CLASSE_ deriving from Objet_U.
  *
- *   TRUST_Ref<_CLASSE_> est une petite classe template contenant un pointeur vers une instance de _CLASSE_.
+ *   TRUST_Ref<_CLASSE_> is a small template class containing a pointer to an instance of _CLASSE_.
  *
- *   Definition de la REF:
+ *   Definition of the REF:
  *
  *   #include <TRUST_Ref.h>
  *   #include <_CLASSE_.h>
  *
- *   Creation d'un objet de type OBS_PTR(_CLASSE_) :
+ *   Creating an object of type OBS_PTR(_CLASSE_):
  *
  *    OBS_PTR(_CLASSE_) la_ref_;
  *
- *    ou bien
+ *    or equivalently
  *
  *    TRUST_Ref<_CLASSE_>
  *
@@ -80,7 +80,7 @@ public:
     return *this;
   }
 
-  // pas delete car soucis dans les iterateurs de TRUST_List par exemple (LIST(REF ....)
+  // not deleted because of issues in TRUST_List iterators, e.g. LIST(REF ...)
   operator const value_type& () const { return valeur(); }
   operator value_type& () { return valeur(); }
 
@@ -95,7 +95,7 @@ public:
   void reset() {  p_ = nullptr; }
 };
 
-// Le resultat de == est positif si r1 et r2 pointent sur le meme objet (meme cle), ou si les deux references sont nulles
+// The result of == is true if r1 and r2 point to the same object (same key), or if both references are null.
 template<typename _CLASSE_>
 inline int operator ==(const TRUST_Ref<_CLASSE_>& r1, const TRUST_Ref<_CLASSE_>& r2)
 {
@@ -108,9 +108,9 @@ inline int operator ==(const TRUST_Ref<_CLASSE_>& r1, const TRUST_Ref<_CLASSE_>&
  * ======================================================= *
  * ======================================================= */
 
-/*! @brief classe TRUST_Ref_Objet_U
+/*! @brief Class TRUST_Ref_Objet_U.
  *
- * Cette classe est quasiment identique a TRUST_Ref<>,  sauf qu'elle ne contient pas les operateurs de conversion implicite
+ * This class is almost identical to TRUST_Ref<>, except that it does not contain implicit conversion operators.
  *
  */
 class TRUST_Ref_Objet_U

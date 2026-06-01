@@ -84,8 +84,8 @@ inline double Champ_Q1NC_implementation::fonction_forme_3D(double x, double y, d
 
 inline double Champ_Q1NC_implementation::fonction_forme_2D_normalise(double ksi, double eta, int face)
 {
-  // la fonction de forme est calculer dans la base (ksi), (eta).
-  // aux milieu des faces.
+  // the shape function is computed in the (ksi), (eta) basis.
+  // at the face midpoints.
   // Psi1(x,y) = 0.25 - 0.5ksi + 0.25(ksi^2 - eta^2)
   // Psi2(x,y) = 0.25 - 0.5eta - 0.25(ksi^2 - eta^2)
   // Psi3(x,y) = 0.25 + 0.5ksi + 0.25(ksi^2 - eta^2)
@@ -128,8 +128,8 @@ inline double Champ_Q1NC_implementation::fonction_forme_2D_normalise(double ksi,
 
 inline double Champ_Q1NC_implementation::fonction_forme_3D_normalise(double ksi, double eta, double psi, int face)
 {
-  // la fonction de forme est calculer dans la base (ksi), (eta), (psi).
-  // aux milieu des faces.
+  // the shape function is computed in the (ksi), (eta), (psi) basis.
+  // at the face midpoints.
 
   // Psi0(x,y,z) = 1/6. - 0.5ksi + 1/3.(ksi^2 - eta^2) + 1/6.(eta^2 - psi^2)
   // Psi1(x,y,z) = 1/6. - 0.5eta - 1/6.(ksi^2 - eta^2) + 1/6.(eta^2 - psi^2)

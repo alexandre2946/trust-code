@@ -36,10 +36,10 @@ ExtrudeParoi::ExtrudeParoi()
   epaisseur[0]=0.5;
 }
 
-/*! @brief Simple appel a: Interprete::printOn(Sortie&)
+/*! @brief Simple call to: Interprete::printOn(Sortie&)
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& ExtrudeParoi::printOn(Sortie& os) const
 {
@@ -74,10 +74,10 @@ void calcul_tab_norme(DoubleTab& tab)
 }
 
 
-/*! @brief Simple appel a: Interprete::readOn(Entree&)
+/*! @brief Simple call to: Interprete::readOn(Entree&)
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
  */
 Entree& ExtrudeParoi::readOn(Entree& is)
 {
@@ -85,13 +85,13 @@ Entree& ExtrudeParoi::readOn(Entree& is)
 }
 
 
-/*! @brief Fonction principale de l'interprete ExtrudeParoi Creation d'une couche de prismes en paroi
+/*! @brief Main function of the ExtrudeParoi interpreter. Creates a layer of wall prisms
  *
- *     (prismes tetraedrises en 3)
+ *     (prisms split into 3 tetrahedra)
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree
- * @throws l'objet a mailler n'est pas du type Domaine
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the input stream
+ * @throws the object to mesh is not of type Domaine
  */
 Entree& ExtrudeParoi::interpreter_(Entree& is)
 {
@@ -120,7 +120,7 @@ Entree& ExtrudeParoi::interpreter_(Entree& is)
 
 /*! @brief
  *
- * @param (Domaine& domaine) le domaine dont on veut raffiner les elements
+ * @param (Domaine& domaine) the domain whose elements are to be refined
  */
 void ExtrudeParoi::extrude(Domaine& dom)
 {
@@ -142,7 +142,7 @@ void ExtrudeParoi::extrude(Domaine& dom)
   Faces lesfaces;
   //domaine.creer_faces(les_faces);
   {
-    // bloc a factoriser avec Domaine_VF.cpp :
+    // block to be factored out with Domaine_VF.cpp:
     Type_Face type_face = dom.type_elem()->type_face(0);
     lesfaces.typer(type_face);
     lesfaces.associer_domaine(dom);
@@ -157,7 +157,7 @@ void ExtrudeParoi::extrude(Domaine& dom)
                                      1 /* include virtual elements */);
 
     Faces_builder faces_builder;
-    IntTab elem_faces; // Tableau dont on aura pas besoin
+    IntTab elem_faces; // Array that will not be needed
     faces_builder.creer_faces_reeles(dom,
                                      connectivite_som_elem,
                                      lesfaces,
@@ -175,8 +175,8 @@ void ExtrudeParoi::extrude(Domaine& dom)
   DoubleVect dmin_som(nbs);
   dmin_som=1e6;
 
-  DoubleTab new_soms;                // les nouveaux sommets
-  IntTab new_elems;                 // les nouveaux elements
+  DoubleTab new_soms;                // the new vertices
+  IntTab new_elems;                 // the new elements
 
 
   for (int l=0; l<dom.nb_front_Cl(); l++)
@@ -196,14 +196,14 @@ void ExtrudeParoi::extrude(Domaine& dom)
           som_arete.resize(3*nbfaces,2);
 
 
-          ArrOfInt som_elem(4); // sommet rattache a l'element frontiere
-          ArrOfInt som_face(3); // sommet de la face frontiere
+          ArrOfInt som_elem(4); // vertex attached to the boundary element
+          ArrOfInt som_face(3); // vertex of the boundary face
 
           ArrOfDouble pt0(3),pt1(3),pt2(3);
           ArrOfDouble normale(3),vect_int(3);
 
 
-          // calcul de la normale portee par chaque sommet de la frontiere
+          // compute the normal carried by each vertex of the boundary
           ////////////////////////////////////////////////////////////////
 
           int compt=0;
@@ -220,7 +220,7 @@ void ExtrudeParoi::extrude(Domaine& dom)
                   List_som.add_if_not(som_face[j]) ;
                 }
 
-              //rangt par ordre croissant des sommets
+              //sort vertices in ascending order
 
               int stot=som_face[0]+som_face[1]+som_face[2];
 
@@ -276,7 +276,7 @@ void ExtrudeParoi::extrude(Domaine& dom)
             }
 
         }//if(nomfr==nom_front)
-    }//for (l<domaine.nb_front_Cl()
+    }//for (l<domaine.nb_front_Cl())
 
   calcul_tab_norme(normale_som);
 
@@ -289,7 +289,7 @@ void ExtrudeParoi::extrude(Domaine& dom)
       exit();
     }
 
-  // Recherche des aretes de nom_front partagee avec d'autres frontieres
+  // Search for edges of nom_front shared with other boundaries
   //////////////////////////////////////////////////////////////////////
 
   tri_lexicographique_tableau(som_arete);
@@ -333,7 +333,7 @@ void ExtrudeParoi::extrude(Domaine& dom)
           int nbfaces=fr.nb_faces();
           const IntTab& sommet=fr.les_sommets_des_faces();
 
-          ArrOfInt som_face(3); // sommets de la face frontiere
+          ArrOfInt som_face(3); // vertices of the boundary face
 
           for (int i=0; i<nbfaces; i++)
             {
@@ -377,7 +377,7 @@ void ExtrudeParoi::extrude(Domaine& dom)
     }
 
 
-  // projection de la normale de bord dans le plan de la frontiere voisine de bord
+  // projection of the boundary normal onto the plane of the neighboring boundary
   ////////////////////////////////////////////////////////////////////////////////
 
   if(projection_normale_bord)
@@ -416,7 +416,7 @@ void ExtrudeParoi::extrude(Domaine& dom)
         }
     }
 
-  // creation des sommets de la couche prismatique
+  // creation of the prismatic layer vertices
   ////////////////////////////////////////////////
 
   int nb_som = List_som.size();
@@ -429,23 +429,23 @@ void ExtrudeParoi::extrude(Domaine& dom)
     {
       int som=List_som[i];
 
-      if(!type) // traduction de l'epaisseur relative en epaisseur absolue
+      if(!type) // convert relative thickness to absolute thickness
         {
           for(int j=0; j<nb_couche; j++) ep_abs[j]=epaisseur[j]*dmin_som(som);
         }
 
       for(int j=0; j<3; j++)
         {
-          new_soms(oldnbsom+i,j) = new_soms(som,j); // creation des nouveaux sommets rattaches a la paroi
+          new_soms(oldnbsom+i,j) = new_soms(som,j); // creation of new vertices attached to the wall
 
-          if(nb_couche>1)                               // creation des nouveaux sommets rattaches aux couches successives
+          if(nb_couche>1)                               // creation of new vertices attached to successive layers
             for(int k=0; k<nb_couche-1; k++)
               new_soms(oldnbsom+(k+1)*nb_som+i,j) = new_soms(som,j)+ep_abs[k]*normale_som(som,j);
-          new_soms(som,j) += ep_abs[nb_couche-1]*normale_som(som,j); // translation des anciens sommets
+          new_soms(som,j) += ep_abs[nb_couche-1]*normale_som(som,j); // translation of old vertices
         }
     }
 
-  // creation des elements de la couche prismatique
+  // creation of the prismatic layer elements
   /////////////////////////////////////////////////
 
   IntTab som_front;
@@ -486,7 +486,7 @@ void ExtrudeParoi::extrude(Domaine& dom)
 
               for(int k=0; k<nb_couche; k++)
                 {
-                  // sommets sup de la couche
+                  // upper vertices of the layer
 
                   int ii1=i4+(k+1)*nb_som;
                   int ii2=i5+(k+1)*nb_som;
@@ -499,14 +499,14 @@ void ExtrudeParoi::extrude(Domaine& dom)
                       ii3=i3;
                     }
 
-                  // sommets inf de la couche
+                  // lower vertices of the layer
 
                   int ii4=i4+k*nb_som;
                   int ii5=i5+k*nb_som;
                   int ii6=i6+k*nb_som;
 
 
-                  // connectivite sommets-element inspiree de Extruder_en3
+                  // vertex-element connectivity inspired by Extruder_en3
 
                   new_elems(oldsz+cpt,0) = ii1;
                   new_elems(oldsz+cpt,1) = ii2;
@@ -530,14 +530,14 @@ void ExtrudeParoi::extrude(Domaine& dom)
                 }
             }
         }//if(nomfr==nom_front)
-    }//for (l<domaine.nb_front_Cl()
+    }//for (l<domaine.nb_front_Cl())
 
 
   coord.reset();
   dom.ajouter(new_soms);
   les_elems.ref(new_elems);
 
-  // Reconstruction de l'octree
+  // Reconstruction of the octree
   dom.invalide_octree();
   dom.typer("Tetraedre");
 
@@ -582,7 +582,7 @@ void ExtrudeParoi::extrude(Domaine& dom)
 
                   for(int k=0; k<nb_couche; k++)
                     {
-                      // sommets sup de la couche
+                      // upper vertices of the layer
 
                       int s1_sup=s1_new+(k+1)*nb_som;
                       int s2_sup=s2_new+(k+1)*nb_som;
@@ -593,7 +593,7 @@ void ExtrudeParoi::extrude(Domaine& dom)
                           s2_sup=s2;
                         }
 
-                      // sommets inf de la couche
+                      // lower vertices of the layer
 
                       int s1_inf=s1_new+k*nb_som;
                       int s2_inf=s2_new+k*nb_som;

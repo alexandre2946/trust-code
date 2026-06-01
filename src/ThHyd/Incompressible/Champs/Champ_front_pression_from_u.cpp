@@ -48,7 +48,7 @@ Entree& Champ_front_pression_from_u::readOn(Entree& is)
 
 
 
-/*! @brief Mise a jour du temps
+/*! @brief Updates the time.
  *
  */
 
@@ -61,7 +61,7 @@ int Champ_front_pression_from_u::initialiser(double tps, const Champ_Inc_base& i
 
 
 
-  // le champ fornt recupere u moyen par div u .... on verfifie que rho est constant
+  // the boundary field retrieves the mean u via div u .... we verify that rho is constant
   int ok=0;
   const Milieu_base& mil=inco.equation().milieu();
   if (sub_type(Fluide_Incompressible,mil))
@@ -91,7 +91,7 @@ int Champ_front_pression_from_u::initialiser(double tps, const Champ_Inc_base& i
 void  Champ_front_pression_from_u::mettre_a_jour(double tps)
 {
   const Champ_Inc_base& inco=ref_inco_.valeur();
-  // on recupere le flux_bord de l'op div c'est donc u
+  // retrieve the boundary flux from the div operator, which is u
   const Navier_Stokes_std& eqns=ref_cast(Navier_Stokes_std,inco.equation());
   const Operateur_Div& opdiv=eqns.operateur_divergence();
   const Domaine_VF& domaine_VF = ref_cast(Domaine_VF,domaine_dis());

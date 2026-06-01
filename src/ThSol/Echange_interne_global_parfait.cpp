@@ -22,10 +22,10 @@ Implemente_instanciable(Echange_interne_global_parfait,"Paroi_echange_interne_gl
 // XD Echange_interne_global_parfait condlim_base Paroi_echange_interne_global_parfait INHERITS_BRACE Internal heat
 // XD_CONT exchange boundary condition with perfect (infinite) exchange coefficient.
 
-/*! @brief Ecrit le type de l'objet sur un flot de sortie
+/*! @brief Writes the object type to an output stream.
  *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param s Output stream.
+ * @return The modified output stream.
  */
 Sortie& Echange_interne_global_parfait::printOn(Sortie& s ) const
 {

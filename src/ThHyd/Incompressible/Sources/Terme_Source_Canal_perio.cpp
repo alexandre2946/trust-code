@@ -71,12 +71,12 @@ Sortie& Terme_Source_Canal_perio::printOn(Sortie& s ) const
 Entree& Terme_Source_Canal_perio::readOn(Entree& is )
 {
   Param param(que_suis_je());
-  // Valeurs par defaut
+  // Default values
   u_etoile = 0.;
   h = 1.;
   coeff = 10.;
   velocity_weighting_ = 0;
-  // FIN valeurs par defaut
+  // END default values
   dir_source_.resize(dimension);
   dir_source_=0;
   set_param(param);
@@ -155,19 +155,19 @@ void Terme_Source_Canal_perio::completer()
             {
               if (perio.est_periodique_selon_un_axe())
                 {
-                  // Cas ou le bord est periodique selon un axe, alors on fixe la direction de l'ecoulement (VDF)
+                  // Case where the boundary is periodic along an axis, so we set the flow direction (VDF)
                   direction_ecoulement_ = perio.direction_periodicite();
                 }
               else
                 {
-                  // Cas general ou le bord periodique n'est pas oriente selon un axe:
+                  // General case where the periodic boundary is not oriented along an axis:
                   dir_source_ = perio.direction_perio();
                   dir_source_ *= -1;
-                  // On adimensionnalise:
+                  // Normalize:
                   double norme = norme_array(dir_source_);
                   dir_source_ /= norme;
                 }
-              // On recupere la surface
+              // Retrieve the surface area
               surface_bord_ = 0.5 * le_bord.frontiere().get_aire();
               return;
             }
@@ -204,7 +204,7 @@ void Terme_Source_Canal_perio::write_flow_rate(const Nom& ext_nom_source_, doubl
       flow_rate_file_.ouvrir(filename, (premiere_ecriture?ios::out:ios::app));
       flow_rate_file_.setf(ios::scientific);
     }
-  // on met des commentaires dans l'entete du fichier
+  // add comments in the file header
   if ((tps <= (tps_init+dt)) && premiere_ecriture)
     {
       if (equation().probleme().is_dilatable()==1)
@@ -223,7 +223,7 @@ void Terme_Source_Canal_perio::write_flow_rate(const Nom& ext_nom_source_, doubl
       debnm1_ = debit_ref_;
       source_ = 0.;
 
-      // Deplacer dans completer ?
+      // Move to completer()?
       // Read the restart file:
       if (equation().probleme().reprise_effectuee())
         {
@@ -283,7 +283,7 @@ void Terme_Source_Canal_perio::write_flow_rate(const Nom& ext_nom_source_, doubl
 
 double Terme_Source_Canal_perio::compute_heat_flux() const
 {
-  // On recupere flux_bords operateur de diffusion
+  // Retrieve flux_bords from the diffusion operator
   const Operateur_base& op_base = equation().operateur(0).l_op_base(); // Diffusion operator
   assert(sub_type(Operateur_Diff_base,op_base)); // Check
   const DoubleTab& flux_bords = op_base.flux_bords();
@@ -333,9 +333,9 @@ ArrOfDouble Terme_Source_Canal_perio::source_convection_diffusion(double debit_e
       for (int num_face=0; num_face<size; num_face++)
         {
           double velocity = 0;
-          if (direction_ecoulement_>=0) // Ecoulement selon un axe
+          if (direction_ecoulement_>=0) // Flow along an axis
             velocity = vitesse(num_face,direction_ecoulement_);
-          else // Cas general
+          else // General case
             for (int i=0; i<dimension; i++)
               velocity += vitesse(num_face,i) * dir_source_[i];
           s[num_face]=-velocity*heat_flux/(volume*debit_e/surface_bord_);
@@ -365,7 +365,7 @@ ArrOfDouble Terme_Source_Canal_perio::source() const
   ext_nom_source_ +=  "_" ;
   ext_nom_source_ +=  bord_periodique_ ;
 
-  // Pourquoi ?
+  // Why?
   if (est_different(dernier_temps_calc_,tps))
     {
       // Compte flow rate:
@@ -406,7 +406,7 @@ ArrOfDouble Terme_Source_Canal_perio::source() const
           envoyer_broadcast(debnm1_, 0);
           envoyer_broadcast(source_, 0);
 
-          // On conserve le test (avec dt_min) car appel a t=0 (dt=0) au cours de preparer calculer pour loi de paroi TBLE
+          // Keep the test (with dt_min) because of a call at t=0 (dt=0) during preparer_calcul for TBLE wall law
           double dt_min = equation().schema_temps().pas_temps_min();
           const DoubleVect& dt_locaux = equation().schema_temps().pas_de_temps_locaux();
           double si = 0;
@@ -485,13 +485,13 @@ ArrOfDouble Terme_Source_Canal_perio::source() const
       exit();
     }
 
-  // Essayer de virer direction_ecoulement_ (attention assert en VDF et ecarts possibles)
+  // Try to remove direction_ecoulement_ (beware of assert in VDF and possible discrepancies)
   ArrOfDouble s;
   s.resize(dimension);
   s = 0.;
-  if (direction_ecoulement_>=0) // Ecoulement selon un axe
+  if (direction_ecoulement_>=0) // Flow along an axis
     s[direction_ecoulement_] = source_;
-  else // Cas general
+  else // General case
     for (int i=0; i<dimension; i++)
       s[i] = source_ * dir_source_[i];
   return s;

@@ -18,9 +18,9 @@
 
 #include <Modele_turbulence_hyd_LES_VEF_base.h>
 
-/*! @brief classe Modele_turbulence_hyd_LES_Wale_VEF Cette classe correspond a la mise en oeuvre du modele sous
+/*! @brief class Modele_turbulence_hyd_LES_Wale_VEF This class implements the WALE subgrid model
  *
- *  maille WALE developpe par F. NICOUD et F. DUCROS en VEF
+ *  developed by F. NICOUD and F. DUCROS in VEF.
  *
  */
 class Modele_turbulence_hyd_LES_Wale_VEF: public Modele_turbulence_hyd_LES_VEF_base

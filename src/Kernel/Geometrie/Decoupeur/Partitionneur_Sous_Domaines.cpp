@@ -41,7 +41,7 @@ Sortie& Partitionneur_Sous_Domaines::printOn(Sortie& os) const
   return os;
 }
 
-/*! @brief Format de lecture: (la liste de sous_domaines/domaines est optionnelle, N est le nombre d'entites lues)
+/*! @brief Reading format: (the sub-domain/domain list is optional, N is the number of entities read)
  *
  *   {
  *      [ Sous_domaines N nom_sous_domaine1 nom_sous_domaine2  nom_sous_domaine3 ... ]
@@ -62,7 +62,7 @@ void Partitionneur_Sous_Domaines::set_param(Param& param) const
   // XD_CONT DOMAIN_NAME_2 ...
 }
 
-/*! @brief Premiere etape d'initialisation du partitionneur: on associe un domaine.
+/*! @brief First initialisation step of the partitioner: associate a domain.
  *
  */
 void Partitionneur_Sous_Domaines::associer_domaine(const Domaine& domaine)
@@ -70,9 +70,9 @@ void Partitionneur_Sous_Domaines::associer_domaine(const Domaine& domaine)
   ref_domaine_ = domaine;
 }
 
-/*! @brief Deuxieme etape d'initialisation: on definit les sous_domaines a utiliser.
+/*! @brief Second initialisation step: define the sub-domains to use.
  *
- * (on peut utiliser readOn a la place).
+ * (readOn can be used instead).
  *
  */
 void Partitionneur_Sous_Domaines::initialiser(const Noms& noms_sous_domaines)
@@ -81,17 +81,16 @@ void Partitionneur_Sous_Domaines::initialiser(const Noms& noms_sous_domaines)
   noms_sous_domaines_ = noms_sous_domaines;
 }
 
-/*! @brief Chaque sous-domaine de noms_sous_domaines_ definit les elements attribues a un processeur.
+/*! @brief Each sub-domain in noms_sous_domaines_ defines the elements assigned to a processor.
  *
- *    Les processeurs sont attribues dans l'ordre d'apparition des
- *    sous-domaines/domaines dans le domaine (et non dans l'ordre d'apparition dans
- *    la liste de sous-domaines).
- *    Premier sous_domaine/domaine qui figure dans la liste => proc 0
- *    Element du deuxieme sous_domaine => proc 1
+ *    Processors are assigned in the order of appearance of the
+ *    sub-domains/domains within the domain (not in the order they appear in
+ *    the sub-domain list).
+ *    First sub-domain/domain in the list => proc 0
+ *    Elements of the second sub-domain => proc 1
  *    ...
- *    Elements restants qui ne figurent dans aucun sous_domaine => sur un nouveau pe.
- *    Si un element figure dans plusieurs sous-domaines, c'est le premier sous_domaine
- *    qui gagne.
+ *    Remaining elements not in any sub-domain => assigned to a new pe.
+ *    If an element belongs to several sub-domains, the first sub-domain wins.
  *
  */
 void Partitionneur_Sous_Domaines::construire_partition(IntVect& elem_part, int& nb_parts_tot) const
@@ -106,7 +105,7 @@ void Partitionneur_Sous_Domaines::construire_partition(IntVect& elem_part, int& 
       Cerr << "Can't mix sous_domaines and domaines yet in sous_domaines partitionner." << finl;
       Process::exit();
     }
-  // Numero de processeur en cours d'attribution:
+  // Current processor number being assigned:
   int pe = 0;
   int count = 0;
   if (noms_domaines_.size()!=0)
@@ -116,10 +115,10 @@ void Partitionneur_Sous_Domaines::construire_partition(IntVect& elem_part, int& 
           const Nom& nom_domaine = noms_domaines_[i];
           if (!interprete().objet_existant(nom_domaine) || !sub_type(Domaine, interprete().objet(nom_domaine)))
             {
-              // Contrairement au sous domaine, le domaine doit exister pour le moment
+              // Unlike sub-domains, the domain must exist for now
               Cerr << "Domain " << nom_domaine << " is not existing." << finl;
               Process::exit();
-              // ToDo eventuellement liste de domaines dans des fichiers ex: DOM_0000.Zones, DOM_0001.Zones
+              // ToDo: eventually a list of domains from files e.g.: DOM_0000.Zones, DOM_0001.Zones
             }
           const Domaine& domaine = ref_cast(Domaine, interprete().objet(nom_domaine));
           DoubleTab domaine_xp;
@@ -143,7 +142,7 @@ void Partitionneur_Sous_Domaines::construire_partition(IntVect& elem_part, int& 
   else
     {
       Noms noms_sous_domaines(noms_sous_domaines_);
-      // Si le nom du seul Sous_Domaine est une liste de Sous_Domaine, on les recupere toutes:
+      // If the name of the only Sous_Domaine is a list of Sous_Domaine, retrieve all of them:
       if (noms_sous_domaines_.size()==1 && sub_type(Sous_Domaines, Interprete::objet(noms_sous_domaines_[0])))
         {
           const Sous_Domaines& liste = ref_cast(Sous_Domaines, Interprete::objet(noms_sous_domaines_[0]));
@@ -197,5 +196,5 @@ void Partitionneur_Sous_Domaines::construire_partition(IntVect& elem_part, int& 
   if (ref_domaine_->bords_perio().size() > 0)
     corriger_bords_avec_liste(dom, 0, elem_part);
 
-  // On ne corrige pas elem0 sur proc0 (cas test CouplageFluide_Pb1Pb2_VEF_CN)
+  // Do not correct elem0 on proc0 (test case CouplageFluide_Pb1Pb2_VEF_CN)
 }

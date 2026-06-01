@@ -26,14 +26,13 @@ class Sous_domaine_VF;
 class Matrice_Morse;
 /*! @brief class Op_Conv_EF_VEF_P1NC_Stab
  *
- *   Cette classe represente l'operateur de convection associe a une equation de
- *   transport d'un scalaire.
- *   La discretisation est VEF
- *   Le champ convecte est scalaire ou vecteur de type Champ_P1NC
- *   Le schema de convection est isu du papier
+ *   This class represents the convection operator associated with a scalar transport equation.
+ *   The discretization is VEF.
+ *   The convected field is a scalar or vector of type Champ_P1NC.
+ *   The convection scheme is derived from the paper
  *   "High-resolution FEM-TVD schemes based on a fully multidimensional flux limiter"
  *    D.Kuzmin and S.Turek.
- *   On herite de Op pour recuperer l'implicitation amont
+ *   Inherits from Op to recover upwind implicitation.
  *
  *
  * @sa Operateur_Conv_base
@@ -47,15 +46,15 @@ class Op_Conv_EF_VEF_P1NC_Stab : public Op_Conv_VEF_Face
 
 public:
 
-  //Methodes annexes
+  //Auxiliary methods
   void remplir_fluent() const override;
   int is_compressible() const;
   void completer() override;
 
-  //Methodes pour l'explicite
+  //Methods for explicit scheme
   DoubleTab& ajouter(const DoubleTab& , DoubleTab& ) const override;
 
-  //Methodes pour l'implicite
+  //Methods for implicit scheme
   void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override;
   void ajouter_contribution(const DoubleTab&, Matrice_Morse&) const override;
 
@@ -75,9 +74,9 @@ public:
 
 private :
 
-  //Methodes annexes
+  //Auxiliary methods
 
-  //Methodes pour l'explicite
+  //Methods for explicit scheme
   void reinit_conv_pour_Cl(const DoubleTab&,const IntList&, const DoubleTabs&, const DoubleTab&, DoubleTab&) const;
 
   KOKKOS_INLINE_FUNCTION void calculer_senseur(CDoubleTabView3, CDoubleArrView, const int, const int, CIntTabView, CIntTabView, CIntTabView, double*, double*, double*, double*) const;
@@ -85,24 +84,24 @@ private :
   void ajouter_old(const DoubleTab& , DoubleTab&, const DoubleTab& vitesse) const;
   void calculer_data_pour_dirichlet();
 
-  //Methodes pour l'implicite
+  //Methods for implicit scheme
   void ajouter_contribution_antidiffusion(const DoubleTab&,const DoubleTab&,Matrice_Morse&) const;
   void ajouter_contribution_partie_compressible(const DoubleTab&,const DoubleTab&,Matrice_Morse&) const;
 
-  //Methodes de test
+  //Test methods
   void test(const DoubleTab&,const DoubleTab&, const DoubleTab& vitesse) const;
   void test_difference_Kij(const DoubleTab&,DoubleTab&,DoubleTab&, const DoubleTab& vitesse) const;
   void test_difference_resu(const DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab& vitesse) const;
   void test_implicite() const;
 
-  //Attributs de la classe
+  //Class attributes
   ArrOfInt elem_nb_faces_dirichlet_;
   IntTab elem_faces_dirichlet_;
   ArrsOfInt elem_faces_frontiere;
 
   ArrOfDouble alpha_tab_;
-  ArrOfDouble beta_; // vaut zero pour les faces ou l'on souhaite degenerer en Amont.
-  //  mutable DoubleTab limiteurs_;//tableau stockant pour chaque face la moyenne algebrique du limiteur
+  ArrOfDouble beta_; // equals zero for faces where upwind (Amont) degeneration is desired.
+  //  mutable DoubleTab limiteurs_;//array storing for each face the algebraic mean of the limiter
 
   double alpha_ = 1.;
 
@@ -111,7 +110,7 @@ private :
   int old_ = 0;
   int volumes_etendus_ = 1;
 
-  bool sous_domaine = false;  // Cas d'un sous-domaine a definir pour que l'EF_Stab degenere en Amont
+  bool sous_domaine = false;  // Sub-domain case to define so that EF_Stab degenerates to upwind (Amont)
   int new_jacobienne_ = 0;
   Nom nom_sous_domaine;
   OBS_PTR(Sous_domaine_VF) le_sous_domaine_dis;

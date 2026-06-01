@@ -23,8 +23,8 @@
 
 /*! @brief : class Champ_Elem_PolyMAC_HFV
  *
- *  Champ correspondant a une inconnue scalaire (type temperature ou pression)
- *  Degres de libertes : valeur aux elements + flux aux faces
+ *  @brief Field corresponding to a scalar unknown (e.g. temperature or pressure).
+ *  Degrees of freedom: value at elements + flux at faces.
  */
 class Champ_Elem_PolyMAC_HFV : public Champ_Elem_PolyMAC_CDO
 {
@@ -32,11 +32,11 @@ class Champ_Elem_PolyMAC_HFV : public Champ_Elem_PolyMAC_CDO
 public :
   Champ_base& affecter_(const Champ_base& ch) override;
 
-  int fixer_nb_valeurs_nodales(int n) override; //valeurs aux elements
+  int fixer_nb_valeurs_nodales(int n) override; //values at elements
 
   const Domaine_PolyMAC_HFV& domaine_PolyMAC_HFV() const;
   int nb_valeurs_nodales() const override;
-  virtual void init_auxiliary_variables(); //pour demander en plus les inconnues auxiliaires (valeurs aux faces)
+  virtual void init_auxiliary_variables(); //request additional auxiliary unknowns (face values)
   int reprendre(Entree& fich) override;
 };
 

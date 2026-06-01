@@ -18,10 +18,10 @@
 Implemente_base(Transport_Interfaces_base,"Transport_Interfaces_base",Equation_base);
 
 
-/*! @brief Appel a Equation_base::printOn(Sortie&)
+/*! @brief Calls Equation_base::printOn(Sortie&)
  *
- * @param (Sortie& is) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param is an output stream
+ * @return the modified output stream
  */
 Sortie& Transport_Interfaces_base::printOn(Sortie& is) const
 {
@@ -31,10 +31,10 @@ Sortie& Transport_Interfaces_base::printOn(Sortie& is) const
 
 /*! @brief cf Equation_base::readOn(Entree&)
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws terme diffusif non specifie
- * @throws terme convectif non specifie
+ * @param is an input stream
+ * @return the modified input stream
+ * @throws diffusive term not specified
+ * @throws convective term not specified
  */
 Entree& Transport_Interfaces_base::readOn(Entree& is)
 {

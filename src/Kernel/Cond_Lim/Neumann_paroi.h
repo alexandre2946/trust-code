@@ -18,10 +18,10 @@
 
 #include <Neumann.h>
 
-/*! @brief Classe Neumann_paroi Cette condition limite correspond a un flux impose pour l'equation de
+/*! @brief Classe Neumann_paroi This boundary condition corresponds to an imposed flux for the
  *
- *     transport d'un scalaire. Ex: une paroi chauffante pour l'equation de transport de la temperature.
- *     Le flux impose est uniforme.
+ *     scalar transport equation. Example: a heated wall for the temperature transport equation.
+ *     The imposed flux is uniform.
  *
  * @sa Neumann
  */

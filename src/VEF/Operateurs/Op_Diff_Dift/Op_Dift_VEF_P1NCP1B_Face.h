@@ -20,11 +20,10 @@
 #include <Op_Dift_VEF_base.h>
 #include <SolveurSys.h>
 
-/*! @brief class Op_Dift_VEF_P1NCP1B_Face Cette classe represente l'operateur de diffusion
+/*! @brief class Op_Dift_VEF_P1NCP1B_Face
  *
- *   La discretisation est VEF
- *   Le champ diffuse est scalaire
- *   Le champ de diffusivite est uniforme
+ *  @brief This class represents the diffusion operator with VEF discretization.
+ *         The diffused field is scalar. The diffusivity field is uniform.
  *
  */
 class Op_Dift_VEF_P1NCP1B_Face: public Op_Dift_VEF_base

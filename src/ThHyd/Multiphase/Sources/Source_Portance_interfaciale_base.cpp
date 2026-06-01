@@ -39,15 +39,15 @@ Entree& Source_Portance_interfaciale_base::readOn(Entree& is)
   const bool res_en_T = pbm ? pbm->resolution_en_T() : true;
   if (!res_en_T) Process::exit("Source_Portance_interfaciale_base::readOn NOT YET PORTED TO ENTHALPY EQUATION ! TODO FIXME !!");
 
-  for (int n = 0; n < pbm->nb_phases(); n++) //recherche de n_l, n_g : phase {liquide,gaz}_continu en priorite
+  for (int n = 0; n < pbm->nb_phases(); n++) // search for n_l, n_g: {liquid,gas}_continuous phase in priority
     if (pbm->nom_phase(n).debute_par("liquide") && (n_l < 0 || pbm->nom_phase(n).finit_par("continu")))  n_l = n;
 
   if (n_l < 0) Process::exit(que_suis_je() + " : liquid phase not found!");
 
-  if (pbm->has_correlation("Portance_interfaciale")) correlation_ = pbm->get_correlation("Portance_interfaciale"); //correlation fournie par le bloc correlation
-  else Correlation_base::typer_lire_correlation(correlation_, (*pbm), "Portance_interfaciale", is); //sinon -> on la lit
+  if (pbm->has_correlation("Portance_interfaciale")) correlation_ = pbm->get_correlation("Portance_interfaciale"); // correlation provided by the correlation block
+  else Correlation_base::typer_lire_correlation(correlation_, (*pbm), "Portance_interfaciale", is); // otherwise read it
 
-  pbm->creer_champ("vorticite"); // Besoin de vorticite
+  pbm->creer_champ("vorticite"); // vorticity is needed
 
   return is;
 }

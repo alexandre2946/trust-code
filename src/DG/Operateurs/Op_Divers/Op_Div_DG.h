@@ -25,8 +25,8 @@ class Domaine_Cl_DG;
 
 /*! @brief class Op_Div_DG
  *
- *   Cette classe represente l'operateur de divergence La discretisation est DG
- *   On calcule la divergence d'un champ_P1NC (la vitesse)
+ *   This class represents the divergence operator with DG discretization.
+ *   It computes the divergence of a velocity field (P1NC-type).
  *
  * @sa Operateur_Div_base
  *

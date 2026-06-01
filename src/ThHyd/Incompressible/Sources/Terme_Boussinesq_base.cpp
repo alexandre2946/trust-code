@@ -35,7 +35,7 @@ Implemente_base(Terme_Boussinesq_base,"Terme_Boussinesq_base",Source_base);
 
 Sortie& Terme_Boussinesq_base::printOn(Sortie& s ) const { return s << que_suis_je() ; }
 
-/*! @brief Lit les parametres du terme source a partir d'un flot d'entree.
+/*! @brief Reads the source term parameters from an input stream.
  *
  */
 Entree& Terme_Boussinesq_base::readOn(Entree& is )
@@ -54,7 +54,7 @@ void Terme_Boussinesq_base::set_param(Param& param) const
   param.ajouter("verif_boussinesq",&verif_);
 }
 
-// Cherche dans le probleme l'equation scalaire
+// Searches the problem for the scalar equation
 void Terme_Boussinesq_base::associer_pb(const Probleme_base& pb)
 {
   int ok=0;
@@ -109,7 +109,7 @@ void Terme_Boussinesq_base::associer_pb(const Probleme_base& pb)
     }
 }
 
-// Fonction de lecture d'un Parser_U
+// Function to read a Parser_U
 void read(Entree& is, Parser_U& fct_Scalaire0_)
 {
   Nom expression;

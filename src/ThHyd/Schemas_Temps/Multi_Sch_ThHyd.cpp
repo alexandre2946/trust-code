@@ -30,9 +30,9 @@ Entree& Multi_Sch_ThHyd::readOn(Entree& s)
   return Schema_Temps_base::readOn(s) ;
 }
 
-/*! @brief Renvoie le nombre de valeurs temporelles a conserver.
+/*! @brief Returns the number of time values to keep.
  *
- * Ici : le max des deux schemas utilises.
+ * Here: the max of the two schemes used.
  *
  */
 int Multi_Sch_ThHyd::nb_valeurs_temporelles() const
@@ -40,9 +40,9 @@ int Multi_Sch_ThHyd::nb_valeurs_temporelles() const
   return std::max(sch_ns_->nb_valeurs_temporelles(),sch_scalaires_->nb_valeurs_temporelles());
 }
 
-/*! @brief Renvoie le nombre de valeurs temporelles futures.
+/*! @brief Returns the number of future time values.
  *
- * Ici : la valeur commune aux deux schemas utilises.
+ * Here: the value common to the two schemes used.
  *
  */
 int Multi_Sch_ThHyd::nb_valeurs_futures() const
@@ -52,9 +52,9 @@ int Multi_Sch_ThHyd::nb_valeurs_futures() const
   return n;
 }
 
-/*! @brief Renvoie le le temps a la i-eme valeur future.
+/*! @brief Returns the time at the i-th future value.
  *
- * Ici : la valeur commune aux deux schemas utilises.
+ * Here: the value common to the two schemes used.
  *
  */
 double Multi_Sch_ThHyd::temps_futur(int i) const
@@ -64,9 +64,9 @@ double Multi_Sch_ThHyd::temps_futur(int i) const
   return t;
 }
 
-/*! @brief Renvoie le le temps le temps que doivent rendre les champs a l'appel de valeurs()
+/*! @brief Returns the time that fields should return when calling valeurs().
  *
- *     Ici : la valeur commune aux deux schemas utilises.
+ *     Here: the value common to the two schemes used.
  *
  */
 double Multi_Sch_ThHyd::temps_defaut() const
@@ -78,14 +78,14 @@ double Multi_Sch_ThHyd::temps_defaut() const
 
 /////////////////////////////////////////
 //                                     //
-// Fin des caracteristiques du schema  //
+// End of scheme characteristics       //
 //                                     //
 /////////////////////////////////////////
 
 
 void Multi_Sch_ThHyd::completer()
 {
-  // OC : je comprends pas ces lignes :
+  // OC: I don't understand these lines:
   /*  double dts=dt_;
       dt_=0;
       mettre_a_jour();
@@ -93,7 +93,7 @@ void Multi_Sch_ThHyd::completer()
       dt_=dts;
   */
 
-  // OC : je verrai plutot une methode  "completer" de ce genre :
+  // OC: I would rather have a "completer" method of this kind:
 
   Schema_Temps_base& le_sch_ns = sch_ns_.valeur();
   le_sch_ns.set_temps_init()=temps_init();
@@ -156,10 +156,10 @@ void Multi_Sch_ThHyd::set_param(Param& param) const
 }
 
 
-/*! @brief Effectue un pas de temps d'Euler explicite sur l'equation passee en parametre.
+/*! @brief Performs one explicit Euler time step on the given equation.
  *
- * @param (Equation_base& eqn) l'equation que l'on veut faire avancer d'un pas de temps
- * @return (int) renvoie toujours 1
+ * @param eqn The equation to advance by one time step.
+ * @return Always returns 1.
  */
 int Multi_Sch_ThHyd::faire_un_pas_de_temps_eqn_base(Equation_base& eqn)
 {
@@ -193,7 +193,7 @@ bool Multi_Sch_ThHyd::iterateTimeStep(bool& converged)
           Cout<< "====================================================" << finl;
           Cout<< eqn_i.que_suis_je()<<" equation is not solved."<<finl;
           Cout<< "====================================================" << finl;
-          // On calcule une fois la derivee pour avoir les flux bord
+          // Compute the derivative once to obtain the boundary fluxes
           if (eqn_i.schema_temps().nb_pas_dt()==0)
             {
               DoubleTab inconnue_valeurs(eqn_i.inconnue().valeurs());
@@ -211,9 +211,9 @@ bool Multi_Sch_ThHyd::iterateTimeStep(bool& converged)
 
 }
 
-/*! @brief Corrige le pas de temps dt_min <= dt <= dt_max
+/*! @brief Corrects the time step so that dt_min <= dt <= dt_max.
  *
- * @return (int) retourne corriger_pas_temps de la classe mere
+ * @return Returns the result of corriger_pas_temps from the base class.
  */
 bool Multi_Sch_ThHyd::corriger_dt_calcule(double& dt) const
 {
@@ -224,9 +224,9 @@ bool Multi_Sch_ThHyd::corriger_dt_calcule(double& dt) const
 }
 
 
-/*! @brief Appel a l'objet sous-jacent Change le temps courant
+/*! @brief Call to the underlying object. Changes the current time.
  *
- * @param (double& t) la nouvelle valeur du temps courant
+ * @param t The new value of the current time.
  */
 void Multi_Sch_ThHyd::changer_temps_courant(const double t)
 {
@@ -236,15 +236,15 @@ void Multi_Sch_ThHyd::changer_temps_courant(const double t)
   Schema_Temps_base::changer_temps_courant(t);
 }
 
-/*! @brief Appel a l'objet sous-jacent Renvoie 1 si il y lieu de stopper le calcul pour differente raisons:
+/*! @brief Call to the underlying object. Returns 1 if the calculation should be stopped for various reasons:
  *
- *         - le temps final est atteint
- *         - le nombre de pas de temps maximum est depasse
- *         - l'etat stationnaire est atteint
- *         - indicateur d'arret fichier
- *     Renvoie 0 sinon
+ *         - the final time has been reached
+ *         - the maximum number of time steps has been exceeded
+ *         - the stationary state has been reached
+ *         - a file-based stop indicator
+ *     Returns 0 otherwise.
  *
- * @return (entier) 1 si il y a lieu de s'arreter 0 sinon
+ * @return 1 if the calculation should stop, 0 otherwise.
  */
 int Multi_Sch_ThHyd::stop() const
 {
@@ -254,9 +254,9 @@ int Multi_Sch_ThHyd::stop() const
   return (ls2 | ls3 | Schema_Temps_base::stop());
 }
 
-/*! @brief Appel a l'objet sous-jacent Imprime le schema en temp sur un flot de sortie (si il y a lieu).
+/*! @brief Call to the underlying object. Prints the time scheme to an output stream (if applicable).
  *
- * @param (Sortie& os) le flot de sortie
+ * @param os The output stream.
  */
 void Multi_Sch_ThHyd::imprimer(Sortie& os) const
 {

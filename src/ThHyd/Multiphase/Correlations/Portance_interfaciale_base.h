@@ -18,16 +18,16 @@
 #include <Correlation_base.h>
 #include <TRUSTTab.h>
 
-/*! @brief classe Portance_interfaciale_base utilitaire pour les operateurs de frottement interfacial prenant la forme
+/*! @brief Base class for interfacial lift force operators of the form:
  *
- *       F_{0l} = - F_{l0} = C_{0l} (u_l - u_0) x rot(u_0) ou la phase
- *       0 est la phase porteuse et l != 0 une phase quelconque
- *       cette classe definit une fonction C_{kl} dependant de :
- *         alpha, p, T -> inconnues (une valeur par phase chacune)
- *         rho, mu, sigma -> proprietes physiques (idem)
- *         ndv(k, l) -> ||v_k - v_l||, a remplir pour k < l
- *     sortie :
- *         coeff(k, l, 0/1) -> coefficient C_{kl} et sa derivee en ndv(k, l), rempli pour k < l
+ *       F_{0l} = - F_{l0} = C_{0l} (u_l - u_0) x rot(u_0), where phase
+ *       0 is the carrier phase and l != 0 is any other phase.
+ *       This class defines a coefficient function C_{kl} depending on:
+ *         alpha, p, T -> unknowns (one value per phase each)
+ *         rho, mu, sigma -> physical properties (same)
+ *         ndv(k, l) -> ||v_k - v_l||, filled for k < l
+ *     output:
+ *         coeff(k, l, 0/1) -> coefficient C_{kl} and its derivative w.r.t. ndv(k, l), filled for k < l
  *
  *
  */
@@ -38,22 +38,22 @@ class Portance_interfaciale_base : public Correlation_base
 public:
   struct input_t
   {
-    double dh;            // diametre hyd
-    DoubleTab alpha;  // alpha[n] : taux de vide de la phase n
-    DoubleTab T;      // T[n]     : temperature de la phase n
-    DoubleTab p;             // pression
-    DoubleTab nv;     // nv[k, l] : norme de ||v_k - v_l||
-    DoubleTab mu;     // mu[n]         : viscosite dynamique de la phase n
-    DoubleTab rho;    // rho[n]        : masse volumique de la phase n
-    DoubleTab sigma;  // sigma[ind_trav]:tension superficielle sigma(ind_trav), ind_trav = (n*(N-1)-(n-1)*(n)/2) + (m-n-1)
-    DoubleTab k_turb; // k_turb[n]     : energie cinetique turbulente de la phase n
-    DoubleTab d_bulles;//d_bulles[n]   : diametre de bulles de la phase n
-    int e;                // indice d'element
+    double dh;            // hydraulic diameter
+    DoubleTab alpha;  // alpha[n] : void fraction of phase n
+    DoubleTab T;      // T[n]     : temperature of phase n
+    DoubleTab p;             // pressure
+    DoubleTab nv;     // nv[k, l] : norm of ||v_k - v_l||
+    DoubleTab mu;     // mu[n]         : dynamic viscosity of phase n
+    DoubleTab rho;    // rho[n]        : density of phase n
+    DoubleTab sigma;  // sigma[ind_trav]: surface tension sigma(ind_trav), ind_trav = (n*(N-1)-(n-1)*(n)/2) + (m-n-1)
+    DoubleTab k_turb; // k_turb[n]     : turbulent kinetic energy of phase n
+    DoubleTab d_bulles;//d_bulles[n]   : bubble diameter of phase n
+    int e;                // element index
   };
-  /* valeurs de sortie */
+  /* output values */
   struct output_t
   {
-    DoubleTab Cl;    //Cl(k, l)       : coeff de portance entre les phases k et l
+    DoubleTab Cl;    //Cl(k, l)       : lift coefficient between phases k and l
   };
 
   virtual void coefficient(const input_t& input, output_t& output) const  = 0;

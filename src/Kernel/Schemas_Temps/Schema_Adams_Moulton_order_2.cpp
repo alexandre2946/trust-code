@@ -55,7 +55,7 @@ Entree& Schema_Adams_Moulton_order_2::readOn(Entree& s)
   return Schema_Adams_Moulton_base::readOn(s);
 }
 
-/*! @brief Renvoie le nombre de valeurs temporelles a conserver.
+/*! @brief Returns the number of temporal values to keep.
  *
  */
 int Schema_Adams_Moulton_order_2::nb_valeurs_temporelles() const

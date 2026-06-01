@@ -40,7 +40,7 @@ Implemente_base_sans_constructeur(Modele_turbulence_hyd_LES_base, "Modele_turbul
 
 Modele_turbulence_hyd_LES_base::Modele_turbulence_hyd_LES_base()
 {
-  methode_ = "volume"; // Parametre par defaut pour calculer la longueur caracteristique
+  methode_ = "volume"; // Default parameter to compute the characteristic length
 }
 
 Sortie& Modele_turbulence_hyd_LES_base::printOn(Sortie& is) const
@@ -125,7 +125,7 @@ void Modele_turbulence_hyd_LES_base::calculer_energie_cinetique_turb()
   DoubleTab& visco_turb = la_viscosite_turbulente_->valeurs();
   double Cq = 0.094;
 
-  // PQ : 10/08/06 : on utilise ici la formule de Schuman : q_sm = (nu_t)^2 / (Cq.l)^2
+  // PQ: 10/08/06: using the Schuman formula here: q_sm = (nu_t)^2 / (Cq.l)^2
 
   const int nb_elem = visco_turb.size();
   if (k.size() != nb_elem)

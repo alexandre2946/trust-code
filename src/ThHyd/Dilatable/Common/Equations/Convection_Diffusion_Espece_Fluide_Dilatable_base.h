@@ -20,9 +20,7 @@
 
 class Fluide_Dilatable_base;
 
-/*! @brief classe Convection_Diffusion_Espece_Fluide_Dilatable_base Cas particulier de Convection_Diffusion_std pour un fluide dilatable
- *
- *      quand le scalaire subissant le transport est la fraction massique
+/*! @brief @brief Particular case of Convection_Diffusion_std for a dilatable fluid when the transported scalar is the mass fraction.
  *
  * @sa Conv_Diffusion_std Convection_Diffusion_Chaleur_Fluide_Dilatable_base
  */
@@ -40,12 +38,12 @@ public :
   int preparer_calcul() override;
   const Motcle& domaine_application() const override;
 
-  // Methodes virtuelles pure
+  // Pure virtual methods
   void assembler( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem) override = 0;
   const Champ_base& diffusivite_pour_pas_de_temps() const override = 0;
   DoubleTab& derivee_en_temps_inco(DoubleTab& ) override = 0;
 
-  // Methodes inlines
+  // Inline methods
   inline bool is_thermal() const override { return false; }
   inline bool is_generic() const override { return true; }
 };

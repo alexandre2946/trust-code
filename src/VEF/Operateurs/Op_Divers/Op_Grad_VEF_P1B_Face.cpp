@@ -93,7 +93,7 @@ static void verifier(const Op_Grad_VEF_P1B_Face& op, int& init, const Domaine_VE
   const DoubleTab& xp = domaine_VEF.xp();
   const DoubleTab& coord_sommets = dom.coord_sommets();
 
-  // Verification de la pression arete
+  // Verification of the edge pressure
   DoubleTab tab(pre);
   exemple_champ_non_homogene(domaine_VEF, tab);
 
@@ -101,7 +101,7 @@ static void verifier(const Op_Grad_VEF_P1B_Face& op, int& init, const Domaine_VE
   r = 0;
   op.ajouter(tab, r);
 
-  // Pression mise a 1 sur tous les noeuds
+  // Pressure set to 1 on all nodes
   DoubleTab p(pre);
   p = 1;
   r = 0;
@@ -111,7 +111,7 @@ static void verifier(const Op_Grad_VEF_P1B_Face& op, int& init, const Domaine_VE
       Cerr << Process::me() << " grad(1) som = " << finl;
       r.ecrit(Cerr);
     }
-  // Pression mise a 1 sur les elements seulement
+  // Pressure set to 1 on elements only
   p = 0;
   int i = 0;
   for (; i < nb_elem_tot; i++)
@@ -123,7 +123,7 @@ static void verifier(const Op_Grad_VEF_P1B_Face& op, int& init, const Domaine_VE
   Cerr << "[" << Process::me() << "] grad(1) elem = " << finl;
   r.ecrit(Cerr);
 
-  // Pression mise a 1 sur les sommets seulement
+  // Pressure set to 1 on vertices only
   p = 0;
   for (; i < nb_elem_tot + nb_som_tot; i++)
     p(i) = 1;
@@ -132,7 +132,7 @@ static void verifier(const Op_Grad_VEF_P1B_Face& op, int& init, const Domaine_VE
   Cerr << Process::me() << " grad(1) som = " << finl;
   r.ecrit(Cerr);
 
-  // Pression mise a 1 sur les aretes seulement
+  // Pressure set to 1 on edges only
   p = 0;
   int sz = p.size_totale();
   for (; i < sz; i++)
@@ -141,7 +141,7 @@ static void verifier(const Op_Grad_VEF_P1B_Face& op, int& init, const Domaine_VE
   op.ajouter(p, r);
   Cerr << Process::me() << " grad(1) aretes = " << finl;
   r.ecrit(Cerr);
-  // Pression variable sur les elements seulement
+  // Variable pressure on elements only
   p = 0;
   for (i = 0; i < nb_elem_tot; i++)
     p(i) = xp(i, 0) - 1;
@@ -154,7 +154,7 @@ static void verifier(const Op_Grad_VEF_P1B_Face& op, int& init, const Domaine_VE
   Cerr << Process::me() << " grad(x-1) elem = " << finl;
   r.ecrit(Cerr);
 
-  // Pression variable sur les sommets seulement
+  // Variable pressure on vertices only
   p = 0;
   for (i = nb_elem_tot; i < nb_elem_tot + nb_som_tot; i++)
     {
@@ -248,7 +248,7 @@ DoubleTab& Op_Grad_VEF_P1B_Face::ajouter_elem(const DoubleTab& tab_pre, DoubleTa
   CDoubleArrView porosite_face = equation().milieu().porosite_face().view_ro();
   CDoubleTabView face_normales = domaine_VEF.face_normales().view_ro();
 
-  // Si pas de support P1, on impose Neumann sur P0
+  // If no P1 support, impose Neumann on P0
 
   if (domaine_VEF.get_alphaS() == 0)
     {
@@ -635,9 +635,9 @@ double Op_Grad_VEF_P1B_Face::calculer_coef_som(int elem, const Domaine_Cl_VEF& z
 
 DoubleTab& Op_Grad_VEF_P1B_Face::ajouter(const DoubleTab& pre, DoubleTab& grad) const
 {
-  // pre doit avoir son espace virtuel a jour
+  // pre must have its virtual space up to date
   assert_espace_virtuel_vect(pre);
-  // on va faire += sur l'espace virtuel, mais sans utiliser les valeurs
+  // we will do += on the virtual space, but without using the values
   assert_invalide_items_non_calcules(grad);
   //Debog::verifier("Op_Grad_VEF_P1B_Face::ajouter pre", pre);
   const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_vef.valeur());
@@ -652,7 +652,7 @@ DoubleTab& Op_Grad_VEF_P1B_Face::ajouter(const DoubleTab& pre, DoubleTab& grad) 
     ajouter_aretes(pre, grad);
   modifier_grad_pour_Cl(grad);
   //calculer_flux_bords();
-  //Optimisation car pas necessaire:
+  //Optimization: not necessary here:
   //grad.echange_espace_virtuel();
   //Debog::verifier("Op_Grad_VEF_P1B_Face::ajouter grad en sortie:", grad);
   return grad;
@@ -674,7 +674,7 @@ void Op_Grad_VEF_P1B_Face::calculer_flux_bords() const
   const DoubleTab& face_normales = domaine_VEF.face_normales();
   const Navier_Stokes_std& eqn_hydr = ref_cast(Navier_Stokes_std, equation());
   const Champ_P1_isoP1Bulle& la_pression_P1B = ref_cast(Champ_P1_isoP1Bulle, eqn_hydr.pression_pa());
-  // Si on filtre:
+  // If filtering:
   if(domaine_VEF.domaine().que_suis_je() == "Domaine_ALE")
     {
       la_pression_P1B.filtrage(domaine_VEF, la_pression_P1B, eqn_hydr.getCouplingInfoForFiltering());
@@ -702,9 +702,9 @@ void Op_Grad_VEF_P1B_Face::calculer_flux_bords() const
   {
     int elem = face_voisins_v(face, 0);
     double pres_tot = 0.;
-    // Contribution de la pression P0
+    // Contribution of P0 pressure
     if (alphaE) pres_tot = pression_P1B_v(elem);
-    // Contribution de la pression P1
+    // Contribution of P1 pressure
     if (alphaS)
       {
         double pres_som = 0.;
@@ -712,7 +712,7 @@ void Op_Grad_VEF_P1B_Face::calculer_flux_bords() const
           pres_som += pression_P1B_v(nps + sommets_v(face, som));
         pres_tot += coeff_P1 * pres_som;
       }
-    // Calcul de la resultante et du couple de pression
+    // Compute the resultant and pressure moment
     for (int i = 0; i < dim; i++)
       flux_bords_v(face, i) = pres_tot * face_normales_v(face, i);
   };
@@ -756,13 +756,13 @@ int Op_Grad_VEF_P1B_Face::impr(Sortie& os) const
       int nfin = ndeb + le_bord.nb_faces();
       for (int face = ndeb; face < nfin; face++)
         {
-          // Calcul de la resultante et du couple de pression
+          // Compute the resultant and pressure moment
           if (dimension == 2)
             {
               tab_flux_bords(0, n_bord, 0) += flux_bords_(face, 0);
               tab_flux_bords(0, n_bord, 1) += flux_bords_(face, 1);
 
-              // Calcul du moment exerce par le fluide sur le bord (OM/\F)
+              // Compute the moment exerted by the fluid on the boundary (OM/\F)
               if (impr_mom)
                 tab_flux_bords(2, n_bord, 0) += flux_bords_(face, 1) * xgr(face, 0) - flux_bords_(face, 0) * xgr(face, 1);
               if (impr_boundary)
@@ -779,7 +779,7 @@ int Op_Grad_VEF_P1B_Face::impr(Sortie& os) const
 
               if (impr_mom)
                 {
-                  // Calcul du moment exerce par le fluide sur le bord (OM/\F)
+                  // Compute the moment exerted by the fluid on the boundary (OM/\F)
                   tab_flux_bords(2, n_bord, 0) += flux_bords_(face, 2) * xgr(face, 1) - flux_bords_(face, 1) * xgr(face, 2);
                   tab_flux_bords(2, n_bord, 1) += flux_bords_(face, 0) * xgr(face, 2) - flux_bords_(face, 2) * xgr(face, 0);
                   tab_flux_bords(2, n_bord, 2) += flux_bords_(face, 1) * xgr(face, 0) - flux_bords_(face, 0) * xgr(face, 1);
@@ -792,9 +792,9 @@ int Op_Grad_VEF_P1B_Face::impr(Sortie& os) const
                 }
             }
         }
-    } // fin for n_bord
+    } // end for n_bord
 
-  // On somme les contributions de chaque processeur
+  // Sum contributions from each processor
   mp_sum_for_each_item(tab_flux_bords);
 
   if (je_suis_maitre())

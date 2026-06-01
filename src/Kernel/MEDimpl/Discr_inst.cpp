@@ -39,9 +39,9 @@ void Discr_inst::discretiser_champ(const Motcle& directive, const Domaine_dis_ba
   assert(0);
   throw;
 }
-/*! @brief Idem que Discr_inst::discretiser_champ(.
+/*! @brief Same as Discr_inst::discretiser_champ(.
  *
- * .. , Champ_Inc) pour un Champ_Fonc.
+ * .. , Champ_Inc) but for a Champ_Fonc.
  *
  */
 void Discr_inst::discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, double temps,
@@ -50,9 +50,9 @@ void Discr_inst::discretiser_champ(const Motcle& directive, const Domaine_dis_ba
   discretiser_champ_fonc_don(directive, z, nature, noms, unites, nb_comp, temps, champ);
 }
 
-/*! @brief Idem que Discr_inst::discretiser_champ(.
+/*! @brief Same as Discr_inst::discretiser_champ(.
  *
- * .. , Champ_Inc) pour un Champ_Don.
+ * .. , Champ_Inc) but for a Champ_Don.
  *
  */
 void Discr_inst::discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, double temps, OWN_PTR(Champ_Don_base)& champ) const
@@ -60,23 +60,23 @@ void Discr_inst::discretiser_champ(const Motcle& directive, const Domaine_dis_ba
   discretiser_champ_fonc_don(directive, z, nature, noms, unites, nb_comp, temps, champ);
 }
 
-/*! @brief Idem que VEF_discretisation::discretiser_champ(.
+/*! @brief Same as VEF_discretisation::discretiser_champ(.
  *
- * .. , Champ_Inc) Traitement commun aux champ_fonc et champ_don.
- *  Cette methode est privee (passage d'un Objet_U pas propre vu
- *  de l'exterieur ...)
+ * .. , Champ_Inc). Common processing for champ_fonc and champ_don.
+ *  This method is private (passing an Objet_U is not clean
+ *  from the outside).
  *
  */
 void Discr_inst::discretiser_champ_fonc_don(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, double temps,
                                             Objet_U& champ) const
 {
-  // Deux pointeurs pour acceder facilement au champ_don ou au champ_fonc, suivant le type de l'objet champ.
+  // Two pointers to easily access the champ_don or the champ_fonc depending on the type of the champ object.
   OWN_PTR(Champ_Fonc_base) *champ_fonc = dynamic_cast<OWN_PTR(Champ_Fonc_base)*>(&champ);
   OWN_PTR(Champ_Don_base) *champ_don = dynamic_cast<OWN_PTR(Champ_Don_base)*>(&champ);
 
   Motcles motcles(2);
-  motcles[0] = "champ_elem";  // Creer un champ aux elements (de type P0)
-  motcles[1] = "champ_sommets";   // Creer un champ aux sommets
+  motcles[0] = "champ_elem";  // Create a field at elements (P0 type)
+  motcles[1] = "champ_sommets";   // Create a field at vertices
 
   Nom type;
   int rang = motcles.search(directive);
@@ -108,8 +108,8 @@ void Discr_inst::discretiser_champ_fonc_don(const Motcle& directive, const Domai
   if (directive == DEMANDE_DESCRIPTION)
     Cerr << "Discr_inst : " << motcles;
 
-  // Si on n'a pas compris la directive (ou si c'est une demande_description)
-  // alors on appelle l'ancetre :
+  // If the directive was not understood (or if it is a demande_description),
+  // call the ancestor:
   if (rang < 0)
     {
       if (champ_fonc)

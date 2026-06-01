@@ -40,7 +40,7 @@ void Loi_Etat_TPPI_QC_base::init_vec_press()
   vec_press_filled_ = true;
 }
 
-// Dans l'ordre on fait ca
+// In order, the following steps are performed:
 //
 //    calculer_Cp();
 //    calculer_mu();

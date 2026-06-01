@@ -32,9 +32,9 @@ public:
   void reset() { parts_.dimensionner_force(0); }
   int size() const { return parts_.size(); }
 
-  // operator[] est non const sinon on pourrait contourner le l'attribut const d'une classe...
+  // operator[] is non-const, otherwise one could bypass the const attribute of a class...
   TRUSTTab<_TYPE_>& operator[](int i) { return parts_[i]; }
-  // En revanche, on a toujours le doit d'avoir la version const:
+  // However, the const version is always available:
   const TRUSTTab<_TYPE_>& operator[](int i) const { return parts_[i]; }
 
 private:

@@ -21,9 +21,9 @@
 #include <TRUST_Ref.h>
 #include <Noms.h>
 
-/*! @brief Interprete un bloc d'instructions dans le jeu de donnees.
+/*! @brief Interprets a block of instructions in the data set.
  *
- * Voir Interprete_bloc::interpreter()
+ * See Interprete_bloc::interpreter()
  *
  *
  */
@@ -31,7 +31,7 @@ class Interprete_bloc: public Liste_bloc
 {
   Declare_instanciable(Interprete_bloc);
 public:
-  // Indique si le bloc se termine par une accolade, un EOF ou le mot FIN
+  // Indicates whether the block ends with a brace, an EOF, or the keyword FIN
   enum Bloc_Type { ACCOLADE, BLOC_EOF, FIN };
 
   Entree& interpreter_bloc(Entree& is, Bloc_Type bloc_type, int verifier_sans_interpreter);
@@ -45,9 +45,9 @@ public:
   inline const Noms& les_noms() const { return les_noms_ ; }
 
 protected:
-  // Noms des objets lus dans le bloc:
+  // Names of objects read in the block:
   Noms les_noms_;
-  // Reference a l'interprete courant avant la creation de celui-ci
+  // Reference to the current interpreter before this one was created
   OBS_PTR(Interprete_bloc) pere_;
 };
 

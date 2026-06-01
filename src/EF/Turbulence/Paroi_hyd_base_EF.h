@@ -22,7 +22,7 @@
 #include <Domaine_EF.h>
 #include <TRUST_Ref.h>
 
-/*! @brief CLASS: Paroi_hyd_base_EF Classe de base des lois de paroi hydraulique en EF
+/*! @brief CLASS: Paroi_hyd_base_EF Base class for hydraulic wall laws in the EF discretization.
  *
  *
  */
@@ -42,7 +42,7 @@ public:
   void get_noms_champs_postraitables(Noms& nom, Option opt = NONE) const override;
 
 protected:
-  IntVect face_keps_imposee_; // avec descripteur parallele
+  IntVect face_keps_imposee_; // with parallel descriptor
   int flag_face_keps_imposee_ = 0;
 };
 

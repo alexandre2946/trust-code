@@ -19,19 +19,19 @@
 
 #include <Champ_front_base.h>
 
-/*! @brief classe Champ_front_var Classe derivee de Champ_front_base qui represente un champ sur
+/*! @brief class Champ_front_var Derived class from Champ_front_base that represents a field on
  *
- *      une frontiere variable en espace (non uniforme).
- *      Le DoubleTab est dimensionne au nombre de faces de la frontiere
- *      par la methode initialiser et possede un espace virtuel.
- *      Chaque modification du tableau de valeurs doit donc etre suivie
- *      d'un appel a echange_espace_virtuel().
- *      Les Champ_front_var sont classes suivant qu'ils sont
- *      stationnaires (Champ_front_var_stationnaire) ou non
+ *      a boundary variable in space (non-uniform).
+ *      The DoubleTab is sized to the number of boundary faces
+ *      by the initializer method and has a virtual space.
+ *      Each modification of the values array must therefore be followed
+ *      by a call to echange_espace_virtuel().
+ *      Champ_front_var fields are classified depending on whether they are
+ *      stationary (Champ_front_var_stationnaire) or not
  *      (Champ_front_var_instationnaire).
- *      Dans le premier cas, le tableau de valeurs est rempli une fois
- *      pour toutes par la methode initialiser. Dans le deuxieme, il
- *      est aussi recalcule a chaque appel a mettre_a_jour.
+ *      In the first case, the values array is filled once
+ *      and for all by the initializer method. In the second, it
+ *      is also recalculated on each call to mettre_a_jour.
  *
  * @sa Champ_front_base Champ_Var
  */

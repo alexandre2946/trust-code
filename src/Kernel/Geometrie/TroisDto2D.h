@@ -20,9 +20,9 @@
 #include <Domaine.h>
 
 
-/*! @brief Classe TroisDto2D x->alpha x
+/*! @brief Class TroisDto2D x->alpha x
  *
- * @sa Interprete Pave, Actuellement le seul type d'objet reconnu par TRUST pour mailler un domaine est le Pave.
+ * @sa Interprete Pave, Currently the only type of object recognized by TRUST for meshing a domain is the Pave.
  */
 template <typename _SIZE_>
 class TroisDto2D_32_64 : public Interprete_geometrique_base_32_64<_SIZE_>
@@ -44,30 +44,30 @@ public :
   Entree& interpreter_(Entree&) override;
   void extraire_2D(const Domaine_t&, Domaine_t&, const Bord_t&,const Nom& , int);
 
-  // OC, 28/10/2004, Modif pour pouvoir extraire un bord d'orientation quelconque.
-  // Renvoi la composante X  de l'origine A du repere local au bord, calcule par la classe.
+  // OC, 28/10/2004, Modification to be able to extract a boundary of any orientation.
+  // Returns the X component of the origin A of the local coordinate system at the boundary, calculated by the class.
   double getXa() { return xa; }
-  // Renvoi la composante Y de l'origine A du repere local au bord, calcule par la classe.
+  // Returns the Y component of the origin A of the local coordinate system at the boundary, calculated by the class.
   double getYa() { return ya; }
-  // Renvoi la composante Z de l'origine A du repere local au bord, calcule par la classe.
+  // Returns the Z component of the origin A of the local coordinate system at the boundary, calculated by the class.
   double getZa() { return za; }
-  // Renvoi la composante X du premier vecteur de base I du repere local au bord, calcule par la classe.
+  // Returns the X component of the first basis vector I of the local coordinate system at the boundary, calculated by the class.
   double getIx() { return Ix; }
-  // Renvoi la composante Y du premier vecteur de base I du repere local au bord, calcule par la classe.
+  // Returns the Y component of the first basis vector I of the local coordinate system at the boundary, calculated by the class.
   double getIy() { return Iy; }
-  // Renvoi la composante Z du premier vecteur de base I du repere local au bord, calcule par la classe.
+  // Returns the Z component of the first basis vector I of the local coordinate system at the boundary, calculated by the class.
   double getIz() { return Iz; }
-  // Renvoi la composante X du  vecteur de base J du repere local au bord, calcule par la classe.
+  // Returns the X component of the basis vector J of the local coordinate system at the boundary, calculated by the class.
   double getJx() { return Jx; }
-  // Renvoi la composante Y du  vecteur de base J du repere local au bord, calcule par la classe.
+  // Returns the Y component of the basis vector J of the local coordinate system at the boundary, calculated by the class.
   double getJy() { return Jy; }
-  // Renvoi la composante Z du  vecteur de base J du repere local au bord, calcule par la classe.
+  // Returns the Z component of the basis vector J of the local coordinate system at the boundary, calculated by the class.
   double getJz() { return Jz; }
-  // Renvoi la composante X du  vecteur de base K du repere local au bord, calcule par la classe.
+  // Returns the X component of the basis vector K of the local coordinate system at the boundary, calculated by the class.
   double getKx() { return Kx; }
-  // Renvoi la composante Y du  vecteur de base K du repere local au bord, calcule par la classe.
+  // Returns the Y component of the basis vector K of the local coordinate system at the boundary, calculated by the class.
   double getKy() { return Ky; }
-  // Renvoi la composante Z du  vecteur de base K du repere local au bord, calcule par la classe.
+  // Returns the Z component of the basis vector K of the local coordinate system at the boundary, calculated by the class.
   double getKz() { return Kz; }
 
   inline int& coupe() { return coupe_; }

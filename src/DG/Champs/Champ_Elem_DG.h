@@ -21,8 +21,8 @@
 #include <Quadrature_base.h>
 #include <Matrice_Dense.h>
 
-// Champ correspondant a une inconnue scalaire (type temperature ou pression)
-// Degres de libertes : valeur aux elements + flux aux faces
+// Field corresponding to a scalar unknown (e.g. temperature or pressure)
+// Degrees of freedom: value at elements + flux at faces
 class Champ_Elem_DG: public Champ_Inc_P0_base
 {
   Declare_instanciable(Champ_Elem_DG);
@@ -38,7 +38,7 @@ public:
   inline const int& get_order() const { return order_; }
   inline const int& nb_bfunc() const { return nb_bfunc_; }
 
-  /* fonctions pour reconstruire la valeur du champ selon la localisation */
+  /* functions to reconstruct the field value depending on the location */
   DoubleTab& valeur_aux_elems(const DoubleTab& positions, const IntVect& les_polys, DoubleTab& valeurs) const override;
   DoubleTab& valeur_aux(const DoubleTab& positions, DoubleTab& valeurs) const override;
   DoubleTab& eval_elem(DoubleTab& valeurs) const override;

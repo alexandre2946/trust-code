@@ -24,8 +24,8 @@
 
 /*! @brief class Op_Grad_EF
  *
- *   Cette classe represente l'operateur de gradient. La discretisation est EF
- *   On calcule le gradient d'un champ_P0_EF (la pression)
+ *   Gradient operator for the EF discretization.
+ *   Computes the gradient of a Champ_P0_EF field (pressure).
  *
  * @sa Operateur_Grad_base
  */

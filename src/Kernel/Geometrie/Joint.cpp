@@ -19,16 +19,16 @@
 Implemente_instanciable_32_64(Joint_32_64,"Joint_32_64",Frontiere);
 
 // ***************************************************************
-//  Implementation de la classe Joint_32_64
+//  Implementation of the Joint_32_64 class
 // ***************************************************************
 
-/*! @brief Ecrit le joint sur un flot de sortie.
+/*! @brief Writes the joint to an output stream.
  *
- * On ecrit:
- *       - la frontiere
- *       - le PE voisin
- *       - l'epaisseur
- *       - les sommets
+ * We write:
+ *       - the boundary
+ *       - the neighboring PE
+ *       - the thickness
+ *       - the vertices
  *
  */
 template <typename _SIZE_>
@@ -43,7 +43,7 @@ Sortie& Joint_32_64<_SIZE_>::printOn(Sortie& s ) const
   return s ;
 }
 
-/*! @brief Lit un joint a partir d'un flot d'entree.
+/*! @brief Reads a joint from an input stream.
  *
  */
 template <typename _SIZE_>
@@ -81,9 +81,9 @@ void Joint_32_64<_SIZE_>::dimensionner(int i)
 }
 
 
-/*! @brief Ajoute des faces a la frontiere (au joint) voir Frontiere::ajouter_faces(const IntTab&)
+/*! @brief Adds faces to the boundary (to the joint). See Frontiere::ajouter_faces(const IntTab&).
  *
- * @param (IntTab& sommets) tableau contenant les numeros des sommets des face a ajouter
+ * @param sommets Array containing the vertex indices of the faces to add.
  */
 template <typename _SIZE_>
 void Joint_32_64<_SIZE_>::ajouter_faces(const IntTab_t& sommets)
@@ -92,12 +92,13 @@ void Joint_32_64<_SIZE_>::ajouter_faces(const IntTab_t& sommets)
   this->faces().voisins() = -1;
 }
 
-/*! @brief Renvoie les informations de joint pour un type d'item geometrique donne, pour remplissage des structures.
+/*! @brief Returns the joint information for a given geometric item type, for filling the structures.
  *
- * Ces structures
- *   sont generalement remplies par la classe Scatter. Exceptions notables:
- *   Domaine_VDF et Domaine_VF pour la renumerotation des faces.
+ * These structures are generally filled by the Scatter class. Notable exceptions:
+ * Domaine_VDF and Domaine_VF for face renumbering.
  *
+ * @param item The geometric item type.
+ * @return Reference to the corresponding Joint_Items structure.
  */
 template <typename _SIZE_>
 typename Joint_32_64<_SIZE_>::Joint_Items_t& Joint_32_64<_SIZE_>::set_joint_item(JOINT_ITEM item)
@@ -121,8 +122,10 @@ typename Joint_32_64<_SIZE_>::Joint_Items_t& Joint_32_64<_SIZE_>::set_joint_item
   return joint_sommets_; // never arrive here
 }
 
-/*! @brief Renvoie les informations de joint pour le type demande.
+/*! @brief Returns the joint information for the requested type (read-only).
  *
+ * @param item The geometric item type.
+ * @return Const reference to the corresponding Joint_Items structure.
  */
 template <typename _SIZE_>
 const typename Joint_32_64<_SIZE_>::Joint_Items_t& Joint_32_64<_SIZE_>::joint_item(JOINT_ITEM item) const

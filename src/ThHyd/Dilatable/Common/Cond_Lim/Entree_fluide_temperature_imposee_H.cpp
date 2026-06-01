@@ -30,7 +30,7 @@ Entree& Entree_fluide_temperature_imposee_H::readOn(Entree& s)
   return Dirichlet_entree_fluide::readOn(s);
 }
 
-/*! @brief Complete les conditions aux limites.
+/*! @brief Complete the boundary conditions.
  *
  */
 void Entree_fluide_temperature_imposee_H::completer()
@@ -39,11 +39,10 @@ void Entree_fluide_temperature_imposee_H::completer()
   modifier_val_imp = 1;
 }
 
-/*! @brief Renvoie la valeur imposee sur la i-eme composante du champ a la frontiere.
+/*! @brief Returns the imposed value for the i-th component of the boundary field.
  *
- * @param (int i) indice suivant la premiere dimension du champ
- * @return (double) la valeur imposee sur la composante du champ specifiee
- * @throws deuxieme dimension du champ de frontiere superieur a 1
+ * @param i Index along the first dimension of the field.
+ * @return Imposed value for the specified field component.
  */
 double Entree_fluide_temperature_imposee_H::val_imp(int i) const
 {

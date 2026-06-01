@@ -18,10 +18,9 @@
 
 #include <EOS_to_TRUST.h>
 
-/*! @brief classe EOS_to_TRUST_generique
+/*! @brief EOS interface for fluid properties as functions of temperature and enthalpy.
  *
- *  Interface commune pour TRUST et ses baltiks qui permet appeler les methodes de la lib EOS
- *  Methods disponibles pour les fluids en temperature et enthalpie
+ *  Common interface for TRUST and its baltiks to call EOS library fluid-property methods.
  *
  *  @sa EOS_to_TRUST
  */
@@ -30,18 +29,18 @@ class EOS_to_TRUST_generique : public EOS_to_TRUST
 public :
   void set_fluide_generique(const char *const model_name, const char *const fluid_name) override;
 
-  // appel simple si besoin : cas incompressible
+  // simple call when needed: incompressible case
   int tppi_get_beta_pT(const SpanD P, const SpanD T, SpanD R, int ncomp = 1, int id = 0) const override;
   int tppi_get_beta_ph(const SpanD P, const SpanD H, SpanD R, int ncomp = 1, int id = 0) const override;
 
-  // methodes particulieres par application pour gagner en performance : utilisees dans Pb_Multiphase
+  // application-specific methods to improve performance: used in Pb_Multiphase
   int tppi_get_CPMLB_pb_multiphase_pT(const MSpanD , MLoiSpanD , int ncomp = 1, int id = 0) const override;
   int tppi_get_all_pb_multiphase_pT(const MSpanD , MLoiSpanD , MLoiSpanD , int ncomp = 1, int id = 0) const override;
 
   int tppi_get_CPMLB_pb_multiphase_ph(const MSpanD , MLoiSpanD_h , int ncomp = 1, int id = 0) const override;
   int tppi_get_all_pb_multiphase_ph(const MSpanD , MLoiSpanD_h , MLoiSpanD_h , int ncomp = 1, int id = 0) const override;
 
-  // methode particuliere par application pour gagner en performance : utilisee dans F5
+  // application-specific method to improve performance: used in F5
   int tppi_get_all_prop_loi_F5(const MSpanD , MLoiSpanD_h  , int ncomp = 1, int id = 0, bool is_liq = true) const override;
 
 private:

@@ -29,7 +29,7 @@ class Champ_Don_base;
 
 class Terme_Source_Acceleration : public Source_base
 {
-  // C'est une classe de base: voir Terme_Source_Acceleration_VDF_Faces
+  // This is a base class: see Terme_Source_Acceleration_VDF_Faces
   Declare_base_sans_constructeur(Terme_Source_Acceleration);
 public:
 
@@ -53,32 +53,32 @@ protected:
 
 
 private:
-// Le terme source, homogene a d/dt(rho*v) et discretise comme la vitesse,
-// stocke pour pouvoir etre postraite.
-// Il est calcule par ajouter() (voir commentaires dans a_pour_champ_fonc)
+// The source term, homogeneous to d/dt(rho*v) and discretized like velocity,
+// stored for post-processing purposes.
+// It is computed by ajouter() (see comments in a_pour_champ_fonc)
   mutable OWN_PTR(Champ_Fonc_base)  terme_source_post_;
 
   // **********************************************************************
-  // champ de vitesse impose au repere mobile (lu optionnellement
-  // dans le jeu de donnees, non utilise par le terme source mais potentiellement
-  // pour le code pour calculer la vitesse dans le repere fixe)
+  // velocity field imposed in the moving frame (optionally read
+  // from the data file, not used by the source term but potentially
+  // by the code to compute the velocity in the fixed frame)
   OWN_PTR(Champ_Don_base) champ_vitesse_;
 
-  // champ d'acceleration impose (lu dans le jeu de donnees)
-  // OWN_PTR(Champ_Don_base) lu dans le jeu de donnees, homogene a d/dt(v) en m/(s^2).
-  // Ce doit etre un champ vectoriel uniforme a "dimension" composantes.
+  // imposed acceleration field (read from the data file)
+  // OWN_PTR(Champ_Don_base) read from the data file, homogeneous to d/dt(v) in m/(s^2).
+  // Must be a uniform vector field with "dimension" components.
   OWN_PTR(Champ_Don_base) champ_acceleration_;
 
-  // champ de rotation instationnaire:
+  // unsteady rotation field:
 
-  // Vitesse de rotation: champ uniforme a trois composantes
-  // (attention: en 2D, vecteur oriente selon Z)
+  // Rotation velocity: uniform field with three components
+  // (note: in 2D, vector oriented along Z)
   OWN_PTR(Champ_Don_base) omega_;
-  // Derivee de la vitesse de rotation par rapport au temps:
-  //  champ uniforme a trois composantes
+  // Time derivative of the rotation velocity:
+  //  uniform field with three components
   OWN_PTR(Champ_Don_base) domegadt_;
-  // Position du centre de rotation:
-  //  champ uniforme a "dimension" composantes
+  // Position of the rotation center:
+  //  uniform field with "dimension" components
   OWN_PTR(Champ_Don_base) centre_rotation_;
 
 

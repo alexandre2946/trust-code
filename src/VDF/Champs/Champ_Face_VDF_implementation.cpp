@@ -60,7 +60,7 @@ DoubleTab& Champ_Face_VDF_implementation::valeur_aux_elems_(const DoubleTab& val
   return val_elem;
 }
 
-/* Elie SAIKALI : utilise pour CGNS => passer champ face a un champ vect aux faces ! */
+/* Elie SAIKALI : used for CGNS => convert face field to a vector field at faces! */
 DoubleTab& Champ_Face_VDF_implementation::valeur_aux_faces_post_impl(const Domaine_VDF& vdf,  DoubleTab& result) const
 {
   const Champ_base& cha = le_champ();
@@ -100,7 +100,7 @@ DoubleVect& Champ_Face_VDF_implementation::valeur_a_elem_(const DoubleTab& val_f
       const double psi = (position(d) - domaine_geom.coord(som0, d)) / (domaine_geom.coord(som1, d) - domaine_geom.coord(som0, d));
       for (int n = 0; n < N; n++)
         {
-          // TODO : FIXME : cas avec line_size 1 mais nb_dim != 2 ... vu dans cathare3D
+          // TODO : FIXME : case with line_size 1 but nb_dim != 2 ... seen in cathare3D
           const double val1 = (N == 1) ? val_face(e_f(e, d)) : val_face(e_f(e, d), n);
           const double val2 = (N == 1) ? val_face(e_f(e, d + D)) : val_face(e_f(e, d + D), n);
           if (le_champ().nb_comp() == 1)
@@ -282,7 +282,7 @@ int Champ_Face_VDF_implementation::imprime_Face(Sortie& os, int ncomp) const
   int cmax=7;
   DoubleVect xi,yj,zk;
   DoubleTab Grille;
-  //Lecture de xi,yj,zk dans un fichier .xiyjzk
+  //Reading xi,yj,zk from a .xiyjzk file
   Nom nomfic(Objet_U::nom_du_cas());
   nomfic+=".xiyjzk";
   LecFicDiffuse ficijk(nomfic);
@@ -299,7 +299,7 @@ int Champ_Face_VDF_implementation::imprime_Face(Sortie& os, int ncomp) const
   m(ncomp)=0;
   if (Objet_U::dimension==3)
     {
-      // Grille ordonnee sur les faces des elements
+      // Grid ordered at element faces
       ni-=m(0);
       nj-=m(1);
       nk-=m(2);

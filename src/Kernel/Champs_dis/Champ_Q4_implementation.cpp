@@ -243,7 +243,7 @@ int Champ_Q4_implementation::imprime_Q4(Sortie& os, int ncomp) const
   int nb_som_tot = le_dom.nb_som_tot();
   const DoubleTab& val = cha.valeurs();
   int som;
-  // On recalcule les centres de gravite :
+  // Recompute the centers of gravity:
   const DoubleTab pos_som = le_dom.coord_sommets();
   os << nb_som_tot << finl;
   for (som = 0; som < nb_som_tot; som++)

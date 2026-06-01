@@ -52,8 +52,8 @@ void Champ_Generique_Gradient::completer(const Postraitement_base& post)
                || ((mon_champ_inc.le_nom()!="vitesse") && (mon_champ_inc.que_suis_je()=="Champ_P0_VDF")) )
             {
 
-              //On recupere l equation alors qu elle n est pas encore associee au Champ_Inc
-              //On parcours les equatiosn du probleme et on identifie celle qui correspond au champ inconnu
+              //We retrieve the equation even though it is not yet associated with Champ_Inc
+              //We iterate over the equations of the problem and identify the one corresponding to the unknown field
 
               int nb_eq = Pb.nombre_d_equations();
               int i=0;
@@ -143,7 +143,7 @@ const Champ_base& Champ_Generique_Gradient::get_champ(OWN_PTR(Champ_base)& espac
 const Noms Champ_Generique_Gradient::get_property(const Motcle& query) const
 {
 
-  //Creation des composantes serait a faire de maniere dynamique (Gradient_...)
+  //Component creation should be done dynamically (Gradient_...)
 
   Motcles motcles(2);
   motcles[0] = "composantes";
@@ -154,7 +154,7 @@ const Noms Champ_Generique_Gradient::get_property(const Motcle& query) const
     {
     case 0:
       {
-        //Actuellement choix fait d ajouter simplement numero de composante
+        //Currently the choice is simply to add the component number
         /*
           const Noms compo_cibles = get_source(0).get_property("composantes");
           ///int size = compo_cibles.size();
@@ -162,7 +162,7 @@ const Noms Champ_Generique_Gradient::get_property(const Motcle& query) const
           ///Nom nom_champ = nom[0];
           Nom nom_champ = "pression";
 
-          //Valable si Champ_Fonc_P1NC
+          //Valid if Champ_Fonc_P1NC
           Noms mots(dimension);
           Nom compo_temp="gradient_";
 
@@ -225,7 +225,7 @@ Entity Champ_Generique_Gradient::get_localisation(const int index) const
     }
   return loc;
 }
-//Nomme le champ en tant que source par defaut
+//Name the field as a source by default
 //"Gradient_" + nom_champ_source
 void Champ_Generique_Gradient::nommer_source()
 {

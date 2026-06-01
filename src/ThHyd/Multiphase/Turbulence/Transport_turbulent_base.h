@@ -20,14 +20,13 @@
 #include <Convection_Diffusion_std.h>
 #include <Viscosite_turbulente_base.h>
 
-/*! @brief classe Transport_turbulent_base correlations decrivant l'effet de la turbulence dans une autre equation (thermique, quantites turbulentes.
+/*! @brief Correlations describing the effect of turbulence in another equation (thermal, turbulent quantities, etc.).
  *
- * ..)
- *     Methodes implementees :
- *     - dimension_min_nu() -> nombre de composantes minimal du tenseur de diffusion par composante (1, D, D^2)
- *     - modifier_mu() -> ajoute au tenseur de diffusion de l'equation la contribution de la turbulence
- *                        prend en argument la correlation de viscosite turbulente de l'operateur de diffusion de la QDM
- *     - gradu_required() -> 1 si la correlation a besoin du tenseur grad u
+ *     Implemented methods:
+ *     - dimension_min_nu() -> minimum number of components of the diffusion tensor per component (1, D, D^2)
+ *     - modifier_mu() -> adds the turbulence contribution to the diffusion tensor of the equation;
+ *                        takes the turbulent viscosity correlation from the momentum diffusion operator as argument
+ *     - gradu_required() -> 1 if the correlation requires the grad u tensor
  *
  *
  */

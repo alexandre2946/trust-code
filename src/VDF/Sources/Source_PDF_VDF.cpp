@@ -111,8 +111,8 @@ This function redirects toward the ajouter_ which correspond to the model chosen
 
 DoubleTab& Source_PDF_VDF::ajouter_(const DoubleTab& variable, DoubleTab& resu, const int i_traitement_special) const
 {
-  // calcul de : coefficient rho/dt * coeff_relax * (volume_thilde / 8) * variable
-  /* i_traitement_special = 0 => traitement classique; coefficient (1/eta) */
+  // compute: coefficient rho/dt * coeff_relax * (volume_thilde / 8) * variable
+  /* i_traitement_special = 0 => standard treatment; coefficient (1/eta) */
   /* i_traitement_special = 1 => coefficient (1/eta -> 1) */
   /* i_traitement_special = 2 => coefficient (1/eta -> 1 + 1/eta) */
 
@@ -202,7 +202,7 @@ This function redirects toward the contribuer_avec_ which correspond to the mode
 
 void  Source_PDF_VDF::contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& matrice) const
 {
-  // calcul : 1/eta rho/dt * coeff_relax * volume
+  // compute: 1/eta rho/dt * coeff_relax * volume
   const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
   const IntTab& elems= domaine_VDF.elem_faces();
   int nb_face_elem=domaine_VDF.domaine().nb_faces_elem();
@@ -222,7 +222,7 @@ void  Source_PDF_VDF::contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& ma
   const DoubleTab& rho_m=champ_rho_->valeurs();
   DoubleTab pond ;
 
-  // return = rho/dt * coeff_relax * volume pour elements interceptes
+  // return = rho/dt * coeff_relax * volume for intercepted elements
   int coef1 = nb_face_elem;
   pond = compute_pond(rho_m, aire, volume, coef1, nb_elems);
 
@@ -550,7 +550,7 @@ void Source_PDF_VDF::calculer_vitesse_imposee_power_law_tbl()
   vitesse_imposee_calculee = 0.0;
   vitesse_imposee_sommet = 0.0;
   sommet_interp = 0;
-  // operateur(0) : diffusivite
+  // operator(0): diffusivity
   if (equation().nombre_d_operateurs()<1)
     {
       Cerr << "Source_PDF_VEF : nombre_d_operateurs = "<<equation().nombre_d_operateurs()<<" < 1"<<finl;
@@ -625,26 +625,26 @@ void Source_PDF_VDF::calculer_vitesse_imposee_power_law_tbl()
           //Cerr << "d2 " << d2 << finl;
           double y_ref= d1+d2;
 
-          // traitement des exceptions
-          if (d1 < eps) itisok = 0; //le point P est sur la frontiere immergee : affectation
+          // handling of exceptions
+          if (d1 < eps) itisok = 0; //point P is on the immersed boundary: assignment
           norme_de_la_normale = sqrt(norme_de_la_normale);
           if ( norme_de_la_normale > eps )
-            for(int j = 0; j < nb_comp; j++) normale(0,j) /= norme_de_la_normale; // la on met la norme unite tout en gardant la direction, on normalise quoi
+            for(int j = 0; j < nb_comp; j++) normale(0,j) /= norme_de_la_normale; // normalize to unit normal while preserving direction
           else
             {
-              for(int j = 0; j < nb_comp; j++) normale(0,j) = 0.; // le point fluide est sur la frontiere immergee : affectation
+              for(int j = 0; j < nb_comp; j++) normale(0,j) = 0.; // fluid point is on the immersed boundary: assignment
               itisok = 0;
             }
-          if ( y_ref < eps ) // le point fluide est sur la frontiere immergee : affectation
+          if ( y_ref < eps ) // fluid point is on the immersed boundary: assignment
             {
               y_ref = 1.;
               itisok = 0;
             }
-          // calcul vitesse power law
+          // compute power law velocity
           if (itisok)
             {
               cells(0) = int(fluid_elems(i));
-              for(int j = 0; j < nb_comp; j++) vf(0, j) = champ_vitesse_inconnue.valeur_a_elem_compo(xf, cells[0], j);// vf la vitesse totale interpolee au pt fluide
+              for(int j = 0; j < nb_comp; j++) vf(0, j) = champ_vitesse_inconnue.valeur_a_elem_compo(xf, cells[0], j);// vf: total velocity interpolated at the fluid point
               double Vn = 0.;
               for(int j = 0; j < nb_comp; j++) Vn += vf(0, j) * normale(0,j);
               DoubleTab v_ref_t(1, nb_comp);
@@ -760,7 +760,7 @@ void Source_PDF_VDF::calculer_vitesse_imposee_power_law_tbl()
                       if (u_tau_ref > u_tau_ref_max) u_tau_ref_max = u_tau_ref;
                       if (u_tau_ref < u_tau_ref_min) u_tau_ref_min = u_tau_ref;
                       u_tau_ref_mean += u_tau_ref;
-                      // Distribution des y+ au voisinage des parois
+                      // Distribution of y+ near the walls
                       if (y_plus > h_yplus_max) h_yplus_max = y_plus;
                       if (y_plus < h_yplus_min) h_yplus_min = y_plus;
                       h_yplus_mean += y_plus;
@@ -781,7 +781,7 @@ void Source_PDF_VDF::calculer_vitesse_imposee_power_law_tbl()
                             {
                               for(int j = 0; j < nb_comp; j++) vitesse_imposee_sommet(i,j) =  v_ref_t(0,j) * pow ( d1 / y_ref , B_pwl )  ;
                             }
-                          else // Formulation lineaire de la loi polynomilale ------------------------------
+                          else // Linear formulation of the polynomial law ------------------------------
                             {
                               for(int j = 0; j < nb_comp; j++) vitesse_imposee_sommet(i,j) =  v_ref_t(0,j) * (1. - B_pwl*(1-d1/y_ref)) ;
                             }
@@ -792,7 +792,7 @@ void Source_PDF_VDF::calculer_vitesse_imposee_power_law_tbl()
                             {
                               for(int j = 0; j < nb_comp; j++) vitesse_imposee_sommet(i,j) = (C_pwl_WJSP*pow(y_plus,2*p_pwl_WJSP-1) *u_tau_ref + D_pwl_WJSP*pow(y_plus,p_pwl_WJSP-1) *u_tau_ref)* v_ref_t(0,j)/norme_v_ref_t;
                             }
-                          else // Formulation lineaire de la loi polynomilale ------------------------------
+                          else // Linear formulation of the polynomial law ------------------------------
                             {
                               for(int j = 0; j < nb_comp; j++) vitesse_imposee_sommet(i,j) = 0 ;
                             }
@@ -825,9 +825,9 @@ void Source_PDF_VDF::calculer_vitesse_imposee_power_law_tbl()
                                   double u_norm = pow(D_pwl_WJSP,2) * nu / (4 * C_pwl_WJSP * y_ref) * (pow ( d1 / y_ref , 2*p_pwl_WJSP - 1 ) * pow(phi,2) + 2 * pow ( d1 / y_ref , p_pwl_WJSP - 1 ) * phi);
                                   for(int j = 0; j < nb_comp; j++) vitesse_imposee_sommet(i,j) =  u_norm * v_ref_t(0,j)/norme_v_ref_t;
                                 }
-                              else // Formulation lineaire de la loi polynomilale ------------------------------
+                              else // Linear formulation of the polynomial law ------------------------------
                                 {
-                                  for(int j = 0; j < nb_comp; j++) vitesse_imposee_sommet(i,j) =  0 ; //à faire
+                                  for(int j = 0; j < nb_comp; j++) vitesse_imposee_sommet(i,j) =  0 ; //TODO: to be implemented
                                 }
                             }
                           else
@@ -836,7 +836,7 @@ void Source_PDF_VDF::calculer_vitesse_imposee_power_law_tbl()
                                 {
                                   for(int j = 0; j < nb_comp; j++) vitesse_imposee_sommet(i,j) =  y_plus * u_tau_ref * v_ref_t(0,j)/norme_v_ref_t  ;
                                 }
-                              else // Formulation lineaire de la loi polynomilale ------------------------------
+                              else // Linear formulation of the polynomial law ------------------------------
                                 {
                                   for(int j = 0; j < nb_comp; j++) vitesse_imposee_sommet(i,j) =  0 ;
                                 }
@@ -844,7 +844,7 @@ void Source_PDF_VDF::calculer_vitesse_imposee_power_law_tbl()
                         }
                       else
                         {
-                          // En fait, on est en sous-couche visqueuse
+                          // Actually, we are in the viscous sublayer
                           if (!form_lin_pwl)
                             {
                               for(int j = 0; j < nb_comp; j++) vitesse_imposee_sommet(i,j) =  v_ref_t(0,j) * ( d1 / y_ref )   ;
@@ -897,7 +897,7 @@ void Source_PDF_VDF::calculer_vitesse_imposee_power_law_tbl()
                       if (u_tau_ref > u_tau_ref_max) u_tau_ref_max = u_tau_ref;
                       if (u_tau_ref < u_tau_ref_min) u_tau_ref_min = u_tau_ref;
                       u_tau_ref_mean += u_tau_ref;
-                      // Distribution des y+ au voisinage des parois
+                      // Distribution of y+ near the walls
                       if (y_plus > h_yplus_max) h_yplus_max = y_plus;
                       if (y_plus < h_yplus_min) h_yplus_min = y_plus;
                       h_yplus_mean += y_plus;
@@ -1073,7 +1073,7 @@ void Source_PDF_VDF::filtre_CLD(DoubleTab& flag_cl) const
             }
         }
     }
-  //vector; NS Attention seulement defini en EF
+  //vector; NS Warning: only defined in EF
   // if (nb_comp == Objet_U::dimension) le_dom_cl.imposer_symetrie(flag_cl,0);
   flag_cl.echange_espace_virtuel();
   return;
@@ -1268,7 +1268,7 @@ const Champ_base& Source_PDF_VDF::get_champ(const Motcle& nom) const
       if (!champ_u_star_ibm_)
         throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 
-      // Initialisation a 0 du champ volumique u_star
+      // Initialize the volumetric u_star field to 0
       DoubleTab& valeurs = champ_u_star_ibm_->valeurs();
       valeurs=0;
       if (tab_u_star_ibm_.size_array()>0)
@@ -1288,7 +1288,7 @@ const Champ_base& Source_PDF_VDF::get_champ(const Motcle& nom) const
       if (!champ_y_plus_ibm_)
         throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 
-      // Initialisation a 0 du champ volumique u_star
+      // Initialize the volumetric u_star field to 0
       DoubleTab& valeurs = champ_y_plus_ibm_->valeurs();
       valeurs=0;
       if (tab_y_plus_ibm_.size_array()>0)

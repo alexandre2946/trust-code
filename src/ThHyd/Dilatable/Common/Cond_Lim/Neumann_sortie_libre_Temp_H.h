@@ -21,9 +21,7 @@
 
 class Fluide_Dilatable_base;
 
-/*! @brief classe  Neumann_sortie_libre_Temp_H Cette classe represente une frontiere ouverte a temperature imposee pour
- *
- *     une equation de chaleur avec l'enthalpie comme iconnue
+/*! @brief @brief Open boundary with imposed temperature for a heat equation with enthalpy as unknown.
  *
  * @sa Neumann Sortie_libre_pression_imposee
  */

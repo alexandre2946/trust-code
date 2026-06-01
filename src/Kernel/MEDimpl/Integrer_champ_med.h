@@ -21,7 +21,7 @@
 class Nom;
 #include <Domaine_forward.h>
 
-/*! @brief Classe Integrer_champ_med Lecture d'un fichier
+/*! @brief class Integrer_champ_med Reads a file.
  *
  * @sa Interprete
  */

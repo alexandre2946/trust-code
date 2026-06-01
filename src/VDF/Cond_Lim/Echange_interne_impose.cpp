@@ -33,12 +33,12 @@ Implemente_instanciable(Echange_interne_impose,"Paroi_echange_interne_impose",Ec
 
 Sortie& Echange_interne_impose::printOn(Sortie& s ) const { return s << que_suis_je() << finl; }
 
-/*! @brief Simple appel a Echange_impose_base::readOn(Entree&) Lit les specifications des conditions aux limites
+/*! @brief Simple call to Echange_impose_base::readOn(Entree&). Reads the boundary condition specifications
  *
- *     a partir d'un flot d'entree.
+ *   from an input stream.
  *
- * @param (Entree& s) un flot d'entree
- * @return (Entree&) le flot de sortie modifie
+ * @param s input stream
+ * @return modified output stream
  */
 Entree& Echange_interne_impose::readOn(Entree& s )
 {

@@ -25,7 +25,7 @@ void Prepro_IBM_Uzawa::set_param(Param& param) const
 {
   Prepro_IBM_base::set_param(param);
   param.ajouter("choix_de_la_methode_uzawa", &lvl_, Param::OPTIONAL); // XD_ADD_P entier
-  // XD_CONT choix de la methode d'Uzawa
+  // XD_CONT choice of the Uzawa method
 }
 
 Entree& Prepro_IBM_Uzawa::readOn(Entree& is)
@@ -53,7 +53,7 @@ void Prepro_IBM_Uzawa::associer_pb(const Probleme_base& pb)
   Prepro_IBM_base::associer_pb(pb);
   compute_solid_fluid(0);
 
-  // Ecriture eventuelle
+  // Optional output
   if( save_prepro_ == 1) Save_Med_File();
 }
 

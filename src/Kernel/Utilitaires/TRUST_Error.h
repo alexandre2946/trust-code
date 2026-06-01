@@ -16,9 +16,9 @@
 #ifndef TRUST_Error_included
 #define TRUST_Error_included
 
-/*! @brief classe TRUST_Error
+/*! @brief TRUST_Error class.
  *
- *  Erreur declenche par process::exit
+ *  Error thrown by Process::exit.
  *
  */
 class TRUST_Error

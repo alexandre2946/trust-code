@@ -19,7 +19,7 @@
 
 #include <Schema_Temps_base.h>
 
-/*! @brief classe Schema_Explicite_Multi_TimeStep_base
+/*! @brief Schema_Explicite_Multi_TimeStep_base
  *
  * @sa Schema_Temps_base
  */
@@ -32,7 +32,7 @@ public :
 
   ////////////////////////////////
   //                            //
-  // Caracteristiques du schema //
+  // Schema characteristics     //
   //                            //
   ////////////////////////////////
 
@@ -42,7 +42,7 @@ public :
 
   /////////////////////////////////////////
   //                                     //
-  // Fin des caracteristiques du schema  //
+  // End of schema characteristics       //
   //                                     //
   /////////////////////////////////////////
   void       modifier_second_membre(const Equation_base& eqn, DoubleTab& secmem)         override = 0;

@@ -21,9 +21,9 @@
 
 #include <Domaine_forward.h>
 
-/*! @brief Partitionneur de domaine en tranches paralleles aux directions de l'espace.
+/*! @brief Domain partitioner that splits the domain into slabs parallel to the coordinate directions.
  *
- * Voir construire_partition
+ * See construire_partition
  *
  */
 template <typename _SIZE_>
@@ -49,11 +49,11 @@ public:
   static void chercher_direction_perio(const Domaine_t& domaine, ArrOfInt& directions_perio);
 
 private:
-  // Parametres du partitionneur
+  // Partitioner parameters
   OBS_PTR(Domaine_t) ref_domaine_;
 
-  // Pour chaque dimension d'espace, 2 ou 3, nombre de tranches
-  // a creer dans cette direction (>=1)
+  // For each space dimension (2 or 3), the number of slabs
+  // to create in that direction (>=1)
   ArrOfInt nb_tranches_;
 };
 

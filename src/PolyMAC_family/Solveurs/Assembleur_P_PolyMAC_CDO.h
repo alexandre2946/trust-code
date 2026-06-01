@@ -43,7 +43,7 @@ public:
   void completer(const Equation_base&) override;
   inline const Equation_base& equation() const { return mon_equation.valeur(); }
 
-  /* corrige les vitesses pour une correction en pression donnee de type (-Cp, Cv) */
+  /* corrects velocities for a given pressure correction of type (-Cp, Cv) */
   void corriger_vitesses(const DoubleTab& dP, DoubleTab& dv) const override
   {
     rec.ajouter_multvect(dP, dv);
@@ -59,13 +59,13 @@ protected:
 
   int has_P_ref = 0, stencil_done = 0;
 #ifdef TRUST_USE_GPU
-  ArrOfTID tab1; //tableau tab1 de la Matrice_Morse (ne change pas)
-  BigArrOfInt tab2; //tableau tab2 de la Matrice_Morse (ne change pas)
+  ArrOfTID tab1; //tab1 array of the Matrice_Morse (does not change)
+  BigArrOfInt tab2; //tab2 array of the Matrice_Morse (does not change)
 #else
-  IntVect tab1; //tableau tab1 de la Matrice_Morse (ne change pas)
-  IntVect tab2; //tableau tab2 de la Matrice_Morse (ne change pas)
+  IntVect tab1; //tab1 array of the Matrice_Morse (does not change)
+  IntVect tab2; //tab2 array of the Matrice_Morse (does not change)
 #endif
-  Matrice_Morse rec; //pour reconstruire les vitesses
+  Matrice_Morse rec; //for reconstructing velocities
 };
 
 #endif /* Assembleur_P_PolyMAC_CDO_included */

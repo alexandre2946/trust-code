@@ -43,9 +43,9 @@ Entree& Perte_Charge_Reguliere_VDF_Face::readOn(Entree& s )
 
 /////////////////////////////////////////////////////////////////////
 //
-//                    Implementation des fonctions
+//                    Implementation of functions
 //
-//               de la classe Perte_Charge_Reguliere_VDF_Face
+//               of the Perte_Charge_Reguliere_VDF_Face class
 //
 ////////////////////////////////////////////////////////////////////
 
@@ -96,7 +96,7 @@ void Perte_Charge_Reguliere_VDF_Face::remplir_num_faces(Nom& nom_sous_domaine)
 
               int num_poly_vois0 = face_voisins(num_face,0);
               if (num_poly_vois0 != -1)
-                if (num_loc[num_poly_vois0] == -1)  // le poly voisin n'est pas dans la sous_domaine
+                if (num_loc[num_poly_vois0] == -1)  // the neighboring poly is not in the subdomain
                   {
                     corr_front_ss[nfac-1]*= volumes(num_poly)/(volumes(num_poly)+volumes(num_poly_vois0)) ;
                   }
@@ -104,7 +104,7 @@ void Perte_Charge_Reguliere_VDF_Face::remplir_num_faces(Nom& nom_sous_domaine)
               int num_poly_vois1 = face_voisins(face_associee,1);
               if (num_poly_vois1 != -1)
                 {
-                  if (num_loc[num_poly_vois1] == -1)  // le poly voisin n'est pas dans la sous_domaine
+                  if (num_loc[num_poly_vois1] == -1)  // the neighboring poly is not in the subdomain
                     {
                       num_faces[nfac++] = face_associee;
                       for (int ifa=0; ifa<dimension; ifa++) xv_(ifa) = xv(face_associee,ifa) ;
@@ -134,7 +134,7 @@ DoubleTab& Perte_Charge_Reguliere_VDF_Face::ajouter_(const DoubleTab& inco,Doubl
   const DoubleVect& porosite_surf = equation().milieu().porosite_face();
   const DoubleTab& vit = la_vitesse->valeurs();
   int ndeb_faces_int = domaine_VDF.premiere_face_int();
-  // on prend nu et non mu
+  // use nu (kinematic viscosity) and not mu (dynamic viscosity)
   const Champ_Don_base& nu = le_fluide->viscosite_cinematique();
 
 

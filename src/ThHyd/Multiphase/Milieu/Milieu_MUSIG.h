@@ -33,7 +33,7 @@ public :
 private :
   std::vector<Fluide_MUSIG> fluidesMUSIG_;
 
-  /*! For each phase, a 3 int array is stored
+  /*! @brief For each phase, a 3 int array is stored
    *
    * phase index for the media / index of FluideMUSIG (-1 if not FluideMUSIG) /index of the phase in fluideMUSIG.
    */

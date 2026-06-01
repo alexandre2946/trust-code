@@ -24,10 +24,10 @@
 
 void Op_PolyMAC_CDO_Elem::dimensionner(const Domaine_PolyMAC_CDO& le_domaine, const Domaine_Cl_PolyMAC_family& le_domaine_cl, Matrice_Morse& la_matrice) const
 {
-  // Dimensionnement de la matrice qui devra recevoir les coefficients provenant de
-  // la convection, de la diffusion pour le cas des elements.
-  // Cette matrice a une structure de matrice morse.
-  // Nous commencons par calculer les tailles des tableaux tab1 et tab2.
+  // Sizing the matrix that will receive coefficients from
+  // convection and diffusion in the element case.
+  // This matrix has a Morse matrix structure.
+  // We start by computing the sizes of arrays tab1 and tab2.
 
   int num_face, face, k;
   int n1 = le_domaine.domaine().nb_elem_tot(), n2 = le_domaine.nb_faces_tot();
@@ -66,7 +66,7 @@ void Op_PolyMAC_CDO_Elem::dimensionner(const Domaine_PolyMAC_CDO& le_domaine, co
       (rang_voisin(elem1))++;
     }
 
-  // Prise en compte des conditions de type periodicite
+  // Account for periodic boundary conditions
 
   for (i = 0; i < les_cl.size(); i++)
     {
@@ -99,7 +99,7 @@ void Op_PolyMAC_CDO_Elem::dimensionner(const Domaine_PolyMAC_CDO& le_domaine, co
         }
     }
 
-  // on balaye les elements pour dimensionner tab1 et tab2
+  // sweep elements to size tab1 and tab2
 
   tab1(0) = 1;
   for (i = 0; i < n1; i++)
@@ -119,7 +119,7 @@ void Op_PolyMAC_CDO_Elem::dimensionner(const Domaine_PolyMAC_CDO& le_domaine, co
       rang_voisin[i] = (int)tab1[i];
     }
 
-  // on traite les faces internes pour les voisins
+  // process internal faces for neighbors
 
   for (num_face = ndeb; num_face < nfin; num_face++)
     {
@@ -136,7 +136,7 @@ void Op_PolyMAC_CDO_Elem::dimensionner(const Domaine_PolyMAC_CDO& le_domaine, co
         }
     }
   // Cerr << "tab2 = " << tab2 << finl;
-  // on traite la condition de periodicite
+  // process the periodicity condition
   for (i = 0; i < les_cl.size(); i++)
     {
       const Cond_lim& la_cl = les_cl[i];

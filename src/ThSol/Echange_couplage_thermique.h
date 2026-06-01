@@ -50,23 +50,23 @@ public :
   inline Champ_front_base& s_p() { return coeff_sp; }
   inline const Champ_front_base& s_p() const { return coeff_sp; }
 
-  // Coefficient d'echange effectif
+  // Effective exchange coefficient
   inline Champ_front_base& h_eff() { return coeff_heff; }
   inline const Champ_front_base& h_eff() const { return coeff_heff; }
 
-  // Type echange effectif
+  // Effective exchange type
   inline Champ_front_base& tep_eff() { return type_echange_eff; }
   inline const Champ_front_base& tep_eff() const { return type_echange_eff; }
 
-  // Temperature effective
+  // Effective temperature
   inline Champ_front_base& T_eff() { return temperature_Teff; }
   inline const Champ_front_base& T_eff() const { return temperature_Teff; }
 
-  // Rapport Echauffement Critique a la paroi
+  // Critical heat flux ratio at the wall
   inline Champ_front_base& rec_paroi() { return rftc_paroi; }
   inline const Champ_front_base& rec_paroi() const { return rftc_paroi; }
 
-  // Flux critique a la paroi
+  // Critical flux at the wall
   inline Champ_front_base& phic_paroi() { return flux_critique_paroi; }
   inline const Champ_front_base&  phic_paroi() const { return flux_critique_paroi; }
 

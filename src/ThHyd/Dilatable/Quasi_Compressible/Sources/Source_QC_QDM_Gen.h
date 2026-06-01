@@ -19,11 +19,9 @@
 #include <Source_base.h>
 #include <Source.h>
 
-/*! @brief Classe Source_QC_QDM_Gen Ces classes filles permettent  de calculer une source pour le QC
+/*! @brief @brief Derived classes compute a source term for the QC momentum equation
  *
- *   en faisant rho * source_incompressible
- *
- *
+ *   by multiplying rho * incompressible_source.
  *
  */
 

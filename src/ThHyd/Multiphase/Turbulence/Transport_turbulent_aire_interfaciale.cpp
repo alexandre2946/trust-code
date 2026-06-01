@@ -40,7 +40,7 @@ Entree& Transport_turbulent_aire_interfaciale::readOn(Entree& is)
   return is;
 }
 
-// Modifier_nu modifie mu : alpha et rho font partie du terme
+// Modifier_nu modifies mu: alpha and rho are part of the term
 void Transport_turbulent_aire_interfaciale::modifier_mu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const
 {
   const DoubleTab& d_b_p = eq.probleme().get_champ("diametre_bulles").passe(),

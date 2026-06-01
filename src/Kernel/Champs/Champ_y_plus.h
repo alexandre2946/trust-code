@@ -16,11 +16,11 @@
 #ifndef Champ_y_plus_included
 #define Champ_y_plus_included
 
-/*! @brief classe Champ_y_plus Permet d'avoir une visualisation de la taille de la premiere maille de paroi en unites de parois.
+/*! @brief class Champ_y_plus Allows visualization of the size of the first wall cell in wall units.
  *
  *        y+ = y u_tau/nu
  *
- * @sa Classe abstraite, Methode abstraite, void me_calculer(double )
+ * @sa Abstract class, Abstract method, void me_calculer(double )
  */
 class Champ_y_plus
 {

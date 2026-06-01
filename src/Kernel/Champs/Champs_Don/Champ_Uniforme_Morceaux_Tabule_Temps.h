@@ -20,9 +20,9 @@
 #include <TRUST_List.h>
 #include <Table.h>
 
-/*! @brief classe Champ_Uniforme_Morceaux_Tabule_Temps Cette classe derivee de Champ_Uniforme_Morceaux_inst represente
+/*! @brief Champ_Uniforme_Morceaux_Tabule_Temps Derived class of Champ_Uniforme_Morceaux_inst that represents
  *
- *     un champ constant par morceaux dans l'espace et tabule en temps.
+ *     a piecewise constant-in-space field tabulated in time.
  *
  * @sa Champ_Uniforme_Morceaux_inst
  */

@@ -90,7 +90,7 @@ DoubleTab& Masse_VDF_Face::appliquer_impl(DoubleTab& sm) const
 
         }
 
-      // Boucle sur les faces internes
+      // Loop over internal faces
       const int ndeb = domaine_VDF.premiere_face_int();
       for (int f = ndeb; f < nb_faces; f++)
         for (int n = 0; n < N; n++)
@@ -131,19 +131,19 @@ void Masse_VDF_Face::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, doubl
       const Masse_ajoutee_base *corr = pbm && pbm->has_correlation("masse_ajoutee") ? &ref_cast(Masse_ajoutee_base, pbm->get_correlation("masse_ajoutee")) : nullptr;
       int i, e, f, m, n, N = inco.line_size(), d, D = dimension, cR = rho.dimension_tot(0) == 1;
 
-      /* faces : si CLs, pas de produit par alpha * rho en multiphase */
+      /* faces: if BCs, no multiplication by alpha * rho in multiphase */
       DoubleTrav masse(N, N), masse_e(N, N); //masse alpha * rho, contribution
-      for (f = 0; f < domaine.nb_faces(); f++) //faces reelles
+      for (f = 0; f < domaine.nb_faces(); f++) //real faces
         {
           if (!pbm || fcl(f, 0) >= 2)
-            for (masse = 0, n = 0; n < N; n++) masse(n, n) = 1; //pas Pb_Multiphase ou CL -> pas de alpha * rho
+            for (masse = 0, n = 0; n < N; n++) masse(n, n) = 1; //not Pb_Multiphase or BC -> no alpha * rho
           else for (masse = 0, i = 0; i < 2; i++)
               if ((e = f_e(f, i)) >= 0)
                 {
-                  for (masse_e = 0, n = 0; n < N; n++) masse_e(n, n) = (*a_r)(e, n); //partie diagonale
+                  for (masse_e = 0, n = 0; n < N; n++) masse_e(n, n) = (*a_r)(e, n); //diagonal part
                   if (corr) corr->ajouter(&(*alpha)(e, 0), &rho(!cR * e, 0), masse_e); //partie masse ajoutee
                   for (n = 0; n < N; n++)
-                    for (m = 0; m < N; m++) masse(n, m) += vfd(f, i) / vf(f) * masse_e(n, m); //contribution au alpha * rho de la face
+                    for (m = 0; m < N; m++) masse(n, m) += vfd(f, i) / vf(f) * masse_e(n, m); //contribution to alpha * rho on the face
                 }
           for (n = 0; n < N; n++)
             {
@@ -178,10 +178,10 @@ DoubleTab& Masse_VDF_Face::corriger_solution(DoubleTab& x, const DoubleTab& y, i
 
   for (f = 0; f < domaine.nb_faces_tot(); f++)
     if (fcl(f, 0) == 2 || fcl(f, 0) == 4)
-      for (n = 0; n < N; n++) x(f, n) = incr ? -vit(f, n) : 0; //Dirichlet homogene / Symetrie: on revient a 0
+      for (n = 0; n < N; n++) x(f, n) = incr ? -vit(f, n) : 0; //homogeneous Dirichlet / Symmetry: reset to 0
     else if (fcl(f, 0) == 3)
       for (n = 0; n < N; n++)
-        for (x(f, n) = incr ? -vit(f, n) : 0, d = 0; d < D; d++) //Dirichlet : valeur de la CL
+        for (x(f, n) = incr ? -vit(f, n) : 0, d = 0; d < D; d++) //Dirichlet: boundary condition value
           x(f, n) += domaine.face_normales(f, d) / fs(f) * ref_cast(Dirichlet, cls[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), N * d + n);
 
   return x;

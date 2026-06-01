@@ -19,7 +19,7 @@
 
 Implemente_instanciable_sans_constructeur(Quadri_VEF,"Quadri_VEF",Elem_VEF_base);
 
-// printOn et readOn
+// printOn and readOn
 
 Sortie& Quadri_VEF::printOn(Sortie& s ) const
 {
@@ -31,9 +31,9 @@ Entree& Quadri_VEF::readOn(Entree& s )
   return s ;
 }
 
-/*! @brief KEL_(0,fa7),KEL_(1,fa7) sont  les numeros locaux des 2 faces qui entourent la facette de numero local fa7
+/*! @brief KEL_(0,fa7),KEL_(1,fa7) are the local indices of the 2 faces surrounding facet with local index fa7.
  *
- *  le numero local de la fa7 est celui du sommet qui la porte
+ *  The local index of fa7 is that of the node that carries it.
  *
  */
 Quadri_VEF::Quadri_VEF()
@@ -50,7 +50,7 @@ Quadri_VEF::Quadri_VEF()
       KEL_(i,j)=tmp[i][j];
 }
 
-/*! @brief remplit le tableau face_normales dans le Domaine_VEF
+/*! @brief Fills the face_normales array in Domaine_VEF.
  *
  */
 void Quadri_VEF::creer_face_normales(DoubleTab& Face_normales,
@@ -78,12 +78,12 @@ void Quadri_VEF::creer_face_normales(DoubleTab& Face_normales,
       int elem1 = Face_voisins(num_Face, 0);
       int elem2 = Face_voisins(num_Face, 1);
 
-      //Orientation de la normale vers le plus grand numero d'elem
-      //pour cela on teste d'abord si l'on est sur le bord
+      //Orient the normal towards the element with the higher index
+      //for that, first check whether we are on the boundary
       if (elem2 != -1)
         {
-          //on oriente a partir du centre de gravite
-          //calcul du centre de gravite de chaque element
+          //orient from the center of gravity
+          //compute the center of gravity of each element
           for (i = 0; i < 4; i++)
             {
               x1g += les_coords(Face_sommets(elem_faces(elem1, i), 0), 0);
@@ -99,7 +99,7 @@ void Quadri_VEF::creer_face_normales(DoubleTab& Face_normales,
           grx = (x2g - x1g) * 0.125;
           gry = (y2g - y1g) * 0.125;
 
-          //on regarde le signe du produit scalaire
+          //check the sign of the dot product
           psc = grx * nx + gry * ny;
           if (psc < 0)
             {
@@ -111,8 +111,8 @@ void Quadri_VEF::creer_face_normales(DoubleTab& Face_normales,
         }
       else
         {
-          //on oriente a partir du centre de gravite et du milieu de la
-          //face courante
+          //orient from the center of gravity and the midpoint of the
+          //current face
 
           for (i = 0; i < 4; i++)
             {
@@ -129,7 +129,7 @@ void Quadri_VEF::creer_face_normales(DoubleTab& Face_normales,
           gry = y2g * 0.5 - y1g * 0.125;
 
           //   Cerr << "grx et gry : " << grx << " " << gry << finl;
-          //on regarde le signe du produit scalaire
+          //check the sign of the dot product
           psc = grx * nx + gry * ny;
           if (psc < 0)
             sign = -1;
@@ -139,7 +139,7 @@ void Quadri_VEF::creer_face_normales(DoubleTab& Face_normales,
     }
 }
 
-/*! @brief calcule les normales des facettes pour des elem standards
+/*! @brief Computes the facet normals for standard elements.
  *
  */
 void Quadri_VEF::creer_facette_normales(const Domaine_VEF& dom_VEF,
@@ -188,14 +188,14 @@ void Quadri_VEF::creer_facette_normales(const Domaine_VEF& dom_VEF,
 
           for (fa7=0; fa7<4; fa7++)
             {
-              // la fa7 d'un element standard a pour sommets
-              // fa7 et G de coordonnees xg :
+              // facet fa7 of a standard element has vertices
+              // fa7 and G with coordinates xg:
               u[0]= x[fa7][0]-xg[0];
               u[1]= x[fa7][1]-xg[1];
               v[0]= -u[1];
               v[1]= u[0];
 
-              // Orientation des normales :
+              // Orient normals:
               switch (fa7)
                 {
                 case 0:
@@ -250,7 +250,7 @@ void Quadri_VEF::creer_facette_normales(const Domaine_VEF& dom_VEF,
   //  Cerr << "facette_normales internes (Quadri_VEF::creer_normales_facettes) : " << facette_normales << finl;
 }
 
-/*! @brief remplit le tableau normales_facettes_Cl dans le Domaine_Cl_VEF pour la facette fa7 de l'element num_elem
+/*! @brief Fills the normales_facettes_Cl array in Domaine_Cl_VEF for facet fa7 of element num_elem.
  *
  */
 void Quadri_VEF::creer_normales_facettes_Cl(DoubleTab& normales_facettes_Cl,
@@ -297,7 +297,7 @@ void Quadri_VEF::creer_normales_facettes_Cl(DoubleTab& normales_facettes_Cl,
       break;
     }
 
-  // Orientation des normales :
+  // Orient normals:
   xj0[0]= x(i0,0)-x(i1,0);
   xj0[1]= x(i0,1)-x(i1,1);
 
@@ -315,7 +315,7 @@ void Quadri_VEF::creer_normales_facettes_Cl(DoubleTab& normales_facettes_Cl,
   // Cerr << "normales_facettes_Cl " << normales_facettes_Cl << finl;
 }
 
-/*! @brief modifie les volumes entrelaces pour la face j d'un elem non standard
+/*! @brief Modifies the interlaced volumes for face j of a non-standard element.
  *
  */
 void Quadri_VEF::modif_volumes_entrelaces(int j,int elem,
@@ -333,14 +333,14 @@ void Quadri_VEF::modif_volumes_entrelaces(int j,int elem,
 
   //   switch(type_cl) {
 
-  //     // pas de Face de Dirichlet : impossible
+  //     // no Dirichlet face: impossible
   //   case 0:
   //     {
   //       Cerr << "Quadri_VEF::modif_volumes_entrelaces() type 0 impossible!\n";
   //       break;
   //     }
 
-  //   case 1: // une Face de Dirichlet : Face 3
+  //   case 1: // one Dirichlet face: Face 3
   //     {
   //       DoubleTab coord(3,2);
   //       for(int i=0;i<3;i++)
@@ -352,7 +352,7 @@ void Quadri_VEF::modif_volumes_entrelaces(int j,int elem,
   //       break;
   //     }
 
-  //   case 3: // une Face de Dirichlet : Face 2
+  //   case 3: // one Dirichlet face: Face 2
   //     {
   //       DoubleTab coord(3,2);
   //       for(int i=0;i<3;i++)
@@ -364,7 +364,7 @@ void Quadri_VEF::modif_volumes_entrelaces(int j,int elem,
   //       break;
   //     }
 
-  //   case 9: // une Face de Dirichlet : Face 1
+  //   case 9: // one Dirichlet face: Face 1
   //     {
   //       DoubleTab coord(3,2);
   //       for(int i=0;i<3;i++)
@@ -376,7 +376,7 @@ void Quadri_VEF::modif_volumes_entrelaces(int j,int elem,
   //       break;
   //     }
 
-  //   case 27: // une Face de Dirichlet :Face 0
+  //   case 27: // one Dirichlet face: Face 0
   //     {
 
   //       DoubleTab coord(3,2);
@@ -402,7 +402,7 @@ void Quadri_VEF::modif_volumes_entrelaces(int j,int elem,
   //       break;
   //     }
 
-  //   case 4: // deux Faces de Dirichlet : Faces 2,3
+  //   case 4: // two Dirichlet faces: Faces 2,3
   //     {
   //       Cerr << " elem_faces(elem,0) " << elem_faces(elem,0) << finl;
   //       Cerr << " elem_faces(elem,1) " << elem_faces(elem,1) << finl;
@@ -411,63 +411,63 @@ void Quadri_VEF::modif_volumes_entrelaces(int j,int elem,
   //       break;
   //     }
 
-  //   case 28: // deux Faces de Dirichlet : Faces 0,3
+  //   case 28: // two Dirichlet faces: Faces 0,3
   //     {
   //       volumes_entrelaces_Cl[elem_faces(elem,1)]  +=volumes_entrelaces[elem_faces(elem,0)];
   //       volumes_entrelaces_Cl[elem_faces(elem,2)]  +=volumes_entrelaces[elem_faces(elem,3)];
   //       break;
   //     }
 
-  //   case 12: // deux Faces de Dirichlet : Faces 1,2
+  //   case 12: // two Dirichlet faces: Faces 1,2
   //     {
   //       volumes_entrelaces_Cl[elem_faces(elem,0)]  +=volumes_entrelaces[elem_faces(elem,1)];
   //       volumes_entrelaces_Cl[elem_faces(elem,3)]  +=volumes_entrelaces[elem_faces(elem,2)];
   //       break;
   //     }
 
-  //   case 36: // deux Faces de Dirichlet : Faces 0,1
+  //   case 36: // two Dirichlet faces: Faces 0,1
   //     {
   //       volumes_entrelaces_Cl[elem_faces(elem,3)]  +=volumes_entrelaces[elem_faces(elem,0)];
   //       volumes_entrelaces_Cl[elem_faces(elem,2)]  +=volumes_entrelaces[elem_faces(elem,1)];
   //       break;
   //     }
 
-  //   case 10: // deux Faces de Dirichlet : Faces 1,3
+  //   case 10: // two Dirichlet faces: Faces 1,3
   //     {
   //       volumes_entrelaces_Cl[elem_faces(elem,0)]  +=volumes_entrelaces[elem_faces(elem,0)];
   //       volumes_entrelaces_Cl[elem_faces(elem,2)]  +=volumes_entrelaces[elem_faces(elem,2)];
   //       break;
   //     }
 
-  //   case 30: // deux Faces de Dirichlet : Faces 0,2
+  //   case 30: // two Dirichlet faces: Faces 0,2
   //     {
   //       volumes_entrelaces_Cl[elem_faces(elem,1)]  +=volumes_entrelaces[elem_faces(elem,1)];
   //       volumes_entrelaces_Cl[elem_faces(elem,3)]  +=volumes_entrelaces[elem_faces(elem,3)];
   //       break;
   //     }
 
-  //   case 13: //trois Faces de Dirichlet : Faces 3,2,1
+  //   case 13: //three Dirichlet faces: Faces 3,2,1
   //     {
   //       volumes_entrelaces_Cl[elem_faces(elem,0)]  +=volumes_entrelaces[elem_faces(elem,3)]+volumes_entrelaces[elem_faces(elem,2)]
   //         +volumes_entrelaces[elem_faces(elem,1)];
   //       break;
   //     }
 
-  //   case 31: //trois Faces de Dirichlet : Faces 0,3,2
+  //   case 31: //three Dirichlet faces: Faces 0,3,2
   //     {
   //       volumes_entrelaces_Cl[elem_faces(elem,1)]  +=volumes_entrelaces[elem_faces(elem,3)]+volumes_entrelaces[elem_faces(elem,2)]
   //         +volumes_entrelaces[elem_faces(elem,0)];
   //       break;
   //     }
 
-  //   case 37: //trois Faces de Dirichlet : Faces 1,0,3
+  //   case 37: //three Dirichlet faces: Faces 1,0,3
   //     {
   //       volumes_entrelaces_Cl[elem_faces(elem,2)]  +=volumes_entrelaces[elem_faces(elem,3)]+volumes_entrelaces[elem_faces(elem,1)]
   //         +volumes_entrelaces[elem_faces(elem,0)];
   //       break;
   //     }
 
-  //   case 39: //trois Faces de Dirichlet : Faces 2,1,0
+  //   case 39: //three Dirichlet faces: Faces 2,1,0
   //     {
   //       volumes_entrelaces_Cl[elem_faces(elem,3)]  +=volumes_entrelaces[elem_faces(elem,2)]+volumes_entrelaces[elem_faces(elem,1)]
   //         +volumes_entrelaces[elem_faces(elem,0)];
@@ -480,11 +480,11 @@ void Quadri_VEF::modif_volumes_entrelaces(int j,int elem,
   //       exit();
   //     }
 
-  //   } // fin du switch
+  //   } // end switch
 
 }
 
-/*! @brief modifie les volumes entrelaces pour la face joint j d'un elem non standard
+/*! @brief Modifies the interlaced volumes for joint face j of a non-standard element.
  *
  */
 void Quadri_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
@@ -497,7 +497,7 @@ void Quadri_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
 
   //   switch(type_cl) {
 
-  //     // pas de Face de Dirichlet : impossible
+  //     // no Dirichlet face: impossible
   //   case 0:
   //     {
   //       Cerr << "Quadri_VEF::modif_volumes_entrelaces() type 0 impossible!\n";
@@ -505,7 +505,7 @@ void Quadri_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
   //     }
 
 
-  //   } // fin du switch
+  //   } // end switch
 
 }
 
@@ -520,63 +520,63 @@ void Quadri_VEF::calcul_vc(const ArrOfInt& Face,ArrOfDouble& vc,
   //Cerr << "vs " << vs << " et vsom " << vsom << " et vitesse " << vitesse << finl;
 
   //   switch(type_cl) {
-  //   case 0: //  pas de Face de Dirichlet
+  //   case 0: //  no Dirichlet face
   //     {
   vc[0] = vs[0]*0.25;
   vc[1] = vs[1]*0.25;
   //       break;
   //     }
 
-  //   case 1: // une Face de Dirichlet : Face 3
+  //   case 1: // one Dirichlet face: Face 3
   //     {
   //       vc[0] = vitesse.valeurs()(Face[3],0);
   //       vc[1] = vitesse.valeurs()(Face[3],1);
   //       break;
   //     }
 
-  //   case 3: // une Face de Dirichlet : Face 2
+  //   case 3: // one Dirichlet face: Face 2
   //     {
   //       vc[0] = vitesse.valeurs()(Face[2],0);
   //       vc[1] = vitesse.valeurs()(Face[2],1);
   //       break;
   //     }
 
-  //   case 9: // une Face de Dirichlet : Face 1
+  //   case 9: // one Dirichlet face: Face 1
   //     {
   //       vc[0] = vitesse.valeurs()(Face[1],0);
   //       vc[1] = vitesse.valeurs()(Face[1],1);
   //       break;
   //     }
 
-  //   case 27: // une Faces de Dirichlet :Face 0
+  //   case 27: // one Dirichlet face: Face 0
   //     {
   //       vc[0] = vitesse.valeurs()(Face[0],0);
   //       vc[1] = vitesse.valeurs()(Face[0],1);
   //       break;
   //     }
 
-  //   case 4: // deux Faces de Dirichlet : Faces 2,3
+  //   case 4: // two Dirichlet faces: Faces 2,3
   //     {
   //       vc[0]= vsom(3,0);
   //       vc[1]= vsom(3,1);
   //       break;
   //     }
 
-  //   case 28: // deux Faces de Dirichlet : Faces 0,3
+  //   case 28: // two Dirichlet faces: Faces 0,3
   //     {
   //       vc[0]= vsom(2,0);
   //       vc[1]= vsom(2,1);
   //       break;
   //     }
 
-  //   case 12: // deux Faces de Dirichlet : Faces 1,2
+  //   case 12: // two Dirichlet faces: Faces 1,2
   //     {
   //       vc[0]= vsom(1,0);
   //       vc[1]= vsom(1,1);
   //       break;
   //     }
 
-  //   case 36: // deux Faces de Dirichlet : Faces 0,1
+  //   case 36: // two Dirichlet faces: Faces 0,1
   //     {
   //       vc[0]= vsom(0,0);
   //       vc[1]= vsom(0,1);
@@ -584,42 +584,42 @@ void Quadri_VEF::calcul_vc(const ArrOfInt& Face,ArrOfDouble& vc,
   //     }
 
 
-  //   case 10: // deux Faces de Dirichlet : Faces 1,3
+  //   case 10: // two Dirichlet faces: Faces 1,3
   //     {
   //       vc[0] = vs[0]*0.25;
   //       vc[1] = vs[1]*0.25;
   //       break;
   //     }
 
-  //   case 30: // deux Faces de Dirichlet : Faces 0,2
+  //   case 30: // two Dirichlet faces: Faces 0,2
   //     {
   //       vc[0] = vs[0]*0.25;
   //       vc[1] = vs[1]*0.25;
   //       break;
   //     }
 
-  //   case 13: //trois Faces de Dirichlet : Faces 3,2,1
+  //   case 13: //three Dirichlet faces: Faces 3,2,1
   //     {
   //       vc[0]= vitesse.valeurs()(Face[2],0);
   //       vc[1]= vitesse.valeurs()(Face[2],1);
   //       break;
   //     }
 
-  //   case 31: //trois Faces de Dirichlet : Faces 0,3,2
+  //   case 31: //three Dirichlet faces: Faces 0,3,2
   //     {
   //       vc[0]= vitesse.valeurs()(Face[3],0);
   //       vc[1]= vitesse.valeurs()(Face[3],1);
   //       break;
   //     }
 
-  //   case 37: //trois Faces de Dirichlet : Faces 1,0,3
+  //   case 37: //three Dirichlet faces: Faces 1,0,3
   //     {
   //       vc[0]= vitesse.valeurs()(Face[0],0);
   //       vc[1]= vitesse.valeurs()(Face[0],1);
   //       break;
   //     }
 
-  //   case 39: //trois Faces de Dirichlet : Faces 2,1,0
+  //   case 39: //three Dirichlet faces: Faces 2,1,0
   //     {
   //       vc[0]= vitesse.valeurs()(Face[1],0);
   //       vc[1]= vitesse.valeurs()(Face[1],1);
@@ -632,13 +632,14 @@ void Quadri_VEF::calcul_vc(const ArrOfInt& Face,ArrOfDouble& vc,
   //       exit();
   //     }
 
-  //   } // fin du switch
+  //   } // end switch
 
 }
 
-/*! @brief calcule les coord xg du centre d'un element non standard calcule aussi idirichlet=nb de faces de Dirichlet de l'element
+/*! @brief Computes the coordinates xg of the centre of a non-standard element.
  *
- *  si idirichlet=2, n1 est le numero du sommet confondu avec G
+ *  Also computes idirichlet = number of Dirichlet faces of the element.
+ *  If idirichlet=2, n1 is the index of the node coinciding with G.
  *
  */
 void Quadri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
@@ -647,8 +648,8 @@ void Quadri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
   int dim=xg.size();
   //   switch(type_elem_Cl) {
 
-  //   case 0:  //  pas de Face de dirichlet: il a 4 Facettes
-  //     //  le point G est le barycentre des sommets du triangle
+  //   case 0:  //  no Dirichlet face: it has 4 facets
+  //     //  point G is the barycentre of the triangle vertices
   //     {
   for (int j=0; j<dim; j++)
     xg[j]=(x(0,j)+x(1,j)+x(2,j)+x(3,j))*0.25;
@@ -656,8 +657,8 @@ void Quadri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
   //       break;
   //     }
 
-  //   case 1: // une Face de Dirichlet : Face 3
-  //     // le point G est le centre de la face 3
+  //   case 1: // one Dirichlet face: Face 3
+  //     // point G is the center of face 3
   //     {
   //       for (int j=0; j<dim; j++)
   //         xg[j]=(x(2,j)+x(3,j))*0.5;
@@ -665,8 +666,8 @@ void Quadri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
   //       break;
   //     }
 
-  //   case 3: // une Face de Dirichlet : Face 2
-  //     // le point G est le centre de la face 2
+  //   case 3: // one Dirichlet face: Face 2
+  //     // point G is the center of face 2
   //     {
   //       for (int j=0; j<dim; j++)
   //         xg[j]=(x(1,j)+x(3,j))*0.5;
@@ -674,8 +675,8 @@ void Quadri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
   //       break;
   //     }
 
-  //   case 9: // une Face de Dirichlet : Face 1
-  //     // le point G est le centre de la face 1
+  //   case 9: // one Dirichlet face: Face 1
+  //     // point G is the center of face 1
   //     {
   //       for (int j=0; j<dim; j++)
   //         xg[j]=(x(0,j)+x(1,j))*0.5;
@@ -683,8 +684,8 @@ void Quadri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
   //       break;
   //     }
 
-  //   case 27: // une Faces de Dirichlet :Face 0
-  //     // le point G est le centre de la face 0
+  //   case 27: // one Dirichlet face: Face 0
+  //     // point G is the center of face 0
   //     {
   //       for (int j=0; j<dim; j++)
   //         xg[j]=(x(0,j)+x(2,j))*0.5;
@@ -692,8 +693,8 @@ void Quadri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
   //       break;
   //     }
 
-  //   case 4: // deux Faces de Dirichlet : Faces 2,3
-  //     //le point G est le sommet commun au deux faces de dirichlet
+  //   case 4: // two Dirichlet faces: Faces 2,3
+  //     //point G is the vertex common to the two Dirichlet faces
   //     {
   //       for (int j=0; j<dim; j++)
   //         xg[j]=x(3,j);
@@ -701,8 +702,8 @@ void Quadri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
   //       break;
   //     }
 
-  //   case 28: // deux Faces de Dirichlet : Faces 0,3
-  //     //le point G est le sommet commun au deux faces de dirichlet
+  //   case 28: // two Dirichlet faces: Faces 0,3
+  //     //point G is the vertex common to the two Dirichlet faces
   //      {
   //       for (int j=0; j<dim; j++)
   //         xg[j]=x(2,j);
@@ -710,8 +711,8 @@ void Quadri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
   //       break;
   //     }
 
-  //   case 12: // deux Faces de Dirichlet : Faces 1,2
-  //     //le point G est le sommet commun au deux faces de dirichlet
+  //   case 12: // two Dirichlet faces: Faces 1,2
+  //     //point G is the vertex common to the two Dirichlet faces
   //      {
   //       for (int j=0; j<dim; j++)
   //         xg[j]=x(1,j);
@@ -719,8 +720,8 @@ void Quadri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
   //       break;
   //     }
 
-  //   case 36: // deux Faces de Dirichlet : Faces 0,1
-  //     //le point G est le sommet commun au deux faces de dirichlet
+  //   case 36: // two Dirichlet faces: Faces 0,1
+  //     //point G is the vertex common to the two Dirichlet faces
   //      {
   //       for (int j=0; j<dim; j++)
   //         xg[j]=x(0,j);
@@ -728,8 +729,8 @@ void Quadri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
   //       break;
   //     }
 
-  //   case 10: // deux Faces de Dirichlet : Faces 1,3
-  //      // on garde les memes volumes de controles que pour des faces internes
+  //   case 10: // two Dirichlet faces: Faces 1,3
+  //      // keep the same control volumes as for internal faces
   //     {
   //       for (int j=0; j<dim; j++)
   //         xg[j]=(x(0,j)+x(1,j)+x(2,j)+x(3,j))*0.25;
@@ -737,8 +738,8 @@ void Quadri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
   //       break;
   //     }
 
-  //   case 30: // deux Faces de Dirichlet : Faces 0,2
-  //      // on garde les memes volumes de controles que pour des faces internes
+  //   case 30: // two Dirichlet faces: Faces 0,2
+  //      // keep the same control volumes as for internal faces
   //     {
   //       for (int j=0; j<dim; j++)
   //         xg[j]=(x(0,j)+x(1,j)+x(2,j)+x(3,j))*0.25;
@@ -746,8 +747,8 @@ void Quadri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
   //       break;
   //     }
 
-  //   case 13: //trois Faces de Dirichlet : Faces 3,2,1
-  //     // le point G est le centre de la face de dirichlet opposee a la face non-dirichlet
+  //   case 13: //three Dirichlet faces: Faces 3,2,1
+  //     // point G is the center of the Dirichlet face opposite to the non-Dirichlet face
   //     {
   //       for (int j=0; j<dim; j++)
   //         xg[j]=(x(1,j)+x(3,j))*0.5;
@@ -755,8 +756,8 @@ void Quadri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
   //       break;
   //     }
 
-  //   case 31: //trois Faces de Dirichlet : Faces 0,3,2
-  //     // le point G est le centre de la face de dirichlet opposee a la face non-dirichlet
+  //   case 31: //three Dirichlet faces: Faces 0,3,2
+  //     // point G is the center of the Dirichlet face opposite to the non-Dirichlet face
   //     {
   //       for (int j=0; j<dim; j++)
   //         xg[j]=(x(2,j)+x(3,j))*0.5;
@@ -764,8 +765,8 @@ void Quadri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
   //       break;
   //     }
 
-  //   case 37: //trois Faces de Dirichlet : Faces 1,0,3
-  //     // le point G est le centre de la face de dirichlet opposee a la face non-dirichlet
+  //   case 37: //three Dirichlet faces: Faces 1,0,3
+  //     // point G is the center of the Dirichlet face opposite to the non-Dirichlet face
   //     {
   //       for (int j=0; j<dim; j++)
   //         xg[j]=(x(0,j)+x(2,j))*0.5;
@@ -773,8 +774,8 @@ void Quadri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
   //       break;
   //     }
 
-  //   case 39: //trois Faces de Dirichlet : Faces 2,1,0
-  //     // le point G est le centre de la face de dirichlet opposee a la face non-dirichlet
+  //   case 39: //three Dirichlet faces: Faces 2,1,0
+  //     // point G is the center of the Dirichlet face opposite to the non-Dirichlet face
   //     {
   //       for (int j=0; j<dim; j++)
   //         xg[j]=(x(0,j)+x(1,j))*0.5;
@@ -782,14 +783,15 @@ void Quadri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
   //       break;
   //     }
 
-  //   } // fin du switch
+  //   } // end switch
 
 }
 
 
-/*! @brief modifie normales_facettes_Cl quand idirichlet=3 idirichlet=nb de faces de Dirichlet de l'element
+/*! @brief Modifies normales_facettes_Cl when idirichlet=3.
  *
- *  si idirichlet=3, n1 est le numero du sommet confondu avec G
+ *  idirichlet = number of Dirichlet faces of the element.
+ *  If idirichlet=3, n1 is the index of the node coinciding with G.
  *
  */
 void Quadri_VEF::modif_normales_facettes_Cl(DoubleTab& normales_facettes_Cl,

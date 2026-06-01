@@ -17,23 +17,17 @@
 #define Sch_CN_EX_iteratif_included
 
 #include <Sch_CN_iteratif.h>
-/*! @brief classe Sch_CN_EX_iteratif
+/*! @brief Extended iterative Crank-Nicolson scheme with additional stabilisation tricks.
  *
- *      Ce schema en temps implemente quelques astuces en plus de Sch_CN_iteratif pour
- *      le stabiliser au-dela de son domaine de stabilite naturel (facsec<2).
+ *      Extends Sch_CN_iteratif to remain stable beyond its natural stability domain (facsec < 2).
  *
- *      Un facteur d'amortissement des iterations est defini : omega.
- *      Il ameliore la stabilite, mais deterore la qualite de la resolution :
- *      Aux petits nombres d'iterations, les derivees temporelles sont sous-estimees
- *      et les lois de conservation ne sont plus necessairement satisfaites.
+ *      An iteration damping factor omega is introduced. It improves stability but degrades solution quality:
+ *      at low iteration counts, time derivatives are underestimated and conservation laws may not be satisfied.
  *
- *      Pour augmenter le pas de temps, les equations autres que Navier-Stokes sont resolues
- *      via le calcul de plusieurs pas de temps d'Euler explicite.
- *      A chaque iteration de Sch_CN_iteratif, les n pas de temps d'Euler explicite sont recalcules.
+ *      To allow larger time steps, equations other than Navier-Stokes are solved by advancing n explicit
+ *      Euler sub-steps. These n sub-steps are recomputed at each iteration of Sch_CN_iteratif.
  *
- *      Ce schema est adapte aux cas industriels de type gros calculs hydrauliques LES avec
- *      thermique couplee a du solide
- *
+ *      This scheme is suited to large-scale industrial LES hydraulic simulations with solid-coupled thermics.
  *
  * @sa Sch_CN_iteratif
  */

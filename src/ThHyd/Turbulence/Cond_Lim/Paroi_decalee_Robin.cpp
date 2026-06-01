@@ -38,7 +38,7 @@ Entree& Paroi_decalee_Robin::readOn(Entree& s)
   return s;
 }
 
-// Cette condition aux limites ne supporte que les equations Navier_Stokes_turbulent et Convection_Diffusion_Temperature_Turbulent
+// This boundary condition only supports the equations Navier_Stokes_turbulent and Convection_Diffusion_Temperature_Turbulent
 int Paroi_decalee_Robin::compatible_avec_eqn(const Equation_base& eqn) const
 {
   if (sub_type(Navier_Stokes_Turbulent, eqn) || sub_type(Convection_Diffusion_Temperature_Turbulent, eqn)) return 1;

@@ -75,7 +75,7 @@ int Echange_Thermique_Volumique_Elem::initialiser(double temps)
 {
   Ai_->initialiser(temps);
   if (ep_cond_) ep_cond_->initialiser(temps);
-  /* recherche du terme source de l'autre cote */
+  /* search for the source term on the other side */
   if (!equation().probleme().is_coupled())
     Process::exit(que_suis_je() + " can only be used in a coupled problem!");
   for (int i = 0; i < equation().probleme().get_pb_couple().nb_problemes(); i++)
@@ -109,15 +109,15 @@ void Echange_Thermique_Volumique_Elem::dimensionner_blocs(matrices_t matrices, c
   const Domaine_VF& dom = ref_cast(Domaine_VF, equation().domaine_dis());
   const int ne_tot = dom.nb_elem_tot(), N = vals[0]->line_size(), M = vals[1]->line_size();
 
-  /* aire interfaciale par maille */
+  /* interfacial area per cell */
   DoubleTab Ai(ne_tot, 1);
   IntVect polys(ne_tot);
   for (int e = 0; e < ne_tot; e++) polys(e) = e;
   Ai_->valeur_aux_elems(dom.xp(), polys, Ai);
-  /* matrice du remapper */
+  /* remapper matrix */
   const std::vector<std::map<mcIdType,double>>& interp = equation().probleme().domaine().get_remapper(o_ech_->equation().probleme().domaine(), true)->getCrudeMatrix();
 
-  /* derivees : aux mailles ou Ai > 0 */
+  /* derivatives: at cells where Ai > 0 */
   Stencil sten[2];
   sten[0].resize(0, 2);
   sten[1].resize(0, 2);
@@ -158,7 +158,7 @@ void Echange_Thermique_Volumique_Elem::ajouter_blocs(matrices_t matrices, Double
   const int cL = lambda.dimension(0) == 1, o_cL = o_lambda.dimension(0) == 1;
   Matrice_Morse *mat = !semi && matrices.count(nom_inc) ? matrices.at(nom_inc) : nullptr, *o_mat = !semi && matrices.count(o_nom_inc) ? matrices.at(o_nom_inc) : nullptr;
 
-  /* aire interfaciale par maille */
+  /* interfacial area per cell */
   DoubleTrav Ai(ne_tot, 1), ep, o_ep, cond, o_cond, o_Ai(o_ne_tot, 1), v_e[2];
   IntVect polys(ne_tot), o_polys(o_ne_tot);
   for (int e = 0; e < ne_tot; e++) polys(e) = e;
@@ -184,7 +184,7 @@ void Echange_Thermique_Volumique_Elem::ajouter_blocs(matrices_t matrices, Double
         }
     }
 
-  /* matrice du remapper */
+  /* remapper matrix */
   const std::vector<std::map<mcIdType,double>>& interp = equation().probleme().domaine().get_remapper(o_ech_->equation().probleme().domaine(), true)->getCrudeMatrix();
   bilan().resize(N[0]), bilan() = 0;
 
@@ -201,11 +201,11 @@ void Echange_Thermique_Volumique_Elem::ajouter_blocs(matrices_t matrices, Double
             //     Cerr << "Intersection : " << kv.second << finl;
             //     Process::exit();
             //   }
-            //resistivite thermique totale : on commence par la partie conductrice
+            //total thermal resistivity: start with the conductive part
             double surf = std::min(Ai(e), o_Ai(o_e)) * kv.second, hf[2] = { 0, };
             double invh = (ep.size() ? ep(e) / (cond.size() ? cond(e) : lambda(!cL * e, 0)) : 0) + (o_ep.size() ? o_ep(o_e) / (o_cond.size() ? o_cond(o_e) : o_lambda(!o_cL * o_e, 0)) : 0);
-            //flux parietaux de chaque cote
-            DoubleTrav f_h(2, std::max(N[0], N[1])); // f_h(i, j) : fraction de l'echange avec la phase j du cote i
+            //wall fluxes on each side
+            DoubleTrav f_h(2, std::max(N[0], N[1])); // f_h(i, j) : fraction of exchange with phase j on side i
             for (int i = 0; i < 2; i++)
               {
                 auto& flux = i ? o_ech_->flux_par_ : flux_par_;
@@ -228,11 +228,11 @@ void Echange_Thermique_Volumique_Elem::ajouter_blocs(matrices_t matrices, Double
                       for (int n = 0; n < N[i]; n++)
                         nv(n) += v_e[i](el, N[i] * d + n) * v_e[i](el, N[i] * d + n);
                     for (int n = 0; n < N[0]; n++) nv(n) = sqrt(nv[n]);
-                    //appel!
+                    //call!
                     corr.qp(in, out);
                     if (nonlinear)
                       Process::exit(que_suis_je() + " : nonlinear heat flux such as " + corr.que_suis_je() + " are not implemented yet!");
-                    //on n'est interesse que par les coeffs d'echange
+                    //we are only interested in the exchange coefficients
                     for (int n = 0; n < N[i]; n++) hf[i] += -dTf_qpk(n, n);
                     for (int n = 0; n < N[i]; n++) f_h(i, n) = -dTf_qpk(n, n) / hf[i];
                     invh += 1. / hf[i];
@@ -241,7 +241,7 @@ void Echange_Thermique_Volumique_Elem::ajouter_blocs(matrices_t matrices, Double
                   Process::exit(que_suis_je() + " : multi-component heat flux with " + pb[i]->le_nom() + ", but no heat_flux has been defined!");
                 else f_h(i, 0) = 1;
               }
-            //contributions!
+            //contributions
             for (int n = 0; n < N[0]; n++)
               {
                 for (int m = 0; m < N[0]; m++) //locales

@@ -314,8 +314,8 @@ void Solv_Petsc::create_solver(Entree& entree)
   Nom ksp;
   lecture(entree);
   EChaine is(get_chaine_lue());
-  is >> ksp;   // On lit le solveur en premier puis les options du solveur: PETSC ksp { ... }
-  is >> motlu; // On lit l'accolade
+  is >> ksp;   // Read the solver name first, then the solver options: PETSC ksp { ... }
+  is >> motlu; // Read the opening brace
   if (motlu != accolade_ouverte)
     {
       Cerr << "Error while reading the parameters of PETSc solver: " << ksp << " { ... }" << finl;
@@ -334,7 +334,7 @@ void Solv_Petsc::create_solver(Entree& entree)
       exit();
     }
 
-  // Creation du solveur et association avec le preconditionneur
+  // Create the solver and associate it with the preconditioner
   if (option_prefix_=="??") // Prefix non fixe
     {
       numero_solveur++;
@@ -380,9 +380,9 @@ void Solv_Petsc::create_solver(Entree& entree)
 #endif
     }
 #ifdef NDEBUG
-  // PETSc 3.14 active par defaut les exceptions, on desactive en production ?
+  // PETSc 3.14 enables exceptions by default; disable in production?
   // PetscSetFPTrap(PETSC_FP_TRAP_OFF);
-  // Utiliser -fp_trap 0 a l'execution plutot: Segfault vu sur petsc gmres { precond diag ... }
+  // Use -fp_trap 0 at runtime instead: segfault observed with petsc gmres { precond diag ... }
 #endif
   //add_option("on_error_abort",""); // ne marche pas semble t'il
   // On doit pouvoir lire des mots cles de base (GCP, GMRES, CHOLESKY)
@@ -425,7 +425,7 @@ void Solv_Petsc::create_solver(Entree& entree)
     case 15:
       {
         if (rang == 15) fixer_limpr(-1);  // Quiet
-        else fixer_limpr(1); // On imprime le residu
+        else fixer_limpr(1); // Print the residual
         solver_supported_on_gpu_by_petsc=1; // Not really, reserved to expert...
         solver_supported_on_gpu_by_amgx=1;  // Not really, reserved to expert...
         if (limpr() >= 0) Cerr << "Reading of the " << (amgx_ ? "AmgX" : "Petsc") << " commands:" << finl;
@@ -482,7 +482,7 @@ void Solv_Petsc::create_solver(Entree& entree)
                   is >> motlu;
                 }
             }
-        // Pour faciliter le debugage:
+        // To facilitate debugging:
         if (rang == 14) // Verbose
           {
             add_option("ksp_view", "");
@@ -491,8 +491,8 @@ void Solv_Petsc::create_solver(Entree& entree)
           }
         if (!amgx_)
           {
-            // Changement dans PETSc 3.21: plus de preconditioneur par defaut
-            // On met ILU(0) comme auparavant pour ne pas changer tous les jeux de donnees qui ont: "petsc cli { }"
+            // Change in PETSc 3.21: no default preconditioner anymore
+            // We set ILU(0) as before to avoid changing all datasets that use: "petsc cli { }"
             Nom current_pc;
             Nom option="-";
             option+=option_prefix_;
@@ -521,14 +521,14 @@ void Solv_Petsc::create_solver(Entree& entree)
         // Gain interessant a partir de 4000 coeurs
         if (Process::nproc()>=4000)
           {
-            //add_option("ksp_cg_single_reduction",""); Pour Petsc < 3.3, la fonction KSPCGUseSingleReduction n'etait pas disponible
+            //add_option("ksp_cg_single_reduction",""); For Petsc < 3.3, the function KSPCGUseSingleReduction was not available
             KSPCGUseSingleReduction(SolveurPetsc_,(PetscBool)1);
           }
         // But It requires two extra work vectors than the conventional implementation in PETSc.
         solver_supported_on_gpu_by_petsc=1;
         solver_supported_on_gpu_by_amgx=1;
-        add_amgx_option("solver(s)","PCG"); // CG avec preconditionnement
-        // PCGF : Flexible CG avec preconditionnement
+        add_amgx_option("solver(s)","PCG"); // CG with preconditioning
+        // PCGF : Flexible CG with preconditioning
         break;
       }
     case 10:
@@ -548,10 +548,10 @@ void Solv_Petsc::create_solver(Entree& entree)
     case 2:
       {
         KSPSetType(SolveurPetsc_, KSPGMRES);
-        // Le preconditionnement a droite permet que le residu utilise pour la convergence
-        // soit le residu reel ||Ax-b|| et non le residu preconditionne pour certains solveurs
-        // avec un preconditionnement a gauche (ex: GMRES). Ainsi, on peut comparer strictement
-        // les performances des solveurs (TRUST ou PETSC) entre eux
+        // Right preconditioning ensures that the residual used for convergence
+        // is the true residual ||Ax-b|| and not the preconditioned residual for some solvers
+        // with left preconditioning (e.g. GMRES). This allows a strict comparison
+        // of solver performance (TRUST or PETSC)
         if (gmres_right_unpreconditionned)
           {
             KSPSetPCSide(SolveurPetsc_, PC_RIGHT);
@@ -579,9 +579,9 @@ void Solv_Petsc::create_solver(Entree& entree)
     case 8:
       {
         KSPSetType(SolveurPetsc_, KSPPGMRES);
-        // PGMRES ne peut etre que preconditionne a gauche (CAx=Cb)
-        // et on ne peut avoir que le residu preconditionne (||CAx-Cb||)
-        // -> on ne peut comparer la convergence avec le GMRES...
+        // PGMRES can only use left preconditioning (CAx=Cb)
+        // and the only available residual is the preconditioned one (||CAx-Cb||)
+        // -> convergence cannot be directly compared with GMRES...
         KSPSetPCSide(SolveurPetsc_, PC_LEFT);
         // KSPSetNormType(SolveurPetsc, KSP_NORM_UNPRECONDITIONED);
         solver_supported_on_gpu_by_petsc=1;
@@ -592,7 +592,7 @@ void Solv_Petsc::create_solver(Entree& entree)
     case 9:
     case 16:
       {
-        // Si MUMPS est present, on le prend par defaut (solveur_direct_=1) sinon SuperLU (solveur_direct_=2):
+        // If MUMPS is available, use it by default (solveur_direct_=1), otherwise SuperLU (solveur_direct_=2):
 #ifdef PETSC_HAVE_MUMPS
         solveur_direct_ = mumps;
         // Option out_of_core
@@ -632,14 +632,14 @@ void Solv_Petsc::create_solver(Entree& entree)
         KSPSetType(SolveurPetsc_, KSPBCGS);
         solver_supported_on_gpu_by_petsc=1;
         solver_supported_on_gpu_by_amgx=1;
-        // BICGSTAB // BICGSTAB sans preconditionnement
+        // BICGSTAB // BICGSTAB without preconditioning
         add_amgx_option("solver(s)","PBICGSTAB"); // BICGSTAB avec precondtionnement
         break;
       }
     case 6:
       {
-        KSPSetType(SolveurPetsc_, KSPIBCGS); // 1 point de synchro au lieu de 3 pour KSPBCGS
-        // Pour optimiser encore les comms, voir:
+        KSPSetType(SolveurPetsc_, KSPIBCGS); // 1 synchronisation point instead of 3 for KSPBCGS
+        // To further optimise communications, see:
         // http://www.mcs.anl.gov/petsc/petsc-as/snapshots/petsc-3.0.0/docs/manualpages/KSP/KSPIBCGS.html
         KSPSetLagNorm(SolveurPetsc_, PETSC_TRUE);
         break;
@@ -659,8 +659,8 @@ void Solv_Petsc::create_solver(Entree& entree)
       {
         if (Process::is_parallel()) Process::exit("Cholesky_lapack can't be used for parallel calculation.");
         solveur_direct_=petsc;
-        // Lapack, old and slow (non pas vrai sur petites matrices d'ordre 100 - 10000 !)
-        add_option("pc_factor_nonzeros_along_diagonal", ""); // Moins robuste que MUMPS pour un pivot nul donc on reordonne pour eviter
+        // Lapack, old and slow (not true for small matrices of order 100 - 10000!)
+        add_option("pc_factor_nonzeros_along_diagonal", ""); // Less robust than MUMPS for a zero pivot, so we reorder to avoid it
         KSPSetType(SolveurPetsc_, KSPPREONLY);
         break;
       }
@@ -706,7 +706,7 @@ void Solv_Petsc::create_solver(Entree& entree)
       }
     }
 
-  // On verifie que le solveur est supporte sur GPU:
+  // Check that the solver is supported on GPU:
   if (gpu_)
     {
 #if defined(PETSC_HAVE_CUDA) || defined(PETSC_HAVE_HIP)
@@ -747,7 +747,7 @@ void Solv_Petsc::create_solver(Entree& entree)
       Motcles les_parametres_solveur(31);
       {
         les_parametres_solveur[0] = "impr";
-        les_parametres_solveur[1] = "seuil"; // Seuil absolu (atol)
+        les_parametres_solveur[1] = "seuil"; // Absolute threshold (atol)
         les_parametres_solveur[2] = "precond";
         les_parametres_solveur[3] = "precond_nul"; // To accept the TRUST syntax
         les_parametres_solveur[4] = "nb_it_max";
@@ -766,8 +766,8 @@ void Solv_Petsc::create_solver(Entree& entree)
         les_parametres_solveur[17] = "restart";
         les_parametres_solveur[18] = "cli_verbose";
         les_parametres_solveur[19] = "dropping_parameter";
-        les_parametres_solveur[20] = "rtol"; // Seuil relatif
-        les_parametres_solveur[21] = "atol"; // Seuil absolu <=> seuil
+        les_parametres_solveur[20] = "rtol"; // Relative threshold
+        les_parametres_solveur[21] = "atol"; // Absolute threshold <=> seuil
         les_parametres_solveur[22] = "ignore_new_nonzero";
         les_parametres_solveur[23] = "rebuild_matrix";
         les_parametres_solveur[24] = "allow_realloc";
@@ -797,7 +797,7 @@ void Solv_Petsc::create_solver(Entree& entree)
             case 0:
               {
                 fixer_limpr(1);
-                // Si MUMPS on ajoute des impressions sur la decomposition
+                // If MUMPS, add printout for the factorisation
                 if (solveur_direct_==mumps)
                   add_option("mat_mumps_icntl_4","3");
                 else if (solveur_direct_==superlu_dist)
@@ -872,7 +872,7 @@ void Solv_Petsc::create_solver(Entree& entree)
                           level.value()=(int)tmp_int;
                           level.defined=1;
                           add_amgx_option("p:ilu_sparsity_level",(Nom)level.value());
-                          // Coloring level:  1 par defaut  Doit valoir ilu_sparsity_level+1 pour MULTICOLOT_INU (voir AmgX reference guide)
+                          // Coloring level: 1 by default. Must equal ilu_sparsity_level+1 for MULTICOLOR_ILU (see AmgX reference guide)
                           add_amgx_option("p:coloring_level",(Nom)Nom(level.value()+1));
                           break;
                         }
@@ -978,7 +978,7 @@ void Solv_Petsc::create_solver(Entree& entree)
               }
             case 9:
               {
-                is >> motlu; // On lit l'accolade
+                is >> motlu; // Read the opening brace
                 if (motlu != accolade_ouverte)
                   {
                     Cerr << "We expected " << accolade_ouverte << " instead of " << motlu << finl;
@@ -1005,8 +1005,8 @@ void Solv_Petsc::create_solver(Entree& entree)
                       }
                   }
                 if (limpr()>-1)
-                  fixer_limpr(1); // On imprime le residu si CLI
-                // Pour faciliter le debugage:
+                  fixer_limpr(1); // Print residual if CLI is active
+                // To facilitate debugging:
                 if (rang == 18) // Verbose
                   {
 
@@ -1019,7 +1019,7 @@ void Solv_Petsc::create_solver(Entree& entree)
             case 10:
               {
                 is >> motlu;
-                // Si pas MUMPS on previent
+                // Warn if MUMPS is not available
                 if (solveur_direct_!=mumps)
                   {
                     Cerr << "Ordering keyword for a solver is limited to Cholesky only." << finl;
@@ -1036,9 +1036,9 @@ void Solv_Petsc::create_solver(Entree& entree)
                   mumps_ordering[5] = "metis";
                 }
                 int rang_mumps=mumps_ordering.search(motlu);
-                // MUMPS fait un choix automatique par defaut (selon type et taille de la matrice, et nombre de processeurs) mais a savoir que:
-                // Sur le cas Cx et PAR_Cx 4 cores, Scotch en sequentiel et PT-Scotch en parallele sont les meilleurs choix
-                // Sur les gros cas, parfois Metis plus rapide pour A=LU et Scotch pour x=A-1B...
+                // MUMPS makes an automatic default choice (based on matrix type/size and number of processors), but note:
+                // For the Cx and PAR_Cx 4-core cases, Scotch (sequential) and PT-Scotch (parallel) are the best choices
+                // For large cases, Metis is sometimes faster for A=LU, and Scotch for x=A-1B...
                 if (rang_mumps==-1)
                   {
                     Cerr << motlu << " : unrecognized ordering from those available for the MUMPS solver Cholesky:" << finl;
@@ -1116,7 +1116,7 @@ void Solv_Petsc::create_solver(Entree& entree)
               }
             case 19:
               {
-                // Si pas MUMPS on previent
+                // Warn if MUMPS is not available
                 if (solveur_direct_!=mumps)
                   {
                     Cerr << les_parametres_solveur[rang] << " keyword for a solver is limited to " << les_solveurs[14] << " only." << finl;
@@ -1197,16 +1197,16 @@ void Solv_Petsc::create_solver(Entree& entree)
       int pc_supported_on_gpu_by_amgx=0;
       Motcles les_precond(18);
       {
-        les_precond[0] = "NULL";               // Pas de preconditionnement
+        les_precond[0] = "NULL";               // No preconditioning
         les_precond[1] = "ILU";                // Incomplete LU
         les_precond[2] = "SSOR";               // Symetric Successive Over Relaxation
-        les_precond[3] = "EISENSTAT";          // Symetric Successive Over Relaxation avec Eiseinstat trick
+        les_precond[3] = "EISENSTAT";          // Symmetric Successive Over Relaxation with Eisenstat trick
         les_precond[4] = "SPAI";               // Sparse Approximate Inverse
         les_precond[5] = "PILUT";              // Dual-threshold incomplete LU factorisation
         les_precond[6] = "DIAG|JACOBI";        // Diagonal (Jacobi) precondtioner
         les_precond[7] = "BOOMERAMG";          // Multigrid preconditioner
-        les_precond[8] = "BLOCK_JACOBI_ICC";   // Block Jacobi ICC preconditioner (code dans PETSc, optimise)
-        les_precond[9] = "BLOCK_JACOBI_ILU";   // Block Jacobi ILU preconditioner (code dans PETSc, optimise)
+        les_precond[8] = "BLOCK_JACOBI_ICC";   // Block Jacobi ICC preconditioner (implemented in PETSc, optimised)
+        les_precond[9] = "BLOCK_JACOBI_ILU";   // Block Jacobi ILU preconditioner (implemented in PETSc, optimised)
         les_precond[10] = "C-AMG";    // Classical AMG
         les_precond[11] = "SA-AMG";   // Smooth Aggregated AMG
         les_precond[12] = "GS";   // Gauss-Seidel
@@ -1219,15 +1219,15 @@ void Solv_Petsc::create_solver(Entree& entree)
 
       if (pc!="")
         {
-          // On empeche le choix d'un preconditionneur avec une methode directe
-          // puisque celle ci EST le preconditionneur KSPREONLY
+          // Prevent choosing a preconditioner with a direct method
+          // because the direct method IS the preconditioner KSPREONLY
           if (solveur_direct_)
             {
               Cerr << "Using precond keyword with a direct method like Cholesky is useless" << finl;
               Cerr << "because for PETSc the LU factorization is used as a preconditioner." << finl;
               exit();
             }
-          // Option du preconditionneur
+          // Preconditioner option
           rang = les_precond.search(pc);
           switch(rang)
             {
@@ -1247,9 +1247,9 @@ void Solv_Petsc::create_solver(Entree& entree)
               {
                 //Cout << "See http://www.ncsa.uiuc.edu/UserInfo/Resources/Software/Math/HYPRE/docs-1.6.0/HYPRE_usr_manual/node33.html" << finl;
                 //Cout << "to have some advices on the incomplete LU factorisation level: ILU(level)" << finl;
-                // On n'attaque pas le ILU de Petsc qui n'est pas parallele
-                // On prend celui de Hypre (Euclid=PILU(k)) en passant par les commandes en ligne
-                // car peu de parametres peuvent etre fixes sinon
+                // We skip PETSc ILU which is not parallel
+                // We use Hypre's (Euclid=PILU(k)) instead via command-line options
+                // because only a few parameters can be set otherwise
                 //PCSetType(PreconditionneurPetsc_, PCHYPRE);
                 //PCHYPRESetType(PreconditionneurPetsc_, "euclid");
                 //add_option("pc_hypre_euclid_levels",(Nom)level.value());
@@ -1319,7 +1319,7 @@ void Solv_Petsc::create_solver(Entree& entree)
                 PCHYPRESetType(PreconditionneurPetsc_, "parasails");
                 add_option("pc_hypre_parasails_nlevels",(Nom)level.value());     // Higher values of level [>=0] leads to more accurate, but more expensive preconditioners (default 1)
                 add_option("pc_hypre_parasails_thresh",(Nom)epsilon.value());   // Lower values of eps [0-1] leads to more accurate, but more expensive preconditioners (default 0.1)
-                //add_option("pc_hypre_parasails_sym","SPD"); // Matrice symetrique definie positive. PL: comment cela a pu marcher avant ? La matrice n'est pas toujours symetrique.
+                //add_option("pc_hypre_parasails_sym","SPD"); // Symmetric positive definite matrix. PL: how did this ever work before? The matrix is not always symmetric.
                 check_not_defined(omega);
                 check_not_defined(ordering);
                 KSPType type_ksp;
@@ -1371,13 +1371,13 @@ void Solv_Petsc::create_solver(Entree& entree)
                   {
                     add_option("sub_pc_type",rang==8 ? "icc" : "ilu");
                     add_option("sub_pc_factor_levels",(Nom)level.value());
-                    // On fixe le precondtionnement non symetrique pour appliquer eventuellement un ordering autre que celui par defaut (natural)
-                    // Un ordering rcm peut ameliorer par exemple la convergence
-                    // Voir le remplissage de la matrice avec -mat_view_draw -draw_pause -1
+                    // Set the non-symmetric preconditioner to allow an ordering different from the default (natural)
+                    // An rcm ordering can improve convergence for example
+                    // Visualise the matrix fill with -mat_view_draw -draw_pause -1
                     if (ordering.value()!="")
                       {
                         add_option("sub_pc_factor_mat_ordering_type",ordering.value());
-                        // Le preconditionnement natural (defaut) ne necessite pas une matrice de preconditionnement symetrique, les autres si:
+                        // Natural preconditioning (default) does not require a symmetric preconditioning matrix, but other orderings do:
                         preconditionnement_non_symetrique_=1;
                       }
 
@@ -1410,11 +1410,11 @@ void Solv_Petsc::create_solver(Entree& entree)
                 PCSetType(PreconditionneurPetsc_, PCHYPRE);
                 PCHYPRESetType(PreconditionneurPetsc_, "boomeramg"); // Classical C-AMG
                 pc_supported_on_gpu_by_petsc=1;
-                // Changement pc_hypre_boomeramg_relax_type_all pour PETSc 3.10, la matrice de
-                // preconditionnement etant seqaij, symetric-SOR/jacobi (defaut) provoque KSP_DIVERGED_INDEFINITE_PC
-                // Voir: https://lists.mcs.anl.gov/mailman/htdig/petsc-users/2012-December/015922.html
+                // Change of pc_hypre_boomeramg_relax_type_all for PETSc 3.10, the preconditioner
+                // matrix being seqaij, symmetric-SOR/jacobi (default) triggers KSP_DIVERGED_INDEFINITE_PC
+                // See: https://lists.mcs.anl.gov/mailman/htdig/petsc-users/2012-December/015922.html
                 if (!gpu_) add_option("pc_hypre_boomeramg_relax_type_all", "Jacobi");
-                // Voir https://mooseframework.inl.gov/releases/moose/2021-05-18/application_development/hypre.html
+                // See https://mooseframework.inl.gov/releases/moose/2021-05-18/application_development/hypre.html
                 //if (dimension==3) Cerr << "Warning, on massive parallel calculation for best performance, consider playing with -pc_hypre_boomeramg_strong_threshold 0.7 or 0.8 or 0.9" << finl;
                 if (dimension==3) add_option("pc_hypre_boomeramg_strong_threshold", "0.7");
                 if (limpr()) add_option("pc_hypre_boomeramg_print_statistics","1");
@@ -1494,7 +1494,7 @@ void Solv_Petsc::create_solver(Entree& entree)
                     //add_option("pc_gamg_threshold","0.");
                     if (rang==10) // C-AMG
                       {
-                        // Convergence fortement degradee 3.14 -> 3.20 malgre les options precedentes...
+                        // Convergence strongly degraded from 3.14 -> 3.20 despite the options above...
                         add_option("pc_gamg_type","classical");
                       }
                     else if (rang==11) // SA-AMG
@@ -1591,7 +1591,7 @@ void Solv_Petsc::create_solver(Entree& entree)
             case 16:
               {
                 // ILU_MUMPS:
-                add_option("pc_type", "cholesky"); // Attention, si on met LU en sequentiel il n'utilise pas MUMPS...
+                add_option("pc_type", "cholesky"); // Warning: if LU is used in sequential mode, MUMPS will not be used...
                 add_option("pc_factor_mat_solver_type", "mumps");
                 add_option("mat_mumps_icntl_35", "1"); // BLR enabled
                 //add_option("mat_mumps_icntl_36", "??"); controls the choice of BLR factorization variant
@@ -1636,12 +1636,12 @@ void Solv_Petsc::create_solver(Entree& entree)
             }
           else
             {
-              // Pour un solveur direct le preconditionner EST le solveur:
+              // For a direct solver the preconditioner IS the solver:
               pc_supported_on_gpu_by_petsc = solver_supported_on_gpu_by_petsc;
               pc_supported_on_gpu_by_amgx = solver_supported_on_gpu_by_amgx;
             }
         }
-      // On verifie que les preconditionneurs sont supportes sur GPU:
+      // Check that the preconditioners are supported on GPU:
       if (gpu_ && pc_supported_on_gpu_by_petsc==0)
         {
           Cerr << les_precond[rang] << " is not supported yet by PETSc on GPU." << finl;
@@ -1654,9 +1654,9 @@ void Solv_Petsc::create_solver(Entree& entree)
         }
     }
 
-  // On fixe des parametres du solveur et du preconditionneur selon que l'on ait un solveur direct ou iteratif
-  // KSPSetInitialGuessNonzero : Resout Ax=B en supposant x nul ou non
-  // KSPSetTolerances : Pour fixer les criteres de convergence du solveur iteratif
+  // Set solver and preconditioner parameters depending on whether we have a direct or iterative solver
+  // KSPSetInitialGuessNonzero: Solves Ax=B assuming x is zero or non-zero
+  // KSPSetTolerances: To set convergence criteria for the iterative solver
   if (solveur_direct_)
     {
       KSPSetInitialGuessNonzero(SolveurPetsc_, PETSC_FALSE);
@@ -1678,22 +1678,22 @@ void Solv_Petsc::create_solver(Entree& entree)
           add_option("ksp_check_norm_iteration",(Nom)(nb_it_max_-1));
           nb_it_max_ = NB_IT_MAX_DEFINED;
         }
-      // Convergence si residu(it) < MAX (seuil_relatif_ * residu(0), seuil_);
+      // Convergence when residu(it) < MAX (seuil_relatif_ * residu(0), seuil_);
       if (seuil_==0 && seuil_relatif_==_RTOL_MIN_)
         {
-          seuil_=1.e-12; // Si aucun seuil defini, on prend un seuil absolu de 1.e-12 (comme avant)
+          seuil_=1.e-12; // If no threshold defined, we use an absolute threshold of 1.e-12 (as before)
         }
       if (seuil_relatif_<_RTOL_MIN_)
         Process::exit("Fix rtol cause it is too low !");
       KSPSetTolerances(SolveurPetsc_, seuil_relatif_, seuil_, (divtol_==0 ? PETSC_DEFAULT : divtol_), nb_it_max_);
     }
   // Change le calcul du test de convergence relative (||Ax-b||/||Ax(0)-b|| au lieu de ||Ax-b||/||b||)
-  // Peu utilisee dans TRUST car on utilise la convergence sur la norme absolue
-  // Mais cela corrige une erreur KSP_DIVERGED_DTOL quand ||Ax-b||/||b||>10000=div_tol par defaut dans PETSc (rencontree sur Etude REV_4)
+  // Rarely used in TRUST because convergence is monitored on the absolute norm
+  // But this fixes a KSP_DIVERGED_DTOL error when ||Ax-b||/||b||>10000=div_tol by default in PETSc (encountered in Etude REV_4)
   //add_option(sys, "ksp_converged_use_initial_residual_norm",1); // Before PETSc 3.5
   KSPConvergedDefaultSetUIRNorm(SolveurPetsc_); // After PETSc 3.5, a function is available
 
-  // Surcharge eventuelle par la ligne de commande
+  // Possible override from the command line
   KSPSetOptionsPrefix(SolveurPetsc_, option_prefix_);
   KSPSetFromOptions(SolveurPetsc_);
   PCSetOptionsPrefix(PreconditionneurPetsc_, option_prefix_);
@@ -2044,10 +2044,10 @@ int Solv_Petsc::add_option(const Nom& astring, const Nom& value, int cli)
     option+=option_prefix_;
 
   option+=astring;
-  // Attention il ne retourne pas de code d'erreur si l'option est mal orthographiee!!
-  // Il ne dit pas non plus qu'elle est unused avec -options_left
-  // Nouveau 1.6.3 pour la ligne de commande reste prioritaire, on ne change une option
-  // que si elle n'a pas deja ete specifiee...
+  // Warning: it does not return an error code if the option is misspelled!!
+  // It also does not report that it is unused with -options_left
+  // New in 1.6.3: the command line remains priority, an option is only changed
+  // if it has not already been specified...
   Nom current_value;
   if (has_option(option, current_value))
     {
@@ -2071,7 +2071,7 @@ int Solv_Petsc::add_option(const Nom& astring, const Nom& value, int cli)
 }
 
 #ifndef PETSC_HAVE_HYPRE
-// Pour que le code puisse compiler/tourner si on prend PETSc sans aucun autre package externe:
+// So that the code can compile/run when using PETSc without any other external package:
 PetscErrorCode PCHYPRESetType(PC,const char[])
 {
   Cerr << "HYPRE preconditioners are not available in this TRUST version." << finl;
@@ -2104,20 +2104,20 @@ int Solv_Petsc::resoudre_systeme(const Matrice_Base& la_matrice, const DoubleVec
   if (SolveurPetsc_==nullptr) create_solver();
   std::fenv_t fenv;
   std::feholdexcept(&fenv);
-  // Si on utilise un solver petsc on le signale pour les stats finales
+  // If a PETSc solver is used, record it for the final statistics
   statistics().begin_count(STD_COUNTERS::petsc_solver,statistics().get_last_opened_counter_level()+1);
   statistics().end_count(STD_COUNTERS::petsc_solver);
   Perf_counters::time_point start = statistics().start_clock();
-  // Attention, bug apres PETSc 3.14 le logging avec PetscLogStage est tres cher pour MatSetValues (appel MPI meme en sequentiel!). Vu sur Flica5 avec appel frequents a Update_matrix
-  bool log_Create_Stage = false; // ToDO mettre un test plus intelligent selon taille du cas ou si parallele ?
+  // Warning: bug after PETSc 3.14 where logging with PetscLogStage is very costly for MatSetValues (MPI call even in sequential!). Observed on Flica5 with frequent calls to Update_matrix
+  bool log_Create_Stage = false; // TODO: add a smarter check based on case size or whether running in parallel
   if (log_Create_Stage) PetscLogStagePush(Create_Stage_);
   if (nouvelle_matrice())
     {
-      // Changement de la taille de matrice, on detruit les objets dont la taille change:
+      // Matrix size has changed: destroy objects whose size changes:
       int hasChanged = mp_max((int)(secmem_sz_!=secmem.size_array()));
       if (MatricePetsc_!=nullptr && hasChanged != 0)
         {
-          // Destruction de la matrice de preconditionnement:
+          // Destroy the preconditioning matrix:
           KSPSetOperators(SolveurPetsc_, MatricePetsc_, PETSC_NULLPTR);
           // Destruction des vecteurs
           VecDestroy(&SecondMembrePetsc_);
@@ -2138,9 +2138,9 @@ int Solv_Petsc::resoudre_systeme(const Matrice_Base& la_matrice, const DoubleVec
             DMDestroy(&dm_);
         }
 
-      matrice_symetrique_ = true;      // On suppose que la matrice est symetrique
+      matrice_symetrique_ = true;      // Assume the matrix is symmetric
 
-      // Construction de la numerotation globale:
+      // Build the global numbering:
       if (MatricePetsc_==nullptr)
         construit_renum(secmem);
 
@@ -2155,13 +2155,13 @@ int Solv_Petsc::resoudre_systeme(const Matrice_Base& la_matrice, const DoubleVec
         {
           // Matrice deja au format Petsc
           MatricePetsc_ = ref_cast(Matrice_Petsc, la_matrice).getMat();
-          set_read_matrix(true); // flag reutilise comme si on avait lu la matrice
+          set_read_matrix(true); // flag reused as if the matrix had been read from file
         }
       else
         construit_matrice_morse_intermediaire(la_matrice, matrice_morse_intermediaire);
       if (verbose) Cout << "[Petsc] Time to convert matrix: \t" << statistics().compute_time(start) << finl;
 
-      // Verification stockage de la matrice
+      // Check matrix storage format
       check_aij(matrice_morse_intermediaire);
 
       bool la_matrice_est_morse_non_symetrique =
@@ -2177,10 +2177,10 @@ int Solv_Petsc::resoudre_systeme(const Matrice_Base& la_matrice, const DoubleVec
 
       // Build x and b if necessary
       Create_vectors(secmem);
-      // Creation de Champs (fields) pour pouvoir utiliser des preconditionneurs PCFIELDSPLIT
+      // Create Fields to allow using PCFIELDSPLIT preconditioners
       Create_DM(secmem);
 
-      // Construit ou update la matrice
+      // Build or update the matrix
       if (nouveau_stencil_)
         Create_objects(matrice_morse, secmem.line_size());
       else
@@ -2219,14 +2219,14 @@ int Solv_Petsc::resoudre_systeme(const Matrice_Base& la_matrice, const DoubleVec
   Update_solution(solution);
   solution.echange_espace_virtuel();
   fixer_nouvelle_matrice(0);
-  // Calcul et verification du vrai residu sur matrice:
+  // Compute and verify the true matrix residual:
   bool check_residual = controle_residu_;
 #ifndef NDEBUG
   if (amgx_ || gpu_)
     if (getenv("TRUST_CLOCK_ON")==nullptr)
       {
         Cerr << "Warning checking residual. D2H and H2D copies are possible..." << finl;
-        check_residual = true; // En debug uniquement car verification faite sur CPU ce qui est dommage en prod...
+        check_residual = true; // Debug mode only because the check is done on CPU which is costly in production...
       }
 #endif
   if (check_residual && !MatricePetsc_ /* Matrice_Petsc::ajouter_multvect() not implemented bouh */)
@@ -2236,7 +2236,7 @@ int Solv_Petsc::resoudre_systeme(const Matrice_Base& la_matrice, const DoubleVec
       la_matrice.ajouter_multvect(solution,test);
       double vrai_residu = mp_norme_vect(test);
       if (verbose) Cout << "||Ax-b||=" << vrai_residu << finl;
-      // Verification de la solution sur la matrice initiale
+      // Check the solution against the initial matrix
       if (nbiter>0 && Process::je_suis_maitre())
         {
           double precision_machine=1.e-12;
@@ -2401,16 +2401,16 @@ int Solv_Petsc::solve(ArrOfDouble& residu)
       // MyKSPMonitor ne marche pas pour certains solveurs (residu(0) n'est pas calcule):
       if (solveur_direct_ || type_ksp_ == KSPIBCGS)
         {
-          // Calcul de residu(0)=||B||
+          // Compute residual(0)=||B||
           VecNorm(SecondMembrePetsc_, NORM_2, &residu[0]);
-          // On l'affiche pour les solveurs directs (pour les autres TRUST s'en occupe):
+          // Display it for direct solvers (for others, TRUST takes care of it):
           if (solveur_direct_) MyKSPMonitor(SolveurPetsc_, 0, residu[0], 0);
         }
-      // Idem: l'historique du residu est mal evalue pour certains solveurs:
-      // donc on le calcul a la derniere iteration:
+      // Same: the residual history is poorly evaluated for some solvers,
+      // so we compute it at the last iteration:
       if (residu[0] > 0 && (solveur_direct_ || type_ksp_ == KSPIBCGS))
         {
-          // Calcul de residu(nbiter)=||Ax-B||
+          // Compute residual(nbiter)=||Ax-B||
           VecScale(SecondMembrePetsc_, -1);
           MatMultAdd(MatricePetsc_, SolutionPetsc_, SecondMembrePetsc_, SecondMembrePetsc_);
           VecNorm(SecondMembrePetsc_, NORM_2, &residu[nbit]);
@@ -2567,38 +2567,38 @@ void Solv_Petsc::check_aij(const Matrice_Morse& matrice)
   /*******************/
   /* Setting mataij_ */
   /*******************/
-  // Matrice non symetrique, on utilise le format aij et non sbaij:
+  // Non-symmetric matrix, we use the aij format instead of sbaij:
   if (!matrice_symetrique_) mataij_=1;
 
   // Matrice reordonee necessite le format aij
   if (reorder_matrix_) mataij_=1;
 
-  // Je n'arrive pas a faire marcher le stockage symetrique avec le preconditionneur PCEISENSTAT
-  // qui est interessant car necessite 2 fois moins d'operations que le SSOR
+  // Could not make symmetric storage work with the PCEISENSTAT preconditioner,
+  // which is attractive because it requires half the operations of SSOR
   if (type_pc_==PCEISENSTAT) mataij_=1;
 
   // Reading a Matrix with Hypre (ToDo test if mataij=1 for Hypre is not better, cause here 2 matrix seqsbaij and seqaij)
   if (read_matrix() && type_pc_==PCHYPRE) mataij_=1;
 
-  // Dans le cas de SUPERLU_DIST pour Cholesky, je n'arrive pas a faire marcher le stockage
-  // symetrique donc l'utilisation de SUPERLU_DIST n'est pas encore optimale en RAM...
+  // For SUPERLU_DIST with Cholesky, symmetric storage could not be made to work,
+  // so SUPERLU_DIST usage is not yet optimal in terms of RAM...
   if (solveur_direct_==superlu_dist) mataij_=1;
   // IDEM pour UMFPACK qui ne supporte que le format AIJ:
   if (solveur_direct_==umfpack) mataij_=1;
   // IDEM pour UMFPACK qui ne supporte que le format AIJ:
   if (solveur_direct_==strumpack) mataij_=1;
 
-  // Dans le cas GPU, seul le format AIJ est supporte pour le moment:
+  // For GPU, only the AIJ format is supported for now:
   if (gpu_ || amgx_) mataij_=1;
 
 #ifdef PETSC_HAVE_OPENMP
-  // Dans le cas d'OpenMP, seul le format aij est multithreade:
-  // PL (01/2021): plus vrai
+  // For OpenMP, only the aij format is multi-threaded:
+  // PL (01/2021): no longer true
   // mataij_=1;
 #endif
 
-  // Dans le cas de save_matrix_ en parallele
-  // Sinon, cela bloque avec sbaij:
+  // When saving save_matrix_ in parallel
+  // Otherwise, it blocks with sbaij:
   if (save_matrix()==1 && Process::is_parallel()) mataij_=1;
 
   // Error in PETSc when read/save the factored matrix if matrix is sbaij
@@ -2655,7 +2655,7 @@ void Solv_Petsc::check_aij(const Matrice_Morse& matrice)
 // Creation des objets PETSc
 void Solv_Petsc::Create_objects(const Matrice_Morse& mat, int blocksize)
 {
-  // Remplissage d'une matrice de preconditionnement non symetrique
+  // Fill a non-symmetric preconditioning matrix
   Mat MatricePrecondionnementPetsc;
   /* Semble plus vrai pour spai dans Petsc 3.10.0:
   if (matrice_symetrique_ && (type_pc_=="hypre" || type_pc_=="spai")) */
@@ -2712,7 +2712,7 @@ void Solv_Petsc::Create_objects(const Matrice_Morse& mat, int blocksize)
   static int message_affi = limpr() >= 0;
   if (solveur_direct_ == mumps)
     {
-      // Message pour prevenir
+      // Warning message
       if (message_affi)
         {
           Cout << "The LU decomposition of a matrix with ";
@@ -2737,15 +2737,15 @@ void Solv_Petsc::Create_objects(const Matrice_Morse& mat, int blocksize)
       PCFactorSetMatSolverType(PreconditionneurPetsc_, MATSOLVERMUMPS);
       if (!reduce_ram_)
         {
-          // Securite pour MUMPS avec augmentation de la memoire:
-          // Par defaut le cas PAR_Canal_incline_VEF plante sur 4 processeurs si -mat_mumps_icntl_14 inferieur a 35...
-          // On revient a 75 car parfois VEF_258 plante... C'est pas clair au niveau memoire...
-          // Passage a Petsc 3.3 necessite d'augmenter a plus de 75 car sinon Aero_192 crashe...
-          // A 90, le cas les_Re180Pr071_T0Q_jdd2 plante sur forchat (32bits)
-          // On differencie sequentiel (peu de memoire, mais estimation juste)
-          // et le calcul parallele (voir peut etre une separation entre plus et moins de 16 processeurs...)
-          // Peut etre equiper le script trust d'une detection des erreurs INFO(1)=-9 ...
-          // On passe de 35 a 40 pour faire passer le cas cavite_entrainee_2D_jdd2 (suite passage a MUMPS 5.2.0)
+          // Safety margin for MUMPS memory increase:
+          // By default, the PAR_Canal_incline_VEF case crashes on 4 processors if -mat_mumps_icntl_14 is below 35...
+          // Reverted to 75 because VEF_258 sometimes crashes... memory situation is unclear...
+          // Upgrading to PETSc 3.3 required raising the value above 75 otherwise Aero_192 crashes...
+          // At 90, the les_Re180Pr071_T0Q_jdd2 case crashes on forchat (32-bit)
+          // Distinguishing sequential (less memory, but accurate estimate)
+          // from parallel (possibly split further between more or fewer than 16 processors...)
+          // Consider adding INFO(1)=-9 error detection to the trust script...
+          // Raised from 35 to 40 to handle the cavite_entrainee_2D_jdd2 case (after moving to MUMPS 5.2.0)
           if (Process::is_sequential())
             add_option("mat_mumps_icntl_14", "40");
           else
@@ -3028,7 +3028,7 @@ void Solv_Petsc::Create_DM(const DoubleVect& b)
                   else
                     champ[prefix + std::to_string((long long) i)] = indices;
                 }
-              idx += nb_seq; //mise a jour du decalage (idx)
+              idx += nb_seq; //update of offset (idx)
             }
         }
 
@@ -3122,12 +3122,12 @@ void Solv_Petsc::Create_MatricePetsc(Mat& MatricePetsc, int mataij, const Matric
   /************************/
   if (mataij == 0)
     {
-      // On utilise SBAIJ pour une matrice symetrique (plus rapide que AIJ)
+      // Use SBAIJ for a symmetric matrix (faster than AIJ)
       MatSetType(MatricePetsc, MATSBAIJ);
     }
   else
     {
-      // On utilise AIJ car je n'arrive pas a faire marcher avec BAIJ
+      // Use AIJ because BAIJ could not be made to work
       MatType mtype = MATAIJ;
 #ifdef TRUST_USE_GPU
       if (gpu_)
@@ -3145,7 +3145,7 @@ void Solv_Petsc::Create_MatricePetsc(Mat& MatricePetsc, int mataij, const Matric
 #endif
       MatSetType(MatricePetsc, mtype);
     }
-  // Surcharge eventuelle par ligne de commande avec -mat_type:
+  // Possible override from command line with -mat_type:
   // Example: now possible to change aijcusparse to aijviennacl via CLI
   MatSetOptionsPrefix(MatricePetsc, option_prefix_);
   MatSetFromOptions(MatricePetsc);
@@ -3216,7 +3216,7 @@ void Solv_Petsc::Create_MatricePetsc(Mat& MatricePetsc, int mataij, const Matric
             {
               const auto k0 = tab1[i] - 1;
               const auto k1 = tab1[i + 1] - 1;
-              nnz[cpt] = k1 - k0; // Nombre d'elements non nuls sur la ligne i
+              nnz[cpt] = k1 - k0; // Number of non-zero elements on row i
               for (auto k = k0; k < k1; k++)
                 {
                   const int colonne_locale = tab2[k] - 1;
@@ -3275,18 +3275,18 @@ void Solv_Petsc::Create_MatricePetsc(Mat& MatricePetsc, int mataij, const Matric
             }
         }
     }
-  // ToDo: nettoyer la matrice TRUST en amont... Car le nnz des matrices peut varier (ex: implicite, Hyd_Cx_impl ou PolyMAC_HFV)
-  // et si on supprime les zeros de la matrice, lors d'un update on peut avoir une allocation -> erreur
+  // ToDo: clean the TRUST matrix upstream... Because nnz of matrices can vary (e.g. implicit, Hyd_Cx_impl or PolyMAC_HFV)
+  // and if zeros are removed from the matrix, an update can trigger an allocation -> error
   if (mataij_)
     {
       if (!mat_ignore_zero_entries_ || mat_morse.constant_stencil())
         MatSetOption(MatricePetsc, MAT_IGNORE_ZERO_ENTRIES, PETSC_FALSE); // Stocke les zeros st stencil constant
       else
         {
-          MatSetOption(MatricePetsc, MAT_IGNORE_ZERO_ENTRIES, PETSC_TRUE); // Ne stocke pas les zeros
+          MatSetOption(MatricePetsc, MAT_IGNORE_ZERO_ENTRIES, PETSC_TRUE); // Do not store zero entries
           if (verbose)
             {
-              ArrOfDouble nonzeros(2); // Pas ArrOfInt car nonzeros peut depasser 2^32 facilement - on n'a pas besoin d'un compte exact
+              ArrOfDouble nonzeros(2); // Not ArrOfInt because nonzeros can easily exceed 2^32 - an exact count is not needed
               nonzeros[0] = 0;
               nonzeros[1] = (double)mat_morse.nb_coeff();
               for (int i = 0; i < nonzeros[1]; i++)
@@ -3362,10 +3362,10 @@ void Solv_Petsc::Update_matrix(Mat& MatricePetsc, const Matrice_Morse& mat_morse
     }
   else
     {
-      // ligne par ligne avec un tableau coeff et tab2 qui contiennent
-      // les coefficients et les colonnes globales pour chaque ligne
-      // On dimensionne ces tableaux a la taille la plus grande possible
-      // ToDo : recalcul de nnz utile ?
+      // row by row with a coeff array and tab2 containing
+      // the coefficients and global columns for each row
+      // We size these arrays to the largest possible size
+      // ToDo : is recomputing nnz useful here?
       ArrOfInt nnz(nb_rows_);
       nnz = 0;
       ArrOfTID& renum_array = renum_;  // tab seen as a flat array (can't use ArrOfPetscInt& because of C++ ref cast...)
@@ -3375,10 +3375,10 @@ void Solv_Petsc::Update_matrix(Mat& MatricePetsc, const Matrice_Morse& mat_morse
       for (int i = 0; i < tab1.size_array() - 1; i++)
         if (items_to_keep_[i])
           {
-            nnz[cpt] = (int)(tab1[i + 1] - tab1[i]); // Nombre d'elements non nuls sur la ligne i
+            nnz[cpt] = (int)(tab1[i + 1] - tab1[i]); // Number of non-zero elements on row i
             cpt++;
           }
-      // Test sur nb_rows si nul (cas proc vide) car sinon max_array plante:
+      // Check nb_rows for zero (empty proc case) because max_array crashes otherwise:
       int size = (nb_rows_ == 0 ? 0 : max_array(nnz));
       ArrOfDouble coeff_tmp(size);
       ArrOfPetscInt tab2_tmp(size);
@@ -3414,7 +3414,7 @@ void Solv_Petsc::Update_matrix(Mat& MatricePetsc, const Matrice_Morse& mat_morse
                 }
               catch (...)
                 {
-                  // ToDo: changer car PETSc est en C: pas d'exception lancee
+                  // ToDo: change this since PETSc is in C: no exception is thrown
                   Cerr << "We detect that the PETSc matrix coefficients are changed without pre-allocation." << finl;
                   Cerr << "Try one of the following option:" << finl;
                   Cerr << "- Rebuild the matrix each time instead of updating the coefficients (slower)." << finl;
@@ -3481,7 +3481,7 @@ bool Solv_Petsc::detect_new_stencil(const Matrice_Morse& mat_morse)
   if (mat_morse.constant_stencil())
     return false;
 
-  // Est ce un nouveau stencil ?
+  // Is this a new stencil?
   Perf_counters::time_point start = statistics().start_clock();
   int new_stencil=0;
   if (!mataij_)

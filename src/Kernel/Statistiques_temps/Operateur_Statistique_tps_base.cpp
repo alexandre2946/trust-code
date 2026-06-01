@@ -17,10 +17,10 @@
 
 Implemente_base(Operateur_Statistique_tps_base,"Operateur_Statistique_tps_base",Objet_U);
 
-/*! @brief Imprime le nom et le type de l'operateur sur un flot de sortie.
+/*! @brief Prints the name and type of the operator to an output stream.
  *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param s an output stream
+ * @return the modified output stream
  */
 Sortie& Operateur_Statistique_tps_base::printOn(Sortie& s ) const
 {
@@ -28,10 +28,10 @@ Sortie& Operateur_Statistique_tps_base::printOn(Sortie& s ) const
 }
 
 
-/*! @brief NE FAIT RIEN
+/*! @brief Does nothing.
  *
- * @param (Entree& s) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param s an input stream
+ * @return the unmodified input stream
  */
 Entree& Operateur_Statistique_tps_base::readOn(Entree& s )
 {

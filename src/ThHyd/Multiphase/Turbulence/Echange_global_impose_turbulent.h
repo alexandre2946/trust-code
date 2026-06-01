@@ -21,10 +21,9 @@
 #include <TRUST_Ref.h>
 #include <TRUSTTab.h>
 
-/*! @brief Classe Echange_global_impose_turbulent
+/*! @brief Base class for turbulent boundary conditions of type Echange_global_impose.
  *
- *  Classe de base pour les CL turbulentes de type Echange_global_impose
- *  Utilisee seulement pour la turbulence de Pb_Multiphase
+ *  Used only for turbulence in Pb_Multiphase.
  *
  */
 class Echange_global_impose_turbulent : public Echange_global_impose
@@ -33,14 +32,14 @@ class Echange_global_impose_turbulent : public Echange_global_impose
 public:
   int compatible_avec_eqn(const Equation_base&) const override;
   virtual int initialiser(double temps) override;
-  virtual int avancer(double temps) override { return 1; } // Avancer ne fait rien car le champ est modifie dans mettre_a_jour
+  virtual int avancer(double temps) override { return 1; } // avancer does nothing because the field is updated in mettre_a_jour
   void mettre_a_jour(double tps) override;
   virtual void liste_faces_loi_paroi(IntTab&) override;
 
   void associer_fr_dis_base(const Frontiere_dis_base& fr) override { la_frontiere_dis = fr; }
   void associer_domaine_cl_dis_base(const Domaine_Cl_dis_base& zcl) override { mon_dom_cl_dis = zcl; }
 
-  // fonctions de cond_lim_base qui necessitent le champ_front qu'on met a zero car on fait abstraction du champ_front
+  // cond_lim_base functions that require champ_front, set to zero since we abstract away from champ_front
   void fixer_nb_valeurs_temporelles(int nb_cases) override { }
   inline Frontiere_dis_base& frontiere_dis() override { return la_frontiere_dis; }
   inline const Frontiere_dis_base& frontiere_dis() const override { return la_frontiere_dis; }

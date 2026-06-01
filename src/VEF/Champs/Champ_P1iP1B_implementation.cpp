@@ -71,12 +71,12 @@ double Champ_P1iP1B_implementation::valeur_a_elem_compo(const DoubleVect& positi
   return val;
 }
 
-// Recupere un tableau positions contenant des coordonnees de points
-// contenus dans les elements ranges dans le tableau les_polys
-// Renvoie le tableau val contenant les valeurs du champ aux points
+// Retrieves a positions array containing coordinates of points
+// contained in the elements stored in the les_polys array
+// Returns the val array containing the field values at those points
 DoubleTab& Champ_P1iP1B_implementation::valeur_aux_elems(const DoubleTab& positions, const IntVect& les_polys, DoubleTab& val) const
 {
-  // zs bien initialise en 3D
+  // zs is properly initialized in 3D
 
   const Domaine_VEF& zvef = domaine_vef();
   const Domaine& domaine_geom = zvef.domaine();
@@ -94,7 +94,7 @@ DoubleTab& Champ_P1iP1B_implementation::valeur_aux_elems(const DoubleTab& positi
   assert((val.dimension(0) == les_polys.size())||(val.dimension_tot(0) == les_polys.size()));
   assert(val.line_size() == nb_compo_);
 
-  // Filtrage du champ dans le tableau champ_filtre_
+  // Filter the field into the champ_filtre_ array
   champ_filtre_=filtrage(zvef,le_champ());
 
   if (nb_compo_ == 1)
@@ -112,10 +112,10 @@ DoubleTab& Champ_P1iP1B_implementation::valeur_aux_elems(const DoubleTab& positi
       Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__),les_polys_size, KOKKOS_LAMBDA(
                              const int rang_poly)
       {
-        // On initialise
+        // Initialize
         val_v(rang_poly,0) = 0.;
 
-        // On prend le_poly
+        // Take le_poly
         int le_poly=les_polys_v(rang_poly);
         if (le_poly != -1)
           {
@@ -129,8 +129,7 @@ DoubleTab& Champ_P1iP1B_implementation::valeur_aux_elems(const DoubleTab& positi
                 double ys = positions_v(rang_poly,1);
                 double zs = (dimension == 3) ? positions_v(rang_poly,2) : 0;
 
-                // Calcul par les fonctions de forme P1 du champ filtre
-                // au point (xs,yz,zs)
+                // Compute the filtered field at point (xs,ys,zs) using P1 shape functions
                 for (int i=0; i<dimension+1; i++)
                   {
                     int som = prs+sommet_poly_v(le_poly,i);
@@ -284,7 +283,7 @@ void assembler(const Domaine_VEF& domaine_VEF, Matrice& matrice)
   IntLists voisins(nb_som_tot);
   DoubleLists coeffs(nb_som_tot);
   DoubleVect diag(nb_som_tot);
-  // On parcourt toutes les aretes non periodiques:
+  // Loop over all non-periodic edges:
   for(int arete=0; arete<nb_arete_tot; arete++)
     {
       if (renum_arete_perio[arete]==arete)
@@ -308,7 +307,7 @@ void assembler(const Domaine_VEF& domaine_VEF, Matrice& matrice)
       if (diag(i)==0)
         {
           assert(i!=dom.get_renum_som_perio(i));
-          diag(i)=1; // Sommets periodiques
+          diag(i)=1; // Periodic vertices
         }
     }
   MatPoisson.dimensionner(nb_som_tot, nnz) ;
@@ -327,7 +326,7 @@ double second_membre(const Domaine_VEF& domaine_VEF, ArrOfDouble& Pa, DoubleVect
   const ArrOfInt& renum_arete_perio=domaine_VEF.get_renum_arete_perio();
   const Domaine& dom=domaine_VEF.domaine();
   secmem=0;
-  // On parcourt toutes les aretes non periodiques
+  // Loop over all non-periodic edges
   for(int arete=0; arete<nb_arete_tot; arete++)
     {
       if (renum_arete_perio[arete]==arete)
@@ -373,19 +372,19 @@ void corriger(const Domaine_VEF& domaine_VEF, DoubleTab& champ_filtre_, Matrice&
     {
       champ_filtre_.ensureDataOnHost(); // We need copy H2D as the Pa part of DoubleTab_parts is computed on host
       ToDo_Kokkos("critical for P0P1Pa");
-      DoubleVect& Pa = parties_P[2];  // partie aretes
+      DoubleVect& Pa = parties_P[2];  // edge part
 
-      // Si premier passage on assemble la matrice
+      // If first pass, assemble the matrix
       if (!matrice) assembler(domaine_VEF, matrice);
 
-      // Construction du second membre
+      // Build the right-hand side
       DoubleVect secmem;
       domaine_VEF.domaine().creer_tableau_sommets(secmem);
       second_membre(domaine_VEF, Pa, secmem);
 
-      // Calcul de la correction
+      // Compute the correction
       DoubleVect solution;
-      solution.copy(secmem, RESIZE_OPTIONS::NOCOPY_NOINIT); // Copie de la structure
+      solution.copy(secmem, RESIZE_OPTIONS::NOCOPY_NOINIT); // Copy of the structure
       solution = 0.;
 
       SolveurSys solveur;
@@ -396,7 +395,7 @@ void corriger(const Domaine_VEF& domaine_VEF, DoubleTab& champ_filtre_, Matrice&
       solveur.nommer("Pa_filter_solver");
       solveur.resoudre_systeme(matrice, secmem, solution);
 
-      // Application de la periodicite sur la solution:
+      // Apply periodicity to the solution:
       const Domaine& dom=domaine_VEF.domaine();
       for(int i=0; i<nb_som; i++)
         {
@@ -405,11 +404,11 @@ void corriger(const Domaine_VEF& domaine_VEF, DoubleTab& champ_filtre_, Matrice&
             solution(i)=solution(som);
         }
 
-      // Correction de Ps:
+      // Correction of Ps:
       for(int som=0; som<nb_som; som++)
         Ps(som) += solution(som);
 
-      // Correction de Pa:
+      // Correction of Pa:
       int nb_arete = domaine_VEF.domaine().nb_aretes();
       const IntTab& aretes_som=domaine_VEF.domaine().aretes_som();
       const ArrOfInt& ok_arete=domaine_VEF.get_ok_arete();
@@ -431,7 +430,7 @@ void corriger(const Domaine_VEF& domaine_VEF, DoubleTab& champ_filtre_, Matrice&
           Pa(arete)-=sigma*coeff_inv;
         }
 
-      // Correction de Pk:
+      // Correction of Pk:
       const IntTab& les_elems = domaine_VEF.domaine().les_elems();
       int nb_som_par_elem=les_elems.dimension_tot(1);
       for(int elem=0; elem<nb_elem; elem++)
@@ -443,28 +442,28 @@ void corriger(const Domaine_VEF& domaine_VEF, DoubleTab& champ_filtre_, Matrice&
         }
     }
 
-  // Filtrage L2:
-  double moyenne_K = mp_moyenne_vect(Pk);                // Calcul de la moyenne du champ aux elements
-  Pk -= moyenne_K;                                 // Correction des elements du champ_filtre_
-  Ps += moyenne_K;                                 // Correction des sommets du champ_filtre_
+  // L2 filtering:
+  double moyenne_K = mp_moyenne_vect(Pk);                // Compute the mean of the element field
+  Pk -= moyenne_K;                                 // Correction of elements of champ_filtre_
+  Ps += moyenne_K;                                 // Correction of vertices of champ_filtre_
 
-  // On retranche a Ps sa moyenne si pas de Cl de Neumann pour avoir une moyenne nulle
-  // Il faudrait peut etre mieux faire cela dans Assembleur_P_VEFPreP1B::modifier_solution
-  // si cela est possible...
+  // Subtract the mean from Ps if there is no Neumann BC, to impose a zero mean
+  // It might be better to do this in Assembleur_P_VEFPreP1B::modifier_solution
+  // if possible...
   assert(Condition_Neumann_imposee_!=-1);
 
   if (!Condition_Neumann_imposee_)
     {
-      // L'espace virtuel de Ps n'a pas besoin d'etre a jour pour calculer correctement la moyenne
-      Ps -= mp_moyenne_vect(Ps); // Correction des sommets du champ_filtre_
+      // The virtual space of Ps does not need to be up to date to correctly compute the mean
+      Ps -= mp_moyenne_vect(Ps); // Correction of vertices of champ_filtre_
     }
 
-  champ_filtre_.echange_espace_virtuel();         // Mise a jour des espaces virtuels
+  champ_filtre_.echange_espace_virtuel();         // Update of virtual spaces
 }
 
 DoubleTab& Champ_P1iP1B_implementation::filtrage(const Domaine_VEF& zvef, const Champ_base& un_champ, bool implicitCoupling) const
 {
-  // Filtrage si supports element et sommet presents au moins
+  // Filter only if both element and vertex supports are present
   if (zvef.get_alphaE() && zvef.get_alphaS())
     {
       // No filtering if it has already been done on this field during the time step
@@ -497,9 +496,9 @@ DoubleTab& Champ_P1iP1B_implementation::filtrage(const Domaine_VEF& zvef, const 
     }
 }
 
-// Fixe Condition_Neumann_imposee_ a 1 si il existe une CL de Neumann 0 sinon
-// Si pas de condition de Neumann, on imposera une moyenne nulle dans le filtrage du champ
-// pour avoir le meme champ en sequentiel et en parallele
+// Sets Condition_Neumann_imposee_ to 1 if a Neumann BC exists, 0 otherwise
+// If there is no Neumann condition, a zero mean will be imposed during field filtering
+// to get the same field in sequential and parallel runs
 void Champ_P1iP1B_implementation::completer(const Domaine_Cl_dis_base& zcl)
 {
   const Conds_lim& les_cl = zcl.les_conditions_limites();
@@ -525,7 +524,7 @@ DoubleTab& Champ_P1iP1B_implementation::trace(const Frontiere_dis_base& fr, cons
   DoubleTab cg_faces_fr(nb_faces_fr,Objet_U::dimension);
   DoubleTab val_interp(nb_faces_fr, 1);
 
-  //On recupere les elements voisins des faces de la frontiere
+  // Retrieve the neighboring elements of the boundary faces
   for (int i=0; i<nb_faces_fr; i++)
     {
       face = fr_vf.num_premiere_face()+i;
@@ -535,8 +534,8 @@ DoubleTab& Champ_P1iP1B_implementation::trace(const Frontiere_dis_base& fr, cons
       elem_voisins(i) = elem;
     }
 
-  //Remplissage du tableau contenant les coordonnees
-  //du centre de gravite des faces de la frontiere
+  // Fill the array containing the coordinates
+  // of the centroid of the boundary faces
   for (int num_face=0; num_face<nb_faces_fr; num_face++)
     for (int dim=0; dim<Objet_U::dimension; dim++)
       {
@@ -544,7 +543,7 @@ DoubleTab& Champ_P1iP1B_implementation::trace(const Frontiere_dis_base& fr, cons
         cg_faces_fr(num_face,dim) = cg_faces(face,dim);
       }
 
-  //Interpolation des valeurs du champ au centre de gravite des faces frontieres
+  // Interpolate field values at the centroid of boundary faces
   valeur_aux_elems(cg_faces_fr,elem_voisins,val_interp);
 
   for (int i=0; i<nb_faces_fr; i++)

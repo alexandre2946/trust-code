@@ -43,16 +43,16 @@ Entree& Champ_Face_PolyMAC_CDO::readOn(Entree& is) { return is; }
 
 int Champ_Face_PolyMAC_CDO::fixer_nb_valeurs_nodales(int n)
 {
-  // j'utilise le meme genre de code que dans Champ_Fonc_P0_base sauf que je recupere le nombre de faces au lieu du nombre d'elements
-  // je suis tout de meme etonne du code utilise dans Champ_Fonc_P0_base::fixer_nb_valeurs_nodales() pour recuperer le domaine discrete...
+  // use the same kind of code as in Champ_Fonc_P0_base, but retrieve the number of faces instead of the number of elements
+  // note: the code used in Champ_Fonc_P0_base::fixer_nb_valeurs_nodales() to retrieve the discrete domain is somewhat surprising...
 
   const Champ_Inc_base& self = ref_cast(Champ_Inc_base, *this);
   const Domaine_PolyMAC_CDO& domaine = ref_cast(Domaine_PolyMAC_CDO,self.domaine_dis_base());
 
   assert(n == domaine.nb_faces() + (dimension < 3 ? domaine.nb_som() : domaine.domaine().nb_aretes()));
 
-  // Probleme: nb_comp vaut 2 mais on ne veut qu'une dimension !!!
-  // HACK :
+  // Problem: nb_comp equals 2 but we only want one dimension !!!
+  // HACK:
   int old_nb_compo = nb_compo_;
   nb_compo_ = 1;
   creer_tableau_distribue(domaine.mdv_faces_aretes);
@@ -64,7 +64,7 @@ Champ_base& Champ_Face_PolyMAC_CDO::affecter_(const Champ_base& ch)
 {
   const DoubleTab& v = ch.valeurs();
   DoubleTab_parts parts(valeurs());
-  DoubleTab& val = parts[0]; //partie vitesses
+  DoubleTab& val = parts[0]; //velocity part
   const Domaine_VF& domaine_PolyMAC_CDO = ref_cast( Domaine_VF,le_dom_VF.valeur());
   int nb_faces = domaine_PolyMAC_CDO.nb_faces();
   const DoubleVect& surface = domaine_PolyMAC_CDO.face_surfaces();
@@ -117,7 +117,7 @@ double Champ_Face_PolyMAC_CDO::valeur_a_elem_compo(const DoubleVect& position, i
   throw;
 }
 
-//interpolation de l'integrale de v autour d'une arete duale, multipliee par la longueur de l'arete
+//interpolation of the integral of v around a dual edge, multiplied by the edge length
 void Champ_Face_PolyMAC_CDO::init_ra() const
 {
   const Domaine_PolyMAC_CDO& domaine = ref_cast(Domaine_PolyMAC_CDO,domaine_vf());
@@ -135,15 +135,15 @@ void Champ_Face_PolyMAC_CDO::init_ra() const
   std::map<int, std::array<double, 3> > ramf;
   for (a = 0; a < xa.dimension_tot(0); radeb.append_line(raji.dimension(0), rajf.dimension(0)), rami.clear(), ramf.clear(), a++)
     {
-      //contribution de chaque face entourant l'arete
+      //contribution from each face surrounding the edge
       for (i = 0; i < a_f.dimension(1) && (f = a_f(a, i)) >= 0; i++)
         {
-          //sens par rapport a l'arete
-          std::array<double, 3> taz = {{ 0, 0, 1 }}, vec; //vecteur tangent a l'arete et produit vectoriel de celui-ci avec xv - xa
+          //orientation relative to the edge
+          std::array<double, 3> taz = {{ 0, 0, 1 }}, vec; //tangent vector to the edge and its cross product with xv - xa
           vec = domaine.cross(3, dimension, dimension < 3 ? &taz[0] : &ta(a, 0), &xv(f, 0), nullptr, dimension < 3 ? &xs(a, 0): &xa(a, 0));
           int sgn = domaine.dot(&vec[0], &nf(f, 0)) > 0 ? 1 : -1;
 
-          //partie m2
+          //m2 contribution
           for (j = 0; j < 2 && (e = f_e(f, j)) >= 0; j++)
             for (k = domaine.m2d(e), idx = 0; k < domaine.m2d(e + 1); k++, idx++)
               for (l = domaine.m2i(k); f == e_f(e, idx) && l < domaine.m2i(k + 1); l++)
@@ -151,7 +151,7 @@ void Champ_Face_PolyMAC_CDO::init_ra() const
                 else if (fcl_(fb, 0) == 3)
                   for (r = 0; r < dimension; r++)
                     ramf[fb][r] += sgn * (e == f_e(f, 0) ? 1 : -1) * (e == f_e(fb, 0) ? 1 : -1) * ve(e) * domaine.m2c(l) / fs(f) * nf(fb, r) / fs(fb);
-          //partie "bord" -> avec va si Neumann ou Symetrie, avec val_imp si Dirichlet_homogene
+          //boundary part -> with va if Neumann or Symetrie, with val_imp if Dirichlet_homogene
           if (fcl_(f, 0) == 1 || fcl_(f, 0) == 2)
             {
               for (k = vadeb(a, 0); k < vadeb(a + 1, 0); k++) rami[vaji(k)] += sgn * domaine.dot(&xa(a, 0), &vaci(k, 0), &xv(f, 0));
@@ -161,7 +161,7 @@ void Champ_Face_PolyMAC_CDO::init_ra() const
             for (k = 0; k < dimension; k++)
               ramf[f][k] += sgn * (xa(a, k) - xv(f, k));
         }
-      //remplissage
+      //filling
       double la = dimension < 3 ? 1 : domaine.longueur_aretes()(a);
       for (auto &&kv : rami)
         if (std::fabs(kv.second) > 1e-8 * la)
@@ -173,7 +173,7 @@ void Champ_Face_PolyMAC_CDO::init_ra() const
   CRIMP(radeb), CRIMP(raji), CRIMP(rajf), CRIMP(raci), CRIMP(racf);
 }
 
-//interpolation aux aretes de la vitesse (dans le plan normal a chaque arete)
+//interpolation of velocity at edges (in the plane normal to each edge)
 void Champ_Face_PolyMAC_CDO::init_va() const
 {
   const Domaine_PolyMAC_CDO& domaine = ref_cast(Domaine_PolyMAC_CDO,domaine_vf());
@@ -194,20 +194,20 @@ void Champ_Face_PolyMAC_CDO::init_va() const
   Matrice33 M, iM;
   for (a = 0; a < xa.dimension_tot(0); vadeb.append_line(vaji.dimension(0), vajf.dimension(0)), vami.clear(), vamf.clear(), a++)
     {
-      /* liste des faces ordonnee dans le sens trigo */
-      //base locale
+      /* list of faces ordered in trigonometric (counter-clockwise) order */
+      //local basis
       std::array<double, 3> taz = {{ 0, 0, 1 }}, v0 = domaine.cross(3, dimension, dimension < 3 ? &taz[0] : &ta(a, 0), &xv(a_f(a, 0), 0), nullptr, &xa(a, 0)),
       v1 = domaine.cross(3, 3, dimension < 3 ? &taz[0] : &ta(a, 0), &v0[0]);
-      // liste des faces, ordonnee en tournant dans la base locale
+      // list of faces, ordered by rotating in the local basis
       std::map<double, int> fmap;
       for (i = 0; i < a_f.dimension(1) && (f = a_f(a, i)) >= 0; i++) fmap[atan2(domaine.dot(&xv(f, 0), &v1[0], &xa(a, 0)), domaine.dot(&xv(f, 0), &v0[0], &xa(a, 0)))] = f;
       std::vector<int> fas, sgn;
       for (auto && kv : fmap) fas.push_back(kv.second);
-      //orientation des faces
-      /* calcul de l'interpolation */
-      DoubleTrav xe((int)fas.size(), dimension), surf((int)fas.size(), 2), nsurf((int)fas.size(), 2, 3); //points intermediaires entre les xv, surfaces et normales des triangles de l'arete duale
-      double surf_tot = 0, xg[3] = { 0, 0, 0 }; //surface totale, centre de gravite, normale a l'arete
-      //orientations des faces par rapport au contour
+      //face orientations
+      /* compute the interpolation */
+      DoubleTrav xe((int)fas.size(), dimension), surf((int)fas.size(), 2), nsurf((int)fas.size(), 2, 3); //intermediate points between xv, surfaces and normals of the dual edge triangles
+      double surf_tot = 0, xg[3] = { 0, 0, 0 }; //total surface, center of gravity, normal to the edge
+      //orientations of faces relative to the contour
       for (i = 0; i < (int) fas.size(); i++)
         {
           std::array <double, 3> vec = domaine.cross(3, dimension, dimension < 3 ? &taz[0] : &ta(a, 0), &xv(fas[i], 0), nullptr, &xa(a, 0));
@@ -215,13 +215,13 @@ void Champ_Face_PolyMAC_CDO::init_va() const
         }
       for (i = 0; i < (int) fas.size(); i++)
         {
-          //points intermediaires entre faces (pas forcement xp)
+          //intermediate points between faces (not necessarily xp)
           int fa[2] = { f = fas[i], fb = fas[(i + 1) * (i + 1 < (int) fas.size())] }, sgfa[2] = { sgn[i], sgn[(i + 1) * (i + 1 < (int) fas.size())] };
-          if (domaine.dot(&xv(fb, 0), &nf(f, 0), &xv(f, 0)) * sgn[i] < 0) //angle > 180 -> on passe par xa
+          if (domaine.dot(&xv(fb, 0), &nf(f, 0), &xv(f, 0)) * sgn[i] < 0) //angle > 180 -> go through xa
             for (k = 0; k < dimension; k++) xe(i, k) = xa(a, k);
           else if (domaine.dot(&xv(f, 0), &xv(fb, 0), &xa(a, 0), &xa(a, 0)) - (dimension < 3 ? 0 : domaine.dot(&xv(f, 0), &ta(a, 0), &xa(a, 0)) * domaine.dot(&xv(fb, 0), &ta(a, 0), &xa(a, 0))) <= 0) //angle obtus -> parallelogramme
             for (k = 0; k < dimension; k++) xe(i, k) = xv(f, k) + xv(fb, k) - xa(a, k);
-          else //angle aigu -> intersection des normales aux faces. On resout (xe - xv).(xv - xa) = 0 pour les deux faces, et xe.ta = ta.(xf + xfb) / 2 en 3D
+          else //acute angle -> intersection of face normals. Solve (xe - xv).(xv - xa) = 0 for both faces, and xe.ta = ta.(xf + xfb) / 2 in 3D
             {
               double s[3];
               for (j = 0; j < 2; j++)
@@ -232,7 +232,7 @@ void Champ_Face_PolyMAC_CDO::init_va() const
               double eps = Matrice33::inverse(M, iM, 0);
               for (j = 0; eps != 0 && j < dimension; j++)
                 for (k = 0, xe(i, j) = xa(a, j); k < dimension; k++) xe(i, j) += iM(j, k) * s[k];
-              //si xe se retrouve du mauvais cote d'une des faces, on prend xp (si l'element existe) ou xf + xfb / 2 (sinon)
+              //if xe ends up on the wrong side of a face, use xp (if the element exists) or xf + xfb / 2 (otherwise)
               if (eps == 0 || domaine.dot(&xe(i, 0), &nf(f, 0), &xv(f, 0)) * sgfa[0] < 0 || domaine.dot(&xe(i, 0), &nf(fb, 0), &xv(fb, 0)) * sgfa[1] > 0)
                 {
                   if ((e = f_e(f, sgfa[0] > 0)) >= 0)
@@ -241,11 +241,11 @@ void Champ_Face_PolyMAC_CDO::init_va() const
                 }
             }
 
-          //surfaces et centre de gravite
+          //surfaces and center of gravity
           for (j = 0; j < 2; j++)
             {
               std::array<double, 3> vsurf3 = domaine.cross(dimension, dimension, &xe(i, 0), &xv(fa[j], 0), &xa(a, 0), &xa(a, 0));
-              //orientation par rapport a ta
+              //orientation relative to ta
               for (k = 0, l = (dimension < 3 ? vsurf3[2] < 0 : domaine.dot(&ta(a, 0), &vsurf3[0]) < 0); k < 3; k++) vsurf3[k] *=  (l ? -1. : 1.) / 2;
               surf(i, j) = dimension < 3 ? std::fabs(vsurf3[2]) : sqrt(domaine.dot(&vsurf3[0], &vsurf3[0]));
               surf_tot += surf(i, j);
@@ -257,18 +257,18 @@ void Champ_Face_PolyMAC_CDO::init_va() const
 
       if (!surf_tot) continue;
       M = Matrice33(surf_tot, 0, 0, 0, surf_tot, 0, 0, 0, surf_tot);
-      /* boucles sur les triangles de l'arete duale */
+      /* loops over the triangles of the dual edge */
       std::array<double, 3> vec;
       for (i = 0; i < (int) fas.size(); i++)
         for (j = 0; j < 2; j++)
           if (surf(i, j) > 1e-16)
             {
-              f = fas[(i + j) * (i + j < (int) fas.size())], e = f_e(f, sgn[i] > 0); //face, element (si il existe)
-              double x[2][3] = { { 0, }, }; //points sur le contour : xv(fa[i]) -> xe(i) (j = 0) ou xe(i) -> xv (fa[i + 1]) (j = 1)
+              f = fas[(i + j) * (i + j < (int) fas.size())], e = f_e(f, sgn[i] > 0); //face, element (if it exists)
+              double x[2][3] = { { 0, }, }; //boundary points: xv(fa[i]) -> xe(i) (j = 0) or xe(i) -> xv(fa[i + 1]) (j = 1)
               for (k = 0; k < 2; k++)
                 for (l = 0; l < dimension; l++) x[k][l] = j == k ? xv(f, l) : xe(i, l);
 
-              //segments arete-points : avec va
+              //edge-point segments: using va
               for (k = 0; k < 2; k++)
                 {
                   for (l = 0; l < dimension; l++) vec[l] = (xa(a, l) + x[k][l]) / 2 - xg[l];
@@ -280,7 +280,7 @@ void Champ_Face_PolyMAC_CDO::init_va() const
               //segment x[0] -> x[1]
               for (k = 0; k < dimension; k++) vec[k] = (x[0][k] + x[1][k]) / 2 - xg[k];
               vec = domaine.cross(3, dimension, &nsurf(i, j, 0), &vec[0]);
-              //partie vf
+              //vf part
               if (fcl_(f, 0) < 2)
                 for (k = 0; k < dimension; k++)
                   vami[f][k] += domaine.dot(x[1], &nf(f, 0), x[0]) / fs(f) * vec[k];
@@ -288,7 +288,7 @@ void Champ_Face_PolyMAC_CDO::init_va() const
                 for (k = 0; k < dimension; k++)
                   for (l = 0; l < dimension; l++)
                     vamf[ {{ f, l }}][l] += domaine.dot(x[1], &nf(f, 0), x[0]) / fs(f) * vec[k] * nf(f, l) / fs(f);
-              //complement : avec ve (e >= 0) / val_imp (Dirichlet) / va (Neumann/Symetrie)
+              //complement: using ve (e >= 0) / imposed value (Dirichlet) / va (Neumann/Symmetry)
               if (e >= 0)
                 for (k = domaine.vedeb(e); k < domaine.vedeb(e + 1); k++) //ve
                   {
@@ -303,14 +303,14 @@ void Champ_Face_PolyMAC_CDO::init_va() const
                   }
               else if (fcl_(f, 0) == 3)
                 for (k = 0; k < dimension; k++)
-                  for (l = 0; l < dimension; l++) //val_imp
+                  for (l = 0; l < dimension; l++) //imposed value
                     vamf[ {{ f, k }}][l] += (x[1][k] - x[0][k] - domaine.dot(x[1], &nf(f, 0), x[0]) * nf(f, k) / (fs(f) * fs(f))) * vec[l];
               else if (fcl_(f, 0) == 1 || fcl_(f, 0) == 2)
                 for (k = 0; k < dimension; k++)
                   for (l = 0; l < dimension; l++) //va
                     M(k, l) -= (x[1][l] - x[0][l] - domaine.dot(x[1], &nf(f, 0), x[0]) * nf(f, l) / (fs(f) * fs(f))) * vec[k];
 
-              //partie normale au triangle (3D seulement): avec vf/ve/val_imp egalement
+              //normal part of the triangle (3D only): also using vf/ve/imposed value
               if (dimension < 3) continue;
               else if (e >= 0)
                 for (k = domaine.vedeb(e); k < domaine.vedeb(e + 1); k++) //ve
@@ -325,7 +325,7 @@ void Champ_Face_PolyMAC_CDO::init_va() const
                   }
               else if (fcl_(f, 0) == 3)
                 for (k = 0; k < dimension; k++)
-                  for (l = 0; l < dimension; l++) //val_imp
+                  for (l = 0; l < dimension; l++) //imposed value
                     vamf[ {{ f, k }}][l] += surf(i, j) * nsurf(i, j, k) * nsurf(i, j, l);
               else if (fcl_(f, 0) == 1 || fcl_(f, 0) == 2)
                 for (k = 0; k < dimension; k++)
@@ -333,7 +333,7 @@ void Champ_Face_PolyMAC_CDO::init_va() const
                     M(k, l) -= surf(i, j) * nsurf(i, j, k) * nsurf(i, j, l);
             }
 
-      //inversion de M et remplissage
+      //inversion of M and filling
       double eps = Matrice33::inverse(M, iM, 0);
       if (std::fabs(eps) < 1e-24) continue;
       for (auto && kv : vami)
@@ -354,7 +354,7 @@ void Champ_Face_PolyMAC_CDO::init_va() const
   CRIMP(vadeb), CRIMP(vaji), CRIMP(vajf), CRIMP(vaci), CRIMP(vacf);
 }
 
-/* vitesse aux elements */
+/* velocity at elements */
 void Champ_Face_PolyMAC_CDO::interp_ve(const DoubleTab& inco, DoubleTab& val, bool is_vit) const
 {
   const Domaine_PolyMAC_CDO& domaine = ref_cast(Domaine_PolyMAC_CDO,domaine_vf());
@@ -382,7 +382,7 @@ void Champ_Face_PolyMAC_CDO::interp_ve(const DoubleTab& inco, DoubleTab& val, bo
 
       for (e = 0; e < val.dimension(0); e++)
         for (j = domaine.vedeb(e); j < domaine.vedeb(e + 1); j++)
-          if (fcl_(f = domaine.veji(j), 0) < 2) //vitesse calculee
+          if (fcl_(f = domaine.veji(j), 0) < 2) //computed velocity
             {
               const double coef = is_vit && pf ? (*pf)(f) / (*pe)(e) : 1.0;
               for (r = 0; r < dimension; r++) val(e, r) += domaine.veci(j, r) * inco(f) * coef;
@@ -397,7 +397,7 @@ void Champ_Face_PolyMAC_CDO::interp_ve(const DoubleTab& inco, DoubleTab& val, bo
     }
 }
 
-/* vitesse aux elements sur une liste d'elements */
+/* velocity at elements over a list of elements */
 void Champ_Face_PolyMAC_CDO::interp_ve(const DoubleTab& inco, const IntVect& les_polys, DoubleTab& val, bool is_vit) const
 {
   const Domaine_PolyMAC_CDO& domaine = ref_cast(Domaine_PolyMAC_CDO,domaine_vf());
@@ -422,7 +422,7 @@ void Champ_Face_PolyMAC_CDO::interp_ve(const DoubleTab& inco, const IntVect& les
     }
 }
 
-/* gradient d_j v_i aux elements */
+/* gradient d_j v_i at elements */
 void Champ_Face_PolyMAC_CDO::interp_gve(const DoubleTab& inco, DoubleTab& vals) const
 {
   const Domaine_PolyMAC_CDO& domaine = ref_cast(Domaine_PolyMAC_CDO,domaine_vf());
@@ -434,35 +434,35 @@ void Champ_Face_PolyMAC_CDO::interp_gve(const DoubleTab& inco, DoubleTab& vals) 
   double scal;
 
   domaine.init_m2solv();
-  //vitesses aux elements, gradient de chaque composante aux faces
+  //velocities at elements, gradient of each component at faces
   DoubleTrav ve1(0, dimension);
   domaine.domaine().creer_tableau_elements(ve1);
   interp_ve(inco, ve1);
 
-  //gradient aux faces duales, champ (nf.grad)v (obtenu en inversant m2)
+  //gradient at dual faces, field (nf.grad)v (obtained by inverting m2)
   DoubleTrav gv(domaine.nb_faces_tot(), dimension), cgv, ngv;
   domaine.creer_tableau_faces(cgv), domaine.creer_tableau_faces(ngv);
   for (f = 0; f < domaine.nb_faces_tot(); f++)
-    if (fcl_(f, 0) != 1) //gve = 0 si Neumann
+    if (fcl_(f, 0) != 1) //gve = 0 if Neumann
       {
         for (i = 0; i < 2; i++)
           if ((e = f_e(f, i)) >= 0)
-            for (k = 0; k < dimension; k++) gv(f, k) += (i ? 1 : -1) * fs(f) * ve1(e, k); //element interne -> avec ve1
+            for (k = 0; k < dimension; k++) gv(f, k) += (i ? 1 : -1) * fs(f) * ve1(e, k); //internal element -> using ve1
           else if (fcl_(f, 0) == 3)
-            for (k = 0; k < dimension; k++) //bord de Dirichlet -> avec val_imp
+            for (k = 0; k < dimension; k++) //Dirichlet boundary -> using imposed value
               gv(f, k) += (i ? 1 : -1) * fs(f) * ref_cast(Dirichlet, cls[fcl_(f, 1)].valeur()).val_imp(fcl_(f, 2), k);
-        //si Symetrie -> on ne garde que la composante normale a la face
+        //if Symmetry -> keep only the normal component at the face
         if (fcl_(f, 0) == 2)
           for (k = 0, scal = domaine.dot(&nf(f, 0), &gv(f, 0)) / fs(f); k < dimension; k++) gv(f, k) = scal * nf(f, k) / fs(f);
       }
 
-  //pour chaque composante :
+  //for each component:
   for (k = 0; k < dimension; k++)
     {
-      /* inversion de m2 -> pour obtenir (nf.grad) v_k */
+      /* invert m2 -> to obtain (nf.grad) v_k */
       for (f = 0; f < domaine.nb_faces_tot(); f++) cgv(f) = gv(f, k);
       domaine.m2solv.resoudre_systeme(domaine.m2mat, cgv, ngv);
-      /* reinterpolation aux elements -> grad v_k */
+      /* re-interpolation at elements -> grad v_k */
       for (e = 0; e < domaine.nb_elem(); e++)
         for (i = domaine.vedeb(e); i < domaine.vedeb(e + 1); i++)
           for (j = 0; j < dimension; j++)
@@ -485,11 +485,11 @@ DoubleTab& Champ_Face_PolyMAC_CDO::valeur_aux_elems_(const DoubleTab& val_face, 
   if (nb_compo == 1)
     Process::exit("TRUST error in Champ_Face_PolyMAC_CDO::valeur_aux_elems_ : A scalar field cannot be of Champ_Face type !");
 
-  // seulement si Champ_Face_PolyMAC_CDO car interp_ve est besoin de mon_dom_cl_dis ...
+  // only if Champ_Face_PolyMAC_CDO because interp_ve needs mon_dom_cl_dis ...
   if (!mon_dom_cl_dis && que_suis_je() == "Champ_Face_PolyMAC_CDO")
-    return val_elem; //on ne peut rien faire tant qu'on ne connait pas les CLs
+    return val_elem; //nothing can be done until the boundary conditions are known
 
-  //on interpole ve sur tous les elements, puis on se restreint a les_polys
+  //interpolate ve over all elements, then restrict to les_polys
   DoubleTrav ve(0, N * D);
   const Domaine_VF& domdom = ref_cast(Domaine_VF, domaine_vf());
   domdom.domaine().creer_tableau_elements(ve);
@@ -527,11 +527,11 @@ DoubleVect& Champ_Face_PolyMAC_CDO::valeur_aux_elems_compo(const DoubleTab& posi
   const Champ_base& cha=le_champ();
   assert(val.size_totale() >= les_polys.size());
 
-  // seulement si Champ_Face_PolyMAC_CDO car interp_ve est besoin de mon_dom_cl_dis ...
+  // only if Champ_Face_PolyMAC_CDO because interp_ve needs mon_dom_cl_dis ...
   if (!mon_dom_cl_dis && que_suis_je() ==  "Champ_Face_PolyMAC_CDO")
-    return val; //on ne peut rien faire tant qu'on ne connait pas les CLs
+    return val; //nothing can be done until the boundary conditions are known
 
-  //on interpole ve sur tous les elements, puis on se restreint a les_polys
+  //interpolate ve over all elements, then restrict to les_polys
   DoubleTrav ve(0, dimension * cha.valeurs().line_size());
   ref_cast(Domaine_VF,domaine_vf()).domaine().creer_tableau_elements(ve);
   if (polymac_flica5 && que_suis_je() == "Champ_Face_PolyMAC_CDO")
@@ -577,7 +577,7 @@ DoubleTab& Champ_Face_PolyMAC_CDO::valeur_aux_faces(DoubleTab& val) const
 
 DoubleVect& Champ_Face_PolyMAC_CDO::calcul_S_barre_sans_contrib_paroi(const DoubleTab& vitesse, DoubleVect& SMA_barre) const
 {
-  // avec contrib au bord pour l'instant...
+  // with boundary contribution for now...
   abort();
   return calcul_S_barre(vitesse, SMA_barre);
 }

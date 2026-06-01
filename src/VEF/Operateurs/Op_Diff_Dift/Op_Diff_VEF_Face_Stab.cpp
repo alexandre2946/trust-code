@@ -134,9 +134,8 @@ DoubleTab& Op_Diff_VEF_Face_Stab::ajouter(const DoubleTab& inconnue_org, DoubleT
   const int nb_elem_tot=domaine_VEF.nb_elem_tot();
   const int nb_faces_elem=domaine_VEF.domaine().nb_faces_elem();
 
-  // soit on a div(phi nu grad inco)
-  // soit on a div(nu grad phi inco)
-  // cela depend si on diffuse phi_psi ou psi
+  // either div(phi nu grad inco) or div(nu grad phi inco)
+  // depending on whether phi_psi or psi is being diffused
   DoubleTab nu;
   DoubleTab tab_inconnue;
 
@@ -166,7 +165,7 @@ DoubleTab& Op_Diff_VEF_Face_Stab::ajouter(const DoubleTab& inconnue_org, DoubleT
 
   modifier_flux(*this);
 
-  resu-=resu2;//-= car le laplacien est place en terme source dans l'equation
+  resu-=resu2;//-= because the Laplacian is placed as a source term in the equation
   return resu;
 }
 
@@ -462,17 +461,17 @@ void Op_Diff_VEF_Face_Stab::ajouter_antidiffusion(const DoubleTab& Aij, const Do
                     muij=calculer_gradients(facei,rij);
                     muji=calculer_gradients(facej,rji);
 
-                    sij=0.; //reste a 0 si que des faces de Dirichlet
+                    sij=0.; //remains 0 if all faces are Dirichlet
                     if (delta_ij>0.)
                       {
                         muij*=delta_imax;
                         muji*=-delta_jmin;
 
-                        if (!ok_facei && !ok_facej) //pas de face de Dirichlet
+                        if (!ok_facei && !ok_facej) //no Dirichlet face
                           sij=minimum(muij,delta_ij,muji);
-                        if (!ok_facei && ok_facej) //facej Dirichlet et pas facei
+                        if (!ok_facei && ok_facej) //facej is Dirichlet, facei is not
                           sij=minimum(muij,delta_ij);
-                        if (ok_facei && !ok_facej) //facei Dirichlet et pas facej
+                        if (ok_facei && !ok_facej) //facei is Dirichlet, facej is not
                           sij=minimum(delta_ij,muji);
                       }
                     else if (delta_ij<0.)
@@ -480,11 +479,11 @@ void Op_Diff_VEF_Face_Stab::ajouter_antidiffusion(const DoubleTab& Aij, const Do
                         muij*=delta_imin;
                         muji*=-delta_jmax;
 
-                        if (!ok_facei && !ok_facej) //pas de face de Dirichlet
+                        if (!ok_facei && !ok_facej) //no Dirichlet face
                           sij=maximum(muij,delta_ij,muji);
-                        if (!ok_facei && ok_facej) //facej Dirichlet et pas facei
+                        if (!ok_facei && ok_facej) //facej is Dirichlet, facei is not
                           sij=maximum(muij,delta_ij);
-                        if (ok_facei && !ok_facej) //facei Dirichlet et pas facej
+                        if (ok_facei && !ok_facej) //facei is Dirichlet, facej is not
                           sij=maximum(delta_ij,muji);
                       }
 
@@ -855,9 +854,8 @@ void Op_Diff_VEF_Face_Stab::ajouter_contribution(const DoubleTab& transporte, Ma
   else
     {
       modifier_matrice_pour_periodique_avant_contribuer(matrice,equation());
-      // On remplit le tableau nu car l'assemblage d'une
-      // matrice avec ajouter_contribution peut se faire
-      // avant le premier pas de temps
+      // Fill the nu array because matrix assembly with
+      // ajouter_contribution may occur before the first time step
       remplir_nu(nu_);
       const Domaine_Cl_VEF& domaine_Cl_VEF = la_zcl_vef.valeur();
       const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
@@ -872,9 +870,9 @@ void Op_Diff_VEF_Face_Stab::ajouter_contribution(const DoubleTab& transporte, Ma
       int marq=phi_psi_diffuse(equation());
       const DoubleVect& porosite_elem = equation().milieu().porosite_elem();
 
-      // soit on a div(phi nu grad inco)
-      // soit on a div(nu grad phi inco)
-      // cela depend si on diffuse phi_psi ou psi
+      // either div(phi nu grad inco)
+      // or div(nu grad phi inco)
+      // depending on whether phi_psi or psi is diffused
       modif_par_porosite_si_flag(nu_,nu,!marq,porosite_elem);
       DoubleVect porosite_eventuelle(equation().milieu().porosite_face());
       if (!marq)
@@ -901,8 +899,8 @@ void Op_Diff_VEF_Face_Stab::ajouter_contribution(const DoubleTab& transporte, Ma
             {
               const Periodique& la_cl_perio = ref_cast(Periodique,la_cl.valeur());
               int fac_asso;
-              // on ne parcourt que la moitie des faces periodiques
-              // on copiera a la fin le resultat dans la face associe..
+              // iterate over only half the periodic faces
+              // the result will be copied to the associated face at the end
               int num2b=num1+le_bord.nb_faces()/2;
               for (num_face=num1; num_face<num2b; num_face++)
                 {
@@ -1028,9 +1026,8 @@ void Op_Diff_VEF_Face_Stab::ajouter_contribution_multi_scalaire(const DoubleTab&
   else
     {
       modifier_matrice_pour_periodique_avant_contribuer(matrice,equation());
-      // On remplit le tableau nu car l'assemblage d'une
-      // matrice avec ajouter_contribution peut se faire
-      // avant le premier pas de temps
+      // Fill the nu array because matrix assembly with
+      // ajouter_contribution may occur before the first time step
       remplir_nu(nu_);
       const Domaine_Cl_VEF& domaine_Cl_VEF = la_zcl_vef.valeur();
       const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
@@ -1045,9 +1042,9 @@ void Op_Diff_VEF_Face_Stab::ajouter_contribution_multi_scalaire(const DoubleTab&
       int marq=phi_psi_diffuse(equation());
       const DoubleVect& porosite_elem = equation().milieu().porosite_elem();
 
-      // soit on a div(phi nu grad inco)
-      // soit on a div(nu grad phi inco)
-      // cela depend si on diffuse phi_psi ou psi
+      // either div(phi nu grad inco)
+      // or div(nu grad phi inco)
+      // depending on whether phi_psi or psi is diffused
       modif_par_porosite_si_flag(nu_,nu,!marq,porosite_elem);
       DoubleVect porosite_eventuelle(equation().milieu().porosite_face());
       if (!marq)
@@ -1073,8 +1070,8 @@ void Op_Diff_VEF_Face_Stab::ajouter_contribution_multi_scalaire(const DoubleTab&
             {
               const Periodique& la_cl_perio = ref_cast(Periodique,la_cl.valeur());
               int fac_asso;
-              // on ne parcourt que la moitie des faces periodiques
-              // on copiera a la fin le resultat dans la face associe..
+              // iterate over only half the periodic faces
+              // the result will be copied to the associated face at the end
               int num2b=num1+le_bord.nb_faces()/2;
               for (num_face=num1; num_face<num2b; num_face++)
                 {

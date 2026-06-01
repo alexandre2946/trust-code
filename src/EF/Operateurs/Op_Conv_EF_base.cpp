@@ -44,7 +44,7 @@ Entree& Op_Conv_EF_base::readOn(Entree& s )
 
 
 
-/*! @brief definit si l'on convecte psi avec phi*u ou avec u
+/*! @brief Defines whether psi is convected with phi*u or with u.
  *
  */
 int  Op_Conv_EF_base::phi_u_transportant(const Equation_base& eq) const
@@ -83,9 +83,9 @@ double Op_Conv_EF_base::calculer_dt_stab() const
 
   double dt_face,dt_stab =1.e30;
 
-  // On traite les conditions aux limites
-  // Si une face porte une condition de Dirichlet on n'en tient pas compte
-  // dans le calcul de dt_stab
+  // Process boundary conditions
+  // If a face carries a Dirichlet condition, it is not taken into account
+  // in the dt_stab computation
   for (int n_bord=0; n_bord<domaine_EF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_EF.les_conditions_limites(n_bord);
@@ -106,7 +106,7 @@ double Op_Conv_EF_base::calculer_dt_stab() const
   }
     }
 
-  // On traite les faces internes non standard
+  // Process non-standard internal faces
   int ndeb = domaine_EF.premiere_face_int();
   int nfin = domaine_EF.premiere_face_std();
 
@@ -116,7 +116,7 @@ double Op_Conv_EF_base::calculer_dt_stab() const
       dt_stab =(dt_face < dt_stab) ? dt_face : dt_stab;
     }
 
-  // On traite les faces internes standard
+  // Process standard internal faces
   ndeb = nfin;
   nfin = domaine_EF.nb_faces();
   for (int num_face=ndeb; num_face<nfin; num_face++)
@@ -126,19 +126,19 @@ double Op_Conv_EF_base::calculer_dt_stab() const
     }
   */
   dt_stab = Process::mp_min(dt_stab);
-  // astuce pour contourner le type const de la methode
+  // trick to work around the const type of the method
   Op_Conv_EF_base& op = ref_cast_non_const(Op_Conv_EF_base,*this);
   op.fixer_dt_stab_conv(dt_stab);
   return dt_stab;
 }
 
-//calcul des valeurs du pas de temps de stabilite de l operateur pour postraitement
-//-discretisation de l espace de stockage (aux faces)
-//	espace_stockage nomme "localisation" pour completer le Champ_Generique_base
-//	espace_stockage nomme "??" sinon
-//-calcul des valeurs
-//-verifie en debug la compatibilite avec dt_stab considere pour le calcul
-// cf Op_Conv_EF_base::calculer_dt_stab() pour choix de calcul de dt_stab
+//compute values of the operator stability time step for post-processing
+//-discretise the storage space (at faces)
+//	storage space named "localisation" to complete the Champ_Generique_base
+//	storage space named "??" otherwise
+//-compute values
+//-verify in debug the compatibility with dt_stab used for the computation
+// cf Op_Conv_EF_base::calculer_dt_stab() for the choice of dt_stab computation
 
 void Op_Conv_EF_base::calculer_pour_post(Champ_base& espace_stockage,const Nom& option,int) const
 {
@@ -164,7 +164,7 @@ void Op_Conv_EF_base::associer(const Domaine_dis_base& domaine_dis,
   la_zcl_EF = zclEF;
   /*
   fluent.resize(le_dom_EF->nb_faces());
-  // On cree l'espace virtuel de fluent
+  // Create the virtual space for fluent
   int nbjoints = zEF.nb_joints();
   int i;
   for(i=0;i<nbjoints;i++){
@@ -191,17 +191,17 @@ DoubleTab& Op_Conv_EF_base::calculer(const DoubleTab& transporte,
 }
 void Op_Conv_EF_base::remplir_fluent() const
 {
-  // Remplissage du tableau fluent par appel a ajouter
-  // C'est cher mais au moins cela corrige (en attendant
-  // d'optimiser) le probleme d'un pas de temps de convection
-  // calcule avec des vitesses du passe
+  // Fill the fluent array by calling ajouter.
+  // This is expensive but at least it corrects (while waiting
+  // to optimize) the problem of a convection time step
+  // computed with past velocities.
   DoubleTrav tmp(equation().inconnue().valeurs());
-  DoubleTab flux_bords_sauve(flux_bords_);  // On sauve les flux_bords car sinon mis a 0
+  DoubleTab flux_bords_sauve(flux_bords_);  // Save flux_bords to avoid it being zeroed out
   ajouter(tmp,tmp);
   flux_bords_=flux_bords_sauve;
-  // PL: C'est vraiment lourd, mais comment faire? fluent est dependant
-  // du schema et donc on peut coder quelque chose comme fluent=vitesse*surface*porosite
-  // dans cette presente methode
+  // PL: This is really heavy, but how else? fluent depends
+  // on the scheme, so one could code something like fluent=velocity*surface*porosity
+  // in the present method
 }
 void Op_Conv_EF_base::completer()
 {

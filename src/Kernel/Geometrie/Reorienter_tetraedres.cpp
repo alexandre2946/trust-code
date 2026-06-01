@@ -75,12 +75,12 @@ Sens_Orient Reorienter_tetraedres_32_64<_SIZE_>::test_orientation_tetra(IntTab_t
       ZC[k] = coord_sommets(som_C,k) - coord_sommets(som_Z,k);
     }
 
-  //calcul pdt vect ZAxZB
+  // compute cross product ZAxZB
   pdtvect[0] = ZA[1]*ZB[2] - ZA[2]*ZB[1];
   pdtvect[1] = ZA[2]*ZB[0] - ZA[0]*ZB[2];
   pdtvect[2] = ZA[0]*ZB[1] - ZA[1]*ZB[0];
 
-  //calcul du pdtscal pdtvect.ZC
+  // compute dot product pdtvect.ZC
   pdtscal = 0.;
   for (k=0 ; k < Objet_U::dimension ; k++)
     {
@@ -89,7 +89,7 @@ Sens_Orient Reorienter_tetraedres_32_64<_SIZE_>::test_orientation_tetra(IntTab_t
 
   if (pdtscal<0.)
     {
-      //le pdt scalaire est negatif : il s'agit d'un tetraedre mal oriente
+      // the dot product is negative: this tetrahedron is badly oriented
 #ifdef _AFFDEBUG
       {
         Process::Journal<<"  element "<<num_element<<"  indirect"<<finl;
@@ -112,7 +112,7 @@ Sens_Orient Reorienter_tetraedres_32_64<_SIZE_>::reorienter_tetra(IntTab_t& les_
   static const int SOM_A = 1;
   static const int SOM_B = 2;
 
-  //pour reorienter le tetraedre, on va permuter les sommets 1 et 2
+  // to reorient the tetrahedron, swap vertices 1 and 2
   int_t tmp;
   tmp = les_elems(num_element,SOM_A);
   les_elems(num_element,SOM_A) = les_elems(num_element,SOM_B);
@@ -127,25 +127,25 @@ void Reorienter_tetraedres_32_64<_SIZE_>::reorienter(Domaine_t& dom) const
 
   if (dom.type_elem()->que_suis_je() == "Tetraedre" )
     {
-      //domaine de tetraedres
+      // domain of tetrahedra
       IntTab_t& les_elems = dom.les_elems();
       int_t nb_elems = les_elems.dimension(0);
 
-      //balaye les tetraedres
+      // loop over tetrahedra
       for (int_t ielem=0 ; ielem<nb_elems ; ielem++)
         {
           if (test_orientation_tetra(les_elems, ielem, coord_sommets) == Sens_Orient::INDIRECT)
             {
-              //tetraedre oriente en sens indirect -> a reorienter
+              // tetrahedron oriented in the indirect sense -> needs reorienting
               reorienter_tetra(les_elems, ielem);
 
 #ifdef _AFFDEBUG
               {
                 Process::Journal<<"  #element reoriente "<<ielem<<finl;
-                static const int SOM_Z = 0;  // indice du sommet qui servira d'origine
-                static const int SOM_A = 1;     // indice du sommet qui servira pour le premier vecteur
-                static const int SOM_B = 2;     // indice du sommet qui servira pour le second vecteur
-                static const int SOM_C = 3;     // indice du sommet qui servira pour le troisieme vecteur
+                static const int SOM_Z = 0;  // index of the vertex used as origin
+                static const int SOM_A = 1;     // index of the vertex used for the first vector
+                static const int SOM_B = 2;     // index of the vertex used for the second vector
+                static const int SOM_C = 3;     // index of the vertex used for the third vector
                 const int som_Z = les_elems(ielem,SOM_Z);
                 const int som_A = les_elems(ielem,SOM_A);
                 const int som_B = les_elems(ielem,SOM_B);

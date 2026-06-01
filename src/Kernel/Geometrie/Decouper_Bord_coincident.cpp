@@ -69,20 +69,20 @@ void Decouper_Bord_coincident::decouper_(Domaine& domaine)
       int oldsz = les_elems.dimension(0);
       int oldnbsom = domaine.nb_som();
 
-      IntTab new_elems(3*oldsz, dimension+1); // tableau sur-dimensionne
+      IntTab new_elems(3*oldsz, dimension+1); // over-dimensioned array
 
-      // Construction de l'Octree sur la grille VEF de base
+      // Build the Octree on the base VEF grid
       domaine.construit_octree();
 
-      //On dimensionne une premiere fois le tableau des sommets
-      //puis on redimensionnera seulement a la fin par la dimension exacte
+      //First dimension the vertex array
+      //then resize it at the end to the exact size
       Scatter::uninit_sequential_domain(domaine);
 
       DoubleTab& sommets_dom = domaine.les_sommets();
       //int dim_som_old=sommets_domaine.dimension(0); // dim_som_old = oldnbsom
       sommets_dom.resize(2*oldnbsom,dimension);
 
-      // On initialise new_elem sur la base du maillage non redecoupe :
+      // Initialize new_elem based on the unsplit mesh:
 
       for(int elem=0; elem<oldsz; elem++)
         {
@@ -98,7 +98,7 @@ void Decouper_Bord_coincident::decouper_(Domaine& domaine)
       fic >> face_newsz;
 
       IntTab new_faces_racc(face_newsz, dimension);
-      //                IntTab new_faces_int(3*face_oldsz, dimension); // tableau sur-dimensionne
+      //                IntTab new_faces_int(3*face_oldsz, dimension); // over-dimensioned array
 
       int j,elem;
       int j0=0,j1=0,j2=0;
@@ -148,12 +148,12 @@ void Decouper_Bord_coincident::decouper_(Domaine& domaine)
               exit();
             }
 
-          if(indice==1) // face de bord a ne pas decouper
+          if(indice==1) // boundary face not to be split
             {
               new_faces_racc(fac,0) = les_elems(elem,j1);
               new_faces_racc(fac,1) = les_elems(elem,j2);
             }
-          else if(indice==2) // face de bord a decouper
+          else if(indice==2) // boundary face to be split
             {
               som1=les_elems(elem,j1);
               som2=les_elems(elem,j2);
@@ -216,7 +216,7 @@ void Decouper_Bord_coincident::decouper_(Domaine& domaine)
       les_elems.ref(new_elems);
       //                new_faces_int.resize(ii,dimension);
 
-      // Reconstruction de l'octree
+      // Rebuild the octree
       Cerr << "Splitting performs ..." << finl;
       domaine.invalide_octree();
       if(dimension==2)
@@ -228,7 +228,7 @@ void Decouper_Bord_coincident::decouper_(Domaine& domaine)
       Cerr << "  Octree rebuilt" << finl;
 
       {
-        // Les Raccords
+        // Connections
         Cerr << "Splitting of connections" << finl;
         for (auto &itr : domaine.faces_raccord())
           {

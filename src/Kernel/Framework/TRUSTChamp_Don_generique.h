@@ -40,7 +40,7 @@ public:
     return mon_domaine.valeur();
   }
 
-  // ERREUR : cela n'a pas de sens de vouloir effectuer une affectation avec un Champ_Don_Fonc_xyz/txyz.
+  // ERROR: it makes no sense to perform an assignment with a Champ_Don_Fonc_xyz/txyz.
   Champ_base& affecter(const Champ_base& ch)
   {
     Champ_base::affecter_erreur();
@@ -101,7 +101,7 @@ protected:
 
 private:
   /*
-   * SFINAE template functions : can not be implemented directly on overrided functions ==> methodes internes ;-)
+   * SFINAE template functions : can not be implemented directly on overrided functions ==> internal methods ;-)
    */
   template<Champ_Don_Type T = _TYPE_> std::enable_if_t<T != Champ_Don_Type::LU, DoubleVect&>
   valeur_a_(const DoubleVect& position, DoubleVect& valeurs) const;

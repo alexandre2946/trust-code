@@ -26,7 +26,7 @@
 #include <LecFicDiffuse.h>
 #include <EcrFicCollecte.h>
 #include <Champ_front_calc.h>
-#include <string> // Pour AIX
+#include <string> // For AIX
 #include <Param.h>
 
 Implemente_instanciable_sans_constructeur(Champ_front_recyclage,"Champ_front_recyclage",Ch_front_var_instationnaire_dep);
@@ -90,9 +90,9 @@ Sortie& Champ_front_recyclage::printOn(Sortie& os) const
   return os;
 }
 
-//-pb_champ_evaluateur est obligatoire pour specifier le nom du probleme
-// et le nom de l inconnue qui vont servir a initialiser la reference
-// vers le champ evaluateur. Le nombre de composantes de ce champ doit etre specifie.
+//-pb_champ_evaluateur is mandatory to specify the name of the problem
+// and the name of the unknown that will be used to initialize the reference
+// to the evaluator field. The number of components of this field must be specified.
 
 Entree& Champ_front_recyclage::readOn(Entree& is)
 {
@@ -170,21 +170,21 @@ int Champ_front_recyclage::lire_motcle_non_standard(const Motcle& mot, Entree& i
   return retval;
 }
 
-//Lecture des informations necessaires pour evaluer la moyenne imposee
-//-profil                : pour imposer un profil analytique
-//-interpolation       : lecture dans un fichier et construction d un champ moyen
-//                       en realisant une interpolation des donnees lues.
-//                       La moyenne est construite pour une direction privilegiee
-//                         (direction_anisotrope) et vaut 0 pour les autres directions
-//-connexion_approchee : lecture dans un fichier et on retient la valeur de la
-//                       variable lue par connexion avec le point le plus proche
-//                       de la face de bord consideree
-//-connexion_exacte    : lecture dans un fichier geometrie des coordonnees de points
-//                         situes dans le plan d evaluation et lecture dans un fichier
-//                       distinct des valeurs moyennes. Les valeurs moyennes lues
-//                         sont stockees quand la correspondance exacte entre les points
-//                         en vis a vis est verifiee.
-//- logarithmique      : construction de la moyenne par une loi de paroi (logarithmique)
+//Reading the information necessary to evaluate the imposed mean
+//-profil                : to impose an analytical profile
+//-interpolation       : reads from a file and builds a mean field
+//                       by interpolating the data read.
+//                       The mean is built for a preferred direction
+//                         (direction_anisotrope) and is 0 for the other directions
+//-connexion_approchee : reads from a file and retains the value of the
+//                       variable read by connection with the closest point
+//                       to the considered boundary face
+//-connexion_exacte    : reads a geometry file containing the coordinates of points
+//                         located in the evaluation plane and reads from a separate
+//                       file the mean values. The mean values read
+//                         are stored when the exact correspondence between
+//                         facing points is verified.
+//- logarithmique      : builds the mean using a wall law (logarithmic)
 //
 
 // XD moyenne_imposee_deriv objet_u moyenne_imposee_deriv INHERITS_BRACE not_set
@@ -366,10 +366,10 @@ int Champ_front_recyclage::lire_info_moyenne_imposee(Entree& is)
   return methode;
 }
 
-//Lecture des informations necessaires pour evaluer la moyenne recyclee
-//-surfacique : moyenne surfacique des valeurs recyclees
-//             (la moyenne est faite sur le bord2 ou l on recupere les valeurs)
-//-interpolation connexion_approchee connexion_exacte (voir lire_info_moyenne_imposee)
+//Reading the information necessary to evaluate the recycled mean
+//-surfacique : surface average of the recycled values
+//             (the average is computed on bord2 where the values are retrieved)
+//-interpolation connexion_approchee connexion_exacte (see lire_info_moyenne_imposee)
 //
 int Champ_front_recyclage::lire_info_moyenne_recyclee(Entree& is)
 {
@@ -444,7 +444,7 @@ int Champ_front_recyclage::lire_info_moyenne_recyclee(Entree& is)
   return methode;
 }
 
-//Initialisation de la reference au champ evaluateur (l_inconnue1)
+//Initialization of the reference to the evaluator field (l_inconnue1)
 void Champ_front_recyclage::associer_champ_evaluateur(const Nom& un_nom_pb1,const Motcle& un_nom_inco1)
 {
   Objet_U& ob1 = Interprete::objet(un_nom_pb1);
@@ -471,8 +471,8 @@ void Champ_front_recyclage::associer_champ_evaluateur(const Nom& un_nom_pb1,cons
     }
 }
 
-//Evaluation de la localisation des points (coords)
-//ou l_inconnue1 doit evaluer les valeurs a recycler
+//Evaluation of the location of points (coords)
+//where l_inconnue1 must evaluate the values to be recycled
 //coords = xv2(faces_bor2) + delt_dist
 //
 void Champ_front_recyclage::get_coord_faces(const Frontiere_dis_base& fr_vf,
@@ -492,11 +492,11 @@ void Champ_front_recyclage::get_coord_faces(const Frontiere_dis_base& fr_vf,
       coords(i,j) = xv2(i+ndeb2,j) + delt_dist(j);
 }
 
-//-appel a Champ_front_calc::initialiser(...)
-//-dimensionnement de moyenne_imposee_ et moyenne_recyclee_ par nb_faces_bord2 et nb_compo_
-//-constructon des structures assurant le parallelisme :
+//-call to Champ_front_calc::initialiser(...)
+//-dimensioning of moyenne_imposee_ and moyenne_recyclee_ by nb_faces_bord2 and nb_compo_
+//-construction of the structures ensuring parallelism:
 // inconnues1_coords_to_eval_ inconnues1_elems_ inconnues2_faces_
-//-initialisation de moyenne_imposee_ et moyenne_recyclee_
+//-initialization of moyenne_imposee_ and moyenne_recyclee_
 //
 int Champ_front_recyclage::initialiser(double temps, const Champ_Inc_base& inco)
 {
@@ -539,15 +539,15 @@ int Champ_front_recyclage::initialiser(double temps, const Champ_Inc_base& inco)
 
   Cerr << "Initializing Champ_front_recyclage on the boundary: " << nom_bord2 << finl;
 
-  // Pour chaque point de remote_coord, chercher le processeur dont le domaine1 contient ce point,
-  //  et l'indice de l'element:
+  // For each point in remote_coord, find the processor whose domain1 contains this point,
+  //  and the index of the element:
 
   const int nprocs = nproc();
   const int moi = me();
 
-  // Remplissage de remote_coords[i]: coordonnees des centres des faces du bord nom_bord2
-  // (bord destination) + delt_dist
-  // du processeur i (tous les procs possedent le meme tableau remote_coords)
+  // Filling remote_coords[i]: coordinates of the face centres of boundary nom_bord2
+  // (destination boundary) + delt_dist
+  // of processor i (all procs hold the same remote_coords array)
   // Build a DoubleTabs containing the coordinates of the remote faces on domaine 1 for each processor
   DoubleTabs remote_coords(nprocs);
   /*
@@ -739,12 +739,12 @@ int Champ_front_recyclage::initialiser(double temps, const Champ_Inc_base& inco)
 
 }
 
-//-Evaluation des valeurs de l_inconnue1 aux points situes
-// dans le plan1 (xv(faces_bord2) + delt_dist)
-//-Echange des donnees entre processeurs
-//-Calcul de moyenne_imposee_ et moyenne_recyclee_ si evaluation dependante du temps
-// (faite par le processeur local sur le bord2 a partir de donnees recues d autres
-//  processeurs ou specifiees dans le jeu de donnees)
+//-Evaluation of the values of l_inconnue1 at the points located
+// in plane1 (xv(faces_bord2) + delt_dist)
+//-Exchange of data between processors
+//-Computation of moyenne_imposee_ and moyenne_recyclee_ if time-dependent evaluation
+// (done by the local processor on bord2 from data received from other
+//  processors or specified in the data set)
 //
 void Champ_front_recyclage::mettre_a_jour(double temps)
 {
@@ -797,8 +797,8 @@ void Champ_front_recyclage::mettre_a_jour(double temps)
 
 }
 
-//Construction de donnees necessaires a l estimation de moyenne_imposee_
-//en fonction de la methode d evaluation retenue (methode_moy_impos_)
+//Building data necessary for estimating moyenne_imposee_
+//according to the chosen evaluation method (methode_moy_impos_)
 //
 void Champ_front_recyclage::initialiser_moyenne_imposee(DoubleTab& moyenne)
 {
@@ -873,8 +873,8 @@ void Champ_front_recyclage::initialiser_moyenne_imposee(DoubleTab& moyenne)
     }
 }
 
-//Construction de donnees necessaires a l estimation de moyenne_recyclee_
-//en fonction de la methode d evaluation retenue (methode_moy_recycl_)
+//Building data necessary for estimating moyenne_recyclee_
+//according to the chosen evaluation method (methode_moy_recycl_)
 //
 void Champ_front_recyclage::initialiser_moyenne_recyclee(DoubleTab& moyenne)
 {
@@ -894,16 +894,16 @@ void Champ_front_recyclage::initialiser_moyenne_recyclee(DoubleTab& moyenne)
 }
 
 
-//Evaluation de moyenne_imposee_ en fonction de la methode d evaluation retenue
-//-methode_moy_impos_==1 : profil analytique
-//-methode_moy_impos_==2 : pas d actualisation (voir initialiser_moyenne_imposee())
-//                           lecture a l initialisation et interpolation des donnees lues
-//-methode_moy_impos_==3 : pas d actualisation (voir initialiser_moyenne_imposee())
-//                           lecture a l initialisation pour realiser une connexion_approchee
-//-methode_moy_impos_==4 : pas d actualisation (voir initialiser_moyenne_imposee())
-//                         lecture a l initialisation pour realiser une connexion_exacte
-//-methode_moy_impos_==5 : pas d actualisation (voir initialiser_moyenne_imposee())
-//                           construction a l initialisation d une loi log :
+//Evaluation of moyenne_imposee_ according to the chosen evaluation method
+//-methode_moy_impos_==1 : analytical profile
+//-methode_moy_impos_==2 : no update (see initialiser_moyenne_imposee())
+//                           read at initialization and interpolation of data read
+//-methode_moy_impos_==3 : no update (see initialiser_moyenne_imposee())
+//                           read at initialization to perform connexion_approchee
+//-methode_moy_impos_==4 : no update (see initialiser_moyenne_imposee())
+//                         read at initialization to perform connexion_exacte
+//-methode_moy_impos_==5 : no update (see initialiser_moyenne_imposee())
+//                           built at initialization using a log law:
 //                           U_log  = ndir/abs(ndir)*u_tau*(1./Kappa)*log(y_plus) + 5.1;
 //
 void Champ_front_recyclage::calcul_moyenne_imposee(const DoubleTab& tab,double temps)
@@ -945,15 +945,15 @@ void Champ_front_recyclage::calcul_moyenne_imposee(const DoubleTab& tab,double t
     }
 }
 
-//Evaluation de moyenne_recyclee_ en fonction de la methode d evaluation retenue
-//-methode_moy_recycl_==1 : moyenne surfacique sur le bord2 des valeurs estimees
-//                          par l_inconnue1 dans plan1
-//-methode_moy_recycl_==2 : pas d actualisation (voir initialiser_moyenne_recyclee)
-//                            lecture a l initialisation et interpolation des donnees lues
-//-methode_moy_recycl_==3 : pas d actualisation (voir initialiser_moyenne_recyclee())
-//                            lecture a l initialisation pour realiser une connexion_approchee
-//-methode_moy_recycl_==4 : pas d actualisation (voir initialiser_moyenne_recyclee())
-//                          lecture a l initialisation pour realiser une connexion_exacte
+//Evaluation of moyenne_recyclee_ according to the chosen evaluation method
+//-methode_moy_recycl_==1 : surface average on bord2 of the values estimated
+//                          by l_inconnue1 in plan1
+//-methode_moy_recycl_==2 : no update (see initialiser_moyenne_recyclee)
+//                            read at initialization and interpolation of data read
+//-methode_moy_recycl_==3 : no update (see initialiser_moyenne_recyclee())
+//                            read at initialization to perform connexion_approchee
+//-methode_moy_recycl_==4 : no update (see initialiser_moyenne_recyclee())
+//                          read at initialization to perform connexion_exacte
 //
 void Champ_front_recyclage::calcul_moyenne_recyclee(const DoubleTab& tab,double temps)
 {
@@ -1001,10 +1001,10 @@ void Champ_front_recyclage::calcul_moyenne_recyclee(const DoubleTab& tab,double 
     }
 }
 
-//-Lecture du fichier pour dimensionner y_Pb2 et U_Pb2
-//-Utilisation des donnees lues dans le fichier pour les trois points
-// possedant les cotes les plus proches de y afin de faire une interpolation
-// de la variable associee
+//-Reading the file to dimension y_Pb2 and U_Pb2
+//-Using the data read from the file for the three points
+// with coordinates closest to y in order to interpolate
+// the associated variable
 //
 double Champ_front_recyclage::UPb(double y,Nom nom_fich)
 {
@@ -1087,11 +1087,11 @@ double Champ_front_recyclage::UPb(double y,Nom nom_fich)
 
 }
 
-//-On determine une direction orthogonale a la direction d anisotropie
-//-Pour chaque point d evaluation se trouvant dans le plan1 :
-//  Estimation de sa cote y dans la direction orthogonale
-//  Initialisation de moyenne (dans la direction anisotrope) a partir de
-//  la fonction UPb pur la cote y
+//-Determine a direction orthogonal to the anisotropic direction
+//-For each evaluation point located in plane1:
+//  Estimate its coordinate y in the orthogonal direction
+//  Initialize the mean (in the anisotropic direction) from
+//  the UPb function for coordinate y
 //
 void Champ_front_recyclage::lire_fichier_format1(DoubleTab& moyenne,
                                                  const Frontiere_dis_base& fr_vf,
@@ -1120,15 +1120,15 @@ void Champ_front_recyclage::lire_fichier_format1(DoubleTab& moyenne,
     }
 }
 
-//-Pour chaque face du bord2 (coordonnes x2 y2 z2):
-//  Lecture dans le fichier nom_fich des coordonnes de points (x1 y1 z1)
-//  et de(s) valeur(s) de la variable associee var1 [var2] [var3]
-//  Initialisation de moyenne (dans la direction anisotrope si celle_ci est specifiee
-//  ou pour toutes les composantes sinon) a partir de var1 [var2] [var3]
-//  associe au point x1 y1 z1 qui est a la plus petite distance de x2 y2 z2
+//-For each face of bord2 (coordinates x2 y2 z2):
+//  Read from file nom_fich the coordinates of points (x1 y1 z1)
+//  and the value(s) of the associated variable var1 [var2] [var3]
+//  Initialize the mean (in the anisotropic direction if specified,
+//  or for all components otherwise) from var1 [var2] [var3]
+//  associated to point x1 y1 z1 which is at the smallest distance from x2 y2 z2
 //
-// Defaut de parallelisme eventuel si (x1 y1 z1) ne parcourent pas les parties virtuels
-// ou si deux points sont a egale distance d un point (x2 y2 z2)
+// Possible parallel issue if (x1 y1 z1) do not cover the virtual parts
+// or if two points are at equal distance from a point (x2 y2 z2)
 //
 void Champ_front_recyclage::lire_fichier_format2(DoubleTab& moyenne,
                                                  const Frontiere_dis_base& fr_vf,
@@ -1196,12 +1196,12 @@ void Champ_front_recyclage::lire_fichier_format2(DoubleTab& moyenne,
     }
 }
 
-//-Pour chaque face du bord2 (coordonnes x2 y2 z2) :
-//  Lecture dans le fichier nom_fch2 des coordonnes de points (x1 y1 z1)
-//  Lecture dans le fichier nom_fich1 des valeurs de la variable associee
-//  et initialisation de moyenne a partir de ces valeurs. La lecture est stoppee
-//  quand on a lu les valeurs associees au point x1 y1 z1 qui est en connexion
-//  exacte avec x2 y2 z2 suivant la direction d anisotropie
+//-For each face of bord2 (coordinates x2 y2 z2):
+//  Read from file nom_fich2 the coordinates of points (x1 y1 z1)
+//  Read from file nom_fich1 the values of the associated variable
+//  and initialize the mean from these values. Reading stops
+//  when the values associated to point x1 y1 z1 that is in exact
+//  connection with x2 y2 z2 along the anisotropic direction are read
 //
 void Champ_front_recyclage::lire_fichier_format3(DoubleTab& moyenne,
                                                  const Frontiere_dis_base& fr_vf,

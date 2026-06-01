@@ -18,9 +18,9 @@
 
 #include <Interprete_geometrique_base.h>
 
-/*! @brief Classe Mailler Un mailleur par agglomeration de domaines (paves en 2D et blocks en 3D)
+/*! @brief Class Mailler A mesher by agglomeration of domains (paves in 2D and blocks in 3D).
  *
- *     Structure du jeu de donnee (en dimension 2) :
+ *     Data set structure (in dimension 2):
  *     Mailler dom
  *     {
  *     [Epsilon eps]
@@ -38,10 +38,10 @@
  *     } ,
  *     Pave nompave2 ...
  *     }
- *     Deux points seront confondus des que la distance entre eux est
- *     inferieure a Epsilon.
+ *     Two points will be merged as soon as the distance between them is
+ *     less than Epsilon.
  *
- * @sa Interprete Pave, Actuellement le seul tyep d'objet reconnu par TRUST pour mailler, un domaine est l'objet Pave
+ * @sa Interprete Pave, Currently the only object type recognized by TRUST for meshing a domain is Pave
  */
 template <typename _SIZE_>
 class Mailler_32_64 : public Interprete_geometrique_base_32_64<_SIZE_>

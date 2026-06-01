@@ -51,15 +51,15 @@ DoubleVect& calcul_longueur_filtre(DoubleVect& longueur_filtre, const Motcle& me
 double distance_sommets(const int , const int , const Domaine_VEF& );
 double som_pscal(const int , const int , const int , const int , const Domaine_VEF& );
 
-// Fonctions inlinees pour optimisation
+// Inlined functions for optimization
 inline double vitesse_tangentielle(const double v0,const double v1,const double r0,const double r1)
 {
-  // On prend std::fabs car mathematiquement la valeur est >=0
+  // We use std::fabs because mathematically the value is >=0
   return sqrt(std::fabs(carre(v0)+carre(v1)-carre(v0*r0+v1*r1)));
 }
 inline double vitesse_tangentielle(const double v0,const double v1,const double v2,const double r0,const double r1,const double r2)
 {
-  // On prend std::fabs car mathematiquement la valeur est >=0
+  // We use std::fabs because mathematically the value is >=0
   return sqrt(std::fabs(carre(v0)+carre(v1)+carre(v2)-carre(v0*r0+v1*r1+v2*r2)));
 }
 
@@ -93,7 +93,7 @@ inline void calcule_r0r1r2(const DoubleTab& face_normale, int& fac, double& r0, 
 inline double distance_face(int fac,int fac1,const Domaine_VEF& domaine)
 {
   int dimension=Objet_U::dimension;
-  const DoubleTab& xv = domaine.xv();    // centre de gravite des faces
+  const DoubleTab& xv = domaine.xv();    // center of gravity of faces
   const DoubleTab& face_normale = domaine.face_normales();
   double a = 0;
   double b = 0;
@@ -140,7 +140,7 @@ double norm_vit1(int dim, CDoubleTabView vit, int fac, int nfac, const int* num,
                  CDoubleTabView face_normale,
                  double* val)
 {
-  // fac numero de la face a paroi fixe
+  // fac: index of the fixed-wall face
   double r[3];
   double norme = 0;
   for (int i=0; i<dim; i++)
@@ -170,7 +170,7 @@ double norm_vit1(int dim, CDoubleTabView vit, int fac, int nfac, const int* num,
     }
   double norm_vit = sqrt(std::fabs(sum_carre-carre(psc)));
 
-  // val1,val2 val3 sont les vitesses tangentielles
+  // val1, val2, val3 are the tangential velocities
   for (int i=0; i<dim; i++)
     val[i]=(v[i] - psc*r[i])/(norm_vit + DMINFLOAT);
 
@@ -182,7 +182,7 @@ double norm_vit1_lp(int dim, CDoubleTabView vit, int fac, int nfac, const int* n
                     CDoubleTabView face_normale,
                     double* val)
 {
-  // fac numero de la face a paroi fixe
+  // fac: index of the fixed-wall face
   double r[3];
   double norme = 0;
   for (int i=0; i<dim; i++)
@@ -212,7 +212,7 @@ double norm_vit1_lp(int dim, CDoubleTabView vit, int fac, int nfac, const int* n
     }
   double norm_vit = sqrt(std::fabs(sum_carre-carre(psc)));
 
-  // val1,val2 val3 sont les vitesses tangentielles
+  // val1, val2, val3 are the tangential velocities
   for (int i=0; i<dim; i++)
     val[i]=(v[i] - psc*r[i])/(norm_vit + DMINFLOAT);
 
@@ -222,7 +222,7 @@ double norm_vit1_lp(int dim, CDoubleTabView vit, int fac, int nfac, const int* n
 KOKKOS_INLINE_FUNCTION
 double norm_vit_lp_k(int dim, CDoubleTabView vit, int num1, int fac, CDoubleTabView face_normale, double* val, int is_defilante)
 {
-  // fac numero de la face paroi
+  // fac: index of the wall face
   double r[3];
   double norme = 0;
   for (int i=0; i<dim; i++)
@@ -247,7 +247,7 @@ double norm_vit_lp_k(int dim, CDoubleTabView vit, int num1, int fac, CDoubleTabV
     }
   double norm_vit = sqrt(std::fabs(sum_carre-carre(psc)));
 
-  // val1,val2 val3 sont les vitesses tangentielles
+  // val1, val2, val3 are the tangential velocities
   for (int i=0; i<dim; i++)
     val[i] = (v[i]-psc*r[i])/(norm_vit+DMINFLOAT);
   return norm_vit;

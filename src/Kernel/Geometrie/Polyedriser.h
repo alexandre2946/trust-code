@@ -18,7 +18,7 @@
 
 #include <Interprete_geometrique_base.h>
 
-/*! @brief Polyedriser Classe destinee a convertir un hexaedre en polyedre
+/*! @brief Polyedriser Class intended to convert a hexahedron into a polyhedron
  *
  */
 template <typename _SIZE_>

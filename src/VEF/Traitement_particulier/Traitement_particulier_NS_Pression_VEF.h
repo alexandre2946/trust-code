@@ -25,9 +25,9 @@
 
 class Champ_Inc_base;
 
-/*! @brief classe Traitement_particulier_NS_Pression_VEF Cette classe permet de faire les traitements particuliers
+/*! @brief class Traitement_particulier_NS_Pression_VEF This class performs special post-processing
  *
- *      pour les calculs de la pression
+ *      for pressure computations.
  *
  *
  * @sa Navier_Stokes, Traitement_particulier_base, Traitement_particulier_Pression
@@ -44,10 +44,10 @@ public :
   Entree& lire(Entree& ) override;
 
 protected :
-// Champ_Fonc_P1NC ch_p ; => ca plante sur l'initialisation du module VEF!!!
-// Champ_Fonc_P1B  ch_p ; => ca compile pas car classe 'declare base'!
+// Champ_Fonc_P1NC ch_p ; => crashes on VEF module initialization!!!
+// Champ_Fonc_P1B  ch_p ; => does not compile because class is 'declare base'!
 // Champ_P0_VEF ch_p;
-// Champ_Fonc_P0_VEF ch_p; => ca plante sur l'initialisation du module VEF!!!
+// Champ_Fonc_P0_VEF ch_p; => crashes on VEF module initialization!!!
   Champ_P1_isoP1Bulle ch_p;
   //Champ_Inc_base ch_p;
 

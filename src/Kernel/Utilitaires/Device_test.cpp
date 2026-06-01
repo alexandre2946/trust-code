@@ -21,7 +21,7 @@
 #include <comm_incl.h>
 #include <DeviceMemory.h>
 
-// Device_test: teste intensivement les methodes de l'interface Device.h:
+// Device_test: intensively tests the methods of the Device.h interface:
 bool self_tested_ = false;
 void self_test()
 {
@@ -31,7 +31,7 @@ void self_test()
     self_tested_ = true;
   {
     // local_operations_vect_bis_generic
-    // Cas test unitaire critique:
+    // Critical unit test case:
     {
       DoubleTab a(2);
       a(0) = 1;
@@ -83,16 +83,16 @@ void self_test()
   }
 
   int N = 10;
-  // Teste les methodes d'acces sur le device:
+  // Test access methods on the device:
   DoubleTab inco(N);
   inco = 1;
   mapToDevice(inco); // copy
   assert(inco.get_data_location() == DataLocation::HostDevice);
   assert(inco.ref_count() == 1);
   {
-    // Exemple 1er operateur
+    // Example: 1st operator
     DoubleTab a;
-    a.ref(inco); // Doit prendre l'etat de inco
+    a.ref(inco); // Must take the state of inco
     assert(a.get_data_location() == DataLocation::HostDevice);
     assert(a.ref_count() == 2);
     assert(inco.ref_count() == 2);
@@ -110,8 +110,8 @@ void self_test()
     const DoubleTab& const_a = a;
     assert(const_b[5] == const_a[5]);
     assert(const_b[5] == 1);
-    //assert(b[5] == a[5]); // Argh double& TRUSTArray<double>::operator[](int i) appele pour a et donc repasse sur host
-    // Comment detecter que operator[](int i) est utilise en read ou write ? Possible ? Non, sauf si const utilise.
+    //assert(b[5] == a[5]); // Argh double& TRUSTArray<double>::operator[](int i) called for a and thus falls back to host
+    // How to detect whether operator[](int i) is used for read or write? Possible? No, unless const is used.
     assert(a.get_data_location() == DataLocation::HostDevice);
     assert(b.get_data_location() == DataLocation::HostDevice);
     assert(inco.get_data_location() == DataLocation::HostDevice);
@@ -119,9 +119,9 @@ void self_test()
   assert(inco.get_data_location() == DataLocation::HostDevice);
   assert(inco.ref_count() == 1);
   {
-    // Exemple 2eme operateur
+    // Example: 2nd operator
     DoubleTab a;
-    a.ref(inco); // Doit prendre l'etat de inco qui est toujours DataLocation::HostDevice
+    a.ref(inco); // Must take the state of inco which is still DataLocation::HostDevice
     assert(a.get_data_location() == DataLocation::HostDevice);
     assert(a.ref_count() == 2);
     assert(inco.ref_count() == 2);
@@ -144,14 +144,14 @@ void self_test()
   }
   assert(inco.ref_count() == 1);
 
-  // Mise a jour de l'inconnue sur le device:
+  // Update of the unknown on the device:
   inco += 1;
   assert(inco.get_data_location() == DataLocation::Device);
   assert(inco.ref_count() == 1);
   {
-    // Pas de temps suivant, nouvel operateur:
+    // Next time step, new operator:
     DoubleTab a;
-    a.ref(inco); // Doit prendre l'etat de inco
+    a.ref(inco); // Must take the state of inco
     assert(a.get_data_location() == DataLocation::Device);
     assert(a.ref_count() == 2);
     assert(inco.ref_count() == 2);
@@ -170,16 +170,16 @@ void self_test()
     assert(const_b[5] == 2);
     assert(a.get_data_location() == DataLocation::HostDevice);
     assert(b.get_data_location() == DataLocation::HostDevice);
-    assert(inco.get_data_location() == DataLocation::HostDevice); // Car a ref sur inco
+    assert(inco.get_data_location() == DataLocation::HostDevice); // Because a refs inco
   }
   assert(inco.get_data_location() == DataLocation::HostDevice);
-  // Mise a jour de l'inconnue sur le device
+  // Update of the unknown on the device
   {
     inco += 1;
     assert(inco.get_data_location() == DataLocation::Device);
 
     DoubleTab a;
-    a.ref(inco); // Doit prendre l'etat de inco
+    a.ref(inco); // Must take the state of inco
     assert(a.get_data_location() == DataLocation::Device);
     assert(a.ref_count() == 2);
     assert(inco.ref_count() == 2);
@@ -202,37 +202,37 @@ void self_test()
   }
   assert(inco.get_data_location() == DataLocation::HostDevice);
 
-  // Test d'operations ArrOfDouble sur GPU
+  // Test ArrOfDouble operations on GPU
   {
     ArrOfDouble a(10), b(10);
     a=1;
     b=2;
     mapToDevice(a);
     mapToDevice(b);
-    b+=a; // TRUSTArray& operator+=(const TRUSTArray& y) sur le device
+    b+=a; // TRUSTArray& operator+=(const TRUSTArray& y) on the device
     b+=3; // TRUSTArray& operator+=(const _TYPE_ dy)
     b-=2; // TRUSTArray& operator-=(const _TYPE_ dy)
     b-=a; // TRUSTArray& operator-=(const TRUSTArray& y)
-    // ToDo regler: Multiple definition of 'nvkernel__ZN10TRUST
+    // ToDo fix: Multiple definition of 'nvkernel__ZN10TRUST
     //b*=10; // TRUSTArray& operator*= (const _TYPE_ dy)
     //b/=2;  // TRUSTArray& operator/= (const _TYPE_ dy)
     assert(a.get_data_location() == DataLocation::HostDevice);
     assert(b.get_data_location() == DataLocation::Device);
     const ArrOfDouble& const_b = b;
-    // Operations sur le device:
-    // Retour sur le host pour verifier le resultat
+    // Operations on the device:
+    // Return to host to verify the result
     copyFromDevice(b);
     assert(const_b[0] == 3);
   }
 
-  // Constructeurs sur device:
+  // Constructors on device:
   {
     DoubleTab a(10);
     allocateOnDevice(a);
     assert(a.get_data_location() == DataLocation::Device);
-    a = 1; // Sur le device
+    a = 1; // On the device
     assert(a.get_data_location() == DataLocation::Device);
-    DoubleTab b(a); // b doit etre aussi alloue sur le device et la copie faite sur le device
+    DoubleTab b(a); // b must also be allocated on the device and the copy done on the device
     assert(b.get_data_location() == DataLocation::Device);
     copyFromDevice(b);
     const ArrOfDouble& const_b = b;
@@ -240,19 +240,19 @@ void self_test()
     assert(const_b[b.size() - 1] == 1);
   }
   {
-    // Copies de tableau:
+    // Array copies:
     DoubleTab a(10);
     a=1;
-    mapToDevice(a); // a sur le device
+    mapToDevice(a); // a on the device
     DoubleTab b;
-    b = a; // b doit etre aussi alloue/rempli sur le device par copie de a:
+    b = a; // b must also be allocated/filled on the device by copying a:
     assert(b.get_data_location() == DataLocation::Device);
     const ArrOfDouble& const_b = b;
     copyFromDevice(b);
     assert(const_b[0] == 1);
     assert(const_b[b.size() - 1] == 1);
   }
-  // operator_vect_vect_generic pour DoubleTab::operator+-*/
+  // operator_vect_vect_generic for DoubleTab::operator+-*/
   {
     DoubleTab a(10), b(10);
     const ArrOfDouble& const_a = a;
@@ -263,13 +263,13 @@ void self_test()
     assert(a.get_data_location() == DataLocation::HostDevice);
     mapToDevice(b);
     assert(b.get_data_location() == DataLocation::HostDevice);
-    a=b;  // TRUSTArray<_TYPE_>::inject_array(v) faite sur le device (a=10)
+    a=b;  // TRUSTArray<_TYPE_>::inject_array(v) done on the device (a=10)
     assert(a.get_data_location() == DataLocation::Device);
-    a+=b; // operator_vect_vect_generic(ADD_) faite sur le device (a=20)
+    a+=b; // operator_vect_vect_generic(ADD_) done on the device (a=20)
     assert(a.get_data_location() == DataLocation::Device);
-    b-=a; // operator_vect_vect_generic(SUB_) faite sur le device (b=-10)
+    b-=a; // operator_vect_vect_generic(SUB_) done on the device (b=-10)
     assert(b.get_data_location() == DataLocation::Device);
-    // Retour sur le host pour verifier les resultats
+    // Return to host to verify results
     copyFromDevice(a);
     copyFromDevice(b);
     assert(a.get_data_location() == DataLocation::HostDevice);
@@ -291,19 +291,19 @@ void self_test()
   // Second DoubleTrav
   {
     DeviceMemory::printMemoryMap();
-    DoubleTrav a(10*N); // a is initialized to 0 on the device cause previous DoubleTrav was HostDevice !
+    DoubleTrav a(10*N); // a is initialized to 0 on the device because the previous DoubleTrav was HostDevice!
     assert(a.get_data_location() == DataLocation::Device);
     const ArrOfDouble& const_a = a;
     assert(const_a[0] == 0);
   }
-  // Constructeur par copie DoubleTab
+  // Copy constructor DoubleTab
   {
     DoubleTab a(N);
     a=-1;
-    mapToDevice(a); // Sur le device
-    DoubleTrav b(a); // b doit etre sur le device (=0)
+    mapToDevice(a); // On the device
+    DoubleTrav b(a); // b must be on the device (=0)
     assert(b.get_data_location()==DataLocation::Device);
-    b+=1; // Operation doit etre faite sur le device (=1)
+    b+=1; // Operation must be done on the device (=1)
     assert(b.get_data_location()==DataLocation::Device);
     copyFromDevice(b);
     const ArrOfDouble& const_b = b;
@@ -317,7 +317,7 @@ void self_test()
     a(1)=3;
     a(2)=-10;
     mapToDevice(a);
-    // Change sur le host pour test:
+    // Change on the host for testing:
     a.data()[0]=0;
     a.data()[1]=0;
     a.data()[2]=0;
@@ -329,7 +329,7 @@ void self_test()
     //assert(local_imax_vect(a)==1);
     //assert(local_imin_vect(a)==2);
     assert(a.isDataOnDevice());
-    // On teste sur host les deux methodes imin,imax non portees sur GPU:
+    // Test on host the two methods imin,imax not ported to GPU:
     copyFromDevice(a);
     assert(a.get_data_location()==DataLocation::HostDevice);
     assert(local_imax_vect(a)==1);
@@ -339,21 +339,21 @@ void self_test()
   {
     DoubleTab a(N);
     a=1;
-    mapToDevice(a); // Sur le device
+    mapToDevice(a); // On the device
     assert(a.get_data_location()==DataLocation::HostDevice);
     DoubleTab b;
     b.ref_array(a);
-    assert(b.get_data_location()==DataLocation::HostDevice); // b doit etre sur le device
+    assert(b.get_data_location()==DataLocation::HostDevice); // b must be on the device
   }
   // ref_tab/ref_array on a chunk array
   {
     DoubleTab a(2*N);
     a=1;
     DoubleTab b;
-    b.ref_tab(a, 0, N); // reference partielle sur a
-    mapToDevice(b); // Sur le device
-    assert(b.get_data_location()==DataLocation::HostDevice); // b doit etre sur le device
-    assert(a.get_data_location()==DataLocation::HostDevice); // a doit etre sur le device
+    b.ref_tab(a, 0, N); // partial reference on a
+    mapToDevice(b); // On the device
+    assert(b.get_data_location()==DataLocation::HostDevice); // b must be on the device
+    assert(a.get_data_location()==DataLocation::HostDevice); // a must be on the device
 
     DoubleArrView a_v = static_cast<ArrOfDouble&>(a).view_wo();
     Kokkos::parallel_for(2*N, KOKKOS_LAMBDA(const int i)
@@ -361,7 +361,7 @@ void self_test()
       a_v[i] = 2;
     });
     Kokkos::fence();
-    // Retour sur le device et verification que a etait completement sur le device:
+    // Return to the device and verify that a was completely on the device:
     assert(a.get_data_location()==DataLocation::Device);
     assert(a(0)==2);
     assert(a.get_data_location()==DataLocation::Host);
@@ -374,17 +374,17 @@ void self_test()
     {
       DoubleTab b;
       b.ref_array(a);
-      mapToDevice(b); // Sur le device
+      mapToDevice(b); // On the device
       assert(a.data()==b.data());
       assert(b.get_data_location() == DataLocation::HostDevice);
-      assert(a.get_data_location() == DataLocation::HostDevice); // a est considere sur le device egalement
+      assert(a.get_data_location() == DataLocation::HostDevice); // a is also considered on the device
     }
     assert(a.get_data_location() == DataLocation::HostDevice);
     ptr_host = a.data();
-    assert(isAllocatedOnDevice(ptr_host)); // Verifie que le tableau possede une zone memoire sur le device
+    assert(isAllocatedOnDevice(ptr_host)); // Check that the array has a memory area on the device
   }
-  assert(!isAllocatedOnDevice(ptr_host)); // Verifie que le tableau ne possede plus une zone memoire sur le device
-  // Test du resize_array_ dans TRUSTArray<_TYPE_, _SIZE_>::resize_array_
+  assert(!isAllocatedOnDevice(ptr_host)); // Check that the array no longer has a memory area on the device
+  // Test of resize_array_ in TRUSTArray<_TYPE_, _SIZE_>::resize_array_
   {
     DoubleTab a(1);
     mapToDevice(a);
@@ -395,8 +395,8 @@ void self_test()
     assert(a(0)==2); // Check that after resize data on device is keep
     assert(a(1)==1); // Check that resize initialize new elements to 0
   }
-  // ToDo:Comment gerer les DoubleTab_Parts ? Pas facile donc pour le moment
-  // le constructeur par copie fait un copyFromDevice du DoubleTab...
+  // ToDo: How to handle DoubleTab_Parts? Not easy, so for now
+  // the copy constructor does a copyFromDevice on the DoubleTab...
   /*
     {
         DoubleTab pression;
@@ -404,8 +404,8 @@ void self_test()
         DoubleTab_parts P0P1(pression); // P0P1 Device
         DoubleTab& P0 = P0P1[0];
         DoubleTab& P1 = P0P1[1];
-        double moyenne_K = mp_moyenne_vect(P0); // P0 DataLocation::HostDevice mais pas P1 !
-        P1 -= moyenne_K; // Gros pb car P1 toujours sur Device !
+        double moyenne_K = mp_moyenne_vect(P0); // P0 DataLocation::HostDevice but not P1!
+        P1 -= moyenne_K; // Big problem as P1 is always on Device!
     }
     */
   //if (Process::me()==0) std::cerr << ptr_host << std::endl;
@@ -425,7 +425,7 @@ void self_test()
   }
 
   {
-    // Provisoire reproduire le blocage ?
+    // Provisional: reproduce the deadlock?
     //DoubleTab a(10);
     //allocateOnDevice(a);
     //allocateOnDevice(a);

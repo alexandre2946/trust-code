@@ -17,10 +17,9 @@
 #define Frottement_interfacial_Weber_included
 #include <Frottement_interfacial_base.h>
 
-/*! @brief classe Frottement_interfacial_Wallis coefficients de frottement interfacial d'un ecoulement annulaire
- *
- *       -> correlation de Wallis ou l'on renseigne une densite d'aire interfaciale fonction du Weber critique (parametre du jeu de donnees)
- *       parametres : non!
+/*! @brief Interfacial friction coefficients for annular flow using the Wallis correlation,
+ *         where the interfacial area density is given as a function of the critical Weber number (dataset parameter).
+ *         Parameters: none.
  *
  *
  */
@@ -33,8 +32,8 @@ public:
                    const DoubleTab& rho, const DoubleTab& mu, const DoubleTab& sigma, double Dh,
                    const DoubleTab& ndv, const DoubleTab& d_bulles, DoubleTab& coeff) const override;
 protected:
-  int n_l = -1, n_g = -1; //phases traitees : liquide / gaz continu
-  double We_c = 8;		  //nombre de Weber critique a partir duquel les bulles cassent
+  int n_l = -1, n_g = -1; // treated phases: liquid / continuous gas
+  double We_c = 8;        // critical Weber number above which bubbles break up
 };
 
 #endif

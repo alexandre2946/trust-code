@@ -20,10 +20,10 @@ Implemente_instanciable_sans_constructeur(Motcle,"Motcle",Nom);
 Implemente_instanciable(Motcles,"Motcles",VECT(Motcle));
 
 
-/*! @brief Ecriture d'un Motcle sur un flot de sortie Utilise l'implementation de la classe Nom
+/*! @brief @brief Writes a Motcle to an output stream. Uses the implementation of the Nom class.
  *
- * @param (Sortie& s) le flot de sortie a utiliser
- * @return (Sortie&) le flot de sortie modifie
+ * @param s The output stream to use.
+ * @return The modified output stream.
  */
 Sortie& Motcle::printOn(Sortie& s) const
 {
@@ -31,10 +31,10 @@ Sortie& Motcle::printOn(Sortie& s) const
 }
 
 
-/*! @brief Ecriture d'un tableau Motcles sur un flot de sortie
+/*! @brief Writes a Motcles array to an output stream.
  *
- * @param (Sortie& s) le flot de sortie a utiliser
- * @return (Sortie&) le flot de sortie modifie
+ * @param s The output stream to use.
+ * @return The modified output stream.
  */
 Sortie& Motcles::printOn(Sortie& s) const
 {
@@ -42,12 +42,10 @@ Sortie& Motcles::printOn(Sortie& s) const
 }
 
 
-/*! @brief Lecture d'un Motcle dans un flot d'entree Utilise l'implementation de la classe Nom
+/*! @brief Reads a Motcle from an input stream. Uses the implementation of the Nom class, then converts the name to uppercase.
  *
- *     Passe ensuite le Nom en majuscules
- *
- * @param (Entree& s) le flux d'entree a utiliser
- * @return (Entree&) le flux d'entree modifie
+ * @param s The input stream to use.
+ * @return The modified input stream.
  */
 Entree& Motcle::readOn(Entree& s)
 {
@@ -57,7 +55,7 @@ Entree& Motcle::readOn(Entree& s)
 }
 
 
-/*! @brief Constructeur par defaut Construit un Nom puis le passe en majuscule
+/*! @brief Default constructor. Constructs a Nom and converts it to uppercase.
  *
  */
 Motcle::Motcle() : Nom()
@@ -66,9 +64,9 @@ Motcle::Motcle() : Nom()
 }
 
 
-/*! @brief Construction d'un Motcle a partie d'une chaine de caracteres Construit un Nom puis le passe en majuscules
+/*! @brief Constructs a Motcle from a character string. Constructs a Nom and converts it to uppercase.
  *
- * @param (const char* nom) la chaine de caracteres du Motcle
+ * @param nom The character string for the Motcle.
  */
 Motcle::Motcle(const char* const nom) : Nom(nom)
 {
@@ -85,18 +83,18 @@ Motcle::Motcle(const Nom& nom) : Nom(nom)
   majuscule();
 }
 
-/*! @brief Construction d'un Motcle par copie
+/*! @brief Copy constructor.
  *
- * @param (const Motcle& nom) le Motcle a copier
+ * @param nom The Motcle to copy.
  */
 Motcle::Motcle(const Motcle& nom) : Nom(nom)
 {
 }
 
-/*! @brief Construction a partir d'une chaine de caracteres Utilise l'implementation de la classe Nom
+/*! @brief Assignment from a character string. Uses the implementation of the Nom class, then converts to uppercase.
  *
- * @param (const char* const mot) la chaine de caracteres du mot a construire
- * @return (Motcle&) reference sur le Motcle cree
+ * @param mot The character string to assign.
+ * @return Reference to the modified Motcle.
  */
 Motcle& Motcle::operator=(const char* const mot)
 {
@@ -112,10 +110,10 @@ Motcle& Motcle::operator=(const Nom& mot)
   return *this;
 }
 
-/*! @brief Construction par copie Utilise l'implementation de la classe Nom
+/*! @brief Copy assignment operator. Uses the implementation of the Nom class.
  *
- * @param (const Motcle& mot) le Motcle a copier
- * @return (Motcle&) reference sur le Motcle modifie
+ * @param mot The Motcle to copy.
+ * @return Reference to the modified Motcle.
  */
 Motcle& Motcle::operator=(const Motcle& mot)
 {
@@ -123,10 +121,10 @@ Motcle& Motcle::operator=(const Motcle& mot)
   return *this;
 }
 
-/*! @brief Lecture d'un tableau Motcles sur un flot d'entree
+/*! @brief Reads a Motcles array from an input stream.
  *
- * @param (Entree& s) le flux d'entree a utiliser
- * @return (Entree&) le flux d'entree modifie
+ * @param s The input stream to use.
+ * @return The modified input stream.
  */
 Entree& Motcles::readOn(Entree& s)
 {
@@ -134,11 +132,11 @@ Entree& Motcles::readOn(Entree& s)
 }
 
 
-/*! @brief Autotest de la classe Motcle Effectue des affectations de controle
+/*! @brief Self-test of the Motcle class. Performs control assignments.
  *
- *     Retourne toujours 1
+ * Always returns 1.
  *
- * @return (int) code de retour; retourne toujours 1
+ * @return Always 1.
  */
 int Motcle::selftest()
 {
@@ -154,9 +152,9 @@ int Motcle::selftest()
 
 
 
-/*! @brief Constructeur Cree un tableau de i elements
+/*! @brief Constructor. Creates an array of i elements.
  *
- * @param (int i) nombre de mots cles
+ * @param i Number of keywords.
  */
 Motcles::Motcles(int i):
   VECT(Motcle)(i)
@@ -217,11 +215,11 @@ static inline int strcmp_uppercase(const char *n1, const char *n2)
   return 1;
 }
 
-/*! @brief Comparaison d'un mot cle avec une chaine de caracteres
+/*! @brief Compares a keyword with another keyword (case-insensitive).
  *
- * @param (const Motcle& un_mot) le mot cle a utiliser pour la comparaison
- * @param (const char* const nom) la chaine de caractere avec laquelle comparer le mot cle
- * @return (int) 1 si le Nom du mot est egal a la chaine
+ * @param nom The first Motcle.
+ * @param un_mot The second Motcle.
+ * @return 1 if the names are equal, 0 otherwise.
  */
 int operator ==(const Motcle& nom, const Motcle& un_mot)
 {
@@ -251,11 +249,11 @@ int operator ==(const Nom& nom, const Motcle& un_mot)
   return (un_mot == nom);
 }
 
-/*! @brief Comparaison d'un mot cle avec une chaine de caracteres
+/*! @brief Compares a keyword with another keyword for inequality (case-insensitive).
  *
- * @param (const Motcle& un_mot) le mot cle a utiliser pour la comparaison
- * @param (const char* const nom) la chaine de caractere avec laquelle comparer le mot cle
- * @return (int) 1 si le Nom du mot est different de la chaine
+ * @param nom The first Motcle.
+ * @param un_mot The second Motcle.
+ * @return 1 if the names differ, 0 otherwise.
  */
 int operator !=(const Motcle& nom, const Motcle& un_mot)
 {
@@ -295,7 +293,7 @@ Motcles noms_to_motcles(const Noms& a)
 
   Motcles b(n);
   for (int i = 0; i < n; i++)
-    b[i] = a[i]; // ouais, ecriture bizarre mais la plus efficace...
+    b[i] = a[i]; // odd-looking but most efficient
   return b;
 }
 

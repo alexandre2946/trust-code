@@ -23,13 +23,15 @@
 
 /// \cond DO_NOT_DOCUMENT
 class Problemes_List_Concentration_Turbulent
-{ /* pour check sources */ };
+{ /* for source check */ };
 /// \endcond
 
-/*! @brief Classe Pb_Thermohydraulique_List_Concentration_Turbulent Cette classe represente un probleme de thermohydraulique avec modelisation de la turbulence:
- *      - Equations de Navier_Stokes en regime turbulent pour un fluide incompressible
- *      - Equation d'energie en regime turbulent
- *      - Equation de Convection-Diffusion d'une ou plusieurs concentrations en regime turbulent
+/*! @brief Turbulent thermohydraulics problem with a list of concentration equations.
+ *
+ *      Couples:
+ *      - Turbulent Navier-Stokes equations for an incompressible fluid
+ *      - Turbulent energy equation
+ *      - Turbulent convection-diffusion equation(s) for one or more concentrations
  *
  * @sa Pb_Fluide_base
  */
@@ -38,9 +40,10 @@ class Pb_Thermohydraulique_List_Concentration_Turbulent: public TRUSTProblem_Lis
   Declare_instanciable(Pb_Thermohydraulique_List_Concentration_Turbulent);
 };
 
-/*! @brief classe Pb_Hydraulique_List_Concentration_Turbulent Cette classe represente un probleme d'hydraulique avec transport de constituants (1 ou plusieurs)
- *      et avec modelisation de la turbulence:
- *      - Equations de Navier_Stokes en regime turbulent  pour un fluide incompressible en regime turbulent
+/*! @brief Turbulent hydraulics problem with a list of species-transport equations (one or more constituents).
+ *
+ *      Couples turbulent Navier-Stokes equations for an incompressible fluid
+ *      with turbulent convection-diffusion equations for concentrations.
  *
  * @sa Pb_Fluide_base
  */

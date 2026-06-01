@@ -20,9 +20,8 @@
 
 /*! @brief : class Segment_EF_axi
  *
- *  <Description of class Segment_EF_axi>
- *
- *
+ *  Segment finite element type for axisymmetric EF discretizations.
+ *  Overrides the normal computation method to handle axisymmetric geometry.
  *
  */
 

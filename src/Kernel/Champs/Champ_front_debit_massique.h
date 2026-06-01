@@ -24,7 +24,7 @@
 
 /*! @brief class Champ_front_debit_massique
  *
- *  Classe derivee de Champ_front_debit pour les amateurs de kg/s
+ *  Derived class of Champ_front_debit for mass flow rates in kg/s
  *
  * @sa Champ_front_base
  */

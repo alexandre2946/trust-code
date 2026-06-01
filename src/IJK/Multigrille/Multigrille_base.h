@@ -141,15 +141,15 @@ protected:
   const int precision_mix_;
   int solver_precision_;
 private:
-  // Solveur systeme pour la grille grossiere
+  // Linear system solver for the coarse grid
   SolveurSys solveur_grossier_;
   Matrice_Grossiere coarse_matrix_;
 
-  // PARAMETRES MULTIGRILLE
-  // Coefficient de relaxation du lisseur Jacobi
-  //  d'apres les publis, l'optimum est 0.71 en 2D et 0.65 en 3D
+  // MULTIGRID PARAMETERS
+  // Relaxation coefficient of the Jacobi smoother
+  //  according to publications, the optimum is 0.71 in 2D and 0.65 in 3D
   ArrOfDouble relax_jacobi_;
-  // Pour chaque niveau, nombre d'iterations lissage pre/post et multigrille
+  // For each level, number of pre/post smoothing and multigrid iterations
   ArrOfInt pre_smooth_steps_;
   ArrOfInt smooth_steps_;
   ArrOfInt nb_full_mg_steps_; // number of multigrid iterations at each level

@@ -19,7 +19,7 @@
 
 #include <Interprete.h>
 
-/*! @brief Ecrit un objet : Ecrire ob1
+/*! @brief Writes an object: Ecrire ob1
  *
  * @sa Ecrire_Fichier
  */

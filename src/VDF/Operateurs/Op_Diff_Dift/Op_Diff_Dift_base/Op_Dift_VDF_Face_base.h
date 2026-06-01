@@ -33,7 +33,7 @@ public:
   double calculer_dt_stab(const Domaine_VDF&) const;
   void calculer_borne_locale(DoubleVect& ,double , double ) const override;
 
-  const Champ_base& diffusivite() const override = 0; // XXX : E Saikali : juste pour securite ...
+  const Champ_base& diffusivite() const override = 0; // XXX : E Saikali : just for safety ...
 
   inline void associer_loipar(const Turbulence_paroi_base& ) { /* do nothing */ }
   inline void modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const override { Op_VDF_Face::modifier_pour_Cl(iter_->domaine(), iter_->domaine_Cl(), matrice, secmem); }

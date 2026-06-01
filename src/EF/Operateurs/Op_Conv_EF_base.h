@@ -27,7 +27,7 @@ class Champ_Inc_base;
 
 /*! @brief class Op_Conv_EF_base
  *
- *  Classe de base des operateurs de convection EF
+ *  Base class for EF convection operators.
  */
 class Op_Conv_EF_base : public Operateur_Conv_base, public Op_EF_base
 {
@@ -56,8 +56,7 @@ protected:
   OBS_PTR(Domaine_Cl_EF) la_zcl_EF;
   OBS_PTR(Champ_Inc_base) vitesse_;
 
-  mutable DoubleVect fluent_;           // tableau qui sert pour le calcul du pas
-  //de temps de stabilite
+  mutable DoubleVect fluent_;           // array used for computing the stability time step
 };
 
 #endif

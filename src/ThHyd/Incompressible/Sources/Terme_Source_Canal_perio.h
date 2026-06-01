@@ -57,7 +57,7 @@ protected :
   Nom bord_periodique_;
   double surface_bord_;
   double h,coeff,u_etoile;
-  // ajout pour eviter des statics
+  // added to avoid statics
   mutable int deb_;
   mutable double source_;
   mutable double debnm1_;

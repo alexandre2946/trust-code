@@ -20,11 +20,10 @@
 #include <Champ_Uniforme_Morceaux.h>
 
 
-/*! @brief Classe Champ_Uniforme_Morceaux_inst Representent un champ constant par morceaux dans l'espace et dependant
+/*! @brief Classe Champ_Uniforme_Morceaux_inst Represents a piecewise constant-in-space field that is time-dependent.
  *
- *     du temps.
  *
- * @sa Champ_Uniforme_Morceaux Champ_Uniforme, Classe abstraite, Methode abstraite, void me_calculer(double t)
+ * @sa Champ_Uniforme_Morceaux Champ_Uniforme, Abstract class, Abstract method, void me_calculer(double t)
  */
 class Champ_Uniforme_Morceaux_inst : public Champ_Uniforme_Morceaux
 {
@@ -42,9 +41,9 @@ private :
 };
 
 
-/*! @brief Effectue une mise a jour en temps du champ.
+/*! @brief Updates the field in time.
  *
- * @param (double temps) le temps de mise a jour
+ * @param (double temps) the update time
  */
 inline void Champ_Uniforme_Morceaux_inst::mettre_a_jour(double un_temps)
 {

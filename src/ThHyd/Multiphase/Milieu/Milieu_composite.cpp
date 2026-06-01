@@ -33,7 +33,7 @@ Sortie& Milieu_composite::printOn(Sortie& os) const { return os; }
 Entree& Milieu_composite::readOn(Entree& is)
 {
   int i = 0;
-  std::vector<std::pair<std::string, int>> especes; // string pour phase_nom. int : 0 pour liquide et 1 pour gaz
+  std::vector<std::pair<std::string, int>> especes; // string for phase_name. int: 0 for liquid and 1 for gas
   Cerr << "Reading Milieu_composite..." << finl;
   Nom mot;
   is >> mot;
@@ -57,7 +57,7 @@ Entree& Milieu_composite::readOn(Entree& is)
           Cerr << que_suis_je() << " : gravity should not be defined in Pb_Multiphase ! Use source_qdm if you want gravity in QDM equation !" << finl;
           Process::exit();
         }
-      else if (!mot.debute_par("saturation") && !mot.debute_par("interface")) // on ajout les phases
+      else if (!mot.debute_par("saturation") && !mot.debute_par("interface")) // add phases
         {
           noms_phases_.add(mot);
           Cerr << "Milieu_composite: add phase " << mot << " ... " << finl;
@@ -90,13 +90,13 @@ Entree& Milieu_composite::readOn(Entree& is)
           fluides_.push_back(fluide);
           especes.push_back(check_fluid_name(fluide->le_nom()));
         }
-      else if (mot.debute_par("saturation")) // on ajout la saturation
+      else if (mot.debute_par("saturation")) // add saturation
         {
           has_saturation_ = true;
           Cerr << "Milieu_composite: add saturation " << mot << " ... " << finl;
           sat_lu_.typer_lire_simple(is, "Typing the saturation ...");
         }
-      else // on ajout l'interface
+      else // add interface
         {
           has_interface_ = true;
           Cerr << "Milieu_composite: add interface " << mot << " ... " << finl;
@@ -110,7 +110,7 @@ Entree& Milieu_composite::readOn(Entree& is)
       Process::exit();
     }
 
-  // Traitement pour les interfaces
+  // Interface processing
   const int N = (int)fluides_.size();
   for (int n = 0; n < N; n++)
     {
@@ -125,7 +125,7 @@ Entree& Milieu_composite::readOn(Entree& is)
               Cerr << "Interface between fluid " << n << " : " << fluides_[n]->le_nom() << " and " << m << " : " << fluides_[m]->le_nom() << finl;
               inter.push_back(&ref_cast(Interface_base, has_saturation_ ? sat_lu_.valeur() : inter_lu_.valeur()));
               const Saturation_base *sat = sub_type(Saturation_base, *inter.back()) ? &ref_cast(Saturation_base, *inter.back()) : nullptr;
-              if (sat && sat->get_Pref() > 0) // pour loi en e = e0 + cp * (T - T0)
+              if (sat && sat->get_Pref() > 0) // for the law e = e0 + cp * (T - T0)
                 {
                   const double hn = pn ? sat->Hvs(sat->get_Pref()) : sat->Hls(sat->get_Pref()),
                                hm = pm ? sat->Hvs(sat->get_Pref()) : sat->Hls(sat->get_Pref()),
@@ -145,7 +145,7 @@ std::pair<std::string, int> Milieu_composite::check_fluid_name(const Nom& name)
   int phase = name.debute_par("gaz");
   Nom espece = phase ? name.getSuffix("gaz_") : name.getSuffix("liquide_");
 
-  // Suppression des suffixes "_group1" et "_group2" pour iate 2 groups
+  // Remove suffixes "_group1" and "_group2" for IATE 2-group model
   std::string nomjdd = espece.getString();
   std::string suffix1 = "_group1";
   std::string suffix2 = "_group2";
@@ -217,7 +217,7 @@ int Milieu_composite::initialiser(const double temps)
 
   t_init_ = temps;
 
-  // XXX Elie Saikali : utile pour cas reprise !
+  // XXX Elie Saikali: useful for restart cases!
   ch_rho_->changer_temps(temps);
   ch_e_int_->changer_temps(temps);
   ch_h_ou_T_->changer_temps(temps);
@@ -271,7 +271,7 @@ void Milieu_composite::discretiser(const Probleme_base& pb, const  Discretisatio
   std::vector<OWN_PTR(Champ_Don_base)* > fields = {&ch_mu_, &ch_nu_, &ch_lambda_, &ch_alpha_, &ch_alpha_fois_rho_, &ch_Cp_, &rho_m_, &h_m_};
   for (auto && f: fields) champs_compris_.ajoute_champ((*f).valeur());
 
-  // on discretise les champs sigma / Tsat si besoin ...
+  // discretize sigma / Tsat fields if needed ...
   if ((int) tab_interface_.size() > 0)
     {
       Cerr << "Milieu_composite::" << __func__ << " ==> Surface tension discretization ..." << finl;
@@ -282,7 +282,7 @@ void Milieu_composite::discretiser(const Probleme_base& pb, const  Discretisatio
           {
             int phase = fluides_[k]->le_nom().debute_par("gaz");
             Nom espece = phase ? fluides_[k]->le_nom().getSuffix("gaz_") : fluides_[k]->le_nom().getSuffix("liquide_");
-            if (has_interface(k, l)) // OK si interf/saturation
+            if (has_interface(k, l)) // OK if interface/saturation
               {
                 Interface_base& inter = get_interface(k, l);
                 inter.assoscier_pb(pb);
@@ -291,7 +291,7 @@ void Milieu_composite::discretiser(const Probleme_base& pb, const  Discretisatio
                 champs_compris_.ajoute_champ(inter.get_sigma_champ());
               }
 
-            if (has_saturation(k, l)) // OK si saturation seulement
+            if (has_saturation(k, l)) // OK if saturation only
               {
                 Saturation_base& sat = get_saturation(k, l);
                 Nom Tsat_nom = Nom("Tsat_") + espece;
@@ -301,7 +301,7 @@ void Milieu_composite::discretiser(const Probleme_base& pb, const  Discretisatio
           }
     }
 
-  // Finalement, on discretise la porosite + diametre_hydro
+  // Finally, discretize porosity + hydraulic diameter
   Milieu_base::discretiser_porosite(pb,dis);
   Milieu_base::discretiser_diametre_hydro(pb,dis);
 }
@@ -325,7 +325,7 @@ void Milieu_composite::mettre_a_jour(double temps)
       const int N = (int) fluides_.size();
       for (int k = 0; k < N; k++)
         for (int l = k + 1; l < N; l++)
-          if (has_interface(k, l)) // OK si interf/saturation
+          if (has_interface(k, l)) // OK if interface/saturation
             get_interface(k, l).mettre_a_jour(temps);
     }
 
@@ -417,11 +417,11 @@ void Milieu_composite::mettre_a_jour_tabs()
 
   const int Nl = rho_m_->valeurs().dimension_tot(0);
 
-  // masse volumique
+  // density
   for (int n = 0; n < N; n++)
     for (int i = 0; i < Nl; i++) trm(i) += a(i, n) * r(i, n);
 
-  // enthalpie
+  // enthalpy
   for (int n = 0; n < N; n++)
     for (int i = 0; i < Nl; i++) thm(i) += a(i, n) * r(i, n) * ent(i, n);
   for (int i = 0; i < Nl; i++) thm(i) /= trm(i);
@@ -430,14 +430,14 @@ void Milieu_composite::mettre_a_jour_tabs()
 void Milieu_composite::associer_equation(const Equation_base *eqn) const
 {
   Fluide_base::associer_equation(eqn);
-  // on fait suivre aux milieux sous-jacents (les fluide_reel en ont besoin!)
+  // propagate to underlying media (real fluids need this)
   for (const auto& itr : fluides_) itr->associer_equation(eqn);
 }
 
 int Milieu_composite::check_unknown_range() const
 {
   int ok = 1;
-  for (int i = 0; ok && i < (int)fluides_.size(); i++) ok &= fluides_[i]->check_unknown_range(); //chaque fluide controle
+  for (int i = 0; ok && i < (int)fluides_.size(); i++) ok &= fluides_[i]->check_unknown_range(); // each fluid is checked
   return ok;
 }
 
@@ -576,10 +576,10 @@ bool Milieu_composite::initTimeStep(double dt)
 {
   for (auto& itr : fluides_) itr->initTimeStep(dt);
 
-  if (!equation_.size()) return true; //pas d'equation associee -> ???
-  const Schema_Temps_base& sch = equation_.begin()->second->schema_temps(); //on recupere le schema en temps par la 1ere equation
+  if (!equation_.size()) return true; // no associated equation -> ???
+  const Schema_Temps_base& sch = equation_.begin()->second->schema_temps(); // retrieve the time scheme from the first equation
 
-  /* champs dont on doit creer des cases */
+  /* fields for which time levels must be created */
   std::vector<Champ_Inc_base *> vch;
   if (ch_rho_ && sub_type(Champ_Inc_base, ch_rho_.valeur()))
     vch.push_back(&ref_cast(Champ_Inc_base, ch_rho_.valeur()));

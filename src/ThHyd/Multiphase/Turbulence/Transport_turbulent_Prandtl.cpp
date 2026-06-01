@@ -39,18 +39,18 @@ Entree& Transport_turbulent_Prandtl::readOn(Entree& is)
   return is;
 }
 
-// Modifier_nu modifie mu : alpha et rho font partie du terme
+// Modifier_nu modifies mu: alpha and rho are part of the term
 void Transport_turbulent_Prandtl::modifier_mu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const
 {
-  const DoubleTab& mu0 = eq.diffusivite_pour_transport().passe(), &nu0 = eq.diffusivite_pour_pas_de_temps().passe(); //viscosites moleculaires
+  const DoubleTab& mu0 = eq.diffusivite_pour_transport().passe(), &nu0 = eq.diffusivite_pour_pas_de_temps().passe(); //molecular viscosities
 
   int nl = nu.dimension(0), N = nu.dimension(1), D = dimension;
 
-  //viscosite cinematique turbulente
+  //turbulent kinematic viscosity
   DoubleTrav nu_t(nl, N);
   visc_turb.eddy_viscosity(nu_t);
 
-  //formule pour passer de nu a mu : mu0 * sigma_ * nu_t / nu0
+  //formula to convert nu to mu: mu0 * sigma_ * nu_t / nu0
   if (nu.nb_dim() == 2)
     for (int i = 0; i < nl; i++)
       for (int n = 0; n < 1; n++) //isotrope

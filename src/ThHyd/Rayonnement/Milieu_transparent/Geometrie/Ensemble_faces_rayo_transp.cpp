@@ -43,7 +43,7 @@ void Ensemble_faces_rayo_transp::lire(const Nom& nom_bord_lu, const Nom& nom_bor
 
 int Ensemble_faces_rayo_transp::contient(int num_face) const
 {
-  // Dans notre cas une face rayonnantes est exactement une face de bord
+  // In our case a radiating face is exactly a boundary face
   if (num_face_Ensemble_.size() == 0)
     return 1;
   else
@@ -72,7 +72,7 @@ void Ensemble_faces_rayo_transp::associer_les_cl(Cond_lim_base& la_cl)
   les_cl_base_ = la_cl;
   Frontiere& le_bord = la_cl.frontiere_dis().frontiere();
   nb_faces_bord_ = le_bord.nb_faces();
-  // On construit num_face_Ensemble. On a les positions_ on cherche la liste des faces de ce bord
+  // Build num_face_Ensemble. Given positions_, find the list of faces on this boundary
   IntList numface;
   DoubleTab pos;
 
@@ -80,7 +80,7 @@ void Ensemble_faces_rayo_transp::associer_les_cl(Cond_lim_base& la_cl)
   if (n1 != 0)
     {
       Faces& faces = le_bord.faces();
-      // pos contient les centres de gravite des faces du bord
+      // pos contains the centres of gravity of the boundary faces
       if (nb_faces_bord_)
         Faces::Calculer_centres_gravite(pos, faces.type_face(), le_bord.domaine().coord_sommets(), faces.les_sommets());
       for (int fac = 0; fac < n1; fac++)

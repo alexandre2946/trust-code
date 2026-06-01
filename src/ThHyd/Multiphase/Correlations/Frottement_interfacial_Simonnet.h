@@ -19,7 +19,7 @@
 #include <Frottement_interfacial_base.h>
 #include <Correlation_base.h>
 
-/*! @brief classe Frottement_interfacial_Simonnet coefficients de frottement interfacial d'un ecoulement a bulles en prennant en compte la densite
+/*! @brief Interfacial friction coefficients for a bubbly flow, accounting for density effects.
  *
  */
 class Frottement_interfacial_Simonnet : public Frottement_interfacial_base

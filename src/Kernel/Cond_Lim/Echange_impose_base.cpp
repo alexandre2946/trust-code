@@ -68,9 +68,9 @@ Entree& Echange_impose_base::readOn(Entree& s)
   return s;
 }
 
-/*! @brief Renvoie la valeur de la temperature imposee sur la i-eme composante du champ de frontiere.
+/*! @brief Returns the value of the imposed temperature on the i-th component of the boundary field.
  *
- * @param (int i) l'indice de la composante du champ de de frontiere
+ * @param (int i) the index of the boundary field component
  * @return (double)
  */
 double Echange_impose_base::T_ext(int i) const
@@ -102,9 +102,9 @@ double Echange_impose_base::T_ext(int i, int j) const
     return T_ext().valeurs()(i, j);
 }
 
-/*! @brief Renvoie la valeur du coefficient d'echange de chaleur impose sur la i-eme composante
+/*! @brief Returns the value of the imposed heat exchange coefficient on the i-th component
  *
- *     du champ de frontiere.
+ *     of the boundary field.
  *
  * @param (int i)
  * @return (double)
@@ -140,9 +140,9 @@ double Echange_impose_base::h_imp(int i, int j) const
     return h_imp_->valeurs()(i, j);
 }
 
-/*! @brief Renvoie la valeur de l'emissivite impose sur la i-eme composante
+/*! @brief Returns the value of the imposed emissivity on the i-th component
  *
- *     du champ de frontiere.
+ *     of the boundary field.
  *
  * @param (int i)
  * @return (double)
@@ -178,12 +178,12 @@ double Echange_impose_base::emissivite(int i, int j) const
     return emissivite_->valeurs()(i, j);
 }
 
-/*! @brief Effectue une mise a jour en temps des conditions aux limites.
+/*! @brief Performs a time update of the boundary conditions.
  *
- *     Lors du premier appel des initialisations sont effectuees:
+ *     During the first call, initializations are performed:
  *       h_imp(0,0) = (rho(0,0)*Cp(0,0))
  *
- * @param (double temps) le temp de mise a jour
+ * @param (double temps) the time of the update
  */
 void Echange_impose_base::mettre_a_jour(double temps)
 {
@@ -203,7 +203,7 @@ int Echange_impose_base::initialiser(double temps)
   return Cond_lim_base::initialiser(temps);
 }
 
-// ajout de methode pour ne pas operer directement su le champ_front
+// Added method to avoid operating directly on the champ_front
 void Echange_impose_base::set_temps_defaut(double temps)
 {
   if (has_h_imp())

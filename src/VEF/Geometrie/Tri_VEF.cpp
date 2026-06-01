@@ -20,7 +20,7 @@
 
 Implemente_instanciable_sans_constructeur(Tri_VEF,"Tri_VEF",Elem_VEF_base);
 
-// printOn et readOn
+// printOn and readOn
 
 
 Sortie& Tri_VEF::printOn(Sortie& s ) const
@@ -35,7 +35,7 @@ Entree& Tri_VEF::readOn(Entree& s )
 
 Tri_VEF::Tri_VEF()
 {
-  /*! @brief KEL_(0,fa7),KEL_(1,fa7) sont  les numeros locaux des 2 faces qui entourent la facette de numero local fa7
+  /*! @brief KEL_(0,fa7),KEL_(1,fa7) are the local indices of the 2 faces surrounding facet with local index fa7.
    *
    */
   int tmp[3][3]=
@@ -50,7 +50,7 @@ Tri_VEF::Tri_VEF()
       KEL_(i,j)=tmp[i][j];
 }
 
-/*! @brief remplit le tableau face_normales dans le Domaine_VEF
+/*! @brief Fills the face_normales array in Domaine_VEF.
  *
  */
 void Tri_VEF::creer_face_normales(DoubleTab& Face_normales,
@@ -74,8 +74,8 @@ void Tri_VEF::creer_face_normales(DoubleTab& Face_normales,
       nx = -y1;
       ny = x1;
 
-      // Orientation de la normale de elem1 vers elem2
-      // pour cela recherche du sommet de elem1 qui n'est pas sur la Face
+      // Orient the normal from elem1 towards elem2
+      // for that, find the node of elem1 that is not on the Face
       int elem1 = Face_voisins(num_Face, 0);
       if ((f0 = elem_faces(elem1, 0)) == num_Face)
         f0 = elem_faces(elem1, 1);
@@ -98,7 +98,7 @@ void Tri_VEF::creer_face_normales(DoubleTab& Face_normales,
         }
     }
 }
-/*! @brief calcule les normales des facettes pour des elem standards
+/*! @brief Computes the facet normals for standard elements.
  *
  */
 void Tri_VEF::creer_facette_normales(const Domaine_VEF& dom_VEF,
@@ -140,14 +140,14 @@ void Tri_VEF::creer_facette_normales(const Domaine_VEF& dom_VEF,
           xg[1]=(x[0][1]+x[1][1]+x[2][1])/3;
           for (fa7=0; fa7<3; fa7++)
             {
-              // la fa7 a pour sommets fa7 et "G" de coordonnees xg
+              // facet fa7 has vertices fa7 and "G" with coordinates xg
               u[0]= x[fa7][0]-xg[0];
               u[1]= x[fa7][1]-xg[1];
               v[0]= -u[1];
               v[1]= u[0];
               i0 = KEL_(0,fa7);
               i1 = KEL_(1,fa7);
-              // Orientation des normales :
+              // Orient normals:
               xj0[0]= x[i0][0]-x[i1][0];
               xj0[1]= x[i0][1]-x[i1][1];
               psc=xj0[0]*v[0] + xj0[1]*v[1];
@@ -166,7 +166,7 @@ void Tri_VEF::creer_facette_normales(const Domaine_VEF& dom_VEF,
     }
 }
 
-/*! @brief remplit le tableau normales_facettes_Cl dans le Domaine_Cl_VEF pour la facette fa7 de l'element num_elem
+/*! @brief Fills the normales_facettes_Cl array in Domaine_Cl_VEF for facet fa7 of element num_elem.
  *
  */
 void Tri_VEF::creer_normales_facettes_Cl(DoubleTab& normales_facettes_Cl,
@@ -187,7 +187,7 @@ void Tri_VEF::creer_normales_facettes_Cl(DoubleTab& normales_facettes_Cl,
   int i0 = KEL_(0,fa7);
   int i1 = KEL_(1,fa7);
 
-  // Orientation des normales :
+  // Normal orientation:
   xj0[0]= x(i0,0)-x(i1,0);
   xj0[1]= x(i0,1)-x(i1,1);
 
@@ -205,7 +205,7 @@ void Tri_VEF::creer_normales_facettes_Cl(DoubleTab& normales_facettes_Cl,
 
 }
 
-/*! @brief modifie les volumes entrelaces pour la face j d'un elem non standard
+/*! @brief Modifies the interlaced volumes for face j of a non-standard element.
  *
  */
 void Tri_VEF::modif_volumes_entrelaces(int j,int elem,
@@ -235,7 +235,7 @@ void Tri_VEF::modif_volumes_entrelaces(int j,int elem,
         break;
       }
 
-    case 2: // une Face de Dirichlet : Face 1
+    case 2: // one Dirichlet face: Face 1
       {
         surf_mod = volumes_entrelaces[j]/2 ;
         volumes_entrelaces_Cl[elem_faces(elem,0)]  += surf_mod;
@@ -243,7 +243,7 @@ void Tri_VEF::modif_volumes_entrelaces(int j,int elem,
         break;
       }
 
-    case 4: // une Face de Dirichlet : Face 0
+    case 4: // one Dirichlet face: Face 0
       {
         surf_mod = volumes_entrelaces[j]/2 ;
         volumes_entrelaces_Cl[elem_faces(elem,1)]  += surf_mod;
@@ -251,7 +251,7 @@ void Tri_VEF::modif_volumes_entrelaces(int j,int elem,
         break;
       }
 
-    case 6: // deux Faces de Dirichlet : Faces 0,1
+    case 6: // two Dirichlet faces: Faces 0,1
       {
         surf_mod = volumes_entrelaces[elem_faces(elem,0)]
                    +  volumes_entrelaces[elem_faces(elem,1)];
@@ -259,7 +259,7 @@ void Tri_VEF::modif_volumes_entrelaces(int j,int elem,
         break;
       }
 
-    case 3: // deux Faces de Dirichlet : Faces 1,2
+    case 3: // two Dirichlet faces: Faces 1,2
       {
         surf_mod = volumes_entrelaces[elem_faces(elem,2)]
                    +  volumes_entrelaces[elem_faces(elem,1)];
@@ -267,7 +267,7 @@ void Tri_VEF::modif_volumes_entrelaces(int j,int elem,
         break;
       }
 
-    case 5: // deux Faces de Dirichlet : Faces 0,2
+    case 5: // two Dirichlet faces: Faces 0,2
       {
         surf_mod = volumes_entrelaces[elem_faces(elem,0)]
                    +  volumes_entrelaces[elem_faces(elem,2)];
@@ -321,7 +321,7 @@ void Tri_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
         break;
       }
 
-    case 2: // une Face de Dirichlet : Face 1
+    case 2: // one Dirichlet face: Face 1
       {
         surf_mod = volumes_entrelaces[j]/2 ;
         face=elem_faces(elem,0);
@@ -333,7 +333,7 @@ void Tri_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
         break;
       }
 
-    case 4: // une Face de Dirichlet : Face 0
+    case 4: // one Dirichlet face: Face 0
       {
         surf_mod = volumes_entrelaces[j]/2 ;
         face=elem_faces(elem,1);
@@ -345,7 +345,7 @@ void Tri_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
         break;
       }
 
-    case 6: // deux Faces de Dirichlet : Faces 0,1
+    case 6: // two Dirichlet faces: Faces 0,1
       {
         surf_mod = volumes_entrelaces[elem_faces(elem,0)]
                    +  volumes_entrelaces[elem_faces(elem,1)];
@@ -355,7 +355,7 @@ void Tri_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
         break;
       }
 
-    case 3: // deux Faces de Dirichlet : Faces 1,2
+    case 3: // two Dirichlet faces: Faces 1,2
       {
         surf_mod = volumes_entrelaces[elem_faces(elem,2)]
                    +  volumes_entrelaces[elem_faces(elem,1)];
@@ -365,7 +365,7 @@ void Tri_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
         break;
       }
 
-    case 5: // deux Faces de Dirichlet : Faces 0,2
+    case 5: // two Dirichlet faces: Faces 0,2
       {
         surf_mod = volumes_entrelaces[elem_faces(elem,0)]
                    +  volumes_entrelaces[elem_faces(elem,2)];
@@ -394,14 +394,14 @@ void Tri_VEF::calcul_vc(const ArrOfInt& Face,ArrOfDouble& vc,
 {
   switch(type_cl)
     {
-    case 0: // le triangle n'a pas de Face de Dirichlet
+    case 0: // triangle has no Dirichlet face
       {
         vc[0] = vs[0]/3;
         vc[1] = vs[1]/3;
         break;
       }
 
-    case 1: // le triangle a une Face de Dirichlet :la Face 2
+    case 1: // triangle has one Dirichlet face: Face 2
       {
         vc[0]= vitesse.valeurs()(Face[2],0)*porosite_face[Face[2]];
         vc[1]= vitesse.valeurs()(Face[2],1)*porosite_face[Face[2]];
@@ -410,7 +410,7 @@ void Tri_VEF::calcul_vc(const ArrOfInt& Face,ArrOfDouble& vc,
         break;
       }
 
-    case 2: // le triangle a une Face de Dirichlet :la Face 1
+    case 2: // triangle has one Dirichlet face: Face 1
       {
         vc[0]= vitesse.valeurs()(Face[1],0)*porosite_face[Face[1]];
         vc[1]= vitesse.valeurs()(Face[1],1)*porosite_face[Face[1]];
@@ -419,7 +419,7 @@ void Tri_VEF::calcul_vc(const ArrOfInt& Face,ArrOfDouble& vc,
         break;
       }
 
-    case 4: // le triangle a une Face de Dirichlet :la Face 0
+    case 4: // triangle has one Dirichlet face: Face 0
       {
         vc[0]= vitesse.valeurs()(Face[0],0)*porosite_face[Face[0]];
         vc[1]= vitesse.valeurs()(Face[0],1)*porosite_face[Face[0]];
@@ -428,34 +428,35 @@ void Tri_VEF::calcul_vc(const ArrOfInt& Face,ArrOfDouble& vc,
         break;
       }
 
-    case 3: // le triangle a deux faces de Dirichlet :les faces 1 et 2
+    case 3: // triangle has two Dirichlet faces: faces 1 and 2
       {
         vc[0]= vsom(0,0);
         vc[1]= vsom(0,1);
         break;
       }
 
-    case 5: // le triangle a deux faces de Dirichlet :les faces 0 et 2
+    case 5: // triangle has two Dirichlet faces: faces 0 and 2
       {
         vc[0]= vsom(1,0);
         vc[1]= vsom(1,1);
         break;
       }
 
-    case 6: // le triangle a deux faces de Dirichlet :les faces 0 et 1
+    case 6: // triangle has two Dirichlet faces: faces 0 and 1
       {
         vc[0]= vsom(2,0);
         vc[1]= vsom(2,1);
         break;
       }
 
-    } // fin du switch
+    } // end switch
 
 }
 
-/*! @brief calcule les coord xg du centre d'un element non standard calcule aussi idirichlet=nb de faces de Dirichlet de l'element
+/*! @brief Computes the coordinates xg of the centre of a non-standard element.
  *
- *  si idirichlet=2, n1 est le numero du sommet confondu avec G
+ *  Also computes idirichlet = number of Dirichlet faces of the element.
+ *  If idirichlet=2, n1 is the index of the node coinciding with G.
  *
  */
 void Tri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
@@ -465,8 +466,8 @@ void Tri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
   switch(type_elem_Cl)
     {
 
-    case 0:  // le triangle n'a pas de Face de dirichlet: il a 3 Facettes
-      //  le point G est le barycentre des sommets du triangle
+    case 0:  // triangle has no Dirichlet face: it has 3 facets
+      //  point G is the barycentre of the triangle vertices
       {
         for (int j=0; j<dim; j++)
           xg[j]=(x(0,j)+x(1,j)+x(2,j))/3;
@@ -475,8 +476,8 @@ void Tri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
         break;
       }
 
-    case 1:  // le triangle a une Face de dirichlet: la Face 2
-      // le point G est le barycentre des sommets de la Face 2
+    case 1:  // triangle has one Dirichlet face: Face 2
+      // point G is the barycentre of the vertices of Face 2
 
       {
         for (int j=0; j<dim; j++)
@@ -486,8 +487,8 @@ void Tri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
         break;
       }
 
-    case 2:  // le triangle a une Face de dirichlet: la Face 1
-      // le point G est le barycentre des sommets de la Face 1
+    case 2:  // triangle has one Dirichlet face: Face 1
+      // point G is the barycentre of the vertices of Face 1
 
       {
         for (int j=0; j<dim; j++)
@@ -497,8 +498,8 @@ void Tri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
         break;
       }
 
-    case 4:  // le triangle a une Face de dirichlet: la Face 0
-      // le point G est le barycentre des sommets de la Face 0
+    case 4:  // triangle has one Dirichlet face: Face 0
+      // point G is the barycentre of the vertices of Face 0
 
       {
         for (int j=0; j<dim; j++)
@@ -508,8 +509,8 @@ void Tri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
         break;
       }
 
-    case 6 : // le triangle a deux faces de Dirichlet : les faces 0,1
-      // le point G est le sommet 2 du triangle
+    case 6 : // triangle has two Dirichlet faces: faces 0,1
+      // point G is vertex 2 of the triangle
 
       {
         for (int j=0; j<dim; j++)
@@ -521,8 +522,8 @@ void Tri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
 
       }
 
-    case 5 : // le triangle a deux faces de Dirichlet : les faces 0,2
-      // le point G est le sommet 1 du triangle
+    case 5 : // triangle has two Dirichlet faces: faces 0,2
+      // point G is vertex 1 of the triangle
 
       {
         for (int j=0; j<dim; j++)
@@ -534,8 +535,8 @@ void Tri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
 
       }
 
-    case 3 : // le triangle a deux faces de Dirichlet : les faces 1,2
-      // le point G est le sommet 0 du triangle
+    case 3 : // triangle has two Dirichlet faces: faces 1,2
+      // point G is vertex 0 of the triangle
 
       {
         for (int j=0; j<dim; j++)
@@ -547,13 +548,14 @@ void Tri_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
 
       }
 
-    } // fin du switch
+    } // end switch
 
 }
 
-/*! @brief modifie normales_facettes_Cl quand idirichlet=2 idirichlet=nb de faces de Dirichlet de l'element
+/*! @brief Modifies normales_facettes_Cl when idirichlet=2.
  *
- *  si idirichlet=2, n1 est le numero du sommet confondu avec G
+ *  idirichlet = number of Dirichlet faces of the element.
+ *  If idirichlet=2, n1 is the index of the node coinciding with G.
  *
  */
 void Tri_VEF::modif_normales_facettes_Cl(DoubleTab& normales_facettes_Cl,
@@ -575,7 +577,7 @@ void Tri_VEF::modif_normales_facettes_Cl(DoubleTab& normales_facettes_Cl,
         //            fa7=n1;
         //normales_facettes_Cl(num_elem,fa7,0) = 0;
         //normales_facettes_Cl(num_elem,fa7,1) = 0;
-        // l'appel semble inutile en 2D
+        // the call seems unnecessary in 2D
         normales_facettes_Cl(num_elem,n1,0) = 0;
         normales_facettes_Cl(num_elem,n1,1) = 0;
         break;

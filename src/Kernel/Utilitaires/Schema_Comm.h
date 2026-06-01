@@ -21,33 +21,31 @@
 
 class Comm_Group;
 
-// Ces objets stockent un graphe de conversation entre
-// processeurs : chaque proc. possede une liste de processeurs a qui
-// envoyer et une liste de processeurs de qui recevoir.
+// These objects store a communication graph between
+// processors: each proc. has a list of processors to send to
+// and a list of processors to receive from.
 //
-// Le groupe est l'ensemble des processeurs sur lesquels on GARANTIT
-// que les methodes suivantes seront appelees SIMULTANEMENT sur tous
-// les processeurs du groupe :
+// The group is the set of processors on which it is GUARANTEED
+// that the following methods will be called SIMULTANEOUSLY on all
+// processors in the group:
 // - begin_comm()
 // - set_send_recv_pe_list(...)
 // - echange_taille_et_messages()
 // - end_comm()
 //
-// En particulier : Il est interdit d'utiliser ces methodes a
-// l'interieur d'une boucle qui n'est pas executee le meme nombre de
-// fois par tous les processeurs du groupe, ni a l'interieur d'un
-// "if() { }" dont le deroulement n'est pas identique sur tous les
-// processeurs du groupe.
+// In particular: it is forbidden to use these methods inside
+// a loop that is not executed the same number of times by all
+// processors in the group, nor inside an "if() { }" whose
+// execution is not identical on all processors in the group.
 //
-// Il est interdit de commencer une nouvelle communication pendant
-// qu'une autre est en cours (une communication finit toujours par
-// "end_comm()")
-// Interdiction en particulier d'utiliser "envoyer", "recevoir" et les
-// fichiers disques partages entre le premier appel a schema.send_buffer()
-// et "terminer()". Faire tres attention a toutes les methodes qu'on utilise
-// entre ces deux appels !
+// It is forbidden to start a new communication while another is
+// in progress (a communication always ends with "end_comm()")
+// In particular, it is forbidden to use "envoyer", "recevoir" and
+// shared disk files between the first call to schema.send_buffer()
+// and "terminer()". Be very careful about all methods used between
+// these two calls!
 //
-// Sur un PE donne, une sequence d'echange doit etre construite comme suit:
+// On a given PE, an exchange sequence must be built as follows:
 // schema.begin_comm()
 // schema.send_buffer(pe1) << data_to_send;
 // schema.send_buffer(pe2) << data_to_send;
@@ -58,17 +56,17 @@ class Comm_Group;
 // ...
 // schema.end_comm();
 //
-// La communication n'est pas forcement symetrique : un processeur peut envoyer
-// un message a un processeur et recevoir d'un autre.
-// En revanche, l'utilisateur garantit que les listes de processeurs fournies dans
-//  send_pe_list et recv_pe_list verifient le principe "tu m'ecoutes quand je te parle !"
-//  (c'est a dire qu'un processeur A appartient a send_pe_list sur le processeur B
-//   si et seulement si le processeur B appartient a recv_pe_list sur le processeur A).
+// Communication is not necessarily symmetric: a processor can send
+// a message to one processor and receive from another.
+// However, the user guarantees that the processor lists provided in
+//  send_pe_list and recv_pe_list satisfy the principle "you listen when I speak!"
+//  (i.e., processor A belongs to send_pe_list on processor B
+//   if and only if processor B belongs to recv_pe_list on processor A).
 
-// Modif BM 20/06/2013: j'ajoute set_all_to_allv_flag. Si le drapeau est mis, le schema de
-//  communication utilise MPI_alltoallv au lieu de ISend IRecv. Pour tenter de resoudre
-//  les problemes rencontres sur supermuc dans la routine de lecture ecriture fichiers
-//  (schema tout le monde ecrit au processeur 0 => erreur d'allocation des MPI_requests).
+// Modif BM 20/06/2013: adding set_all_to_allv_flag. If the flag is set, the communication
+//  scheme uses MPI_alltoallv instead of ISend IRecv. To try to solve
+//  problems encountered on supermuc in the file read/write routine
+//  (schema where everyone writes to processor 0 => error allocating MPI_requests).
 
 class OutputCommBuffer;
 class InOutCommBuffers;
@@ -90,15 +88,15 @@ public:
   const Schema_Comm& operator= (const Schema_Comm&);
   void set_send_recv_pe_list(const ArrOfInt& send_pe_list, const ArrOfInt& recv_pe_list, const int me_to_me = 0);
 
-  void begin_comm() const;                 // Statut passe a WRITING
-  // Autorise si status_ == WRITING:
+  void begin_comm() const;                 // Status transitions to WRITING
+  // Allowed when status_ == WRITING:
   Sortie& send_buffer(int num_PE) const;
-  void echange_taille_et_messages() const; // Statut passe a EXCHANGED
-  void echange_messages(const ArrOfInt& recv_size) const;  // Statut passe a EXCHANGED
-  // Autorise si status_ == EXCHANGED:
+  void echange_taille_et_messages() const; // Status transitions to EXCHANGED
+  void echange_messages(const ArrOfInt& recv_size) const;  // Status transitions to EXCHANGED
+  // Allowed when status_ == EXCHANGED:
   Entree& recv_buffer(int num_PE) const;
-  void end_comm() const;                   // Statut passe a RESET
-  // Accesseurs:
+  void end_comm() const;                   // Status transitions to RESET
+  // Accessors:
   const ArrOfInt& get_send_pe_list() const;
   const ArrOfInt& get_recv_pe_list() const;
 
@@ -107,29 +105,27 @@ public:
 protected:
   void echange_taille(const ArrOfInt& send_size, ArrOfInt& recv_size) const;
   void echange_messages(const ArrOfInt& send_size, const ArrOfInt& recv_size) const;
-  // Statut passe a EXCHANGED
+  // Status transitions to EXCHANGED
   void check_send_recv_pe_list() const;
 
-  // Un seul statut pour tous les echanges : on ne supporte pas les
-  // acces concurrents a la classe car on veut limiter le nombre
-  // de buffers et le nombre d'"outstanding requests".
-  // Donc : interdiction de commencer une nouvelle comm si les buffers
-  // sont en cours d'utilisation.
+  // A single status for all exchanges: concurrent access to the class is not supported
+  // because we want to limit the number of buffers and the number of "outstanding requests".
+  // Therefore: it is forbidden to start a new communication if the buffers
+  // are currently in use.
   enum Static_Status { UNINITIALIZED, RESET, WRITING, EXCHANGED };
   static Static_Status status_;
   static OutputCommBuffer& obuffer(int pe);
   static InputCommBuffer&   ebuffer(int pe);
 
-  ArrOfInt send_pe_list_; // Liste des processeurs a qui envoyer
-  ArrOfInt recv_pe_list_; // Liste des processeurs de qui recevoir
-  int   me_to_me_;     // Drapeau: est-ce qu'on autorise a s'envoyer des messages a soi ?
-  OBS_PTR(Comm_Group) ref_group_;// Groupe de processeurs qui vont discuter
+  ArrOfInt send_pe_list_; // List of processors to send to
+  ArrOfInt recv_pe_list_; // List of processors to receive from
+  int   me_to_me_;     // Flag: is sending messages to oneself allowed?
+  OBS_PTR(Comm_Group) ref_group_;// Group of processors that will communicate
 
-  int use_all_to_allv_; // Drapeau, quel type de communication faut-il utiliser ?
+  int use_all_to_allv_; // Flag, which type of communication should be used?
 private:
-  // Les pointeurs sont ranges dans une classe specifique (destructeur
-  // des membres statiques appele automatiquement a la fin de l'execution
-  // pour liberer la memoire).
+  // Pointers are stored in a specific class (destructor of static members
+  // called automatically at end of execution to free memory).
   static InOutCommBuffers buffers_;
   static int n_buffers_;
 };
@@ -142,8 +138,8 @@ public:
   const ArrOfInt& get_send_size() const;
   const ArrOfInt& get_recv_size() const;
 protected:
-  ArrOfInt send_size_;    // Taille des messages a envoyer en bytes
-  ArrOfInt recv_size_;    // Taille des messages a recevoir en bytes
+  ArrOfInt send_size_;    // Size of messages to send in bytes
+  ArrOfInt recv_size_;    // Size of messages to receive in bytes
 };
 
 #endif

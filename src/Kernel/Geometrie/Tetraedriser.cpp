@@ -26,12 +26,12 @@ Sortie& Tetraedriser::printOn(Sortie& os) const { return Interprete::printOn(os)
 
 Entree& Tetraedriser::readOn(Entree& is) { return Interprete::readOn(is); }
 
-/*! @brief Fonction hors classe Decoupe toutes les faces d'un objet Faces
+/*! @brief Function outside class Cuts all faces of a Faces object
  *
- *     dont les faces on 4 sommets
- *     en 2 faces a 3 sommets.
+ *     whose faces have 4 vertices
+ *     into 2 faces with 3 vertices.
  *
- * @param (Faces& faces) l'ensemble des faces a decouper
+ * @param (Faces& faces) the set of faces to cut
  */
 static void decoupe(Faces& faces)
 {
@@ -57,16 +57,16 @@ static void decoupe(Faces& faces)
   sommets.ref(nouveaux);
 }
 
-/*! @brief Tetraedrise tous les elements d'un domaine: transforme les elements goemetriques du domaine en tetraedres.
+/*! @brief Tetrahedralizes all elements of a domain: transforms the geometric elements of the domain into tetrahedra.
  *
- *     Pour l'instant on ne sait tetraedriser que des Hexaedre.
- *     (on les coupe en 2).
- *     Les elements sont tetraedrises et tous les bords
- *     sont types en Triangle_3D.
+ *     For now we can only tetrahedralize Hexahedra.
+ *     (we cut them into 2).
+ *     The elements are tetrahedralized and all boundaries
+ *     are typed as Triangle_3D.
  *
- * @param (Domaine& domaine) le domaine dont on veut tetraedriser les elements
- * @throws on ne sait pas tetraedriser les elements
- * geometriques de ce type
+ * @param (Domaine& domaine) the domain whose elements we want to tetrahedralize
+ * @throws we do not know how to tetrahedralize elements
+ * of this geometric type
  */
 void Tetraedriser::trianguler(Domaine& domaine) const
 {

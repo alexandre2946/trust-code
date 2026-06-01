@@ -21,7 +21,7 @@
 
 class Champ_base;
 
-/*! @brief classe Correlation_Vec_Sca_VDF
+/*! @brief Correlation_Vec_Sca_VDF class
  *
  * @sa Champ_Fonc_P0_VDF Correlation_Vec_Sca_VDF
  */

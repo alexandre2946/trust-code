@@ -53,13 +53,13 @@ void Domaine_EF_axi::calculer_Bij_gen(DoubleTab& bij)
 
       for (int i=0; i<nbsom_elem; i++)
         {
-          // on cherche les faces contribuantes ,ce n'est pas optimal
+          // search for contributing faces, this is not optimal
           for (int f=0; f<nbface_elem; f++)
             {
               int face=elemfaces(elem,f);
               for (int s=0; s<nbsom_face; s++)
                 {
-                  // on cherche les faces contribuantes ,ce n'est pas optimal
+                  // search for contributing faces, this is not optimal
                   if (face_sommets_(face,s)==les_elems(elem,i))
                     {
                       double x1 = les_coords(les_elems(elem,0),0);

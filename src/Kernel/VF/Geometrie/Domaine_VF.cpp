@@ -86,10 +86,10 @@ Sortie& Domaine_VF::printOn(Sortie& os) const
   os << "elem_faces_ : " << finl;
   elem_faces_.ecrit(os);
 
-  //  os << "faces_doubles_ : " << finl; // PQ : 12/10/05 : a voir ce qu'il faut faire ici ???
+  //  os << "faces_doubles_ : " << finl; // PQ : 12/10/05 : TODO what to do here ???
   //  faces_doubles_.ecrit(os);
 
-  os << "face_sommets_ : " << finl; // PQ : 12/10/05 : a voir ce qu'il faut faire ici ???
+  os << "face_sommets_ : " << finl; // PQ : 12/10/05 : TODO what to do here ???
   face_sommets_.ecrit(os);
 
   os << "nb_faces_ : " << finl;
@@ -110,7 +110,7 @@ Entree& Domaine_VF::readOn(Entree& is)
   xp_.lit(is);
   xv_.lit(is);
   elem_faces_.lit(is);
-  //  faces_doubles_.lit(is); // PQ : 12/10/05 : a voir ce qu'il faut faire ici ???
+  //  faces_doubles_.lit(is); // PQ : 12/10/05 : TODO what to do here ???
   face_sommets_.lit(is);
   int nb_faces_unused;
   is >> nb_faces_unused;
@@ -145,17 +145,17 @@ void Domaine_VF::order_faces(Faces& les_faces)
  */
 void Domaine_VF::prepare_elem_non_std(Faces& les_faces)
 {
-  // Construction de rang_elem_non_std_ :
-  //  C'est un vecteur indexe par les elements du domaine.
+  // Construction of rang_elem_non_std_ :
+  //  It is a vector indexed by the domain elements.
   //  size() = nb_elem()
   //  size_tot() = nb_elem_tot()
-  //  Valeurs dans le tableau :
-  //   rang_elem_non_std_[i] = -1 si l'element i est standard,
-  //  sinon
-  //   rang_elem_non_std_[i] = j, ou j est l'indice de l'element dans
-  //   les tableaux indexes par les elements non standards (par exemple le tableau Domaine_Cl_EF::type_elem_Cl_).
+  //  Values in the array:
+  //   rang_elem_non_std_[i] = -1 if element i is standard,
+  //  otherwise
+  //   rang_elem_non_std_[i] = j, where j is the index of the element in
+  //   the arrays indexed by non-standard elements (for example the array Domaine_Cl_EF::type_elem_Cl_).
   //
-  // Un element est non standard s'il est voisin d'une face frontiere.
+  // An element is non-standard if it is adjacent to a boundary face.
   {
     const Domaine& dom = domaine();
     const int nb_elements = nb_elem();
@@ -163,7 +163,7 @@ void Domaine_VF::prepare_elem_non_std(Faces& les_faces)
     dom.creer_tableau_elements(rang_elem_non_std_);
     rang_elem_non_std_ = -1;
     int nb_elems_non_std = 0;
-    // D'abord on marque les elements non standards avec rang_elem_non_std_[i] = 0
+    // First mark the non-standard elements with rang_elem_non_std_[i] = 0
     for (int i_face = 0; i_face < nb_faces_front; i_face++)
       {
         const int elem = les_faces.voisin(i_face, 0);
@@ -177,7 +177,7 @@ void Domaine_VF::prepare_elem_non_std(Faces& les_faces)
     rang_elem_non_std_.echange_espace_virtuel();
     int count = 0;
     const int size_tot = rang_elem_non_std_.size_totale();
-    // On remplace le marqueur "0" par un indice incremental.
+    // Replace the "0" marker with an incremental index.
     for (int elem = 0; elem < size_tot; elem++)
       if (rang_elem_non_std_[elem] == 0)
         rang_elem_non_std_[elem] = count++;
@@ -191,19 +191,19 @@ void Domaine_VF::prepare_elem_non_std(Faces& les_faces)
  */
 void Domaine_VF::compute_sort_key(Faces& les_faces, IntTab& sort_key)
 {
-  // Construction du tableau de renumerotation des faces. Ce tableau,
-  // une fois trie dans l'ordre croissant donne l'ordre des faces dans
-  // le domaine_VF. La cle de tri est construite de sorte a pouvoir retrouver
-  // l'indice de la face a partir de la cle par la formule :
+  // Construction of the face renumbering array. This array,
+  // once sorted in ascending order, gives the order of faces in
+  // the domain_VF. The sort key is built so as to be able to recover
+  // the face index from the key using the formula:
   //  indice_face = cle % nb_faces
   const int nbfaces = les_faces.nb_faces();
   sort_key.resize(nbfaces, 2);
 
   nb_faces_std_ = 0;
   const int nb_faces_front = domaine().nb_faces_frontiere();
-  // Attention : face_voisins_ n'est pas encore initialise, il faut passer par les_faces.voisins() :
+  // Note: face_voisins_ is not yet initialized, we must use les_faces.voisins() instead:
   const IntTab& facevoisins = les_faces.voisins();
-  // On place en premier les faces de bord:
+  // Place boundary faces first:
   for (int i = 0; i < nb_faces_front; i++)
     {
       sort_key(i,0) = i;
@@ -214,15 +214,15 @@ void Domaine_VF::compute_sort_key(Faces& les_faces, IntTab& sort_key)
     {
       const int elem0 = facevoisins(i, 0);
       const int elem1 = facevoisins(i, 1);
-      // Ces faces ont toujours deux voisins.
+      // These faces always have two neighbours.
       assert(elem0 >= 0 && elem1 >= 0);
-      // Si la face est voisine d'un element non standard, elle doit etre classee juste apres les faces de bord:
+      // If the face is adjacent to a non-standard element, it must be classified just after the boundary faces:
       if (rang_elem_non_std_[elem0] >= 0 || rang_elem_non_std_[elem1] >= 0)
         {
           sort_key(i, 0) = i;
           sort_key(i, 1) = i;
         }
-      else  // Face standard : a la fin du tableau
+      else  // Standard face: at the end of the array
         {
           sort_key(i, 0) = i + nbfaces;
           sort_key(i, 1) = i;
@@ -301,7 +301,7 @@ void Domaine_VF::sort_along_zcurve(const Faces& les_faces, IntTab& sort_key) con
 void Domaine_VF::renumber_faces(Faces& les_faces, IntTab& sort_key)
 {
   const int nbfaces = les_faces.nb_faces();
-  // On reordonne les faces:
+  // Reorder the faces:
   IntTab& faces_sommets = les_faces.les_sommets();
   {
     IntTab old_tab(faces_sommets);
@@ -325,7 +325,7 @@ void Domaine_VF::renumber_faces(Faces& les_faces, IntTab& sort_key)
       }
   }
 
-  // Calcul de la table inversee: reverse_index[ancien_numero] = nouveau numero
+  // Compute the inverse table: reverse_index[old_number] = new_number
   ArrOfInt reverse_index(nbfaces);
   for (int i = 0; i < nbfaces; i++)
     {
@@ -333,8 +333,8 @@ void Domaine_VF::renumber_faces(Faces& les_faces, IntTab& sort_key)
       reverse_index[j] = i;
     }
 
-  // Renumerotation de elem_faces:
-  // Nombre d'indices de faces dans le tableau
+  // Renumbering of elem_faces:
+  // Number of face indices in the array
   const int nb_items = elem_faces_.size();
   ArrOfInt& array = elem_faces_;
   for (int i = 0; i < nb_items; i++)
@@ -343,7 +343,7 @@ void Domaine_VF::renumber_faces(Faces& les_faces, IntTab& sort_key)
       array[i] = old < 0 ? -1 : reverse_index[old];
     }
 
-  // Mise a jour des indices des faces de joint:
+  // Update of the joint face indices:
   Joints&      joints    = domaine().faces_joint();
   const int nbjoints = joints.size();
   for (int i_joint = 0; i_joint < nbjoints; i_joint++)
@@ -351,23 +351,23 @@ void Domaine_VF::renumber_faces(Faces& les_faces, IntTab& sort_key)
       Joint&     un_joint         = joints[i_joint];
       ArrOfInt& indices_faces = un_joint.set_joint_item(JOINT_ITEM::FACE).set_items_communs();
       const int nbfaces2    = indices_faces.size_array();
-      assert(nbfaces2 == un_joint.nb_faces()); // renum_items_communs rempli ?
+      assert(nbfaces2 == un_joint.nb_faces()); // renum_items_communs filled?
       for (int i = 0; i < nbfaces2; i++)
         {
-          const int old = indices_faces[i]; // ancien indice local
+          const int old = indices_faces[i]; // old local index
           indices_faces[i] = reverse_index[old];
         }
-      // Les faces de joint ne sont plus consecutives dans le
-      // tableau: num_premiere_face n'a plus ne sens
+      // Joint faces are no longer consecutive in the
+      // array: num_premiere_face no longer makes sense
       un_joint.fixer_num_premiere_face(-1);
     }
 
-  // Mise a jour des indices des groupes de faces:
+  // Update of the face group indices:
   Groupes_Faces&      groupes_faces    = domaine().groupes_faces();
   groupes_faces.renumerote(reverse_index);
 }
 
-/*! @brief Genere les faces construits les frontieres
+/*! @brief Generates the faces and builds the boundaries
  *
  */
 void Domaine_VF::discretiser()
@@ -408,12 +408,12 @@ void Domaine_VF::discretiser()
 
     order_faces(les_faces);
 
-    // Les faces sont dans l'ordre definitif, on peut remplir
-    // renum_items_communs des faces:
+    // The faces are in their final order, we can now fill
+    // renum_items_communs for the faces:
     Scatter::calculer_renum_items_communs(ledomaine.faces_joint(), JOINT_ITEM::FACE);
 
-    // Remplissage de face_voisins des frontieres:
-    // a factoriser avec DomaineCut.cpp
+    // Filling of face_voisins for the boundaries:
+    // to be factored with DomaineCut.cpp
     {
       const IntTab& facevoisins = les_faces.voisins();
       const int nb_frontieres = ledomaine.nb_front_Cl();
@@ -433,40 +433,40 @@ void Domaine_VF::discretiser()
     }
 
     Scatter::calculer_espace_distant_faces(domaine(), les_faces.nb_faces(), elem_faces_);
-    // Apres la methode suivante, on aura le droit d'utiliser creer_tableau_faces() :
+    // After the following method, we will be allowed to use creer_tableau_faces():
     Scatter::construire_md_vector(domaine(), les_faces.nb_faces(), JOINT_ITEM::FACE, md_vector_faces_);
 
 
     const MD_Vector& md_vect_sommets = domaine().les_sommets().get_md_vector();
     const MD_Vector& md_vect_elements = domaine().les_elems().get_md_vector();
-    // Construction de l'espace virtuel du tableau face_sommets
+    // Construction of the virtual space of the face_sommets array
     Scatter::construire_espace_virtuel_traduction(md_vector_faces_, md_vect_sommets, les_faces.les_sommets());
 
-    // Idem pour face_voisins_
-    // Certaines faces des elements virtuels les plus externes n'ont pas d'element local voisin => erreurs non fatales
+    // Same for face_voisins_
+    // Some faces of the outermost virtual elements have no local neighbouring element => non-fatal errors
     Scatter::construire_espace_virtuel_traduction(md_vector_faces_, md_vect_elements, les_faces.voisins(), 0 /* error not fatal */);
 
-    // Idem pour elem_faces_
+    // Same for elem_faces_
     Scatter::construire_espace_virtuel_traduction(md_vect_elements, md_vector_faces_, elem_faces_);
 
     ledomaine.init_faces_virt_bord(md_vector_faces_, md_vector_faces_front_);
 
-    // Assignation de face_voisins et face_sommets
+    // Assignment of face_voisins and face_sommets
     face_voisins().ref(les_faces.voisins());
     face_sommets().ref(les_faces.les_sommets());
 
-    // Calcul des surfaces:
+    // Computation of surfaces:
     les_faces.calculer_surfaces(face_surfaces_);
-    // Calcul de la surface des faces virtuelles
+    // Computation of the surface of virtual faces
     MD_Vector md_nul;
     creer_tableau_faces(face_surfaces_);
     face_surfaces_.echange_espace_virtuel();
-    face_surfaces_.set_md_vector(md_nul); // Detache la structure parallele
+    face_surfaces_.set_md_vector(md_nul); // Detach the parallel structure
 
-    // Changement a la v1.5.7 beta: xv_ a maintenant un descripteur parallele: dimension(0)=nb_faces
+    // Change in v1.5.7 beta: xv_ now has a parallel descriptor: dimension(0)=nb_faces
     les_faces.calculer_centres_gravite(xv_);
 
-    // Calcul des volumes
+    // Computation of volumes
     ledomaine.calculer_volumes(volumes_, inverse_volumes_);
   }
   {
@@ -502,13 +502,13 @@ void Domaine_VF::discretiser()
         les_bords_[i].associer_Domaine_dis(*this);
       }
   }
-  // Centre de gravite des elements (tableau xp_)
+  // Centre of gravity of elements (array xp_)
   ledomaine.calculer_centres_gravite(xp_);
-  // Centre de gravite du domaine
+  // Centre of gravity of the domain
   ArrOfDouble c(dimension);
   ledomaine.calculer_mon_centre_de_gravite(c);
 
-  // On cree les domaines frontieres
+  // Create the boundary domains
   ledomaine.creer_mes_domaines_frontieres(*this);
 
   delete les_faces_ptr;
@@ -521,11 +521,11 @@ void Domaine_VF::discretiser()
 
 
   ///////////////////////
-  // On imprime des infos
+  // Print some information
   ///////////////////////
-  ledomaine.imprimer();        // Extremas du domaine et volumes
-  infobord();                        // Aires des bords
-  info_elem_som();                // Nombre elements et sommets
+  ledomaine.imprimer();        // Domain extrema and volumes
+  infobord();                        // Boundary areas
+  info_elem_som();                // Number of elements and vertices
   Cerr << "<<<<<< End of Discretization VF >>>>>>>>>>" << finl;
 }
 
@@ -533,7 +533,7 @@ void Domaine_VF::discretiser_no_face()
 {
   Domaine& dom = domaine();
   typer_elem(dom);
-  // Calcul du volume du domaine discretise
+  // Compute the volume of the discretised domain
   dom.calculer_volumes(volumes(), inverse_volumes());
 }
 
@@ -557,7 +557,7 @@ void Domaine_VF::remplir_face_voisins_fictifs(const Domaine_Cl_dis_base& )
 
 
 
-/*! @brief renvoie new(Faces) ! elle est surchargee par Domaine_VDF par ex.
+/*! @brief Returns new(Faces)! It is overridden by Domaine_VDF for example.
  *
  */
 Faces* Domaine_VF::creer_faces()
@@ -576,9 +576,9 @@ void Domaine_VF::modifier_pour_Cl(const Conds_lim& conds_lim)
       if (sub_type(Periodique, cl))
         {
           // if (perio ...
-          // Modifications du tableau face_voisins
-          // Une face de type periodicite doit avoir les memes voisins que
-          // sa face associee
+          // Modifications of the face_voisins array
+          // A periodic-type face must have the same neighbours as
+          // its associated face
           //      face_voisins(face,j) = face_voisins(face_associee(face),j)  j=1,2
           //
 
@@ -614,17 +614,17 @@ void Domaine_VF::modifier_pour_Cl(const Conds_lim& conds_lim)
     }
 
 
-  // PQ : 10/10/05 : les faces periodiques etant a double contribution
-  //                      l'appel a marquer_faces_double_contrib s'effectue dans cette methode
-  //                      afin de pouvoir beneficier de conds_lim.
+  // PQ : 10/10/05 : periodic faces having double contribution,
+  //                      the call to marquer_faces_double_contrib is done in this method
+  //                      in order to benefit from conds_lim.
 
 
   marquer_faces_double_contrib(conds_lim);
-  // Construction du tableau num_fac_loc_
+  // Construction of the num_fac_loc_ array
   construire_num_fac_loc();
 }
 
-// Methode pour la construction du tableau num_fac_loc_
+// Method for building the num_fac_loc_ array
 void Domaine_VF::construire_num_fac_loc()
 {
   const int size = nb_faces_tot();
@@ -640,7 +640,7 @@ void Domaine_VF::construire_num_fac_loc()
             if (face_loc != -1) num_fac_loc_(face,voisin) = face_loc;
             else
               {
-                // Cas periodique
+                // Periodic case
                 int autre_voisin = 1 - voisin;
                 int elem2 = face_voisins(face,autre_voisin);
                 int nb_faces_elem = elem_faces_.dimension(1);
@@ -660,14 +660,14 @@ void Domaine_VF::construire_num_fac_loc()
       }
 }
 
-// Renvoie le numero local de face a partir des numeros globaux face et elem
-// Utiliser si possible Domaine_VF::num_fac_loc(face,voisin) car la methode est
-// optimisee, celle ci non.
+// Returns the local face number from the global face and elem numbers
+// Use Domaine_VF::num_fac_loc(face,voisin) if possible because that method is
+// optimized, whereas this one is not.
 int Domaine_VF::numero_face_local(int face, int elem) const
 {
   //int nfe=domaine().nb_faces_elem();
-  // GF pour le cas ou on a plusieurs types de faces....
-  // nb_faces_elem() renvoit le nbre de sommet par face du premier type de faces
+  // GF for the case where there are multiple types of faces....
+  // nb_faces_elem() returns the number of vertices per face for the first face type
   int nfe=elem_faces_.dimension(1);
   for(int face_loc=0; face_loc<nfe; face_loc++)
     if(elem_faces_(elem, face_loc)==face)
@@ -675,9 +675,7 @@ int Domaine_VF::numero_face_local(int face, int elem) const
   return -1;
 }
 
-/*! @brief Remplissage du tableau face_virt_pe_num_ (voir commentaire dans Domaine_VF.
- *
- * h)
+/*! @brief Fills in the face_virt_pe_num_ array (see comment in Domaine_VF.h).
  *
  */
 void Domaine_VF::construire_face_virt_pe_num()
@@ -699,14 +697,14 @@ void Domaine_VF::construire_face_virt_pe_num()
   tmp.echange_espace_virtuel();
 
   face_virt_pe_num_.resize(nb_faces_virt, 2);
-  // Copie de la partie virtuelle de tmp dans face_virt_pe_num_
+  // Copy of the virtual part of tmp into face_virt_pe_num_
   face_virt_pe_num_.inject_array(tmp, nb_faces_virt*2, 0 /* dest offset*/, nf * 2 /* source offset*/);
 }
 
 const IntTab& Domaine_VF::face_virt_pe_num() const
 {
-  // On verifie que le tableau a ete construit (si ca plante, c'est qu'on a
-  // oublie d'appeler construire_face_virt_pe_num()).
+  // Verify that the array has been built (if it crashes, it means we
+  // forgot to call construire_face_virt_pe_num()).
   assert(face_virt_pe_num_.dimension(1) == 2);
   return face_virt_pe_num_;
 }
@@ -760,7 +758,7 @@ DoubleTab Domaine_VF::normalized_boundaries_outward_vector(int global_face_numbe
 void Domaine_VF::marquer_faces_double_contrib(const Conds_lim& conds_lim)
 {
   Journal() << " Domaine_VF::marquer_faces_double_contrib" << finl;
-  // marquage des faces periodiques
+  // marking periodic faces
   ////////////////////////////////////////////////
 
   est_face_bord_=0; // init for inner faces.
@@ -789,7 +787,7 @@ void Domaine_VF::marquer_faces_double_contrib(const Conds_lim& conds_lim)
         }
     }
 
-  // marquage des faces items communs
+  // marking shared item faces
   ////////////////////////////////////////////////
   int nbjoints=nb_joints();
 
@@ -800,11 +798,11 @@ void Domaine_VF::marquer_faces_double_contrib(const Conds_lim& conds_lim)
       const int nbfaces = indices_faces_joint.dimension(0);
       for (int j = 0; j < nbfaces; j++)
         {
-          // Pour acceder au face de joint, il existe desormais un tableau dedie renum_items_communs()
-          // car l'ancienne facon d'acceder a ces faces etait de passer par
-          // joint.num_premiere_face() et joint.nb_faces() ce qui n'est plus valable !
-          // En effet, la numerotation des faces de joint n'est plus continue desormais !
-          // joint.num_premiere_face() retourne -1 desormais pour detecter les anciens codages.
+          // To access joint faces, there is now a dedicated array renum_items_communs()
+          // because the old way of accessing these faces was through
+          // joint.num_premiere_face() and joint.nb_faces() which is no longer valid!
+          // Indeed, the numbering of joint faces is no longer contiguous!
+          // joint.num_premiere_face() now returns -1 to detect old code patterns.
           int face_de_joint = indices_faces_joint(j, 1);
           faces_doubles_[face_de_joint] = 1;
         }
@@ -874,7 +872,7 @@ void Domaine_VF::info_elem_som()
   Cerr<<"=============================================="<<finl;
   trustIdType internal_item = std::min(nbelem, nbfaces);
   internal_item = std::min(internal_item, nbsom);
-  // premiere_face_int()*dimension+1 pour ne pas alerter sur flux vectoriels aux faces frontieres:
+  // premiere_face_int()*dimension+1 to avoid alerting on vector fluxes at boundary faces:
   DeviceMemory::internal_items_size_ = std::max((trustIdType)(premiere_face_int()*dimension+1),internal_item);
 }
 
@@ -925,14 +923,14 @@ void Domaine_VF::remplir_face_numero_bord()
 
 const DoubleTab& Domaine_VF::xv_bord() const
 {
-  if (xv_bord_.get_md_vector() == md_vector_faces_bord()) return xv_bord_; //deja cree
+  if (xv_bord_.get_md_vector() == md_vector_faces_bord()) return xv_bord_; //already created
   xv_bord_.resize(0, dimension), creer_tableau_faces_bord(xv_bord_);
-  std::copy(xv_.addr(), xv_.addr() + dimension * premiere_face_int(), xv_bord_.addr()); //faces reelles : le debut de xv_
+  std::copy(xv_.addr(), xv_.addr() + dimension * premiere_face_int(), xv_bord_.addr()); //real faces: the beginning of xv_
   xv_bord_.echange_espace_virtuel();
   return xv_bord_;
 }
 
-/*! @brief calcul le tableau xgr pour le calcul des moments des forces aux bords :
+/*! @brief Computes the xgr array for the computation of moments of forces at boundaries.
  *
  *
  */
@@ -971,10 +969,10 @@ void Domaine_VF::build_map_mc_Cmesh(const bool with_faces)
   /* Step 1. build mesh */
   build_mc_Cmesh();
 
-  /* Step 2. build nodes correspondance : indx est i + nx * (j + ny * k) */
+  /* Step 2. build nodes correspondance : indx is i + nx * (j + ny * k) */
   build_mc_Cmesh_nodesCorrespondence();
 
-  /* Step 2. build elem and face correspondance : indx est i + (nx - 1) * (j + (ny - 1) * k) */
+  /* Step 2. build elem and face correspondance : indx is i + (nx - 1) * (j + (ny - 1) * k) */
   build_mc_Cmesh_correspondence(with_faces);
 
   mc_Cmesh_with_faces_corr_ = with_faces;
@@ -1155,17 +1153,17 @@ void Domaine_VF::build_mc_Cmesh_correspondence(bool withFace)
 static int findCartIndex(const std::vector<double>& vect, const double value)
 {
   if (value < vect.front() || value > vect.back())
-    return -1; // pas dedans
+    return -1; // not inside
 
   auto it = std::lower_bound(vect.begin(), vect.end(), value);
 
   if (it == vect.end())
-    return -1; // pas dedans
+    return -1; // not inside
 
   int index = static_cast<int>(std::distance(vect.begin(), it));
 
   if (index > 0 && value < vect[index])
-    index--; // juste avant !!
+    index--; // just before!!
 
   return index;
 }
@@ -1274,20 +1272,20 @@ void Domaine_VF::compute_average_porosity(const DoubleVect& val_source, const Do
 void Domaine_VF::get_nb_integ_points(IntTab& ) const
 {
   Process::exit("The function should not be used in domaine_VF, related to quadrature points (DG discretization)");
-  //surcharge dans domaine_DG mais qui n'est pas dans kernel
+  //overridden in domaine_DG but not present in kernel
 }
 
 void Domaine_VF::get_ind_integ_points(IntTab& ) const
 {
   Process::exit("The function should not be used in domaine_VF, related to quadrature points (DG discretization)");
-  //surcharge dans domaine_DG mais qui n'est pas dans kernel
+  //overridden in domaine_DG but not present in kernel
 }
 
 int Domaine_VF::get_max_nb_integ_points() const
 {
   Process::exit("The function should not be used in domaine_VF, related to quadrature points (DG discretization)");
   return 0;
-  //surcharge dans domaine_DG mais qui n'est pas dans kernel
+  //overridden in domaine_DG but not present in kernel
 }
 
 #ifdef TRUST_USE_ARBORX
@@ -1302,7 +1300,7 @@ struct ExtractIndex
 };
 #endif
 
-/*! Methode inspiree de Raccord_distant_homogene::initialise
+/*! @brief Method inspired by Raccord_distant_homogene::initialise
  */
 void Domaine_VF::init_dist_paroi_globale(const Conds_lim& conds_lim)
 {
@@ -1314,7 +1312,7 @@ void Domaine_VF::init_dist_paroi_globale(const Conds_lim& conds_lim)
   const IntTab& f_s = face_sommets();
   const DoubleTab& xs = domaine_.domaine().coord_sommets();
 
-  // On initialise les tables y_faces_ et y_elem_
+  // Initialize the tables y_faces_ and y_elem_
   domaine_.creer_tableau_faces(y_faces_);
   domaine_.domaine().creer_tableau_elements(y_elem_);
 
@@ -1324,12 +1322,12 @@ void Domaine_VF::init_dist_paroi_globale(const Conds_lim& conds_lim)
   MD_Vector_tools::creer_tableau_distribue(y_elem_.get_md_vector(), n_y_elem_);
   MD_Vector_tools::creer_tableau_distribue(y_faces_.get_md_vector(), n_y_faces_);
 
-  // On va identifier les faces par leur centres de gravite
+  // Identify faces by their centres of gravity
   int parts = Process::nproc();
   int moi = Process::me();
   DoubleTabs remote_xv(parts);
 
-  // On initialise la table de faces/sommets/aretes de bords locale, on cree une table de sommets locale et on compte les aretes
+  // Initialize the local boundary face/vertex/edge table, create a local vertex table and count the edges
   int nb_faces_bord_ = 0;
   int nb_aretes = 0;
   std::set<int> soms;
@@ -1350,7 +1348,7 @@ void Domaine_VF::init_dist_paroi_globale(const Conds_lim& conds_lim)
                 soms.insert(f_s(f, nb_som_loc));
                 nb_som_loc++;
               }
-            nb_aretes += (D == 3 ? nb_som_loc : 0)  ; // Autant d'aretes autour d'une face que de sommets !
+            nb_aretes += (D == 3 ? nb_som_loc : 0)  ; // As many edges around a face as there are vertices!
           }
       }
 
@@ -1360,7 +1358,7 @@ void Domaine_VF::init_dist_paroi_globale(const Conds_lim& conds_lim)
   remote_xv[moi].resize(nb_faces_bord_ + (int)soms.size() + nb_aretes,D);
   int index[5] = { -1, -1, -1, -1, -1 };
   bool Z_numbered = que_suis_je() == "Domaine_VDF" && dimension==3;
-  if (Z_numbered) // Numerotation en Z des sommets dans une face...
+  if (Z_numbered) // Z-numbering of vertices in a face...
     {
       index[0] = 0;
       index[1] = 1;
@@ -1368,8 +1366,8 @@ void Domaine_VF::init_dist_paroi_globale(const Conds_lim& conds_lim)
       index[3] = 2;
       index[4] = 0;
     }
-  // On remplit les coordonnes des faces et aretes de bord locales
-  int ind_tab = 0 ; // indice de la face/sommet/arete dans le tableau
+  // Fill in the coordinates of local boundary faces and edges
+  int ind_tab = 0 ; // index of the face/vertex/edge in the array
   for (int ind_cl = 0 ; ind_cl < conds_lim.size() ; ind_cl++)
     if ( sub_type(Dirichlet_paroi_defilante, conds_lim[ind_cl].valeur()) || sub_type(Dirichlet_homogene, conds_lim[ind_cl].valeur()) || (sub_type(Navier, conds_lim[ind_cl].valeur()) && !sub_type(Symetrie, conds_lim[ind_cl].valeur()) ) )
       {
@@ -1379,12 +1377,12 @@ void Domaine_VF::init_dist_paroi_globale(const Conds_lim& conds_lim)
         for (int f=num_face_1_cl ; f < nb_faces_cl+num_face_1_cl ; f++)
           {
             for (int d=0 ; d<D ; d++)
-              remote_xv[moi](ind_tab,d) = domaine_.xv(f, d); // Remplissage des faces
+              remote_xv[moi](ind_tab,d) = domaine_.xv(f, d); // Fill in face coordinates
             ind_tab++;
 
-            if (D==3) // Remplissage des aretes
+            if (D==3) // Fill in edge coordinates
               {
-                if (Z_numbered) // Numerotation en Z des sommets dans une face...
+                if (Z_numbered) // Z-numbering of vertices within a face...
                   {
                     for (int id_som=1; id_som<=nb_som_face(); id_som++)
                       {
@@ -1412,7 +1410,7 @@ void Domaine_VF::init_dist_paroi_globale(const Conds_lim& conds_lim)
           }
       }
 
-  for (auto som:soms) // Remplissage des sommets
+  for (auto som:soms) // Fill in vertex coordinates
     {
       for (int d=0 ; d<D ; d++)
         remote_xv[moi](ind_tab,d) = xs(som, d);
@@ -1420,8 +1418,8 @@ void Domaine_VF::init_dist_paroi_globale(const Conds_lim& conds_lim)
     }
 
 
-  // Puis on echange les tableaux des centres de gravites
-  // envoi des tableaux
+  // Exchange the arrays of centres of gravity
+  // broadcast the arrays
   Cerr << "[MPI] Broadcasting remote_xv..." << finl;
   for (int p = 0; p < parts; p++)
     envoyer_broadcast(remote_xv[p], p);
@@ -1434,9 +1432,9 @@ void Domaine_VF::init_dist_paroi_globale(const Conds_lim& conds_lim)
   double GBytes = nb_total_points * 4.0 /* float */ * D / 1024.0 / 1024.0 / 1024.0;
   Cerr << "Estimated memory needed: " << GBytes << " GB" << finl;
 
-  // On traite les informations, chaque proc connait tous les XV
+  // Process the information; each proc knows all the XV
 
-// On boucle sur toutes les faces puis tous les elems
+// Loop over all faces then all elements
   const DoubleTab& local_xv = domaine_.xv();
   const DoubleTab& local_xp = domaine_.xp();
   ArrOfInt glob_idx(Process::check_int_overflow(nf+ne));
@@ -1540,9 +1538,9 @@ void Domaine_VF::init_dist_paroi_globale(const Conds_lim& conds_lim)
     }
 #else
   // MedCoupling implementation (C++14, soon deprecated):
-  //indices des points de remote_xvs les plus proches de chaque point de local_xv
+  //indices of the remote_xvs points closest to each point of local_xv
   MCAuto <DataArrayIdType> glob(DataArrayIdType::New());
-  //DataArrayDoubles des xv locaux et de tous les remote_xv (a la suite)
+  //DataArrayDoubles of the local xv and all remote_xv (concatenated)
   std::vector<MCAuto<DataArrayDouble> > vxv(parts);
   std::vector<const DataArrayDouble*> cvxv(parts);
   MCAuto<DataArrayDouble> remote_xvs(DataArrayDouble::New());
@@ -1567,10 +1565,10 @@ void Domaine_VF::init_dist_paroi_globale(const Conds_lim& conds_lim)
 #endif
 
   ToDo_Kokkos("critical");
-//pour chaque element et face de local_xs : remplissage des tableaux
+//for each element and face in local_xs: fill in the arrays
   for (int fe = 0; fe<nf+ne; fe++)
     {
-      //retour de l'indice global (glob_idx(ind_face)) au couple (proc, ind_face2)
+      //convert global index (glob_idx(ind_face)) to the pair (proc, ind_face2)
       int proc = 0;
       int fe2 = glob_idx(fe);
       while (fe2 >= remote_xv[proc].dimension(0))
@@ -1603,7 +1601,7 @@ void Domaine_VF::init_dist_paroi_globale(const Conds_lim& conds_lim)
         }
     }
 
-// Pour les elems de bord, on calcule la distance de facon propre avec le produit scalaire
+// For boundary elements, compute the distance properly using the dot product
   for (int ind_cl = 0 ; ind_cl < conds_lim.size() ; ind_cl++)
     if ( sub_type(Dirichlet_paroi_defilante, conds_lim[ind_cl].valeur()) || sub_type(Dirichlet_homogene, conds_lim[ind_cl].valeur()) || (sub_type(Navier, conds_lim[ind_cl].valeur()) && !sub_type(Symetrie, conds_lim[ind_cl].valeur()) ))
       {
@@ -1614,7 +1612,7 @@ void Domaine_VF::init_dist_paroi_globale(const Conds_lim& conds_lim)
           {
             const int ind = (face_voisins(f,0)>=0) ? face_voisins(f,0) : face_voisins(f,1) ;
             const double dist_ef_loc = (face_voisins(f,0)>=0) ? dist_face_elem0(f, face_voisins(f,0)) : dist_face_elem1(f, face_voisins(f,1));
-            if ( dist_ef_loc < y_elem_(ind) ) // Prise en compte du cas ou l'element a plusieurs faces de bord
+            if ( dist_ef_loc < y_elem_(ind) ) // Handle the case where the element has multiple boundary faces
               {
                 y_elem_(ind) = dist_ef_loc ;
                 for (int d = 0 ; d < D ; d++)
@@ -1760,7 +1758,7 @@ void Domaine_VF::build_mc_dual_mesh() const
 
     if (e1 >= 0 && e2 >= 0)
       {
-        // On garde l'element vraiment adjacent a la face geometrique
+        // Keep only the element truly adjacent to the geometric face
         if (d2(e1) <= d2(e2)) e2 = -1;
         else e1 = -1;
       }
@@ -1772,7 +1770,7 @@ void Domaine_VF::build_mc_dual_mesh() const
     {
       int e1=face_voisins_(f, 0), e2=face_voisins_(f, 1);
 
-      // XXX Elie Saikali : face periodique : la traiter comme une face de bord geometrique ...
+      // XXX Elie Saikali : periodic face: treat it as a geometric boundary face ...
       if (est_face_bord_[f] == 2)
         corrige_voisins_dual_perio(f, e1, e2);
 
@@ -1804,7 +1802,7 @@ void Domaine_VF::build_mc_dual_mesh() const
     {
       int e1 = face_voisins_(f, 0), e2 = face_voisins_(f, 1);
 
-      // XXX Elie Saikali : face periodique : la traiter comme une face de bord geometrique ...
+      // XXX Elie Saikali : periodic face: treat it as a geometric boundary face ...
       if (est_face_bord_[f] == 2)
         corrige_voisins_dual_perio(f, e1, e2);
 

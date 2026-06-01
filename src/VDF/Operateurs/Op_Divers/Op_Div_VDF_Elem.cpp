@@ -26,8 +26,8 @@ void Op_Div_VDF_Elem::associer(const Domaine_dis_base& domaine_dis, const Domain
 {
   const Domaine_VDF& zvdf = ref_cast(Domaine_VDF,domaine_dis);
   const Domaine_Cl_VDF& zclvdf = ref_cast(Domaine_Cl_VDF,domaine_Cl_dis);
-  // On n'associe pas div a la vitesse car non P0.
-  // On n'associe pas div a la pression car div(P) n'a pas de sens. Donc on fait rien !
+  // Do not associate div with the velocity because it is not P0.
+  // Do not associate div with the pressure because div(P) makes no sense. So do nothing!
 
   iter_->associer(zvdf,zclvdf,*this);
   Eval_Div_VDF_Elem& eval_div = static_cast<Eval_Div_VDF_Elem&> (iter_->evaluateur());

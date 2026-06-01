@@ -22,7 +22,7 @@
 class Domaine_Cl_VDF;
 class Champ_Face_VDF;
 
-/*! @brief classe Taux_cisaillement_P0_VDF
+/*! @brief class Taux_cisaillement_P0_VDF
  *
  */
 class Taux_cisaillement_P0_VDF : public Champ_Fonc_P0_VDF

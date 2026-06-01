@@ -19,8 +19,8 @@
 #include <Champ_Face_base.h>
 #include <SolveurSys.h>
 
-// Champ correspondant a une inconnue decrite par ses flux aux faces (type vitesse)
-// Degres de libertes : composante normale aux faces + composante tangentielle aux aretes de la vorticite
+// Field corresponding to an unknown described by its face fluxes (e.g. velocity)
+// Degrees of freedom: normal component at faces + tangential component at edges of the vorticity
 class Champ_Face_PolyMAC_CDO: public Champ_Face_base
 {
   Declare_instanciable(Champ_Face_PolyMAC_CDO);
@@ -44,17 +44,17 @@ public:
 
   int fixer_nb_valeurs_nodales(int n) override;
 
-  //integrale de la vitesse sur le bord des aretes duales -> pour calculer la vorticite
+  //integral of velocity on the boundary of dual edges -> to compute the vorticity
   void init_ra() const;
-  mutable IntTab radeb, raji, rajf; //reconstruction du rotationnel par (raji, raci)[radeb(a, 0), radeb(a + 1, 0)[ (vitesses aux faces)
-  mutable DoubleTab raci, racf;     //                                + (rajf, racf)[radeb(a, 1), radeb(a + 1, 1)[ (val_imp aux faces de bord)
+  mutable IntTab radeb, raji, rajf; //reconstruction of the curl via (raji, raci)[radeb(a, 0), radeb(a + 1, 0)[ (face velocities)
+  mutable DoubleTab raci, racf;     //                             + (rajf, racf)[radeb(a, 1), radeb(a + 1, 1)[ (imposed values at boundary faces)
 
-  //interpolation aux aretes de la vitesse (dans le plan normal a chaque arete)
+  //interpolation of velocity at edges (in the plane normal to each edge)
   void init_va() const;
-  mutable IntTab vadeb, vaji, vajf;   //reconstruction de la vitesse par (vaji, vaci)[vadeb(a, 0), vadeb(a + 1, 0)[ (vitesses aux faces)
-  mutable DoubleTab vaci, vacf;       // + (vajf, vacf)[vadeb(a, 1), vadeb(a + 1, 1)[ (val_imp aux faces de bord) + (vaja, vaca)[vadeb(., 2)] (val_imp aux aretes)
+  mutable IntTab vadeb, vaji, vajf;   //reconstruction of velocity via (vaji, vaci)[vadeb(a, 0), vadeb(a + 1, 0)[ (face velocities)
+  mutable DoubleTab vaci, vacf;       // + (vajf, vacf)[vadeb(a, 1), vadeb(a + 1, 1)[ (imposed values at boundary faces) + (vaja, vaca)[vadeb(., 2)] (imposed values at edges)
 
-  //interpolations aux elements : vitesse val(e, i) = v_i, gradient vals(e, i, j) = dv_i / dx_j
+  //interpolations at elements: velocity val(e, i) = v_i, gradient vals(e, i, j) = dv_i / dx_j
   virtual void interp_ve(const DoubleTab& inco, DoubleTab& val, bool is_vit = true) const;
   virtual void interp_ve(const DoubleTab& inco, const IntVect&, DoubleTab& val, bool is_vit = true) const;
   virtual void interp_gve(const DoubleTab& inco, DoubleTab& vals) const final;

@@ -26,11 +26,9 @@ class Domaine_VF;
 class Domaine_dis_base;
 class Domaine_Cl_dis_base;
 
-/*! @brief classe EDO_Pression_th_base Cette classe est la base de la hierarchie des EDO sur la pression
+/*! @brief @brief Base class of the ODE hierarchy for thermodynamic pressure associated with the scheme resolution for dilatable fluids.
  *
- *      associees a la resolution du schema pour les fluides dilatables
- *
- * @sa Fluide_Dilatable_base, Classe abstraite dont toutes les lois d'etat doivent deriver., Methodes abstraites:, void calculer_coeff_T(), void Resoudre_EDO_PT(), void calculer_masse_volumique()
+ * @sa Fluide_Dilatable_base
  */
 
 class EDO_Pression_th_base : public Objet_U
@@ -43,7 +41,7 @@ public :
   virtual void completer();
   void mettre_a_jour_CL(double);
 
-  // Virtuelles pure
+  // Pure virtual methods
   virtual double masse_totale(double P, const DoubleTab& T)=0;
   virtual double masse_totale(const DoubleTab& P, const DoubleTab& T)=0;
 
@@ -54,7 +52,7 @@ protected :
   OBS_PTR(Fluide_Dilatable_base) le_fluide_;
   OBS_PTR(Domaine_Cl_dis_base) le_dom_Cl;
   OBS_PTR(Domaine_VF) le_dom;
-  double M0 = -1.;// la masse totale initiale
+  double M0 = -1.; // total initial mass
 };
 
 #endif /* EDO_Pression_th_base_included */

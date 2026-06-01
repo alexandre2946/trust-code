@@ -27,10 +27,10 @@ Entree& Integrale_tps_Champ::readOn(Entree& s)
   return s;
 }
 
-/*! @brief Mets a jour l'integrale.
+/*! @brief Updates the integral.
  *
- * Verifie que le temps de l'integrale est inferieur a celui du champ associe et poursuit l'integration jusqu'au temps courant.
- *     si la borne superieure de l'integrale n'est pas depassee.
+ * @brief Checks that the integral time is less than or equal to the current time of the associated field and continues
+ *     the integration up to the current time, if the upper bound of the integral has not been exceeded.
  *
  */
 void Integrale_tps_Champ::mettre_a_jour_integrale()

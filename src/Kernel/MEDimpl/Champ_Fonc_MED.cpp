@@ -135,11 +135,11 @@ Entree& Champ_Fonc_MED::readOn(Entree& is)
   // Finished interpreting ... processing now:
   //
   if (!nom_decoup_lu)
-    nom_decoup_ = Nom("decoup/") + nom_dom_ + ".txt"; //valeur par defaut de nom_decoup
+    nom_decoup_ = Nom("decoup/") + nom_dom_ + ".txt"; // default value for nom_decoup
 
   traite_nom_fichier_med(nom_fichier_med_);
-  // La lecture de fichiers multiples .med fonctionne: voir cas test Champ_fonc_MED_Parallele
-  // Un test est fait plus loin pour bien verifier que les partitionnement se recouvrent pour cela
+  // Reading multiple .med files works: see test case Champ_fonc_MED_Parallele
+  // A check is performed below to verify that the partitions overlap correctly
   int multiple_med = 0;
   Nom tmp(nom_fichier_med_);
   tmp.prefix("0001.med");
@@ -147,7 +147,7 @@ Entree& Champ_Fonc_MED::readOn(Entree& is)
     {
       multiple_med = 1;
       /*
-      // Ajout d'un test bloquant pour empecher la lecture de fichiers 000n.med
+      // Adding a blocking test to prevent reading 000n.med files
       Cerr << "Error, Champ_Fonc_MED can't read, for the moment, partitioned MED files." << finl;
       Cerr << "Try to build a single MED file by:" << finl;
       Cerr << "A) Using LATA format for the previous calculation." << finl;
@@ -170,7 +170,7 @@ Entree& Champ_Fonc_MED::readOn(Entree& is)
         }
       else
         {
-          // use_existing_domain utilisable en parallele uniquement si le process 0 gere tout le domaine ou si decoup specifie:
+          // use_existing_domain can be used in parallel only if process 0 manages the entire domain or if a partition file is specified:
           const Domaine& le_domaine=ref_cast(Domaine, interprete().objet(nom_dom_));
           if (Process::is_parallel() && mp_max((int)(le_domaine.nb_som()>0)) != 0 && !nom_decoup_lu)
             {
@@ -236,7 +236,7 @@ Entree& Champ_Fonc_MED::readOn(Entree& is)
       liremed.lire_geom(false); // false: do not create sub-dom files
       if (multiple_med)
         {
-          // On verifie que l'on a bien des recouvrements identiques (verification imparfaite sur les BoundingBox)
+          // Check that the overlaps are identical (imperfect check based on BoundingBox)
           DoubleTab BB1 = dom_med_.getBoundingBox();
           const Domaine& dom_calcul = ref_cast(Domaine, interprete().objet(nom_dom_));
           DoubleTab BB2 = dom_calcul.getBoundingBox();
@@ -250,8 +250,8 @@ Entree& Champ_Fonc_MED::readOn(Entree& is)
                 }
           Cerr << "Ok MED partition matches the domain partition so reading multiple MED files..." << finl;
         }
-      // MODIF ELI LAUCOIN (06/03/2012) :
-      // j'ajoute l'attribut temps_sauv_
+      // MODIF ELI LAUCOIN (06/03/2012):
+      // adding the attribute temps_sauv_
       field_size = creer(nom_fichier_med_,dom_med_,loc_,temps_sauv_);
     }
   if (last_time_only_)
@@ -259,13 +259,13 @@ Entree& Champ_Fonc_MED::readOn(Entree& is)
       temps_=temps_sauv_[temps_sauv_.size_array()-1];
       Cout << "The resumption time is "<<temps_<<finl;
     }
-  // FIN MODIF ELI LAUCOIN (06/03/2012)
-  /* si on est en parallele : creation du filtre */
+  // END MODIF ELI LAUCOIN (06/03/2012)
+  /* in parallel mode: create the filter */
   if (Process::is_parallel() && field_size < 0)
     {
       EFichier fdec;
       fdec.ouvrir(nom_decoup_);
-      // Cas ou le maillage du fichier .med suit la numerotation du maillage initial (necessite le fichier du decoupage pour retrouver la numerotation)
+      // Case where the .med file mesh follows the numbering of the initial mesh (requires the partition file to recover the numbering)
       if (fdec.good())
         {
           int dec_size=-1;
@@ -304,7 +304,7 @@ Entree& Champ_Fonc_MED::readOn(Entree& is)
               Process::exit();
             }
         }
-      else // Cas ou le maillage .med suit la numerotation du maillage decoupe
+      else // Case where the .med mesh follows the numbering of the partitioned mesh
         {
           int nb_item = le_champ().valeurs().dimension(0);
           trustIdType first_item = mppartial_sum(nb_item);
@@ -335,7 +335,7 @@ void Champ_Fonc_MED::mettre_a_jour(double t)
 {
   if (t<0)
     {
-      // Si t negatif convention (non indique dans la doc Trust) pour specifier un numero de pas de temps:
+      // If t is negative: convention (not documented in TRUST) to specify a time step number:
       int given_it = -(int) t - 1;
       lire(-1, given_it);
     }
@@ -352,9 +352,9 @@ INTERP_KERNEL::NormalizedCellType type_geo_trio_to_type_medcoupling(const Nom& t
 
 void Champ_Fonc_MED::lire(double t, int given_it)
 {
-  if (domainebidon_inst.nb_elem()==0) // Cas d'un domaine vide
+  if (domainebidon_inst.nb_elem()==0) // Empty domain case
     {
-      // Mise a jour:
+      // Update:
       Champ_Fonc_base::mettre_a_jour(t);
       le_champ().Champ_Fonc_base::mettre_a_jour(t);
       return;
@@ -365,17 +365,17 @@ void Champ_Fonc_MED::lire(double t, int given_it)
   std::string  meshName = nom_maillage_ == Nom() ? mon_dom->le_nom().getString() : nom_maillage_.getString();
   std::string fieldName = nom_champ_dans_fichier_med_.getString();
   std::string  fileName = nom_fichier_med_.getString();
-  // Etude des conditions pour chercher ou nom un champ dans le fichier MED:
+  // Determine whether to search for the field in the MED file:
   bool search_field = true;
   nb_dt = temps_sauv_.size_array();
   if (nb_dt>0)
     {
-      // nb_dt nombre de pas de temps dans le fichier MED
-      // ndt taille du tableau temps_sauv contenant les pas de temps du champ dans le fichier MED
-      // tmax dernier temps du tableau temps_sauv ?
-      // dt ?
-      // t temps courant pour lequel on veut remplir le champ
-      // last_time_only_ specifie dans le jeu de donnees ou non
+      // nb_dt: number of time steps in the MED file
+      // ndt: size of the temps_sauv array containing the time steps of the field in the MED file
+      // tmax: last time in the temps_sauv array
+      // dt: last time step in the temps_sauv array
+      // t: current time for which the field is to be filled
+      // last_time_only_: specified in the dataset or not
       double tmax = temps_sauv_[nb_dt - 1];
       double dt = temps_sauv_[nb_dt - 1];
       if (((nb_dt == 1) && (!est_egal(dt, t))) || ((last_time_only_) && (!est_egal(tmax, t))))
@@ -441,7 +441,7 @@ void Champ_Fonc_MED::lire(double t, int given_it)
         }
     }
 #endif  // MEDCOUPLING_
-  // Mise a jour:
+  // Update:
   Champ_Fonc_base::mettre_a_jour(t);
   le_champ().Champ_Fonc_base::mettre_a_jour(t);
 #else   // MED_
@@ -528,7 +528,7 @@ int Champ_Fonc_MED::creer(const Nom& nom_fic, const Domaine& un_dom, const Motcl
   domainebidon_inst.associer_domaine(un_dom);
   le_champ().associer_domaine_dis_base(domainebidon_inst);
   le_champ().fixer_nb_valeurs_nodales(type_champ == "Champ_Fonc_P0_MED" ? un_dom.nb_elem() : un_dom.nb_som());
-  //pour forcer la lecture lors du mettre a jour
+  // force a read on the next update
   changer_temps(-1e3);
   le_champ().nommer(le_nom());
   return size;
@@ -539,7 +539,7 @@ int Champ_Fonc_MED::creer(const Nom& nom_fic, const Domaine& un_dom, const Motcl
 }
 
 #ifdef MEDCOUPLING_
-// Remplissage des temps du champ fieldName depuis le fichier fileName
+// Fill the time steps of field fieldName from file fileName
 ArrOfDouble Champ_Fonc_MED::lire_temps_champ(const std::string& fileName, const std::string& fieldName)
 {
   ArrOfDouble temps_sauv;
@@ -553,11 +553,11 @@ ArrOfDouble Champ_Fonc_MED::lire_temps_champ(const std::string& fileName, const 
   return temps_sauv;
 }
 
-// Lecture du dernier champ dans le fichier juste pour decouvrir et stocker:
-// les temps (temps_sauv)
-// sa taille (size)
-// le nombre de composantes (nbcomp)
-// le type (type_champ)
+// Read the last field in the file just to discover and store:
+// the times (temps_sauv)
+// its size (size)
+// the number of components (nbcomp)
+// the type (type_champ)
 void Champ_Fonc_MED::lire_donnees_champ(const std::string& fileName, const std::string& meshName, const std::string& fieldName,
                                         ArrOfDouble& temps_sauv, int& size, int& nbcomp, Nom& type_champ)
 {
@@ -589,7 +589,7 @@ void Champ_Fonc_MED::lire_donnees_champ(const std::string& fileName, const std::
         }
       size = (int)field->getNumberOfTuplesExpected();
       nbcomp = (int)field->getNumberOfComponents();
-      if (nn>1) ffield_ = nullptr; // Plusieurs champs donc on ne stocke pas le dernier, il faudra relire le bon
+      if (nn>1) ffield_ = nullptr; // Multiple fields: do not store the last one, the correct one will be re-read
     }
 
   if (field_type == MEDCoupling::ON_CELLS)
@@ -618,17 +618,17 @@ void Champ_Fonc_MED::lire_donnees_champ(const std::string& fileName, const std::
 MCAuto<MEDCouplingField> Champ_Fonc_MED::lire_champ(const std::string& fileName, const std::string& meshName,
                                                     const std::string& fieldName, const int iteration, const int order)
 {
-  // Pour lecture plus rapide du field sans lecture du mesh si le maillage MED est deja disponible:
+  // Faster field reading without reading the mesh if the MED mesh is already available:
   if (meshName == domaine().le_nom() && !domaine().is_mc_mesh_ready()) domaine().build_mc_mesh();
   bool fast = domaine().is_mc_mesh_ready();
   Cerr << "Reading" << (fast ? " (fast)" : "") << " the field " << fieldName << " on the " << meshName << " mesh into " << fileName << " file" << finl;
   MCAuto<MEDCouplingField> ffield;
-  if (fast) // Lecture plus rapide du field sans lecture du mesh associe
+  if (fast) // Faster field reading without reading the associated mesh
     {
       MCAuto<MEDFileField1TS> file = MEDFileField1TS::New(fileName, fieldName, iteration, order);
       ffield = file->getFieldOnMeshAtLevel(field_type, domaine().get_mc_mesh(), 0);
     }
-  else   // Lecture ~deux fois plus lente du field avec lecture du mesh associe
+  else   // ~Twice slower field reading including reading of the associated mesh
     {
       ffield = ReadField(field_type, fileName, meshName, 0, fieldName, iteration, order);
     }

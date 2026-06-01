@@ -18,9 +18,10 @@
 
 
 
-/*! @brief class Domaine_Cl_EF Cette classe porte les tableaux qui servent a mettre en oeuvre
+/*! @brief class Domaine_Cl_EF
  *
- *   les condition aux limites dans la formulation EF
+ * @brief This class holds the arrays used to apply boundary conditions
+ *   in the EF formulation.
  *
  *
  * @sa Domaine_Cl_dis_base
@@ -61,20 +62,20 @@ public :
   };
 protected:
 
-  // Attributs:
+  // Attributes:
 
   int modif_perio_fait_=0;
 
-  // Fonctions de creation des membres prives du domaine:
+  // Functions for creating private domain members:
 
   void remplir_type_elem_Cl(const Domaine_EF& );
-  ArrOfInt type_sommet_;  // -1 interne 0 Neumann 1 Symetrie >2 Dirichlet
-  // Un sommet est d'abord diri , puis Symetrie , puis Neumann , puis interne
+  ArrOfInt type_sommet_;  // -1 internal, 0 Neumann, 1 Symmetry, >2 Dirichlet
+  // A vertex is first Dirichlet, then Symmetry, then Neumann, then internal
   OWN_PTR(Champ_Don_base) normales_symetrie_,normales_symetrie_bis_,normales_symetrie_ter_;
 };
 
 //
-// Fonctions inline de la classe Domaine_Cl_EF
+// Inline functions of class Domaine_Cl_EF
 //
 
 

@@ -19,11 +19,11 @@
 #include <Frottement_impose_base.h>
 
 
-/*! @brief Classe Frottement_global_impose Classe de base pour des conditions aux limites de type Navier (v.
+/*! @brief Classe Frottement_global_impose Base class for Navier-type boundary conditions (v.
  *
- * n nul, v_t par contrainte
- *     imposee) dans laquelle la contrainte imposee suit un coefficient de frottement :
- *     (force subie) = - coefficient_frottement * (vitesse tangentielle)_{face}
+ * n zero, v_t by imposed stress)
+ *     in which the imposed stress follows a friction coefficient:
+ *     (applied force) = - coefficient_frottement * (tangential velocity)_{face}
  *
  * @sa Navier
  */

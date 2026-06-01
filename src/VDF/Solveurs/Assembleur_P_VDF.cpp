@@ -44,31 +44,30 @@ Entree& Assembleur_P_VDF::readOn(Entree& s )
   return Assembleur_base::readOn(s);
 }
 
-/*! @brief Remplit le tableau faces avec la liste des indices des faces periodiques dans le tableau faces_voisins.
+/*! @brief Fills the array faces with the list of indices of the periodic faces in the face_voisins array.
  *
- * Chaque face periodique figure deux fois
- *  dans faces_voisins (a chaque face correspond la face opposee). On ne
- *  met dans le tableau faces que celle des deux qui a l'indice le + petit
- *  dans la liste des faces de chaque bord periodique.
- *  Valeur de retour:
- *  nombre de faces periodiques (egal a la taille du tableau faces).
+ * @brief Each periodic face appears twice in face_voisins (each face corresponds to the opposite face).
+ *  Only the one of the two with the smaller index in the list of faces of each periodic boundary
+ *  is stored in the array faces.
+ *  Return value:
+ *  number of periodic faces (equal to the size of the faces array).
  *
  */
 int Assembleur_P_VDF::liste_faces_periodiques(ArrOfInt& faces)
 {
-  // On commence par surestimer largement la taille du tableau :
-  // nombre de faces de bord
+  // First, largely overestimate the array size:
+  // number of boundary faces
   const int nb_faces_bord = le_dom_VDF->nb_faces_bord();
   faces.resize_array(nb_faces_bord);
 
-  // Recherche des faces periodiques dans les conditions aux limites:
+  // Search for periodic faces in the boundary conditions:
   const Conds_lim& les_cl = le_dom_Cl_VDF->les_conditions_limites();
   const int nb_cl = les_cl.size();
   int nb_faces_periodiques = 0;
   for (int num_cl = 0; num_cl < nb_cl; num_cl++)
     {
       const Cond_lim_base& la_cl = les_cl[num_cl].valeur();
-      // Selectionne uniquement les conditions Periodique
+      // Select only the Periodique conditions
       if ( ! sub_type(Periodique,la_cl))
         continue;
       const Periodique& la_cl_perio = ref_cast(Periodique, la_cl);
@@ -77,7 +76,7 @@ int Assembleur_P_VDF::liste_faces_periodiques(ArrOfInt& faces)
       const int num_premiere_face = frontiere.num_premiere_face();
       for (int i = 0; i < nb_faces_cl; i++)
         {
-          // Numero de la face opposee dans le tableau des faces du bord:
+          // Index of the opposite face in the boundary face array:
           const int face_associee = la_cl_perio.face_associee(i);
           if (face_associee > i)
             {
@@ -88,19 +87,19 @@ int Assembleur_P_VDF::liste_faces_periodiques(ArrOfInt& faces)
         }
     }
 
-  // Taille finale du tableau faces
+  // Final size of the faces array
   faces.resize_array(nb_faces_periodiques);
   return nb_faces_periodiques;
 }
 
-/*! @brief Determine les elements non nuls de la matrice et prepare le stockage.
+/*! @brief Determines the nonzero entries of the matrix and prepares the storage.
  *
- * Matrice creuse de taille nb_elements (lignes) * nb_elem_tot (colonnes)
- *   Codee comme une matrice bloc composee de deux matrices morse:
- *    * Matrice carree symetrique nb_elements * nb_elements
- *      (contient les termes M(i,j) ou i et j sont des numeros d'elements reels)
- *    * Matrice rectangle nb_elements * (nb_elem_tot - nb_elem)
- *      (contient les termes M(i,j) ou i est reel et j est virtuel
+ * @brief Sparse matrix of size nb_elements (rows) * nb_elem_tot (columns)
+ *   Stored as a block matrix composed of two Morse matrices:
+ *    * Square symmetric matrix nb_elements * nb_elements
+ *      (contains the terms M(i,j) where i and j are indices of real elements)
+ *    * Rectangular matrix nb_elements * (nb_elem_tot - nb_elem)
+ *      (contains the terms M(i,j) where i is real and j is virtual)
  *
  */
 int Assembleur_P_VDF::construire(Matrice& la_matrice)
@@ -109,28 +108,28 @@ int Assembleur_P_VDF::construire(Matrice& la_matrice)
   const Domaine_VDF& domaine_vdf   = le_dom_VDF.valeur();
   const IntTab& face_voisins = domaine_vdf.face_voisins();
 
-  // Comptage du nombre total d'elements non nuls:
-  // matrice carree : nombre de faces internes / 2 + nb_elem + nbfaces periodiques
-  //                  (chaque face interne donne un coef, et on a un element
-  //                   diagonal et chaque face periodique donne aussi un coef)
-  // matrice rectangle : nombre de faces de joint
+  // Count the total number of non-zero entries:
+  // square matrix: number of internal faces / 2 + nb_elem + nb periodic faces
+  //                (each internal face gives one coefficient, there is one diagonal
+  //                 element and each periodic face also gives one coefficient)
+  // rectangular matrix: number of joint faces
 
 
-  // Premiere etape : comptage du nombre d'elements non nuls sur chaque ligne
-  // Pour chaque ligne de la matrice carree, nombre d'elements non nuls
+  // First step: count the number of non-zero entries per row
+  // For each row of the square matrix, number of non-zero entries
   const int nb_elem     = domaine_vdf.nb_elem();
   const int nb_elem_tot = domaine_vdf.nb_elem_tot();
   ArrOfInt carre_nb_non_zero(nb_elem);
-  // Idem pour le rectangle
+  // Same for the rectangular matrix
   ArrOfInt rect_nb_non_zero(nb_elem);
-  // Il y a l'element sur la diagonale :
+  // There is one element on the diagonal:
   carre_nb_non_zero = 1;
   rect_nb_non_zero = 0;
   int carre_nb_non_zero_tot = nb_elem;
   int rect_nb_non_zero_tot = 0;
 
-  // Plus un element non nul pour chaque face interne et chaque face periodique
-  // (matrice symetrique, on ne stocke que l'element m(line,col) avec col>line)
+  // Plus one non-zero entry for each internal and periodic face
+  // (symmetric matrix, only the entry m(line,col) with col>line is stored)
 
   ArrOfInt liste_faces_perio;
   const int nb_faces_periodiques = liste_faces_periodiques(liste_faces_perio);
@@ -139,7 +138,7 @@ int Assembleur_P_VDF::construire(Matrice& la_matrice)
   for (i = 0; i < nb_faces_internes + nb_faces_periodiques; i++)
     {
       int face;
-      if (i < nb_faces_internes) // Astuce pour boucler sur les faces internes et periodiques
+      if (i < nb_faces_internes) // Trick to loop over internal and periodic faces
         face = premiere_face_interne + i;
       else
         face = liste_faces_perio[i - nb_faces_internes];
@@ -152,14 +151,14 @@ int Assembleur_P_VDF::construire(Matrice& la_matrice)
           elem1 = elem0;
           elem0 = tmp;
         }
-      if (elem0 < nb_elem)   // elem0 est reel
+      if (elem0 < nb_elem)   // elem0 is real
         {
-          if (elem1 < nb_elem)      // elem1 reel
+          if (elem1 < nb_elem)      // elem1 real
             {
               carre_nb_non_zero[elem0] ++;
               carre_nb_non_zero_tot ++;
             }
-          else                      // elem1 virtuel
+          else                      // elem1 virtual
             {
               rect_nb_non_zero[elem0] ++;
               rect_nb_non_zero_tot ++;
@@ -167,7 +166,7 @@ int Assembleur_P_VDF::construire(Matrice& la_matrice)
         }
     }
 
-  // Typage et dimensionnement de la matrice de pression
+  // Type and size the pressure matrix
   la_matrice.typer("Matrice_Bloc");
   Matrice_Bloc& matrice =ref_cast(Matrice_Bloc , la_matrice.valeur());
   matrice.dimensionner(1,2);
@@ -186,19 +185,19 @@ int Assembleur_P_VDF::construire(Matrice& la_matrice)
   auto& carre_tab1 = carre.get_set_tab1();
   auto& rect_tab1 = rect.get_set_tab1();
 
-  // Matrice creuse, stockage morse avec des indices fortran:
-  // lignes numerotees 1..n, colonnes 1..m
-  // Le k-ieme coefficient non nul de la ligne i (1<=i<=n) est (avec 1<=k)
-  //   M(i,j) = coeff_[tab1_[k]]     en fortran
-  //   M(i,j) = coeff_[tab1_[k-1]-1] en C
-  // Le numero j de la colonne ou se trouve ce coefficient (1<=j<=m) est
-  //   j = tab2_[tab1_[k]]     en fortran
-  //   j = tab2_[tab1_[k-1]-1] en C
+  // Sparse matrix, Morse storage with Fortran indices:
+  // rows numbered 1..n, columns 1..m
+  // The k-th nonzero coefficient on row i (1<=i<=n) is (with 1<=k)
+  //   M(i,j) = coeff_[tab1_[k]]     in Fortran
+  //   M(i,j) = coeff_[tab1_[k-1]-1] in C
+  // The column index j of this coefficient (1<=j<=m) is
+  //   j = tab2_[tab1_[k]]     in Fortran
+  //   j = tab2_[tab1_[k-1]-1] in C
   //
-  // Calcul de l'indice du premier coefficient de la ligne i
-  // dans le tableau d'indices morse des deux matrices (tab1_)
+  // Compute the index of the first coefficient on row i
+  // in the Morse index array of the two matrices (tab1_)
   {
-    int indice = 1; // tab1_ contient un indice fortran (1er element en 1)
+    int indice = 1; // tab1_ contains a Fortran index (first element at 1)
     for (i = 0; i < nb_elem; i++)
       {
         carre_tab1[i] = indice;
@@ -215,26 +214,25 @@ int Assembleur_P_VDF::construire(Matrice& la_matrice)
     rect_tab1[i] = indice;
   }
 
-  // Deuxieme etape : remplissage de tab2_ = numero de la colonne de chaque
-  // terme non nul de la matrice
+  // Second step: fill tab2_ = column index of each non-zero term of the matrix
   auto& carre_tab2 = carre.get_set_tab2();
   auto& rect_tab2 = rect.get_set_tab2();
 
   carre_tab2 = -1;
   rect_tab2 = -1;
 
-  // Terme diagonal:
+  // Diagonal term:
   for (i = 1; i <= nb_elem; i++)
-    carre_tab2[carre_tab1[i-1]-1] = i; // Indice fortran 1<=i<=nb_elem
+    carre_tab2[carre_tab1[i-1]-1] = i; // Fortran index 1<=i<=nb_elem
 
-  carre_nb_non_zero = 1; // Nombre de coefficients non nuls sur chaque ligne
+  carre_nb_non_zero = 1; // Number of nonzero coefficients on each row
   rect_nb_non_zero = 0;
 
-  // Termes extra-diagonaux:
+  // Off-diagonal terms:
   for (int i_face = 0; i_face < nb_faces_internes + nb_faces_periodiques; i_face++)
     {
 
-      // Calcul du numero de la face a traiter
+      // Compute the index of the face to process
       const int face = (i_face < nb_faces_internes)
                        ? premiere_face_interne + i_face
                        : liste_faces_perio[i_face - nb_faces_internes];
@@ -247,22 +245,22 @@ int Assembleur_P_VDF::construire(Matrice& la_matrice)
           elem1 = elem0;
           elem0 = tmp;
         }
-      assert(elem0 >= 0);            // Verifie qu'on a bien deux elements voisins
-      if (elem0 < nb_elem)                              // elem0 est reel
+      assert(elem0 >= 0);            // Verify that we have two neighboring elements
+      if (elem0 < nb_elem)                              // elem0 is real
         {
-          const int ligne = elem0 + 1;                 // Indice fortran
-          if (elem1 < nb_elem)                            // elem1 est reel aussi
+          const int ligne = elem0 + 1;                 // Fortran index
+          if (elem1 < nb_elem)                            // elem1 is real too
             {
-              const int colonne = elem1 + 1;             // Indice fortran
+              const int colonne = elem1 + 1;             // Fortran index
               const int n = carre_nb_non_zero[ligne-1]++;
-              const auto index = carre_tab1[ligne-1] + n; // Indice fortran dans tab2
+              const auto index = carre_tab1[ligne-1] + n; // Fortran index in tab2
               carre_tab2[index - 1] = colonne;
             }
-          else                                           // elem1 est virtuel
+          else                                           // elem1 is virtual
             {
-              const int colonne = elem1 - nb_elem + 1;  // Indice fortran
+              const int colonne = elem1 - nb_elem + 1;  // Fortran index
               const int n = rect_nb_non_zero[ligne-1]++;
-              const auto index = rect_tab1[ligne-1] + n; // Indice fortran dans tab2
+              const auto index = rect_tab1[ligne-1] + n; // Fortran index in tab2
               rect_tab2[index - 1] = colonne;
             }
         }
@@ -271,10 +269,10 @@ int Assembleur_P_VDF::construire(Matrice& la_matrice)
   return 1;
 }
 
-/*! @brief Calcul des coefficients de la matrice de pression avec un champ de rho.
+/*! @brief Computes the coefficients of the pressure matrix with a rho field.
  *
- * Si rho_ptr == 0, on calcule la matrice -div( porosite * grad P ),
- *   sinon on calcule -div( porosite/rho grad P ) et *rho_ptr doit etre un Champ_Fonc_Face_VDF.
+ * @brief If rho_ptr == 0, compute the matrix -div( porosity * grad P ),
+ *   otherwise compute -div( porosity/rho grad P ) and *rho_ptr must be a Champ_Fonc_Face_VDF.
  *
  */
 
@@ -294,8 +292,8 @@ int Assembleur_P_VDF::remplir(Matrice& la_matrice, const DoubleVect& volumes_ent
       valeurs_rho = & (rho_ptr->valeurs());
     }
 
-  // Raccourcis vers la partie carree (coefficients elements reels/reels)
-  // et la partie rectangulaire (elements reels / elements virtuels) de la matrice
+  // Shortcuts to the square part (real/real element coefficients)
+  // and the rectangular part (real/virtual elements) of the matrix
   Matrice_Bloc& matrice = ref_cast(Matrice_Bloc, la_matrice.valeur());
   Matrice_Morse_Sym& carre = ref_cast(Matrice_Morse_Sym, matrice.get_bloc(0,0).valeur());
   Matrice_Morse&      rect  = ref_cast(Matrice_Morse,     matrice.get_bloc(0,1).valeur());
@@ -314,14 +312,14 @@ int Assembleur_P_VDF::remplir(Matrice& la_matrice, const DoubleVect& volumes_ent
   carre_coeff = 0.;
   rect_coeff = 0.;
 
-  // Traitement des faces internes et periodiques :
-  // Pour chaque face entre deux elements elem0 et elem1, y a quatre termes a ajouter :
+  // Processing internal and periodic faces:
+  // For each face between two elements elem0 and elem1, there are four terms to add:
   //   M(elem0,elem0)
   //   M(elem0,elem1)
   //   M(elem1,elem1)
-  //   M(elem1,elem0)  (omis car la matrice est stockee symetrique)
+  //   M(elem1,elem0)  (omitted because the matrix is stored as symmetric)
 
-  // Construction de la liste des faces periodiques
+  // Build the list of periodic faces
   ArrOfInt liste_faces_perio;
   const int nb_faces_periodiques = liste_faces_periodiques(liste_faces_perio);
   const int nb_faces_internes = domaine_vdf.nb_faces_internes();
@@ -329,18 +327,18 @@ int Assembleur_P_VDF::remplir(Matrice& la_matrice, const DoubleVect& volumes_ent
   for (int i_face = 0; i_face < nb_faces_internes + nb_faces_periodiques; i_face++)
     {
 
-      // Calcul du numero de la face a traiter
+      // Compute the index of the face to process
       const int num_face = (i_face < nb_faces_internes)
                            ? premiere_face_interne + i_face
                            : liste_faces_perio[i_face - nb_faces_internes];
-      // Calcul de rho sur cette face
+      // Compute rho on this face
       const double rho_face = (valeurs_rho) ? (*valeurs_rho)[num_face] : 1.;
-      // Calcul du coefficient
+      // Compute the coefficient
       const double surface  = face_surfaces[num_face];
       const double volume   = volumes_entrelaces[num_face];
       const double porosite = porosite_face[num_face];
       const double coefficient = surface * surface * porosite / (volume * rho_face);
-      // Numeros des deux elements voisins (le plus petit dans elem0)
+      // Indices of the two neighboring elements (the smaller one in elem0)
       int elem0 = face_voisins(num_face,0);
       int elem1 = face_voisins(num_face,1);
       if (elem0 > elem1)
@@ -351,38 +349,38 @@ int Assembleur_P_VDF::remplir(Matrice& la_matrice, const DoubleVect& volumes_ent
         }
       if (elem0 < nb_elem)
         {
-          // elem0 est reel
-          const int ligne = elem0 + 1;   // Indice fortran
-          // Indice fortran de l'element diagonal (elem0, elem0)
+          // elem0 is real
+          const int ligne = elem0 + 1;   // Fortran index
+          // Fortran index of the diagonal element (elem0, elem0)
           const auto index_diag = carre_tab1[ligne-1];
           carre_coeff[index_diag - 1] += coefficient;
           if (elem1 < nb_elem)
             {
-              // elem1 est reel aussi
-              // Indice fortran de l'element diagonal (elem1, elem1)
-              const auto index_diag1 = carre_tab1[elem1]; // a la ligne elem1+1
-              // Indice fortran de l'element extradiagonal (elem0, elem1)
+              // elem1 is real too
+              // Fortran index of the diagonal element (elem1, elem1)
+              const auto index_diag1 = carre_tab1[elem1]; // at row elem1+1
+              // Fortran index of the off-diagonal element (elem0, elem1)
               const int n = carre_nb_non_zero[ligne-1]++;
               const auto index = index_diag + n;
-              // Coefficient diagonal
+              // Diagonal coefficient
               carre_coeff[index_diag1 - 1] += coefficient;
-              // Coefficient extra-diagonal
+              // Off-diagonal coefficient
               carre_coeff[index - 1] = - coefficient;
               assert(carre.get_tab2()(index - 1) == elem1 + 1);
             }
           else
             {
-              // elem1 est virtuel
+              // elem1 is virtual
               const int n = rect_nb_non_zero[ligne-1]++;
-              const auto index = rect_tab1[ligne-1] + n; // Indice fortran dans tab2
-              // Coefficient extra-diagonal
+              const auto index = rect_tab1[ligne-1] + n; // Fortran index in tab2
+              // Off-diagonal coefficient
               rect_coeff[index - 1] = - coefficient;
               assert(rect.get_tab2()(index - 1) == elem1 - nb_elem + 1);
             }
         }
     }
 
-  // Traitement des conditions aux limites
+  // Processing the boundary conditions
   const Conds_lim& les_cl = le_dom_Cl_VDF->les_conditions_limites();
   const int nb_cl = les_cl.size();
   for (int num_cl = 0; num_cl < nb_cl; num_cl++)
@@ -390,7 +388,7 @@ int Assembleur_P_VDF::remplir(Matrice& la_matrice, const DoubleVect& volumes_ent
       const Cond_lim_base& la_cl = les_cl[num_cl].valeur();
       const Front_VF& la_front_dis = ref_cast(Front_VF,la_cl.frontiere_dis());
 
-      // Test sur les conditions limites en 2D RZ (on doit avoir symetrie selon l'axe de revolution)
+      // Test on boundary conditions in 2D RZ (symmetry about the axis of revolution is required)
       if (bidim_axi && !sub_type(Symetrie,la_cl))
         {
           const int ndeb = la_front_dis.num_premiere_face();
@@ -405,10 +403,10 @@ int Assembleur_P_VDF::remplir(Matrice& la_matrice, const DoubleVect& volumes_ent
             }
         }
 
-      // Pour chaque face de bord entre elem0 et un element fictif exterieur
-      // a pression imposee P0, on a :
+      // For each boundary face between elem0 and a fictitious exterior element
+      // with imposed pressure P0, we have:
       //    grad P = (P(elem0) - P0) * surface / volume_entrelace
-      // elem0 est une inconnue, P0 est ajoute au second membre dans "modifier_secmem".
+      // elem0 is an unknown; P0 is added to the right-hand side in "modifier_secmem".
       if (sub_type(Neumann_sortie_libre,la_cl))
         {
           has_P_ref = 1;
@@ -417,45 +415,45 @@ int Assembleur_P_VDF::remplir(Matrice& la_matrice, const DoubleVect& volumes_ent
           const int nfin = ndeb + la_front_dis.nb_faces();
           for (int num_face = ndeb; num_face < nfin; num_face++)
             {
-              // Calcul de rho sur cette face
+              // Compute rho on this face
               const double rho_face = (valeurs_rho) ? (*valeurs_rho)[num_face] : 1.;
-              // Calcul du coefficient a ajouter dans la matrice
+              // Compute the coefficient to add to the matrix
               const double surface  = face_surfaces[num_face];
-              // Attention: le volume entrelace a une valeur particuliere au bord
-              // (voir Domaine_VDF::calculer_volumes_entrelaces() )
+              // Note: the staggered volume has a special value at the boundary
+              // (see Domaine_VDF::calculer_volumes_entrelaces())
               const double volume   = volumes_entrelaces[num_face];
               const double porosite = porosite_face[num_face];
               const double coefficient = Option_VDF::coeff_P_neumann * surface * surface * porosite / (volume * rho_face);
               assert(coefficient > 0.);
-              // Numero de l'element voisin (l'un est -1, l'autre est un element reel)
+              // Index of the neighboring element (one is -1, the other is a real element)
               const int elem0 = face_voisins(num_face, 0);
               const int elem1 = face_voisins(num_face, 1);
               assert(elem0 == -1 || elem1 == -1);
               const int elem = elem0 + elem1 + 1;
-              // Ajout du coefficient a la matrice
+              // Add the coefficient to the matrix
               assert(elem < nb_elem);
-              const auto index = carre_tab1[elem]; // Indice fortran
+              const auto index = carre_tab1[elem]; // Fortran index
               carre_coeff[index - 1] += coefficient;
               les_coeff_pression[num_face] = coefficient;
             }
         }
       else
         {
-          // Pour les autres conditions aux limites, aucun terme supplementaire dans
-          // la matrice (grad P scalaire n = 0 sur le bord,
-          // ou derivee en temps de grad P scalaire n = 0 sur le bord)
+          // For other boundary conditions, no additional term in the matrix
+          // (grad P dot n = 0 on the boundary,
+          // or time derivative of grad P dot n = 0 on the boundary)
         }
     }
   has_P_ref = (int)mp_max(has_P_ref);
 
-  // Verification sanitaire: pas d'element nul sur la diagonale
+  // Sanity check: no zero element on the diagonal
   for (int i = 0; i < nb_elem; i++)
     {
       const auto index = carre_tab1[i];
       const double coeff_diagonal = carre_coeff[index - 1];
       if (coeff_diagonal == 0.)
         {
-          // La maille i n'a pas de voisin: pression quelconque
+          // Cell i has no neighbor: pressure is arbitrary
           carre_coeff[index - 1] = 1.;
         }
     }
@@ -465,14 +463,14 @@ int Assembleur_P_VDF::remplir(Matrice& la_matrice, const DoubleVect& volumes_ent
   return 1;
 }
 
-/*! @brief Modification du second membre pour appliquer les conditions aux limites.
+/*! @brief Modifies the right-hand side to apply boundary conditions.
  *
- * Les conditions prises en charge sont
+ * @brief The supported conditions are:
  *   Neumann_sortie_libre,
  *   Entree_fluide_vitesse_imposee,
- *   Dirichlet_paroi_defilante (rien a faire),
- *   Dirichlet_paroi_fixe (rien a faire),
- *   Symetrie (rien a faire)
+ *   Dirichlet_paroi_defilante (nothing to do),
+ *   Dirichlet_paroi_fixe (nothing to do),
+ *   Symetrie (nothing to do)
  *
  */
 int Assembleur_P_VDF::modifier_secmem(DoubleTab& secmem)
@@ -527,13 +525,13 @@ int Assembleur_P_VDF::modifier_secmem(DoubleTab& secmem)
   return 1;
 }
 
-/*! @brief Modification du second membre du solveur en pression pour une condition "Neumann_sortie_libre".
+/*! @brief Modifies the right-hand side of the pressure solver for a "Neumann_sortie_libre" condition.
  *
- *  Calcul en "increment de pression" :
- *   ajouter l'increment de pression, c'est a dire zero (c.l. instationnaire non supportee)
- *  Calcul en "pression" :
- *   Ajout du terme Pimpose * surface / volume_entrelace au second membre dans la discretisation de la
- *   pression au bord (entre un element elem0 et un element fictif exterieur a pression imposee) :
+ *  @brief Computation in "pressure increment" mode:
+ *   add the pressure increment, i.e. zero (unsteady boundary condition not supported)
+ *  Computation in "pressure" mode:
+ *   Add the term Pimpose * surface / volume_entrelace to the right-hand side in the discretization of the
+ *   pressure at the boundary (between an element elem0 and a fictitious exterior element with imposed pressure):
  *     grad P = (P(elem0) - Pimpose) * surface / volume_entrelace
  *
  */
@@ -557,7 +555,7 @@ void Assembleur_P_VDF::modifier_secmem_pression_imposee(const Neumann_sortie_lib
         exit();
         } else {
         // Champ stationnaire, on ajoute un increment de pression nul.
-        // Donc rien a faire.
+        // So nothing to do.
         }
       */
     }
@@ -576,10 +574,10 @@ void Assembleur_P_VDF::modifier_secmem_pression_imposee(const Neumann_sortie_lib
     }
 }
 
-/*! @brief Modification du second membre du systeme en pression pour une condition aux limites de vitesse imposee.
+/*! @brief Modifies the right-hand side of the pressure system for an imposed velocity boundary condition.
  *
- *  Si on resout en increment de pression, ...
- *  sinon rien a faire.
+ *  @brief If solving in pressure increment mode, ...
+ *  otherwise nothing to do.
  *
  */
 void Assembleur_P_VDF::modifier_secmem_vitesse_imposee(const Entree_fluide_vitesse_imposee& cond_lim,
@@ -606,10 +604,10 @@ void Assembleur_P_VDF::modifier_secmem_vitesse_imposee(const Entree_fluide_vites
               const double surface = face_surfaces(num_face);
               const int elem0 = face_voisins(num_face, 0);
               const int elem1 = face_voisins(num_face, 1);
-              // gpoint est relatif a la normale a la face (elle pointe vers elem1)
-              // La normale est-elle entrante ou sortante ?
+              // gpoint is relative to the face normal (pointing towards elem1)
+              // Is the normal inward or outward?
               const double signe = (elem0 < 0) ? 1. : -1.;
-              // Numero de l'element adjacent a la face de bord
+              // Index of the element adjacent to the boundary face
               const int elem = elem0 + elem1 + 1;
               const int ori = le_dom.orientation(num_face);
               const double gpoint = nb_dim==1 ? tab_gpoint(ori) : tab_gpoint(ch_unif ? 0 : i, ori);
@@ -619,12 +617,12 @@ void Assembleur_P_VDF::modifier_secmem_vitesse_imposee(const Entree_fluide_vites
         }
       else
         {
-          // Le champ frontiere est stationnaire, rien a faire.
+          // The boundary field is steady, nothing to do.
         }
     }
   else
     {
-      // Resolution en pression: la condition aux limites est imposee ailleurs
+      // Pressure resolution: the boundary condition is imposed elsewhere
     }
 }
 
@@ -634,8 +632,8 @@ int Assembleur_P_VDF::modifier_solution(DoubleTab& pression)
   double press_0;
   if(!has_P_ref)
     {
-      // On prend la pression minimale comme pression de reference
-      // afin d'avoir la meme pression de reference en sequentiel et parallele
+      // Take the minimum pressure as the reference pressure
+      // to have the same reference pressure in sequential and parallel runs
       press_0=DMAXFLOAT;
       int nb_elem=le_dom_VDF->domaine().nb_elem();
       for(int n=0; n<nb_elem; n++)
@@ -715,18 +713,17 @@ int Assembleur_P_VDF::assembler_rho_variable(Matrice& matrice,
   return 1;
 }
 
-/*! @brief Assemble la matrice de pression pour un fluide quasi compressible.
+/*! @brief Assembles the pressure matrix for a quasi-compressible fluid.
  *
- * La matrice M est telle que M*P = div( porosite * grad(P) ).
- *     Le drapeau resoudre_increment_pression est mis a zero s'il n'a pas
- *     encore ete assigne.
+ * @brief The matrix M is such that M*P = div( porosity * grad(P) ).
+ *     The resoudre_increment_pression flag is set to zero if not yet assigned.
  *
- * @param (DoubleTab& tab_rho) mass volumique
- * @return (int) renvoie toujours 1
+ * @param tab_rho Density array.
+ * @return Always returns 1.
  */
 int Assembleur_P_VDF::assembler_QC(const DoubleTab& tab_rho, Matrice& matrice)
 {
-  // Par defaut pour le qc: resolution en pression et pas en increment pression.
+  // Default for QC: solve in pressure, not in pressure increment.
   if (get_resoudre_increment_pression() < 0)
     {
       set_resoudre_increment_pression(1);
@@ -770,7 +767,7 @@ int Assembleur_P_VDF::assembler_QC(const DoubleTab& tab_rho, Matrice& matrice)
 /* equation sum_k alpha_k = 1 en Pb_Multiphase */
 void Assembleur_P_VDF::dimensionner_continuite(matrices_t matrices, int aux_only) const
 {
-  if (aux_only) return; //rien a faire
+  if (aux_only) return; //nothing to do
   int e, n, N = ref_cast(Pb_Multiphase, le_dom_Cl_VDF->equation().probleme()).nb_phases(), ne_tot = le_dom_VDF->nb_elem_tot();
   Stencil stencil(0, 2);
 
@@ -786,7 +783,7 @@ void Assembleur_P_VDF::assembler_continuite(matrices_t matrices, DoubleTab& secm
   Matrice_Morse& mat = *matrices.at("alpha");
   const DoubleVect& ve = le_dom_VDF->volumes(), &pe = le_dom_Cl_VDF->equation().milieu().porosite_elem();
   int e, n, N = alpha.line_size();
-  /* second membre : on multiplie par porosite * volume pour que le systeme en P soit symetrique en cartesien */
+  /* right-hand side: multiply by porosity * volume so that the pressure system is symmetric in Cartesian coordinates */
   for (e = 0; e < le_dom_VDF->nb_elem(); e++)
     for (secmem(e) = -pe(e) * ve(e), n = 0; n < N; n++) secmem(e) += pe(e) * ve(e) * alpha(e, n);
   /* matrice */
@@ -825,6 +822,6 @@ void Assembleur_P_VDF::associer_domaine_cl_dis_base(const Domaine_Cl_dis_base& l
 
 void Assembleur_P_VDF::completer(const Equation_base& Eqn)
 {
-  // CCa 30/04/99 : je ne sais pas si je dois faire qqchose
+  // CCa 30/04/99: not sure if anything needs to be done here
   ;
 }

@@ -40,7 +40,7 @@ Entree& Op_Conv_DI_L2_VEF_Face::readOn(Entree& s )
 }
 
 //
-//   Fonctions de la classe Op_Conv_DI_L2_VEF_Face
+//   Functions of class Op_Conv_DI_L2_VEF_Face
 //
 
 void Op_Conv_DI_L2_VEF_Face::associer_vitesse(const Champ_base& vit)
@@ -52,8 +52,8 @@ void Op_Conv_DI_L2_VEF_Face::associer_vitesse(const Champ_base& vit)
 
 void flora(DoubleTab A, int& N , DoubleVect B, DoubleVect& U, int& test_flora)
 {
-  //cette procedure correspond a la methode d'elimination de Gauss
-  test_flora = 0; //test pour savoir si la matrice est inversible(0) ou non(1)
+  //This procedure corresponds to the Gaussian elimination method
+  test_flora = 0; //test to determine whether the matrix is invertible (0) or not (1)
   int N1 = N-1;
   int m, m1, i, i1, k, l;
   double quo,SU;
@@ -100,8 +100,8 @@ void flora(DoubleTab A, int& N , DoubleVect B, DoubleVect& U, int& test_flora)
 
 void flora_p(DoubleTab& A, int& N, DoubleVect& B, DoubleVect& U, int& test_flora)
 {
-  //cette procedure correspond a la methode d'elimination de Gauss
-  test_flora = 1;//test pour savoir si la matrice est inversible(1) ou non(0)
+  //This procedure corresponds to the Gaussian elimination method
+  test_flora = 1;//test to determine whether the matrix is invertible (1) or not (0)
   int N1 = N-1;
   int m, m1, i, j, i1, k, l;
   int test=0;
@@ -172,10 +172,10 @@ void flora_p(DoubleTab& A, int& N, DoubleVect& B, DoubleVect& U, int& test_flora
 
 void qrdcmp(DoubleTab& A, int& N, DoubleVect& C, DoubleVect& D, int& sing)
 {
-  //construit la decomposition QR de A. Le triangle superieur R est stockee dans le triangle superieur de A,
-  //exepte les elements de la diagonale, qui sont stockes dans D. La matrice orthogonale Q est representee
-  //comme un produit de N-1 matrice Q(1), ..., Q(N-1) ou Q(j) = Id-(uj*ujt)/cj. La ieme composante de uj est 0
-  //pour i=1, ...,j-1 et A(i,j) pour i=j, ..., N. sing retourne 0 si la decomposition est possible et 1 sinon.
+  //Builds the QR decomposition of A. The upper triangle R is stored in the upper triangle of A,
+  //except for the diagonal elements, which are stored in D. The orthogonal matrix Q is represented
+  //as a product of N-1 matrices Q(1), ..., Q(N-1) where Q(j) = Id-(uj*ujt)/cj. The i-th component of uj is 0
+  //for i=1, ...,j-1 and A(i,j) for i=j, ..., N. sing returns 0 if the decomposition is possible and 1 otherwise.
 
   int i, j, k;
   double scale, sigma, sum, tau;
@@ -222,8 +222,8 @@ void qrdcmp(DoubleTab& A, int& N, DoubleVect& C, DoubleVect& D, int& sing)
 
 void rsolv(DoubleTab& A, int& N, DoubleVect& D, DoubleVect& B)
 {
-  //resout le systeme Rx=B, ou R est triangulaire superieure stockee dans A et D, provenant de qrdcmp
-  //le resultat est stocke dans B.
+  //Solves the system Rx=B, where R is the upper triangular matrix stored in A and D, from qrdcmp
+  //the result is stored in B.
   int i, j;
   double sum;
   B(N-1) /= D(N-1);
@@ -237,7 +237,7 @@ void rsolv(DoubleTab& A, int& N, DoubleVect& D, DoubleVect& B)
 void qrsolv( DoubleTab& A, int& N, DoubleVect& B, DoubleVect& X, int& sing,
              int& ncomp, DoubleVect& C, DoubleVect& D)
 {
-  //resout le systeme lineaire Ax=B
+  //Solves the linear system Ax=B
   // DoubleVect C(N), D(N);
   int i, j;
   double sum, tau;
@@ -364,7 +364,7 @@ void gradient_biconjugue(DoubleTab A, int n, DoubleVect b, DoubleVect& x, int& s
 }
 
 
-// convbis correspond au calcul de -1*terme_convection
+// convbis computes -1*terme_convection
 
 void convbis(double psc,int num1,int num2,
              const DoubleTab& transporte, int ncomp,
@@ -435,15 +435,14 @@ DoubleTab& Op_Conv_DI_L2_VEF_Face::ajouter(const DoubleTab& transporte,
 
   //  int premiere_face_int = domaine_VEF.premiere_face_int();
 
-  // Pour le traitement de la convection on distingue les polyedres
-  // standard qui ne "voient" pas les conditions aux limites et les
-  // polyedres non standard qui ont au moins une face sur le bord.
-  // Un polyedre standard a n facettes sur lesquelles on applique le
-  // schema de convection.
-  // Pour un polyedre non standard qui porte des conditions aux limites
-  // de Dirichlet, une partie des facettes sont portees par les faces.
-  // En bref pour un polyedre le traitement de la convection depend
-  // du type (triangle, tetraedre ...) et du nombre de faces de Dirichlet.
+  // For the convection treatment, standard polyhedra (which do not "see"
+  // any boundary conditions) are distinguished from non-standard polyhedra
+  // that have at least one face on the boundary.
+  // A standard polyhedron has n facets on which the convection scheme is applied.
+  // For a non-standard polyhedron with Dirichlet boundary conditions,
+  // part of the facets are carried by boundary faces.
+  // In short, the convection treatment for a polyhedron depends
+  // on the type (triangle, tetrahedron, ...) and the number of Dirichlet faces.
 
   double psc;
   int poly,face_adj,fa7,i,j,n_bord;
@@ -475,14 +474,13 @@ DoubleTab& Op_Conv_DI_L2_VEF_Face::ajouter(const DoubleTab& transporte,
       M = 15 ;
       derive.resize(N,ncomp_ch_transporte) ;
     }
-  // On remet a zero le tableau qui sert pour
-  // le calcul du pas de temps de stabilite
+  // Reset the array used for stability time step computation
   fluent_ = 0;
 
-  // Traitement particulier pour les faces de periodicite
+  // Special treatment for periodic faces
 
   int nb_faces_perio = 0;
-  // Boucle pour compter le nombre de faces de periodicite
+  // Loop to count the number of periodic faces
   for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -499,7 +497,7 @@ DoubleTab& Op_Conv_DI_L2_VEF_Face::ajouter(const DoubleTab& transporte,
   else
     tab.resize(nb_faces_perio,ncomp_ch_transporte);
 
-  // Boucle pour remplir tab
+  // Loop to fill tab
   nb_faces_perio=0;
   for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
@@ -523,13 +521,12 @@ DoubleTab& Op_Conv_DI_L2_VEF_Face::ajouter(const DoubleTab& transporte,
     }
 
 
-  // Les polyedres non standard sont ranges en 2 groupes dans le Domaine_VEF:
-  //  - polyedres bords et joints
-  //  - polyedres bords et non joints
-  // On traite les polyedres en suivant l'ordre dans lequel ils figurent
-  // dans le domaine
+  // Non-standard polyhedra are stored in 2 groups in the Domaine_VEF:
+  //  - boundary and shared polyhedra
+  //  - boundary and non-shared polyhedra
+  // Polyhedra are processed in the order they appear in the domain
 
-  // boucle sur les polys
+  // loop over polyhedra
 
   int nlim = -1 ;
   const IntTab& KEL=domaine_VEF.type_elem().KEL();
@@ -542,11 +539,11 @@ DoubleTab& Op_Conv_DI_L2_VEF_Face::ajouter(const DoubleTab& transporte,
       else
         itypcl=domaine_Cl_VEF.type_elem_Cl(rang);
 
-      // calcul des numeros des faces du polyedre
+      // compute face indices of the polyhedron
       for (face_adj=0; face_adj<nfac; face_adj++)
         face[face_adj]= elem_faces(poly,face_adj);
 
-      // calcul de la vitesse aux sommets des polyedres
+      // compute velocity at the vertices of the polyhedra
       for (j=0; j<dimension; j++)
         {
           vs[j] = la_vitesse.valeurs()(face[0],j);
@@ -557,7 +554,7 @@ DoubleTab& Op_Conv_DI_L2_VEF_Face::ajouter(const DoubleTab& transporte,
         for (j=0; j<dimension; j++)
           vsom(i,j) = vs[j] - dimension*la_vitesse.valeurs()(face[i],j);
 
-      // calcul de vc
+      // compute vc
       domaine_VEF.type_elem().calcul_vc(face,vc,vs,vsom,vitesse(),
                                         itypcl,porosite_face);
 
@@ -580,7 +577,7 @@ DoubleTab& Op_Conv_DI_L2_VEF_Face::ajouter(const DoubleTab& transporte,
             cal_amont++ ;
         }
 
-      // calcul polynom de reconstruction
+      // compute reconstruction polynomial
       if(dimension == 2 )
         {
           if ( cal_amont == 0) poly_DI_L2_2d(N,M,derive,poly,ncomp_ch_transporte,transporte,sing);
@@ -590,7 +587,7 @@ DoubleTab& Op_Conv_DI_L2_VEF_Face::ajouter(const DoubleTab& transporte,
           if ( cal_amont == 0) poly_DI_L2_3d(N,M,derive,poly,ncomp_ch_transporte,transporte,sing);
         }
 
-      // Boucle sur les facettes du polyedre
+      // Loop over facets of the polyhedron
 
       for (fa7=0; fa7<nfa7; fa7++)
         {
@@ -601,13 +598,13 @@ DoubleTab& Op_Conv_DI_L2_VEF_Face::ajouter(const DoubleTab& transporte,
             for (i=0; i<dimension; i++)
               cc[i] = normales_facettes_Cl(rang,fa7,i);
 
-          // On applique le schema de convection a chaque sommet de la facette
+          // Apply the convection scheme to each vertex of the facet
 
           // reconstruction seulement wenn first = 0
 
           first = -1 ;
 
-          // On traite le ou les sommets qui sont aussi des sommets du polyedre
+          // Process the vertex/vertices that are also vertices of the polyhedron
           for (i=0; i<nb_som_facette-1; i++)
             {
               first++ ;
@@ -641,7 +638,7 @@ DoubleTab& Op_Conv_DI_L2_VEF_Face::ajouter(const DoubleTab& transporte,
 
         }
 
-    } // fin de la boucle
+    } // end of loop
 
   Cerr << " limitiert in " << nlim << " valeurs " << finl ;
 
@@ -649,15 +646,14 @@ DoubleTab& Op_Conv_DI_L2_VEF_Face::ajouter(const DoubleTab& transporte,
   nb_faces_perio = 0;
   double diff1,diff2;
 
-  // Dimensionnement du tableau des flux convectifs au bord du domaine
-  // de calcul
+  // Size the array of convective fluxes at the domain boundary
   DoubleTab& flux_b = flux_bords_;
   flux_b.resize(domaine_VEF.nb_faces_bord(),ncomp_ch_transporte);
   flux_b = 0.;
 
-  // Boucle sur les bords pour traiter les conditions aux limites
-  // il y a prise en compte d'un terme de convection pour les
-  // conditions aux limites de Neumann_sortie_libre seulement
+  // Loop over boundaries to process boundary conditions
+  // a convective term is accounted for only for
+  // Neumann_sortie_libre boundary conditions
 
   for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {

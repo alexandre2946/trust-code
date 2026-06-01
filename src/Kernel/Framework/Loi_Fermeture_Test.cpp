@@ -51,7 +51,7 @@ void Loi_Fermeture_Test::discretiser(const Discretisation_base& dis)
   const Domaine_dis_base& le_dom_dis = pb.domaine_dis();
 
 
-  dis.discretiser_champ("CHAMP_ELEM", le_dom_dis,"test_time", "s",1 /* nb composantes par defaut */,temps, champ_test_);
+  dis.discretiser_champ("CHAMP_ELEM", le_dom_dis,"test_time", "s",1 /* default number of components */,temps, champ_test_);
 
   champs_compris_.ajoute_champ(champ_test_);
 }

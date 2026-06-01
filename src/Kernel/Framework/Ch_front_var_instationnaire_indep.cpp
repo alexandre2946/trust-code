@@ -27,7 +27,7 @@ Entree& Ch_front_var_instationnaire_indep::readOn(Entree& s)
   return s ;
 }
 
-/*! @brief Factorise le fait que l'initialisation est une premiere mise a jour.
+/*! @brief Factors out the fact that initialization is a first update.
  *
  */
 int Ch_front_var_instationnaire_indep::initialiser(double temps, const Champ_Inc_base& inco)

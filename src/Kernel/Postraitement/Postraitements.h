@@ -20,7 +20,9 @@
 #include <TRUST_Deriv.h>
 #include <TRUST_List.h>
 
-/*! @brief classe Postraitements Cette classe represente une liste de postraitements
+/*! @brief class Postraitements
+ *
+ * @brief Represents a list of post-processing objects.
  *
  * @sa Postraitement
  */

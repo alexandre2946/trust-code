@@ -35,8 +35,8 @@ Entree& Multiplicateur_diphasique_Friedel::readOn(Entree& is)
 
   const Pb_Multiphase *pbm = sub_type(Pb_Multiphase, pb_.valeur()) ? &ref_cast(Pb_Multiphase, pb_.valeur()) : nullptr;
 
-  if (!pbm || pbm->nb_phases() == 1) n_l = 0, n_g = -1; //pas un Pb_Multiphase -> monophasique liquide
-  else for (int n = 0; n < pbm->nb_phases(); n++) //recherche de n_l, n_g : phase {liquide,gaz}_continu en priorite
+  if (!pbm || pbm->nb_phases() == 1) n_l = 0, n_g = -1; //not a Pb_Multiphase -> single-phase liquid
+  else for (int n = 0; n < pbm->nb_phases(); n++) //search for n_l, n_g: continuous {liquid,gas} phase with priority
       if (pbm->nom_phase(n).debute_par("liquide") && (n_l < 0 || pbm->nom_phase(n).finit_par("continu")))  n_l = n;
       else if (pbm->nom_phase(n).debute_par("gaz") && (n_g < 0 || pbm->nom_phase(n).finit_par("continu"))) n_g = n;
 
@@ -50,18 +50,18 @@ void Multiplicateur_diphasique_Friedel::coefficient(const double *alpha, const d
                                                     const double Fm, DoubleTab& coeff) const
 {
   int min_ = min_sensas_ || min_lottes_flinn_;
-  double G = alpha[n_l] * rho[n_l] * std::fabs(v[n_l]) + alpha[n_g] * rho[n_g] * std::fabs(v[n_g]), //debit total
-         x = G ? alpha[n_g] * rho[n_g] * v[n_g] / G : 0, //titre
+  double G = alpha[n_l] * rho[n_l] * std::fabs(v[n_l]) + alpha[n_g] * rho[n_g] * std::fabs(v[n_g]), //total mass flux
+         x = G ? alpha[n_g] * rho[n_g] * v[n_g] / G : 0, //quality
          E = (1 - x) * (1 - x) + x * x * (rho[n_l] * f[n_g] / rho[n_g] / f[n_l]),
          F = std::pow(x, 0.78) * std::pow(1 - x, 0.224),
          H = std::pow(rho[n_l] / rho[n_g], 0.91) * std::pow(mu[n_g] / mu[n_l], 0.19) * std::pow(1 - mu[n_g] / mu[n_l], 0.7),
-         rho_m = 1.0 / (x / rho[n_g] + (1.0 - x) / rho[n_l]), //masse volumlque du melange
+         rho_m = 1.0 / (x / rho[n_g] + (1.0 - x) / rho[n_l]), //mixture density
          Fr = G * G / (9.81 * Dh * rho_m * rho_m), We = G * G * Dh / (sigma * rho_m), //Froude, Weber,
-         Phi2 = E + 3.24 * F * H * std::pow(Fr, -0.0454) * std::pow(We, -0.035), //le multiplicateur!
-         frac_g = std::min(std::max((alpha[n_g] - alpha_min_) / (alpha_max_ - alpha_min_), 0.), 1.), frac_l = 1 - frac_g, //fraction appliquee a la vapeur
+         Phi2 = E + 3.24 * F * H * std::pow(Fr, -0.0454) * std::pow(We, -0.035), //the multiplier!
+         frac_g = std::min(std::max((alpha[n_g] - alpha_min_) / (alpha_max_ - alpha_min_), 0.), 1.), frac_l = 1 - frac_g, //fraction applied to the vapor
          mul = min_sensas_ ? std::min(1., 1.4429 * std::pow(alpha[n_l], 0.6492)) : 1;
   coeff = 0;
-  if (min_ && Fk[n_l] * mul < Phi2 * Fm * (alpha[n_l] * alpha[n_l])) /* Lottes-Flinn/SENSAS sur le liquide donne un frottement plus bas -> on le prend*/
+  if (min_ && Fk[n_l] * mul < Phi2 * Fm * (alpha[n_l] * alpha[n_l])) /* Lottes-Flinn/SENSAS gives a lower friction on the liquid -> use it*/
     coeff(n_l, 0) = frac_l * min_ / (alpha[n_l] * alpha[n_l]), coeff(n_g, 0) = frac_g * min_ / (alpha[n_l] * alpha[n_l]);
-  else  coeff(n_l, 1) = frac_l * Phi2, coeff(n_g, 1) = frac_g * Phi2; //application au liquide et/ou a la vapeur
+  else  coeff(n_l, 1) = frac_l * Phi2, coeff(n_g, 1) = frac_g * Phi2; //applied to liquid and/or vapor
 }

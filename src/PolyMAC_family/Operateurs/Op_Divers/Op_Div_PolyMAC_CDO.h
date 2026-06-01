@@ -25,8 +25,8 @@ class MAtrice_Morse;
 
 /*! @brief class Op_Div_PolyMAC_CDO
  *
- *   Cette classe represente l'operateur de divergence La discretisation est PolyMAC_CDO
- *   On calcule la divergence d'un champ_P1NC (la vitesse)
+ *   Divergence operator for the PolyMAC_CDO discretization.
+ *   Computes the divergence of a velocity field.
  *
  * @sa Operateur_Div_base
  *

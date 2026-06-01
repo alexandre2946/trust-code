@@ -21,9 +21,7 @@
 #include <Schema_Temps_base.h>
 
 
-/*! @brief Diffusivite turbulente a longueur de melange et vitesse de melange identique pour les deux phases
- *
- *
+/*! @brief Mixing-length turbulent diffusivity model with identical mixing length and velocity for both phases.
  *
  */
 class Viscosite_turbulente_l_melange : public Viscosite_turbulente_base

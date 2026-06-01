@@ -18,7 +18,7 @@
 
 Implemente_instanciable_sans_constructeur(Parametre_implicite,"Parametre_implicite",Parametre_equation_base);
 
-// Par defaut les seuils sont negatifs (donc pas utilisables!!)
+// By default the thresholds are negative (therefore unusable!!)
 Parametre_implicite::Parametre_implicite()
 {
   seuil_convergence_implicite()=-1.;
@@ -83,7 +83,7 @@ Entree& Parametre_implicite::readOn(Entree& is)
   return is;
 }
 
-/*! @brief permet de mettre les seuils equivalents a ceux de la 161 pour l'instant warning ensuite ereur.
+/*! @brief Allows setting thresholds equivalent to those of version 161: warning for now, error later.
  *
  */
 void  Parametre_implicite::set_seuil_solveur_avec_seuil_convergence_solveur(double seuil_convergence_solveur)

@@ -21,8 +21,8 @@
 
 /*! @brief class Champ_front_debit
  *
- *  Classe derivee de Champ_front_base qui represente les
- *  champs aux frontieres normaux :
+ *  Derived class of Champ_front_base representing
+ *  normal boundary fields:
  *
  * @sa Champ_front_base
  */

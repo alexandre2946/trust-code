@@ -56,7 +56,7 @@ void Source_WC_Chaleur_VDF::compute_interpolate_gradP(DoubleTab& UgradP_elem, co
 
   const Navier_Stokes_WC& eqHyd = ref_cast(Navier_Stokes_WC,mon_equation->probleme().equation(0));
   const DoubleTab& la_vitesse = eqHyd.vitesse().valeurs();
-  DoubleTab grad_Ptot(eqHyd.grad_P().valeurs()); // initialise avec grad(P) car face
+  DoubleTab grad_Ptot(eqHyd.grad_P().valeurs()); // initialized with grad(P) because face-based
   const Convection_Diffusion_Chaleur_WC& eq_chal = ref_cast(Convection_Diffusion_Chaleur_WC,mon_equation.valeur());
   const Operateur_Grad& Op_Grad = eq_chal.operateur_gradient_WC();
   Op_Grad.calculer(Ptot,grad_Ptot); // compute grad(P_tot)
@@ -78,7 +78,7 @@ void Source_WC_Chaleur_VDF::compute_interpolate_gradP(DoubleTab& UgradP_elem, co
   face_to_elem(domaine,UgradP,UgradP_elem);
 }
 
-// On peut utiliser les methodes statics de Discretisation_tools... mais faut creer de Champ_base ...
+// Could use the static methods of Discretisation_tools... but a Champ_base needs to be created ...
 void Source_WC_Chaleur_VDF::face_to_elem(const Domaine_VF& domaine, const DoubleTab& UgradP,DoubleTab& UgradP_elem) const
 {
   const IntTab& elem_faces = domaine.elem_faces();
@@ -92,17 +92,17 @@ void Source_WC_Chaleur_VDF::face_to_elem(const Domaine_VF& domaine, const Double
   UgradP_elem *= 0.5;
 }
 
-// marche bien mais pas bon pour le vef ... P en vef est partout, grad sur les faces mais pas bon pour nous
+// works well but not suitable for vef ... P in vef is everywhere, grad on faces but not suitable for us
 void Source_WC_Chaleur_VDF::compute_interpolate_gradP_old(DoubleTab& UgradP_elem, const DoubleTab& Ptot) const
 {
   // compute the grad
   const Navier_Stokes_WC& eqHyd = ref_cast(Navier_Stokes_WC,mon_equation->probleme().equation(0));
   const DoubleTab& la_vitesse = eqHyd.vitesse().valeurs();
-  DoubleTab grad_Ptot(eqHyd.grad_P().valeurs()); // initialise avec grad(P) car face
-  const Operateur_Grad& gradient = eqHyd.operateur_gradient(); // recuperer op grad de NS
+  DoubleTab grad_Ptot(eqHyd.grad_P().valeurs()); // initialized with grad(P) because face-based
+  const Operateur_Grad& gradient = eqHyd.operateur_gradient(); // retrieve the NS gradient operator
   gradient.calculer(Ptot,grad_Ptot); // compute grad(P_tot)
 
-  // XXX : very important : sinon we have values * V !
+  // XXX : very important : otherwise we have values * V !
   eqHyd.solv_masse().appliquer(grad_Ptot);
 
   /*
@@ -129,7 +129,7 @@ void Source_WC_Chaleur_VDF::compute_interpolate_gradP_old(DoubleTab& UgradP_elem
       // corrige si Neumann_sortie_libre
       if ( sub_type(Neumann_sortie_libre,la_cl.valeur()) )
         {
-          // recuperer face et remplace gradient par 0
+          // retrieve face and replace gradient by 0
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           const int ndeb = le_bord.num_premiere_face(), nfin = ndeb + le_bord.nb_faces();
 

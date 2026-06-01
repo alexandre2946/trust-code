@@ -18,10 +18,10 @@
 
 #include <Loi_Etat_Mono_GP_base.h>
 
-/*! @brief classe Loi_Etat_GP_WC Cette classe represente la loi d'etat pour les gaz parfaits.
+/*! @brief @brief State law class for ideal gases in the weakly compressible (WC) framework.
  *
- *      Associe a un fluide dilatable, elle definit un fluide weakly compressible
- *      dont la loi d'eata est :
+ *      Associated with a dilatable fluid, it defines a weakly compressible fluid
+ *      whose equation of state is:
  *         Pth = rho*R*T
  *
  * @sa Fluide_Dilatable_base Loi_Etat_Mono_GP_base

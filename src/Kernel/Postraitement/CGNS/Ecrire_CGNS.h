@@ -64,7 +64,7 @@ public:
   void cgns_set_postraiter_domain() { postraiter_domaine_ = true; }
   void cgns_set_is_dual_domain() { is_dual_ = true; }
   void cgns_set_is_deformable_domain() { is_deformable_ = true; }
-  void cgns_set_lagrangian_domain() { is_lagrangian_ = true, is_deformable_ = true; } /* pour FTD on active les 2 flags */
+  void cgns_set_lagrangian_domain() { is_lagrangian_ = true, is_deformable_ = true; } /* for FTD we activate both flags */
   void cgns_set_loc_vector(const std::vector<std::string>& vec) { loc_vect_ = vec; }
   void cgns_set_base_name(const Nom& );
   void cgns_set_discr_type(const Nom& type) { discr_type_ = type.getString(); }
@@ -104,10 +104,10 @@ private:
   OBS_PTR(std::vector<std::string>) loc_vect_;
   std::vector<TRUST_2_CGNS> T2CGNS_;
 
-  std::map<std::string, Nom> fld_loc_map_; /* { Loc , Nom_dom } */
+  std::map<std::string, Nom> fld_loc_map_; /* { Loc , Domain_name } */
   std::vector<Nom> doms_written_;
   std::vector<std::string> baseFile_name_vect_;
-  std::unordered_set<std::string> fieldName_dumped_; /* manage doubled fields / synonyms / compos .. ! */
+  std::unordered_set<std::string> fieldName_dumped_; /* manage duplicate fields / synonyms / components .. ! */
   std::string solname_elem_ = "", solname_som_ = "", solname_faces_ = "", baseFile_name_ = "";
   std::string grid_name_ = "", grid_name_loc_ = "";
   std::string discr_type_ = "";
@@ -125,23 +125,23 @@ private:
   int flowId_som_ = 0, fieldId_som_ = 0;
   int flowId_faces_ = 0, fieldId_faces_ = 0;
 
-  // specifique pour link
+  // specific to linked files
   bool grid_file_opened_ = false, solution_file_opened_ = false; /* Management of link files */
   std::vector<std::string> baseZone_name_;
   std::vector<std::vector<std::string>> connectname_;
   std::vector<std::vector<cgsize_t>> sizeId_;
   std::vector<int> cellDim_;
 
-  // specifique par in zone
-  std::vector<std::vector<int>> zoneId_par_; /* par ordre d'ecriture du domaine */
+  // specific to parallel in-zone mode
+  std::vector<std::vector<int>> zoneId_par_; /* in domain writing order */
 
-  // specifique LINKED_FILES_PER_COMM_GROUP / SINGLE_FILE_PER_COMM_GROUP
+  // specific to LINKED_FILES_PER_COMM_GROUP / SINGLE_FILE_PER_COMM_GROUP
   void gather_local_sizeId_for_comm_group();
   int proc_maitre_local_comm_ = -123;
   std::vector<int> vec_proc_maitre_local_comm_, unique_vec_proc_maitre_local_comm_;
-  std::vector<std::vector<cgsize_t>> sizeId_som_local_comm_, sizeId_elem_local_comm_; // meme dim que sizeId_
+  std::vector<std::vector<cgsize_t>> sizeId_som_local_comm_, sizeId_elem_local_comm_; // same dimension as sizeId_
 
-  // specifique maillage dual pour faces
+  // specific to dual mesh for face fields
   IntTab fs_dual_, ef_dual_;
   bool is_dual_ = false;
   inline IntTab& get_fs_dual() { return fs_dual_;}
@@ -149,20 +149,20 @@ private:
   inline IntTab& get_ef_dual() { return ef_dual_;}
   inline const IntTab& get_ef_dual() const { return ef_dual_;}
 
-  // gestion elem/som/faces
+  // management of elem/node/face locations
   void cgns_fill_field_loc_map(const Nom&);
 
-  // Methodes pour Domaine Lagrangien; ie: FTD
+  // Methods for Lagrangian domain; ie: FTD
   bool is_lagrangian_ = false;
   void cgns_write_final_link_file_lagrangian();
   void link_multi_loc_support_lagrangian();
 
-  // Methodes pour Domaine Deformable
+  // Methods for deformable domain
   void link_multi_loc_support_pb_deformable();
   void init_proc_maitre_local_comm();
   bool is_deformable_ = false, multi_loc_deformable_support_linked_ = false;
 
-  // Methodes pour LINK
+  // Methods for linked files
   void cgns_fill_info_grid_link_file(const char*, const CGNS_TYPE&, const int, const int, const int, const bool);
   void cgns_open_grid_base_link_file();
   void cgns_init_solution_link_file(const std::string& , const Nom&);
@@ -173,16 +173,16 @@ private:
   void cgns_close_grid_or_solution_link_file(const double, const TYPE_LINK_CGNS,  bool is_cerr = true);
   void add_new_linked_base(const std::string&, const Nom&);
 
-  // Version sequentielle
+  // Sequential version
   void cgns_write_domaine_seq(const Domaine * ,const Nom& , const DoubleTab& , const IntTab& , const Motcle& );
   void cgns_write_domaine_deformable_seq(const Domaine * ,const Nom& , const DoubleTab& , const IntTab& , const Motcle& );
   void cgns_write_field_seq(const int, const double, const Nom&, const Nom&, const Nom&, const Nom&, const DoubleTab&);
 
-  // Version parallele over zone
+  // Parallel over-zone version
   void cgns_write_domaine_par_over_zone(const Domaine * ,const Nom& , const DoubleTab& , const IntTab& , const Motcle& );
   void cgns_write_field_par_over_zone(const int, const double, const Nom&, const Nom&, const Nom&, const Nom&, const DoubleTab&);
 
-  // Version parallele in zone
+  // Parallel in-zone version
   void cgns_write_domaine_par_in_zone(const Domaine * ,const Nom& , const DoubleTab& , const IntTab& , const Motcle& );
   void cgns_write_domaine_deformable_par_in_zone(const Domaine * ,const Nom& , const DoubleTab& , const IntTab& , const Motcle& );
   void cgns_write_field_par_in_zone(const int, const double, const Nom&, const Nom&, const Nom&, const Nom&, const DoubleTab&);
@@ -193,7 +193,7 @@ private:
                                            const TRUST_2_CGNS& TRUST2CGNS, const int ind_base_zone,
                                            const int sectionId, const int sectionId2) const;
 
-  // Version fichier CGNS unique (safe !)
+  // Single CGNS file version (safe!)
   void cgns_write_iters();
   void ensure_modify_open_singlefile();
   void cgns_flush_to_disk() const;

@@ -18,7 +18,7 @@
 
 #include <Milieu_base.h>
 
-/*! @brief Classe Solide Cette classe represente un milieu solide et ses proprietes.
+/*! @brief Class Solide: represents a solid medium and its physical properties.
  *
  * @sa Milieu_base
  */

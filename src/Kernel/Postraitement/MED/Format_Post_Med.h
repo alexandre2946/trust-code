@@ -19,23 +19,23 @@
 #include <Format_Post_base.h>
 #include <Ecrire_MED.h>
 
-/*! @brief : Classe de postraitement des champs euleriens au format med.
+/*! @brief : Post-processing class for Eulerian fields in MED format.
  *
  */
 
 ///////////////////////////////////////////////////////////////////////
-//    Pour creer un fichier valide, il faut faire:
-//    (initialisation) initialize("base_nom_fichier",...);
-//                     //base_nom_fichier indique le nom du fichier sans extension ".med"
+//    To create a valid file, the following steps are needed:
+//    (initialization) initialize("base_nom_fichier",...);
+//                     //base_nom_fichier is the file name without the ".med" extension
 //                     ecrire_entete(temps_courant,reprise,est_le_premier_post)
 //                     [ preparer_post(...) ]
 //                     [ completer_post(...) ]
-//                       //Les deux methodes ci-dessus permettent de generer trois fichiers qui
-//                       //seront concatenes en fin de calcul et permettent d exploiter le fichier .med
-//                       //a un autre format (lml)
+//                       //The two methods above generate three files that
+//                       //are concatenated at the end of the computation and allow exporting
+//                       //the .med file to another format (lml)
 //                     ecrire_domaine(domaine,est_le_premier_post)
 //
-//    (pour chaque dt) ecrire_temps(temps_courant)
+//    (for each dt)   ecrire_temps(temps_courant)
 //                     ecrire_champ(const Domaine& domaine, const Noms& unite_, const Noms& noms_compo,
 //                                      int ncomp,double temps_,double temps_courant
 //                                      const Nom  & id_du_champ,
@@ -44,17 +44,17 @@
 //                                    const DoubleTab & data)
 //                    [ecrire_champ(...,data)]
 //
-//    (finir)         finir(est_le_dernier_post)
-//                        //En plus de l ecriture de fin, concatenation des trois fichiers
-//                    //crees par preparer_pot() et completer_post()
+//    (finalize)      finir(est_le_dernier_post)
+//                        //In addition to the final write, concatenates the three files
+//                    //created by preparer_pot() and completer_post()
 //////////////////////////////////////////////////////////////////////
 
 class Format_Post_Med : public Format_Post_base
 {
   Declare_instanciable_sans_constructeur(Format_Post_Med);
 public:
-  // Methodes declarees dans la classe de base (interface commune a tous
-  // les formats de postraitment de champs):
+  // Methods declared in the base class (common interface for all
+  // field post-processing formats):
   void reset() override;
   void set_param(Param& param) const override;
   int initialize_by_default(const Nom& file_basename) override;
@@ -78,7 +78,7 @@ public:
 protected:
   Nom med_basename_;
 
-  // Methodes specifiques a ce format:
+  // Methods specific to this format:
   virtual int ecrire_domaine_med(const Domaine& domaine, const Nom& nom_fic,const int est_le_premier_post,Nom& nom_fich);
   virtual int ecrire_temps_med(const double temps,Nom& nom_fich);
   virtual int ecrire_champ_med(const Domaine& domaine, const Noms& unite_, const Noms& noms_compo, int ncomp, double temps_, const Nom& nom_pdb, const Nom& id_du_champ, const Nom& id_du_domaine,

@@ -20,11 +20,11 @@
 
 #include <Cond_lim.h>
 
-/*! @brief classe Conds_lim Cette classe represente un vecteur de conditions aux limites.
+/*! @brief class Conds_lim This class represents a vector of boundary conditions.
  *
- *      Un objet de ce type est porte par chaque Domaine_Cl_dis_base associee
- *      a une equation. Une classe representant un vecteur d'objet est
- *      declaree grace a la macro VECT(classe_X)
+ *      An object of this type is carried by each Domaine_Cl_dis_base associated
+ *      with an equation. A class representing a vector of objects is
+ *      declared through the macro VECT(classe_X)
  *
  * @sa Cond_lim Domaine_Cl_dis_base
  */
@@ -53,9 +53,9 @@ inline int Conds_lim::initialiser(double temps)
   return ok;
 }
 
-/*! @brief Mise a jour en temps de toutes les conditions aux limites du vecteur.
+/*! @brief Time update of all boundary conditions in the vector.
  *
- * @param (double temps) le pas de temps de mise a jour
+ * @param (double temps) the time step for update
  */
 inline void Conds_lim::mettre_a_jour(double temps)
 {
@@ -67,19 +67,19 @@ inline void Conds_lim::resetTime(double temps)
   for (auto& itr : *this) itr->resetTime(temps);
 }
 
-/*! @brief Calcul des coefficients d'echange pour toutes les conditions aux limites du vecteur.
+/*! @brief Calculation of exchange coefficients for all boundary conditions in the vector.
  *
- * @param (double temps) le pas de temps de mise a jour
+ * @param (double temps) the time step for update
  */
 inline void Conds_lim::calculer_coeffs_echange(double temps)
 {
   for (auto& itr : *this) itr->calculer_coeffs_echange(temps);
 }
 
-/*! @brief Renvoie si TOUTES les conditions aux limites du vecteurs sont compatibles avec l'equation passee en parametre.
+/*! @brief Returns whether ALL boundary conditions in the vector are compatible with the equation passed as parameter.
  *
- * @param (Equation_base& eqn) l'equation avec laquelle on va verifier la compatibilite
- * @return (int) 1 si toutes les conditions aux limites sont compatibles avec l'equation, 0 sinon.
+ * @param (Equation_base& eqn) the equation with which we will check compatibility
+ * @return (int) 1 if all boundary conditions are compatible with the equation, 0 otherwise.
  */
 inline int Conds_lim::compatible_avec_eqn(const Equation_base& eqn) const
 {
@@ -88,10 +88,10 @@ inline int Conds_lim::compatible_avec_eqn(const Equation_base& eqn) const
   return ok;
 }
 
-/*! @brief Renvoie si TOUTES les conditions aux limites du vecteurs sont compatibles avec la discretisation passee en parametre.
+/*! @brief Returns whether ALL boundary conditions in the vector are compatible with the discretization passed as parameter.
  *
- * @param la discretisation avec laquelle on va verifier la compatibilite
- * @return (int) 1 si toutes les conditions aux limites sont compatibles avec la discretisation, 0 sinon.
+ * @param the discretization with which we will check compatibility
+ * @return (int) 1 if all boundary conditions are compatible with the discretization, 0 otherwise.
  */
 inline int Conds_lim::compatible_avec_discr(const Discretisation_base& dis) const
 {
@@ -100,9 +100,9 @@ inline int Conds_lim::compatible_avec_discr(const Discretisation_base& dis) cons
   return ok;
 }
 
-/*! @brief Positionnement du drapeau modifier_val_imp de toutes les conditions aux limites du vecteur.
+/*! @brief Sets the modifier_val_imp flag for all boundary conditions in the vector.
  *
- * @param (double temps) le pas de temps de mise a jour
+ * @param (int drap) the value to assign to the flag
  */
 inline void Conds_lim::set_modifier_val_imp(int drap)
 {

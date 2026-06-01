@@ -45,11 +45,11 @@ Sortie& Partitionneur_Fichier_MED::printOn(Sortie& os) const
   return os;
 }
 
-/*! @brief Lecture des parametres du partitionneur sur disque.
+/*! @brief Reads the partitioner parameters from disk.
  *
- * Fomat attendu:
+ * Expected format:
  *     { file FILENAME field FIELDNAME }
- *   FILENAME est le nom d'un fichier MED, le champ FIELDNAME comporte un ArrayOfInt avec le numero du processeur.
+ *   FILENAME is the name of a MED file; the FIELDNAME field contains an ArrayOfInt with the processor number.
  *
  */
 void Partitionneur_Fichier_MED::set_param(Param& param) const
@@ -70,7 +70,7 @@ void Partitionneur_Fichier_MED::initialiser(const char *filename)
   filename_ = filename;
 }
 
-/*! @brief Lit le contenu du fichier "filename_" et stocke le resultat dans elem_part
+/*! @brief Reads the content of "filename_" and stores the result in elem_part.
  *
  */
 void Partitionneur_Fichier_MED::construire_partition(IntVect& elem_part, int& nb_parts_tot) const
@@ -103,7 +103,7 @@ void Partitionneur_Fichier_MED::construire_partition(IntVect& elem_part, int& nb
   MEDCouplingFieldInt32 * field = dynamic_cast<MEDCouplingFieldInt32 *>((MEDCouplingField *)ffield);
   if(field)
     {
-      // Lecture d'une partition exacte du domaine donnee par un champ d'entiers
+      // Reading an exact partition of the domain given by an integer field
       DataArrayInt32 *da = field->getArray();
       const int *field_values = da->begin();
 
@@ -142,7 +142,7 @@ void Partitionneur_Fichier_MED::construire_partition(IntVect& elem_part, int& nb
     }
   else
     {
-      // Lecture d'une partition d'un domaine qui recouvre partiellement le domaine par un champ de double:
+      // Reading a partition of a domain that partially covers the domain, given by a double field:
       /*
         Decouper outer_domain {
               partitionneur metis { nb_parts 3 } zones_name outer_domain

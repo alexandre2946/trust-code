@@ -19,11 +19,10 @@
 
 #include <Schema_Adams_Bashforth_base.h>
 
-/*! @brief classe Schema_Adams_Bashforth_order_3 Cette classe represente un schema en temps d'Adams-Bashforth d'ordre 3
+/*! @brief class Schema_Adams_Bashforth_order_3 This class represents a variable time-step third-order Adams-Bashforth time scheme:
  *
- *      a pas de temps variable :
  *      U(n+1) = U(n) + dt*(23/12*(dU/dt)(n)-4/3(dU/dt)(n-1)+5/12(dU/dt)(n-2))
- *      si le pas de temps est constant
+ *      when the time step is constant.
  *
  * @sa Schema_Temps_base
  */

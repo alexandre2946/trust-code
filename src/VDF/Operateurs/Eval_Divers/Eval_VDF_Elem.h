@@ -22,10 +22,10 @@
 class Echange_externe_impose;
 class Champ_base;
 
-/*! @brief class Eval_VDF_Elem Cette classe represente le prototype fonctionnel
+/*! @brief class Eval_VDF_Elem This class represents the functional prototype
  *
- *  des evaluateurs de flux associes aux equations de
- *  conservation integrees sur les elements
+ *  for flux evaluators associated with conservation equations
+ *  integrated over elements
  *
  */
 class Eval_VDF_Elem

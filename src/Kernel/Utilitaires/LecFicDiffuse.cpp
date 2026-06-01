@@ -34,10 +34,9 @@ LecFicDiffuse::LecFicDiffuse()
   file_.set_error_action(ERROR_CONTINUE);
 }
 
-/*! @brief ouverture du fichier name.
+/*! @brief Opens file name.
  *
- * Cette methode doit etre appelee sur tous les processeurs. En cas
- *   d'echec : exit()
+ * This method must be called on all processors. On failure: exit().
  *
  */
 LecFicDiffuse::LecFicDiffuse(const char* name,
@@ -52,10 +51,10 @@ LecFicDiffuse::LecFicDiffuse(const char* name,
     }
 }
 
-/*! @brief Ouverture du fichier.
+/*! @brief Opens the file.
  *
- * Cette methode doit etre appelee par tous les processeurs du groupe.
- *  Valeur de retour: 1 si ok, 0 sinon
+ * This method must be called by all processors in the group.
+ *  Return value: 1 if ok, 0 otherwise.
  *
  */
 int LecFicDiffuse::ouvrir(const char* name,

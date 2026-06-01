@@ -20,10 +20,10 @@
 
 
 
-/*! @brief classe Parser_U Version de la classe Parser, derivant de Objet_U.
+/*! @brief class Parser_U Version of the Parser class, deriving from Objet_U.
  *
- *      Elle permet lors de son utilisation de beneficier de la gestion de la memoire propre aux Objet_U
- *      a la difference de la classe Math/Parser
+ *      It allows during its use to benefit from the memory management specific to Objet_U
+ *      unlike the Math/Parser class
  *
  *
  * @sa Parser
@@ -43,38 +43,38 @@ public :
 
 
   /**
-   * Construit l'arbre correspondant a la chaine de caracteres. Cet arbre doit etre construit une seule fois et la chaine de caractere est evaluee en parcourant cet arbre par la methode eval() autant de fois qu'on le souhaite.
+   * Constructs the tree corresponding to the character string. This tree must be constructed only once and the character string is evaluated by traversing this tree using the eval() method as many times as desired.
    */
   inline void parseString();
 
 
   /**
-   * Sert a evaluer l'expression mathematique correspondante a la chaine de caracteres. Poru cela il faut avant         toute chose construire l'arbre par la methode parseString().
+   * Used to evaluate the mathematical expression corresponding to the character string. For this, you must first construct the tree using the parseString() method.
    */
   inline double eval();
 
   /**
-   * Fixe la valeur de la variable representee par une chaine sv.
+   * Sets the value of the variable represented by a string sv.
    */
   inline void setVar(const char* sv, double val);
 
   /**
-   * permet d'obtenir le nombre de variables fixees
+   * Returns the maximum number of fixed variables.
    */
   inline int getmaxVar();
 
   /**
-   * permet d'obtenir le nombre de variables enregistrees
+   * Returns the number of registered variables.
    */
   inline int getNbVar();
 
   /**
-   * Fixe la valeur de la variable representee par une chaine v.
+   * Sets the value of the variable represented by the string v.
    */
   inline void setVar(const std::string& v, double val);
 
   /**
-   * Fixe la valeur de la variable de numero specifie. Ce numero correspondt a l'ordre de l'ajout des variables par la methode addVar().
+   * Sets the value of the variable with the specified number. This number corresponds to the order in which variables were added via the addVar() method.
    */
   inline void setVar(int i, double val);
 #ifdef INT_is_64_
@@ -84,12 +84,12 @@ public :
   };
 #endif
   /**
-   * Fixe le nombre max de variables a indiquer avec la methode addVar.
+   * Sets the maximum number of variables to be specified with the addVar method.
    */
   inline void setNbVar(int nvar);
 
   /**
-   * permet d'ajouter une variable en specifiant sa chaine representative (par ex. : x, y1 etc...)
+   * Allows adding a variable by specifying its representative string (e.g.: x, y1, etc.)
    */
   inline void addVar(const char *v);
 
@@ -111,7 +111,7 @@ private :
 
 
 /**
- * Construit l'arbre correspondant a la chaine de caracteres. Cet arbre doit etre construit une seule fois et la chaine de caractere est evaluee en parcourant cet arbre par la methode eval() autant de fois qu'on le souhaite.
+ * Builds the tree corresponding to the character string. This tree must be built once and the string is evaluated by traversing this tree via the eval() method as many times as desired.
  */
 inline void Parser_U::parseString()
 {
@@ -120,7 +120,7 @@ inline void Parser_U::parseString()
 
 
 /**
- * Sert a evaluer l'expression mathematique correspondante a la chaine de caracteres. Poru cela il faut avant         toute chose construire l'arbre par la methode parseString().
+ * Used to evaluate the mathematical expression corresponding to the character string. For this, the tree must first be built using the parseString() method.
  */
 inline double Parser_U::eval()
 {
@@ -128,7 +128,7 @@ inline double Parser_U::eval()
 }
 
 /**
- * permet d'obtenir le nombre de variable fixees
+ * Returns the maximum number of fixed variables.
  */
 inline int Parser_U::getmaxVar()
 {
@@ -136,7 +136,7 @@ inline int Parser_U::getmaxVar()
 }
 
 /**
- * permet d'obtenir le nombre de variables enregistrees
+ * Returns the number of registered variables.
  */
 inline int Parser_U::getNbVar()
 {
@@ -144,7 +144,7 @@ inline int Parser_U::getNbVar()
 }
 
 /**
- * Fixe la valeur de la variable representee par une chaine sv.
+ * Sets the value of the variable represented by the string sv.
  */
 inline void Parser_U::setVar(const char* sv, double val)
 {
@@ -152,7 +152,7 @@ inline void Parser_U::setVar(const char* sv, double val)
 }
 
 /**
- * Fixe la valeur de la variable representee par un string v.
+ * Sets the value of the variable represented by the string v.
  */
 inline void Parser_U::setVar(const std::string& v, double val)
 {
@@ -160,7 +160,7 @@ inline void Parser_U::setVar(const std::string& v, double val)
 }
 
 /**
- * Fixe la valeur de la variable de numero specifie. Ce numero correspond a l'ordre de l'ajout des variables par la methode addVar().
+ * Sets the value of the variable with the specified number. This number corresponds to the order in which variables were added via the addVar() method.
  */
 inline void Parser_U::setVar(int i, double val)
 {
@@ -169,7 +169,7 @@ inline void Parser_U::setVar(int i, double val)
 
 
 /**
- * Fixe le nombre max de variables a indiquer avec la methode addVar.
+ * Sets the maximum number of variables to be specified with the addVar method.
  */
 inline void Parser_U::setNbVar(int nvar)
 {
@@ -178,7 +178,7 @@ inline void Parser_U::setNbVar(int nvar)
 
 
 /**
- * permet d'ajouter une variable en specifiant sa chaine representative (par ex. : x, y1 etc...)
+ * Allows adding a variable by specifying its representative string (e.g.: x, y1, etc.)
  */
 inline void Parser_U::addVar(const char *v)
 {

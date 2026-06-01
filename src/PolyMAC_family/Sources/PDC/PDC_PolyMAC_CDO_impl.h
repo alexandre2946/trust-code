@@ -34,11 +34,11 @@ class PDC_Anisotrope_PolyMAC_CDO
 protected:
   int lire_motcle_non_standard_impl(const Motcle&, Entree&);
 
-  //! Implemente le calcul effectif de la perte de charge pour un lieu donne
+  //! Implements the effective computation of the pressure drop for a given location
   void coeffs_perte_charge_impl(const DoubleVect&, const DoubleVect&, double, double, double, double, double, double, double&, double&, double&, DoubleVect&, Parser_U&) const;
 
   mutable Parser_U lambda_ortho;
-  OWN_PTR(Champ_Don_base) v; //!< Vecteur directeur de la perte de charge.
+  OWN_PTR(Champ_Don_base) v; //!< Direction vector of the pressure drop.
 };
 
 /////////////////////////////////////////////////
@@ -47,10 +47,10 @@ class PDC_Circulaire_PolyMAC_CDO
 protected:
   int lire_motcle_non_standard_impl(const Motcle&, Entree&);
 
-  //! Implemente le calcul effectif de la perte de charge pour un lieu donne
+  //! Implements the effective computation of the pressure drop for a given location
   void coeffs_perte_charge_impl(const DoubleVect&, const DoubleVect&, double, double, double, double, double, double, double&, double&, double&, DoubleVect&, Parser_U&) const;
 
-  OWN_PTR(Champ_Don_base) diam_hydr_ortho, v; //!< Vecteur directeur de la perte de charge.
+  OWN_PTR(Champ_Don_base) diam_hydr_ortho, v; //!< Direction vector of the pressure drop.
   mutable Parser_U lambda_ortho;
   mutable DoubleVect v_valeur;
 };
@@ -59,10 +59,10 @@ protected:
 class PDC_Directionnelle_PolyMAC_CDO
 {
 protected:
-  //! Implemente le calcul effectif de la perte de charge pour un lieu donne
+  //! Implements the effective computation of the pressure drop for a given location
   void coeffs_perte_charge_impl(const DoubleVect&, const DoubleVect&, double, double, double, double, double, double, double&, double&, double&, DoubleVect&, Parser_U&) const;
 
-  OWN_PTR(Champ_Don_base) v; //!< Vecteur directeur de la perte de charge.
+  OWN_PTR(Champ_Don_base) v; //!< Direction vector of the pressure drop.
 };
 
 /////////////////////////////////////////////////

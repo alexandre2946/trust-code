@@ -28,14 +28,14 @@
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Interprete_bloc,"Interprete_bloc",Liste_bloc);
 
-// Voir Interprete_bloc::interprete_courant()
+// See Interprete_bloc::interprete_courant()
 static OBS_PTR(Interprete_bloc) interprete_courant_;
 
-/*! @brief renvoie l'interprete_bloc en train d'etre lu dans le jeu de donnees.
+/*! @brief Returns the Interprete_bloc currently being read from the data set.
  *
- * On change d'interprete courant
- *   quand on cree et on detruit un objet de type Interprete_bloc
- *   (par exemple quand on entre ou qu'on sort d'un bloc { })
+ * The current interpreter changes
+ *   when an object of type Interprete_bloc is created or destroyed
+ *   (for example when entering or leaving a { } block).
  *
  */
 Interprete_bloc& Interprete_bloc::interprete_courant()
@@ -45,8 +45,8 @@ Interprete_bloc& Interprete_bloc::interprete_courant()
 
 Interprete_bloc::Interprete_bloc()
 {
-  // S'il existe un interprete courant, il devient le pere
-  // de l'interprete en cours de construction:
+  // If a current interpreter exists, it becomes the parent
+  // of the interpreter being constructed:
   if (interprete_courant_) pere_ = interprete_courant_;
 
   interprete_courant_ = *this;
@@ -54,7 +54,7 @@ Interprete_bloc::Interprete_bloc()
 
 Interprete_bloc::~Interprete_bloc()
 {
-  // Restaure la valeur de l'interprete courant precedent
+  // Restore the value of the previous current interpreter
   interprete_courant_ = pere_;
 }
 
@@ -70,30 +70,28 @@ Entree& Interprete_bloc::readOn(Entree& is)
   return is;
 }
 
-/*! @brief Interpretation d'un bloc d'instructions prises dans l'entree is.
+/*! @brief Interprets a block of instructions read from input is.
  *
- * Si le bloc commence par {, on suppose que l'accolade a deja ete lue.
- *   Le bloc se termine soit par }, soit par la fin du fichier, soit par
- *   le mot FIN en fonction de bloc_type (voir mon_main.cpp par exemple)
- *   Si verifie_sans_interpreter!=0, on ne cree aucun objet et on ne
- *   lance aucun interprete, on se contente de verifier la coherence des
- *   accolades (meme nombre de { que de }).
+ * If the block begins with {, the opening brace is assumed to have already been read.
+ *   The block ends with }, end of file, or the keyword FIN depending on bloc_type
+ *   (see mon_main.cpp for example).
+ *   If verifie_sans_interpreter!=0, no objects are created and no interpreter
+ *   is started; only the consistency of braces is checked (same number of { as }).
  *
  */
 Entree& Interprete_bloc::interpreter_bloc(Entree& is, Bloc_Type bloc_type, int verifie_sans_interpreter)
 {
-  // Le niveau de sortie des messages journal
+  // The output level for journal messages
   const int jlevel = 3;
   Journal(jlevel) << "Interprete_bloc::interpreter_bloc bloc_type=" << (int) bloc_type << finl;
   Motcle motlu;
   is >> motlu;
   while (1)
     {
-      // Est-ce qu'on est a la fin du bloc ?
+      // Are we at the end of the block?
       if (is.eof())
         {
-          // Certains fichiers .data ne se terminent pas par FIN, on accepte aussi d'arriver a eof
-          // sans avoir trouve "FIN".
+          // Some .data files do not end with FIN; reaching eof without finding "FIN" is also accepted.
           if (bloc_type == BLOC_EOF || bloc_type == FIN)
             {
               Journal(jlevel) << "Interprete_bloc: end of file => end of bloc" << finl;
@@ -105,7 +103,7 @@ Entree& Interprete_bloc::interpreter_bloc(Entree& is, Bloc_Type bloc_type, int v
               Process::exit();
             }
         }
-      // Autres fins possibles:
+      // Other possible endings:
       if (motlu == "}" || motlu == "FIN|END")
         {
           if ((motlu == "}" && bloc_type == ACCOLADE) || (motlu == "FIN|END" && bloc_type == FIN))
@@ -123,12 +121,12 @@ Entree& Interprete_bloc::interpreter_bloc(Entree& is, Bloc_Type bloc_type, int v
             }
         }
 
-      // Est-ce que c'est un commentaire ?
+      // Is it a comment?
       if (motlu == "#")
         {
           Nom commentaire("# ");
           Nom nom_lu;
-          int countleft = 8; // On retient les 8 premiers mots du commentaire
+          int countleft = 8; // Keep the first 8 words of the comment
           do
             {
               is >> nom_lu;
@@ -145,14 +143,14 @@ Entree& Interprete_bloc::interpreter_bloc(Entree& is, Bloc_Type bloc_type, int v
             {
               Cerr << "Error in Interprete_bloc: end of file while reading a comment :\n" << commentaire << "..." << finl;
             }
-          // Prochain mot a interpreter:
+          // Next keyword to interpret:
           motlu = nom_lu;
         }
       else if (motlu == "{")
         {
           Journal(jlevel) << "Interprete_bloc: reading { => creating new Interprete_bloc" << finl;
-          // Est-ce que c'est un debut de bloc ?
-          // Nouvel interprete:
+          // Is it the beginning of a block?
+          // New interpreter:
           Interprete_bloc inter;
           inter.interpreter_bloc(is, ACCOLADE, verifie_sans_interpreter);
         }
@@ -160,18 +158,18 @@ Entree& Interprete_bloc::interpreter_bloc(Entree& is, Bloc_Type bloc_type, int v
         {
           if (verifie_sans_interpreter)
             {
-              // Si on veut seulement verifier le nombre d'accolades,
-              // il suffit d'ignorer le motcle... on ouvre recursivement
-              // de nouveaux interprete si on rencontre { et on les ferme
-              // si on trouve }. S'il manque une } a la fin, on obtiendra le message
-              // "check for missing }" et s'il y en a une en trop on aura
-              // le message "extra }"
+              // If we only want to verify the number of braces,
+              // it is enough to ignore the keyword... recursively open
+              // new interpreters when { is encountered and close them
+              // when } is found. If a } is missing at the end, we get the message
+              // "check for missing }" and if there is an extra one we get
+              // the message "extra }"
               Journal(jlevel) << "Interprete_bloc: just checking {} => ignore keyword " << motlu << finl;
               verifie(motlu);
             }
           else
             {
-              // Dans le bloc suivant, s'il y a une erreur de lecture sur is, c'est une erreur:
+              // In the following block, if there is a read error on is, it is an error:
               is.set_error_action(Entree::ERROR_EXIT);
               int export_object = 0;
               if (motlu == "export")
@@ -180,21 +178,21 @@ Entree& Interprete_bloc::interpreter_bloc(Entree& is, Bloc_Type bloc_type, int v
                   export_object = 1;
                   is >> motlu;
                 }
-              // Le mot cle doit etre un type d'objet instanciable
+              // The keyword must be an instantiable object type
               Journal(jlevel) << "Interprete_bloc: reading " << motlu << " => trying to instanciate object" << finl;
               DerObjU objet;
               objet.typer(motlu);
 
               if (sub_type(Interprete, objet.valeur()))
                 {
-                  // Si c'est un interprete, on appelle la methode interprete de l'objet:
+                  // If it is an interpreter, call the interpreter method of the object:
                   Journal(jlevel) << " Calling object.interpreter()" << finl;
                   Interprete& inter = ref_cast(Interprete, objet.valeur());
                   inter.interpreter(is);
                 }
               else
                 {
-                  // Ce n'est pas un interprete, on lit le nom de l'objet et on le stocke
+                  // Not an interpreter; read the object name and store it
                   Journal(jlevel) << " Reading object name" << finl;
                   Nom nom_objet;
                   is >> nom_objet;
@@ -212,7 +210,7 @@ Entree& Interprete_bloc::interpreter_bloc(Entree& is, Bloc_Type bloc_type, int v
   return is;
 }
 
-/*! @brief Renvoie l'Objet_U correspondant a nom contenu dans cet interprete_bloc Si l'objet n'existe pas, exit() (on ne cherche pas dans le pere).
+/*! @brief Returns the Objet_U corresponding to nom contained in this interprete_bloc. If the object does not exist, exit() (no search in the parent).
  *
  */
 Objet_U& Interprete_bloc::objet_local(const Nom& nom)
@@ -226,7 +224,7 @@ Objet_U& Interprete_bloc::objet_local(const Nom& nom)
   return operator[](i);
 }
 
-/*! @brief renvoie un drapeau indiquant si un objet de ce nom est enregistre dans cet inteprete (ne teste pas le pere).
+/*! @brief Returns a flag indicating whether an object with this name is registered in this interpreter (does not check the parent).
  *
  */
 int Interprete_bloc::objet_local_existant(const Nom& nom)
@@ -235,14 +233,14 @@ int Interprete_bloc::objet_local_existant(const Nom& nom)
   return (i >= 0);
 }
 
-/*! @brief Ajoute l'objet ob a la liste des objets de l'interprete, et nomme l'objet avec nom.
+/*! @brief Adds object ob to the interpreter's object list and names it with nom.
  *
- * Si l'objet existe deja, exit()
+ * If the object already exists, exit().
  *
  */
 Objet_U& Interprete_bloc::ajouter(const Nom& nom, DerObjU& ob)
 {
-  Journal(3) << "Interprete::ajouter(" << nom << ") de type " << ob->que_suis_je() << finl;
+  Journal(3) << "Interprete::ajouter(" << nom << ") of type " << ob->que_suis_je() << finl;
   if (les_noms_.search(nom) >= 0)
     {
       Cerr << "Error in Interprete::ajouter: object " << nom << " already exists." << finl;
@@ -254,9 +252,9 @@ Objet_U& Interprete_bloc::ajouter(const Nom& nom, DerObjU& ob)
   return obu;
 }
 
-/*! @brief cherche l'objet demande dans l'Interprete_bloc courant (Interprete_bloc::interprete_courant()) et dans tous
+/*! @brief Searches for the requested object in the current Interprete_bloc (Interprete_bloc::interprete_courant()) and in all
  *
- *   ses peres successifs. Si l'objet n'existe pas, exit()
+ *   its successive parents. If the object does not exist, exit().
  *
  */
 Objet_U& Interprete_bloc::objet_global(const Nom& nom)
@@ -272,13 +270,13 @@ Objet_U& Interprete_bloc::objet_global(const Nom& nom)
         }
       ptr = interp.pere_;
     }
-  // Objet non trouve !
+  // Object not found!
   Cerr << "Error in Interprete::objet: object " << nom << " does not exist." << finl;
   Process::exit();
   return objet_global(nom); // Pour le compilo
 }
 
-/*! @brief renvoie un drapeau indiquant si un objet de ce nom existe dans inteprete_courant() ou l'un de ses parents.
+/*! @brief Returns a flag indicating whether an object with this name exists in interprete_courant() or one of its parents.
  *
  */
 int Interprete_bloc::objet_global_existant(const Nom& nom)
@@ -291,6 +289,6 @@ int Interprete_bloc::objet_global_existant(const Nom& nom)
         return 1;
       ptr = interp.pere_;
     }
-  // Objet non trouve !
+  // Object not found!
   return 0;
 }

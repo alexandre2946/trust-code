@@ -23,7 +23,7 @@ class Source_Permeabilite_VDF
 { };
 /// \endcond
 
-/*! @brief class ModPerm_Cte Cette classe represente une permeabilite cte.
+/*! @brief class ModPerm_Cte This class represents a constant permeability.
  *
  */
 class ModPerm_Cte : public Modele_Permeabilite_base
@@ -31,13 +31,13 @@ class ModPerm_Cte : public Modele_Permeabilite_base
   Declare_instanciable_sans_constructeur(ModPerm_Cte);
 public:
   ModPerm_Cte() : cte(1.) { }
-  inline double getK(double ) const override { return cte;} // Renvoie la valeur de la permeabilite en fonction de la porosite (d'une face par exemple).
+  inline double getK(double ) const override { return cte;} // Returns the permeability value as a function of porosity (of a face for example).
 
 protected:
   double cte;
 };
 
-/*! @brief Cette classe represente la correlation de Carman Kozeny pour la permeabilite d'un lit de particule de diametre donne.
+/*! @brief This class represents the Carman Kozeny correlation for the permeability of a particle bed of given diameter.
  *
  */
 class ModPerm_Carman_Kozeny : public Modele_Permeabilite_base
@@ -48,7 +48,7 @@ public:
   inline double getDiametre() const { return diam; }
   inline void setDiametre(double d) { diam = d; }
 
-  inline double getK(double porosite) const override // Renvoie la valeur de la permeabilite en fonction de la porosite (d'une face par exemple).
+  inline double getK(double porosite) const override // Returns the permeability value as a function of porosity (of a face for example).
   {
     const double tmp = diam *porosite /(1.-porosite);
     return tmp*tmp*porosite/C;
@@ -58,7 +58,7 @@ protected:
   double diam, C;
 };
 
-/*! @brief Cette classe represente la correlation de Ergun pour la permeabilite d'un lit de particule de diametre donne.
+/*! @brief This class represents the Ergun correlation for the permeability of a particle bed of given diameter.
  *
  */
 class ModPerm_ErgunPourDarcy : public ModPerm_Carman_Kozeny
@@ -68,7 +68,7 @@ public:
   ModPerm_ErgunPourDarcy() { C = 150.; }
 };
 
-/*! @brief Cette classe represente la correlation de Ergun associe au terme de Forchheimer, pour la permeabilite d'un lit de particule de diametre donne.
+/*! @brief This class represents the Ergun correlation associated with the Forchheimer term, for the permeability of a particle bed of given diameter.
  *
  */
 class ModPerm_ErgunPourForch : public ModPerm_Carman_Kozeny
@@ -77,7 +77,7 @@ class ModPerm_ErgunPourForch : public ModPerm_Carman_Kozeny
 public:
   ModPerm_ErgunPourForch() { C = 1.75; }
 
-  inline double getK(double porosite) const override // Renvoie la valeur de la permeabilite en fonction de la porosite (d'une face par exemple).
+  inline double getK(double porosite) const override // Returns the permeability value as a function of porosity (of a face for example).
   {
     const double tmp = diam *porosite*porosite*porosite /(1.-porosite)/C;
     return tmp*tmp;

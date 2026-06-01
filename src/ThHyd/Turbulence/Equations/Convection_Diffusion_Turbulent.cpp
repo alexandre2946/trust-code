@@ -104,7 +104,7 @@ Entree& Convection_Diffusion_Turbulent::lire_op_diff_turbulent(Entree& is, const
   else
     {
       Nom disc = eqn.discretisation().que_suis_je();
-      // les operateurs C_D_Turb_T sont communs aux discretisations VEF et VEFP1B
+      // the C_D_Turb_T operators are common to VEF and VEFP1B discretizations
       if (disc == "VEFPreP1B")
         disc = "VEF";
       type += disc;
@@ -137,7 +137,7 @@ Entree& Convection_Diffusion_Turbulent::lire_op_diff_turbulent(Entree& is, const
   return is;
 }
 
-/*! @brief Complete le modele de turbulence.
+/*! @brief Completes the turbulence model.
  *
  */
 void Convection_Diffusion_Turbulent::completer()
@@ -151,9 +151,9 @@ bool Convection_Diffusion_Turbulent::initTimeStep(double dt)
   return le_modele_turbulence->initTimeStep(dt);
 }
 
-/*! @brief Prepare le calcul.
+/*! @brief Prepares the computation.
  *
- * @return (int) renvoie toujours 1
+ * @return Always returns 1.
  */
 int Convection_Diffusion_Turbulent::preparer_calcul()
 {
@@ -170,24 +170,23 @@ std::vector<YAML_data> Convection_Diffusion_Turbulent::data_a_sauvegarder() cons
   return data;
 }
 
-/*! @brief Simple appel a Modele_turbulence_scal_base::sauvegarder(Sortie&) sur le membre concerne.
+/*! @brief Simple call to Modele_turbulence_scal_base::sauvegarder(Sortie&) on the turbulence member.
  *
- *     Sauvegarde le modele de turbulence sur un flot
- *     de sortie.
+ * Saves the turbulence model to an output stream.
  *
- * @param (Sortie& os) un flot de sortie
- * @return (int) code de retour propage
+ * @param os Output stream.
+ * @return Return code propagated from the turbulence model.
  */
 int Convection_Diffusion_Turbulent::sauvegarder(Sortie& os) const
 {
   return le_modele_turbulence->sauvegarder(os);
 }
 
-/*! @brief Reprise (apres une sauvegarde) a partir d'un flot d'entree.
+/*! @brief Restores from a checkpoint via an input stream.
  *
- * @param (Entree& is) un flot d'entree
- * @return (int) renvoie toujours 1
- * @throws fin de fichier atteinte pendant la reprise
+ * @param is Input stream.
+ * @return Always returns 1.
+ * @throws If end of file is reached during the restore.
  */
 int Convection_Diffusion_Turbulent::reprendre(Entree& is)
 {
@@ -195,9 +194,9 @@ int Convection_Diffusion_Turbulent::reprendre(Entree& is)
   return 1;
 }
 
-/*! @brief Mise a jour en temps du modele de turbulence.
+/*! @brief Time update of the turbulence model.
  *
- * @param (double temps) le temps de mise a jour
+ * @param temps Current time.
  */
 void Convection_Diffusion_Turbulent::mettre_a_jour(double temps)
 {

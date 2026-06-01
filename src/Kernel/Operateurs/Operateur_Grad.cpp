@@ -30,7 +30,7 @@ Entree& Operateur_Grad::readOn(Entree& is)
   return Operateur::lire(is);
 }
 
-/*! @brief Type l'operateur: se type "Op_Grad_"+discretisation()+
+/*! @brief Types the operator: types as "Op_Grad_"+discretisation()+
  *
  *     "_"+inconnue().suffix
  *
@@ -50,11 +50,11 @@ void Operateur_Grad::typer_direct(const Nom& un_type)
   OWN_PTR(Operateur_Grad_base)::typer(un_type);
 }
 
-/*! @brief Ajoute la contribution de l'operateur au tableau passe en parametre
+/*! @brief Adds the contribution of the operator to the array passed as parameter
  *
- * @param (DoubleTab& donnee) tableau contenant les donnees sur lesquelles on applique l'operateur.
- * @param (DoubleTab& resu) tableau auquel on ajoute la contribution de l'operateur
- * @return (DoubleTab&) le tableau contenant le resultat
+ * @param (DoubleTab& donnee) array containing the data on which the operator is applied.
+ * @param (DoubleTab& resu) array to which the contribution of the operator is added
+ * @return (DoubleTab&) the array containing the result
  */
 DoubleTab& Operateur_Grad::ajouter(const DoubleTab& donnee,
                                    DoubleTab& resu) const
@@ -66,11 +66,11 @@ DoubleTab& Operateur_Grad::ajouter(const DoubleTab& donnee,
 }
 
 
-/*! @brief Initialise le tableau passe en parametre avec la contribution de l'operateur.
+/*! @brief Initializes the array passed as parameter with the contribution of the operator.
  *
- * @param (DoubleTab& donnee) tableau contenant les donnees sur lesquelles on applique l'operateur.
- * @param (DoubleTab& resu) tableau dans lequel stocke la contribution de l'operateur
- * @return (DoubleTab&) le tableau contenant le resultat
+ * @param (DoubleTab& donnee) array containing the data on which the operator is applied.
+ * @param (DoubleTab& resu) array in which the contribution of the operator is stored
+ * @return (DoubleTab&) the array containing the result
  */
 DoubleTab& Operateur_Grad::calculer(const DoubleTab& donnee,
                                     DoubleTab& resu) const

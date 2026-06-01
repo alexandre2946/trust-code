@@ -22,13 +22,13 @@
 #include <Navier.h>
 #include <Param.h>
 
-/*! @brief Classe Frottement_impose_base Classe de base pour des conditions aux limites de type Navier (v.
+/*! @brief Classe Frottement_impose_base Base class for Navier-type boundary conditions (v.
  *
- * n nul, v_t par contrainte
- *     imposee) dans laquelle la contrainte imposee suit un coefficient de frottement :
- *     (force subie) = - coefficient_frottement * (vitesse tangentielle)
- *     La vitesse tangentielle peut etre soit prise directement a chaque face (classe Frottement_externe_impose),
- *     soit etre prise en l'element voisin de la face (classe Frottement_global_impose)
+ * n zero, v_t by imposed stress)
+ *     in which the imposed stress follows a friction coefficient:
+ *     (applied force) = - friction_coefficient * (tangential velocity)
+ *     The tangential velocity can be taken directly at each face (class Frottement_externe_impose),
+ *     or taken at the neighbouring element of the face (class Frottement_global_impose)
  *
  * @sa Navier
  */
@@ -41,7 +41,7 @@ public:
   int initialiser(double temps) override =0;
   void associer_domaine_cl_dis_base(const Domaine_Cl_dis_base& zcl) override { mon_dom_cl_dis = zcl; }
 
-  // fonctions de cond_lim_base qui necessitent le champ_front qu'on met a zero car on fait abstraction du champ_front
+  // cond_lim_base functions that require le_champ_front: set to zero because we abstract away the boundary field
   void completer() override { }
   void fixer_nb_valeurs_temporelles(int nb_cases) override { }
   inline Frontiere_dis_base& frontiere_dis() override { return la_frontiere_dis; }

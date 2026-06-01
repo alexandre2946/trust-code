@@ -32,7 +32,7 @@
 #include <Kokkos_UniqueToken.hpp>
 
 #ifdef __NVCC__
-// PL: flemme de corriger un warning assez obscur...
+// PL: cannot be bothered to fix this somewhat obscure warning...
 #pragma nv_diag_suppress 20011
 #endif
 class ParserView : public Parser

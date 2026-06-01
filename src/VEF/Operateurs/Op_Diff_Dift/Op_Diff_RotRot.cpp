@@ -44,7 +44,7 @@ void Op_Diff_RotRot::associer(const Domaine_dis_base& domaine_dis, const Domaine
   rot_.associer(domaine_dis, domaine_Cl_dis, inco);
 
   //////////////////////////////////////////////
-  //On definit le champ vorticite
+  // Define the vorticity field
   vorticite_.typer("Champ_P1_isoP1Bulle");
   Champ_P1_isoP1Bulle& vorticite = ref_cast(Champ_P1_isoP1Bulle, vorticite_.valeur());
 
@@ -102,15 +102,14 @@ int Op_Diff_RotRot::calculer_vorticite(DoubleTab& solution, const DoubleTab& cur
   const Domaine& domaine = domaine_vef().domaine();
   //static int nb_appel2=0;
 
-  // Resolution en vorticite: on ne considere que le cas
-  // sequentiel pour le moment.
-  // Pour le cas parallele, il faut s'inspirer de la classe N_S.cpp.
+  // Vorticity resolution: only sequential case is considered for now.
+  // For the parallel case, the approach used in class N_S.cpp should be followed.
 
   if (Process::is_sequential())
     {
-      //On considere que la matrice de vorticite est une matrice
-      //morse par defaut, et on applique la methode inverse()
-      //pour resoudre le systeme lineaire.
+      // The vorticity matrix is treated as a Morse matrix
+      // by default, and the inverse() method is applied
+      // to solve the linear system.
       const Matrice_Morse_Sym& la_matrice = ref_cast(Matrice_Morse_Sym, matrice_vorticite_.valeur());
       //      Matrice_Morse& la_matrice = (Matrice_Morse&) matrice_vorticite_.valeur();
       DoubleTab solution_temporaire(la_matrice.ordre());
@@ -118,19 +117,19 @@ int Op_Diff_RotRot::calculer_vorticite(DoubleTab& solution, const DoubleTab& cur
       assert(solution_temporaire.size() == solution.size() - 1);
       assert(curl.size() == solution_temporaire.size());
 
-      //On resoud un systeme lineaire pour calculer la vorticite
-      //La vorticite est alors stockee dans la variable solution
+      // Solve the linear system to compute the vorticity.
+      // The vorticity is then stored in the variable solution.
       //      la_matrice.inverse(curl,solution_temporaire,1e-15);
       Solv_GCP& solv = ref_cast_non_const(Solv_GCP, solveur_.valeur());
       solv.set_seuil(1e-17);
       solv.resoudre_systeme(la_matrice, curl, solution_temporaire);
 
-      //On recopie les valeurs de solution temoraire dans solution
-      //Une case n'est pas remplie: on le fait plus tard.
+      // Copy values from solution_temporaire into solution.
+      // One slot is not filled yet: it is done later.
       for (int i = 0; i < solution_temporaire.size(); i++)
         solution[i] = solution_temporaire[i];
 
-      //On remplit le dernier element de "solution"
+      // Fill in the last entry of "solution"
       int sommet = domaine.nb_som() - 1;
 
       for (int i = 0; i < curl_.elem_som_size(sommet); i++)
@@ -144,14 +143,12 @@ int Op_Diff_RotRot::calculer_vorticite(DoubleTab& solution, const DoubleTab& cur
 }
 
 //////////////////////////////////////////////////////
-/* Fonctions permettant l'assemblage de la matrice */
-/* de vorticite */
+/* Functions for assembling the vorticity matrix */
 /////////////////////////////////////////////////////
-/* On calcule la matrice de vorticite pour le probleme triple:
- / on considere le cas sans condition au limite pour la vorticite
- / pour le moment, et on ne code pas la partie parallele de
- / l'algo.
- / REM: pour l'instant, ne fonctionne qu'en 2D
+/* Compute the vorticity matrix for the triple problem:
+ / we consider the case without boundary conditions for the vorticity
+ / for the moment, and the parallel part of the algorithm is not coded.
+ / REM: currently only works in 2D
  */
 int Op_Diff_RotRot::assembler_matrice(Matrice& matrice)
 {
@@ -350,15 +347,15 @@ int Op_Diff_RotRot::assembler_matrice(Matrice& matrice)
   return 1;
 }
 
-/* Pour un element donne "numero_elem" retourne */
-/* la liste des sommets appartenant a cet element */
+/* For a given element "numero_elem", returns */
+/* the list of vertices belonging to that element */
 IntList Op_Diff_RotRot::sommets_pour_element(int numero_elem) const
 {
   IntList resultat;
   int numero_global_sommet = 0;
   const Domaine& domaine = domaine_vef().domaine();
 
-  // Par precaution mais normalement inutile
+  // As a precaution but normally not needed
   if (!resultat.est_vide())
     resultat.vide();
 
@@ -371,23 +368,22 @@ IntList Op_Diff_RotRot::sommets_pour_element(int numero_elem) const
   return resultat;
 }
 
-/* Pour un sommet donne "numero_sommet" retourne */
-/* la liste des elements contenant ce sommet */
+/* For a given vertex "numero_sommet", returns */
+/* the list of elements containing that vertex */
 IntList Op_Diff_RotRot::elements_pour_sommet(int numero_sommet) const
 {
   IntList resultat;
   int numero_global_som;
   const Domaine& domaine = domaine_vef().domaine();
 
-  // Par precaution mais normalement inutile
+  // As a precaution but normally not needed
   if (!resultat.est_vide())
     resultat.vide();
 
-  // Pas tres efficace mais marche quelle que soit la dimension:
-  // on boucle sur les elements, on regarde pour chaque element
-  // ses sommets, puis on compare ces sommets au parametre d'entree
-  // et si l'un d'eux coincide avec le parametre d'entree, on stocke
-  // l'element.
+  // Not very efficient but works regardless of the dimension:
+  // loop over elements, check for each element
+  // its vertices, then compare those vertices to the input parameter;
+  // if one of them coincides with the input parameter, store the element.
   for (int numero_elem = 0; numero_elem < domaine.nb_elem(); numero_elem++)
     for (int numero_som = 0; numero_som < domaine.nb_som_elem(); numero_som++)
       {
@@ -400,25 +396,25 @@ IntList Op_Diff_RotRot::elements_pour_sommet(int numero_sommet) const
 
 }
 
-/* Pour un sommet donne "numero_sommet" retourne */
-/* la liste des sommets voisins de "numero_sommet" */
-/* Parametre: la liste des elements contenant "numero_sommet" */
-/* Il suffit de chercher dans ces elements pour avoir le resultat */
-/* REM: la liste resultat contient le sommet "numero_sommet" */
+/* For a given vertex "numero_sommet", returns */
+/* the list of neighbouring vertices of "numero_sommet" */
+/* Parameter: the list of elements containing "numero_sommet" */
+/* Search within these elements to obtain the result */
+/* NOTE: the result list contains the vertex "numero_sommet" itself */
 IntList Op_Diff_RotRot::sommets_voisins(int numero_sommet, const IntList& liste) const
 {
   IntList resultat;
   int numero_global_som;
   const Domaine& domaine = domaine_vef().domaine();
 
-  //Il suffit de recuperer les sommets des elements de "liste"
-  //puis de les comparer a "numero_som" et de les conserver
-  //sans doublon.
+  //Retrieve the vertices of the elements in "liste"
+  //then compare them to "numero_som" and keep them
+  //without duplicates.
   for (int numero_elem_loc = 0; numero_elem_loc < liste.size(); numero_elem_loc++)
     for (int numero_som = 0; numero_som < domaine.nb_som_elem(); numero_som++)
       {
         numero_global_som = domaine.sommet_elem(liste[numero_elem_loc], numero_som);
-        resultat.add_if_not(numero_global_som); //contient "numero_sommet"
+        resultat.add_if_not(numero_global_som); //contains "numero_sommet"
       }
 
   //   Cerr << "Affichage de sommets_voisins pour numero_som " << numero_sommet
@@ -460,45 +456,45 @@ void Op_Diff_RotRot::Tri(IntList& liste_a_trier) const
 
 }
 
-/* Pour l'element "numero_elem" retourne le coefficient */
-/* a placer dans la sous matrice de taille nb_elem * nb_elem */
-/* a la ligne "numero_elem" , colonne "numero_elem"*/
-/* Matrice EF */
+/* For element "numero_elem", returns the coefficient */
+/* to place in the nb_elem * nb_elem sub-matrix */
+/* at row "numero_elem", column "numero_elem" */
+/* EF matrix */
 double Op_Diff_RotRot::remplir_elem_elem_EF(const int numero_elem) const
 {
   return 1. * domaine_vef().volumes(numero_elem);
 }
 
-/* Pour l'element "numero_elem" retourne le coefficient */
-/* a placer dans la sous matrice de taille nb_elem * nb_som */
-/* a la ligne "numero_elem" , colonne "numero_som"*/
-/* Matrice EF */
+/* For element "numero_elem", returns the coefficient */
+/* to place in the nb_elem * nb_som sub-matrix */
+/* at row "numero_elem", column "numero_som" */
+/* EF matrix */
 double Op_Diff_RotRot::remplir_elem_som_EF(const int numero_elem, const int numero_som) const
 {
   return (1. * domaine_vef().volumes(numero_elem) / (dimension + 1));
 }
 
-/* Pour le sommet "numero_som" retourne le coefficient */
-/* a placer dans la sous matrice de taille nb_som * nb_elem */
-/* a la ligne "numero_som" , colonne "numero_elem"*/
-/* Matrice EF */
+/* For vertex "numero_som", returns the coefficient */
+/* to place in the nb_som * nb_elem sub-matrix */
+/* at row "numero_som", column "numero_elem" */
+/* EF matrix */
 double Op_Diff_RotRot::remplir_som_elem_EF(const int numero_elem, const int numero_som) const
 {
   return (1. * domaine_vef().volumes(numero_elem) / (dimension + 1));
 }
 
-/* Pour l'element "numero_som" retourne le coefficient */
-/* a placer dans la sous matrice de taille nb_som * nb_som */
-/* a la ligne "numero_som" , colonne "sommet_voisin"*/
-/* "elem_voisins" est le tableau des elements contenant "numero_som" */
-/* Matrice EF */
+/* For vertex "numero_som", returns the coefficient */
+/* to place in the nb_som * nb_som sub-matrix */
+/* at row "numero_som", column "sommet_voisin" */
+/* "elem_voisins" is the array of elements containing "numero_som" */
+/* EF matrix */
 double Op_Diff_RotRot::remplir_som_som_EF(const int numero_som, const int sommet_voisin, const IntList& elem_voisins) const
 {
   double resultat = 0.;
   int test = 0;
 
-  //Premier test: si numero_som = sommet_voisin
-  //Alors on peut tout de suite retourner le resultat
+  //First test: if numero_som == sommet_voisin
+  //then we can immediately return the result
   if (numero_som == sommet_voisin)
     {
       for (int i = 0; i < elem_voisins.size(); i++)
@@ -506,14 +502,14 @@ double Op_Diff_RotRot::remplir_som_som_EF(const int numero_som, const int sommet
           resultat += domaine_vef().volumes(elem_voisins[i]);
         }
 
-      //On tient compte de la dimension dans nos calculs
+      //Account for the spatial dimension
       resultat *= 2. / ((dimension + 1) * (dimension + 2));
 
       return resultat;
     }
 
   //Sinon:
-  //On calcule la contribution au resultat
+  // Compute the contribution to the result
 
   for (int i = 0; i < elem_voisins.size(); i++)
     {

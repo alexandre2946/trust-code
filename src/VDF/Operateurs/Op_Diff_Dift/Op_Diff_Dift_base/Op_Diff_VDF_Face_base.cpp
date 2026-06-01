@@ -26,7 +26,7 @@ Entree& Op_Diff_VDF_Face_base::readOn(Entree& s ) { return s ; }
 void Op_Diff_VDF_Face_base::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   const std::string& nom_inco = equation().inconnue().le_nom().getString();
-  if (!matrices.count(nom_inco) || semi_impl.count(nom_inco)) return; //semi-implicite ou pas de bloc diagonal -> rien a faire
+  if (!matrices.count(nom_inco) || semi_impl.count(nom_inco)) return; //semi-implicit or no diagonal block -> nothing to do
 
   Matrice_Morse *mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr, mat2;
   Op_VDF_Face::dimensionner(iter_->domaine(), iter_->domaine_Cl(), mat2);
@@ -39,7 +39,7 @@ void Op_Diff_VDF_Face_base::ajouter_blocs(matrices_t matrices, DoubleTab& secmem
   assert_invalide_items_non_calcules(secmem, 0.);
   iter_->ajouter_blocs(matrices, secmem, semi_impl);
 
-  // On ajoute des termes si axi ...
+  // Add extra terms if axisymmetric ...
   Op_Diff_VDF_base::ajoute_terme_pour_axi(matrices, secmem, semi_impl);
 }
 

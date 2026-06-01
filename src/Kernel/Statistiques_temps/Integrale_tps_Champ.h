@@ -33,14 +33,14 @@ public:
   inline Champ_Fonc_base& le_champ_calcule() { return le_champ_.valeur(); }
   inline const OBS_PTR(Champ_Generique_base)& le_champ() const { return le_champ_ref_; }
 
-  inline double temps_integrale() const { return tps_integrale_; } // le temps courant de l'integrale
-  inline double t_debut() const { return t_debut_; } // le temps de debut d'integration
-  inline double t_fin() const { return t_fin_; } //  le temps de fin d'integration
-  inline double dt_integration() const { return dt_integr_calcul_; } // la duree d'integration deja effectuee
-  inline void fixer_t_debut(double t) { t_debut_ = t; } // Fixe le temps de debut d'integration
-  inline void fixer_t_fin(double t) { t_fin_ = t; } // Fixe le temps de fin d'integration
+  inline double temps_integrale() const { return tps_integrale_; } // current time of the integral
+  inline double t_debut() const { return t_debut_; } // integration start time
+  inline double t_fin() const { return t_fin_; } //  integration end time
+  inline double dt_integration() const { return dt_integr_calcul_; } // integration duration already performed
+  inline void fixer_t_debut(double t) { t_debut_ = t; } // Sets the integration start time
+  inline void fixer_t_fin(double t) { t_fin_ = t; } // Sets the integration end time
   inline void fixer_dt_integr(double t) { dt_integr_calcul_ = t; }
-  inline void fixer_tps_integrale(double t) { tps_integrale_ = t; } // Fixe le temps courant de l'integrale (derniere date a laquelle on a mis l'integrale a jour)
+  inline void fixer_tps_integrale(double t) { tps_integrale_ = t; } // Sets the current time of the integral (last date at which the integral was updated)
   inline void associer(const Champ_base&, int, double, double) { }
   inline void associer(const Champ_Generique_base&, int, double, double);
   virtual void mettre_a_jour_integrale();

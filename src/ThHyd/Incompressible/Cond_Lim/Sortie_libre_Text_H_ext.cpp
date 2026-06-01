@@ -21,16 +21,16 @@ Implemente_instanciable(Sortie_libre_Text_H_ext, "Sortie_libre_Text_H_ext", Neum
 
 Sortie& Sortie_libre_Text_H_ext::printOn(Sortie& s) const { return s << que_suis_je() << finl; }
 
-/*! @brief Type le_champ_front en "Champ_front_uniforme".
+/*! @brief Types le_champ_front as "Champ_front_uniforme".
  *
- * Lit les valeurs du champ exterieur si les conditions
- *     aux limites sont specifiees: "T_ext", "C_ext", "Y_ext" ou "K_Eps_ext"
- *     Produit une erreur sinon.
+ * Reads the values of the external field if the boundary conditions
+ *     are specified as: "T_ext", "C_ext", "Y_ext" or "K_Eps_ext"
+ *     Raises an error otherwise.
  *
- * @param (Entree& s) un flot d'entree
- * @return (Entree& s) le flot d'entree modifie
- * @throws type de champ exterieur non reconnu,
- * les types reconnus sont: "T_ext", "C_ext", "Y_ext" ou "K_Eps_ext"
+ * @param (Entree& s) input stream
+ * @return (Entree& s) the modified input stream
+ * @throws external field type not recognized;
+ * recognized types are: "T_ext", "C_ext", "Y_ext" or "K_Eps_ext"
  */
 Entree& Sortie_libre_Text_H_ext::readOn(Entree& s)
 {
@@ -96,11 +96,11 @@ Entree& Sortie_libre_Text_H_ext::readOn(Entree& s)
   return s;
 }
 
-/*! @brief Renvoie la valeur de la i-eme composante du champ impose a l'exterieur de la frontiere.
+/*! @brief Returns the value of the i-th component of the field imposed on the exterior of the boundary.
  *
- * @param (int i) indice suivant la premiere dimension du champ
- * @return (double) la valeur imposee sur la composante du champ specifiee
- * @throws deuxieme dimension du champ de frontiere superieur a 1
+ * @param (int i) index along the first dimension of the field
+ * @return (double) the value imposed on the specified component of the field
+ * @throws second dimension of the boundary field greater than 1
  */
 double Sortie_libre_Text_H_ext::val_ext(int i) const
 {
@@ -130,17 +130,17 @@ double Sortie_libre_Text_H_ext::val_ext(int i) const
     }
 }
 
-/*! @brief Renvoie la valeur de la (i,j)-eme composante du champ impose a l'exterieur de la frontiere.
+/*! @brief Returns the value of the (i,j)-th component of the field imposed on the exterior of the boundary.
  *
- * @param (int i) indice suivant la premiere dimension du champ
- * @param (int j) indice suivant la deuxieme dimension du champ
- * @return (double) la valeur imposee sur la composante du champ specifiee
+ * @param (int i) index along the first dimension of the field
+ * @param (int j) index along the second dimension of the field
+ * @return (double) the value imposed on the specified component of the field
  */
 double Sortie_libre_Text_H_ext::val_ext(int i, int j) const
 {
   if (type_cond_lim == 0)
     {
-      // Condition limite en temperature
+      // Temperature boundary condition
       if (le_champ_Text->valeurs().dimension(0) == 1)
         return le_champ_Text->valeurs()(0, j);
       else
@@ -148,7 +148,7 @@ double Sortie_libre_Text_H_ext::val_ext(int i, int j) const
     }
   else
     {
-      // Condition limite en enthalpie
+      // Enthalpy boundary condition
       if (le_champ_hext->valeurs().dimension(0) == 1)
         return le_champ_hext->valeurs()(0, j);
       else
@@ -156,16 +156,16 @@ double Sortie_libre_Text_H_ext::val_ext(int i, int j) const
     }
 }
 
-/*! @brief Renvoie la valeur du flux impose sur la i-eme composante du champ representant le flux a la frontiere.
+/*! @brief Returns the value of the imposed flux on the i-th component of the field representing the flux at the boundary.
  *
- *     Le champ a la frontiere est considere constant sur tous
- *     les elements de la frontiere.
- *     La valeur du flux impose a la frontiere est egale
- *     a la valeur du champ (considere constant) a la frontiere
+ *     The boundary field is considered constant over all
+ *     elements of the boundary.
+ *     The imposed flux value at the boundary equals
+ *     the value of the (constant) boundary field.
  *
- * @param (int i) indice suivant la premiere dimension du champ
- * @return (double) la valeur imposee sur la composante du champ specifiee
- * @throws deuxieme dimension du champ de frontiere superieur a 1
+ * @param (int i) index along the first dimension of the field
+ * @return (double) the value imposed on the specified component of the field
+ * @throws second dimension of the boundary field greater than 1
  */
 double Sortie_libre_Text_H_ext::flux_impose(int i) const
 {
@@ -193,20 +193,20 @@ double Sortie_libre_Text_H_ext::flux_impose(int i) const
     }
 }
 
-/*! @brief Renvoie la valeur du flux impose sur la (i,j)-eme composante du champ representant le flux a la frontiere.
+/*! @brief Returns the value of the imposed flux on the (i,j)-th component of the field representing the flux at the boundary.
  *
- *     Le champ a la frontiere n'est PAS constant sur tous les elements
- *     la frontiere.
+ *     The boundary field is NOT constant over all elements
+ *     of the boundary.
  *
- * @param (int i) indice suivant la premiere dimension du champ
- * @param (int j) indice suivant la deuxieme dimension du champ
- * @return (double) la valeur imposee sur la composante du champ specifiee
+ * @param (int i) index along the first dimension of the field
+ * @param (int j) index along the second dimension of the field
+ * @return (double) the value imposed on the specified component of the field
  */
 double Sortie_libre_Text_H_ext::flux_impose(int i, int j) const
 {
   if (type_cond_lim == 0)
     {
-      // Condition limite en temperature
+      // Temperature boundary condition
       if (le_champ_Text->valeurs().dimension(0) == 1)
         return le_champ_Text->valeurs()(0, j);
       else
@@ -214,7 +214,7 @@ double Sortie_libre_Text_H_ext::flux_impose(int i, int j) const
     }
   else
     {
-      // Condition limite en enthalpie
+      // Enthalpy boundary condition
       if (le_champ_hext->valeurs().dimension(0) == 1)
         return le_champ_hext->valeurs()(0, j);
       else

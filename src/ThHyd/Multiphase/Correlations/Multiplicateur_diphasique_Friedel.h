@@ -17,10 +17,10 @@
 #define Multiplicateur_diphasique_Friedel_included
 #include <Multiplicateur_diphasique_base.h>
 
-/*! @brief classe Multiplicateur_diphasique_Friedel multiplicateur diphasique par la correlation de Friedel :
+/*! @brief Two-phase multiplier using the Friedel correlation:
  *
- *     - applique a la phase liquide pour alpha < alpha_min
- *     - applique a la phase vapeur pour alpha > alpha_max
+ *     - applied to the liquid phase for alpha < alpha_min
+ *     - applied to the vapor phase for alpha > alpha_max
  *
  *
  */
@@ -34,7 +34,7 @@ public:
                    const double Fm, DoubleTab& coeff) const override;
 protected:
   double alpha_min_ = 1, alpha_max_ = 1.1;
-  int n_l = -1, n_g = -1, min_lottes_flinn_ = 0, min_sensas_ = 0; //indices des phases frottantes (liquide, gaz), prise de min avec Lottes-Flinn
+  int n_l = -1, n_g = -1, min_lottes_flinn_ = 0, min_sensas_ = 0; //indices of the friction phases (liquid, gas), minimum taken with Lottes-Flinn
 };
 
 #endif

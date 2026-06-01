@@ -55,10 +55,10 @@ void Solv_AMGX::initialize()
   SolveurAmgX_.initialize(PETSC_COMM_WORLD, AmgXmode.getString(), config().getString());
   Cout << "[AmgX] Time to initialize: " << statistics().compute_time(start) << finl;
   amgx_initialized_ = true;
-  // MPI_Barrier(PETSC_COMM_WORLD); Voir dans https://github.com/barbagroup/AmgXWrapper/pull/30/commits/1554808a3689f51fa43ab81a35c47a9a1525939a
+  // MPI_Barrier(PETSC_COMM_WORLD); See https://github.com/barbagroup/AmgXWrapper/pull/30/commits/1554808a3689f51fa43ab81a35c47a9a1525939a
 }
 
-// Creation des objets
+// Create objects
 void Solv_AMGX::Create_objects(const Matrice_Morse& mat_morse, int blocksize)
 {
   initialize();
@@ -67,7 +67,7 @@ void Solv_AMGX::Create_objects(const Matrice_Morse& mat_morse, int blocksize)
       Cerr << "Read_matrix not supported on GPU yet." << finl;
       Process::exit();
     }
-  // Creation de la matrice Petsc (CSR pointeurs dessus)
+  // Create the PETSc matrix (CSR pointers on top)
   if (MatricePetsc_ != nullptr) MatDestroy(&MatricePetsc_);
 
   Create_MatricePetsc(MatricePetsc_, mataij_, mat_morse);
@@ -102,7 +102,7 @@ void Solv_AMGX::Update_solution(DoubleVect& solution)
   Solv_Externe::Update_solution<Kokkos::DefaultExecutionSpace>(solution);
 }
 
-// Fonction de conversion Petsc ->CSR
+// PETSc to CSR conversion function
 PetscErrorCode Solv_AMGX::petscToCSR(Mat& A, Vec& lhs_petsc, Vec& rhs_petsc)
 {
   PetscFunctionBeginUser;
@@ -172,13 +172,13 @@ bool Solv_AMGX::detect_new_stencil(const Matrice_Morse& mat_morse)
   cudaGetDeviceCount(&num_devices);
   if (num_devices>1)
     {
-      // Exemple cas PETSC_AMGX en parallele:
+      // Example: PETSC_AMGX case in parallel:
       Cout << "[AmgX] In Solv_AMGX::check_stencil same_stencil=true cause bug in SolveurAmgX_::updateA on multi-GPU (ToDo: fix by switching to CSR interface)!" << finl;
       return true;
     }
   Perf_counters::time_point start = statistics().start_clock();
-  // Parcours de la matrice_morse (qui peut contenir des 0 et qui n'est pas triee par colonnes croissantes)
-  // si matrice sur le GPU deja construite (qui est sans 0 et qui est triee par colonnes croissantes):
+  // Traverse the Matrice_Morse (which may contain zeros and is not sorted by ascending column index)
+  // against the GPU matrix already built (which has no zeros and is sorted by ascending column index):
   const auto& tab1 = mat_morse.get_tab1();
   const auto& tab2 = mat_morse.get_tab2();
   const auto& coeff = mat_morse.get_coeff();
@@ -206,13 +206,13 @@ bool Solv_AMGX::detect_new_stencil(const Matrice_Morse& mat_morse)
                     {
                       bool found = false;
                       auto col = renum_array[tab2(k) - 1];
-                      // Boucle pour voir si le coeff est sur le GPU:
+                      // Loop to check whether the coefficient is present on the GPU:
                       auto RowGlobal = decalage_local_global_+RowLocal;
                       for (auto kk = rowOffsets[RowLocal]; kk < rowOffsets[RowLocal + 1]; kk++)
                         {
                           if (colIndices[kk] == col)
                             {
-                              values[kk] = coeff(k); // On met a jour le coefficient
+                              values[kk] = coeff(k); // Update the coefficient
                               found = true;
                               break;
                             }
@@ -251,7 +251,7 @@ int Solv_AMGX::nbiter(ArrOfDouble& residu)
 {
   int nbiter = -1;
   SolveurAmgX_.getIters(nbiter);
-  // Bug AmgX, seul le process 0 renvoie correctement nbiter...
+  // AmgX bug: only process 0 returns nbiter correctly...
   envoyer_broadcast(nbiter, 0);
   if (limpr() > -1)
     {

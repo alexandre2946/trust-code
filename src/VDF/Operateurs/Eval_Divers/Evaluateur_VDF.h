@@ -22,11 +22,11 @@
 
 class Domaine_Cl_VDF;
 
-/*! @brief class Evaluateur_VDF Classe de base des evaluateurs VDF.
+/*! @brief class Evaluateur_VDF Base class for VDF evaluators.
  *
- *  Cette classe n'appartient pas a la hierarchie des Objet_U.
- *  Cette classe porte une reference a un objet de type Domaine_VDF et une reference a un objet de type Domaine_Cl_VDF. Elle porte des tableaux locaux
- *  qui sont en fait des references aux tableaux de l'objet de type Domaine_VDF (ces tableaux locaux n'existent pas en memoire).
+ *  This class does not belong to the Objet_U hierarchy.
+ *  This class holds a reference to an object of type Domaine_VDF and a reference to an object of type Domaine_Cl_VDF. It holds local arrays
+ *  which are in fact references to the arrays of the Domaine_VDF object (these local arrays do not exist in memory).
  *
  */
 
@@ -50,12 +50,12 @@ protected:
   OBS_PTR(Domaine_VDF) le_dom;
   OBS_PTR(Domaine_Cl_VDF) la_zcl;
   int dimension = -100, premiere_face_bord = -100;
-  IntTab elem_;                       // les 2 elements voisins d'une face
-  DoubleVect surface;          // surfaces des faces
-  IntVect orientation;         // orientations des faces
+  IntTab elem_;                       // the 2 neighboring elements of a face
+  DoubleVect surface;          // face areas
+  IntVect orientation;         // face orientations
   DoubleVect porosite;               // porosites surfaciques
   DoubleVect volume_entrelaces;//
-  DoubleTab xv;                // coord des centres des faces
+  DoubleTab xv;                // coordinates of face centers
   double dist_norm_bord(int) const;
 };
 

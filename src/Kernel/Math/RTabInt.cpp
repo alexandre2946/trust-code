@@ -39,8 +39,10 @@ Entree& RTabInt::readOn(Entree& is)
 }
 
 
-/*! @brief constructeur
+/*! @brief Constructor: initializes the array with n elements set to x, plus TB_ extra slots.
  *
+ * @param (int n) initial number of elements
+ * @param (int x) initial value for each element
  */
 RTabInt::RTabInt(int n, int x)
 {
@@ -56,16 +58,18 @@ RTabInt::RTabInt(int n, int x)
   max_data=init;
 }
 
-/*! @brief Renvoi le tableau porte
+/*! @brief Returns the underlying data array.
  *
+ * @return (const ArrOfInt&) the data array
  */
 const ArrOfInt& RTabInt::donnees() const
 {
   return data;
 }
 
-/*! @brief Ajoute TB_ cases si i > size_r_ sinon ajoute i en queue
+/*! @brief Appends the value i at the end of the array; grows by TB_ slots if needed.
  *
+ * @param (int i) value to append
  */
 void RTabInt::add(int i)
 {
@@ -89,8 +93,10 @@ void RTabInt::add(int i)
     max_data=i;
 }
 
-/*! @brief Recherche un element egal a i dans le tableau Renvoi la valeur si elle existe, -1 sinon
+/*! @brief Searches for an element equal to i in the array. Returns the value if found, -1 otherwise.
  *
+ * @param (int i) value to search for
+ * @return (int) the value if found, -1 otherwise
  */
 int RTabInt::search(int i)
 {

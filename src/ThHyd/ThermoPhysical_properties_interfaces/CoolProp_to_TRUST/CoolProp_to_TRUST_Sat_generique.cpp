@@ -54,7 +54,7 @@ int CoolProp_to_TRUST_Sat_generique::tppi_get_single_sat_p_(SAT enum_prop, const
             minus_ = fluide->p();
             res[i] = (plus_ - minus_) / ( 2 * EPS * P_ou_T[i]);
           }
-      return 0; // FIXME : on suppose que tout OK
+      return 0; // FIXME : assuming everything is OK
     }
 
   assert (ncomp * (int)P_ou_T.size() == (int)res.size());
@@ -66,7 +66,7 @@ int CoolProp_to_TRUST_Sat_generique::tppi_get_single_sat_p_(SAT enum_prop, const
       for (auto& val : RR) val = res[i_it2 * ncomp + ind];
       tppi_get_single_sat_p__(enum_prop, P_ou_T, RR, is_liq);
       for (auto& val : RR) res[i_it2 * ncomp + ind] = val;
-      return 0; // FIXME : on suppose que tout OK
+      return 0; // FIXME : assuming everything is OK
     }
 #else
   Cerr << "CoolProp_to_TRUST_Sat_generique::" <<  __func__ << " should not be called since TRUST is not compiled with the CoolProp library !!! " << finl;
@@ -77,7 +77,7 @@ int CoolProp_to_TRUST_Sat_generique::tppi_get_single_sat_p_(SAT enum_prop, const
 int CoolProp_to_TRUST_Sat_generique::tppi_get_single_sat_p__(SAT enum_prop, const SpanD P, SpanD res, bool is_liq) const
 {
 #ifdef HAS_COOLPROP
-  // derivees qui manquent ...
+  // missing derivatives ...
   if (enum_prop == SAT::T_SAT_DP || enum_prop == SAT::LV_SAT_DP || enum_prop == SAT::RHOL_SAT_DP || enum_prop == SAT::RHOV_SAT_DP ||
       enum_prop == SAT::CPL_SAT_DP || enum_prop == SAT::CPV_SAT_DP || enum_prop == SAT::HL_SAT_DP || enum_prop == SAT::HV_SAT_DP)
     return FD_derivative_p(enum_prop, P, res, is_liq);
@@ -93,7 +93,7 @@ int CoolProp_to_TRUST_Sat_generique::tppi_get_single_sat_p__(SAT enum_prop, cons
           const double hl_ = fluide->hmass();
           res[i] = hv_ - hl_;
         }
-      return 0; // FIXME : on suppose que tout OK
+      return 0; // FIXME : assuming everything is OK
     }
 
   for (int i = 0; i < sz; i++)
@@ -107,14 +107,14 @@ int CoolProp_to_TRUST_Sat_generique::tppi_get_single_sat_p__(SAT enum_prop, cons
       if (enum_prop == SAT::MU) res[i] = fluide->viscosity();
       if (enum_prop == SAT::SIGMA  && user_uniform_sigma_<=0.)
         {
-          // soucis la avec plusieurs instance de factory abstract_state
+          // issue here with multiple instances of factory abstract_state
 //          res[i] = fluide->surface_tension();
           const int ph_ = is_liq ? 0 : 1;
           res[i] = CoolProp::PropsSI("surface_tension", "P", P[i], "Q", ph_, fld_name_sat_);
         }
       else if (enum_prop == SAT::SIGMA && user_uniform_sigma_>0.) res[i] = user_uniform_sigma_;
     }
-  return 0; // FIXME : on suppose que tout OK
+  return 0; // FIXME : assuming everything is OK
 #else
   Cerr << "CoolProp_to_TRUST_Sat_generique::" <<  __func__ << " should not be called since TRUST is not compiled with the CoolProp library !!! " << finl;
   throw;
@@ -147,7 +147,7 @@ int CoolProp_to_TRUST_Sat_generique::FD_derivative_p(SAT enum_prop, const SpanD 
 
           res[i] = hv_dp_ - hl_dp_;
         }
-      return 0; // FIXME : on suppose que tout OK
+      return 0; // FIXME : assuming everything is OK
     }
 
   for (int i = 0; i < sz; i++)
@@ -169,7 +169,7 @@ int CoolProp_to_TRUST_Sat_generique::FD_derivative_p(SAT enum_prop, const SpanD 
       res[i] = (plus_ - minus_) / ( 2 * EPS * P[i]);
     }
 
-  return 0; // FIXME : on suppose que tout OK
+  return 0; // FIXME : assuming everything is OK
 #else
   Cerr << "CoolProp_to_TRUST_Sat_generique::" <<  __func__ << " should not be called since TRUST is not compiled with the CoolProp library !!! " << finl;
   throw;
@@ -198,7 +198,7 @@ int CoolProp_to_TRUST_Sat_generique::tppi_get_all_flux_interfacial_pb_multiphase
         fluide->update(CoolProp::PQ_INPUTS,  P[i], 1);  // SI units
         Hvs__[i] = fluide->hmass();
 
-        // derivees
+        // derivatives
         double plus_1_ = EPS, minus_1_ = EPS, plus_2_ = EPS, minus_2_ = EPS;
 
         fluide->update(CoolProp::PQ_INPUTS,  P[i] * (1. + EPS), 0);  // SI units
@@ -239,7 +239,7 @@ int CoolProp_to_TRUST_Sat_generique::tppi_get_all_flux_interfacial_pb_multiphase
           fluide->update(CoolProp::PQ_INPUTS,  P[i], 1);  // SI units
           Hvs_[i] = fluide->hmass();
 
-          // derivees
+          // derivatives
           double plus_1_ = EPS, minus_1_ = EPS, plus_2_ = EPS, minus_2_ = EPS;
 
           fluide->update(CoolProp::PQ_INPUTS,  P[i] * (1. + EPS), 0);  // SI units
@@ -274,7 +274,7 @@ int CoolProp_to_TRUST_Sat_generique::tppi_get_all_flux_interfacial_pb_multiphase
         }
     }
 
-  return 0; // FIXME : on suppose que tout OK
+  return 0; // FIXME : assuming everything is OK
 #else
   Cerr << "CoolProp_to_TRUST_Sat_generique::" <<  __func__ << " should not be called since TRUST is not compiled with the CoolProp library !!! " << finl;
   throw;
@@ -338,7 +338,7 @@ int CoolProp_to_TRUST_Sat_generique::tppi_get_all_sat_loi_F5(const MSpanD input,
           }
       }
 
-  // derivees qui manquent ...
+  // missing derivatives ...
   bool has_liq_DP = false, has_vap_DP = false;
   for (auto &itr : sats)
     {
@@ -429,7 +429,7 @@ int CoolProp_to_TRUST_Sat_generique::tppi_get_all_sat_loi_F5(const MSpanD input,
           }
       }
 
-  return 0; // FIXME : on suppose que tout OK
+  return 0; // FIXME : assuming everything is OK
 #else
   Cerr << "CoolProp_to_TRUST_Sat_generique::" <<  __func__ << " should not be called since TRUST is not compiled with the CoolProp library !!! " << finl;
   throw;

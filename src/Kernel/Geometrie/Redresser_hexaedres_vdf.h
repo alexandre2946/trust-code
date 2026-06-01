@@ -18,9 +18,9 @@
 
 
 
-/*! @brief class Redresser_hexaedres_vdf Realise un maillage en decoupant chaque tetraedre en 4 nouveaux tetraedres
+/*! @brief class Redresser_hexaedres_vdf Produces a mesh by splitting each tetrahedron into 4 new tetrahedra.
  *
- *  Le maillage obtenu n'a pas de directions preferentielles
+ *  The resulting mesh has no preferred directions.
  *
  *
  * @sa Interprete

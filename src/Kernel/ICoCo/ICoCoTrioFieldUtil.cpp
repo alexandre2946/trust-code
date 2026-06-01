@@ -14,7 +14,7 @@
 *****************************************************************************/
 
 #include <ICoCoTrioFieldUtil.h>
-// pour ajouter une dependance pour avoir le .o dans ICoCo
+// to add a dependency and ensure the .o is included in ICoCo
 #include <ICoCoField.h>
 #include <cstring>
 #include <iostream>
@@ -23,8 +23,8 @@
 using ICoCo::TrioField;
 
 
-// Ajoute 1 a 1 les valeurs du TrioField donnee en parametre a celles de this
-// Verifie la compatibilite des dimensionnements
+// Adds element-wise the values of the given TrioField parameter to those of this
+// Checks compatibility of dimensions
 
 void ajoute_field(ICoCo::TrioField& a , const ICoCo::TrioField& OtherField)
 {

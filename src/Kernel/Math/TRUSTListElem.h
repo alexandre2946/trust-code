@@ -21,9 +21,9 @@
 
 template<typename _TYPE_> class TRUSTList;
 
-/*! @brief : Classe qui sert a representer une liste de reels int/double precision.
+/*! @brief : Class used to represent a list of int/double precision reals.
  *
- * On ne peut pas utiliser la classe container List avec des objets du type int/double car int/double est un type predefini du C++ qui ne possede pas les fonctions exigees par List< >.
+ * The container class List cannot be used with objects of type int/double because int/double is a predefined C++ type that does not have the functions required by List< >.
  *
  */
 template<typename _TYPE_>
@@ -37,8 +37,8 @@ public :
   TRUSTListElem(const TRUSTListElem&);
   ~TRUSTListElem();
 
-  inline int est_vide() const { return suivant_ == this; } // renvoie 1 si la liste est vide. 0 sinon
-  inline int est_dernier() const { return ((est_vide()) || (suivant_ == 0)); } // renvoie 1 si il n'y a pas de suivant. 0 sinon
+  inline int est_vide() const { return suivant_ == this; } // returns 1 if the list is empty, 0 otherwise
+  inline int est_dernier() const { return ((est_vide()) || (suivant_ == 0)); } // returns 1 if there is no next element, 0 otherwise
 
   inline _TYPE_& valeur() { return data; }
   inline _TYPE_ valeur() const { return data; }
@@ -85,7 +85,7 @@ TRUSTListElem<_TYPE_>::~TRUSTListElem()
 
   if (suivant_)
     {
-      // On ne garde pas la version delete suivant_ car sinon on est limite par le nombre d'appel recursif possible
+      // We do not use the "delete suivant_" version because it is limited by the maximum recursion depth
       // delete suivant_;
       TRUSTListElem<_TYPE_> *poignee, *pr;
       pr = suivant_;

@@ -20,12 +20,11 @@
 
 template <typename _SIZE_> class Domaine_32_64;
 
-/*! @brief Classe Prisme Cette represente l'element geometrique Prisme.
+/*! @brief Class Prisme: represents the geometric element Prism.
  *
- *     Un prisme est un polyedre ayant 5 faces, 6 sommets et deux types
- *     de face:
- *        2 triangles a 3 sommets
- *        3 quadrangles a 4 sommets
+ *     A prism is a polyhedron with 5 faces, 6 vertices, and two face types:
+ *        2 triangles with 3 vertices
+ *        3 quadrangles with 4 vertices
  *
  * @sa Elem_geom_base Elem_geom
  */
@@ -69,11 +68,11 @@ public :
 };
 
 
-/*! @brief Renvoie le numero du j-ieme sommet de la i-ieme face de l'element.
+/*! @brief Returns the index of the j-th vertex of the i-th face of the element.
  *
- * @param (int i) un numero de face
- * @param (int j) un numero de sommet
- * @return (int) le numero du j-ieme sommet de la i-ieme face
+ * @param i a face index
+ * @param j a vertex index
+ * @return the index of the j-th vertex of the i-th face
  */
 template <typename _SIZE_>
 inline int Prisme_32_64<_SIZE_>::face_sommet(int face, int sommet) const
@@ -97,12 +96,12 @@ inline int Prisme_32_64<_SIZE_>::face_sommet(int face, int sommet) const
 }
 
 
-/*! @brief Renvoie le nombre de faces du type specifie que possede l'element geometrique.
+/*! @brief Returns the number of faces of the specified type that the geometric element has.
  *
- *     Un Prisme a 2 types de faces: quadrangle ou triangle.
+ *     A prism has 2 face types: quadrangle or triangle.
  *
- * @param (int i) le type de face
- * @return (int) le nombre de faces de type i
+ * @param i the face type
+ * @return the number of faces of type i
  */
 template <typename _SIZE_>
 inline int Prisme_32_64<_SIZE_>::nb_faces(int i) const
@@ -111,9 +110,9 @@ inline int Prisme_32_64<_SIZE_>::nb_faces(int i) const
   switch(i)
     {
     case 0:
-      return 3; //les quadrangles
+      return 3; //quadrangles
     case 1:
-      return 2; //les triangles
+      return 2; //triangles
     default :
       Cerr << "Error, a prism has 2 types of faces and not " << i << finl;
       Process::exit();
@@ -123,10 +122,10 @@ inline int Prisme_32_64<_SIZE_>::nb_faces(int i) const
 }
 
 
-/*! @brief Renvoie le nombre de sommets des faces du type specifie.
+/*! @brief Returns the number of vertices of the faces of the specified type.
  *
- * @param (int i) le type de face
- * @return (int) le nombre de sommets des faces de type i
+ * @param i the face type
+ * @return the number of vertices of faces of type i
  */
 template <typename _SIZE_>
 inline int Prisme_32_64<_SIZE_>::nb_som_face(int i) const
@@ -146,10 +145,10 @@ inline int Prisme_32_64<_SIZE_>::nb_som_face(int i) const
 }
 
 
-/*! @brief Renvoie le numero du i-ieme sommet de la face 0
+/*! @brief Returns the index of the i-th vertex of face 0.
  *
- * @param (int i) le numero du sommet a renvoyer
- * @return (int) le numero du i-ieme sommet de la face 0
+ * @param i the index of the vertex to return
+ * @return the index of the i-th vertex of face 0
  */
 template <typename _SIZE_>
 inline int Prisme_32_64<_SIZE_>::face_sommet0(int i) const
@@ -173,16 +172,16 @@ inline int Prisme_32_64<_SIZE_>::face_sommet0(int i) const
     default :
       Cerr << "Error in Prisme_32_64<_SIZE_>::face_sommet0" << finl;
       Process::exit();
-      // Pour qq compilos :
+      // For some compilers:
       return -1;
     }
 }
 
 
-/*! @brief Renvoie le numero du i-ieme sommet de la face 1
+/*! @brief Returns the index of the i-th vertex of face 1.
  *
- * @param (int i) le numero du sommet a renvoyer
- * @return (int) le numero du i-ieme sommet de la face 1
+ * @param i the index of the vertex to return
+ * @return the index of the i-th vertex of face 1
  */
 template <typename _SIZE_>
 inline int Prisme_32_64<_SIZE_>::face_sommet1(int i) const
@@ -206,16 +205,16 @@ inline int Prisme_32_64<_SIZE_>::face_sommet1(int i) const
     default :
       Cerr << "Error in Prisme_32_64<_SIZE_>::face_sommet1" << finl;
       Process::exit();
-      // Pour qq compilos :
+      // For some compilers:
       return -1;
     }
 }
 
 
-/*! @brief Renvoie le numero du i-ieme sommet de la face 2
+/*! @brief Returns the index of the i-th vertex of face 2.
  *
- * @param (int i) le numero du sommet a renvoyer
- * @return (int) le numero du i-ieme sommet de la face 2
+ * @param i the index of the vertex to return
+ * @return the index of the i-th vertex of face 2
  */
 template <typename _SIZE_>
 inline int Prisme_32_64<_SIZE_>::face_sommet2(int i) const
@@ -239,16 +238,16 @@ inline int Prisme_32_64<_SIZE_>::face_sommet2(int i) const
     default :
       Cerr << "Error in Prisme_32_64<_SIZE_>::face_sommet2" << finl;
       Process::exit();
-      // Pour qq compilos :
+      // For some compilers:
       return -1;
     }
 }
 
 
-/*! @brief Renvoie le numero du i-ieme sommet de la face 3
+/*! @brief Returns the index of the i-th vertex of face 3.
  *
- * @param (int i) le numero du sommet a renvoyer
- * @return (int) le numero du i-ieme sommet de la face 3
+ * @param i the index of the vertex to return
+ * @return the index of the i-th vertex of face 3
  */
 template <typename _SIZE_>
 inline int Prisme_32_64<_SIZE_>::face_sommet3(int i) const
@@ -262,10 +261,10 @@ inline int Prisme_32_64<_SIZE_>::face_sommet3(int i) const
 }
 
 
-/*! @brief Renvoie le numero du i-ieme sommet de la face 4
+/*! @brief Returns the index of the i-th vertex of face 4.
  *
- * @param (int i) le numero du sommet a renvoyer
- * @return (int) le numero du i-ieme sommet de la face 4
+ * @param i the index of the vertex to return
+ * @return the index of the i-th vertex of face 4
  */
 template <typename _SIZE_>
 inline int Prisme_32_64<_SIZE_>::face_sommet4(int i) const
@@ -278,12 +277,12 @@ inline int Prisme_32_64<_SIZE_>::face_sommet4(int i) const
   return i+3;
 }
 
-/*! @brief Renvoie le i-ieme type de face.
+/*! @brief Returns the i-th face type.
  *
- * Un prisme a 2 types de face: quadrangle et triangle
+ * A prism has 2 face types: quadrangle and triangle.
  *
- * @param (int i) le rang du type de face a renvoyer
- * @return (Type_Face) le type de la face i
+ * @param i the rank of the face type to return
+ * @return the type of face i
  */
 template <typename _SIZE_>
 inline Type_Face Prisme_32_64<_SIZE_>::type_face(int i) const

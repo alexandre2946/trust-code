@@ -18,19 +18,19 @@
 #include <TRUSTTabs_forward.h>
 #include <TRUSTArray.h>
 
-/*! @brief Cette classe permet de stocker des listes d'entiers accessibles en temps constant.
+/*! @brief This class allows storing lists of integers accessible in constant time.
  *
- * La taille des listes ne peut pas changer sans
- *   perdre le contenu (ce sont des listes statiques).
- *   Exemple:
+ * The size of the lists cannot change without
+ *   losing the content (these are static lists).
+ *   Example:
  *    Static_Int_List l;
  *    ArrOfInt tailles(3);
  *    tailles[0] = 2; tailles[1] = 3; tailles[2] = 0;
- *    // On reserve la memoire pour trois listes de taille 2, 3 et 0:
+ *    // Reserve memory for three lists of size 2, 3 and 0:
  *    l.set_list_sizes(tailles);
- *    // On affecte une valeur au deuxieme element de la premiere liste:
+ *    // Assign a value to the second element of the first list:
  *    l.set_value(0,1,765);
- *    // Affiche la valeur
+ *    // Print the value
  *    Cout << l(0,1);
  *
  */
@@ -63,16 +63,16 @@ public:
   Sortie& ecrire(Sortie& os) const;
 
 private:
-  // Les listes d'entiers sont stockees de facon contigue
-  // dans le tableau valeurs_.
-  // Le premier element de la liste i est valeurs_[index_[i]]
-  // et le dernier element est valeurs_[index_[i+1]-1]
-  // (c'est comme le stockage morse des matrices).
+  // Integer lists are stored contiguously
+  // in the valeurs_ array.
+  // The first element of list i is valeurs_[index_[i]]
+  // and the last element is valeurs_[index_[i+1]-1]
+  // (similar to Morse storage of matrices).
   ArrOfInt_t index_;
   ArrOfInt_t valeurs_;
 };
 
-/*! @brief affecte la "valeur" au j-ieme element de la i-ieme liste avec 0 <= i < get_nb_lists()  et  0 <= j < get_list_size(i)
+/*! @brief Assigns "valeur" to the j-th element of the i-th list with 0 <= i < get_nb_lists()  and  0 <= j < get_list_size(i).
  *
  */
 template <typename _SIZE_>
@@ -83,7 +83,7 @@ inline void Static_Int_Lists_32_64<_SIZE_>::set_value(int_t i, int_t j, int_t va
   valeurs_[index] = valeur;
 }
 
-/*! @brief renvoie le j-ieme element de la i-ieme liste avec 0 <= i < get_nb_lists()  et  0 <= j < get_list_size(i)
+/*! @brief Returns the j-th element of the i-th list with 0 <= i < get_nb_lists()  and  0 <= j < get_list_size(i).
  *
  */
 template <typename _SIZE_>
@@ -95,7 +95,7 @@ inline typename Static_Int_Lists_32_64<_SIZE_>::int_t Static_Int_Lists_32_64<_SI
   return val;
 }
 
-/*! @brief renvoie le nombre d'elements de la liste i
+/*! @brief Returns the number of elements in list i.
  *
  */
 template <typename _SIZE_>
@@ -104,7 +104,7 @@ inline typename Static_Int_Lists_32_64<_SIZE_>::int_t Static_Int_Lists_32_64<_SI
   return index_[i+1] - index_[i];
 }
 
-/*! @brief renvoie le nombre de listes stockees
+/*! @brief Returns the number of stored lists.
  *
  */
 template <typename _SIZE_>

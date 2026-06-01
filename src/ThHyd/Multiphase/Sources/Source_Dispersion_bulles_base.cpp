@@ -40,7 +40,7 @@ Entree& Source_Dispersion_bulles_base::readOn(Entree& is)
     Process::exit(que_suis_je() + " : not needed for single-phase flow!");
 
   if (pbm->has_correlation("Dispersion_bulles"))
-    correlation_ = pbm->get_correlation("Dispersion_bulles"); //correlation fournie par le bloc correlation
+    correlation_ = pbm->get_correlation("Dispersion_bulles"); // correlation provided by the correlation block
   else
     Process::exit(que_suis_je() + " : the turbulent dispersion correlation must be defined in the correlation bloc.");
 

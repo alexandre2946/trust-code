@@ -128,11 +128,11 @@ void Transformer_32_64<_SIZE_>::transformation_complete(Noms& les_fcts)
   Scatter::uninit_sequential_domain(this->domaine());
   transformer(this->domaine(), les_fcts);
 
-  // Transformation de l'element parfois necessaire
+  // Element transformation sometimes necessary
   auto& type_elem = this->domaine().type_elem();
   if (type_elem->que_suis_je() == "Rectangle")
     {
-      if (ref_cast(Rectangle,type_elem.valeur()).reordonner_elem() == -1) // Le reordonner_elem revele que l'on n'a plus des Rectangle
+      if (ref_cast(Rectangle,type_elem.valeur()).reordonner_elem() == -1) // reordonner_elem reveals that we no longer have Rectangle elements
         {
           type_elem.typer("Quadrangle");
           type_elem->associer_domaine(this->domaine());
@@ -140,7 +140,7 @@ void Transformer_32_64<_SIZE_>::transformation_complete(Noms& les_fcts)
     }
   if (type_elem->que_suis_je() == "Hexaedre")
     {
-      if (ref_cast(Hexaedre,type_elem.valeur()).reordonner_elem() == -1) // Le reordonner_elem revele que l'on n'a plus des Hexaedre
+      if (ref_cast(Hexaedre,type_elem.valeur()).reordonner_elem() == -1) // reordonner_elem reveals that we no longer have Hexaedre elements
         {
           type_elem.typer("Hexaedre_VEF");
           type_elem->associer_domaine(this->domaine());
@@ -152,9 +152,9 @@ void Transformer_32_64<_SIZE_>::transformation_complete(Noms& les_fcts)
           les_bords.associer_domaine(this->domaine());
         }
     }
-  // Il faut reordonner apres un Transformer -y x par exemple car
-  // la numerotation des elements est melangee... Le probleme c'est
-  // que tous les reordonner ne sont pas correctement faits...
+  // Reordering is needed after a Transformer -y x for example because
+  // the element numbering is mixed up... The problem is
+  // that not all reordering routines are correctly implemented...
   // 2-3
   // 0-1
   this->domaine().reordonner();

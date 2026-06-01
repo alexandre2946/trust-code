@@ -33,7 +33,7 @@ Entree& Op_Conv_Amont_old_VEF_Face::readOn(Entree& s )
 }
 
 
-//// convbis correspond au calcul de -1*terme_convection
+//// convbis corresponds to the calculation of -1*convection_term
 //
 static void convbis(const double psc,const int num1,const int num2,
                     const DoubleTab& transporte,const int ncomp,
@@ -127,30 +127,27 @@ DoubleTab& Op_Conv_Amont_old_VEF_Face::ajouter(const DoubleTab& transporte,
     }
 
   // MODIF SB su 10/09/03
-  // Pour les 3 elements suivants, il y a autant de sommets que de face
-  // constituant l'element geometrique
-  // PB avec les hexa, 8 sommets et 6 faces, donc l'utilisation du tableau
-  // face[i] ne fonctionne plus
-  // la methode retenue pour eviter de calculer la vitesse aux sommets sans
-  // les fonctions de forme n'est donc pas utilisable,
-  // pour l'hexa on n'a pas acces a la face.
-  // il existe le tableau Face=>sommets mais pas l'inverse.
-  // trop couteux et pour le moment on n'etend pas les porosites aux hexa
+  // For the following 3 elements, there are as many vertices as faces
+  // making up the geometric element.
+  // Problem with hexahedra: 8 vertices and 6 faces, so using the array
+  // face[i] no longer works.
+  // The method retained to avoid computing velocity at vertices without
+  // the shape functions is therefore not usable for hexahedra,
+  // where the Face=>vertices array exists but not its inverse.
+  // Too costly; porosity extension to hexahedra is not done for now.
   // ||(nom_elem=="Quadri_VEF")
   int istetra=0;
   Nom nom_elem=type_elem.que_suis_je();
   if ((nom_elem=="Tetra_VEF")||(nom_elem=="Tri_VEF"))
     istetra=1;
 
-  // Pour le traitement de la convection on distingue les polyedres
-  // standard qui ne "voient" pas les conditions aux limites et les
-  // polyedres non standard qui ont au moins une face sur le bord.
-  // Un polyedre standard a n facettes sur lesquelles on applique le
-  // schema de convection.
-  // Pour un polyedre non standard qui porte des conditions aux limites
-  // de Dirichlet, une partie des facettes sont portees par les faces.
-  // En bref pour un polyedre le traitement de la convection depend
-  // du type (triangle, tetraedre ...) et du nombre de faces de Dirichlet.
+  // For the convection treatment, standard polyhedra (not "seeing" boundary conditions)
+  // are distinguished from non-standard polyhedra (having at least one boundary face).
+  // A standard polyhedron has n facets on which the convection scheme is applied.
+  // For a non-standard polyhedron with Dirichlet boundary conditions, part of its
+  // facets are carried by the boundary faces.
+  // In short, for a polyhedron the convection treatment depends on the type
+  // (triangle, tetrahedron ...) and the number of Dirichlet faces.
 
   double psc;
   int poly,face_adj,fa7,i,j,n_bord,num_face, rang ,itypcl, num10,num20,num_som;
@@ -162,14 +159,14 @@ DoubleTab& Op_Conv_Amont_old_VEF_Face::ajouter(const DoubleTab& transporte,
   DoubleTab vsom(nsom,dimension);
   DoubleVect cc(dimension);
 
-  // On remet a zero le tableau qui sert pour
-  // le calcul du pas de temps de stabilite
+  // Reset the array used for
+  // computing the stability time step
   fluent_ = 0;
 
-  // Traitement particulier pour les faces de periodicite
+  // Special treatment for periodic faces
 
   int nb_faces_perio = 0;
-  // Boucle pour compter le nombre de faces de periodicite
+  // Loop to count the number of periodic faces
   for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -181,7 +178,7 @@ DoubleTab& Op_Conv_Amont_old_VEF_Face::ajouter(const DoubleTab& transporte,
     }
 
   DoubleTab tab(nb_faces_perio,ncomp_ch_transporte);
-  // Boucle pour remplir tab
+  // Loop to fill tab
   nb_faces_perio=0;
   for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
@@ -205,13 +202,12 @@ DoubleTab& Op_Conv_Amont_old_VEF_Face::ajouter(const DoubleTab& transporte,
   compteur = 0;
   vsom=0.;
 
-  // Les polyedres non standard sont ranges en 2 groupes dans le Domaine_VEF:
-  //  - polyedres bords et joints
-  //  - polyedres bords et non joints
-  // On traite les polyedres en suivant l'ordre dans lequel ils figurent
-  // dans le domaine
+  // Non-standard polyhedra are grouped into 2 sets in Domaine_VEF:
+  //  - boundary and joint polyhedra
+  //  - boundary and non-joint polyhedra
+  // Polyhedra are processed in the order in which they appear in the domain
 
-  // boucle sur les polys
+  // loop over polyhedra
   const IntTab& KEL=type_elem.KEL();
   for (poly=0; poly<nb_elem_tot; poly++)
     {
@@ -221,10 +217,10 @@ DoubleTab& Op_Conv_Amont_old_VEF_Face::ajouter(const DoubleTab& transporte,
       else
         itypcl=domaine_Cl_VEF.type_elem_Cl(rang);
 
-      // calcul des numeros des faces du polyedre
+      // compute the face indices of the polyhedron
       for (face_adj=0; face_adj<nfac; face_adj++)
         face[face_adj]= elem_faces(poly,face_adj);
-      // on conserve cette partie
+      // keep this part
       for (j=0; j<dimension; j++)
         {
           vs[j] = la_vitesse.valeurs()(face[0],j)*porosite_face(face[0]);
@@ -232,7 +228,7 @@ DoubleTab& Op_Conv_Amont_old_VEF_Face::ajouter(const DoubleTab& transporte,
             vs[j]+= la_vitesse.valeurs()(face[i],j)*porosite_face(face[i]);
         }
 
-      // calcul de la vitesse aux sommets des polyedres
+      // compute velocity at the vertices of the polyhedra
       // int ncomp;
       if (istetra==1)
         {
@@ -242,8 +238,8 @@ DoubleTab& Op_Conv_Amont_old_VEF_Face::ajouter(const DoubleTab& transporte,
         }
       else
         {
-          // pour que cela soit valide avec les hexa
-          // On va utliser les fonctions de forme implementees dans la classe Champs_P1_impl ou Champs_Q1_impl
+          // to be valid with hexahedra
+          // Use the shape functions implemented in class Champs_P1_impl or Champs_Q1_impl
           // int ncomp;
           for (j=0; j<nsom; j++)
             {
@@ -255,7 +251,7 @@ DoubleTab& Op_Conv_Amont_old_VEF_Face::ajouter(const DoubleTab& transporte,
 
       type_elem.calcul_vc(face,vc,vs,vsom,vitesse(),itypcl,porosite_face);
 
-      // Boucle sur les facettes du polyedre
+      // Loop over facets of the polyhedron
       for (fa7=0; fa7<nfa7; fa7++)
         {
           if (rang==-1)
@@ -265,15 +261,15 @@ DoubleTab& Op_Conv_Amont_old_VEF_Face::ajouter(const DoubleTab& transporte,
             for (i=0; i<dimension; i++)
               cc[i] = normales_facettes_Cl(rang,fa7,i);
 
-          // On applique le schema de convection a chaque sommet de la facette
-          // On traite le ou les sommets qui sont aussi des sommets du polyedre
+          // Apply the convection scheme to each vertex of the facet
+          // Process the vertex/vertices that are also vertices of the polyhedron
           for (i=0; i<nb_som_facette-1; i++)
             {
               psc =0;
               for (j=0; j<dimension; j++)
                 psc+= vsom(KEL(i+2,fa7),j)*cc[j];
 
-              // Boucle sur les facettes du polyedre
+              // Loop over facets of the polyhedron
               psc /= nb_som_facette;
               num10 = face[KEL(0,fa7)];
               num20 = face[KEL(1,fa7)];
@@ -281,7 +277,7 @@ DoubleTab& Op_Conv_Amont_old_VEF_Face::ajouter(const DoubleTab& transporte,
 
               convbis(psc,num10,num20,transporte,ncomp_ch_transporte,resu,fluent_);
             }
-          // On traite le sommet confondu avec le centre de gravite du polyedre
+          // Process the vertex coinciding with the centre of gravity of the polyhedron
           psc=0;
           for (j=0; j<dimension; j++)
             psc += vc[j]*cc[j];
@@ -293,7 +289,7 @@ DoubleTab& Op_Conv_Amont_old_VEF_Face::ajouter(const DoubleTab& transporte,
           convbis(psc,num10,num20,transporte,ncomp_ch_transporte,resu,fluent_);
         }
 
-    } // fin de la boucle
+    } // end of loop
   //   if(Process::is_sequential())
   //     Process::Journal()<<"OpVEFFaAmont ap interne resu[8]="<<resu(8,0)<<","<<resu(8,1)<<finl;
   //   if((Process::nproc()==2)&&(Process::me()==0))
@@ -303,15 +299,14 @@ DoubleTab& Op_Conv_Amont_old_VEF_Face::ajouter(const DoubleTab& transporte,
   nb_faces_perio = 0;
   double diff1,diff2;
 
-  // Dimensionnement du tableau des flux convectifs au bord du domaine
-  // de calcul
+  // Dimensioning the array of convective fluxes at the boundary
+  // of the computational domain
   DoubleTab& flux_b = flux_bords_;
   flux_b.resize(domaine_VEF.nb_faces_bord(),ncomp_ch_transporte);
   flux_b = 0.;
 
-  // Boucle sur les bords pour traiter les conditions aux limites
-  // il y a prise en compte d'un terme de convection pour les
-  // conditions aux limites de Neumann_sortie_libre seulement
+  // Loop over the boundaries to process the boundary conditions
+  // a convection term is included for Neumann_sortie_libre boundary conditions only
 
   for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
@@ -400,15 +395,13 @@ void Op_Conv_Amont_old_VEF_Face::ajouter_contribution(const DoubleTab& transport
   const DoubleTab& normales_facettes_Cl = domaine_Cl_VEF.normales_facettes_Cl();
   int nfac = domaine.nb_faces_elem(), nsom = domaine.nb_som_elem(), nb_som_facette = domaine.type_elem()->nb_som_face();
 
-  // Pour le traitement de la convection on distingue les polyedres
-  // standard qui ne "voient" pas les conditions aux limites et les
-  // polyedres non standard qui ont au moins une face sur le bord.
-  // Un polyedre standard a n facettes sur lesquelles on applique le
-  // schema de convection.
-  // Pour un polyedre non standard qui porte des conditions aux limites
-  // de Dirichlet, une partie des facettes sont portees par les faces.
-  // En bref pour un polyedre le traitement de la convection depend
-  // du type (triangle, tetraedre ...) et du nombre de faces de Dirichlet.
+  // For the convection treatment, standard polyhedra (not "seeing" boundary conditions)
+  // are distinguished from non-standard polyhedra (having at least one boundary face).
+  // A standard polyhedron has n facets on which the convection scheme is applied.
+  // For a non-standard polyhedron with Dirichlet boundary conditions, part of its
+  // facets are carried by the boundary faces.
+  // In short, for a polyhedron the convection treatment depends on the type
+  // (triangle, tetrahedron ...) and the number of Dirichlet faces.
 
   double psc;
   //DoubleTab pscl=0;
@@ -424,11 +417,11 @@ void Op_Conv_Amont_old_VEF_Face::ajouter_contribution(const DoubleTab& transport
   auto& tab2 = matrice.get_set_tab2();
   auto& coeff = matrice.get_set_coeff();
 
-  // Traitement particulier pour les faces de periodicite
+  // Special treatment for periodic faces
   int voisine, nb_faces_perio = 0;
   double diff1,diff2;
 
-  // Boucle pour compter le nombre de faces de periodicite
+  // Loop to count the number of periodic faces
   for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -441,7 +434,7 @@ void Op_Conv_Amont_old_VEF_Face::ajouter_contribution(const DoubleTab& transport
 
   DoubleTab tab(nb_faces_perio,ncomp_ch_transporte);
 
-  // Boucle pour remplir tab
+  // Loop to fill tab
   nb_faces_perio=0;
   for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
@@ -460,13 +453,12 @@ void Op_Conv_Amont_old_VEF_Face::ajouter_contribution(const DoubleTab& transport
         }
     }
 
-  // Les polyedres non standard sont ranges en 2 groupes dans le Domaine_VEF:
-  //  - polyedres bords et joints
-  //  - polyedres bords et non joints
-  // On traite les polyedres en suivant l'ordre dans lequel ils figurent
-  // dans le domaine
+  // Non-standard polyhedra are grouped into 2 sets in Domaine_VEF:
+  //  - boundary and joint polyhedra
+  //  - boundary and non-joint polyhedra
+  // Polyhedra are processed in the order in which they appear in the domain
 
-  // boucle sur les polys
+  // loop over polyhedra
   const IntTab& KEL=type_elem.KEL();
   for (poly=0; poly<nb_elem_tot; poly++)
     {
@@ -477,11 +469,11 @@ void Op_Conv_Amont_old_VEF_Face::ajouter_contribution(const DoubleTab& transport
       else
         itypcl=domaine_Cl_VEF.type_elem_Cl(rang);
 
-      // calcul des numeros des faces du polyedre
+      // compute the face indices of the polyhedron
       for (face_adj=0; face_adj<nfac; face_adj++)
         face[face_adj]= elem_faces(poly,face_adj);
 
-      // calcul de la vitesse aux sommets des polyedres
+      // compute velocity at the vertices of the polyhedra
       for (j=0; j<dimension; j++)
         {
           vs[j] = la_vitesse.valeurs()(face[0],j);
@@ -489,8 +481,8 @@ void Op_Conv_Amont_old_VEF_Face::ajouter_contribution(const DoubleTab& transport
             vs[j]+= la_vitesse.valeurs()(face[i],j);
         }
 
-      // calcul de la vitesse aux sommets des polyedres
-      // On va utliser les fonctions de forme implementees dans la classe Champs_P1_impl ou Champs_Q1_impl
+      // compute velocity at the vertices of the polyhedra
+      // Use the shape functions implemented in class Champs_P1_impl or Champs_Q1_impl
 
       int ncomp;
       for (j=0; j<nsom; j++)
@@ -501,10 +493,10 @@ void Op_Conv_Amont_old_VEF_Face::ajouter_contribution(const DoubleTab& transport
               vsom(j,ncomp) = la_vitesse.valeur_a_sommet_compo(num_som,poly,ncomp);
         }
 
-      // calcul de vc
+      // compute vc
       type_elem.calcul_vc(face,vc,vs,vsom,vitesse(),itypcl,porosite_face);
 
-      // Boucle sur les facettes du polyedre
+      // Loop over facets of the polyhedron
 
       for (fa7=0; fa7<nfa7; fa7++)
         {
@@ -515,15 +507,15 @@ void Op_Conv_Amont_old_VEF_Face::ajouter_contribution(const DoubleTab& transport
             for (i=0; i<dimension; i++)
               cc[i] = normales_facettes_Cl(rang,fa7,i);
 
-          // On applique le schema de convection a chaque sommet de la facette
-          // On traite le ou les sommets qui sont aussi des sommets du polyedre
+          // Apply the convection scheme to each vertex of the facet
+          // Process the vertex/vertices that are also vertices of the polyhedron
 
           for (i=0; i<nb_som_facette-1; i++)
             {
               psc =0;
 
               /////////////////////////////////////////////////////////////////////
-              // Remplissage du tableau de coefficients correspondant a convbis
+              // Fill the coefficient array corresponding to convbis
               /////////////////////////////////////////////////////////////////////
 
               for (j=0; j<dimension; j++)
@@ -533,9 +525,9 @@ void Op_Conv_Amont_old_VEF_Face::ajouter_contribution(const DoubleTab& transport
               num20 = face[KEL(1,fa7)];
               convbisimplicite(psc,num10,num20,transporte,ncomp_ch_transporte,matrice);
 
-            } // fin de boucle sur les sommets des facettes.
+            } // end of loop over facet vertices.
 
-          // on traite le sommet confondu avec le centre de gravite du polyedre
+          // process the vertex coinciding with the centre of gravity of the polyhedron
           psc=0;
           for (j=0; j<dimension; j++)
             psc += vc[j]*cc[j];
@@ -544,13 +536,12 @@ void Op_Conv_Amont_old_VEF_Face::ajouter_contribution(const DoubleTab& transport
           num20 = face[KEL(1,fa7)];
           convbisimplicite(psc,num10,num20,transporte,ncomp_ch_transporte,matrice);
 
-        } // fin de boucle sur les facettes.
+        } // end of loop over facets.
 
-    } // fin de boucle sur les polyedres.
+    } // end of loop over polyhedra.
 
-  // Boucle sur les bords pour traiter les conditions aux limites
-  // il y a prise en compte d'un terme de convection pour les
-  // conditions aux limites de Neumann_sortie_libre seulement
+  // Loop over the boundaries to process the boundary conditions
+  // a convection term is included for Neumann_sortie_libre boundary conditions only
 
   for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
@@ -640,11 +631,11 @@ void Op_Conv_Amont_old_VEF_Face::contribue_au_second_membre(DoubleTab& resu ) co
 
   //IntVect face(nfac);
 
-  // Traitement particulier pour les faces de periodicite
+  // Special treatment for periodic faces
   int voisine, nb_faces_perio = 0;
   double diff1,diff2;
 
-  // Boucle pour compter le nombre de faces de periodicite
+  // Loop to count the number of periodic faces
   for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -656,7 +647,7 @@ void Op_Conv_Amont_old_VEF_Face::contribue_au_second_membre(DoubleTab& resu ) co
     }
 
   DoubleTab tab(nb_faces_perio,ncomp);
-  // Boucle pour remplir tab
+  // Loop to fill tab
   nb_faces_perio=0;
   for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
@@ -675,9 +666,8 @@ void Op_Conv_Amont_old_VEF_Face::contribue_au_second_membre(DoubleTab& resu ) co
             }
         }
     }
-  // Boucle sur les bords pour traiter les conditions aux limites
-  // il y a prise en compte d'un terme de convection pour les
-  // conditions aux limites de Neumann_sortie_libre seulement
+  // Loop over the boundaries to process the boundary conditions
+  // a convection term is included for Neumann_sortie_libre boundary conditions only
 
   for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {

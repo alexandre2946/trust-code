@@ -21,10 +21,10 @@ Implemente_instanciable(Noms,"Noms",VECT(Nom));
 // XD list_nom listobj list_nom BRACE nom_anonyme NO_COMMA List of name.
 // XD list_nom_virgule listobj list_nom_virgule BRACE nom_anonyme COMMA List of name.
 
-// XD un_pb objet_lecture nul NO_BRACE pour les groupes
+// XD un_pb objet_lecture nul NO_BRACE for groups
 // XD attr mot ref_Pb_base mot REQ the string
-// XD list_un_pb listobj nul BRACE un_pb COMMA pour les groupes
-// XD list_list_nom listobj nul BRACE list_un_pb COMMA pour les groupes
+// XD list_un_pb listobj nul BRACE un_pb COMMA for groups
+// XD list_list_nom listobj nul BRACE list_un_pb COMMA for groups
 
 Sortie& Noms::printOn(Sortie& s) const
 {

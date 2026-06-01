@@ -20,8 +20,8 @@
 
 /*! @brief class Op_Div_PolyMAC_HFV
  *
- *   Cette classe represente l'operateur de divergence La discretisation est PolyMAC_HFV
- *   On calcule la divergence d'un champ_P1NC (la vitesse)
+ *   Divergence operator for the PolyMAC_HFV discretization.
+ *   Computes the divergence of a velocity field.
  *
  * @sa Op_Div_PolyMAC_CDO
  *

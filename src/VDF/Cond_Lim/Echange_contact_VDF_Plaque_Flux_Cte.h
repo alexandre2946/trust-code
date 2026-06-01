@@ -24,9 +24,10 @@ class Domaine_VDF;
 
 ////////////////////////////////////////////////////////////////
 
-/*! @brief classe : Echange_contact_VDF_Plaque_Flux_Cte Calcule le coefficient d'echange via la correlation de Shah, valable
+/*! @brief class: Echange_contact_VDF_Plaque_Flux_Cte
  *
- *    entre deux plaques planes paralleles a flux surfacique constant
+ *   Computes the heat exchange coefficient using the Shah correlation, valid
+ *   between two parallel flat plates with constant surface flux.
  *
  *
  */

@@ -24,34 +24,31 @@ class Geometrie;
 
 /*! @brief class Domaine_EF
  *
- *  	Classe instanciable qui derive de Domaine_VF.
- *  	Cette classe contient les informations geometriques que demande
- *  	la methode des Volumes Elements Finis (element de Crouzeix-Raviart)
- *  	La classe porte un certain nombre d'informations concernant les faces
- *  	Dans cet ensemble de faces on fait figurer aussi les faces du bord et
- *       des joints. Pour manipuler les faces on distingue 2 categories:
- *            - les faces non standard qui sont sur un joint, un bord ou qui sont
- *              internes tout en appartenant a un element du bord
- *            - les faces standard qui sont les faces internes n'appartenant pas
- *              a un element du bord
- *       Cette distinction correspond au traitement des conditions aux limites:les
- *       faces standard ne "voient pas" les conditions aux limites.
- *       L'ensemble des faces est numerote comme suit:
- *            - les faces qui sont sur un Domaine_joint apparaissent en premier
- *     	       (dans l'ordre du vecteur les_joints)
- *    	     - les faces qui sont sur un Domaine_bord apparaissent ensuite
- * 	       (dans l'ordre du vecteur les_bords)
- *   	     - les faces internes non standard apparaissent ensuite
- *            - les faces internes standard en dernier
- *       Finalement on trouve regroupees en premier toutes les faces non standard
- *       qui vont necessiter un traitement particulier
- *       On distingue deux types d'elements
- *            - les elements non standard : ils ont au moins une face de bord
- *            - les elements standard : ils n'ont pas de face de bord
- *       Les elements standard (resp. les elements non standard) ne sont pas ranges
- *       de maniere consecutive dans l'objet Domaine. On utilise le tableau
- *       rang_elem_non_std pour acceder de maniere selective a l'un ou
- *       l'autre des types d'elements
+ * @brief Instantiable class derived from Domaine_VF.
+ *  	This class holds the geometric information required by the
+ *  	Finite Element (FE) method (Crouzeix-Raviart element).
+ *  	The class stores a number of pieces of information about faces.
+ *  	The set of faces also includes boundary faces and
+ *       joint faces. Faces are split into 2 categories:
+ *            - non-standard faces: on a joint, on a boundary, or internal
+ *              but belonging to a boundary element
+ *            - standard faces: internal faces not belonging to a boundary element
+ *       This distinction corresponds to the treatment of boundary conditions:
+ *       standard faces do not "see" the boundary conditions.
+ *       The full set of faces is numbered as follows:
+ *            - faces on a Domaine_joint appear first
+ *     	       (in the order of the les_joints vector)
+ *    	     - faces on a Domaine_bord appear next
+ * 	       (in the order of the les_bords vector)
+ *   	     - non-standard internal faces appear next
+ *            - standard internal faces appear last
+ *       All non-standard faces requiring special treatment are thus grouped first.
+ *       Two element types are distinguished:
+ *            - non-standard elements: they have at least one boundary face
+ *            - standard elements: they have no boundary face
+ *       Standard (resp. non-standard) elements are not stored consecutively
+ *       in the Domaine object. The rang_elem_non_std array is used to
+ *       selectively access one or the other type of element.
  *
  */
 
@@ -102,11 +99,11 @@ protected:
 private:
   DoubleVect porosite_sommets_, volumes_sommets_thilde_, volumes_thilde_;
   //  OWN_PTR(Champ_Don_base) champ_porosite_sommets_,champ_porosite_lu_;
-  DoubleTab Bij_, Bij_thilde_;                         // stockage des matrice Bije
+  DoubleTab Bij_, Bij_thilde_;                         // storage of the Bije matrices
 
-  double h_carre = 1.e30;			 // carre du pas du maillage
-  DoubleVect h_carre_;			// carre du pas d'une maille
-  OWN_PTR(Elem_EF_base) type_elem_;                  // type de l'element de discretisation
+  double h_carre = 1.e30;			 // square of the mesh step
+  DoubleVect h_carre_;			// square of the mesh step per cell
+  OWN_PTR(Elem_EF_base) type_elem_;                  // type of the discretisation element
 
   Sortie& ecrit(Sortie& os) const;
   IntVect orientation_;

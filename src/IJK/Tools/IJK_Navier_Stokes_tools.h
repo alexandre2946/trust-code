@@ -115,13 +115,13 @@ void mass_solver_scalar(IJK_Field_double& dv, const ArrOfDouble_with_ghost& delt
 
 void density_solver_with_rho(IJK_Field_double& velocity, const IJK_Field_double& rho, const ArrOfDouble_with_ghost& delta_z_local, const int k);
 
-// fonction moyenne en temps du champs de vitesse utilise dans le cas de bulles fixes
+// time-averaged velocity field function used in the case of fixed bubbles
 void update_integral_velocity(const IJK_Field_vector3_double& v_instant,  IJK_Field_vector3_double& v_tmp,
                               const IJK_Field_double& indic, const IJK_Field_double& indic_tmp);
 void compute_and_store_gradU_cell(const IJK_Field_double& vitesse_i,
                                   const IJK_Field_double& vitesse_j,
                                   const IJK_Field_double& vitesse_k,
-                                  /* Et les champs en sortie */
+                                  /* And the output fields */
                                   IJK_Field_double& dudx, IJK_Field_double& dvdy, IJK_Field_double& dwdx,
                                   IJK_Field_double& dudz, IJK_Field_double& dvdz, IJK_Field_double& dwdz,
                                   const int compute_all,

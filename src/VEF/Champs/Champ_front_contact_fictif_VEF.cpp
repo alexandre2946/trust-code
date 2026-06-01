@@ -94,7 +94,7 @@ void Champ_front_contact_fictif_VEF::mettre_a_jour(double temps )
 
     }
   tab.echange_espace_virtuel();
-  // Verification de la coherence des temperatures de bord calculees
+  // Verification of the consistency of the computed boundary temperatures
   //verifier_temperature_bord();
 }
 

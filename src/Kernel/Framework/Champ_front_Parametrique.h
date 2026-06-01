@@ -30,7 +30,7 @@ class Champ_front_Parametrique : public Champ_front_base
   Declare_instanciable(Champ_front_Parametrique);
 
 public:
-  // Methodes surchargees:
+  // Overridden methods:
   using Champ_Proto::valeurs;
   inline virtual DoubleTab& valeurs() override { return champ().valeurs(); }
   inline virtual const DoubleTab& valeurs() const override { return champ().valeurs(); }
@@ -54,18 +54,18 @@ public:
   Nature_du_champ nature_du_champ() const override { return champ().nature_du_champ(); }
   Nature_du_champ fixer_nature_du_champ(Nature_du_champ nat) override { return champ().fixer_nature_du_champ(nat); }
 
-  // Methodes surchargees avec boucles sur les champs
+  // Overridden methods with loops over fields
   void associer_fr_dis_base(const Frontiere_dis_base& fr) override { for (auto& ch : champs_) ch->associer_fr_dis_base(fr); }
   int initialiser(double temps, const Champ_Inc_base& inco) override { for (auto& ch : champs_) ch->initialiser(temps, inco); return 1; }
   virtual void completer() override { for (auto& ch : champs_) ch->completer(); }
   void fixer_nb_valeurs_temporelles(int nb_cases) override { for (auto& ch : champs_) ch->fixer_nb_valeurs_temporelles(nb_cases); }
 
-  // Methodes surchargees avec calcul specifique de la derivee en temps du champ_front_parametrique (Gpoint_):
+  // Overridden methods with specific computation of the time derivative of the parametric boundary field (Gpoint_):
   void calculer_derivee_en_temps(double t1, double t2) override;
   const DoubleTab& derivee_en_temps() const override;
-  bool instationnaire() const override { return index_==1 ? champ().instationnaire() : true; } // Le premier champ peut etre stationnaire mais ensuite instationnaire forcement
+  bool instationnaire() const override { return index_==1 ? champ().instationnaire() : true; } // The first field can be stationary but subsequent ones are necessarily unsteady
 
-  // Methodes specifiques:
+  // Specific methods:
   std::string newCompute() const;
   Champ_front_base& champ() { return champs_[index_-1]; }
   const Champ_front_base& champ() const { return champs_[index_-1]; }
@@ -73,7 +73,7 @@ public:
 private:
   LIST(OWN_PTR(Champ_front_base)) champs_;
   mutable int index_=0;
-  mutable double last_t2_ = DMAXFLOAT; // Pour gerer les changements de champs dans calculer_derivee_en_temps
+  mutable double last_t2_ = DMAXFLOAT; // To manage field changes in calculer_derivee_en_temps
 };
 
 #endif

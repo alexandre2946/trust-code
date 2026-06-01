@@ -35,7 +35,7 @@ public :
   int preparer_calcul() override;
 
   // overload to change behavior
-  Entree& lire_cond_init(Entree&) override; //pour lire la pression
+  Entree& lire_cond_init(Entree&) override; //to read the pressure
   void discretiser() override;
   void set_param(Param& param) const override;
   void completer() override;

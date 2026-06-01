@@ -22,21 +22,21 @@
 class Equation_base;
 class MorEqn;
 
-/*! @brief class Champ_Generique_Morceau_Equation OWN_PTR(Champ_base) destine a post-traiter une quantite liee a un morceau d equation
+/*! @brief class Champ_Generique_Morceau_Equation OWN_PTR(Champ_base) intended to post-process a quantity related to an equation piece
  *
- *  Consulter la hierarchie de MorEqn pour connaitre les morceaux d equation
- *  Syntaxe a respecter pour jdd
+ *  See the MorEqn hierarchy to know the available equation pieces
+ *  Syntax to follow in the data file
  *
- *  "nom_champ" Morceau_Equation { type "type_moreqn" numero "numero_moreqn" option "type_option" [ compo "num_compo" ]
- *                                                 source Champ_Post_ref_Champ { Pb_champ "nom_pb" "nom_champ_discret" }
+ *  "field_name" Morceau_Equation { type "type_moreqn" numero "numero_moreqn" option "type_option" [ compo "num_compo" ]
+ *                                                 source Champ_Post_ref_Champ { Pb_champ "pb_name" "discrete_field_name" }
  *                }
- *  "nom_champ"     fixe par utilisateur sera le nom du champ generique
- *  "unite"     fixe par utilisateur pour la lisibilite dans les postraitements
- *  "type_moreqn"   designe le type de morceau d equation (actuellement disponible "operateur")
- *  "numero_moreqn" designe le numero du morceau
- *                    ex : cas operateur : 0 (diffusion) 1 (convection) 2 (gradient) 3 (divergence)
- *  "type_option"   option choisie ("stabilite" ou "flux_bords")
- *  "num_compo"           numero de la composante a postraiter (a considerer uniquement pour "flux_bords" si plusieurs composantes)
+ *  "field_name"     set by the user will be the name of the generic field
+ *  "unite"     set by the user for readability in post-processing
+ *  "type_moreqn"   designates the type of equation piece (currently available: "operateur")
+ *  "numero_moreqn" designates the piece number
+ *                    ex: operator case: 0 (diffusion) 1 (convection) 2 (gradient) 3 (divergence)
+ *  "type_option"   chosen option ("stabilite" or "flux_bords")
+ *  "num_compo"           component number to post-process (to consider only for "flux_bords" if multiple components)
  *
  */
 
@@ -72,6 +72,7 @@ protected:
   OBS_PTR(Equation_base) ref_eq_;       //REF vers l equation qui porte le morceau
   Motcle  localisation_;            //localisation correspondant au support du champ postraite
   Nom unite_;                 //unite du champ obtenu (a specifier par l'utilisateur)
+
 
 };
 

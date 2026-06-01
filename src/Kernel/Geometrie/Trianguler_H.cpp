@@ -23,10 +23,10 @@ Implemente_instanciable(Trianguler_H,"Trianguler_H",Triangulation_base);
 
 
 
-/*! @brief Simple appel a: Interprete::printOn(Sortie&)
+/*! @brief Simple call to: Interprete::printOn(Sortie&)
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param os Output stream.
+ * @return The modified output stream.
  */
 Sortie& Trianguler_H::printOn(Sortie& os) const
 {
@@ -34,22 +34,22 @@ Sortie& Trianguler_H::printOn(Sortie& os) const
 }
 
 
-/*! @brief Simple appel a: Interprete::readOn(Entree&)
+/*! @brief Simple call to: Interprete::readOn(Entree&)
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param is Input stream.
+ * @return The modified input stream.
  */
 Entree& Trianguler_H::readOn(Entree& is)
 {
   return Interprete::readOn(is);
 }
 
-/*! @brief Triangule tous les element d'un domaine: transforme les elements goemetriques du domaine en triangles.
+/*! @brief @brief Triangulates all elements of a domain: transforms the geometric elements of the domain into triangles.
  *
- *     Pour l'instant on ne sait trianguler que des Rectangles
- *     (on les coupe en 2).
+ *     Currently only Rectangles can be triangulated
+ *     (they are split into 2).
  *
- * @param (Domaine& domaine) le domaine dont on veut trianguler les elements
+ * @param domaine The domain whose elements are to be triangulated.
  */
 void Trianguler_H::trianguler(Domaine& domaine) const
 {

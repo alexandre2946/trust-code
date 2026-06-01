@@ -117,8 +117,10 @@ void Turbulence_paroi_scal_base::get_noms_champs_postraitables(Noms& nom, Option
     nom.add(champs_compris_.liste_noms_compris());
 
 }
-/*! @brief Ouverture/creation d'un fichier d'impression de Face, d_eq, Nu local, h
+/*! @brief Opens or creates a print file for Face, d_eq, local Nu, h.
  *
+ * @param Nusselt Shared output file object.
+ * @param extension File extension suffix.
  */
 void Turbulence_paroi_scal_base::ouvrir_fichier_partage(EcrFicPartage& Nusselt, const Nom& extension) const
 {
@@ -127,10 +129,10 @@ void Turbulence_paroi_scal_base::ouvrir_fichier_partage(EcrFicPartage& Nusselt, 
 
   Nom fichier = Objet_U::nom_du_cas() + "_" + pb.le_nom() + "_" + extension + ".face";
 
-  // On cree le fichier au premier pas de temps si il n'y a pas reprise
+  // Create the file at the first time step if there is no restart
   if (nb_impr_ == 0 && !pb.reprise_effectuee())
     Nusselt.ouvrir(fichier);
-  else // Sinon on l'ouvre
+  else // Otherwise open in append mode
     Nusselt.ouvrir(fichier, ios::app);
 
   if (je_suis_maitre())
@@ -141,20 +143,23 @@ void Turbulence_paroi_scal_base::ouvrir_fichier_partage(EcrFicPartage& Nusselt, 
   nb_impr_++;
 }
 
-/*! @brief Ouverture/creation d'un fichier d'impression de moyennes
+/*! @brief Opens or creates a file for printing mean values.
  *
+ * @param fichier Shared output file object.
+ * @param nom_fichier Base filename.
+ * @param extension File extension suffix.
  */
 void Turbulence_paroi_scal_base::ouvrir_fichier_partage(EcrFicPartage& fichier, const Nom& nom_fichier, const Nom& extension) const
 {
   const Probleme_base& pb = mon_modele_turb_scal->equation().probleme();
   Nom nom_fic = nom_fichier + "." + extension;
 
-  // On cree le fichier nom_fichier au premier pas de temps si il n'y a pas reprise
+  // Create the file at the first time step if there is no restart
   if (nb_impr0_ == 0 && !pb.reprise_effectuee())
     {
       fichier.ouvrir(nom_fic);
     }
-  // Sinon on l'ouvre
+  // Otherwise open in append mode
   else
     {
       fichier.ouvrir(nom_fic, ios::app);
@@ -325,7 +330,7 @@ void Turbulence_paroi_scal_base::imprimer_nusselt_mean_only(Sortie& os, int boun
     }
   mp_sum_for_each_item(moy_bords);
 
-// affichages des lignes dans le fichier
+// print lines to the file
   if (je_suis_maitre())
     {
       fichier << sch.temps_courant();

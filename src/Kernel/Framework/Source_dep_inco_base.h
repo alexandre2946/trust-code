@@ -19,10 +19,10 @@
 #include <Source_base.h>
 
 /*! @brief class Source_dep_inco_base
- * Les sources heritant de cette clase doivent coder ajouter_ de facon a permettre d'impliciter le terme en diffusion implicite.
- * On cherche a obtenir la source sous la forme f(un)*uk
- * ajouter(resu)=ajouter_(inco,resu), et dans ajouter_ on utilise
- * inco pour uk , inconnue.valeurs() pour Un, voir Perte_Charge_Singuliere_VDF_Face.cpp
+ * Sources inheriting from this class must implement ajouter_ in a way that allows implicit treatment of the diffusion term.
+ * The goal is to express the source in the form f(un)*uk.
+ * ajouter(resu)=ajouter_(inco,resu), and in ajouter_ we use
+ * inco for uk, inconnue.valeurs() for Un, see Perte_Charge_Singuliere_VDF_Face.cpp
  *
  */
 class Source_dep_inco_base : public Source_base

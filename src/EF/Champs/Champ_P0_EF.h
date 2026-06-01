@@ -22,8 +22,8 @@
 
 class Domaine_EF;
 
-/*! @brief classe Champ_P0_EF Classe qui represente un champ discret P0 par element
- *  associe a un domaine discretise de type Domaine_EF
+/*! @brief class Champ_P0_EF Represents a P0-per-element discrete field
+ *  associated with a domain discretized as Domaine_EF.
  *
  * @sa Champ_Inc_P0_base
  */

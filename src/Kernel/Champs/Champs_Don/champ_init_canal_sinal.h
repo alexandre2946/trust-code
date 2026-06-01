@@ -29,7 +29,7 @@ public :
 
 protected :
   double Ucent = -1., h = -1., ampli_bruit = -1., omega = -1., ampli_sin = -1.;
-  // Initialisation par defaut des minimums et maximums pour generaliser l'initialisation du canal pour n'importe quelle position dans l'espace.
+  // Default initialisation of minimums and maximums to generalise channel initialisation for any position in space.
   int dir_wall = 1, dir_flow = 0;
   double min_dir_flow = 0., min_dir_wall = 0.;
 

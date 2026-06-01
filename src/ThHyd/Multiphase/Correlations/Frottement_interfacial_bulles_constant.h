@@ -17,12 +17,12 @@
 #define Frottement_interfacial_bulles_constant_included
 #include <Frottement_interfacial_base.h>
 
-/*! @brief classe Frottement_interfacial_bulles coefficients de frottement interfacial d'un ecoulement a bulles
+/*! @brief Constant interfacial friction coefficient for bubbly flows.
  *
- *       parametres (a lire dans les Op_FI_*_bulles) :
- *        - C_d_     -> coefficient de friction
- *        - r_bulle_ -> rayon de la bulle (si absent, la correlation utilisera toute seule le diametre de bulles du probleme)
- *        - symetrical_force_ -> 1 si la force est symmetrique (pas de diff liq/vap), 0 si non (doit chercher phase vap)
+ *       Parameters (read in Op_FI_*_bulles):
+ *        - C_d_     -> friction coefficient
+ *        - r_bulle_ -> bubble radius (if absent, the correlation will use the bubble diameter from the problem)
+ *        - symetrical_force_ -> 1 if the force is symmetric (no liq/vap difference), 0 otherwise (must find vapor phase)
  *
  */
 
@@ -37,7 +37,7 @@ public:
 
 protected:
   double C_d_ = -123.;
-  int n_l = -1; //phase liquide
+  int n_l = -1; //liquid phase
   double r_bulle_ = -1.;
 };
 

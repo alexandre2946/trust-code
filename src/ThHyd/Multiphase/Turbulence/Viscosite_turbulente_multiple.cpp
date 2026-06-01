@@ -50,7 +50,7 @@ Entree& Viscosite_turbulente_multiple::readOn(Entree& is)
 
 void Viscosite_turbulente_multiple::eddy_viscosity(DoubleTab& nu_t) const
 {
-  //On fait appel aux correlations d'en_dessous
+  //Call the sub-correlations
   nu_t = 0;
   DoubleTrav nu_loc = DoubleTrav(nu_t);
   for (auto &&corr : viscs_turbs)
@@ -63,7 +63,7 @@ void Viscosite_turbulente_multiple::eddy_viscosity(DoubleTab& nu_t) const
     }
 }
 
-void Viscosite_turbulente_multiple::reynolds_stress(DoubleTab& R_ij) const // Renvoie <u_i'u_j'>
+void Viscosite_turbulente_multiple::reynolds_stress(DoubleTab& R_ij) const // Returns <u_i'u_j'>
 {
   int D = dimension;
   R_ij = 0;
@@ -80,7 +80,7 @@ void Viscosite_turbulente_multiple::reynolds_stress(DoubleTab& R_ij) const // Re
     }
 }
 
-void Viscosite_turbulente_multiple::reynolds_stress_BIF(DoubleTab& R_ij) const // Renvoie <u_i'u_j'>
+void Viscosite_turbulente_multiple::reynolds_stress_BIF(DoubleTab& R_ij) const // Returns <u_i'u_j'>
 {
   int D = dimension;
   R_ij = 0;

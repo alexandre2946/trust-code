@@ -39,55 +39,55 @@ public:
 
   int tester() const;
 
-  /* Fonction permettant de calculer la vorticite a partir de la vitesse. */
+  /* Function to compute the vorticity from the velocity field. */
   int calculer_vorticite(DoubleTab&, const DoubleTab&) const;
 
-  /* Assemble la matrice de vorticite */
+  /* Assemble the vorticity matrix. */
   int assembler_matrice(Matrice&);
 
-  /* Pour un element donne "numero_elem" retourne la liste des sommets appartenant a cet element */
+  /* For a given element "numero_elem", returns the list of vertices belonging to that element. */
   IntList sommets_pour_element(int numero_elem) const;
 
-  /* Pour un sommet donne "numero_som" retourne la liste des elements contenant ce sommet */
+  /* For a given vertex "numero_som", returns the list of elements containing that vertex. */
   IntList elements_pour_sommet(int numero_som) const;
 
-  /* Pour un sommet donne "numero_som" retourne */
-  /* la liste des sommets voisins de "numero_som */
-  /* Parametre: la liste des elements contenant "numero_som" */
-  /* Il suffit de chercher dans ces elements pour avoir le resultat */
-  /* REM: la liste resultat contient le sommet "numero_som" */
+  /* For a given vertex "numero_som", returns */
+  /* the list of neighboring vertices of "numero_som". */
+  /* Parameter: the list of elements containing "numero_som". */
+  /* It is sufficient to search in those elements to get the result. */
+  /* NOTE: the result list includes the vertex "numero_som" itself. */
   IntList sommets_voisins(int numero_som, const IntList& liste) const;
 
-  /* Pour l'element "numero_elem" retourne le coefficient */
-  /* a placer dans la sous matrice de taille nb_elem * nb_elem */
-  /* a la ligne "numero_elem" */
-  /* Matrice EF */
+  /* For element "numero_elem", returns the coefficient */
+  /* to place in the nb_elem * nb_elem sub-matrix */
+  /* at row "numero_elem". */
+  /* EF matrix */
   double remplir_elem_elem_EF(const int numero_elem) const;
 
-  /* Pour l'element "numero_elem" retourne le coefficient */
-  /* a placer dans la sous matrice de taille nb_elem * nb_som */
-  /* a la ligne "numero_elem" */
-  /* Matrice EF */
+  /* For element "numero_elem", returns the coefficient */
+  /* to place in the nb_elem * nb_som sub-matrix */
+  /* at row "numero_elem". */
+  /* EF matrix */
   double remplir_elem_som_EF(const int numero_elem, const int numero_som) const;
 
-  /* Pour le sommet "numero_som" retourne le coefficient */
-  /* a placer dans la sous matrice de taille nb_som * nb_elem */
-  /* a la ligne "numero_som" */
-  /* Matrice EF */
+  /* For vertex "numero_som", returns the coefficient */
+  /* to place in the nb_som * nb_elem sub-matrix */
+  /* at row "numero_som". */
+  /* EF matrix */
   double remplir_som_elem_EF(const int numero_elem, const int numero_som) const;
 
-  /* Pour l'element "numero_elem" retourne le coefficient */
-  /* a placer dans la sous matrice de taille nb_elem * nb_som */
-  /* a la ligne "numero_som" */
-  /* "IntList" est le tableau des elements qui contiennent "numero_som" */
-  /* Matrice EF */
+  /* For element "numero_elem", returns the coefficient */
+  /* to place in the nb_elem * nb_som sub-matrix */
+  /* at row "numero_som". */
+  /* "IntList" is the array of elements containing "numero_som". */
+  /* EF matrix */
   double remplir_som_som_EF(const int numero_som, const int sommet_voisin, const IntList&) const;
 
-  /* Fonction de tri d'une IntList */
-  /* Le tri s'effectue par ordre croissant */
+  /* Function to sort an IntList */
+  /* Sorting is done in ascending order. */
   void Tri(IntList& liste_a_trier) const;
 
-  //Methode pour rendre le vecteur normal a la "face" de l'element "elem"
+  //Method to return the outward normal vector at "face" of element "elem"
   DoubleTab vecteur_normal(const int face, const int elem) const;
 
   const Domaine_VEF& domaine_vef() const;

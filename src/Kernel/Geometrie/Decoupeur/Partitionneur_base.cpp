@@ -40,9 +40,9 @@ void Partitionneur_base_32_64<_SIZE_>::set_param(Param& param) const
 {
 }
 
-/*! @brief corrige la partition pour que l'element 0 du domaine initial se trouve sur le premier sous-domaine de la partition.
+/*! @brief Corrects the partition so that element 0 of the initial domain is on the first sub-domain of the partition.
  *
- *   On echange le premier sous-domaine et celui qui contient l'element 0.
+ *   The first sub-domain and the one containing element 0 are swapped.
  *
  */
 template <typename _SIZE_>
@@ -72,14 +72,12 @@ void Partitionneur_base_32_64<_SIZE_>::corriger_elem0_sur_proc0(BigIntVect_& ele
 
 namespace
 {
-/*! @brief construction (taille et contenu) du tableau elements avec pour chaque face du bord donne, l'indice de l'element du domaine adjacent
+/*! @brief Builds (size and content) the elements array with, for each face of the given boundary, the index of the adjacent domain element.
  *
- *   a cette face.
- *
- * @param (som_elem) connectivite sommet-elements du domaine, calculee a l'aide de construire_connectivite_som_elem
- * @param (faces) les faces du bord a traiter (pour chaque face, indices des sommets)
- * @param (nom_faces) un nom de bord a imprimer en cas d'erreur
- * @param (elements) le tableau a remplir.
+ * @param som_elem Vertex-element connectivity for the domain, computed using construire_connectivite_som_elem.
+ * @param faces The faces of the boundary to process (for each face, indices of the vertices).
+ * @param nom_faces A boundary name to print in case of error.
+ * @param elements The array to fill.
  */
 template <typename _SIZE_>
 void chercher_elems_voisins_faces(const Static_Int_Lists_32_64<_SIZE_>& som_elem,
@@ -115,15 +113,15 @@ void chercher_elems_voisins_faces(const Static_Int_Lists_32_64<_SIZE_>& som_elem
 }
 }
 
-/*! @brief Calcul d'un graphe de connectivite entre les elements lies par des faces periodiques.
+/*! @brief Computes a connectivity graph between elements connected by periodic faces.
  *
- * Si l'element i est voisin de l'element j par une face periodique, alors il existe
- *   k tel que graph(i,k)==j et il existe k2 tel que graph(j,k2)==i.
+ * If element i is a neighbour of element j through a periodic face, then there exists
+ *   k such that graph(i,k)==j and there exists k2 such that graph(j,k2)==i.
  *
- * @param (domaine) le domaine a traiter
- * @param (liste_bords_periodiques) liste des noms des bords periodiques. ATTENTION: on suppose que les faces des bords periodiques sont rangees selon la convention des bords periodiques. Voir check_faces_periodiques().
- * @param (som_elem) la connectivite sommets-elements pour le domaine donnee.
- * @param (graph) On y stocke le resultat. Valeur de retour: nombre d'elements dans le graphe (egal au nombre de faces periodiques)
+ * @param domaine The domain to process.
+ * @param som_elem Vertex-element connectivity for the given domain. WARNING: periodic boundary faces are assumed to be ordered according to the periodic boundary convention. See check_faces_periodiques().
+ * @param my_offset Global element offset for this process.
+ * @param graph Where the result is stored. Return value: number of elements in the graph (equal to the number of periodic faces).
  */
 template <typename _SIZE_>
 typename Partitionneur_base_32_64<_SIZE_>::int_t
@@ -134,14 +132,14 @@ Partitionneur_base_32_64<_SIZE_>::calculer_graphe_connexions_periodiques(const D
   const Noms& liste_bords_periodiques = domaine.bords_perio();
   const int_t nb_elem = domaine.nb_elem();
 
-  // Pour chaque element, combient a-t-il de faces periodiques ?
+  // For each element, how many periodic faces does it have?
   ArrOfInt_t nb_faces_perio(nb_elem);
-  // Liste de correspondances element0 <=> element1
-  // entre l'element voisin d'une face et l'element voisin de la face periodique opposee
+  // List of correspondences element0 <=> element1
+  // between the element adjacent to a face and the element adjacent to the opposite periodic face
   IntTab_t correspondances(0,2);
 
-  // Premiere etape: remplissage de nb_faces_perio et correspondances
-  // Parcours des bords periodiques
+  // First step: fill nb_faces_perio and correspondances
+  // Loop over periodic boundaries
   const int nb_bords = domaine.nb_bords();
   for (int i_bord = 0; i_bord < nb_bords; i_bord++)
     {
@@ -169,17 +167,17 @@ Partitionneur_base_32_64<_SIZE_>::calculer_graphe_connexions_periodiques(const D
       ArrOfInt_t elems_voisins;
       chercher_elems_voisins_faces<_SIZE_>(som_elem, bord.faces().les_sommets(), bord.le_nom(), elems_voisins);
 
-      // Parcours des faces du bord periodique, 2 a 2.
-      // On suppose que les faces apparaissent dans l'ordre:
-      //  d'abord toutes les faces d'une extremite du domaine,
-      //  puis, dans le meme ordre, les faces de l'autre extremite.
-      assert(bord.nb_faces() % 2 == 0); // Nombre pair, forcement
+      // Loop over the periodic boundary faces, two by two.
+      // It is assumed that faces appear in the order:
+      //  first all faces from one end of the domain,
+      //  then, in the same order, the faces from the other end.
+      assert(bord.nb_faces() % 2 == 0); // Even count, necessarily
       const int_t nb_faces = bord.nb_faces() / 2;
       for (int_t i = 0; i < nb_faces; i++)
         {
-          // Les indices des deux elements "voisins" par la face periodique:
+          // Indices of the two elements "neighbouring" through the periodic face:
           int_t elem0 = elems_voisins[i];
-          int_t elem1 = elems_voisins[i+nb_faces]; // Indice de la face perio correspondante
+          int_t elem1 = elems_voisins[i+nb_faces]; // Index of the corresponding periodic face
 
           ++nb_faces_perio[elem0 - my_offset*(elem0 >= my_offset)];
           ++nb_faces_perio[elem1 - my_offset*(elem1 >= my_offset)];
@@ -197,11 +195,11 @@ Partitionneur_base_32_64<_SIZE_>::calculer_graphe_connexions_periodiques(const D
         }
     }
 
-  // Deuxieme etape:
-  // Construction de "graph" a partir du tableau correspondances.
+  // Second step:
+  // Build "graph" from the correspondances array.
   graph.set_list_sizes(nb_faces_perio);
-  // On recycle le tableau nb_faces_perio pour stocker le nombre
-  // d'elements deja remplis dans chaque liste:
+  // Reuse the nb_faces_perio array to store the number
+  // of elements already filled in each list:
   nb_faces_perio = 0;
   const int_t n = correspondances.dimension(0);
   for (int_t i = 0; i < n; i++)
@@ -218,19 +216,19 @@ Partitionneur_base_32_64<_SIZE_>::calculer_graphe_connexions_periodiques(const D
   return n * 2;
 }
 
-/*! @brief Modifie elem_part pour assurer les proprietes suivantes : 1) Les elements possedant un sommet de bord sont associes
+/*! @brief Modifies elem_part to ensure the following properties: 1) Elements that have a boundary vertex are associated
  *
- *      a un processeur possedant une face de bord adjacente a ce sommet.
- *   2) Si un processeur possede un sommet periodique reel, il
- *      possede forcement le renum_som_perio associe (donc un element
- *      qui possede ce sommet et un face periodique).
- *   Cette propriete est indispensable pour le periodique (existence
- *   de renum_som_perio pour tous les sommets).
- *   Pour les autres bords, cette correction est peut-etre inutile, mais
- *   pas sur. Sans cette correction, il peut exister des sommets de bord
- *   isoles (un processeur possede un sommet de bord mais aucune face).
- *   Si on cherche les sommets de bord en parcourant les faces de bord,
- *   c'est faux. Avec cette correction, cet algorithme est correct.
+ *      with a processor that owns an adjacent boundary face.
+ *   2) If a processor owns a real periodic vertex, it necessarily
+ *      also owns the associated renum_som_perio (hence an element
+ *      that has this vertex and a periodic face).
+ *   This property is essential for periodicity (existence
+ *   of renum_som_perio for all vertices).
+ *   For other boundaries, this correction may be unnecessary, but
+ *   this is not certain. Without this correction, isolated boundary
+ *   vertices can exist (a processor owns a boundary vertex but no face).
+ *   If boundary vertices are searched by scanning boundary faces,
+ *   the result is wrong. With this correction, that algorithm is correct.
  *
  */
 template <typename _SIZE_>
@@ -247,15 +245,15 @@ Partitionneur_base_32_64<_SIZE_>::corriger_sommets_bord(const Domaine_t& domaine
   const int_t nb_elem_tot = domaine.nb_elem_tot();
   const Noms& liste_bords_perio = domaine.bords_perio();
 
-  // Premiere etape :
-  // Marquage des sommets de bord :
+  // First step:
+  // Mark boundary vertices:
   ArrOfBit_t sommet_bord(nb_som_tot);
   ArrOfBit_t sommet_bord_perio(nb_som_tot);
   sommet_bord = 0;
   sommet_bord_perio = 0;
-  // element_bord indique si l'element est adjacent a une face de bord
+  // element_bord indicates whether the element is adjacent to a boundary face
   ArrOfBit_t element_bord(nb_elem_tot);
-  // element_bord_perio indique si l'element est adjacent a une face de bord periodique
+  // element_bord_perio indicates whether the element is adjacent to a periodic boundary face
   ArrOfBit_t element_bord_perio(nb_elem_tot);
   element_bord = 0;
   element_bord_perio = 0;
@@ -272,9 +270,9 @@ Partitionneur_base_32_64<_SIZE_>::corriger_sommets_bord(const Domaine_t& domaine
 
       chercher_elems_voisins_faces(som_elem, faces_sommets, bord.le_nom(), elems_voisins);
 
-      // Pour chaque element voisin des faces du bord, on marque cet element.
-      // On associe a chaque sommet de bord l'indice de la partie la plus
-      // petite qui contient une face de bord adjacente au sommet.
+      // For each element neighbouring the boundary faces, mark that element.
+      // Associate to each boundary vertex the index of the smallest part
+      // that contains an adjacent boundary face.
       for (int_t i_face = 0; i_face < nb_faces_bord; i_face++)
         {
           const int_t elem_voisin = elems_voisins[i_face];
@@ -291,17 +289,16 @@ Partitionneur_base_32_64<_SIZE_>::corriger_sommets_bord(const Domaine_t& domaine
         }
     }
 
-  // Deuxieme etape:
-  // Parcours des elements qui n'ont pas de face de bord mais qui ont
-  //  des sommets de bord:
-  //  On construit pour chaque sommet de bord de l'element, la liste des
-  //  "parties autorisees"
-  //    Si le sommet renum_som_perio est adjacent a une face de bord periodique,
-  //    les parties autorisees sont celles qui possedent une face periodique
-  //    adjacente au sommet.
-  //    Sinon, c'est les parties contenant une face de bord adjacente au sommet
-  //  On calcule l'intersection de ces listes et si l'element n'est pas dans
-  //  une partie autorisee, on en choisit une et on le met dedans.
+  // Second step:
+  // Loop over elements that have no boundary face but do have
+  //  boundary vertices:
+  //  For each boundary vertex of the element, build the list of
+  //  "allowed parts":
+  //    If the renum_som_perio vertex is adjacent to a periodic boundary face,
+  //    the allowed parts are those that own a periodic face adjacent to the vertex.
+  //    Otherwise, they are the parts containing an adjacent boundary face.
+  //  Compute the intersection of these lists and if the element does not belong
+  //  to an allowed part, choose one and assign it.
   int_t count = 0;
   {
     BigArrOfInt_ parties_autorisees, tmp;
@@ -310,27 +307,27 @@ Partitionneur_base_32_64<_SIZE_>::corriger_sommets_bord(const Domaine_t& domaine
     const int nb_som_elem = elements.dimension_int(1);
     for (int_t elem = 0; elem < nb_elem; elem++)
       {
-        // L'element a-t-il un sommet periodique ?
+        // Does the element have a periodic vertex?
         bool has_som_perio = false;
         int isom;
         for (isom = 0; isom < nb_som_elem; isom++)
           if (sommet_bord_perio[elements(elem, isom)])
             has_som_perio = true;
-        // Boucle sur les sommets de l'element:
+        // Loop over element vertices:
         parties_autorisees.resize_array(0);
-        int nb_sommets_bord = 0; // Nombre de sommets de bord de l'element
+        int nb_sommets_bord = 0; // Number of boundary vertices of the element
         for (isom = 0; isom < nb_som_elem; isom++)
           {
             const int_t som = elements(elem, isom);
-            // Ne traiter que les sommets de bord perio si l'element a un bord perio,
-            // sinon ne traiter que les sommets de bord.
+            // Process only periodic boundary vertices if the element has a periodic boundary,
+            // otherwise process only boundary vertices.
             if (has_som_perio && !sommet_bord_perio[som])
               continue;
             if (!sommet_bord[som])
               continue;
 
             nb_sommets_bord++;
-            // On met dans tmp la liste des parties associees aux elements de bord adjacents
+            // Put in tmp the list of parts associated with adjacent boundary elements
             {
               tmp.resize_array(0);
               const int_t renum_som = renum_som_perio[som];
@@ -351,7 +348,7 @@ Partitionneur_base_32_64<_SIZE_>::corriger_sommets_bord(const Domaine_t& domaine
                 }
               array_trier_retirer_doublons(tmp);
             }
-            // Calcul de l'intersection entre tmp et parties_autorisees
+            // Compute the intersection between tmp and parties_autorisees
             if (parties_autorisees.size_array() > 0)
               array_calculer_intersection(parties_autorisees, tmp);
             else
@@ -359,7 +356,7 @@ Partitionneur_base_32_64<_SIZE_>::corriger_sommets_bord(const Domaine_t& domaine
           }
         if (nb_sommets_bord > 0)
           {
-            // Est-ce que l'element appartient a une partie autorisee ?
+            // Does the element belong to an allowed part?
             const int_t n = parties_autorisees.size_array();
             if (n == 0)
               {
@@ -375,7 +372,7 @@ Partitionneur_base_32_64<_SIZE_>::corriger_sommets_bord(const Domaine_t& domaine
                     break;
                 if (i >= n)
                   {
-                    // Il faut affecter une autre partie:
+                    // Another part must be assigned:
                     elem_part[elem] = parties_autorisees[0];
                     count++;
                   }
@@ -387,10 +384,10 @@ Partitionneur_base_32_64<_SIZE_>::corriger_sommets_bord(const Domaine_t& domaine
   return count;
 }
 
-/*! @brief applique des corrections a elem_part pour que le multi-periodique soit correct :
+/*! @brief Applies corrections to elem_part so that multi-periodicity is correct:
  *
- *   Si un sommet appartient a plusieurs frontieres periodiques,
- *   tous les elements adjacents sont rattaches au meme processeur.
+ *   If a vertex belongs to several periodic boundaries,
+ *   all adjacent elements are assigned to the same processor.
  *
  */
 template <typename _SIZE_>
@@ -404,14 +401,14 @@ Partitionneur_base_32_64<_SIZE_>::corriger_multiperiodique(const Domaine_t& doma
   const int_t nb_elem = domaine.nb_elem();
   const Noms& liste_bords_perio = domaine.bords_perio();
 
-  // Pour chaque sommet periodique, selectionner une partie a laquelle il appartient
-  // (la plus petite parmi les parties des elements periodiques adjacents)
-  // Initialise a -1
+  // For each periodic vertex, select a part to which it belongs
+  // (the smallest among the parts of the adjacent periodic elements)
+  // Initialised to -1
   BigArrOfInt_ partie_associee(nb_som);
   partie_associee= -1;
-  // Pour chaque sommet, a quel(s) bords periodiques appartient-il
-  // (somme de 2^n ou n est l'indice du nom du bord dans la liste des bords periodiques)
-  // Initialise a 0
+  // For each vertex, to which periodic boundary(ies) does it belong?
+  // (sum of 2^n where n is the index of the boundary name in the periodic boundary list)
+  // Initialised to 0
   BigArrOfInt_ marqueur_bord(nb_som);
 
   int deux_puissance_i_bord = 1;
@@ -439,18 +436,18 @@ Partitionneur_base_32_64<_SIZE_>::corriger_multiperiodique(const Domaine_t& doma
       deux_puissance_i_bord *= 2;
       if (deux_puissance_i_bord > 65536)
         {
-          // De toutes facons, plus de 3 frontieres periodiques, c'est hautement suspect...
+          // In any case, more than 3 periodic boundaries is highly suspicious...
           Cerr << "Error in Partitionneur_base_32_64<_SIZE_>::corriger_multiperiodique : there is too many periodic boundaries." << finl;
           exit();
         }
     }
 
-  // Transformer marqueur_bord:
-  // 1 si le sommet appartient a plusieurs bords periodiques,
-  // 0 sinon
+  // Transform marqueur_bord:
+  // 1 if the vertex belongs to several periodic boundaries,
+  // 0 otherwise
   for (int_t sommet = 0; sommet < nb_som; sommet++)
     {
-      // Compter le nombre de bits a 1 dans le marqueur
+      // Count the number of bits set to 1 in the marker
       const int marq = marqueur_bord[sommet];
       int n = 0;
       for (int x = 1; x < marq; x = x * 2)
@@ -458,25 +455,25 @@ Partitionneur_base_32_64<_SIZE_>::corriger_multiperiodique(const Domaine_t& doma
           if (marq & x) // bitwise AND
             n++;
         }
-      // Marqueur a 1 si le sommet appartient a plusieurs bords
+      // Marker is 1 if the vertex belongs to several boundaries
       marqueur_bord[sommet] = (n > 1);
     }
-  // Deuxieme etape: affecter les elements adjacents a un sommet multiperiodique
-  // a la partie associee au sommet renum_som_perio de ce sommet.
+  // Second step: assign elements adjacent to a multi-periodic vertex
+  // to the part associated with the renum_som_perio vertex of that vertex.
   const IntTab_t& les_elems = domaine.les_elems();
   const int nb_som_elem = les_elems.dimension_int(1);
   int_t count = 0;
   for (int_t elem = 0; elem < nb_elem; elem++)
     {
-      // Cet int vaudra -1 si aucun sommet de l'element est periodique,
-      // sinon, c'est la plus petite des parties associees aux sommets periodiques
+      // This int will be -1 if no vertex of the element is periodic,
+      // otherwise it is the smallest of the parts associated with the periodic vertices
       int new_part = -1;
       for (int isom = 0; isom < nb_som_elem; isom++)
         {
           const int_t sommet = les_elems(elem, isom);
           if (marqueur_bord[sommet])
             {
-              // Ce sommet appartient a plusieurs frontieres periodiques
+              // This vertex belongs to several periodic boundaries
               const int_t renum = renum_som_perio[sommet];
               const int part = partie_associee[renum];
               assert(marqueur_bord[renum]);
@@ -593,12 +590,14 @@ Partitionneur_base_32_64<_SIZE_>::corriger_multiperiodique(const Domaine_t& doma
   return count;
 }
 
-/*! @brief corrige la partition elem_part pour qu'un element i se trouve sur la meme partition elem_part[i] que tous les elements auxquels il est lie dans le graphe
+/*! @brief Corrects elem_part so that element i is on the same partition elem_part[i] as all elements connected to it in the graph
  *
- *   (elements d'indices graph_elements_perio(i, j) pour tout j).
+ *   (elements with indices graph_elements_perio(i, j) for all j).
  *
- * @param (graph_elements_perio) graphe calcule par la methode calculer_graphe_connexions_periodiques
- * @param (elem_part) pour chaque element, a quelle partie appartient-il. Valeur de retour: nombre d'elements dont la partition a ete corrigee.
+ * @param graph_elements_perio Graph computed by calculer_graphe_connexions_periodiques.
+ * @param som_elem Vertex-element connectivity.
+ * @param domaine The domain.
+ * @param elem_part For each element, which part it belongs to. Return value: number of elements whose partition was corrected.
  */
 template <typename _SIZE_>
 typename Partitionneur_base_32_64<_SIZE_>::int_t
@@ -607,10 +606,10 @@ Partitionneur_base_32_64<_SIZE_>::corriger_bords_avec_graphe(const Static_Int_Li
                                                              const Domaine_t& domaine,
                                                              BigIntVect_& elem_part)
 {
-  // Algorithme: parcours de tous les elements dans l'ordre.
-  //  Pour chaque element, associer aux autres elements lies la partie a laquelle appartient
-  //  l'element courant. Comme le graphe est symetrique, si un element a deja ete traite,
-  //  on ne change rien les fois suivantes. Donc un seul passage suffit.
+  // Algorithm: loop over all elements in order.
+  //  For each element, assign to all linked elements the part to which the current
+  //  element belongs. Since the graph is symmetric, if an element has already been
+  //  processed, nothing is changed on subsequent passes. One pass is sufficient.
   const Noms& liste_bords_periodiques = domaine.bords_perio();
   const int_t n = graph_elements_perio.get_nb_lists(); //elem_part.size_array();
   //assert(n == graph_elements_perio.get_nb_lists());
@@ -634,12 +633,12 @@ Partitionneur_base_32_64<_SIZE_>::corriger_bords_avec_graphe(const Static_Int_Li
 
   const int_t nb_sommets_reels = domaine.nb_som();
   ArrOfInt_t renum_som_perio(nb_sommets_reels);
-  // Initialisation du tableau renum_som_perio
+  // Initialise the renum_som_perio array
   for (int_t i = 0; i < nb_sommets_reels; i++)
     renum_som_perio[i] = i;
   bool parallel_algo = Process::is_parallel();
   Reordonner_faces_periodiques_32_64<_SIZE_>::renum_som_perio(domaine, renum_som_perio,
-                                                              parallel_algo /* pas d'espace virtuel en sequentiel */);
+                                                              parallel_algo /* no virtual space in sequential */);
 
   if (liste_bords_periodiques.size() > 1)
     count += corriger_multiperiodique(domaine, renum_som_perio, som_elem, elem_part);
@@ -647,11 +646,10 @@ Partitionneur_base_32_64<_SIZE_>::corriger_bords_avec_graphe(const Static_Int_Li
   return count;
 }
 
-/*! @brief Calcul des graphes de connectivite elements periodiques et appel a corriger_periodique_avec_graphe.
+/*! @brief Computes the periodic element connectivity graphs and calls corriger_periodique_avec_graphe.
  *
- * (Methode a utiliser quand on ne dispose
- *    pas encore du graphe de de connectivite, si on a le graphe sous la main,
- *    appeler directement corriger_periodique_avec_graphe)
+ * (Method to use when the connectivity graph is not yet available;
+ *    if the graph is already at hand, call corriger_periodique_avec_graphe directly.)
  *
  */
 template <typename _SIZE_>
@@ -665,7 +663,7 @@ void Partitionneur_base_32_64<_SIZE_>::corriger_bords_avec_liste(const Domaine_t
   construire_connectivite_som_elem(dom.nb_som_tot(),
                                    dom.les_elems(),
                                    som_elem,
-                                   1 /* inclure les elements virtuels */);
+                                   1 /* include virtual elements */);
   Cerr << " Construction of graph connectivity for periodic elements" << finl;
   Static_Int_Lists_t graph_elements_perio;
   calculer_graphe_connexions_periodiques(dom,

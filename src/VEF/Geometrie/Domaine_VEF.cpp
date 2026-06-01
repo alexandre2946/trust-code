@@ -125,7 +125,7 @@ void exemple_champ_non_homogene(const Domaine_VEF& domaine_VEF, DoubleTab& tab)
   const DoubleTab& coord=domaine.coord_sommets();
   const DoubleTab& xa=domaine_VEF.xa();
   const ArrOfInt& renum_arete_perio=domaine_VEF.get_renum_arete_perio();
-  // Verification du tableau xa des coordonnees arete
+  // Check array xa of edge coordinates
   if (xa.size_array()) Debog::verifier("xa=",xa);
   int nb_elem=domaine.nb_elem();
   int nb_elem_tot=domaine.nb_elem_tot();
@@ -141,7 +141,7 @@ void exemple_champ_non_homogene(const Domaine_VEF& domaine_VEF, DoubleTab& tab)
     {
       tab(nb_elem_tot+I)=(1.1+coord(I,0))*(1.1+2*coord(I,1));
       if (Objet_U::dimension==3) tab(nb_elem_tot+I)*=(1.1+3*coord(I,2));
-      // On applique la periodicite:
+      // Apply periodicity:
       tab(nb_elem_tot+I)=tab(nb_elem_tot+domaine.get_renum_som_perio(I));
     }
 
@@ -151,9 +151,9 @@ void exemple_champ_non_homogene(const Domaine_VEF& domaine_VEF, DoubleTab& tab)
   for (int I=0; I<nb_aretes; I++)
     {
       tab(nb_elem_tot+nb_som_tot+I)=(1.1+xa(I,0))*(1.1+2*xa(I,1))*(1.1+3*xa(I,2));
-      // On applique la periodicite:
+      // Apply periodicity:
       tab(nb_elem_tot+nb_som_tot+I)=tab[nb_elem_tot+nb_som_tot+renum_arete_perio[I]];
-      // On verifie ok_arete au passage
+      // Check ok_arete in passing
       assert(ok_arete(I)==ok_arete(renum_arete_perio[I]));
     }
   tab.echange_espace_virtuel();
@@ -171,14 +171,14 @@ void Domaine_VEF::discretiser()
   Elem_geom_base& elem_geom = domaine_geom.type_elem().valeur();
   Domaine_VF::discretiser();
 
-  // Correction du tableau face_voisins:
-  //  A l'issue de Domaine_VF::discretiser(), les elements voisins 0 et 1 d'une
-  //  face sont les memes sur tous les processeurs qui possedent la face.
-  //  Si la face est virtuelle et qu'un des deux elements voisins n'est
-  //  pas connu (il n'est pas dans l'epaisseur du joint), l'element voisin
-  //  vaut -1. Cela peut etre un voisin 0 ou un voisin 1.
-  //  On corrige les faces virtuelles pour que, si un element voisin n'est
-  //  pas connu, alors il est voisin1. Le voisin0 est donc toujours valide.
+  // Correction of the face_voisins array:
+  //  After Domaine_VF::discretiser(), neighbor elements 0 and 1 of a face
+  //  are the same on all processors that own the face.
+  //  If the face is virtual and one of its two neighbor elements is
+  //  unknown (not in the ghost layer), the neighbor element
+  //  is -1. This can be neighbor 0 or neighbor 1.
+  //  Correct virtual faces so that if a neighbor element is unknown,
+  //  it is neighbor1. Neighbor0 is therefore always valid.
   {
     IntTab& face_vois = face_voisins();
     const int debut = nb_faces();
@@ -254,7 +254,7 @@ void Domaine_VEF::discretiser()
     type_elem_->creer_face_normales(face_normales_, face_som, face_vois, elem_face, domaine_geom);
   }
 
-  // Calcul de facette_normales_
+  // Compute facette_normales_
   type_elem_->creer_facette_normales(*this, rang_elem_non_std());
 
   calculer_volumes_entrelaces();
@@ -270,14 +270,14 @@ void Domaine_VEF::discretiser()
 
   const IntTab& elements = domaine().les_elems();
   const int nb_som_elem = elements.dimension(1);
-  // Boucle sur tous les elements car on ajoute des contributions aux sommets de joints:
+  // Loop over all elements because contributions are added to joint vertices:
   const int n = nb_elem_tot();
-  // On a besoin de l'espace virtuel des volumes
+  // The virtual space of volumes is needed
   const DoubleVect& volume_elem = volumes();
   assert_espace_virtuel_vect(volume_elem);
 
-  // Annule tout le tableau car on va faire += sur des items virtuels
-  // (sinon acces a des cases non initialisees)
+  // Zero out the entire array because += is done on virtual items
+  // (otherwise uninitialized memory is accessed)
   operator_egal(volumes_som_, 0., VECT_ALL_ITEMS);
   for(int k=0; k<n; k++)
     {
@@ -293,7 +293,7 @@ void Domaine_VEF::discretiser()
 
 void Domaine_VEF::discretiser_suite(const VEF_discretisation& discr)
 {
-  // Recuperation des parametres de la discretisation
+  // Retrieve discretisation parameters
   alphaE = discr.get_alphaE();
   alphaS = discr.get_alphaS();
   alphaA = discr.get_alphaA();
@@ -306,7 +306,7 @@ void Domaine_VEF::discretiser_suite(const VEF_discretisation& discr)
   if (alphaA)
     discretiser_arete();
 
-  // Construction du descripteur pour les tableaux p1bulle
+  // Build the descriptor for p1bulle arrays
   {
     MD_Vector_composite md_p1b;
     if (alphaE)
@@ -374,11 +374,11 @@ void Domaine_VEF::discretiser_arete()
 {
   const Domaine& dom = domaine();
 
-  // Creation des aretes reelles (informations geometriques construites et stockees dans le domaine)
+  // Create real edges (geometric information built and stored in the domain)
   domaine().creer_aretes();
   md_vector_aretes_ = domaine().aretes_som().get_md_vector();
 
-  // Calcul des centres de gravite des aretes xa_ stockes dans le Domaine_VF
+  // Compute edge gravity centers xa_ stored in Domaine_VF
   const IntTab& aretes_som = domaine().aretes_som();
   const int nb_aretes = aretes_som.dimension(0);
   const DoubleTab& coord = dom.les_sommets();
@@ -396,16 +396,16 @@ void Domaine_VEF::discretiser_arete()
 
   const IntTab& elem_aretes = domaine().elem_aretes();
 
-  // Calcul du volume des aretes
-  // Creation d'un tableau initialise a zero:
+  // Compute edge volumes
+  // Create an array initialised to zero:
   creer_tableau_aretes(volumes_aretes);
 
   const int nbr_elem = domaine().nb_elem();
   const int nb_aretes_elem = elem_aretes.dimension(1);
-  // facteur 6 pour le calcul des volumes des aretes, est-ce correct pour autre chose qu'un tetra ?
+  // factor 6 for edge volume computation, is this correct for elements other than tetra?
   assert(nb_aretes_elem == 6);
-  // Essai d'une autre facon de coder: calcul des contributions aux aretes par les elements reels,
-  // puis sommation des contributions des aretes partagees:
+  // Alternative approach: compute contributions to edges from real elements,
+  // then sum contributions of shared edges:
   for (int elem = 0; elem < nbr_elem; elem++)
     {
       double vol = volumes(elem) / 6.0;
@@ -415,7 +415,7 @@ void Domaine_VEF::discretiser_arete()
           volumes_aretes[arete] += vol;
         }
     }
-  // Sommation des contributions des aretes joint et echange des espaces virtuels
+  // Sum joint edge contributions and exchange virtual spaces
   MD_Vector_tools::echange_espace_virtuel(volumes_aretes, MD_Vector_tools::EV_SOMME_ECHANGE);
 }
 
@@ -426,18 +426,18 @@ void Domaine_VEF::construire_ok_arete()
   const IntTab& aretes_som=domaine().aretes_som();
   const int nb_som_reel=nb_som();
 
-  // Connectivite sommets-aretes (pour chaque sommet, liste des aretes adjacentes)
-  // B.M.: je remplace IntTab(n, 64) par une Static_Int_List et je reutilise
-  //  la methode de calcul des connectivites... plus econome en memoire !
-  // som_aretes contient une connectivite modifiee pour les sommets periodiques
-  // (les aretes sont toujours rattachees au sommet get_renum_som_perio(),
-  //  les aretes periodiques opposees sont remplacees par une arete [nb_som_reel,nb_som_reel]
-  //  fictive, et les sommets perio opposes ne sont rattaches a aucune arete)
+  // Vertex-to-edge connectivity (for each vertex, list of adjacent edges)
+  // B.M.: replacing IntTab(n, 64) with a Static_Int_List, reusing
+  //  the connectivity computation method... more memory efficient!
+  // som_aretes contains a modified connectivity for periodic vertices
+  // (edges are always attached to get_renum_som_perio() vertex,
+  //  opposite periodic edges are replaced by a fictitious edge [nb_som_reel,nb_som_reel],
+  //  and opposite periodic vertices are not attached to any edge)
   const int nb_aretes = aretes_som.dimension(0);
   Static_Int_Lists som_aretes;
   {
-    // Creation d'un tableau d'aretes ou les sommets sont remplaces par le sommet
-    //  periodique associe et sans les aretes periodiques opposees
+    // Create an edge array where vertices are replaced by their periodic counterpart
+    //  and without the opposite periodic edges
     IntTab aretes_som2;
     aretes_som2.copy(aretes_som, RESIZE_OPTIONS::NOCOPY_NOINIT);
 
@@ -450,22 +450,22 @@ void Domaine_VEF::construire_ok_arete()
           }
         else
           {
-            // arete periodique opposee, non conservee, on cree une arete fictive pour
-            // construire_connectivite_som_elem: le sommet d'indice nb_som_reel
-            // sera connecte a toutes les aretes periodiques supprimees
+            // opposite periodic edge, not retained; create a fictitious edge for
+            // construire_connectivite_som_elem: vertex with index nb_som_reel
+            // will be connected to all suppressed periodic edges
             aretes_som2(i, 0) = nb_som_reel;
             aretes_som2(i, 1) = nb_som_reel;
           }
       }
-    // On donne un sommet de plus (le sommet fictif connecte aux aretes supprimees)
+    // Add one extra vertex (the fictitious vertex connected to suppressed edges)
     construire_connectivite_som_elem(nb_som_reel+1, aretes_som2, som_aretes, 0 /* do not include virtual items */);
   }
 
-  // Creation et initialisation du tableau contenu, initialise a zero par defaut
+  // Create and initialise array contenu, initialised to zero by default
   ArrOfInt contenu(nb_som_reel);
 
-  // Initialisation pour le parallele: contenu est mis a 2
-  // pour les sommets communs recus d'un autre processeur
+  // Parallel initialisation: contenu is set to 2
+  // for shared vertices received from another processor
   {
     ArrOfBit flags;
     dom.les_sommets().get_md_vector()->get_sequential_items_flags(flags);
@@ -473,7 +473,7 @@ void Domaine_VEF::construire_ok_arete()
       {
         if (!flags[i])
           {
-            // Ce sommet est recu d'un autre processeur
+            // This vertex is received from another processor
             const int i2 = dom.get_renum_som_perio(i);
             contenu[i] = 2;
             if (i2 != i)
@@ -482,8 +482,8 @@ void Domaine_VEF::construire_ok_arete()
       }
   }
 
-  // Estimation du nombre d'aretes superflues a trouver sur le domaine
-  // en comptant les sommets reels non periodiques dont le contenu vaut 0
+  // Estimate the number of superfluous edges to find on the domain
+  // by counting real non-periodic vertices whose contenu equals 0
   int nombre_aretes_superflues_prevues_sur_le_dom=0;
   for (int i=0; i<nb_som_reel; i++)
     if (i==dom.get_renum_som_perio(i) && contenu[i]==0)
@@ -491,10 +491,10 @@ void Domaine_VEF::construire_ok_arete()
 
   ok_arete = -1;
 
-  // On boucle tant qu'il y'a des sommets avec le contenu 0
+  // Loop while there are vertices with contenu == 0
   while (min_array(contenu)==0)
     {
-      // On cherche le premier sommet avec contenu 0 en bouclant sur les aretes
+      // Find the first vertex with contenu == 0 by looping over edges
       int Aroot=-1,Sroot=-1;
       int S0,S1;
       do
@@ -521,7 +521,7 @@ void Domaine_VEF::construire_ok_arete()
           Sroot=S1;
         }
 
-      // Boucle sur les sommets
+      // Loop over vertices
       do
         {
           const int nb_aretes_voisines = som_aretes.get_list_size(Sroot);
@@ -550,20 +550,20 @@ void Domaine_VEF::construire_ok_arete()
         }
       while((Sroot=next(Sroot, contenu))!=-1);
 
-      // Correction pour des tableaux ok_arete et contenu pour la periodicite
+      // Correction of ok_arete and contenu arrays for periodicity
       for(int i=0; i<nb_aretes; i++)
         ok_arete(i)=ok_arete[renum_arete_perio[i]];
       for(int i=0; i<nb_som_reel; i++)
         contenu[i]=contenu[dom.get_renum_som_perio(i)];
     }
 
-  // Mise a jour des parties virtuelles du tableau ok_arete
+  // Update virtual parts of the ok_arete array
   ok_arete.echange_espace_virtuel();
 
-  // Verification des aretes superflues
+  // Check superfluous edges
   verifie_ok_arete(nombre_aretes_superflues_prevues_sur_le_dom);
 
-  // Ecriture des aretes superflues dans un fichier nom_du_cas.ok_arete afin de le relire la fois suivante
+  // Write superfluous edges to file nom_du_cas.ok_arete to be read next time
   Nom fichier(nom_du_cas());
   fichier+="_";
   fichier+=domaine().le_nom()+".ok_arete";
@@ -584,7 +584,7 @@ void Domaine_VEF::construire_ok_arete()
   if (Process::je_suis_maitre())
     fic_ok_arete_ << nb_aretes_seq << finl;
 
-  // Chaque processeur ecrit ses aretes non communes:
+  // Each processor writes its non-shared edges:
   const int n = marqueurs_aretes.size_array();
   for (int i = 0; i < n; i++)
     {
@@ -602,7 +602,7 @@ void Domaine_VEF::construire_renum_arete_perio(const Conds_lim& conds_lim)
   const int nb_aretes_tot = static_cast<int>(domaine().nb_aretes_tot()); // domain is already discretised, so already split, so we're just working with a small part
   const Domaine& dom=domaine();
 
-  // Initialisation de renum_arete_perio
+  // Initialise renum_arete_perio
   renum_arete_perio.resize_array(nb_aretes_tot);
   for (int i=0; i<nb_aretes_tot; i++)
     renum_arete_perio[i]=i;
@@ -610,7 +610,7 @@ void Domaine_VEF::construire_renum_arete_perio(const Conds_lim& conds_lim)
   const IntTab& elem_aretes=domaine().elem_aretes();
   ArrOfInt aretes1(6);
   ArrOfInt aretes2(6);
-  // Premiere etape: faire pointer tous les aretes periodiques liees entre elles vers la meme arete
+  // First step: make all periodic edges linked together point to the same edge
   for (auto& itr : conds_lim)
     {
       //for cl
@@ -646,7 +646,7 @@ void Domaine_VEF::construire_renum_arete_perio(const Conds_lim& conds_lim)
                   {
                     int ar1=aretes1[j1];
                     int& ar1_perio = renum_arete_perio[ar1];
-                    // On verifie que l'arete appartient a la face (ok==2)
+                    // Check that the edge belongs to the face (ok==2)
                     int som11=aretes_som(ar1, 0);
                     int som12=aretes_som(ar1, 1);
                     int ok=0;
@@ -666,7 +666,7 @@ void Domaine_VEF::construire_renum_arete_perio(const Conds_lim& conds_lim)
                             int som21=aretes_som(ar2, 0);
                             int som22=aretes_som(ar2, 1);
                             ok=0;
-                            // On verifie que l'arete appartient a la face_assciee (ok==2)
+                            // Check that the edge belongs to face_assciee (ok==2)
                             for (int k=0; k<nbf; k++)
                               if (sommet(face_assciee,k)==som21 || sommet(face_assciee,k)==som22) ok++;
                             assert(ok>0);
@@ -675,18 +675,18 @@ void Domaine_VEF::construire_renum_arete_perio(const Conds_lim& conds_lim)
                                 int s21=dom.get_renum_som_perio(som21);
                                 int s22=dom.get_renum_som_perio(som22);
                                 assert(ar1!=ar2);
-                                //Les aretes sont donc periodiques si on rentre dans le "if"
+                                //The edges are therefore periodic if we enter the "if"
                                 if ( ( (s21==s11)||(s22==s11) ) && ( (s22==s12)||(s21==s12) ) )
                                   {
-                                    // Critere I : choix de l'arete perio en fonction d'un critere geometrique
+                                    // Criterion I: choose the periodic edge based on a geometric criterion
                                     int dir_perio = la_cl_perio.direction_periodicite();
                                     int arete_perio = (xa(ar1_perio,dir_perio)<=xa(ar2_perio,dir_perio)) ? ar1_perio : ar2_perio;
                                     /*
-                                    // Critere II : choix de l'arete perio en fonction des sommets periodiques
+                                    // Criterion II: choose the periodic edge based on periodic vertices
                                     int arete_perio;
-                                    if (som11!=s11 && som12!=s12) // Les sommets de l'arete 1 sont periodiques
+                                    if (som11!=s11 && som12!=s12) // Vertices of edge 1 are periodic
                                     arete_perio = ar2_perio;
-                                    else if (som21!=s21 && som22!=s22) // Les sommets de l'arete 2 sont periodiques
+                                    else if (som21!=s21 && som22!=s22) // Vertices of edge 2 are periodic
                                     arete_perio = ar1_perio;
                                     else
                                     {
@@ -697,20 +697,20 @@ void Domaine_VEF::construire_renum_arete_perio(const Conds_lim& conds_lim)
                                     ar1_perio = arete_perio;
                                     volumes_aretes(ar2)+=volumes_aretes(ar1);
                                     volumes_aretes(ar1)+=volumes_aretes(ar2);
-                                  }//fin du if sur "s21==s11"
+                                  }//end if "s21==s11"
                               }
-                          }//fin du for sur "j2"
+                          }//end for "j2"
                       }
-                  }//fin du if sur "renum_arete_perio(aretes1)" et du for sur "j1"
-              }//fin du if sur "fait"
-        }//fin if Perio
-    }// fin for cl
+                  }//end if "renum_arete_perio(aretes1)" and end for "j1"
+              }//end if "fait"
+        }//end if Perio
+    }// end for cl
 
-  // Deuxieme etape: faire pointer tous les aretes periodiques liees entre elles vers la meme arete
+  // Second step: make all periodic edges linked together point to the same edge
   for (int i = 0; i < nb_aretes_tot; i++)
     {
       int j = renum_arete_perio[i];
-      // Parcourir les aretes reliees pour cette chaine:
+      // Traverse linked edges for this chain:
       while (j != renum_arete_perio[j])
         j = renum_arete_perio[j];
       renum_arete_perio[i] = j;
@@ -730,24 +730,23 @@ void Domaine_VEF::construire_renum_arete_perio(const Conds_lim& conds_lim)
 void Domaine_VEF::verifie_ok_arete(int nombre_aretes_superflues_prevues_sur_le_dom) const
 {
   Cerr << "Check array ok_arete..." << finl;
-  // Algorithme de verification du tableau des aretes superflues
-  // ok_arete(i)==0 : i arete superflue
-  // ok_arete(i)==2 : i arete necessaire
+  // Algorithm to verify the superfluous edge array
+  // ok_arete(i)==0 : edge i is superfluous
+  // ok_arete(i)==2 : edge i is necessary
   // ...
-  // contenu doit contenir uniquement 2 ce qui implique que tous les
-  // sommets ont ete analyses.
+  // contenu must contain only 2, meaning all vertices have been analysed.
   const Domaine& dom=domaine();
   const int nb_som_reel=nb_som();
   const IntTab& aretes_som=domaine().aretes_som();
-  int nb_aretes_pour_verbose=60; // Pour verbose
+  int nb_aretes_pour_verbose=60; // for verbose output
   ArrOfInt sommet_relie_arete_superflue(nb_som_reel);
   sommet_relie_arete_superflue=0;
-  for (int i=0; i<nb_som_reel; i++) // Si i est un sommet periodique:
-    if (dom.get_renum_som_perio(i)!=i) // il suffit de faire la verification sur le sommet dom.get_renum_som_perio(i)
-      sommet_relie_arete_superflue[i]=1; // donc on ne verifie pas i
+  for (int i=0; i<nb_som_reel; i++) // If i is a periodic vertex:
+    if (dom.get_renum_som_perio(i)!=i) // it suffices to verify on vertex dom.get_renum_som_perio(i)
+      sommet_relie_arete_superflue[i]=1; // so we skip i
 
   double nombre_aretes_reelles_superflues=0;
-  // On parcourt toutes les aretes mais on ne regarde que les sommets reels
+  // Traverse all edges but only consider real vertices
   int nb_aretes_tot=domaine().nb_aretes_tot();
   int nb_aretes_reelles=domaine().nb_aretes();
   for (int i=0; i<nb_aretes_tot; i++)
@@ -766,7 +765,7 @@ void Domaine_VEF::verifie_ok_arete(int nombre_aretes_superflues_prevues_sur_le_d
               sommet_relie_arete_superflue[S1]=1;
               sommet_relie_arete_superflue[dom.get_renum_som_perio(S1)]=1;
             }
-          if (renum_arete_perio[i]==i) // Pour ne compter les aretes periodiques qu'une fois
+          if (renum_arete_perio[i]==i) // Count periodic edges only once
             {
               if (nb_aretes_tot<nb_aretes_pour_verbose)
                 {
@@ -774,14 +773,14 @@ void Domaine_VEF::verifie_ok_arete(int nombre_aretes_superflues_prevues_sur_le_d
                   else Cerr << "[" << Process::me() << "] Arete " << i << " superflue perio: " << S0 << " " << S1 << " Periodique avec " << renum_arete_perio[i] << finl;
                 }
               int aretes_superflues_communes=1;
-              // Si l'arete superflue est commune on en tient compte
+              // If the superfluous edge is shared, account for it
               for (int j=0; j<dom.faces_joint().size(); j++)
                 {
                   int nb_aretes_sur_le_joint = dom.faces_joint()(j).joint_item(JOINT_ITEM::ARETE).items_communs().size_array();
                   for (int k=0; k<nb_aretes_sur_le_joint; k++)
                     if (dom.faces_joint()(j).joint_item(JOINT_ITEM::ARETE).items_communs()[k]==i) aretes_superflues_communes++;
                 }
-              // On compte les aretes reelles superflues
+              // Count real superfluous edges
               if (i<nb_aretes_reelles)
                 nombre_aretes_reelles_superflues+=1./aretes_superflues_communes;
             }
@@ -864,7 +863,7 @@ int Domaine_VEF::lecture_ok_arete()
 
   Cerr << "Trying to read file " << fichier << " (edges to remove from the set of degrees of freedom)" << finl;
   EFichierBin fic_ok_arete_;
-  // Lecture de ok_arete dans un fichier pour comparaison sequentiel-parallele
+  // Read ok_arete from file for sequential-parallel comparison
   if (!fic_ok_arete_.ouvrir(fichier,ios::out))
     {
       Cerr << "File " << fichier << " does not exist." << finl;
@@ -886,7 +885,7 @@ int Domaine_VEF::lecture_ok_arete()
 
 
   IntVect marqueurs;
-  creer_tableau_aretes(marqueurs); // initialise a zero par defaut
+  creer_tableau_aretes(marqueurs); // initialised to zero by default
 
   for (int i = 0; i < n; i++)
     {
@@ -909,11 +908,11 @@ int Domaine_VEF::lecture_ok_arete()
         }
       else
         {
-          // Normal en parallele: on n'a pas toutes les aretes sur tous les procs...
+          // Normal in parallel: not all edges are available on all processors...
         }
     }
 
-  // On doit avoir trouve exactement une fois toutes les aretes:
+  // Each edge must have been found exactly once:
   if (max_array(marqueurs) > 1 || min_array(marqueurs) < 1)
     {
       Cerr << "File " << fichier << " is not compatible with the current mesh." << finl;
@@ -936,10 +935,10 @@ void Domaine_VEF::creer_tableau_p1bulle(Array_base& x, RESIZE_OPTIONS opt) const
 void Domaine_VEF::calculer_h_carre()
 {
   const int nbe = nb_elem();
-  // Calcul de h_carre
+  // Compute h_carre
   h_carre = 1.e30;
   h_carre_.resize(nbe);
-  // Calcul des surfaces
+  // Compute face surfaces
   const int nb_faces_elem = domaine().nb_faces_elem();
   CDoubleArrView face_surfaces_v = face_surfaces().view_ro();
   CDoubleArrView volumes_v = volumes().view_ro();
@@ -1020,11 +1019,10 @@ void Domaine_VEF::modifier_pour_Cl(const Conds_lim& conds_lim)
           const Periodique& la_cl_period = ref_cast(Periodique, cl);
           int nb_faces_elem = domaine().nb_faces_elem();
           const Front_VF& la_front_dis = ref_cast(Front_VF, cl.frontiere_dis());
-          // Modification des tableaux face_voisins_ , face_normales_ , volumes_entrelaces_
-          // On change l'orientation de certaines normales
-          // de sorte que les normales aux faces de periodicite soient orientees
-          // de face_voisins(la_face_en_question,0) vers face_voisins(la_face_en_question,1)
-          // comme le sont les faces internes d'ailleurs
+          // Modification of arrays face_voisins_, face_normales_, volumes_entrelaces_
+          // Orient certain normals so that normals at periodic faces point
+          // from face_voisins(face,0) to face_voisins(face,1),
+          // consistent with internal faces
           ToDo_Kokkos("critical");
           for (int ind_face = 0; ind_face <  la_front_dis.nb_faces_tot(); ind_face++)
             {
@@ -1055,11 +1053,11 @@ void Domaine_VEF::modifier_pour_Cl(const Conds_lim& conds_lim)
         }
     }
 
-  // PQ : 10/10/05 : les faces periodiques etant a double contribution
-  //                      l'appel a marquer_faces_double_contrib s'effectue dans cette methode
-  //                      afin de pouvoir beneficier de conds_lim.
+  // PQ: 10/10/05: periodic faces having double contribution,
+  //               marquer_faces_double_contrib is called in this method
+  //               to be able to use conds_lim.
   Domaine_VF::marquer_faces_double_contrib(conds_lim);
-  // Construction du tableau num_fac_loc_
+  // Build array num_fac_loc_
   construire_num_fac_loc();
 
   static DoubleVect* ptr=0;
@@ -1087,7 +1085,7 @@ void Domaine_VEF::modifier_pour_Cl(const Conds_lim& conds_lim)
       ptr = &volumes_som_;
     }
 
-  // Verification du tableau renum_som_perio
+  // Check array renum_som_perio
   if (Debog::active())
     {
       IntVect tmp;
@@ -1101,29 +1099,29 @@ void Domaine_VEF::modifier_pour_Cl(const Conds_lim& conds_lim)
 
   if(get_alphaA())
     {
-      // Construction de renum_arete_perio
+      // Build renum_arete_perio
       construire_renum_arete_perio(conds_lim);
 
-      // Creation d'un tableau distribue pour ok_arete
+      // Create a distributed array for ok_arete
       creer_tableau_aretes(ok_arete, RESIZE_OPTIONS::NOCOPY_NOINIT);
 
-      // Si P1 alors on doit trouver les aretes superflues:
+      // If P1, find superfluous edges:
       if (get_alphaS())
         {
-          // On essaie de lire un fichier .ok_arete d'un precedant calcul
-          // S'il n'existe pas ou est incoherent avec le maillage, on reconstruit ok_arete
+          // Try to read a .ok_arete file from a previous calculation
+          // If it does not exist or is inconsistent with the mesh, rebuild ok_arete
           if (!lecture_ok_arete())
             construire_ok_arete();
         }
       else
         {
-          // Toutes les aretes sont necessaires si pas support P1
+          // All edges are necessary if no P1 support
           ok_arete=1;
         }
       Debog::verifier_getref("ok_arete", ok_arete, ok_arete);
 
-      //Debog::verifier("ok_arete (identique seulement si ok_arete relu dans le fichier .ok_arete):",ok_arete);
-    }// fin if 3D
+      //Debog::verifier("ok_arete (identical only if ok_arete re-read from the .ok_arete file):",ok_arete);
+    }// end if 3D
 }
 
 void Domaine_VEF::typer_elem(Domaine& domaine_geom)
@@ -1158,11 +1156,11 @@ void Domaine_VEF::typer_elem(Domaine& domaine_geom)
 
 DoubleTab& Domaine_VEF::vecteur_face_facette()
 {
-  // On construit si de taille nul
-  // ou si le maillage est deformable
+  // Build if size is zero
+  // or if the mesh is deformable
   if (vecteur_face_facette_.size() == 0 || domaine().deformable())
     {
-      // Taille 8*n*4*3*2=192n
+      // Size 8*n*4*3*2=192n
       const int nfa7 = type_elem().nb_facette();
       const int nb_poly_tot = nb_elem_tot();
       vecteur_face_facette_.resize(nb_poly_tot, nfa7, dimension, 2);
@@ -1173,16 +1171,16 @@ DoubleTab& Domaine_VEF::vecteur_face_facette()
       int nb_som_facette=dimension;
       for (int poly = 0; poly < nb_poly_tot; poly++)
         {
-          // Boucle sur les facettes du polyedre non standard:
+          // Loop over facets of the non-standard polyhedron:
           for (int fa7 = 0; fa7 < nfa7; fa7++)
             {
               int num1 = elem_faces(poly, KEL(0, fa7));
               int num2 = elem_faces(poly, KEL(1, fa7));
 
-              // Calcul des rx0 et rx1 :
+              // Compute rx0 and rx1:
               for (int i = 0; i < dimension; i++)
                 {
-                  // Calcul de la ieme coordonnee du centre de la fa7
+                  // Compute the i-th coordinate of the fa7 center
                   double coord_centre_fa7 = xg(poly, i);
                   for (int num_som_fa7 = 0; num_som_fa7 < nb_som_facette - 1; num_som_fa7++)
                     {
@@ -1191,11 +1189,11 @@ DoubleTab& Domaine_VEF::vecteur_face_facette()
                       coord_centre_fa7 += coord(isom_glob, i);
                     }
                   coord_centre_fa7 /= nb_som_facette;
-                  // Fin calcul de la ieme coordonnee du centre de la fa7
+                  // End compute i-th coordinate of fa7 center
                   vecteur_face_facette_(poly,fa7,i,0) = coord_centre_fa7 - xv_(num1,i);
                   vecteur_face_facette_(poly,fa7,i,1) = coord_centre_fa7 - xv_(num2,i);
                 }
-              // Fin de Calcul des rx0 et rx1
+              // End of rx0 and rx1 computation
             }
         }
       Cerr << "Build of vecteur_face_facette() size:" << vecteur_face_facette_.size_array() << finl;

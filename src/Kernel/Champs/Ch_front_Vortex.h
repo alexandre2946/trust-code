@@ -21,9 +21,9 @@
 
 #include <Domaine_forward.h>
 
-/*! @brief classe Ch_fr_Vortex Classe derivee de Champ_front_var qui represente les
+/*! @brief class Ch_fr_Vortex Derived class of Champ_front_var that represents
  *
- *      champs aux frontieres calcules suivant la methode des vortex
+ *      boundary fields computed according to the vortex method
  *         nval
  *         xi yi zi val_i
  *
@@ -55,22 +55,22 @@ protected :
   int nb_vortex = -1;
   double temps = -100.;
 
-  double nx = -100., ny = -100., nz = -100.;         // composantes normales du repere associe a la frontiere
-  double t1x = -100., t1y = -100., t1z = -100.; // composantes tangentielles : n.t1 = 0
-  double t2x = -100., t2y = -100., t2z = -100.; // composantes tangentielles : t2 = n ^ t1 = 0
+  double nx = -100., ny = -100., nz = -100.;         // normal components of the frame associated with the boundary
+  double t1x = -100., t1y = -100., t1z = -100.; // tangential components: n.t1 = 0
+  double t2x = -100., t2y = -100., t2z = -100.; // tangential components: t2 = n ^ t1 = 0
 
-  DoubleVect xvort;  // coordonnees x des vortex
-  DoubleVect yvort;  // coordonnees y des vortex
-  DoubleVect zvort;  // coordonnees z des vortex
-  DoubleVect tvort;  // durees de vie des vortex
-  DoubleVect svort;  // signes de la vorticite des vortex
-  ArrOfInt fvort;    // numero faces contenant le centre du vortex
-  DoubleVect gamma;  // intensite du vortex
-  DoubleVect sigma;  // longeur caracteristique du vortex
+  DoubleVect xvort;  // x coordinates of the vortices
+  DoubleVect yvort;  // y coordinates of the vortices
+  DoubleVect zvort;  // z coordinates of the vortices
+  DoubleVect tvort;  // lifetimes of the vortices
+  DoubleVect svort;  // signs of the vorticity of the vortices
+  ArrOfInt fvort;    // face numbers containing the center of the vortex
+  DoubleVect gamma;  // intensity of the vortex
+  DoubleVect sigma;  // characteristic length of the vortex
 
   DoubleVect u, v, w, u_moy, dudy, k, eps;
 
-  DoubleVect Wk; // processus de Wiener
+  DoubleVect Wk; // Wiener process
 };
 
 #endif

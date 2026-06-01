@@ -41,9 +41,9 @@ Entree& Marqueur_Lagrange_base::readOn(Entree& is)
 }
 
 
-// -discretisation du champ densite_particules
-// -association du domaine a l ensemble d points suivis
-// -t_debut_integr_ fixe par defaut a t_init si pas de valeur lue dans le jdd
+// - discretization of the densite_particules field
+// - association of the domain to the set of tracked points
+// - t_debut_integr_ defaults to t_init if no value is read from the data file
 void Marqueur_Lagrange_base::discretiser(const Probleme_base& pb, const  Discretisation_base& dis)
 {
   const Domaine_dis_base& domaine_dis=pb.equation(0).domaine_dis();

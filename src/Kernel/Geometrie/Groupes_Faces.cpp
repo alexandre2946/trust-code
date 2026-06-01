@@ -23,9 +23,9 @@ Sortie& Groupes_Faces_32_64<_SIZE_>::printOn(Sortie& os) const { return LIST(Gro
 template <typename _SIZE_>
 Entree& Groupes_Faces_32_64<_SIZE_>::readOn(Entree& is) { return LIST(Groupe_Faces_32_64<_SIZE_>)::readOn(is); }
 
-/*! @brief Associe un domaine a tous les objets Groupe_Faces de la liste.
+/*! @brief Associates a domain to all Groupe_Faces objects in the list.
  *
- * @param (Domaine& un_domaine) le domaine a associer aux Groupe_Faces de la liste
+ * @param (Domaine& un_domaine) the domain to associate with the Groupe_Faces objects in the list
  */
 template <typename _SIZE_>
 void Groupes_Faces_32_64<_SIZE_>::associer_domaine(const Domaine_t& un_domaine)
@@ -33,13 +33,13 @@ void Groupes_Faces_32_64<_SIZE_>::associer_domaine(const Domaine_t& un_domaine)
   for (auto& itr : *this) itr.associer_domaine(un_domaine);
 }
 
-/*! @brief Renvoie le nombre total de faces contenues dans la liste des Groupe_Faces, i.
+/*! @brief Returns the total number of faces contained in the list of Groupe_Faces, i.
  *
- * e. la somme de toutes
- *     les faces de tous les objet Groupe_Faces contenu dans
- *     la liste.
+ * e. the sum of all
+ *     faces of all Groupe_Faces objects contained in
+ *     the list.
  *
- * @return (int) le nombre total de faces contenues dans la liste des Groupe_Faces
+ * @return (int) the total number of faces contained in the list of Groupe_Faces
  */
 template <typename _SIZE_>
 typename Groupes_Faces_32_64<_SIZE_>::int_t Groupes_Faces_32_64<_SIZE_>::nb_faces() const
@@ -50,14 +50,14 @@ typename Groupes_Faces_32_64<_SIZE_>::int_t Groupes_Faces_32_64<_SIZE_>::nb_face
   return nombre;
 }
 
-/*! @brief Renvoie le nombre total de faces de type specifie contenues dans la liste des Groupe_Faces
+/*! @brief Returns the total number of faces of the specified type contained in the list of Groupe_Faces,
  *
- *     i.e. la somme de toutes les faces de type specifie
- *     de tous les objet Groupe_Faces contenu dans
- *     la liste.
+ *     i.e. the sum of all faces of the specified type
+ *     of all Groupe_Faces objects contained in
+ *     the list.
  *
- * @param (Type_Face type) le type des faces a compter
- * @return (int) le nombre total de faces contenues dans la liste des Groupe_Faces
+ * @param (Type_Face type) the type of faces to count
+ * @return (int) the total number of faces of the specified type contained in the list of Groupe_Faces
  */
 template <typename _SIZE_>
 typename Groupes_Faces_32_64<_SIZE_>::int_t Groupes_Faces_32_64<_SIZE_>::nb_faces(Type_Face type) const
@@ -69,8 +69,8 @@ typename Groupes_Faces_32_64<_SIZE_>::int_t Groupes_Faces_32_64<_SIZE_>::nb_face
   return nombre;
 }
 
-/*! Mise a jour des indices des groupes de faces avec table inversee: reverse_index[ancien_numero] = nouveau numero:
- * necessaire lorsque les numeros des faces ont ete modifies
+/*! Updates the face group indices using an inverse table: reverse_index[old_index] = new_index.
+ * Necessary when face indices have been modified.
  */
 template <typename _SIZE_>
 void Groupes_Faces_32_64<_SIZE_>::renumerote(ArrOfInt_t& reverse_index)
@@ -82,7 +82,7 @@ void Groupes_Faces_32_64<_SIZE_>::renumerote(ArrOfInt_t& reverse_index)
       assert(nbfaces2 == itr.nb_faces());
       for (int_t i = 0; i < nbfaces2; i++)
         {
-          const int_t old = indices_faces[i]; // ancien indice local
+          const int_t old = indices_faces[i]; // old local index
           indices_faces[i] = reverse_index[old];
         }
     }

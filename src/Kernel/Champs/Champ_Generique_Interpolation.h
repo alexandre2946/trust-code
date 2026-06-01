@@ -19,23 +19,23 @@
 #include <Champ_Gen_de_Champs_Gen.h>
 
 
-/*! @brief Un champ generique qui est construit comme une interpolation d'un autre champ generique (interpolation aux sommets ou aux elements).
+/*! @brief A generic field constructed as an interpolation of another generic field (interpolation at vertices or elements).
  *
- *   L interpolation sera effectuee sur un domaine qui peut etre
- *   le domaine de calcul ou un domaine different specifie par l utilisateur
+ *   The interpolation will be performed on a domain that can be
+ *   the computational domain or a different domain specified by the user
  *
  */
 
-//// Syntaxe a respecter pour jdd
+//// Data file syntax to follow
 //
-// "nom_champ" Interpolation { [ domaine ] "dom_interp"
+// "field_name" Interpolation { [ domain ] "interp_domain"
 //                localisation "loc"
-//                source "type_champ_ge" { ...source ref_Champ { Pb_champ "nom_pb" "nom_champ_discret" } }
+//                source "generic_field_type" { ...source ref_Champ { Pb_champ "pb_name" "discrete_field_name" } }
 //               }
-// "nom_champ" fixe par utilisateur sera le nom du champ generique
-// "dom_interp" nom du domaine d interpolation dans le cas ou il differe du domaine de calcul (optionnel)
-// "loc" designe la localisation d interpolation "elem", "elem_dg", "faces" ou "som"
-// "type_champ_gen" type d'un champ generique
+// "field_name" set by the user will be the name of the generic field
+// "interp_domain" name of the interpolation domain in case it differs from the computational domain (optional)
+// "loc" designates the interpolation localisation "elem", "elem_dg", "faces" or "som"
+// "generic_field_type" type of a generic field
 
 class Champ_Generique_Interpolation : public Champ_Gen_de_Champs_Gen
 {
@@ -73,17 +73,17 @@ public:
 
   const Noms& fixer_noms_compo(const Noms& noms) override;
   const Noms& fixer_noms_synonyms(const Noms& noms) override;
-  //L attribut compo_ de Champ_Generique_Interpolation n est rempli que pour les Champ_Generique_Interpolation
-  //crees par macro et cela afin de reproduire les noms de composantes dans les lml
+  //The compo_ attribute of Champ_Generique_Interpolation is only filled for Champ_Generique_Interpolation
+  //instances created by macro, in order to reproduce component names in lml files
   Noms compo_,syno_;
 
 private:
-  Motcle            localisation_;                 // localisation d interpolation elem, som
+  Motcle            localisation_;                 // interpolation localisation: elem, som
   Motcle            methode_;                      // calculer_champ_post, etc...
-  Nom               nom_domaine_lu_;               // Nom du domaine lu
-  OBS_PTR(Domaine)      domaine_;                      // domaine sur lequel on veut interpoler le champ (domaine natif si reference nulle)
-  OBS_PTR(Domaine_dis_base)  le_dom_dis;                    // rempli si domaine d'interpolation different du domaine natif. Une REF car le Domaine_dis_cache est responsable de la memoire
-  // ex : Sonde utilise valeur_aux...() qui necessite de disposer d un domaine discretise
+  Nom               nom_domaine_lu_;               // Name of the domain read
+  OBS_PTR(Domaine)      domaine_;                      // domain on which we want to interpolate the field (native domain if reference is null)
+  OBS_PTR(Domaine_dis_base)  le_dom_dis;                    // filled if interpolation domain differs from native domain. A REF since Domaine_dis_cache owns the memory
+  // ex: Sonde uses valeur_aux...() which requires a discretized domain
   int optimisation_sous_maillage_,optimisation_demande_;
   ArrOfInt renumerotation_maillage_;
   mutable OWN_PTR(Champ_Fonc_base) espace_stockage_;

@@ -20,10 +20,8 @@
 
 class Fluide_Dilatable_base;
 
-/*! @brief classe Loi_Etat_GP_base Cette classe represente la loi d'etat base pour les gaz parfaits.
- *
- *      Elle definit un fluide dilatable dont la loi d'etat est :
- *         Pth = rho*R*T
+/*! @brief Base state law class for ideal gases, defining a dilatable fluid with the equation of state:
+ *           Pth = rho*R*T
  *
  * @sa Fluide_Dilatable_base Loi_Etat_base
  */
@@ -46,7 +44,7 @@ public :
   KOKKOS_INLINE_FUNCTION double calculer_masse_volumique(double P,double T, double R) const { return P / ( R * T ); }
   double inverser_Pth(double,double) override;
 
-  // Methodes inlines
+  // Inline methods
   inline double R() const { return R_; }
 
 protected :

@@ -35,7 +35,7 @@ Entree& Op_Conv_Muscl3_VEF_Face::readOn(Entree& s )
   type_lim_int = type_lim_vanleer;
   ordre_=3;
   alpha_=1;
-  // Lecture eventuelle de alpha_
+  // Optional reading of alpha_
   Motcle motlu, accouverte = "{" , accfermee = "}" ;
   Motcles les_mots(6);
   {

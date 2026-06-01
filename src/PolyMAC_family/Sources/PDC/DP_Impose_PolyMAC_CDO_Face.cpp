@@ -39,7 +39,7 @@ Entree& DP_Impose_PolyMAC_CDO_Face::readOn(Entree& s)
       Cerr << "DP_Impose_PolyMAC_CDO_Face : champ d'orientation non renseigne!" << finl;
       Process::exit();
     }
-  //fichier de sortie
+  //output file
   set_fichier(Nom("DP_") + identifiant_);
   set_description(Nom("DP impose sur la surface ") + identifiant_);
   Noms col_names;
@@ -63,7 +63,7 @@ Entree& DP_Impose_PolyMAC_CDO_Face::readOn(Entree& s)
 void DP_Impose_PolyMAC_CDO_Face::completer()
 {
   Perte_Charge_PolyMAC_CDO_Face::completer();
-  // eq_masse besoin de champ_conserve !
+  // eq_masse needs champ_conserve!
   if (sub_type(Pb_Multiphase, mon_equation->probleme())) ref_cast(Pb_Multiphase, mon_equation->probleme()).equation_masse().init_champ_conserve();
   bilan().resize(3 + !regul_);
 }
@@ -82,7 +82,7 @@ int DP_Impose_PolyMAC_CDO_Face::sauvegarder(Sortie& os) const
       os << flush;
       Cerr << "Saving fac_regul at time : " << Nom(temps, "%e")  << " with value " << fac_regul_ << finl;
     }
-  return 8;//un double
+  return 8;//one double
 }
 
 int DP_Impose_PolyMAC_CDO_Face::reprendre(Entree& is)
@@ -137,7 +137,7 @@ void DP_Impose_PolyMAC_CDO_Face::ajouter_blocs(matrices_t matrices, DoubleTab& s
     }
   else
     {
-      //valeurs du champ de DP
+      //values of the DP field
       DoubleTrav xvf(num_faces.size(), dimension), DP(num_faces.size(), 3);
       for (int i = 0; i < num_faces.size(); i++)
         for (int j = 0; j < dimension; j++) xvf(i, j) = domaine_poly.xv()(num_faces(i), j);
@@ -153,7 +153,7 @@ void DP_Impose_PolyMAC_CDO_Face::ajouter_blocs(matrices_t matrices, DoubleTab& s
       bilan()(1) = num_faces.size() ? DP(0, 1) / rho : -DBL_MAX;
       bilan()(3) = num_faces.size() ? DP(0, 2) * rho : -DBL_MAX;
       Process::mp_max_for_each(bilan()(0), bilan()(1), bilan()(3));
-      if (Process::me()) bilan() = 0; //pour eviter un sommage en sortie
+      if (Process::me()) bilan() = 0; //to avoid summing twice in output
     }
 }
 
@@ -163,5 +163,5 @@ void DP_Impose_PolyMAC_CDO_Face::mettre_a_jour(double temps)
   update_dp_regul(equation(), calculate_Q(equation(), num_faces, sgn), bilan());
   if (regul_) return;
 
-  bilan()(2) = calculate_Q(equation(), num_faces, sgn) * (Process::me() ? 0 : 1); //pour eviter le sommage en sortie
+  bilan()(2) = calculate_Q(equation(), num_faces, sgn) * (Process::me() ? 0 : 1); //to avoid summing twice in output
 }

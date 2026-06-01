@@ -42,12 +42,12 @@ void Op_Dift_EF_base::associer_modele_turbulence(const Modele_turbulence_hyd_bas
 
 void Op_Dift_EF_base::mettre_a_jour(double )
 {
-  if (sub_type(Navier_Stokes_std,equation())) // on traite l'hydraulique
+  if (sub_type(Navier_Stokes_std,equation())) // handling the hydraulics
     {
       if ( le_modele_turbulence->utiliser_loi_paroi())
         {
-          // Modif BM: on ne prend la ref que si le tableau a ete initialise, sinon ca bloque
-          // l'initialisation
+          // Modif BM: only take the ref if the array has been initialized, otherwise it blocks
+          // the initialization
           const DoubleTab& tab = le_modele_turbulence->loi_paroi().Cisaillement_paroi();
           if (tab.size_array() > 0)
             tau_tan_.ref(tab);
@@ -91,7 +91,7 @@ void Op_Dift_EF_base::calculer_borne_locale(DoubleVect& borne_visco_turb, double
   for (int elem=0; elem<nb_elem; elem++)
     {
       double h_inv = 1./le_dom_ef.carre_pas_maille(elem);
-      // C'est pas tres propre pour recuperer diffu mais ca evite de coder cette methode dans plusieurs classes:
+      // Not very clean to retrieve diffu this way, but it avoids coding this method in several classes:
       double diffu = (flag ? diffusivite().valeurs()(elem) : diffusivite().valeurs()(0,0));
       //
       double coef = 1./(2*(dt_conv+DMINFLOAT)*dimension*h_inv*dt_diff_sur_dt_conv) - diffu;

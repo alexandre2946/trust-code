@@ -39,17 +39,17 @@ Entree& Read_unsupported_ASCII_file_from_ICEM::readOn(Entree& is)
   return is;
 }
 
-// Fonction utilisee
+// Used function
 inline char read_write_string_from(EFichierBin& s,SFichierBin& o, const char* first_caracter)
 {
-  // La regle est :
-  // On lit jusqu'a first_caracter s'il est defini
-  // On complete par le separateur 00
-  // On retourne le dernier caractere (avant l'espace)
+  // The rule is:
+  // Read up to first_caracter if it is defined
+  // Pad with the separator 00
+  // Return the last character (before the space)
   char octet;
   char zero=0;
   char last_caracter;
-  // Si first_caracter est defini on lit jusqu'a lui
+  // If first_caracter is defined, read up to it
   if (*first_caracter!=0)
     {
 #ifndef NDEBUG
@@ -68,8 +68,8 @@ inline char read_write_string_from(EFichierBin& s,SFichierBin& o, const char* fi
     }
   else
     {
-      // Si first caracter n'est pas defini, on se contente de passer
-      // les espaces (32, 20 en hexa) et separateurs (00) et delete (127, 7F en hexa)
+      // If first_caracter is not defined, simply skip
+      // spaces (32, 20 in hex) and separators (00) and delete (127, 7F in hex)
 #ifndef NDEBUG
       Cerr << " -> Read the bytes :";
 #endif
@@ -87,7 +87,7 @@ inline char read_write_string_from(EFichierBin& s,SFichierBin& o, const char* fi
   o.get_ostream().write(&octet,1);
   last_caracter = octet;
   Nom chaine(octet);
-  // On lit jusqu'a l'espace:
+  // Read up to the space:
   //while (s.good() && s.get_istream().read(&octet,1)!=0 && octet!=32)
   while (s.good() && s.get_istream().read(&octet,1) && octet!=32)
     {
@@ -108,30 +108,30 @@ inline char read_write_string_from(EFichierBin& s,SFichierBin& o, const char* fi
 #endif
   return last_caracter;
 }
-// Fonction qui verifie si on lit un binaire d'ICEM et si oui
-// cree un fichier compatible TRUST
+// Function that checks if we are reading an ICEM binary file and if so
+// creates a TRUST-compatible file
 void check_ICEM_binary_file(Nom& filename, const Nom& nom_objet_lu)
 {
-  // On verifie que l'objet lu est un domaine
+  // Check that the read object is a domain
   Objet_U& objet_lu = Interprete::objet(nom_objet_lu);
   // [ABN] hmmmm ... hopefully the only place where we have this sort of things....:
   if (!(objet_lu.que_suis_je()=="Domaine" || objet_lu.que_suis_je()=="Domaine")) return;
 
   EFichierBin tmp(filename);
-  // Un fichier binaire ASCII est reconnaissable par le fait que le nom du
-  // domaine est suivi d'un espace donc l'octet est 32 (= 20 en hexa = space)
-  // Dans un binaire classique le nom du domaine est suivi par 0
+  // An ASCII binary file is recognizable by the fact that the domain name
+  // is followed by a space, so the byte is 32 (= 20 in hex = space)
+  // In a standard binary file the domain name is followed by 0
   char octet=(char)-1;
   while(octet!=32 && octet!=0)
     tmp.get_istream().read(&octet,1);
   tmp.close();
-  if (octet==32) // C'est un fichier binaire ICEM
+  if (octet==32) // This is an ICEM binary file
     {
       char zero=0;
       Cerr << "==============================================" << finl;
       Cerr << filename << " is an ICEM binary file." << finl;
       Cerr << "To save space, you can now delete this file and use" << finl;
-      // Suppression de certains espaces du fichier binaire
+      // Removal of certain spaces from the binary file
       Nom new_filename(filename);
       new_filename+=".cleaned";
       Cerr << "instead, the newly created " << new_filename << " file." << finl;
@@ -144,15 +144,15 @@ void check_ICEM_binary_file(Nom& filename, const Nom& nom_objet_lu)
           o.get_ofstream().write(&octet,1);
           s.get_istream().read(&octet,1);
         }
-      // Ecriture de 00 a la place de 32
+      // Write 00 in place of 32
       o.get_ostream().write(&zero,1);
-      // Ensuite on va jusqu'a l'entier 2
+      // Then go up to integer 2
       s.get_istream().read(&octet,1);
       while(octet!=2)
         s.get_istream().read(&octet,1);
-      // On revient en arriere et on peut commencer a lire le DoubleTab
+      // Go back and start reading the DoubleTab
       s.get_istream().unget();
-      // Lecture des sommets
+      // Read nodes
       DoubleTab sommets;
       s >> sommets;
       o << sommets;
@@ -163,37 +163,37 @@ void check_ICEM_binary_file(Nom& filename, const Nom& nom_objet_lu)
           Cerr << "Error in is_a_ICEM_binary_file : { is waited." << finl;
           Process::exit();
         }
-      // Nom du domaine
+      // Domain name
       read_write_string_from(s,o,"");
-      // Lecture du type d'element
+      // Read element type
       read_write_string_from(s,o,"T"); // TETRAEDRE
-      // Lecture des elements
+      // Read elements
       IntTab elems;
       s >> elems;
       o << elems;
       Cerr << "End of the read of the cells." << finl;
-      // Boucle sur les frontieres
-      //  {  : 7b en hexa, 123 en decimal
-      //  ,  : 2C en hexa, 44  en decimal
-      //  }  : 7D en haxe, 125 en decimal
+      // Loop over boundaries
+      //  {  : 7b in hex, 123 in decimal
+      //  ,  : 2C in hex, 44  in decimal
+      //  }  : 7D in hex, 125 in decimal
       const char* sep="{";
       while(read_write_string_from(s,o,sep)!=125)
         {
-          // Nom de frontiere
+          // Boundary name
           read_write_string_from(s,o,"");
-          // Type de l'element
+          // Element type
           read_write_string_from(s,o,"T"); // TRIANGLE_3D
-          // Elements de la frontiere
+          // Boundary elements
           s >> elems;
           o << elems;
-          // Faces voisines
+          // Neighbor faces
           IntTab faces_voisins;
           s >> faces_voisins;
           o << faces_voisins;
           Cerr << "End of the read of a boundary." << finl;
-          sep=""; // , ou } on ne peut savoir a l'avance...
+          sep=""; // , or } cannot be known in advance...
         }
-      // Lecture des 3 "vide"
+      // Read the 3 "vide" entries
       for (int i=0; i<3; i++)
         {
           if (read_write_string_from(s,o,"v")!=101)
@@ -202,17 +202,17 @@ void check_ICEM_binary_file(Nom& filename, const Nom& nom_objet_lu)
               Process::exit();
             }
         }
-      // Lecture de }
+      // Read }
       if (read_write_string_from(s,o,"}")!=125)
         {
           Cerr << "Error in is_a_ICEM_binary_file : } is waited." << finl;
           Process::exit();
         }
-      // Lecture du dernier "vide"
+      // Read the last "vide" entry
       read_write_string_from(s,o,"v");
       o.close();
       s.close();
-      // On pointe vers le nouveau fichier
+      // Point to the new file
       filename=new_filename;
       Cerr << "=============================================" << finl;
       Cerr << "You can use now: " << finl;

@@ -31,7 +31,7 @@ class Equation_base;
 class Milieu_base;
 class Param;
 
-/*! @brief classe Champ_front_recyclage
+/*! @brief Champ_front_recyclage
  *
  *                         delt_dist                                             delt_dist
  *         pb1           <---------->             pb2                            <-------->    pb
@@ -45,32 +45,32 @@ class Param;
  *
  *                              Fig. 1                                                        Fig. 2
  *
- *      Cette classe a pour objectif d evaluer les valeurs d un champ_front (ch_fr2) sur le bord d un domaine (bord2)
- *      en exploitant les valeurs d un champ 1 (ch1 dit champ evaluateur) evaluees dans un plan (plan1) distant de
- *      delt_dist de bord2 (Fig. 1).
+ *      The goal of this class is to evaluate the values of a boundary field (ch_fr2) on the boundary of a domain (bord2)
+ *      by exploiting the values of a field 1 (ch1, called the evaluator field) evaluated in a plane (plan1) at a distance
+ *      delt_dist from bord2 (Fig. 1).
  *
  */
 
-//     Les problemes pb2 et pb1, les domaines dom2 et dom1 ainsi que les champs 2 et 1 peuvent etre identiques
-//     (pb2=pb1=pb dom2=dom1=dom et ch2=ch1=ch)
-//     auquel cas les valeurs du champ front (ch_fr) sur le bord (bord) seront construites
-//     a partir des valeurs du champ ch (qui devient le champ evaluateur) calculees dans le plan (plan)
-//     distant de delt_dist du bord (Fig. 2).
+//     Problems pb2 and pb1, domains dom2 and dom1, and fields 2 and 1 can be identical
+//     (pb2=pb1=pb dom2=dom1=dom and ch2=ch1=ch)
+//     in which case the values of the boundary field (ch_fr) on the boundary (bord) will be built
+//     from the values of field ch (which becomes the evaluator field) computed in the plane (plan)
+//     at a distance delt_dist from the boundary (Fig. 2).
 
-//     L expression des valeurs attribuees au champ front sur le bord2 (ou bord) ont pour expression :
+//     The expression for the values assigned to the boundary field on bord2 (or bord) is:
 //     val_ch_fr2(dir) = ampli_moy_imposee(dir)*moyenne_imposee(dir)
 //                       + ampli_fluct(dir)*(val_evaluateur(dir)-ampli_moy_recyclee(dir)*moyenne_recyclee(dir))
 //
-//     val_ch_fr2         :  valeurs prises par le_champ_front ch_fr2 (ou ch_fr)
-//     moyenne_imposee    :  moyenne de le_champ_front (peut etre impose analytiquement ou lue dans un fichier)
-//     val_evaluateur     :  valeurs du champ_evaluateur dans le plan1 (ou plan) evaluees par interpolation
-//     moyenne_recylee    :  moyenne du champ_evaluateur (peut etre evaluee par moyenne surfacique ou provenir d un traitement_particulier)
-//     ampli_moy_imposee  :  facteur d amplification de la la moyenne imposee
-//     ampli_moy_recyclee :  facteur d amplification de la la moyenne recyclee
-//     ampli_fluct        :  facteur d amplification de la fluctuation recyclee
+//     val_ch_fr2         :  values taken by the boundary field ch_fr2 (or ch_fr)
+//     moyenne_imposee    :  mean of the boundary field (can be imposed analytically or read from a file)
+//     val_evaluateur     :  values of the evaluator field in plane1 (or plane) evaluated by interpolation
+//     moyenne_recyclee   :  mean of the evaluator field (can be computed by surface averaging or from a special treatment)
+//     ampli_moy_imposee  :  amplification factor for the imposed mean
+//     ampli_moy_recyclee :  amplification factor for the recycled mean
+//     ampli_fluct        :  amplification factor for the recycled fluctuation
 //     dir                :  direction
 
-//     Syntaxe utilisateur :
+//     User syntax:
 //     Champ_front_recyclage
 //     {
 //      pb_champ_evaluateur nom_pb1 nom_inco1 nb_compo1
@@ -84,46 +84,46 @@ class Param;
 //     }
 //
 //     methode_moy = 1 (keyword profil)
-//                     pour imposer un profil analytique
-//     methode_moy = 2 (keyword interpolation) :
-//                       lecture dans un fichier et construction d un champ moyen
-//                     en realisant une interpolation des donnees lues.
-//                     La moyenne est construite pour une direction privilegiee
-//                     (direction_anisotrope) et vaut 0 pour les autres directions
+//                     to impose an analytical profile
+//     methode_moy = 2 (keyword interpolation):
+//                       reads from a file and builds a mean field
+//                     by interpolating the data read.
+//                     The mean is built for a preferred direction
+//                     (direction_anisotrope) and is 0 for other directions
 //     methode_moy = 3 (keyword connexion_approchee)
-//                     lecture dans un fichier et on retient la valeur de la
-//                     variable lue par connexion avec le point le plus proche
-//                     de la face de bord consideree
+//                     reads from a file and retains the value of the
+//                     variable read by connection with the closest point
+//                     to the considered boundary face
 //     methode_moy = 4 (keyword connexion_exacte)
-//                     lecture dans un fichier geometrie des coordonnees de points
-//                     situes dans le plan d evaluation et lecture dans un fichier
-//                     distinct des valeurs moyennes. Les valeurs moyennes lues
-//                     sont stockees quand la correspondance exacte entre les points
-//                     en vis a vis est verifiee.
+//                     reads a geometry file containing the coordinates of points
+//                     located in the evaluation plane and reads from a separate file
+//                     the mean values. The mean values read
+//                     are stored when the exact correspondence between
+//                     facing points is verified.
 //     methode_moy = 5 (keyword logarithmique)
-//                     construction de la moyenne par une loi de paroi (logarithmique)
+//                     builds the mean using a wall law (logarithmic)
 //
 //
-//    methode_moy = 2 et methode_moy = 3 :
-//                     un fichier unique a lire contennant positions et valeurs de la variable
-//    methode_moy = 4 : deux fichiers a lire : le premier contenant les valeurs de la variable
-//                                               et le second contenant les positions
+//    methode_moy = 2 and methode_moy = 3:
+//                     a single file to read containing positions and values of the variable
+//    methode_moy = 4: two files to read: the first containing the values of the variable
+//                                         and the second containing the positions
 //
 //
 //    methode_recyc = 1 (keyword surfacique)
-//                      moyenne surfacique des valeurs recyclees
-//                     (la moyenne est faite sur le bord2 ou l on recupere les valeurs)
-//    methode_recyc = 2 (keyword interpolation) :
-//                       voir methode_moy = 2
+//                      surface average of the recycled values
+//                     (the average is computed on bord2 where the values are retrieved)
+//    methode_recyc = 2 (keyword interpolation):
+//                       see methode_moy = 2
 //    methode_recyc = 3 (keyword connexion_approchee)
-//                     voir methode_moy = 3
+//                     see methode_moy = 3
 //    methode_recyc = 4 (keyword connexion_exacte)
-//                     voir methode_moy = 4
+//                     see methode_moy = 4
 //
-//    methode_recyc = 2 et methode_moy = 3 :
-//                     un fichier unique a lire contennant positions et valeurs de la variable
-//    methode_recyc = 4 : deux fichiers a lire : le premier contenant les valeurs de la variable
-//                                                 et le second contenant les positions
+//    methode_recyc = 2 and methode_moy = 3:
+//                     a single file to read containing positions and values of the variable
+//    methode_recyc = 4: two files to read: the first containing the values of the variable
+//                                           and the second containing the positions
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -164,48 +164,48 @@ protected :
   void set_param(Param& param) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
 
-  OBS_PTR(Champ_Inc_base) l_inconnue1;  //Reference au champ inconnu (ch1) qui sert d evaluateur
-  //dans le plan ou l on recupere les valeurs
+  OBS_PTR(Champ_Inc_base) l_inconnue1;  //Reference to the unknown field (ch1) used as evaluator
+  //in the plane where the values are retrieved
 
-  DoubleVect delt_dist;             //vecteur distance entre bord2 et le plan (plan1)
-  //de calcul des valeurs de ch1
+  DoubleVect delt_dist;             //distance vector between bord2 and the plane (plan1)
+  //for computing the values of ch1
 
-  Nom nom_pb1;                      //nom du probleme evaluateur (pb1)
+  Nom nom_pb1;                      //name of the evaluator problem (pb1)
 
-  Motcle nom_inco1;                 //nom du champ inconnu evaluateur (ch1)
+  Motcle nom_inco1;                 //name of the evaluator unknown field (ch1)
 
-  DoubleTab moyenne_imposee_;            //Voir description ci dessus
+  DoubleTab moyenne_imposee_;            //See description above
   DoubleTab moyenne_recyclee_;
   DoubleVect ampli_fluct_;
   DoubleVect ampli_moy_imposee_;
   DoubleVect ampli_moy_recyclee_;
 
-  int methode_moy_impos_;            //methode pour evaluer moyenne_imposee_
-  int methode_moy_recycl_;       //methode pour evaluer moyenne_recyclee_
+  int methode_moy_impos_;            //method to evaluate moyenne_imposee_
+  int methode_moy_recycl_;       //method to evaluate moyenne_recyclee_
 
-  Nom fich_impos_,fich_recycl_;     //Noms de fichiers eventuellemment utilises
-  Nom fich_maillage_;                    //pour evaluer moyenne_imposee_ et moyenne_recyclee_
+  Nom fich_impos_,fich_recycl_;     //Names of files optionally used
+  Nom fich_maillage_;                    //to evaluate moyenne_imposee_ and moyenne_recyclee_
 
-  int ndir;                            //direction d anisotropie
+  int ndir;                            //direction of anisotropy
 
-  VECT(Parser_U) profil_2;             //Parser et expressions pour imposer une moyenne analytique
+  VECT(Parser_U) profil_2;             //Parser and expressions for imposing an analytical mean
   Noms fcts_xyz;
 
-  double u_tau,diametre,visco_cin;  //parametres pour imposer une moyenne en profil log
+  double u_tau,diametre,visco_cin;  //parameters for imposing a mean using a logarithmic profile
 
-  // Ensemble des points ou il faut evaluer inconnue1 (uniquement des coordonnees
-  //  incluses dans le domaine1 local), classees en fonction du processeur a qui
-  //  il faut envoyer le resultat de l'evaluation. Donc attention, on n'a pas forcement
-  //  egalite entre l'inconnue locale sur la face et l'inconnue distante sur la face si
-  //  les maillages surfaciques des frontieres locales et distantes ne sont pas identiques...
+  // Set of points where inconnue1 must be evaluated (only coordinates
+  //  included in the local domain1), sorted by the processor to which
+  //  the evaluation result must be sent. Note that there is not necessarily
+  //  equality between the local unknown on the face and the remote unknown on the face if
+  //  the surface meshes of the local and remote boundaries are not identical...
   DoubleTabs inconnues1_coords_to_eval_;
 
-  // Pour chaque point ou il faut evaluer inconnue1, indice de l'element dans lequel
-  //  se trouve ce point (toujours par processeur destination)
+  // For each point where inconnue1 must be evaluated, index of the element in which
+  //  this point lies (always by destination processor)
   ArrsOfInt inconnues1_elems_;
 
-  // A la reception des valeurs, indices des faces de bord ou on doit stocker le
-  //  resultat recu de chaque processeur
+  // Upon reception of values, indices of the boundary faces where the
+  //  result received from each processor must be stored
   ArrsOfInt inconnues2_faces_;
 };
 

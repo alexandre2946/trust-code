@@ -34,11 +34,11 @@ public:
 protected:
   virtual void               declare_support_masse_volumique(int ok);
 private:
-  // L'objet derive utilise bien le champ masse volumique.
-  // Voir le constructeur.
+  // The derived object does use the density field.
+  // See the constructor.
   int          support_ok_;
-  // Reference au champ de masse volumique a utiliser.
-  // La ref peut etre nulle.
+  // Reference to the density field to use.
+  // The reference may be null.
   OBS_PTR(Champ_base) ref_champ_rho_;
 };
 

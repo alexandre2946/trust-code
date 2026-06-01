@@ -20,7 +20,8 @@
 #include <Objet_U.h>
 
 class Param;
-/*! @brief class Objet_a_lire : contient un nom, et une reference vers un int,double,flag,un Objet_U a lire,ou un Objet_u sur lequel il faut appeler lire_motcle_non_standard
+/*! @brief ptrParam class: contains a name and a reference to an int, double, flag, an Objet_U to read,
+ *   or an Objet_U on which lire_motcle_non_standard must be called.
  *
  */
 class ptrParam: public Objet_U

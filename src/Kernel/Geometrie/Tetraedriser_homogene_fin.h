@@ -18,9 +18,9 @@
 
 
 
-/*! @brief class Tetra_homogene_fin Realise un maillage en decoupant chaque pave en 48 tetraedres
+/*! @brief class Tetra_homogene_fin Creates a mesh by splitting each block into 48 tetrahedra.
  *
- *  Le maillage obtenu n'a pas de directions preferentielles
+ *  The resulting mesh has no preferred directions.
  *
  *
  * @sa Interprete

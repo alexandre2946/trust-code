@@ -16,9 +16,9 @@
 #ifndef Champ_h_conv_included
 #define Champ_h_conv_included
 
-/*! @brief classe Champ_h_conv Permet d'avoir une visualisation du gradient de temperature
+/*! @brief class Champ_h_conv Allows visualization of the temperature gradient
  *
- * @sa Classe abstraite, Methode abstraite, void me_calculer(double )
+ * @sa Abstract class, Abstract method, void me_calculer(double )
  */
 class Champ_h_conv
 {

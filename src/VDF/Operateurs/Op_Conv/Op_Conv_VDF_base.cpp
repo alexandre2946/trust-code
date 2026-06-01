@@ -29,7 +29,7 @@ Sortie& Op_Conv_VDF_base::printOn(Sortie& s ) const { return s << que_suis_je() 
 
 Entree& Op_Conv_VDF_base::readOn(Entree& s)
 {
-  if (sub_type(Masse_Multiphase, equation())) //convection dans Masse_Multiphase -> champs de debit / titre
+  if (sub_type(Masse_Multiphase, equation())) //convection in Masse_Multiphase -> flow / quality fields
     {
       const Pb_Multiphase& pb = ref_cast(Pb_Multiphase, equation().probleme());
       noms_cc_phases_.dimensionner(pb.nb_phases()), cc_phases_.resize(pb.nb_phases());
@@ -139,7 +139,7 @@ void Op_Conv_VDF_base::dimensionner_blocs_face(matrices_t matrices, const tabs_t
   const DoubleTab& inco = ch.valeurs();
 
   const std::string& nom_inco = ch.le_nom().getString();
-  if (!matrices.count(nom_inco) || semi_impl.count(nom_inco)) return; //pas de bloc diagonal ou semi-implicite -> rien a faire
+  if (!matrices.count(nom_inco) || semi_impl.count(nom_inco)) return; //no diagonal block or semi-implicit -> nothing to do
   const Pb_Multiphase *pbm = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()) : nullptr;
   const Masse_ajoutee_base *corr = pbm && pbm->has_correlation("masse_ajoutee") ? &ref_cast(Masse_ajoutee_base, pbm->get_correlation("masse_ajoutee")) : nullptr;
   Matrice_Morse& mat = *matrices.at(nom_inco), mat2;
@@ -192,11 +192,11 @@ double Op_Conv_VDF_base::calculer_dt_stab() const
       domaine_VDF.domaine().creer_tableau_elements(fluent_);
     }
   fluent_ = 0;
-  // Remplissage du tableau fluent
+  // Fill the fluent array
   double psc;
   int num1, num2, face, elem1;
 
-  // On traite les bords
+  // Process boundary faces
   for (int n_bord = 0; n_bord < domaine_VDF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VDF.les_conditions_limites(n_bord);
@@ -219,7 +219,7 @@ double Op_Conv_VDF_base::calculer_dt_stab() const
         }
     }
 
-  // Boucle sur les faces internes pour remplir fluent
+  // Loop over internal faces to fill fluent
   const int domaine_VDF_nb_faces = domaine_VDF.nb_faces(), premiere_face = domaine_VDF.premiere_face_int();
   for (face = premiere_face; face < domaine_VDF_nb_faces; face++)
     for (int n = 0; n < N; n++)
@@ -228,7 +228,7 @@ double Op_Conv_VDF_base::calculer_dt_stab() const
         eval_fluent(psc, face_voisins(face, 0), face_voisins(face, 1), n, fluent_);
       }
 
-  // Calcul du pas de temps de stabilite a partir du tableau fluent
+  // Compute the stability time step from the fluent array
   if (vitesse().le_nom()=="rho_u" && equation().probleme().is_dilatable())
     diviser_par_rho_si_dilatable(fluent_,equation().milieu());
 
@@ -246,7 +246,7 @@ double Op_Conv_VDF_base::calculer_dt_stab() const
 
   dt_stab = Process::mp_min(dt_stab);
 
-  // astuce pour contourner le type const de la methode
+  // trick to work around the const type of the method
   Op_Conv_VDF_base& op =ref_cast_non_const(Op_Conv_VDF_base, *this);
   op.fixer_dt_stab_conv(dt_stab);
   return dt_stab;
@@ -263,8 +263,8 @@ void Op_Conv_VDF_base::calculer_dt_local(DoubleTab& dt_face) const
   const DoubleVect& vit=equation().inconnue().valeurs();
   DoubleTrav fluent(volumes_entrelaces);
 
-  // Remplissage du tableau fluent
-  // On traite les bords
+  // Fill the fluent array
+  // Process boundary faces
   for (int n_bord = 0; n_bord < domaine_VDF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VDF.les_conditions_limites(n_bord);
@@ -282,7 +282,7 @@ void Op_Conv_VDF_base::calculer_dt_local(DoubleTab& dt_face) const
         }
     }
 
-  // Boucle sur les faces internes pour remplir fluent
+  // Loop over internal faces to fill fluent
   const int domaine_VDF_nb_faces = domaine_VDF.nb_faces(), premiere_face = domaine_VDF.premiere_face_int();
   for (int face = premiere_face; face < domaine_VDF_nb_faces; face++)
     {
@@ -292,12 +292,12 @@ void Op_Conv_VDF_base::calculer_dt_local(DoubleTab& dt_face) const
     }
 
 
-  // Calcul du pas de temps de stabilite a partir du tableau fluent
+  // Compute the stability time step from the fluent array
   if (vitesse().le_nom()=="rho_u" && equation().probleme().is_dilatable())
     diviser_par_rho_si_dilatable(fluent,equation().milieu());
 
   dt_face=(volumes_entrelaces);
-  // Boucle sur les faces de bords
+  // Loop over boundary faces
   for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VDF.les_conditions_limites(n_bord);
@@ -310,7 +310,7 @@ void Op_Conv_VDF_base::calculer_dt_local(DoubleTab& dt_face) const
         }
     }
 
-  // Boucle sur les faces internes
+  // Loop over internal faces
   for (int num_face = premiere_face; num_face<domaine_VDF_nb_faces; num_face++)
     {
       if( sup_strict(fluent[num_face], 1.e-16) ) dt_face(num_face)= volumes_entrelaces(num_face)/fluent[num_face];
@@ -347,7 +347,7 @@ void Op_Conv_VDF_base::calculer_dt_local(DoubleTab& dt_face) const
 //  dt_conv_locaux=dt_face;
 }
 
-// cf Op_Conv_VDF_base::calculer_dt_stab() pour choix de calcul de dt_stab
+// cf Op_Conv_VDF_base::calculer_dt_stab() for the choice of dt_stab computation
 void Op_Conv_VDF_base::calculer_pour_post(Champ_base& espace_stockage,const Nom& option,int comp) const
 {
   if (Motcle(option)=="stabilite")
@@ -363,14 +363,14 @@ void Op_Conv_VDF_base::calculer_pour_post(Champ_base& espace_stockage,const Nom&
       const DoubleVect& vit = vitesse().valeurs();
       const int N = std::min(vit.line_size(), equation().inconnue().valeurs().line_size());
       DoubleTrav fluent(domaine_VDF.domaine().nb_elem_tot(), N);
-      assert(N == 1); // en attendant de coder les boucles...
+      assert(N == 1); // until the loops are coded...
 
-      // Remplissage du tableau fluent
+      // Fill the fluent array
       fluent = 0;
       double psc;
       int num1, num2, face, elem1;
 
-      // On traite les bords
+      // Process boundary faces
       for (int n_bord = 0; n_bord < domaine_VDF.nb_front_Cl(); n_bord++)
         {
           const Cond_lim& la_cl = domaine_Cl_VDF.les_conditions_limites(n_bord);
@@ -392,7 +392,7 @@ void Op_Conv_VDF_base::calculer_pour_post(Champ_base& espace_stockage,const Nom&
             }
         }
 
-      // Boucle sur les faces internes pour remplir fluent
+      // Loop over internal faces to fill fluent
       const int domaine_VDF_nb_faces = domaine_VDF.nb_faces();
       for (face = domaine_VDF.premiere_face_int(); face < domaine_VDF_nb_faces; face++)
         {
@@ -445,8 +445,8 @@ void Op_Conv_VDF_base::get_noms_champs_postraitables(Noms& nom,Option opt) const
 }
 void Op_Conv_VDF_base::creer_champ(const Motcle& motlu)
 {
-  Operateur_Conv_base::creer_champ(motlu); // Do nothing mais bon :-) Maybe some day it will
-  if (sub_type(Masse_Multiphase, equation())) //convection dans Masse_Multiphase -> champs de debit / titre
+  Operateur_Conv_base::creer_champ(motlu); // Do nothing, well :-) Maybe some day it will
+  if (sub_type(Masse_Multiphase, equation())) //convection in Masse_Multiphase -> flow / quality fields
     {
       int i = noms_cc_phases_.rang(motlu), j = noms_vd_phases_.rang(motlu), k = noms_x_phases_.rang(motlu);
       if (i >= 0 && !cc_phases_[i])
@@ -469,9 +469,9 @@ void Op_Conv_VDF_base::creer_champ(const Motcle& motlu)
 
 void Op_Conv_VDF_base::mettre_a_jour(double temps)
 {
-  Operateur_Conv_base::mettre_a_jour(temps); // Do nothing mais bon :-) Maybe some day it will
+  Operateur_Conv_base::mettre_a_jour(temps); // Do nothing, well :-) Maybe some day it will
 
-  if (sub_type(Masse_Multiphase, equation())) //convection dans Masse_Multiphase -> champs de debit / titre
+  if (sub_type(Masse_Multiphase, equation())) //convection in Masse_Multiphase -> flow / quality fields
     {
       const Domaine_VDF& domaine = iter_->domaine();
       const IntTab& f_e = domaine.face_voisins(), &e_f = domaine.elem_faces();
@@ -486,7 +486,7 @@ void Op_Conv_VDF_base::mettre_a_jour(double temps)
 
       if (cc_phases_.size())
         for (n = 0, m = 0; n < N; n++, m += (M > 1))
-          if (cc_phases_[n]) /* mise a jour des champs de debit */
+          if (cc_phases_[n]) /* update of mass flow fields */
             {
               Champ_Face_VDF& c_ph = ref_cast(Champ_Face_VDF, cc_phases_[n].valeur());
               DoubleTab& v_ph = c_ph.valeurs();
@@ -497,12 +497,12 @@ void Op_Conv_VDF_base::mettre_a_jour(double temps)
 
       if (vd_phases_.size())
         for (n = 0, m = 0; n < N; n++, m += (M > 1))
-          if (vd_phases_[n]) /* mise a jour des champs de vitesse debitante */
+          if (vd_phases_[n]) /* update of flow velocity fields */
             {
               const DoubleTab& alp = equation().inconnue().valeurs();
               Champ_Face_VDF& c_ph = ref_cast(Champ_Face_VDF, vd_phases_[n].valeur());
               DoubleTab& v_ph = c_ph.valeurs();
-              /* on remplit la partie aux faces, puis on demande au champ d'interpoler aux elements */
+              /* fill the face part, then ask the field to interpolate to elements */
               for (f = 0; f < domaine.nb_faces(); v_ph(f) *= vit(f, m) * pf(f), f++)
                 for (v_ph(f) = 0, i = 0; i < 2; i++) v_ph(f) += (1. + (vit(f, m) * (i ? -1 : 1) >= 0 ? 1. : -1.) * 1.0 /* FIXME : amont */) / 2 * ((e = f_e(f, i)) >= 0 ? alp(e, n) : balp(f, n));
               c_ph.changer_temps(temps);
@@ -511,7 +511,7 @@ void Op_Conv_VDF_base::mettre_a_jour(double temps)
       DoubleTrav G(N), v(N, D);
       double Gt;
       if (x_phases_.size())
-        for (e = 0; e < domaine.nb_elem(); e++) //titre : aux elements
+        for (e = 0; e < domaine.nb_elem(); e++) //quality: at elements
           {
             for (v = 0, i = 0; i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++)
               for (n = 0; n < N; n++)

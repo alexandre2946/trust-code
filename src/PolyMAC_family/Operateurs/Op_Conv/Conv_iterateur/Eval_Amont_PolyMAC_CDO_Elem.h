@@ -21,18 +21,16 @@
 
 /*! @brief class Eval_Amont_PolyMAC_CDO_Elem
  *
- *  Evaluateur PolyMAC_CDO pour la convection
- *  Le champ convecte est scalaire (Champ_Elem_PolyMAC_CDO)
- *  Schema de convection Amont
- *  Rq:Les evaluateurs de flux convectifs calculent en fait le terme
- *  convectif qui figure au second membre de l'equation d'evolution
- *  c.a.d l'oppose du flux convectif pour la methode EXPLICITE.
+ * @brief PolyMAC_CDO evaluator for convection with a scalar convected field (Champ_Elem_PolyMAC_CDO),
+ *        using an upwind convection scheme.
+ *        Note: convective flux evaluators actually compute the convective term that appears on the
+ *        right-hand side of the evolution equation, i.e., the opposite of the convective flux
+ *        for the EXPLICIT method.
  *
- *  Dans le cas de la methode IMPLICITE les evaluateurs calculent la quantite qui figure
- *  dans le premier membre de l'equation, nous ne prenons pas par consequent l'oppose en
- *  ce qui concerne les termes pour la matrice, par contre pour le second membre nous
- *  procedons comme en explicite mais en ne fesant intervenir que les valeurs fournies
- *  par les conditions limites.
+ *        For the IMPLICIT method, the evaluators compute the quantity that appears on the left-hand
+ *        side of the equation. Consequently, we do not take the opposite for the matrix terms,
+ *        but for the right-hand side we proceed as in the explicit case, involving only the values
+ *        provided by the boundary conditions.
  *
  *
  */
@@ -53,8 +51,8 @@ public:
   inline int calculer_flux_faces_symetrie() const override { return 0; }
   inline int calculer_flux_faces_periodique() const override { return 1; }
 
-  // Fonctions qui servent a calculer le flux de grandeurs scalaires
-  // Elles sont de type double et renvoient le flux
+  // Functions that compute the flux of scalar quantities
+  // They return a double representing the flux
 
   inline double flux_face(const DoubleTab&, int, const Dirichlet_entree_fluide&, int) const override;
   inline double flux_face(const DoubleTab&, int, const Dirichlet_paroi_defilante&, int) const override { return 0; }
@@ -68,8 +66,8 @@ public:
   inline double flux_face(const DoubleTab&, int, const Periodique&, int) const override;
   inline double flux_faces_interne(const DoubleTab&, int) const override;
 
-  // Fonctions qui servent a calculer le flux de grandeurs vectorielles
-  // Elles sont de type void et remplissent le tableau flux
+  // Functions that compute the flux of vector quantities
+  // They are void and fill the flux array
 
   inline void flux_face(const DoubleTab&, int, const Symetrie&, int, DoubleVect& flux) const override { }
   inline void flux_face(const DoubleTab&, int, const Periodique&, int, DoubleVect& flux) const override;
@@ -84,8 +82,8 @@ public:
 
   inline void flux_faces_interne(const DoubleTab&, int, DoubleVect& flux) const override;
 
-  // Fonctions qui servent a calculer les coefficients de la matrice pour des grandeurs
-  // scalaires dans le cas implicite.
+  // Functions that compute the matrix coefficients for scalar quantities
+  // in the implicit case.
 
   inline void coeffs_face(int, int, const Symetrie&, double& aii, double& ajj) const override { }
   inline void coeffs_face(int, int, const Neumann_sortie_libre&, double& aii, double& ajj) const override;
@@ -99,7 +97,7 @@ public:
   inline void coeffs_face(int, int, const Periodique&, double& aii, double& ajj) const override;
   inline void coeffs_faces_interne(int, double& aii, double& ajj) const override;
 
-  // contribution de la derivee en vitesse d'une equation scalaire
+  // contribution of the velocity derivative to a scalar equation
   inline double coeffs_face_bloc_vitesse(const DoubleTab&, int, const Dirichlet_entree_fluide&, int) const override;
   inline double coeffs_face_bloc_vitesse(const DoubleTab&, int, const Dirichlet_paroi_defilante&, int) const override { return 0; }
   inline double coeffs_face_bloc_vitesse(const DoubleTab&, int, const Dirichlet_paroi_fixe&, int) const override { return 0; }
@@ -112,8 +110,8 @@ public:
   inline double coeffs_face_bloc_vitesse(const DoubleTab&, int, const Periodique&, int) const override;
   inline double coeffs_faces_interne_bloc_vitesse(const DoubleTab&, int) const override;
 
-  // Fonctions qui servent a calculer la contribution des conditions limites
-  // au second membre pour l'implicite pour les grandeurs scalaires.
+  // Functions that compute the boundary condition contribution
+  // to the right-hand side for implicit scalar quantities.
 
   inline double secmem_face(int, const Symetrie&, int) const override { return 0; }
   inline double secmem_face(int, const Neumann_sortie_libre&, int) const override;
@@ -127,8 +125,8 @@ public:
   inline double secmem_face(int, const Periodique&, int) const override { return 0; }
   inline double secmem_faces_interne(int) const override { return 0; }
 
-  // Fonctions qui servent a calculer les coefficients de la matrice pour des grandeurs
-  // vectorielles dans le cas implicite.
+  // Functions that compute the matrix coefficients for vector quantities
+  // in the implicit case.
 
   inline void coeffs_face(int, int, const Symetrie&, DoubleVect& aii, DoubleVect& ajj) const override { }
   inline void coeffs_face(int, int, const Neumann_sortie_libre&, DoubleVect& aii, DoubleVect& ajj) const override;
@@ -143,8 +141,8 @@ public:
 
   inline void coeffs_faces_interne(int, DoubleVect& aii, DoubleVect& ajj) const override;
 
-  // Fonctions qui servent a calculer la contribution des conditions limites
-  // au second membre pour l'implicite pour les grandeurs vectorielles.
+  // Functions that compute the boundary condition contribution
+  // to the right-hand side for implicit vector quantities.
 
   inline void secmem_face(int, const Symetrie&, int, DoubleVect&) const override { }
   inline void secmem_face(int, const Neumann_sortie_libre&, int, DoubleVect&) const override;

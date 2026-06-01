@@ -48,22 +48,22 @@ Sous_domaine_dis_base& Domaine_dis_base::sous_domaine_dis(int i)
   return les_sous_domaines_dis_[i].valeur();
 }
 
-/*! @brief Associe un Domaine a l'objet.
+/*! @brief Associates a Domain with the object.
  *
- * @param (Domaine& un_domaine) le domaine a associer au domaine discretise
+ * @param (Domaine& un_domaine) the domain to associate with the discretized domain
  */
 void Domaine_dis_base::associer_domaine(const Domaine& un_domaine)
 {
   le_dom_=un_domaine;
 }
 
-/*! @brief Renvoie la frontiere de Nom nom.
+/*! @brief Returns the boundary of Name nom.
  *
- * (On indexe les frontiere avec leur nom)
+ * (We index the boundaries with their name)
  *
- * @param (Nom& nom) le nom de la frontiere a indexer
- * @return (Frontiere_dis_base&) la frontiere discretisee indexee
- * @throws frontiere de nom inconnu leve par rang_frontiere(Nom&)
+ * @param (Nom& nom) the name of the boundary to index
+ * @return (Frontiere_dis_base&) the indexed discretized boundary
+ * @throws boundary with unknown name thrown by rang_frontiere(Nom&)
  */
 const Frontiere_dis_base& Domaine_dis_base::frontiere_dis(const Nom& nom) const
 {
@@ -75,11 +75,11 @@ Frontiere_dis_base& Domaine_dis_base::frontiere_dis(const Nom& nom)
   return frontiere_dis(rang_frontiere(nom));
 }
 
-/*! @brief Renvoie le rang de la frontiere de Nom nom Renvoie -1 si aucune frontiere ne s'appelle nom.
+/*! @brief Returns the rank of the boundary of Name nom Returns -1 if no boundary is named nom.
  *
- * @param (Nom& nom) le nom de la frontiere dont cherche le rang
- * @return (int) le rang de la frontiere si elle existe -1 sinon
- * @throws pas de frontiere de Nom nom trouvee
+ * @param (Nom& nom) the name of the boundary whose rank we seek
+ * @return (int) the rank of the boundary if it exists -1 otherwise
+ * @throws no boundary of Name nom found
  */
 int Domaine_dis_base::rang_frontiere(const Nom& nom) const
 {
@@ -103,9 +103,9 @@ int Domaine_dis_base::rang_frontiere(const Nom& nom)
   return -1;
 }
 
-/*! @brief Ecriture des noms des bords sur un flot de sortie.
+/*! @brief Writes the boundary names to an output stream.
  *
- * @param (Sortie& os) un flot de sortie
+ * @param (Sortie& os) an output stream
  */
 void Domaine_dis_base::ecrire_noms_bords(Sortie& os) const
 {
@@ -189,9 +189,9 @@ void Domaine_dis_base::discretiser_root(const Nom& typ)
     discretiser_no_face();
 
   if (Build_Map_to_Structured::BUILD_MAP_TO_STRUCTURED)
-    build_map_mc_Cmesh(face_ok); /* ici pour avoir l'info sur face_normals */
+    build_map_mc_Cmesh(face_ok); /* here to have the info on face_normals */
 
-  // Remplit les sous_domaines_dis, les type, et leur associe les domaine_dis et les sous_domaine correspondantes.
+  // Fills the sub-domains_dis, their types, and associates the corresponding domaine_dis and sous_domaine objects.
   les_sous_domaines_dis_.dimensionner(dom.nb_ss_domaines());
 
   for (int i=0; i<dom.nb_ss_domaines(); i++)

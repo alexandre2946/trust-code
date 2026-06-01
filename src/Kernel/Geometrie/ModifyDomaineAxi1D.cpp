@@ -20,7 +20,7 @@ Implemente_instanciable(ModifyDomaineAxi1D,"ModifyDomaineAxi1D|Convert_1D_to_1Da
 // XD attr dom chaine dom REQ not_set
 // XD attr bloc bloc_lecture bloc REQ not_set
 //
-// printOn et readOn
+// printOn and readOn
 
 Sortie& ModifyDomaineAxi1D::printOn(Sortie& s ) const
 {

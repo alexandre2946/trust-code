@@ -28,10 +28,10 @@
 Implemente_instanciable(Traitement_particulier_NS_temperature_VEF,"Traitement_particulier_NS_temperature_VEF",Traitement_particulier_NS_temperature);
 
 
-/*! @brief
+/*! @brief Prints the object to an output stream.
  *
- * @param (Sortie& is) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& is) output stream
+ * @return (Sortie&) modified output stream
  */
 Sortie& Traitement_particulier_NS_temperature_VEF::printOn(Sortie& is) const
 {
@@ -39,10 +39,10 @@ Sortie& Traitement_particulier_NS_temperature_VEF::printOn(Sortie& is) const
 }
 
 
-/*! @brief
+/*! @brief Reads the object from an input stream.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) input stream
+ * @return (Entree&) modified input stream
  */
 Entree& Traitement_particulier_NS_temperature_VEF::readOn(Entree& is)
 {
@@ -54,7 +54,7 @@ void Traitement_particulier_NS_temperature_VEF::calcul_temperature()
   const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,mon_equation->domaine_Cl_dis() );
-  //  const DoubleTab& xv = domaine_VEF.xv();    // centre de gravite des faces
+  //  const DoubleTab& xv = domaine_VEF.xv();    // face centers of gravity
   int nb_front=domaine_VEF.nb_front_Cl();
 
 
@@ -116,7 +116,7 @@ void Traitement_particulier_NS_temperature_VEF::calcul_temperature()
               if(tab_temperature(iface)<Tmin) Tmin=tab_temperature(iface);
             }
 
-          // PQ : 06/04/09 : devlpts pour le parallele
+          // PQ : 06/04/09 : developments for parallel execution
           rhoUS  = mp_sum(rhoUS);
           Tmoyen = mp_sum(Tmoyen);
           Tmin   = mp_min(Tmin);
@@ -146,8 +146,8 @@ void Traitement_particulier_NS_temperature_VEF::calcul_temperature()
 
       /*
       /////////////////////////////////////////////////////////////////////////
-      // PQ : 04/08/08 anciennement utilise pour la thermalisation des solides
-      // a conserver en cas de besoin futur
+      // PQ : 04/08/08 formerly used for solid thermalization
+      // to be kept for future use
       /////////////////////////////////////////////////////////////////////////
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()))

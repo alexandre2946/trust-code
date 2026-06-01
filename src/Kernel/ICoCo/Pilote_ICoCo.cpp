@@ -37,12 +37,12 @@ Implemente_instanciable(Pilote_ICoCo,"Pilote_ICoCo",Interprete);
 // XD attr main chaine main REQ not_set
 
 
-/*! @brief Simple appel a: Interprete::printOn(Sortie&)
+/*! @brief Simple call to: Interprete::printOn(Sortie&)
  *
- *     Imprime l'interprete sur un flot de sortie
+ *     Prints the interpreter to an output stream
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Pilote_ICoCo::printOn(Sortie& os) const
 {
@@ -50,10 +50,10 @@ Sortie& Pilote_ICoCo::printOn(Sortie& os) const
 }
 
 
-/*! @brief Simple appel a: Interprete::readOn(Entree&)
+/*! @brief Simple call to: Interprete::readOn(Entree&)
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
  */
 Entree& Pilote_ICoCo::readOn(Entree& is)
 {
@@ -61,18 +61,17 @@ Entree& Pilote_ICoCo::readOn(Entree& is)
 }
 
 
-/*! @brief Fonction principale de l'interprete: resoudre un probleme
+/*! @brief Main function of the interpreter: solve a problem
  *
- *     Le probleme est pilote via l'interface ICoCo
- *     On lui fournit a chaque pas de temps les champs
- *     d'entree "pression_sortie" et "vitesse_entree"
- *     qui sont respectivement un ch_front_input et un ch_front_input_uniforme
- *     Montre l'utilisation de l'avance en temps et des input fields
+ *     The problem is driven via the ICoCo interface.
+ *     At each time step, the input fields "pression_sortie" and "vitesse_entree"
+ *     are provided; these are respectively a ch_front_input and a ch_front_input_uniforme.
+ *     Demonstrates the use of time advancement and input fields.
  *
  */
 
-//     Utilisation dans le JDD : Pilote_ICoCo_1 pb
-//     Utilise dans le cas test U_in_var_impl_ICoCo
+//     Usage in the data file: Pilote_ICoCo_1 pb
+//     Used in the test case U_in_var_impl_ICoCo
 void main_pilote_icoco_1(Probleme_U& pb_to_solve)
 {
   ProblemTrio pb;
@@ -176,17 +175,16 @@ void main_pilote_icoco_1(Probleme_U& pb_to_solve)
   pb.terminate();
 
 }
-/*! @brief Fonction principale de l'interprete: resoudre un probleme
+/*! @brief Main function of the interpreter: solve a problem
  *
- *     Le probleme est pilote via l'interface ICoCo.
- *     On lui fournit a chaque pas de temps le champ
- *     d'entree "puissance" qui est un Champ_input_P0
- *     Montre l'utilisation de l'avance en temps et des input fields
+ *     The problem is driven via the ICoCo interface.
+ *     At each time step, the input field "puissance" is provided; it is a Champ_input_P0.
+ *     Demonstrates the use of time advancement and input fields.
  *
  */
 
-//     Utilisation dans le JDD : Pilote_ICoCo_2 pb
-//     Utilise dans le cas test ChDonXYZ_ICoCo
+//     Usage in the data file: Pilote_ICoCo_2 pb
+//     Used in the test case ChDonXYZ_ICoCo
 void main_pilote_icoco_2(Probleme_U& pb_to_solve)
 {
   ProblemTrio pb;
@@ -448,13 +446,13 @@ void main_pilote_icoco_4(Probleme_U& pb_to_solve, int sortie_root_directory, int
 }
 
 
-/*! @brief Fonction principale de l'interprete: resoudre un probleme
+/*! @brief Main function of the interpreter: solve a problem
  *
- *     Le probleme est pilote via l'interface ICoCo
- *     Le troisieme pas de temps est effectue deux fois
+ *     The problem is driven via the ICoCo interface.
+ *     The third time step is performed twice.
  *
- * @param (Entree& is) un flot d'entree
- * @return le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return the modified input stream
  */
 void main_abort( Probleme_U& pb_to_solve)
 {

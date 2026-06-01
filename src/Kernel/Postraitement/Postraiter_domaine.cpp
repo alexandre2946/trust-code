@@ -47,13 +47,13 @@ void traite_bord(const Domaine& domaine, IntVect& ch_som, IntVect& ch_elem3, int
 
   if (isjoint != 2)
     {
-      // on a pas encore calcule ch_elem3
+      // ch_elem3 has not been computed yet
       ch_elem3 = moi;
       for (j = 0; j < nb_faces; j++)
         for (k = 0; k < nb_som_faces; k++)
           {
             som = faces.sommet(j, k);
-            // cas des polyedres
+            // case of polyhedra
             if (som == -1)
               break;
             if (ch_som(som) == 0)
@@ -167,7 +167,7 @@ void traite_bord(const Domaine& domaine, IntVect& ch_som, IntVect& ch_elem3, int
 
   for (int s = 0; s < nb_elem; s++)
     ch_elem2(s, 0) = (ch_elem3[s]);
-  // on ajoute ce bord
+  // add this boundary
   Noms noms_post(1);
   noms_post[0] = nom_bord;
   Noms unites(1);
@@ -197,7 +197,7 @@ Entree& Postraiter_domaine::interpreter_(Entree& is)
   nom_pdb = "NOM_DU_CAS";
   param.ajouter("fichier|file", &nom_pdb); // XD_ADD_P chaine
   // XD_CONT The file name can be changed with the fichier option.
-  // desactive l'ecriture des joints pratique pour comparer parallele et sequentielle
+  // disables joint writing, useful for comparing parallel and sequential results
   joint_non_ecrit_ = 1;
   param.ajouter("joints_non_postraites", &joint_non_ecrit_); // XD_ADD_P entier(into=[0,1])
   // XD_CONT The joints_non_postraites (1 by default) will not write the boundaries between the partitioned mesh.
@@ -342,15 +342,15 @@ void Postraiter_domaine::ecrire(Nom& nom_pdb)
       int nb_elem = dom.nb_elem();
       IntVect ch_elem2(nb_elem);
       int num = 0;
-      // En format LATA V2, les frontieres et joints
-      // sont ecrits par defaut depuis la 1.6.6 lors
-      // de l'ecriture des domaines si le domaine a ete discretise <=> indice_domaines_frontieres>0
+      // In LATA V2 format, boundaries and joints
+      // are written by default since version 1.6.6 when
+      // writing domains if the domain has been discretized <=> indice_domaines_frontieres>0
       if (format_post_ != "lata" || dom.domaines_frontieres().size() == 0)
         {
           if (dom.domaines_frontieres().size() == 0)
             Cerr << "Warning: it could be faster and nicer to discretize your domain before using Postraiter_domaine." << finl;
           //////////////////////////
-          // Ecriture des frontieres
+          // Write boundaries
           //////////////////////////
           if (ecrire_frontiere_)
             {
@@ -360,8 +360,8 @@ void Postraiter_domaine::ecrire(Nom& nom_pdb)
                 {
                   num = i + nglob;
                   Nom nom_fr = dom.bord(i).le_nom();
-                  // le maitre envoit le nom de la frontiere
-                  // afin que les processeurs traitent les bords dans le meme ordre
+                  // the master broadcasts the boundary name
+                  // so that all processors process boundaries in the same order
                   if (je_suis_maitre())
                     envoyer(nom_fr, 0, -1, 11);
                   else
@@ -397,7 +397,7 @@ void Postraiter_domaine::ecrire(Nom& nom_pdb)
 
               nglob += dom.nb_raccords();
 
-              // On ecrit un champ global
+              // Write a global field
               Noms noms_post(1);
               if (nb_domaine_ == 1)
                 noms_post[0] = "Bord";
@@ -413,7 +413,7 @@ void Postraiter_domaine::ecrire(Nom& nom_pdb)
             }
 
           //////////////////////
-          // Ecriture des joints
+          // Write joints
           //////////////////////
           if (!joint_non_ecrit_)
             for (int p = 0; p < nproc(); p++)
@@ -434,7 +434,7 @@ void Postraiter_domaine::ecrire(Nom& nom_pdb)
                         nom_bord += "_avec_Proc_";
                         nom_bord += Nom(dom.joint(i).PEvoisin());
                       }
-                    // Le processeur p envoie nom_bord a tout le monde
+                    // Processor p broadcasts nom_bord to all processors
                     envoyer_broadcast(nom_bord, p);
                     Faces toto;
                     Cerr << me() << " INFO " << p << " " << nom_bord << finl;
@@ -447,7 +447,7 @@ void Postraiter_domaine::ecrire(Nom& nom_pdb)
               }
         }
       //////////////////////////
-      // Ecriture des sous_domaines
+      // Write sub-domains
       //////////////////////////
       int nb_ss_domaines = dom.nb_ss_domaines();
       int nb_elem_tot = dom.nb_elem_tot();

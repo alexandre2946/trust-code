@@ -31,9 +31,9 @@ Entree& Champ_Generique_Champ::readOn( Entree& is )
 }
 
 
-/*! @brief pb_champ :   declenche la lecture du nom du probleme (nom_pb_) auquel appartient le champ discret et le nom de ce champ discret (nom_champ_)
+/*! @brief pb_champ :   triggers the reading of the problem name (nom_pb_) to which the discrete field belongs and the name of that discrete field (nom_champ_)
  *
- *   nom_source : option pour nommer le champ en tant que source (sinon nommer par defaut)
+ *   nom_source : option to name the field as a source (otherwise named by default)
  *
  */
 void Champ_Generique_Champ::set_param(Param& param) const
@@ -47,7 +47,7 @@ int Champ_Generique_Champ::lire_motcle_non_standard(const Motcle& mot, Entree& i
 {
   if (mot=="champ")
     {
-      // Lecture du champ
+      // Read the field
       is >> champ_;
       set_ref_champ(champ_.valeur());
       ref_champ_.reset();
@@ -60,9 +60,9 @@ void Champ_Generique_Champ::mettre_a_jour(double temps)
 {
   champ_->mettre_a_jour(temps);
 }
-/*! @brief Voir Champ_Generique_base::get_champ.
+/*! @brief See Champ_Generique_base::get_champ.
  *
- * Ici, l'espace_stockage n'est pas utilise, le champ existe deja
+ * Here, the storage space is not used, the field already exists
  *
  */
 const Champ_base& Champ_Generique_Champ::get_champ(OWN_PTR(Champ_base)& espace_stockage) const

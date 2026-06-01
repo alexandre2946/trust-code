@@ -45,7 +45,7 @@ Entree& Solveur_Masse_EF::readOn(Entree& s)
 
 ///////////////////////////////////////////////////////////////
 //
-//  Implementation des fonctions de la classe Solveur_Masse_EF
+//  Implementation of the Solveur_Masse_EF class functions
 //
 //////////////////////////////////////////////////////////////
 
@@ -72,7 +72,7 @@ DoubleTab& Solveur_Masse_EF::appliquer_impl(DoubleTab& sm) const
   int nb_som_face=faces_sommets.dimension(1);
   if (sm.nb_dim() == 1)
     {
-      // On traite les faces standard qui ne portent pas de conditions aux limites
+      // Process standard faces that do not carry boundary conditions
 
       for (int som=0; som<nbsom; som++)
         {
@@ -80,11 +80,11 @@ DoubleTab& Solveur_Masse_EF::appliquer_impl(DoubleTab& sm) const
 
         }
 
-      // On traite les faces non standard
-      // les faces des bord sont des faces non standard susceptibles de porter des C.L
-      // les faces internes non standard ne portent pas de C.L
+      // Process non-standard faces
+      // boundary faces are non-standard faces that may carry boundary conditions
+      // non-standard internal faces do not carry boundary conditions
 
-      // On traite les conditions aux limites
+      // Process boundary conditions
       int nb_cl=domaine_Cl_EF.nb_cond_lim();
       for (int n_bord=0; n_bord<nb_cl; n_bord++)
         {
@@ -98,7 +98,7 @@ DoubleTab& Solveur_Masse_EF::appliquer_impl(DoubleTab& sm) const
                ||
                (sub_type(Dirichlet_homogene,la_cl.valeur()))
              )
-            // Pour les faces de Dirichlet on met sm a 0
+            // For Dirichlet faces, set sm to 0
             for (face=num1; face<num2; face++)
               for (int s=0; s<nb_som_face; s++)
                 {
@@ -112,7 +112,7 @@ DoubleTab& Solveur_Masse_EF::appliquer_impl(DoubleTab& sm) const
   else
     {
       int nbcomp = sm.dimension(1);
-      // On traite les faces standard qui ne portent pas de conditions aux limites
+      // Process standard faces that do not carry boundary conditions
 
       for (int som=0; som<nbsom; som++)
         {
@@ -121,11 +121,11 @@ DoubleTab& Solveur_Masse_EF::appliquer_impl(DoubleTab& sm) const
 
         }
 
-      // On traite les faces non standard
-      // les faces des bord sont des faces non standard susceptibles de porter des C.L
-      // les faces internes non standard ne portent pas de C.L
+      // Process non-standard faces
+      // boundary faces are non-standard faces that may carry boundary conditions
+      // non-standard internal faces do not carry boundary conditions
 
-      // On traite les conditions aux limites
+      // Process boundary conditions
       if (domaine_Cl_EF.equation().inconnue().nature_du_champ()==vectoriel)
         domaine_Cl_EF.imposer_symetrie(sm);
       int nb_cl=domaine_Cl_EF.nb_cond_lim();
@@ -141,7 +141,7 @@ DoubleTab& Solveur_Masse_EF::appliquer_impl(DoubleTab& sm) const
                ||
                (sub_type(Dirichlet_homogene,la_cl.valeur()))
              )
-            // Pour les faces de Dirichlet on met sm a 0
+            // For Dirichlet faces, set sm to 0
             for (face=num1; face<num2; face++)
               for (int s=0; s<nb_som_face; s++)
                 {
@@ -177,7 +177,7 @@ Matrice_Base& Solveur_Masse_EF::ajouter_masse(double dt, Matrice_Base& matrice, 
 {
   if (penalisation||(le_dom_Cl_EF->equation().inconnue().nature_du_champ()!=vectoriel))
     return Solveur_Masse_base::ajouter_masse(dt,matrice,penalisation);
-  // Sinon on modifie temporairement la nature du champ pour que appliquer_impl ne projette pas sur n.
+  // Otherwise temporarily change the field type so that appliquer_impl does not project onto n.
   Champ_Inc_base& inco=ref_cast_non_const( Champ_Inc_base,le_dom_Cl_EF->equation().inconnue());
   inco.fixer_nature_du_champ(multi_scalaire);
   Solveur_Masse_base::ajouter_masse(dt,matrice,penalisation);
@@ -193,7 +193,7 @@ DoubleTab& Solveur_Masse_EF::ajouter_masse(double dt, DoubleTab& x, const Double
   if (penalisation||(le_dom_Cl_EF->equation().inconnue().nature_du_champ()!=vectoriel))
     return Solveur_Masse_base::ajouter_masse(dt,x,y,penalisation, use_old_volumes);
 
-  // Sinon on modifie temporairement la nature du champ pour que appliquer_impl ne projette pas sur n.
+  // Otherwise temporarily change the field type so that appliquer_impl does not project onto n.
   Champ_Inc_base& inco=ref_cast_non_const( Champ_Inc_base,le_dom_Cl_EF->equation().inconnue());
   inco.fixer_nature_du_champ(multi_scalaire);
   Solveur_Masse_base::ajouter_masse(dt,x,y,penalisation, use_old_volumes);

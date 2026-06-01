@@ -61,9 +61,9 @@ Entree& Schema_Adams_Moulton_order_3::readOn(Entree& s)
   return Schema_Adams_Moulton_base::readOn(s);
 }
 
-//On calcule la valeur moyenne entre borne_inf et borne_sup du polynome de lagrange de degre 2 :
-//- qui vaut 0 en a et en b
-//- qui vaut 1 en c
+// Computes the average value between borne_inf and borne_sup of the degree-2 Lagrange polynomial:
+// - which equals 0 at a and b
+// - which equals 1 at c
 static double integrate_lagrangian_basis(double a, double b, double c, double borne_inf, double borne_sup)
 {
   double result  = 0.;
@@ -83,10 +83,10 @@ static double integrate_lagrangian_basis(double a, double b, double c, double bo
 }
 
 
-/*! @brief Renvoie le nombre de valeurs temporelles a conserver.
+/*! @brief Returns the number of temporal values to keep.
  *
- * 3 valeurs temporelles : tn-1, tn, tn+1
- *  1 valeur de plus pour le fonctionnement des algorithmes de l'implicite
+ * 3 temporal values: tn-1, tn, tn+1
+ * 1 extra value for the implicit algorithm machinery.
  *
  */
 int Schema_Adams_Moulton_order_3::nb_valeurs_temporelles() const

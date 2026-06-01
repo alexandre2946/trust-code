@@ -17,7 +17,7 @@
 #include <assert.h>
 #include <TRUSTTab.h>
 
-//  Attention: le constructeur par defaut n'initialise pas le vecteur !
+//  Warning: the default constructor does not initialize the vector!
 class Vecteur3
 {
 public:

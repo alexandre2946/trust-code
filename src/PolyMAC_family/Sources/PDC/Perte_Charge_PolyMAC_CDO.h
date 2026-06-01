@@ -19,22 +19,22 @@
 #include <Perte_Charge_Gen.h>
 #include <Domaine_PolyMAC_CDO.h>
 
-//! Factorise les fonctionnalites de plusieurs pertes de charge en VEF, vitesse aux faces
+//! Factorises the features of several pressure drop classes in VEF, face velocity
 /**
-   Perte_Charge_Isotrope, Perte_Charge_Directionnelle et
-   Perte_Charge_Anisotrope heritent de Perte_Charge_PolyMAC_CDO. Elles
-   doivent surcharger essentiellement readOn() et perte_charge().
-   readOn() est suppose lire au moins diam_hydr et sous_domaine.
+   Perte_Charge_Isotrope, Perte_Charge_Directionnelle and
+   Perte_Charge_Anisotrope inherit from Perte_Charge_PolyMAC_CDO. They
+   must override essentially readOn() and perte_charge().
+   readOn() is expected to read at least diam_hydr and sous_domaine.
 
-   Ces classes sont censees remplacer Perte_Charge_PolyMAC_CDO_Face
-   et Perte_Charge_PolyMAC_CDO_P1NC.
+   These classes are intended to replace Perte_Charge_PolyMAC_CDO_Face
+   and Perte_Charge_PolyMAC_CDO_P1NC.
 */
 
 class Perte_Charge_PolyMAC_CDO : public Perte_Charge_Gen
 {
   Declare_base(Perte_Charge_PolyMAC_CDO);
 public:
-  DoubleTab& ajouter(DoubleTab& ) const override; //!< Appelle perte_charge pour chaque face ou cela est necessaire
+  DoubleTab& ajouter(DoubleTab& ) const override; //!< Calls perte_charge for each face where it is necessary
   void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override ;
 
   const Domaine_PolyMAC_CDO& le_dom_poly()  const  { return ref_cast(Domaine_PolyMAC_CDO, le_dom_vf_.valeur()); }

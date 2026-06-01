@@ -37,8 +37,8 @@ public:
   inline DoubleVect& tab_d_reel();
   DoubleVect& equivalent_distance_name(DoubleVect& d_eq, const Nom& nom_bord) const override;
 protected:
-  DoubleVect tab_d_reel_;   // tableau des distances (dimenssionnelles) du
-  // point y+ = 1
+  DoubleVect tab_d_reel_;   // array of (dimensional) distances to
+  // the y+ = 1 point
 };
 
 #endif /* Paroi_scal_hyd_base_EF_included */

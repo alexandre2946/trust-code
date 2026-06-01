@@ -94,7 +94,7 @@ Entree& Champ_Don_Fonc_txyz::readOn(Entree& is)
       Cerr << "Interpretation of function " << tmp << " Ok" << finl;
     }
 
-  // On remplit le tableau des valeurs aux elements
+  // Fill the element value array
   Domaine& domaine = interprete_get_domaine(nom_dom);
   int nb_elems = domaine.nb_elem();
   DoubleTab& mes_val = valeurs();

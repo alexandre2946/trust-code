@@ -22,7 +22,7 @@
 class Nom;
 class Domaine_VF;
 
-/*! @brief Classe Extraire_surface Lecture d'un fichier
+/*! @brief Class Extraire_surface Reading a file
  *
  * @sa Interprete
  */

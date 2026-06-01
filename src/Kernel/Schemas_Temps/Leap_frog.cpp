@@ -32,14 +32,14 @@ Entree& Leap_frog::readOn(Entree& s)
 
 ////////////////////////////////
 //                            //
-// Caracteristiques du schema //
+// Schema characteristics     //
 //                            //
 ////////////////////////////////
 
 
-/*! @brief Renvoie le nombre de valeurs temporelles a conserver.
+/*! @brief Returns the number of temporal values to keep.
  *
- * Ici : n-2, n-1, n, et n+1, donc 4.
+ * Here: n-2, n-1, n, and n+1, so 4.
  *
  */
 int Leap_frog::nb_valeurs_temporelles() const
@@ -47,9 +47,9 @@ int Leap_frog::nb_valeurs_temporelles() const
   return 4;
 }
 
-/*! @brief Renvoie le nombre de valeurs temporelles futures.
+/*! @brief Returns the number of future temporal values.
  *
- * Ici : n+1, donc 1.
+ * Here: n+1, so 1.
  *
  */
 int Leap_frog::nb_valeurs_futures() const
@@ -57,9 +57,9 @@ int Leap_frog::nb_valeurs_futures() const
   return 1 ;
 }
 
-/*! @brief Renvoie le le temps a la i-eme valeur future.
+/*! @brief Returns the time at the i-th future value.
  *
- * Ici : t(n+1)
+ * Here: t(n+1)
  *
  */
 double Leap_frog::temps_futur(int i) const
@@ -68,9 +68,9 @@ double Leap_frog::temps_futur(int i) const
   return temps_courant()+pas_de_temps();
 }
 
-/*! @brief Renvoie le le temps le temps que doivent rendre les champs a l'appel de valeurs()
+/*! @brief Returns the time that fields must return when valeurs() is called.
  *
- *     Ici : t(n+1)
+ *     Here: t(n+1)
  *
  */
 double Leap_frog::temps_defaut() const
@@ -80,19 +80,19 @@ double Leap_frog::temps_defaut() const
 
 /////////////////////////////////////////
 //                                     //
-// Fin des caracteristiques du schema  //
+// End of schema characteristics       //
 //                                     //
 /////////////////////////////////////////
 
 
-/*! @brief Effectue un pas de temps Leap_frog, sur l'equation passee en parametre.
+/*! @brief Performs a Leap_frog time step on the equation passed as parameter.
  *
- * @param (Equation_base& eq) l'equation que l'on veut faire avancer d'un pas de temps
- * @return (int) renvoie toujours 1
+ * @param (Equation_base& eq) the equation to advance by one time step
+ * @return (int) always returns 1
  */
 int Leap_frog::faire_un_pas_de_temps_eqn_base(Equation_base& eq)
 {
-  // EXEMPLE POUR UN SCHEMA EXPLICITE UTILISANT U(n) et U(n+1)
+  // EXAMPLE FOR AN EXPLICIT SCHEME USING U(n) and U(n+1)
   // Un+1=Un+dt*F
   //  Un
   DoubleTab& present = eq.inconnue().valeurs();
@@ -104,10 +104,10 @@ int Leap_frog::faire_un_pas_de_temps_eqn_base(Equation_base& eq)
   eq.derivee_en_temps_inco(futur);
   futur.echange_espace_virtuel();
 
-  // ECRIRE ICI LE CALCUL de U(n+1) EN FONCTION DE U(n) ET DE derivee
+  // WRITE HERE THE COMPUTATION OF U(n+1) AS A FUNCTION OF U(n) AND OF derivee
   // futur*=dt; Un+1=dt*F
   // futur+=present; Un+1=Un+dt*F
-  // SI IL S'AGISSAIT D'UN SCHEMA QUI FAIT INTERVENIR U(n-1)
+  // IF IT WERE A SCHEME INVOLVING U(n-1)
   //    if ((nb_pas_dt_>4) && ((nb_pas_dt_ % 10) != 0)) {
   // if (nb_pas_dt_>4) {
   if ((nb_pas_dt_>4) && ((nb_pas_dt_ % 10) != 0))

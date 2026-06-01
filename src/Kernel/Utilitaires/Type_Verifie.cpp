@@ -18,14 +18,14 @@
 
 static Motcles motcle_obsolete;
 
-// Parcours du jeu de donnees pour verification des mots cles obsoletes
+// Traversal of the data set to check for obsolete keywords
 void verifie(const Nom& type)
 {
   int n=72;
   if( motcle_obsolete.size()!=n)
     {
       int i=0;
-      // Definition des anciens mots cles desormais plus reconnus
+      // Definition of old keywords that are no longer recognized
       motcle_obsolete.dimensionner(n);
       motcle_obsolete[i++] = "Solv_GCP_SSOR";
       motcle_obsolete[i++] = "Frontiere_Ouverte_Rayo_transp_VDF";
@@ -101,40 +101,40 @@ void verifie(const Nom& type)
       motcle_obsolete[i++] = "option_PolyMAC_MPFA";
       assert(i==n);
     }
-  // GF on ne constuit les noms de la nouvelle syntaxe que si necessaire
-  // cela optimise un peu...
+  // GF: the new syntax names are only built if necessary
+  // this optimizes slightly...
   int rang=motcle_obsolete.search((Motcle)type);
   if (rang!=-1)
     {
 
-      // Definition de la nouvelle syntaxe
+      // Definition of the new syntax
       Noms nouvelle_syntaxe(n);
       int i=0;
-      nouvelle_syntaxe[i++] = "1.2, le format du jeu de donnees pour le solveur de pression a change:\nsolveur_pression GCP_ssor { omega 1.5 seuil 1.e-8 impr }\nDevient, pour tenir compte du preconditionneur:\nsolveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-8 impr }";
-      nouvelle_syntaxe[i++] = "1.4.9, il devient Frontiere_Ouverte_Rayo_transp";
-      nouvelle_syntaxe[i++] = "1.4.9, il devient Frontiere_Ouverte_Rayo_transp";
+      nouvelle_syntaxe[i++] = "1.2, the format of the data set for the pressure solver has changed:\nsolveur_pression GCP_ssor { omega 1.5 seuil 1.e-8 impr }\nBecomes, to account for the preconditioner:\nsolveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-8 impr }";
+      nouvelle_syntaxe[i++] = "1.4.9, it becomes Frontiere_Ouverte_Rayo_transp";
+      nouvelle_syntaxe[i++] = "1.4.9, it becomes Frontiere_Ouverte_Rayo_transp";
       nouvelle_syntaxe[i++] = "1.5.";
-      nouvelle_syntaxe[i++] = "1.5, il devient Lire_MED";
-      nouvelle_syntaxe[i++] = "1.5, il devient Ecrire_MED, puis Write_MED a v1.9.2";
-      nouvelle_syntaxe[i++] = "1.5, il devient Canal";
-      nouvelle_syntaxe[i++] = "1.5, il suffit de mettre Prandtl";
-      nouvelle_syntaxe[i++] = "1.5.1, il est a remplacer par generic";
-      nouvelle_syntaxe[i++] = "1.5.1, il n'est plus necessaire dans la definition de la loi de paroi Shifted";
-      nouvelle_syntaxe[i++] = "1.5.1, il devient Temperature_paroi";
-      nouvelle_syntaxe[i++] = "1.5.1, on doit utiliser Champ_front_fonc_XYZ a la place";
-      nouvelle_syntaxe[i++] = "1.5.1, on doit utiliser Champ_front_fonc_XYZ a la place";
-      nouvelle_syntaxe[i++] = "1.5.1, on doit utiliser Champ_fonc_XYZ a la place";
-      nouvelle_syntaxe[i++] = "1.5.1, on doit utiliser Puissance_Thermique a la place";
-      nouvelle_syntaxe[i++] = "1.5.1, on doit utiliser Source_Constituant a la place";
-      nouvelle_syntaxe[i++] = "1.5.1, on doit utiliser Seuil_convergence_implicite a la place";
-      nouvelle_syntaxe[i++] = "1.5.1, on doit utiliser Seuil_convergence_solveur a la place";
-      nouvelle_syntaxe[i++] = "1.5.1, on doit utiliser Seuil_convergence_variable a la place";
-      nouvelle_syntaxe[i++] = "1.5.2, on doit utiliser Sch_CN_EX_iteratif ou Sch_CN_iteratif a la place";
-      nouvelle_syntaxe[i++] = "1.5.2, on doit utiliser Resoudre a la place";
-      nouvelle_syntaxe[i++] = "1.5.2, on doit utiliser Resoudre a la place";
-      nouvelle_syntaxe[i++] = "1.5.3, on doit utiliser le mot cle Periodique dans le decoupeur pour specifier les bords periodiques.";
-      nouvelle_syntaxe[i++] = "1.5.5, on doit utiliser Declarer_bord_perio { ... }";
-      nouvelle_syntaxe[i++] = "1.5.7, il n'est plus necessaire pour paralleliser certaines conditions limites.";
+      nouvelle_syntaxe[i++] = "1.5, it becomes Lire_MED";
+      nouvelle_syntaxe[i++] = "1.5, it becomes Ecrire_MED, then Write_MED at v1.9.2";
+      nouvelle_syntaxe[i++] = "1.5, it becomes Canal";
+      nouvelle_syntaxe[i++] = "1.5, just use Prandtl";
+      nouvelle_syntaxe[i++] = "1.5.1, it should be replaced by generic";
+      nouvelle_syntaxe[i++] = "1.5.1, it is no longer necessary in the definition of the Shifted wall law";
+      nouvelle_syntaxe[i++] = "1.5.1, it becomes Temperature_paroi";
+      nouvelle_syntaxe[i++] = "1.5.1, you should use Champ_front_fonc_XYZ instead";
+      nouvelle_syntaxe[i++] = "1.5.1, you should use Champ_front_fonc_XYZ instead";
+      nouvelle_syntaxe[i++] = "1.5.1, you should use Champ_fonc_XYZ instead";
+      nouvelle_syntaxe[i++] = "1.5.1, you should use Puissance_Thermique instead";
+      nouvelle_syntaxe[i++] = "1.5.1, you should use Source_Constituant instead";
+      nouvelle_syntaxe[i++] = "1.5.1, you should use Seuil_convergence_implicite instead";
+      nouvelle_syntaxe[i++] = "1.5.1, you should use Seuil_convergence_solveur instead";
+      nouvelle_syntaxe[i++] = "1.5.1, you should use Seuil_convergence_variable instead";
+      nouvelle_syntaxe[i++] = "1.5.2, you should use Sch_CN_EX_iteratif or Sch_CN_iteratif instead";
+      nouvelle_syntaxe[i++] = "1.5.2, you should use Resoudre instead";
+      nouvelle_syntaxe[i++] = "1.5.2, you should use Resoudre instead";
+      nouvelle_syntaxe[i++] = "1.5.3, you should use the keyword Periodique in the partitioner to specify periodic boundaries.";
+      nouvelle_syntaxe[i++] = "1.5.5, you should use Declarer_bord_perio { ... }";
+      nouvelle_syntaxe[i++] = "1.5.7, it is no longer necessary to parallelize certain boundary conditions.";
       nouvelle_syntaxe[i++] = "1.5.7, you should use Extruder_en3 keyword and after RegroupeBord keyword to create periodic boundary.";
       nouvelle_syntaxe[i++] = "1.6.0, you should use Extruder keyword and after RegroupeBord keyword to create periodic boundary.";
       nouvelle_syntaxe[i++] = "1.6.0, you should use ScatterFormatte.";
@@ -188,6 +188,6 @@ void verifie(const Nom& type)
       Cerr << "Look if necessary at the reference manual and change your data file." << finl;
       Process::exit();
     }
-  // Parcours les releases notes pour afficher des infos en relation avec le mot cle type
+  // Traverse the release notes to display info related to the keyword type
   cherche_dans_les_releases_notes(type);
 }

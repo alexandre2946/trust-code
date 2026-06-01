@@ -18,7 +18,7 @@
 
 #include <Interprete_geometrique_base.h>
 
-/*! @brief Classe Reordonner Cette classe est un interprete qui sert a reordonner les noeuds d'un domaine.
+/*! @brief Class Reordonner This class is an interpreter used to reorder the nodes of a domain.
  *
  */
 template <typename _SIZE_>

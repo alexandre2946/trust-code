@@ -113,7 +113,7 @@ int Masse_Multiphase::has_interface_blocs() const
   return ok;
 }
 
-/* l'evanescence passe en dernier */
+/* evanescence is processed last */
 void Masse_Multiphase::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   Equation_base::dimensionner_blocs(matrices, semi_impl);
@@ -126,10 +126,10 @@ void Masse_Multiphase::assembler_blocs_avec_inertie(matrices_t matrices, DoubleT
   if (evanescence_) evanescence_->ajouter_blocs(matrices, secmem, semi_impl);
 }
 
-/*! @brief Associe un milieu physique a l'equation, le milieu est en fait caste en Fluide_base
+/*! @brief Associates a physical medium to the equation; the medium is cast to Fluide_base.
  *
- * @param (Milieu_base& un_milieu)
- * @throws les proprietes physiques du fluide ne sont pas toutes specifiees
+ * @param un_milieu Physical medium to associate.
+ * @throws not all physical properties of the fluid are specified
  */
 void Masse_Multiphase::associer_milieu_base(const Milieu_base& un_milieu)
 {
@@ -137,7 +137,7 @@ void Masse_Multiphase::associer_milieu_base(const Milieu_base& un_milieu)
   associer_fluide(un_fluide);
 }
 
-/*! @brief Associe l inconnue de l equation a la loi d etat,
+/*! @brief Associates the unknown of the equation to the state law.
  *
  */
 void Masse_Multiphase::completer()
@@ -148,7 +148,7 @@ void Masse_Multiphase::completer()
   const Domaine_dis_base& zdis = domaine_dis();
   if (discretisation().is_vdf())
     {
-      // initialiser l'operateur grad SI VDF
+      // initialize the grad operator if VDF
       Op_Grad_.associer_eqn(*this);
       Op_Grad_.typer();
       Op_Grad_.l_op_base().associer_eqn(*this);
@@ -180,7 +180,7 @@ void Masse_Multiphase::verifier_somme_alpha()
     }
 }
 
-/*! @brief Discretise l'equation.
+/*! @brief Discretizes the equation.
  *
  */
 void Masse_Multiphase::discretiser()
@@ -189,7 +189,7 @@ void Masse_Multiphase::discretiser()
   double temps = schema_temps().temps_courant();
   const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
   Cerr << "Volume fraction discretization" << finl;
-  //On utilise temperature pour la directive car discretisation identique
+  // Use temperature directive since the discretization is identical
   const Pb_Multiphase& pb = ref_cast(Pb_Multiphase, probleme());
   dis.discretiser_champ("temperature",domaine_dis(),"alpha","sans_dimension", pb.nb_phases(),nb_valeurs_temp,temps,l_inco_ch_);
   l_inco_ch_->fixer_nature_du_champ(pb.nb_phases() == 1 ? scalaire : pb.nb_phases() == dimension ? vectoriel : multi_scalaire); //pfft
@@ -201,12 +201,12 @@ void Masse_Multiphase::discretiser()
   Cerr << "Masse_Multiphase::discretiser() ok" << finl;
 }
 
-/*! @brief Renvoie le milieu physique de l'equation.
+/*! @brief Returns the physical medium associated with the equation.
  *
- * (un Fluide_base upcaste en Milieu_base)
- *     (version const)
+ * (a Fluide_base upcasted to Milieu_base)
+ *     (const version)
  *
- * @return (Milieu_base&) le Fluide_base upcaste en Milieu_base
+ * @return The Fluide_base upcasted to Milieu_base.
  */
 const Milieu_base& Masse_Multiphase::milieu() const
 {
@@ -214,11 +214,11 @@ const Milieu_base& Masse_Multiphase::milieu() const
 }
 
 
-/*! @brief Renvoie le milieu physique de l'equation.
+/*! @brief Returns the physical medium associated with the equation.
  *
- * (un Fluide_base upcaste en Milieu_base)
+ * (a Fluide_base upcasted to Milieu_base)
  *
- * @return (Milieu_base&) le Fluide_base upcaste en Milieu_base
+ * @return The Fluide_base upcasted to Milieu_base.
  */
 Milieu_base& Masse_Multiphase::milieu()
 {
@@ -226,12 +226,10 @@ Milieu_base& Masse_Multiphase::milieu()
 }
 
 
-/*! @brief Renvoie le fluide incompressible associe a l'equation.
+/*! @brief Returns the incompressible fluid associated with the equation (const version).
  *
- * (version const)
- *
- * @return (Fluide_base&) le fluide incompressible associe a l'equation
- * @throws pas de fluide associe a l'eqaution
+ * @return The incompressible fluid associated with the equation.
+ * @throws If no fluid is associated with the equation.
  */
 const Fluide_base& Masse_Multiphase::fluide() const
 {
@@ -244,10 +242,10 @@ const Fluide_base& Masse_Multiphase::fluide() const
 }
 
 
-/*! @brief Renvoie le fluide incompressible associe a l'equation.
+/*! @brief Returns the incompressible fluid associated with the equation.
  *
- * @return (Fluide_base&) le fluide incompressible associe a l'equation
- * @throws pas de fluide associe a l'eqaution
+ * @return The incompressible fluid associated with the equation.
+ * @throws If no fluid is associated with the equation.
  */
 Fluide_base& Masse_Multiphase::fluide()
 {
@@ -255,11 +253,11 @@ Fluide_base& Masse_Multiphase::fluide()
   return le_fluide_.valeur();
 }
 
-/*! @brief Renvoie le nom du domaine d'application de l'equation.
+/*! @brief Returns the name of the application domain of the equation.
  *
- * Ici "Thermique".
+ * Here "Fraction_volumique".
  *
- * @return (Motcle&) le nom du domaine d'application de l'equation
+ * @return The name of the application domain.
  */
 const Motcle& Masse_Multiphase::domaine_application() const
 {
@@ -267,9 +265,9 @@ const Motcle& Masse_Multiphase::domaine_application() const
   return domaine;
 }
 
-/*! @brief Associe un fluide de type Fluide_base a l'equation.
+/*! @brief Associates a fluid of type Fluide_base with the equation.
  *
- * @param (Fluide_base& un_fluide) le milieu a associer a l'equation
+ * @param un_fluide The fluid medium to associate with the equation.
  */
 void Masse_Multiphase::associer_fluide(const Fluide_base& un_fluide)
 {
@@ -291,20 +289,20 @@ void Masse_Multiphase::calculer_alpha_rho(const Objet_U& obj, DoubleTab& val, Do
             N = val.line_size(),
             cR = sub_type(Champ_Uniforme, ch_rho);
 
-  /* valeurs du champ */
+  /* field values */
   for (int i = 0; i < nl; i++)
     for (int n = 0; n < N; n++)
       val(i, n) = alpha(i, n) * rho(!cR * i, n);
 
-  /* valeur aux bords */
-  /* on ne peut utiliser valeur_aux_bords que si ch_rho a un domaine_dis_base */
+  /* boundary values */
+  /* valeur_aux_bords can only be used if ch_rho has a domaine_dis_base */
   ch_rho.a_un_domaine_dis_base() ? bval = ch_rho.valeur_aux_bords() :
                                           ch_rho.valeur_aux(ref_cast(Domaine_VF, eqn.domaine_dis()).xv_bord(), bval);
 
   tab_multiply_any_shape(bval, ch_alpha.valeur_aux_bords(), VECT_ALL_ITEMS);
 
-  /* derivees */
-  DoubleTab& d_a = deriv["alpha"]; //derivee en alpha : rho
+  /* derivatives */
+  DoubleTab& d_a = deriv["alpha"]; // derivative w.r.t. alpha: rho
   d_a.resize(nl, N);
 
   for (int i = 0; i < nl; i++)
@@ -312,7 +310,7 @@ void Masse_Multiphase::calculer_alpha_rho(const Objet_U& obj, DoubleTab& val, Do
       d_a(i, n) = rho(!cR * i, n);
 
   if (pch_rho)
-    for (auto &&d_c : pch_rho->derivees()) //derivees en les dependances de rho
+    for (auto &&d_c : pch_rho->derivees()) // derivatives w.r.t. the dependencies of rho
       {
         DoubleTab& der = deriv[d_c.first];
         der.resize(nl, N);
@@ -334,13 +332,13 @@ void Masse_Multiphase::calculer_alpha_rho_conv(const Objet_U& obj, DoubleTab& va
              N = val.line_size(),
              cR = sub_type(Champ_Uniforme, ch_rho);
 
-  /* valeurs du champ */
+  /* field values */
   for (int i = 0; i < nl; i++)
     for (int n = 0; n < N; n++)
       val(i, n) = (alpha(i, n) - pbm.alpha_inf_phase(n)) * rho(!cR * i, n);
 
-  /* valeur aux bords */
-  /* on ne peut utiliser valeur_aux_bords que si ch_rho a un domaine_dis_base */
+  /* boundary values */
+  /* valeur_aux_bords can only be used if ch_rho has a domaine_dis_base */
   ch_rho.a_un_domaine_dis_base() ? bval = ch_rho.valeur_aux_bords() :
                                           ch_rho.valeur_aux(ref_cast(Domaine_VF, eqn.domaine_dis()).xv_bord(), bval);
 
@@ -355,8 +353,8 @@ void Masse_Multiphase::calculer_alpha_rho_conv(const Objet_U& obj, DoubleTab& va
 
   tab_multiply_any_shape(bval, calpha, VECT_ALL_ITEMS);
 
-  /* derivees */
-  DoubleTab& d_a = deriv["alpha"]; //derivee en alpha : rho
+  /* derivatives */
+  DoubleTab& d_a = deriv["alpha"]; // derivative w.r.t. alpha: rho
   d_a.resize(nl, N);
 
   for (int i = 0; i < nl; i++)
@@ -364,7 +362,7 @@ void Masse_Multiphase::calculer_alpha_rho_conv(const Objet_U& obj, DoubleTab& va
       d_a(i, n) = rho(!cR * i, n);
 
   if (pch_rho)
-    for (auto &&d_c : pch_rho->derivees()) //derivees en les dependances de rho
+    for (auto &&d_c : pch_rho->derivees()) // derivatives w.r.t. the dependencies of rho
       {
         DoubleTab& der = deriv[d_c.first];
         der.resize(nl, N);
@@ -378,13 +376,13 @@ void Masse_Multiphase::calculer_alpha_rho_conv(const Objet_U& obj, DoubleTab& va
 void Masse_Multiphase::init_champ_convecte() const
 {
   if (champ_convecte_)
-    return; //deja fait
+    return; // already done
 
   const int Nt = inconnue().nb_valeurs_temporelles(),
             Nl = inconnue().valeurs().size_reelle_ok() ? inconnue().valeurs().dimension(0) : -1,
             Nc = inconnue().valeurs().line_size();
 
-  //champ_convecte_ : meme type / support que l'inconnue
+  // champ_convecte_: same type / support as the unknown
   discretisation().creer_champ(champ_convecte_, domaine_dis(), inconnue().que_suis_je(), "N/A", "N/A", Nc, Nl, Nt, schema_temps().temps_courant());
 
   champ_convecte_->associer_eqn(*this);

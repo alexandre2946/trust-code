@@ -25,15 +25,15 @@ class Nom;
 
 enum Option { NONE, DESCRIPTION };
 
-/*! @brief classe Champs_compris_interface Cette classe contient une interface de methodes destinees a gerer
+/*! @brief class Champs_compris_interface This class contains an interface of methods intended to manage
  *
- *               les champs compris (postraitables) pour une classe donnee.
- *               Les classes qui heritent de cette classe sont : Probleme_base, Equation_base, Milieu_base,
+ *               the understood (post-processable) fields for a given class.
+ *               The classes that inherit from this class are: Probleme_base, Equation_base, Milieu_base,
  *               Operateur_base, Source_base, Traitement_particulier_NS_base, Traitement_particulier_Solide_base,
  *               Modele_turbulence_hyd_base, Modele_turbulence_scal_base, Loi_Etat_base, Modele_Fonc_Bas_Reynolds_Base,
- *               Modele_Fonc_Bas_Reynolds_Thermique_Base et l interface est propagee dans leurs classes derivees
+ *               Modele_Fonc_Bas_Reynolds_Thermique_Base and the interface is propagated in their derived classes
  *
- *         Methodes de l interface
+ *         Interface methods:
  *         creer_champ()
  *         get_champ()
  *         get_noms_champs_postraitables()
@@ -50,49 +50,49 @@ public :
   virtual bool has_champ(const Motcle& nom, OBS_PTR(Champ_base)& ref_champ) const=0;
   virtual bool has_champ(const Motcle& nom) const=0;
 
-  //Pour illustrer la description des methodes faite ci-dessous, on pourra
-  //se referer a leur codage dans Probleme_base, Equation_base et Navier_Stokes_std
+  //To illustrate the description of the methods below, one can
+  //refer to their implementation in Probleme_base, Equation_base and Navier_Stokes_std
 
-  // la methode creer_champ()
+  // the creer_champ() method
   /////////////////////////////////////////////////////////////////////////////////
-  //Cette methode permet de creer un "champ calcule". Ce champ de type Champ_Fonc_base
-  //(ex : vorticite) est estime uniquement pour etre postraite et ne sert pas a
-  //la resolution du probleme.
-  //Le probleme delegue a son milieu et ses equations la creation du champ.
-  //Une classe qui identifie le champ comme etant un de ses attributs, le cree
-  //en lancant sa discretisation. Une classe qui porte un "champ calcule" possedera
-  //par consequnt un methode creer_champ(). Cette methode contiendra l appel de la
-  //methode d une classe mere qui possede aussi un ou des "champs calcules"
-  //La mise a jour du champ ne sera faite que si une requete par la methode get_champ()
-  //(voir ci-dessous) est effectuee.
-  //Actuellement seules les equations portent des champs calcules car elles
-  //disposent d un objet discretisation.
+  //This method allows creating a "calculated field". This field of type Champ_Fonc_base
+  //(e.g.: vorticity) is estimated only for post-processing and is not used for
+  //solving the problem.
+  //The problem delegates to its medium and its equations the creation of the field.
+  //A class that identifies the field as one of its attributes creates it
+  //by launching its discretization. A class that carries a "calculated field" will
+  //therefore have a creer_champ() method. This method will contain the call to the
+  //method of a parent class that also has one or more "calculated fields".
+  //The field update will only be done if a request via the get_champ() method
+  //(see below) is made.
+  //Currently only equations carry calculated fields because they
+  //have a discretization object.
   //////////////////////////////////////////////////////////////////////////////
 
-  // la methode get_champ()
+  // the get_champ() method
   ///////////////////////////////////////////////////////////////////////
-  //Cette methode permet de lancer une requete pour recuperer une REF a un
-  //champ a partir de son identifiant (nom) ou de celui d une de ses composantes
-  //Le mecanisme general est le suivant :
-  //-Le probleme delegue la requete a son milieu puis a ses equations si le milieu n a pas identifie
-  //le nom
-  //-La classe qui effectue une requete (ex : Navier_Stokes) interroge sa classe mere pour savoir si
-  //l identifiant correspond a un champs compris par celle-ci ou a l un de ses attributs.
-  //Le mecanisme est recursif, ainsi la classe mere interroge sa propre classe mere ...
-  //Si la hierarchie amont de la classe qui a lance la requete (ex : Navier_Stokes) ne reconnait pas
-  //l identifiant, celle-ci teste ses propres champs compris puis delegue la requete a ses attributs
-  //en cas de reponse negative
+  //This method allows launching a request to retrieve a REF to a
+  //field from its identifier (name) or that of one of its components.
+  //The general mechanism is as follows:
+  //-The problem delegates the request to its medium then to its equations if the medium has not identified
+  //the name.
+  //-The class that makes a request (e.g.: Navier_Stokes) queries its parent class to check if
+  //the identifier corresponds to a field understood by it or to one of its attributes.
+  //The mechanism is recursive, so the parent class queries its own parent class...
+  //If the upstream hierarchy of the class that launched the request (e.g.: Navier_Stokes) does not recognize
+  //the identifier, it tests its own understood fields then delegates the request to its attributes
+  //in case of a negative response.
   ////////////////////////////////////////////////////////////////////////
 
-  // la methode get_noms_champs_postraitables()
+  // the get_noms_champs_postraitables() method
   ////////////////////////////////////////////////////////////////////////
-  //Cette methode permet d informer l utilisateur sur les champs postraitables pour un probleme donne
-  //Le principe de balayage des classes est le meme que pour la methode get_champ() (voir ci-dessus)
-  //-Si l option DESCRIPTION est activee :
-  //Chaque classe concernee par le probleme ecrit l identifiant de ses champs (ou de leurs composantes)
-  //dans le fichier de sortie (err)
-  //-Si l'option NONE est activee (valeur par defaut)
-  //la liste des noms est ajoutee dans nom
+  //This method allows informing the user about the post-processable fields for a given problem.
+  //The class scanning principle is the same as for the get_champ() method (see above).
+  //-If the DESCRIPTION option is activated:
+  //Each class concerned by the problem writes the identifier of its fields (or their components)
+  //in the output file (err).
+  //-If the NONE option is activated (default value):
+  //the list of names is added to nom.
   ////////////////////////////////////////////////////////////////////////
 
 };

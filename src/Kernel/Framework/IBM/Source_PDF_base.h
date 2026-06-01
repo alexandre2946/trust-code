@@ -91,7 +91,7 @@ public:
   void compute_NeighNode_IBM_elem(DoubleTab&, IntLists&, bool all_elem_vois = false);
   inline bool get_imm_wall_law() {return imm_wall_law_;}
 
-  // Methodes de l interface des champs postraitables
+  // Methods of the post-processable fields interface
   void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
   bool has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const override;
   bool has_champ(const Motcle& nom) const override;
@@ -132,12 +132,12 @@ protected:
   double temps_computation_pdf_ = -123.; //time of the computation of sec_mem_pdf
   DoubleTab source_term_PDF; // PDF source term
 
-  mutable OWN_PTR(Champ_Fonc_base)  champ_source_term_PDF_; //!< Champ pour postraitement
-  mutable OWN_PTR(Champ_Fonc_base)  champ_barycentre_IBM_; //!< Champ pour postraitement
-  mutable OWN_PTR(Champ_Fonc_base)  champ_aire_IBM_; //!< Champ pour postraitement
-  mutable OWN_PTR(Champ_Fonc_base)  champ_normal_IBM_; //!< Champ pour postraitement
-  mutable OWN_PTR(Champ_Fonc_base)  champ_vitesse_shape_IBM_; //!< Champ pour postraitement
-  mutable OWN_PTR(Champ_Fonc_base)  champ_pseudo_level_set_IBM_; //!< Champ pour postraitement
+  mutable OWN_PTR(Champ_Fonc_base)  champ_source_term_PDF_; //!< Field for post-processing
+  mutable OWN_PTR(Champ_Fonc_base)  champ_barycentre_IBM_; //!< Field for post-processing
+  mutable OWN_PTR(Champ_Fonc_base)  champ_aire_IBM_; //!< Field for post-processing
+  mutable OWN_PTR(Champ_Fonc_base)  champ_normal_IBM_; //!< Field for post-processing
+  mutable OWN_PTR(Champ_Fonc_base)  champ_vitesse_shape_IBM_; //!< Field for post-processing
+  mutable OWN_PTR(Champ_Fonc_base)  champ_pseudo_level_set_IBM_; //!< Field for post-processing
 
   bool aire_from_prepro_ = false;
   bool rotation_from_prepro_ = false;

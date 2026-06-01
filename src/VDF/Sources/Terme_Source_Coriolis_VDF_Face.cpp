@@ -25,7 +25,7 @@
 #include <Navier_Stokes_std.h>
 #include <Fluide_Dilatable_base.h>
 
-// Ajoute pour compatibilite avec Quasi-Compressible
+// Added for compatibility with Quasi-Compressible
 Implemente_instanciable(Terme_Source_Coriolis_QC_VDF_Face,"Coriolis_QC_VDF_Face",Terme_Source_Coriolis_VDF_Face);
 //// printOn
 //
@@ -105,14 +105,14 @@ void Terme_Source_Coriolis_VDF_Face::ajouter_blocs(matrices_t matrices, DoubleTa
 
   calculer_force_de_Coriolis();
 
-  // Boucle sur les conditions limites pour traiter les faces de bord
+  // Loop over boundary conditions to process boundary faces
 
   for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
 
-      // pour chaque Condition Limite on regarde son type
-      // Si face de Dirichlet ou de Symetrie on ne fait rien
-      // Si face de Neumann on calcule la contribution au terme source
+      // for each boundary condition, check its type
+      // If Dirichlet or Symmetry face, do nothing
+      // If Neumann face, compute the contribution to the source term
 
       const Cond_lim& la_cl = domaine_Cl_VDF.les_conditions_limites(n_bord);
 
@@ -161,7 +161,7 @@ void Terme_Source_Coriolis_VDF_Face::ajouter_blocs(matrices_t matrices, DoubleTa
         }
     }
 
-  // Boucle sur les faces internes
+  // Loop over internal faces
 
   ndeb = domaine_VDF.premiere_face_int();
   for (num_face =domaine_VDF.premiere_face_int(); num_face<domaine_VDF.nb_faces(); num_face++)
@@ -181,8 +181,8 @@ DoubleTab& Terme_Source_Coriolis_VDF_Face::calculer(DoubleTab& resu) const
 
 void Terme_Source_Coriolis_VDF_Face::calculer_force_de_Coriolis() const
 {
-  // On calcule la force de Coriolis par element (maillage entrelace!)
-  // On se ramenera aux faces dans le ajouter
+  // Compute the Coriolis force per element (staggered mesh!)
+  // Will be projected to faces in ajouter
   const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
   const DoubleTab& vitesse = eq_hydraulique().inconnue().valeurs();
   //  int nb_faces = domaine_VDF.nb_faces();
@@ -237,9 +237,8 @@ void Terme_Source_Coriolis_VDF_Face::calculer_force_de_Coriolis() const
       Process::exit();
     }
 
-  // Si l'on est en Quasi Compressible, le terme source doit etre
-  // multiplie par la masse volumique puisque c'est sous cette forme
-  // qu'est ecrite l'equation de NS.
+  // In Quasi-Compressible mode, the source term must be
+  // multiplied by the density since the NS equation is written in this form.
   const Probleme_base& pb = eq_hydraulique().probleme();
   if(pb.is_dilatable())
     {

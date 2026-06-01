@@ -38,17 +38,17 @@ MD_Vector_std::MD_Vector_std(int n)
   blocs_items_to_compute_[1] = n;
 }
 
-/*! @brief Constructeur.
+/*! @brief Constructor.
  *
- * Si nb_items_reels >= 0, items_to_compute contiendra un bloc avec les items reels,
- *    sinon, items_to_compute prendra tous les items (jusqu'a nb_items_tot).
+ * If nb_items_reels >= 0, items_to_compute will contain a block with the real items,
+ *    otherwise, items_to_compute will cover all items (up to nb_items_tot).
  *
- * @param (nb_items_tot) valeur que prendra nb_items_tot_ (doit etre >= 0)
- * @param (nb_items_reels) valeur que prendra nb_items_reels_ (doit etre >= -1, -1 signifie qu'il n'y a pas d'items "reels" groupes au debut du tableau
- * @param (pe_voisins) liste des processeurs voisins, classes dans l'ordre croissant (les tableaux ArrsOfInt doivent avoir la meme taille). Cette liste n'est pas reprise integralement: on retire les processeurs pour lesquels toutes les trois listes d'items sont vides.
- * @param (items_to_send) pour chaque pe_voisin, liste des items a envoyer (communs et virtuels). count_items_to_send_to_items_ est calcule par une communication a partir de items_to_recv.
- * @param (items_to_recv) liste d'items individuels a recevoir des differents procs (souvent des items communs mais ce n'est pas obligatoire, ex front-tracking)
- * @param (blocs_to_recv) liste de blocs d'items a recevoir (voir MD_Vector_std::blocs_to_recv_) (souvent les items virtuels...)
+ * @param (nb_items_tot) value assigned to nb_items_tot_ (must be >= 0)
+ * @param (nb_items_reels) value assigned to nb_items_reels_ (must be >= -1; -1 means there are no "real" items grouped at the start of the array)
+ * @param (pe_voisins) list of neighbouring processors, sorted in ascending order (ArrsOfInt arrays must have the same size). This list is not taken as-is: processors for which all three item lists are empty are removed.
+ * @param (items_to_send) for each pe_voisin, list of items to send (shared and virtual). count_items_to_send_to_items_ is computed via communication from items_to_recv.
+ * @param (items_to_recv) list of individual items to receive from the different procs (often shared items but not necessarily, e.g. front-tracking)
+ * @param (blocs_to_recv) list of blocks of items to receive (see MD_Vector_std::blocs_to_recv_) (often the virtual items...)
  */
 MD_Vector_std::MD_Vector_std(int nb_items_tot, int nb_items_reels, const ArrOfInt& pe_voisins,
                              const ArrsOfInt& items_to_send, const ArrsOfInt& items_to_recv, const ArrsOfInt& blocs_to_recv)
@@ -62,8 +62,8 @@ MD_Vector_std::MD_Vector_std(int nb_items_tot, int nb_items_reels, const ArrOfIn
   assert(items_to_recv.size() == nb_voisins);
   assert(blocs_to_recv.size() == nb_voisins);
 
-  // selection: liste des indices des pe a conserver dans pe_voisins
-  //  (procs avec qui on echange effectivement des donnees)
+  // selection: list of indices of processors to keep in pe_voisins
+  //  (procs with whom data is actually exchanged)
   ArrOfInt tmp, selection;
 
 
@@ -94,7 +94,7 @@ MD_Vector_std::MD_Vector_std(int nb_items_tot, int nb_items_reels, const ArrOfIn
     blocs_to_recv_.set(tmpbis);
   }
 
-  // Calcul de nb_items_to_items_
+  // Compute nb_items_to_items_
   {
     nb_items_to_items_.resize_array(nb_voisins2, RESIZE_OPTIONS::NOCOPY_NOINIT);
     tmp.resize_array(nproc(), RESIZE_OPTIONS::NOCOPY_NOINIT);
@@ -110,7 +110,7 @@ MD_Vector_std::MD_Vector_std(int nb_items_tot, int nb_items_reels, const ArrOfIn
         nb_items_to_items_[i] = n;
       }
   }
-  // Calcul de blocs_items_count_
+  // Compute blocs_items_count_
   {
     blocs_items_count_.resize_array(nb_voisins2, RESIZE_OPTIONS::NOCOPY_NOINIT);
     for (i = 0; i < nb_voisins2; i++)
@@ -127,16 +127,16 @@ MD_Vector_std::MD_Vector_std(int nb_items_tot, int nb_items_reels, const ArrOfIn
         blocs_items_count_[i] = count;
       }
   }
-  // Calcul des blocs d'items sequentiels (items non recus d'un autre proc)
+  // Compute the blocks of sequential items (items not received from another proc)
   tmp.resize_array(nb_items_tot, RESIZE_OPTIONS::NOCOPY_NOINIT);
   {
-    // Marquage des items recus a zero
+    // Mark received items as zero
     tmp = 1;
     const ArrOfInt& items = items_to_recv_.get_data();
     int n = items.size_array();
     for (i = 0; i < n; i++)
       {
-        assert(tmp[items[i]] == 1); // sinon, c'est qu'on recoit deux fois le meme items
+        assert(tmp[items[i]] == 1); // otherwise the same item is received twice
         tmp[items[i]] = 0;
       }
     const ArrOfInt& items2 = blocs_to_recv_.get_data();
@@ -148,12 +148,12 @@ MD_Vector_std::MD_Vector_std(int nb_items_tot, int nb_items_reels, const ArrOfIn
         const int end = items2[i * 2 + 1];
         for (int j = start; j < end; j++)
           {
-            assert(tmp[j] == 1); // sinon, c'est qu'on recoit deux fois le meme items
+            assert(tmp[j] == 1); // otherwise, the same item is received twice
             tmp[j] = 0;
           }
       }
 
-    // Construction d'une liste de blocs d'items sequentiels (ceux qui sont restes a 1)
+    // Build a list of sequential item blocks (those that remained 1)
     ArrOfInt blocs;
 
     int nb_seq = 0;
@@ -178,17 +178,17 @@ MD_Vector_std::MD_Vector_std(int nb_items_tot, int nb_items_reels, const ArrOfIn
   }
 
   // Bloc items to compute:
-  // Par defaut: un seul bloc
+  // Default: a single block
   if (nb_items_reels_ >= 0)
     {
-      // Les operateurs sur les tableaux calculent tous les items reels
+      // Array operators compute all real items
       blocs_items_to_compute_.resize(2, RESIZE_OPTIONS::NOCOPY_NOINIT);
       blocs_items_to_compute_[0] = 0;
       blocs_items_to_compute_[1] = nb_items_reels_;
     }
   else
     {
-      // Les operateurs sur les tableaux calculent tout
+      // Array operators compute everything
       blocs_items_to_compute_.resize(2, RESIZE_OPTIONS::NOCOPY_NOINIT);
       blocs_items_to_compute_[0] = 0;
       blocs_items_to_compute_[1] = nb_items_tot_;
@@ -260,7 +260,7 @@ int find_in_array(const ArrOfInt& a, int x)
   return n;
 }
 
-/*! @brief Renvoie le nombre d'items extraits (pas le nombre de blocs)
+/*! @brief Returns the number of extracted items (not the number of blocks).
  */
 int extract_blocs(const ArrOfInt src, const ArrOfInt& renum, ArrOfInt& dest)
 {
@@ -434,9 +434,9 @@ void MD_Vector_std::fill_md_vect_renum(const IntVect& renum, MD_Vector& md_vect)
 {
   MD_Vector_std dest;
 
-  // Calcul de nb_items_tot_ et nb_items_reels_
-  // nb_items_tot_ est le nombre d'items pour lesquels renum[i] >= 0
-  // Les items reels sont ceux qui etaient reels dans le tableau d'origine et qui sont a conserver
+  // Compute nb_items_tot_ and nb_items_reels_
+  // nb_items_tot_ is the number of items for which renum[i] >= 0
+  // Real items are those that were real in the original array and are to be kept
   {
     const int src_size = get_nb_items_tot();
     const int src_size_r = get_nb_items_reels();
@@ -451,33 +451,33 @@ void MD_Vector_std::fill_md_vect_renum(const IntVect& renum, MD_Vector& md_vect)
               dest.nb_items_reels_++;
           }
       }
-    // Si l'attribut nb_items_reels_ est invalide dans le vecteur source, il est invalide dans le
-    // vecteur resultat:
+    // If the nb_items_reels_ attribute is invalid in the source vector, it is also invalid in the
+    // result vector:
     if (src_size_r < 0)
       dest.nb_items_reels_ = -1;
   }
-  // Remplissage de blocs_items_to_sum_ et blocs_items_to_compute_
-  // Ce sont les items pour lesquels renum[i] >= 0 et qui sont dans les blocs_items_to_sum_
-  // et blocs_items_to_compute_ du descripteur source.
+  // Fill blocs_items_to_sum_ and blocs_items_to_compute_
+  // These are the items for which renum[i] >= 0 and which are in the blocs_items_to_sum_
+  // and blocs_items_to_compute_ of the source descriptor.
   ::extract_blocs(blocs_items_to_sum_, renum, dest.blocs_items_to_sum_);
   dest.nb_items_seq_local_ = ::extract_blocs(blocs_items_to_compute_, renum, dest.blocs_items_to_compute_);
   dest.nb_items_seq_tot_ = Process::mp_sum(dest.nb_items_seq_local_);
 
   // ********************************************************
-  // Calcul des items a recevoir: ce sont les items pour lesquels renum[i] >= 0 et qui etaient a
-  // recevoir dans le descripteur source.
-  // Chaque fois qu'on trouve un item a recevoir, il faut informer le processeur voisin qui possede l'item
-  // que c'est item doit etre envoye (utilisation du schema_comm). Pour identifier ces items, on utilise
-  // sont rang dans le tableau des items a envoyer dans le descripteur source (variable item_rank)
+  // Compute items to receive: these are items for which renum[i] >= 0 and which were to be
+  // received in the source descriptor.
+  // Each time a received item is found, the neighbouring processor that owns it must be notified
+  // that this item needs to be sent (using schema_comm). To identify these items, their rank
+  // in the array of items to send in the source descriptor is used (variable item_rank).
   //
   const int nb_pe_voisins = pe_voisins_.size_array();
   Schema_Comm schema_comm;
   schema_comm.set_send_recv_pe_list(pe_voisins_, pe_voisins_);
   schema_comm.begin_comm();
-  // Calcul des listes items_to_recv
-  // index+data forment les deux tableau d'un StaticIntLists.
-  // On construit pour commencer autant de listes que de processeurs voisins dans le descripteur source.
-  // On retirera a la fin les processeurs qui n'echangent pas de donnees
+  // Compute the items_to_recv lists
+  // index+data form the two arrays of a StaticIntLists.
+  // We first build as many lists as there are neighbouring processors in the source descriptor.
+  // Processors that do not exchange data will be removed at the end.
   ArrOfInt dest_items_recv_index;
   ArrOfInt dest_items_recv_data;
   ArrOfInt dest_blocs_recv_index;
@@ -492,18 +492,18 @@ void MD_Vector_std::fill_md_vect_renum(const IntVect& renum, MD_Vector& md_vect)
     dest_blocs_recv_index[0] = 0;
     dest.blocs_items_count_.resize_array(nb_pe_voisins, RESIZE_OPTIONS::NOCOPY_NOINIT);
     dest.nb_items_to_items_.resize_array(nb_pe_voisins, RESIZE_OPTIONS::NOCOPY_NOINIT);
-    // Preallocation de la taille maxi
+    // Pre-allocate to maximum size
     dest_items_recv_data.resize_array(items_to_recv_.get_data().size_array(), RESIZE_OPTIONS::NOCOPY_NOINIT);
 
     dest_items_recv_data.resize_array(0);
-    // On ne peut pas prevoir le nombre de blocs, il peut y en avoir plus que dans la source
+    // The number of blocks cannot be predicted; there can be more than in the source
 
     for (int i_pe = 0; i_pe < nb_pe_voisins; i_pe++)
       {
         tmp.resize_array(0);
-        int item_rank = 0; // Compteur d'items recus dans le descripteur source
-        // 1) Extraction des items individuels
-        //    (remplissage de dest_items_recv_index, dest_items_recv_data et tmp)
+        int item_rank = 0; // Counter of received items in the source descriptor
+        // 1) Extract individual items
+        //    (fill dest_items_recv_index, dest_items_recv_data and tmp)
         const int n = items_to_recv_.get_list_size(i_pe);
         for (int i = 0; i < n; i++)
           {
@@ -511,26 +511,26 @@ void MD_Vector_std::fill_md_vect_renum(const IntVect& renum, MD_Vector& md_vect)
             const int rj = renum[j];
             if (rj >= 0)
               {
-                // Ajout de cet item
+                // Add this item
                 dest_items_recv_data.append_array(rj);
-                // Demander au processeur voisin d'envoyer cet item
+                // Request that the neighbouring processor sends this item
                 tmp.append_array(item_rank);
               }
             item_rank++;
           }
-        // Initialisation de la taille de la liste d'items pour ce processeur:
+        // Set the list size for items of this processor:
         dest_items_recv_index[i_pe+1] = dest_items_recv_data.size_array();
 
-        // 2) Extraction des blocs d'items recus de ce processeur
-        //    (remplissage de dest_blocs_recv_index dest_blocs_recv_data dest.blocs_items_count_ et tmp)
+        // 2) Extract blocks of items received from this processor
+        //    (fill dest_blocs_recv_index, dest_blocs_recv_data, dest.blocs_items_count_ and tmp)
         const int nblocs = blocs_to_recv_.get_list_size(i_pe) / 2;
-        int received_count = 0; // nombre d'items recus de ce processeur
+        int received_count = 0; // number of items received from this processor
         for (int ibloc = 0; ibloc < nblocs; ibloc++)
           {
             const int jdeb = blocs_to_recv_(i_pe, ibloc * 2);
             const int jfin = blocs_to_recv_(i_pe, ibloc * 2 + 1);
-            int last_added = -2; // ne peut jamais etre egal a rj-1
-            // Pour chaque item du bloc, s'il doit etre conserve, le reporter dans les blocs a recevoir:
+            int last_added = -2; // can never equal rj-1
+            // For each item in the block, if it is to be kept, report it in the blocks to receive:
             for (int j = jdeb; j < jfin; j++)
               {
                 const int rj = renum[j];
@@ -538,39 +538,39 @@ void MD_Vector_std::fill_md_vect_renum(const IntVect& renum, MD_Vector& md_vect)
                   {
                     if (rj <= last_added)
                       {
-                        // Les items dans les blocs a recevoir doivent etre tries dans l'ordre croissant
-                        // (sinon cet algorithme ne marche pas, il faut en utiliser un autre pour
-                        //  construire les blocs, et en plus le comptage des items reels ne veut peut-etre plus rien dire)
+                        // Items in the receive blocks must be sorted in ascending order
+                        // (otherwise this algorithm does not work; a different one is needed to
+                        //  build the blocks, and furthermore counting the real items may no longer make sense)
                         Cerr << "Error in creer_md_vect_renum: renum array is not sorted: cannot extract blocs to recv" << finl;
                         Process::exit();
                       }
-                    // Cet item est-il contigu avec le precedent ?
+                    // Is this item contiguous with the previous one?
                     if (last_added == rj-1)
                       {
-                        // Oui, augmenter la taille du dernier bloc
+                        // Yes, extend the last block
                         const int k = dest_blocs_recv_data.size_array();
-                        // fin de bloc = indice du dernier plus 1
+                        // end of block = index of last + 1
                         dest_blocs_recv_data[k-1] = rj+1;
                       }
                     else
                       {
-                        // Non, creer un nouveau bloc
+                        // No, create a new block
                         dest_blocs_recv_data.append_array(rj);
                         dest_blocs_recv_data.append_array(rj+1);
                       }
                     last_added = rj;
-                    // Demander au processeur voisin d'envoyer cet item
+                    // Request that the neighbouring processor sends this item
                     tmp.append_array(item_rank);
                     received_count++;
                   }
                 item_rank++;
               }
           }
-        // Initialisation de la taille de la liste de blocs pour ce processeur:
+        // Set the list size for blocks of this processor:
         dest_blocs_recv_index[i_pe+1] = dest_blocs_recv_data.size_array();
-        // Nombre d'items recus de ce processeur
+        // Number of items received from this processor
         dest.blocs_items_count_[i_pe] = received_count;
-        // Envoi du tableau tmp au processeur voisin:
+        // Send the tmp array to the neighbouring processor:
         schema_comm.send_buffer(pe_voisins_[i_pe]) << tmp;
       }
   }
@@ -578,14 +578,14 @@ void MD_Vector_std::fill_md_vect_renum(const IntVect& renum, MD_Vector& md_vect)
   schema_comm.echange_taille_et_messages();
 
   // ********************************************************
-  // Construction de dest.items_to_send avec les infos recues
+  // Build dest.items_to_send with the received information
   //
   ArrOfInt dest_items_send_index;
   dest_items_send_index.resize_array(nb_pe_voisins + 1, RESIZE_OPTIONS::NOCOPY_NOINIT);
   ArrOfInt dest_items_send_data;
-  ArrOfInt nb_items_to_items(nb_pe_voisins); // Initialise a zero
+  ArrOfInt nb_items_to_items(nb_pe_voisins); // Initialized to zero
 
-  // Allocation d'une taille par borne superieure:
+  // Allocate to upper-bound size:
   dest_items_send_data.resize_array(items_to_send_.get_data().size_array(), RESIZE_OPTIONS::NOCOPY_NOINIT);
   dest_items_send_index[0] = 0;
   {
@@ -593,20 +593,20 @@ void MD_Vector_std::fill_md_vect_renum(const IntVect& renum, MD_Vector& md_vect)
     int error = 0;
     for (int i_pe = 0; i_pe < nb_pe_voisins; i_pe++)
       {
-        // nb_item_received_single est le nombre d'items dans items_to_send_ qui seront receptionnes
-        //  par items_to_recv_. Les suivants sont recus dans blocs_to_recv_.
+        // nb_item_received_single is the number of items in items_to_send_ that will be received
+        //  by items_to_recv_. The subsequent ones are received in blocs_to_recv_.
         schema_comm.recv_buffer(pe_voisins_[i_pe]) >> tmp;
         const int n = tmp.size_array();
         for (int i = 0; i < n; i++)
           {
-            // tmp contient des indices qui pointent dans items_to_send_
+            // tmp contains indices pointing into items_to_send_
             int j = tmp[i];
-            // k est l'indice dans l'ancien tableau de l'item a envoyer
+            // k is the index in the old array of the item to send
             int k = items_to_send_(i_pe, j);
             int renum_k = renum[k];
-            // Une erreur possible ici: un processeur a besoin d'un item virtuel et l'item
-            // reel a ete supprime sur le processeur source. Il faut alors utiliser un
-            // autre algo pour changer le proprietaire de l'item...
+            // A possible error here: a processor needs a virtual item and the
+            // real item has been removed on the source processor. A different algorithm
+            // must then be used to change the owner of the item...
             if (renum_k < 0)
               error = 1;
             dest_items_send_data[count++] = renum_k;
@@ -620,13 +620,13 @@ void MD_Vector_std::fill_md_vect_renum(const IntVect& renum, MD_Vector& md_vect)
              << " received a request for distant items that are not in the new vector" << finl;
         Process::exit();
       }
-    // On ajuste a la taille definitive
+    // Adjust to the final size
 
     dest_items_send_data.resize_array(count);
   }
   schema_comm.end_comm();
 
-  /* nouveau nb_items_to_items */
+  /* new nb_items_to_items */
   schema_comm.begin_comm();
   for (int i_pe = 0; i_pe < nb_pe_voisins; i_pe++)
     schema_comm.send_buffer(pe_voisins_[i_pe]) << dest_items_recv_index(i_pe + 1) - dest_items_recv_index(i_pe);
@@ -635,10 +635,10 @@ void MD_Vector_std::fill_md_vect_renum(const IntVect& renum, MD_Vector& md_vect)
     schema_comm.recv_buffer(pe_voisins_[i_pe]) >> nb_items_to_items[i_pe];
   schema_comm.end_comm();
 
-  // Construction de la liste de processeurs voisins de dest
-  //  (processeurs avec qui on echange des donnees)
-  // Et compression des indexes des StaticIntLists pour retirer les
-  //  processeurs supprimes.
+  // Build the list of neighbouring processors for dest
+  //  (processors with whom data is exchanged)
+  // And compress the StaticIntLists indexes to remove the
+  //  deleted processors.
   {
     int pe_count = 0;
     dest.pe_voisins_.resize_array(nb_pe_voisins, RESIZE_OPTIONS::NOCOPY_NOINIT);

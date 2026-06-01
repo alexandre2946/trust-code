@@ -15,7 +15,7 @@
 #include <Static_Int_Lists.h>
 #include <TRUSTArrays.h>
 
-/*! @brief detruit toutes les listes
+/*! @brief Destroys all lists.
  */
 template <typename _SIZE_>
 void Static_Int_Lists_32_64<_SIZE_>::reset()
@@ -24,11 +24,11 @@ void Static_Int_Lists_32_64<_SIZE_>::reset()
   valeurs_.resize_array(0);
 }
 
-/*! @brief detruit les listes existantes et en cree de nouvelles.
+/*! @brief Destroys existing lists and creates new ones.
  *
- * On cree autant de listes que d'elements dans le tableau sizes.
- *   La i-ieme liste a une taille sizes[i]
- *   Les valeurs sizes doivent etre positives ou nulles.
+ * Creates as many lists as there are elements in the sizes array.
+ *   The i-th list has a size of sizes[i].
+ *   The sizes values must be non-negative.
  *
  */
 template <typename _SIZE_>
@@ -38,7 +38,7 @@ void Static_Int_Lists_32_64<_SIZE_>::set_list_sizes(const ArrOfInt_t& sizes)
 
   const int_t nb_listes = sizes.size_array();
   index_.resize_array(nb_listes + 1);
-  // Construction du tableau d'index
+  // Build the index array
   index_[0];
   for (int_t i = 0; i < nb_listes; i++)
     {
@@ -49,10 +49,9 @@ void Static_Int_Lists_32_64<_SIZE_>::set_list_sizes(const ArrOfInt_t& sizes)
   valeurs_.resize_array(somme_sizes);
 }
 
-/*! @brief remplace les valeurs stockes par toutes les listes par celles du tableau data.
+/*! @brief Replaces the values stored in all lists with those from the data array.
  *
- * data doit avoir pour taille la somme des tailles de toutes
- *   les listes.
+ * data must have a size equal to the sum of the sizes of all lists.
  *
  */
 template <typename _SIZE_>
@@ -63,7 +62,7 @@ void Static_Int_Lists_32_64<_SIZE_>::set_data(const ArrOfInt_t& data)
 }
 
 #ifndef NDEBUG
-// Verifie la coherence du tableau index et data
+// Check consistency of the index and data arrays
 template <typename _SIZE_>
 static bool check_index_data(const ArrOfInt_T<_SIZE_>& index, const ArrOfInt_T<_SIZE_>& data)
 {
@@ -71,7 +70,7 @@ static bool check_index_data(const ArrOfInt_T<_SIZE_>& index, const ArrOfInt_T<_
     return false;
   if (index[0] != 0)
     return false;
-  const _SIZE_ n = index.size_array() - 1; // nombre de listes
+  const _SIZE_ n = index.size_array() - 1; // number of lists
   for (_SIZE_ i = 0; i < n; i++)
     if (index[i+1] < index[i])
       return false;
@@ -81,8 +80,10 @@ static bool check_index_data(const ArrOfInt_T<_SIZE_>& index, const ArrOfInt_T<_
 }
 #endif
 
-/*! @brief remplace index et data.
+/*! @brief Replaces index and data arrays.
  *
+ * @param index the new index array
+ * @param data the new data array
  */
 template <typename _SIZE_>
 void Static_Int_Lists_32_64<_SIZE_>::set_index_data(const ArrOfInt_t& index, const ArrOfInt_t& data)
@@ -92,10 +93,11 @@ void Static_Int_Lists_32_64<_SIZE_>::set_index_data(const ArrOfInt_t& index, con
   valeurs_ = data;
 }
 
-/*! @brief tri par ordre croissant des valeurs de la i-ieme liste.
+/*! @brief Sorts the values of the i-th list in ascending order.
  *
- * Si num_liste < 0, on trie toutes les listes.
+ * If num_liste < 0, all lists are sorted.
  *
+ * @param num_liste index of the list to sort, or -1 to sort all lists
  */
 template <typename _SIZE_>
 void Static_Int_Lists_32_64<_SIZE_>::trier_liste(int_t num_liste)
@@ -113,8 +115,10 @@ void Static_Int_Lists_32_64<_SIZE_>::trier_liste(int_t num_liste)
     }
 }
 
-/*! @brief copie la i-ieme liste dans le tableau fourni Le tableau array doit etre resizable.
+/*! @brief Copies the i-th list into the provided array. The array must be resizable.
  *
+ * @param i index of the list to copy
+ * @param array destination array to fill
  */
 template <typename _SIZE_>
 void Static_Int_Lists_32_64<_SIZE_>::copy_list_to_array(int_t i, ArrOfInt_t& array) const

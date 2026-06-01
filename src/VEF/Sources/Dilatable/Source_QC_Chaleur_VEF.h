@@ -21,9 +21,9 @@
 
 /*! @brief class  Source_QC_Chaleur_VEF
  *
- *  Cette classe represente un terme source supplementaire a prendre en compte
- *  dans les equations de la chaleur dans le cas ou le fluide est quasi compressible
- *  et pour une discretisation VEF
+ *  This class represents an additional source term to be taken into account
+ *  in the heat equations when the fluid is quasi-compressible
+ *  and for a VEF discretization.
  *
  *
  * @sa Source_base Fluide_Quasi_Compressible Source_QC_Chaleur

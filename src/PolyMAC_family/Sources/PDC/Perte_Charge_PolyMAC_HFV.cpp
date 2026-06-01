@@ -65,20 +65,20 @@ void Perte_Charge_PolyMAC_HFV::ajouter_blocs(matrices_t matrices, DoubleTab& sec
   DoubleTrav pos(D), v(N, D), vm(D), v_ph(D), dir(D), nv(N), Cf(N), Cf_t(N), Fk(N), G(N), mult(N, 2), Sigma_tab;
 
   for (n = 0; n < N; n++)
-    mult(n, 0) = 1, mult(n, 1) = 0; //valeur par defaut de mult
-  if (fmult) //si multiplicateur -> calcul de sigma
+    mult(n, 0) = 1, mult(n, 1) = 0; //default value of mult
+  if (fmult) //if multiplier -> compute sigma
     {
       const Milieu_composite& milc = ref_cast(Milieu_composite, equation().milieu());
-      // Et pour les methodes span de la classe Saturation
-      const int ne_tot = domaine.nb_elem_tot(), nb_max_sat =  N * (N-1) /2; // oui !! suite arithmetique !!
+      // For the span methods of the Saturation class
+      const int ne_tot = domaine.nb_elem_tot(), nb_max_sat =  N * (N-1) /2; // arithmetic series !
       Sigma_tab.resize(ne_tot, nb_max_sat);
       for (k = 0; k < N; k++)
         for (int l = k + 1; l < N; l++)
           if (milc.has_saturation(k, l))
             {
               const Saturation_base& z_sat = milc.get_saturation(k, l);
-              const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Et oui ! matrice triang sup !
-              // recuperer Tsat et sigma ...
+              const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // upper triangular matrix !
+              // retrieve Tsat and sigma ...
               const DoubleTab& sig = z_sat.get_sigma_tab();
 
               // fill in the good case
@@ -87,26 +87,26 @@ void Perte_Charge_PolyMAC_HFV::ajouter_blocs(matrices_t matrices, DoubleTab& sec
             }
     }
 
-  /* contribution de chaque element ou on applique la perte de charge */
+  /* contribution of each element where the pressure drop is applied */
   for (i = 0; i < (pssz ? pssz->nb_elem_tot() : domaine.nb_elem_tot()); i++)
     {
       int e = pssz ? (*pssz)[i] : i;
       for (d = 0; d < D; d++)
         pos(d) = xp(e, d);
 
-      /* vecteur vitesse en e */
+      /* velocity vector at element e */
       double dh_e = C_dh ? dh.valeurs()(0, 0) : dh.valeur_a_compo(pos, 0);
       if (poly_v2)
         for (d = 0; d < D; d++)
           for (n = 0; n < N; n++)
-            v(n, d) = pvit(nf_tot + D * e + d, n); //vitesse par variable auxiliaire
+            v(n, d) = pvit(nf_tot + D * e + d, n); //velocity via auxiliary variable
       else
         for (v = 0, j = 0; j < e_f.dimension(1) && (f = e_f(e, j)) >= 0; j++)
           for (n = 0; n < N; n++)
-            for (d = 0; d < D; d++) /* PolyMAC_HFV V1 : vitesse a reconstruire */
+            for (d = 0; d < D; d++) /* PolyMAC_HFV V1: velocity to reconstruct */
               v(n, d) += fs(f) * pf(f) / (ve(e) * pe(e)) * (xv(f, d) - xp(e, d)) * (e == f_e(f, 0) ? 1 : -1) * pvit(f, n);
 
-      /* norme de v (avec seuil), debit surfacique par phase et total */
+      /* norm of v (with threshold), mass flux per phase and total */
       for (n = 0, Gm = 0; n < N; Gm += G(n), n++)
         nv(n) = std::max(v_min, sqrt(domaine.dot(&v(n, 0), &v(n, 0)))), G(n) = (alp ? (*alp)(e, n) : 1) * rho(!cR * e, n) * nv(n);
       for (arm = 0, n = 0; n < N; n++)
@@ -116,28 +116,28 @@ void Perte_Charge_PolyMAC_HFV::ajouter_blocs(matrices_t matrices, DoubleTab& sec
         vm(d) /= arm;
       nvm = std::max(v_min, sqrt(domaine.dot(&vm(0), &vm(0))));
 
-      /* coefficients de frottements par composante : Cf(n) (phase seule), Cf_t(n) (le debit total dans cette phase) */
+      /* friction coefficients per component: Cf(n) (single phase), Cf_t(n) (total flow rate in this phase) */
       for (n = 0; n < N; n++)
         {
           double Re = dh_e * std::max(G(n), 1e-10) / mu(!cM * e, n), Re_m = dh_e * Gm / mu(!cM * e, n);
           for (d = 0; d < D; d++)
             v_ph(d) = v(n, d);
-          /* phase seule */
+          /* single phase */
           coeffs_perte_charge(v_ph, pos, t, nv(n), dh_e, nu(!cN * e, n), Re, C_iso, C_dir, v_dir, dir);
           Cf(n) = (C_iso + (C_dir - C_iso) * (nv(n) > 1e-8 ? std::pow(domaine.dot(&v(n, 0), &dir(0)), 2) / (nv(n) * nv(n)) : 0)) * 2 * dh_e / std::max(nv(n), 1e-10);
-          /* tout le melange dans la phase */
+          /* entire mixture in the phase */
           coeffs_perte_charge(vm, pos, t, nvm, dh_e, nu(!cN * e, n), Re_m, C_iso, C_dir, v_dir, dir);
           Cf_t(n) = (C_iso + (C_dir - C_iso) * (nvm > 1e-8 ? std::pow(domaine.dot(&vm(0), &dir(0)), 2) / (nvm * nvm) : 0)) * 2 * dh_e / std::max(nvm, 1e-10);
           Fk(n) = Cf(n) * G(n) * G(n) / rho(!cR * e, n) / 2.0 / dh_e; //force
         }
-      Fm = Cf_t(0) * Gm * Gm / rho(!cR * e, 0) / 2.0 / dh_e; //force paroi "melange" (debit total, mais proprietes physiques du liquide)
+      Fm = Cf_t(0) * Gm * Gm / rho(!cR * e, 0) / 2.0 / dh_e; //wall force "mixture" (total flow rate, but physical properties of the liquid)
 
-      /* appel du multiplicateur diphasique (si il existe) */
+      /* call the two-phase multiplier (if it exists) */
       if (fmult) fmult->coefficient(&(*alp)(e, 0), &rho(!cR * e, 0), &nv(0), &Cf_t(0), &mu(!cM * e, 0), dh_e, Sigma_tab(e,0), &Fk(0), Fm, mult);
 
-      /* contributions aux faces de e */
+      /* contributions to the faces of element e */
       for (j = 0; j < e_f.dimension(1) && (f = e_f(e, j)) >= 0; j++)
-        if (f < domaine.nb_faces() && (!poly_v2 || fcl(f, 0) < 2)) /* contrib aux faces de Dirichlet en Poly V1 */
+        if (f < domaine.nb_faces() && (!poly_v2 || fcl(f, 0) < 2)) /* contribution to Dirichlet faces in Poly V1 */
           for (n = 0; n < N; n++)
             {
               double fac = pf(f) * vfd(f, e != f_e(f, 0)) * 0.5 / dh_e, fac_n = fac * mult(n, 0) * Cf(n) * nv(n), fac_m = fac * mult(n, 1) * Cf_t(n) * Gm / rho(!cR * e, n);
@@ -150,7 +150,7 @@ void Perte_Charge_PolyMAC_HFV::ajouter_blocs(matrices_t matrices, DoubleTab& sec
 
       if (poly_v2)
         for (d = 0, k = nf_tot + D * e; d < D; d++, k++)
-          for (n = 0; n < N; n++) /* PolyMAC_HFV V2: contributions aux equations aux elements */
+          for (n = 0; n < N; n++) /* PolyMAC_HFV V2: contributions to element equations */
             {
               double fac = pe(e) * ve(e) * 0.5 / dh_e, fac_n = fac * mult(n, 0) * Cf(n) * nv(n), fac_m = fac * mult(n, 1) * Cf_t(n) * Gm / rho(!cR * e, n);
               for (m = 0; m < N; m++)

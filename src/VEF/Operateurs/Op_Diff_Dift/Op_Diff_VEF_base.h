@@ -30,7 +30,7 @@ class Sortie;
 
 /*! @brief class Op_Diff_VEF_base
  *
- *  Classe de base des operateurs de convection VEF
+ *  @brief Base class for VEF diffusion operators.
  *
  *
  */
@@ -85,8 +85,8 @@ private:
   KOKKOS_INLINE_FUNCTION diffu__view(const int comp, const int num_elem, const _TYPE_ &diffu) const { return diffu(comp); }
 };
 
-// ATTENTION le diffu intervenant dans les fonctions n'est que LOCAL (on appelle d_nu apres)
-// Fonction utile viscA
+// WARNING the diffu used in the functions is only LOCAL (d_nu is called afterwards)
+// Useful function viscA
 // nu <Si, Sj> / |K|
 template<typename _TYPE_>
 inline double Op_Diff_VEF_base::viscA(int i, int j, int num_elem, const _TYPE_ &diffu) const

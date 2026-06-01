@@ -29,13 +29,14 @@ Sortie& Pb_Thermohydraulique_Turbulent::printOn(Sortie& os) const { return Pb_Fl
 
 Entree& Pb_Thermohydraulique_Turbulent::readOn(Entree& is) { return Pb_Fluide_base::readOn(is); }
 
-/*! @brief Renvoie le nombre d'equation, Renvoie 2 car il y a 2 equations a un probleme de
+/*! @brief Returns the number of equations.
  *
- *     thermo-hydraulique turbulent:
- *      - l'equation de Navier Stokes
- *      - l'equation de la thermique de type Convection_Diffusion_Temperature_Turbulent
+ *     Returns 2 because there are 2 equations in a turbulent
+ *     thermohydraulic problem:
+ *      - the Navier-Stokes equation
+ *      - the thermal equation of type Convection_Diffusion_Temperature_Turbulent
  *
- * @return (int) le nombre d'equation
+ * @return Number of equations (2).
  */
 int Pb_Thermohydraulique_Turbulent::nombre_d_equations() const
 {
@@ -56,12 +57,10 @@ const Equation_base& Pb_Thermohydraulique_Turbulent::equation(int i) const
 
 }
 
-/*! @brief Renvoie l'equation d'hydraulique de type Navier_Stokes_Turbulent si i=0 Renvoie l'equation de la thermique de type
+/*! @brief Returns the hydraulic equation of type Navier_Stokes_Turbulent if i=0, returns the thermal equation of type Convection_Diffusion_Temperature_Turbulent if i=1.
  *
- *     Convection_Diffusion_Temperature_Turbulent si i=1
- *
- * @param (int i) l'index de l'equation a renvoyer
- * @return (Equation_base&) l'equation correspondante a l'index
+ * @param i Index of the equation to return.
+ * @return The equation corresponding to the given index.
  */
 Equation_base& Pb_Thermohydraulique_Turbulent::equation(int i)
 {
@@ -76,10 +75,12 @@ Equation_base& Pb_Thermohydraulique_Turbulent::equation(int i)
     return eq_thermique;
 }
 
-/*! @brief Associe le milieu au probleme Le milieu doit etre de type fluide incompressible
+/*! @brief Associates the medium to the problem.
  *
- * @param (Milieu_base& mil) le milieu physique a associer au probleme
- * @throws mauvais type de milieu physique
+ * The medium must be of type incompressible fluid.
+ *
+ * @param mil Physical medium to associate with the problem.
+ * @throws If the medium is not of the correct physical type.
  */
 void Pb_Thermohydraulique_Turbulent::associer_milieu_base(const Milieu_base& mil)
 {

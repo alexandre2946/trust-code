@@ -55,13 +55,13 @@ bool Convection_Diffusion_Temperature_IBM::initTimeStep(double dt)
   return true;
 }
 
-// ajoute les contributions des operateurs et des sources
+// adds contributions from operators and sources
 void Convection_Diffusion_Temperature_IBM::assembler(Matrice_Morse& matrice, const DoubleTab& inco, DoubleTab& resu)
 {
   assembler_ibm_proto(matrice, inco, resu);
 }
 
-// for IBM methods; on ajoute source PDF au RHS
+// for IBM methods; adds PDF source to RHS
 void Convection_Diffusion_Temperature_IBM::derivee_en_temps_inco_sources(DoubleTrav& secmem)
 {
   derivee_en_temps_inco_ibm_proto(secmem);

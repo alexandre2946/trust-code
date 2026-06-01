@@ -97,7 +97,7 @@ int Perte_Charge_VEF::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 
 ////////////////////////////////////////////////////////////////
 //                                                            //
-//             Fonction principale : ajouter                  //
+//             Main function: ajouter                         //
 //                                                            //
 ////////////////////////////////////////////////////////////////
 
@@ -121,36 +121,36 @@ double valeur_a_la_face(const Champ_Don_base& le_ch, const IntTab& f_e, int f)
 DoubleTab& Perte_Charge_VEF::ajouter(DoubleTab& resu) const
 {
   const Domaine_VEF& zvef=le_dom_VEF.valeur();
-  const Champ_Don_base& nu=le_fluide->viscosite_cinematique(); // viscosite cinematique
-  const DoubleTab& xv=zvef.xv() ;                 // centres de gravite des faces
+  const Champ_Don_base& nu=le_fluide->viscosite_cinematique(); // kinematic viscosity
+  const DoubleTab& xv=zvef.xv() ;                 // face centers of gravity
   const DoubleTab& vit=la_vitesse->valeurs();
-  // Sinon segfault a l'initialisation de ssz quand il n'y a pas de sous-domaine !
+  // Otherwise segfault at initialization of ssz when there is no sub-domain!
   const Sous_domaine_VF& ssz = sous_domaine ? le_sous_domaine_dis.valeur() : Sous_domaine_VF();
   const IntTab& f_e = zvef.face_voisins();
 
-  // Parametres pour perte_charge()
+  // Parameters for perte_charge()
   DoubleVect u(dimension);
   DoubleVect pos(dimension);
   DoubleVect v_valeur(dimension);
-  // Optimisations pour les cas ou nu ou diam_hydr sont constants
+  // Optimizations for cases where nu or diam_hydr are constant
   const bool nu_constant = sub_type(Champ_Uniforme, nu), dh_constant = sub_type(Champ_Uniforme, diam_hydr.valeur()),
              nu_xyz = sub_type(Champ_Don_Fonc_xyz, nu) || sub_type(Champ_Don_Fonc_txyz, nu),
              dh_xyz = sub_type(Champ_Don_Fonc_xyz, diam_hydr.valeur()) || sub_type(Champ_Don_Fonc_txyz, diam_hydr.valeur());
 
-  // Le temps actuel
+  // Current time
   double t=equation().schema_temps().temps_courant();
 
-  // Nombre de faces a traiter.
+  // Number of faces to process.
   int max_faces = sous_domaine ? ssz.les_faces().size() : zvef.nb_faces();
 
   for (int face=0; face<max_faces; face++)
     {
-      // indice de la face dans le domaine_VEF
+      // face index in domaine_VEF
       int la_face = sous_domaine ? ssz.les_faces()[face] : face;
 
       if (la_face<zvef.nb_faces())
         {
-          // Recup la vitesse a la face, et en calcule le module
+          // Retrieve velocity at the face and compute its magnitude
           double norme_u=0;
           for (int dim=0; dim<dimension; dim++)
             {
@@ -159,32 +159,32 @@ DoubleTab& Perte_Charge_VEF::ajouter(DoubleTab& resu) const
             }
           norme_u=sqrt(norme_u) ;
 
-          // Calcul de la position
+          // Compute position
           for (int i=0; i<dimension; i++)
             pos[i]=xv(la_face,i);
 
           const double nu_valeur = nu_constant ? nu.valeurs()(0,0) : (nu_xyz ? nu.valeur_a_compo(pos,0) : ::valeur_a_la_face(nu, f_e, la_face));
           const double dh_valeur = dh_constant ? diam_hydr->valeurs()(0,0) : (dh_xyz ? diam_hydr->valeur_a_compo(pos,0) : ::valeur_a_la_face(diam_hydr, f_e, la_face));
 
-          // Calcul du reynolds
+          // Compute Reynolds number
           double reynolds=norme_u*dh_valeur/nu_valeur;
-          // Lambda est souvent indetermine pour Re->0
+          // Lambda is often undefined for Re->0
           if (reynolds < 1.e-10)
             reynolds=1e-10;
 
-          // Calcul du volume d'integration
+          // Compute the integration volume
           double volume=sous_domaine?
                         ssz.volumes_entrelaces(face) :
                         zvef.volumes_entrelaces(la_face);
           volume*=equation().milieu().porosite_face(la_face);
 
-          // Calcul du resultat final (ouf)
+          // Compute the final result
           double coeff_ortho,coeff_long,u_l;
           coeffs_perte_charge(u,pos,t,norme_u,dh_valeur,nu_valeur,reynolds,coeff_ortho,coeff_long,u_l,v_valeur);
           for (int dim=0; dim<dimension; dim++)
             {
-              // La perte de charge vaut -coeff_long*u_l*v_valeur[dim] -coeff_ortho(u[dim] -u_v*v_valeur[dim])
-              // soit -coeff_ortho* u[dim] - (coeff_long-coeff_ortho)* u_l*v_valeur[dim]
+              // The pressure drop equals -coeff_long*u_l*v_valeur[dim] -coeff_ortho(u[dim] -u_v*v_valeur[dim])
+              // i.e. -coeff_ortho* u[dim] - (coeff_long-coeff_ortho)* u_l*v_valeur[dim]
               resu(la_face,dim)-=(coeff_ortho* u[dim] + (coeff_long-coeff_ortho)* u_l*v_valeur[dim])*volume;
             }
         }
@@ -192,37 +192,37 @@ DoubleTab& Perte_Charge_VEF::ajouter(DoubleTab& resu) const
   return resu;
 }
 
-/*! @brief copie de ajouter sauf la derniere ligne
+/*! @brief Copy of ajouter except the last line.
  *
  */
 void Perte_Charge_VEF::contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& matrice) const
 {
-  if (implicite_==0) return; // La perte de charge n'est pas implicitee, on quitte
+  if (implicite_==0) return; // The pressure drop is not implicitized, exit
 
-  // Raccourcis
-  const Champ_Don_base& nu=le_fluide->viscosite_cinematique(); // viscosite cinematique
-  const DoubleTab& xv=le_dom_VEF->xv() ;                     // centres de gravite des faces
+  // Shortcuts
+  const Champ_Don_base& nu=le_fluide->viscosite_cinematique(); // kinematic viscosity
+  const DoubleTab& xv=le_dom_VEF->xv() ;                     // face centers of gravity
   const DoubleTab& vit=la_vitesse->valeurs();
-  // Sinon segfault a l'initialisation de ssz quand il n'y a pas de sous-domaine !
+  // Otherwise segfault at initialization of ssz when there is no sub-domain!
   const Sous_domaine_VF& ssz=sous_domaine?le_sous_domaine_dis.valeur():Sous_domaine_VF();
   const Domaine_VEF& zvef=le_dom_VEF.valeur();
   const IntTab& f_e = zvef.face_voisins();
 
-  // Parametres pour perte_charge()
+  // Parameters for perte_charge()
   DoubleVect u(dimension);
   double norme_u;
   double reynolds;
   DoubleVect pos(dimension);
   DoubleVect v_valeur(dimension);
-  // Optimisations pour les cas ou nu ou diam_hydr sont constants
+  // Optimizations for cases where nu or diam_hydr are constant
   const bool nu_constant = sub_type(Champ_Uniforme, nu), dh_constant = sub_type(Champ_Uniforme, diam_hydr.valeur()),
              nu_xyz = sub_type(Champ_Don_Fonc_xyz, nu) || sub_type(Champ_Don_Fonc_txyz, nu),
              dh_xyz = sub_type(Champ_Don_Fonc_xyz, diam_hydr.valeur()) || sub_type(Champ_Don_Fonc_txyz, diam_hydr.valeur());
 
-  // Le temps actuel
+  // Current time
   double t=equation().schema_temps().temps_courant();
 
-  // Nombre de faces a traiter.
+  // Number of faces to process.
   int max_faces=sous_domaine?
                 ssz.les_faces().size() :
 
@@ -235,16 +235,16 @@ void Perte_Charge_VEF::contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& m
   for (int face=0; face<max_faces; face++)
     {
 
-      // indice de la face dans le domaine_VEF
+      // face index in domaine_VEF
       int la_face=sous_domaine?
                   ssz.les_faces()[face] :
                   face;
 
-      // Fixed bug by GF: si la face est une face virtuelle on passe, car nu mal calcule et coef(no,no) invalide
+      // Fixed bug by GF: if the face is a virtual face, skip it because nu is poorly computed and coef(no,no) is invalid
       if (la_face>=zvef.nb_faces())
         continue;
 
-      // Recup la vitesse a la face, et en calcule le module
+      // Retrieve velocity at the face and compute its magnitude
       norme_u=0;
       for (int dim=0; dim<dimension; dim++)
         {
@@ -253,26 +253,26 @@ void Perte_Charge_VEF::contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& m
         }
       norme_u=sqrt(norme_u) ;
 
-      // Calcul de la position
+      // Compute position
       for (int i=0; i<dimension; i++)
         pos[i]=xv(la_face,i);
 
       const double nu_valeur = nu_constant ? nu.valeurs()(0,0) : (nu_xyz ? nu.valeur_a_compo(pos,0) : ::valeur_a_la_face(nu, f_e, la_face));
       const double dh_valeur = dh_constant ? diam_hydr->valeurs()(0,0) : (dh_xyz ? diam_hydr->valeur_a_compo(pos,0) : ::valeur_a_la_face(diam_hydr, f_e, la_face));
 
-      // Calcul du reynolds
+      // Compute Reynolds number
       reynolds=norme_u*dh_valeur/nu_valeur;
-      // Lambda est souvent indetermine pour Re->0
+      // Lambda is often undefined for Re->0
       if (reynolds < 1.e-10)
         reynolds=1e-10;
 
-      // Calcul du volume d'integration
+      // Compute the integration volume
       double volume=sous_domaine?
                     ssz.volumes_entrelaces(face) :
                     zvef.volumes_entrelaces(la_face);
       volume*=equation().milieu().porosite_face(la_face);
 
-      // Calcul du resultat final (ouf)
+      // Compute the final result
       double coeff_ortho,coeff_long,u_l;
       coeffs_perte_charge(u,pos,t,norme_u,dh_valeur,nu_valeur,reynolds,coeff_ortho,coeff_long,u_l,v_valeur);
       for (int dim=0; dim<dimension; dim++)
@@ -280,9 +280,9 @@ void Perte_Charge_VEF::contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& m
           int n0=la_face*dimension+dim;
           // matrice.coef(n0,n0) += (coeff_ortho + (coeff_long-coeff_ortho)* v_valeur[dim]*v_valeur[dim]); // Fixed bug
           matrice.coef(n0,n0) += (coeff_ortho + (coeff_long-coeff_ortho)* v_valeur[dim]*v_valeur[dim])*volume;
-          // La perte de charge vaut -coeff_long*u_l*v_valeur[dim] -coeff_ortho(u[dim] -u_v*v_valeur[dim])
-          // soit -coeff_ortho* u[dim] - (coeff_long-coeff_orho)* u_l*v_valeur[dim]
-          //      resu(la_face,dim)-=(coeff_ortho* u[dim] + (coeff_long-coeff_orho)* u_l*v_valeur[dim]);
+          // The pressure drop equals -coeff_long*u_l*v_valeur[dim] -coeff_ortho(u[dim] -u_v*v_valeur[dim])
+          // i.e. -coeff_ortho* u[dim] - (coeff_long-coeff_ortho)* u_l*v_valeur[dim]
+          //      resu(la_face,dim)-=(coeff_ortho* u[dim] + (coeff_long-coeff_ortho)* u_l*v_valeur[dim]);
         }
     }
 }
@@ -322,7 +322,7 @@ void Perte_Charge_VEF::completer()
 
 ////////////////////////////////////////////////////////////////
 //                                                            //
-//         Fonctions virtuelles pures de Source_base          //
+//         Pure virtual functions of Source_base              //
 //                                                            //
 ////////////////////////////////////////////////////////////////
 

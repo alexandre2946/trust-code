@@ -29,15 +29,15 @@ class Domaine_VEF;
 class Fluide_base;
 class Param;
 
-//! Factorise les fonctionnalites de plusieurs pertes de charge en VEF, vitesse aux faces
+//! Factorizes the common functionality of several pressure drop operators in VEF, velocity at faces.
 /**
-   Perte_Charge_Isotrope, Perte_Charge_Directionnelle et
-   Perte_Charge_Anisotrope heritent de Perte_Charge_VEF. Elles
-   doivent surcharger essentiellement readOn() et perte_charge().
-   readOn() est suppose lire au moins diam_hydr et sous_domaine.
+   Perte_Charge_Isotrope, Perte_Charge_Directionnelle and
+   Perte_Charge_Anisotrope inherit from Perte_Charge_VEF. They
+   must essentially override readOn() and perte_charge().
+   readOn() is expected to read at least diam_hydr and sous_domaine.
 
-   Ces classes sont censees remplacer Perte_Charge_VEF_Face
-   et Perte_Charge_VEF_P1NC.
+   These classes are intended to replace Perte_Charge_VEF_Face
+   and Perte_Charge_VEF_P1NC.
 */
 
 class Perte_Charge_VEF : public Source_base, public Terme_Source_Qdm
@@ -45,58 +45,57 @@ class Perte_Charge_VEF : public Source_base, public Terme_Source_Qdm
   Declare_base(Perte_Charge_VEF);
 
 public:
-  DoubleTab& ajouter(DoubleTab& ) const override; //!< Appelle perte_charge pour chaque face ou cela est necessaire
+  DoubleTab& ajouter(DoubleTab& ) const override; //!< Calls perte_charge for each face where needed
   void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override ;
   DoubleTab& calculer(DoubleTab& ) const override ;
-  void associer_pb(const Probleme_base&) override;  //!< associe le_fluide et la_vitesse
+  void associer_pb(const Probleme_base&) override;  //!< Associates le_fluide and la_vitesse
   void completer() override;
 
 protected:
   virtual void set_param(Param& param) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
-  void associer_domaines(const Domaine_dis_base&,const Domaine_Cl_dis_base&) override;   //!< associe le_dom_VEF et le_dom_Cl_VEF
+  void associer_domaines(const Domaine_dis_base&,const Domaine_Cl_dis_base&) override;   //!< Associates le_dom_VEF and le_dom_Cl_VEF
 
-  //! Appele pour chaque face par ajouter()
+  //! Called for each face by ajouter()
   /**
-     Utilise les intermediaires de calcul : u, norme_u, dh_valeur, reynolds
-     Retourne le resultat calcule dans p_charge.
+     Uses the intermediate quantities: u, norme_u, dh_valeur, reynolds.
+     Returns the computed result in p_charge.
 
-     Avantage : bonne factorisation.
-     Inconvenient : cout de l'appel d'une methode virtuelle a
-     l'interieur d'une boucle.
+     Advantage: good factorization.
+     Drawback: cost of a virtual method call inside a loop.
 
-     \param u La vitesse a la face courante. 2 ou 3 composantes
-     \param pos toto
-     \param t titi
-     \param norme_u La norme de la vitesse a la face courante
-     \param dh Le diametre hydraulique a la face courante (tire de diam_hydr)
-     \param nu la viscosite cinematique
-     \param reynolds Le nombre de reynolds a la face courante : norme_u * dh_valeur / nu
-     \param coeff_ortho coefficient dans la direction orthogonale
-     \param coeff_long coefficient dans la direction longitudinale
-     \param u_l vitesse dans la direction longitudinale
-     \param v_valeur direction_longitudinale p_charge a 2 ou 3 composantes
-     La perte de charge vaut -coeff_long*u_l*v_valeur -coeff_ortho(u -u_v*v_valeur)
+     \param u Velocity at the current face. 2 or 3 components.
+     \param pos position of the current face.
+     \param t current time.
+     \param norme_u Norm of the velocity at the current face.
+     \param dh Hydraulic diameter at the current face (derived from diam_hydr).
+     \param nu kinematic viscosity.
+     \param reynolds Reynolds number at the current face: norme_u * dh_valeur / nu.
+     \param coeff_ortho coefficient in the orthogonal direction.
+     \param coeff_long coefficient in the longitudinal direction.
+     \param u_l velocity in the longitudinal direction.
+     \param v_valeur longitudinal direction of p_charge with 2 or 3 components.
+     The pressure drop equals -coeff_long*u_l*v_valeur -coeff_ortho(u -u_v*v_valeur).
   */
   virtual void coeffs_perte_charge(const DoubleVect& u, const DoubleVect& pos,
                                    double t, double norme_u, double dh, double nu, double reynolds,
                                    double& coeff_ortho, double& coeff_long,
                                    double& u_l, DoubleVect& v_valeur) const=0;
 
-  //! Diametre hydraulique utilise dans le calcul de la perte de charge
+  //! Hydraulic diameter used in the pressure drop computation
   OWN_PTR(Champ_Don_base) diam_hydr;
-  //! Fluide associe au probleme
+  //! Fluid associated with the problem
   OBS_PTR(Fluide_base) le_fluide;
-  //! Vitesse associee a l'equation resolue
+  //! Velocity associated with the solved equation
   OBS_PTR(Champ_Inc_base) la_vitesse;
-  //! Domaine dans laquelle s'applique la perte de charge
+  //! Domain to which the pressure drop applies.
   OBS_PTR(Domaine_VEF) le_dom_VEF;
   OBS_PTR(Domaine_Cl_VEF) le_dom_Cl_VEF;
 
-  // Cas d'un sous-domaine
-  bool sous_domaine=false; //!< Le terme est-il limite a un sous-domaine ?
-  Nom nom_sous_domaine; //!< Nom du sous-domaine, initialise dans readOn()
-  OBS_PTR(Sous_domaine_VF) le_sous_domaine_dis; //!< Initialise dans completer()
+  // Sub-domain case
+  bool sous_domaine=false; //!< Is the term restricted to a sub-domain?
+  Nom nom_sous_domaine; //!< Name of the sub-domain, initialized in readOn()
+  OBS_PTR(Sous_domaine_VF) le_sous_domaine_dis; //!< Initialized in completer()
   int implicite_;
 
   mutable Parser_U lambda;

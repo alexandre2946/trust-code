@@ -392,10 +392,10 @@ void Domaine_DG::compute_mesh_param()
 //              double x2=xs(s2,0);
 //              double y1=xs(s1,1);
 //              double prod=x1*y2-x2*y1;
-//              std::cout<< "Les sommets sont ("<<x1<<","<<y1<<") et (" <<x2<<","<<y2<<") et prod : "<<prod<<std::endl ;
+//              std::cout<< "Vertices are ("<<x1<<","<<y1<<") and (" <<x2<<","<<y2<<") and prod: "<<prod<<std::endl ;
               per_(e)+= std::sqrt((xs(s1,0) - xs(s2,0)) * (xs(s1,0) - xs(s2,0)) + (xs(s1,1) - xs(s2,1)) * (xs(s1,1) - xs(s2,1)));
 
-              // calcul of h
+              // computation of h
               for (int loc_vert2 = f+1; loc_vert2 < nsom; loc_vert2++) // That's tricky: we use the bijection between vertices and faces to loop over the vertices simultaneously.
                 h_e=std::max(h_e,std::sqrt((xs(vert_elems(e, f),0) - xs(vert_elems(e, loc_vert2),0)) * (xs(vert_elems(e, f),0) - xs(vert_elems(e, loc_vert2),0)) + (xs(vert_elems(e, f),1) - xs(vert_elems(e, loc_vert2),1)) * (xs(vert_elems(e, f),1) - xs(vert_elems(e, loc_vert2),1)))); // max between the distance of each vertices
             }
@@ -418,9 +418,9 @@ void Domaine_DG::calculer_h_carre()
     }
   h_carre = Process::mp_max(h_carre);
 
-  // Calcul de h_carre
+  // Compute h_carre
   //h_carre = 1;
-  if (h_carre_.size()) return; // deja fait
+  if (h_carre_.size()) return; // already done
   int nb_elem_tot = this->nb_elem_tot();
   h_carre_.resize(nb_elem_tot);
   h_carre_ = h_carre;

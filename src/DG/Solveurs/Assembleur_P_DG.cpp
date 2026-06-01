@@ -218,7 +218,7 @@ int Assembleur_P_DG::assembler_mat(Matrice& la_matrice, const DoubleVect& diag, 
 
       double sur_f = domaine.face_surfaces(f);
 
-      double h_T = sqrt(std::min(domaine.carre_pas_maille(elem0), domaine.carre_pas_maille(elem1))); // TODO possibilite de prendre moyenne harmonique (stabilite)
+      double h_T = sqrt(std::min(domaine.carre_pas_maille(elem0), domaine.carre_pas_maille(elem1))); // TODO possibility to use harmonic mean (stability)
       double invh_T = 1. / h_T;
 
       //*****************//
@@ -331,7 +331,7 @@ int Assembleur_P_DG::assembler_mat(Matrice& la_matrice, const DoubleVect& diag, 
           bfunc.eval_grad_bfunc_on_facets(quad, elem, f, grad_fbase0);
 
           double h_T = sqrt(domaine.carre_pas_maille(elem));
-          double invh_T = 1. / h_T; //TODO regarder penalisation remplacer h_T par h_F
+          double invh_T = 1. / h_T; //TODO review penalization: replace h_T by h_F
           double sur_f = domaine.face_surfaces(f);
 
           for (int i = 0; i < nb_basis_func; i++)
@@ -366,11 +366,10 @@ int Assembleur_P_DG::assembler_mat(Matrice& la_matrice, const DoubleVect& diag, 
   return 1;
 }
 
-/*! @brief Assemble la matrice de pression pour un fluide quasi compressible laplacein(P) est remplace par div(grad(P)/rho).
+/*! @brief Assembles the pressure matrix for a quasi-compressible fluid: laplacian(P) is replaced by div(grad(P)/rho).
  *
- * @param (DoubleTab& tab_rho) mass volumique Valeurs par dDGaut:
- * @return (int) renvoie toujours 1
- * @throws DGfets de bord:
+ * @param tab_rho The density field.
+ * @return Always 1.
  */
 int Assembleur_P_DG::assembler_QC(const DoubleTab& tab_rho, Matrice& matrice)
 {
@@ -416,8 +415,8 @@ int Assembleur_P_DG::modifier_solution(DoubleTab& pression)
   double press_0;
   if(!has_P_ref)
     {
-      // On prend la pression minimale comme pression de reference
-      // afin d'avoir la meme pression de reference en sequentiel et parallele
+      // Use the minimum pressure as the reference pressure
+      // to ensure the same pressure reference in sequential and parallel runs
       press_0=DMAXFLOAT;
       int nb_elem=le_dom_dg_->domaine().nb_elem();
       for(int n=0; n<nb_elem; n++)

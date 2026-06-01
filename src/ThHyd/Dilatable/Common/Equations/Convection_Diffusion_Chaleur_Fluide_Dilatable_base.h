@@ -19,11 +19,9 @@
 #include <Convection_Diffusion_Fluide_Dilatable_base.h>
 #include <Ecrire_YAML.h>
 
-/*! @brief classe Convection_Diffusion_Chaleur_Fluide_Dilatable_base Cas particulier de Convection_Diffusion_std pour un fluide quasi dilatable
+/*! @brief @brief Particular case of Convection_Diffusion_std for a quasi-dilatable fluid when the transported scalar is temperature (ideal gases) or enthalpy (real gases).
  *
- *      quand le scalaire subissant le transport est la temperature en gaz parfaits,
- *      ou l'enthalpie en gaz reels.
- *      (generalisation de Convection_Diffusion_Temperature pour les gaz reels)
+ * Generalization of Convection_Diffusion_Temperature for real gases.
  *
  * @sa Conv_Diffusion_std Convection_Diffusion_Chaleur_Fluide_Dilatable_base
  */
@@ -46,11 +44,11 @@ public :
   const Motcle& domaine_application() const override;
   DoubleTab& derivee_en_temps_inco(DoubleTab& ) override;
 
-  // Methodes virtuelles pure
+  // Pure virtual methods
   bool is_generic() const override =0;
-  void calculer_div_u_ou_div_rhou(DoubleTab& res) const override =0; // encore une fois desole
+  void calculer_div_u_ou_div_rhou(DoubleTab& res) const override =0;
 
-  // Methodes inlines
+  // Inline methods
   inline bool is_thermal() const override { return true; }
 };
 

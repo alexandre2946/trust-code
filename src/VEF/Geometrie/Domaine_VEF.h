@@ -27,28 +27,27 @@ class Geometrie;
 
 /*! @brief class Domaine_VEF
  *
- *          Classe instanciable qui derive de Domaine_VF.
- *          Cette classe contient les informations geometriques que demande la methode des Volumes Elements Finis (element de Crouzeix-Raviart)
- *          La classe porte un certain nombre d'informations concernant les faces
- *          Dans cet ensemble de faces on fait figurer aussi les faces du bord et des joints. Pour manipuler les faces on distingue 2 categories:
- *            - les faces non standard qui sont sur un joint, un bord ou qui sont
- *              internes tout en appartenant a un element du bord
- *            - les faces standard qui sont les faces internes n'appartenant pas
- *              a un element du bord
- *       Cette distinction correspond au traitement des conditions aux limites:les faces standard ne "voient pas" les conditions aux limites.
- *       L'ensemble des faces est numerote comme suit:
- *            - les faces qui sont sur un Domaine_joint apparaissent en premier
- *                    (dans l'ordre du vecteur les_joints)
- *                 - les faces qui sont sur un Domaine_bord apparaissent ensuite
- *                (dans l'ordre du vecteur les_bords)
- *                - les faces internes non standard apparaissent ensuite
- *            - les faces internes standard en dernier
- *       Finalement on trouve regroupees en premier toutes les faces non standard qui vont necessiter un traitement particulier
- *       On distingue deux types d'elements
- *            - les elements non standard : ils ont au moins une face de bord
- *            - les elements standard : ils n'ont pas de face de bord
- *       Les elements standard (resp. les elements non standard) ne sont pas ranges de maniere consecutive dans l'objet Domaine. On utilise le tableau
- *       rang_elem_non_std pour acceder de maniere selective a l'un ou l'autre des types d'elements
+ * @brief Instantiable class derived from Domaine_VF.
+ *          This class contains the geometric information required by the Finite Element Volume method (Crouzeix-Raviart element).
+ *          The class holds a number of pieces of information about faces.
+ *          Among these faces, boundary and joint faces are also included. Two categories of faces are distinguished:
+ *            - non-standard faces: on a joint, a boundary, or internal faces
+ *              belonging to a boundary element
+ *            - standard faces: internal faces not belonging to any boundary element
+ *       This distinction corresponds to boundary condition treatment: standard faces do not "see" boundary conditions.
+ *       The full set of faces is numbered as follows:
+ *            - faces on a Domaine_joint appear first
+ *                    (in the order of the les_joints vector)
+ *                 - faces on a Domaine_bord appear next
+ *                (in the order of the les_bords vector)
+ *                - internal non-standard faces appear next
+ *            - internal standard faces appear last
+ *       All non-standard faces requiring special treatment are therefore grouped at the beginning.
+ *       Two element types are distinguished:
+ *            - non-standard elements: they have at least one boundary face
+ *            - standard elements: they have no boundary face
+ *       Standard (resp. non-standard) elements are not stored consecutively in the Domaine object.
+ *       The array rang_elem_non_std is used to selectively access either type.
  */
 class Domaine_VEF: public Domaine_VF
 {
@@ -109,16 +108,16 @@ public:
   inline double dist_face_elem1(int num_face,int n1) const override;
 
 private:
-  double h_carre = 1.e30;                         // carre du pas du maillage
-  DoubleVect h_carre_;                        // carre du pas d'une maille
-  OWN_PTR(Elem_VEF_base) type_elem_;                  // type de l'element de discretisation
-  // normales aux faces des volumes entrelaces:
+  double h_carre = 1.e30;                         // squared mesh step size
+  DoubleVect h_carre_;                        // squared cell step size
+  OWN_PTR(Elem_VEF_base) type_elem_;                  // type of the discretisation element
+  // normals to interlaced volume faces:
 #ifdef TRUST_USE_GPU
   BigDoubleTab facette_normales_; // Cause size=nb_elem*6*dim may be > 2^31
 #else
   DoubleTab facette_normales_;
 #endif
-  DoubleTab vecteur_face_facette_;                // vecteur centre face->centre facette
+  DoubleTab vecteur_face_facette_;                // vector from face center to facette center
   IntVect orientation_;
 
 
@@ -127,22 +126,22 @@ private:
   IntVect ok_arete;
 
   int P1Bulle = -1, alphaE = -1, alphaS = -1, alphaA = -1;
-  int alphaRT = -1; // pour trio statio
+  int alphaRT = -1; // for trio stationary
   int modif_div_face_dirichlet = -1;
-  int cl_pression_sommet_faible = -1; // determine si les cl de pression sont imposees de facon faible ou forte -> voir divergence et assembleur
-  // Descripteur pour les tableaux p1b (selon alphaE, alphaS et alphaA) (construit dans Domaine_VEF::discretiser())
+  int cl_pression_sommet_faible = -1; // determines whether pressure BCs are imposed weakly or strongly -> see divergence and assembler
+  // Descriptor for p1b arrays (depending on alphaE, alphaS and alphaA) (built in Domaine_VEF::discretiser())
   MD_Vector md_vector_p1b_;
 
   Sortie& ecrit(Sortie& os) const;
 };
 
-// Fonction Kokkos hors classe: En effet, sinon avec dom_VEF.oriente_normale(...), une instance de Domaine_VEF est copiee du host au device !
+// Out-of-class Kokkos function: otherwise dom_VEF.oriente_normale(...) would copy a Domaine_VEF instance from host to device!
 KOKKOS_INLINE_FUNCTION int oriente_normale(int face_opp, int elem2, CIntTabView face_voisins)
 {
   return (face_voisins(face_opp, 0) == elem2) ? 1 : -1;
 }
 
-// Methode pour tester:
+// Test method:
 void exemple_champ_non_homogene(const Domaine_VEF&, DoubleTab&);
 
 inline int Domaine_VEF::numero_premier_element() const

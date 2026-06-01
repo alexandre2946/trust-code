@@ -110,10 +110,10 @@ DoubleTab& Op_Conv_EF_VEF_P1NC::ajouter(const DoubleTab& transporte_2,
 
   assert(nb_faces_elem==(dimension+1));
   {
-    // calcul de la CFL.
+    // CFL computation.
     double psc;
-    // On remet a zero le tableau qui sert pour
-    // le calcul du pas de temps de stabilite
+    // Reset to zero the array used for
+    // the computation of the stability time step
     fluent_ = 0;
 
     const int nb_faces = domaine_VEF.nb_faces();
@@ -129,9 +129,9 @@ DoubleTab& Op_Conv_EF_VEF_P1NC::ajouter(const DoubleTab& transporte_2,
 
   DoubleTab transporte_;
   DoubleTab vitesse_face_;
-  // soit on a transporte=phi*transporte_ et vitesse_face=vitesse_
-  // soit transporte=transporte_ et vitesse_face=phi*vitesse_
-  // cela d~pend si on transporte avec phi u ou avec u.
+  // either transporte=phi*transporte_ and vitesse_face=vitesse_
+  // or transporte=transporte_ and vitesse_face=phi*vitesse_
+  // depending on whether transport uses phi*u or u.
   const DoubleTab& transporte=modif_par_porosite_si_flag(transporte_2,transporte_,!marq,porosite_face);
   const DoubleTab& tab_vitesse=modif_par_porosite_si_flag(velocity_tab,vitesse_face_,marq,porosite_face);
   //  DoubleTab ubar(transporte);

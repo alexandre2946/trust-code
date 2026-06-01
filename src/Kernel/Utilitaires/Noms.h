@@ -19,7 +19,7 @@
 #include <TRUST_Vector.h>
 #include <Nom.h>
 
-/*! @brief Un tableau de chaine de caracteres (VECT(Nom))
+/*! @brief An array of character strings (VECT(Nom)).
  *
  */
 class Noms : public VECT(Nom)
@@ -34,9 +34,9 @@ public :
 };
 
 
-/*! @brief Constructeur Construit un tableau de i noms
+/*! @brief Constructor. Builds an array of i names.
  *
- * @param (int i) nombre d'elements du tableau
+ * @param i Number of elements in the array.
  */
 inline Noms::Noms(int i): VECT(Nom)(i) {}
 #endif

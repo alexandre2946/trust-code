@@ -20,12 +20,13 @@
 #include <Champ_Ostwald.h>
 #include <TRUST_Ref.h>
 
-/*! @brief classe Champ_Ostwald_VDF Represente un champ en discretisation VDF qui varie en fonction
+/*! @brief class Champ_Ostwald_VDF
  *
- *         de la consistance et de l'indice de structure.
- *          Champ utilise pour le fluide d'Ostwald et la discretisation VDF.
- *             Fait reference a Champ_Face pour lancer le calcul de D:D dans Champ4.cpp
- *                     domaine_VDF pou utiliser la
+ * @brief Represents a field in VDF discretization that varies as a function
+ *        of the consistency and the structure index.
+ *        Field used for the Ostwald fluid with VDF discretization.
+ *        References Champ_Face to trigger the computation of D:D in Champ4.cpp,
+ *        and uses domaine_VDF.
  *
  * @sa Champ_Ostwald
  */

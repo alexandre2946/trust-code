@@ -28,7 +28,7 @@ using MEDCoupling::MEDCouplingField;
 #endif
 
 
-/*! @brief classe Champ_Fonc_MED Load a field from a MED file for a given time.
+/*! @brief class Champ_Fonc_MED Load a field from a MED file for a given time.
  *
  * @sa Champ_Fonc_P0
  */
@@ -140,15 +140,14 @@ inline DoubleVect& Champ_Fonc_MED::valeur_a(const DoubleVect& position, DoubleVe
 
 inline DoubleVect& Champ_Fonc_MED::valeur_a_elem(const DoubleVect& position, DoubleVect& tab_valeurs, int le_poly) const
 {
-  // Le codage de cette methode passe par valeur_a() et ignore l'entier le_poly
-  // car si on utilise le_champ().valeur_a_elem(position,tab_valeurs,le_poly), on
-  // a des ecarts sequentiel-parallele pour les champs P0 (et probablement aussi pour
-  // les autres champs).
-  // Je m'explique cela par le fait qu'en parallele, le_poly designe un numero d'element
-  // dans la partition associee a un processeur, alors que le champ designe par le pointeur vrai_champ_
-  // est defini sur la totalite du domaine.
-  // Pour cette raison, j'utilise valeur_a(), qui localise la position dans la totalite du domaine,
-  // et qui retourne la valeur de vrai_champ_ dans cet element.
+  // This method is implemented via valeur_a() and ignores the integer le_poly,
+  // because using le_champ().valeur_a_elem(position, tab_valeurs, le_poly) causes
+  // sequential-parallel discrepancies for P0 fields (and probably for other fields too).
+  // The reason is that in parallel, le_poly refers to an element index within the partition
+  // associated with a processor, while the field pointed to by vrai_champ_
+  // is defined over the entire domain.
+  // For this reason, valeur_a() is used, which locates the position within the entire domain
+  // and returns the value of vrai_champ_ in that element.
   return le_champ().valeur_a(position,tab_valeurs);
 }
 

@@ -51,24 +51,24 @@ inline void verifie_syntaxe(Motcle& motlu)
       Process::exit();
     }
 }
-/*! @brief Fonction principale de l'interprete Mailler Structure du jeu de donnee (en dimension 2) :
+/*! @brief Main function of the Mailler interpreter Data set structure (in dimension 2):
  *
  *     Mailler dom
  *     {
  *     [Epsilon eps]
- *     [objet1]
+ *     [object1]
  *     ,
- *     [objet2]
+ *     [object2]
  *     ...
  *     }
- *     Deux points seront confondus des que la distance entre eux est
- *     inferieure a Epsilon.
+ *     Two points will be merged as soon as the distance between them is
+ *     less than Epsilon.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree
- * @throws l'objet a mailler n'est pas du type Domaine_t
- * @throws accolade ouvrante attendue
- * @throws accolade fermante ou virgule attendue
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the input stream
+ * @throws the object to be meshed is not of Domaine_t type
+ * @throws opening brace expected
+ * @throws closing brace or comma expected
  */
 template <typename _SIZE_>
 Entree& Mailler_32_64<_SIZE_>::interpreter_(Entree& is)
@@ -83,7 +83,7 @@ Entree& Mailler_32_64<_SIZE_>::interpreter_(Entree& is)
   this->associer_domaine(is);
   Domaine_t& dom = this->domaine();
 
-  // On debloque les structures pour modifier le domaine
+  // Unlock structures to allow domain modification
   Scatter::uninit_sequential_domain(dom);
 
   Motcle motlu;
@@ -105,7 +105,7 @@ Entree& Mailler_32_64<_SIZE_>::interpreter_(Entree& is)
           double eps;
           is >> eps;
           dom.fixer_epsilon(eps);
-          // GF le eps du domaine ne sert plus quand on cherche les sommets doubles;
+          // GF the domain eps is no longer used when searching for duplicate vertices;
           this->precision_geom=eps;
           is >> motlu;
           verifie_syntaxe(motlu);
@@ -134,7 +134,7 @@ Entree& Mailler_32_64<_SIZE_>::interpreter_(Entree& is)
     }
   while(motlu != "}");
 
-  // Dans le cas ou on a modifie precision geom, on le remet a la valeur d'origine
+  // If precision_geom was modified, restore its original value
   this->precision_geom=precision_geom_sa;
   dom.fill_from_list(dom_lst);
   dom.fixer_premieres_faces_frontiere();

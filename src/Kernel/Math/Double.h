@@ -68,7 +68,7 @@
 #  define DMINFLOAT        1e-30
 # endif
 
-/*! @brief : fonctions utiles sur les double
+/*! @brief : useful functions on doubles
  *
  */
 #ifdef LATATOOLS

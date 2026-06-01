@@ -28,7 +28,7 @@ public:
 
 private:
   void set_param(Param&) const override;
-  int lvl_= 1 ; // choix de la methode d'Uzawa par defaut
+  int lvl_= 1 ; // choice of the Uzawa method by default
 };
 
 #endif /* Prepro_IBM_Uzawa_included */

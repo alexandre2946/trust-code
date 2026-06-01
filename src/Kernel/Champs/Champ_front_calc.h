@@ -27,10 +27,10 @@ class Front_dis_base;
 class Equation_base;
 class Milieu_base;
 
-/*! @brief classe Champ_front_calc Classe derivee de Champ_front_var qui represente les
+/*! @brief class Champ_front_calc Derived class of Champ_front_var representing
  *
- *      champs a la frontiere obtenus en prenant la trace
- *      d'un objet de type OWN_PTR(Champ_Inc_base) (champ inconnue d'une equation)
+ *      boundary fields obtained by taking the trace
+ *      of an object of type OWN_PTR(Champ_Inc_base) (unknown field of an equation)
  *
  * @sa Champ_front_var_instationnaire Champ_Inc
  */
@@ -46,7 +46,7 @@ public:
   void creer(const Nom&, const Nom&, const Motcle&);
   void verifier(const Cond_lim_base& la_cl) const override;
 
-  // Methodes pour acceder aux objets opposes:
+  // Methods to access the opposite objects:
   const Champ_Inc_base& inconnue() const;
   const Nom& nom_bord_oppose() const;
   const Equation_base& equation() const;
@@ -57,11 +57,11 @@ public:
   inline void set_distant(int d) { distant_=d ; }
 
 protected :
-  OBS_PTR(Champ_Inc_base) l_inconnue;          // L'inconnue du probleme oppose
-  Nom nom_autre_bord_,nom_autre_pb_;       // Nom du bord et du probleme oppose
+  OBS_PTR(Champ_Inc_base) l_inconnue;          // Unknown of the opposite problem
+  Nom nom_autre_bord_,nom_autre_pb_;       // Name of the boundary and of the opposite problem
   Motcle nom_inco_;
   bool via_readon_ = false;
-  int distant_;                            // par defaut distant_ vaut 1
+  int distant_;                            // by default distant_ equals 1
 };
 
 #endif /* Champ_front_calc_included */

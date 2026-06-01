@@ -24,7 +24,7 @@
 
 /*! @brief class Puissance_Thermique_QC_EF
  *
- *  Cette classe represente un terme source de l'equation de la thermique du type degagement volumique de puissance thermique
+ *  This class represents a source term of the thermal equation of the type volumetric heat release.
  *
  * @sa Terme_Puissance_Thermique, Terme_Source_EF_base
  */

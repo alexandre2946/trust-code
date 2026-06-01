@@ -148,7 +148,7 @@ double Loi_Etat_rhoT_GP_QC::inverser_Pth(double T, double rho)
   throw;
 }
 
-/*! @brief Recalcule la masse volumique
+/*! @brief Recomputes the density.
  *
  */
 void Loi_Etat_rhoT_GP_QC::calculer_masse_volumique()

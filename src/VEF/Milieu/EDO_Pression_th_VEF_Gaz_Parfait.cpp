@@ -30,10 +30,10 @@ Sortie& EDO_Pression_th_VEF_Gaz_Parfait::printOn(Sortie& os) const { return os <
 
 Entree& EDO_Pression_th_VEF_Gaz_Parfait::readOn(Entree& is) { return is; }
 
-/*! @brief Resoud l'EDO
+/*! @brief Solves the ODE.
  *
- * @param (double Pth_n) La pression a l'etape precedente
- * @return (double) La nouvelle valeur de la pression
+ * @param (double Pth_n) The pressure at the previous time step
+ * @return (double) The new pressure value
  */
 double EDO_Pression_th_VEF_Gaz_Parfait::resoudre(double Pth_n)
 {
@@ -53,11 +53,11 @@ double EDO_Pression_th_VEF_Gaz_Parfait::resoudre(double Pth_n)
 
   const Domaine_VEF& domaine_vef = ref_cast(Domaine_VEF, le_dom.valeur());
 
-  if (traitPth == 0)   // EDO
+  if (traitPth == 0)   // ODE
     {
       const DoubleTab& tab_rho = le_fluide_->masse_volumique().valeurs();       // n+1/2
       const double rho_moy = Champ_P1NC::calculer_integrale_volumique(domaine_vef, tab_rho, FAUX_EN_PERIO);
-      DoubleTrav tab_tmp(tab_rho); // copie de rho
+      DoubleTrav tab_tmp(tab_rho); // copy of rho
       tab_tmp = tab_rho;
       assert(tab_tmp.size() == nb_faces);
       const double invdt = 1. / dt;
@@ -76,34 +76,34 @@ double EDO_Pression_th_VEF_Gaz_Parfait::resoudre(double Pth_n)
       //    double Pth = (Pth_n + S*dt/V);
       //double Pth = Pth_n/(1- S*dt);
       Pth = Pth_n / (1 - S * dt);
-      //test pour faire apparaitre la difference sur Pth
+      //test to reveal the difference on Pth
       //Pth *= 1e10;
     }
 
-  else if (traitPth == 1)   // Conservation masse (WEC mars 2008)
+  else if (traitPth == 1)   // Mass conservation (WEC March 2008)
     {
 
-      // On veut Masse(n+1) - Masse(n) = dt * Debits_aux_bords
-      // or Masse = Pth / R * sum(Vi/Ti) en volume
-      // et Debit = Pth / R * sum(Sj.Uj/Tj) aux faces Dirichlet
+      // We want Mass(n+1) - Mass(n) = dt * Boundary_fluxes
+      // where Mass = Pth / R * sum(Vi/Ti) in volume
+      // and Flux = Pth / R * sum(Sj.Uj/Tj) at Dirichlet faces
 
-      // Donc si on note masse_n = sum(Vi/Ti(n))
-      // debit_u_imp = sum(Sj.Uj(impose)/Tj(n+1)) pour les vitesses imposees
-      // et debit_rho_u_imp = sum(Sj.Uj(impose)/Tj(n+1)) pour les rho_u imposes
-      //                      ou U(impose) = (rho.U)(impose) / rho(Pth(n),T(n+1))
-      // il faut Pth(n+1)*masse_np1 - Pth(n)*masse_n = Pth(n+1) * debit_u_imp * dt
+      // So if we denote masse_n = sum(Vi/Ti(n))
+      // debit_u_imp = sum(Sj.Uj(imposed)/Tj(n+1)) for imposed velocities
+      // and debit_rho_u_imp = sum(Sj.Uj(imposed)/Tj(n+1)) for imposed rho_u
+      //                      where U(imposed) = (rho.U)(imposed) / rho(Pth(n),T(n+1))
+      // we need Pth(n+1)*masse_np1 - Pth(n)*masse_n = Pth(n+1) * debit_u_imp * dt
       //                                             + Pth(n) * debit_rho_u_imp * dt
 
-      // Attention il faudrait prendre en compte les porosites dans les integrales !!!
+      // Warning: porosity should be taken into account in the integrals !!!
 
       double debit_u_imp = 0, debit_rho_u_imp = 0;
 
-      // On veut que rho_np1 soit calcule avec T(n+1) et Pth_n pour les CLs en rho_u impose
+      // We want rho_np1 to be computed with T(n+1) and Pth_n for boundary conditions with imposed rho_u
       le_fluide_->calculer_masse_volumique();
 
-      // Calcul de masse_n et masse_np1
+      // Computation of masse_n and masse_np1
       DoubleTrav tab_tmp;
-      tab_tmp.copy(tab_tempn, RESIZE_OPTIONS::NOCOPY_NOINIT); // copier uniquement la structure
+      tab_tmp.copy(tab_tempn, RESIZE_OPTIONS::NOCOPY_NOINIT); // copy the structure only
 
       CDoubleArrView tempn = static_cast<const ArrOfDouble&>(tab_tempn).view_ro();
       DoubleArrView tmp = static_cast<ArrOfDouble&>(tab_tmp).view_wo();
@@ -122,7 +122,7 @@ double EDO_Pression_th_VEF_Gaz_Parfait::resoudre(double Pth_n)
       end_gpu_timer(__KERNEL_NAME__);
       const double masse_np1 = Champ_P1NC::calculer_integrale_volumique(domaine_vef, tab_tmp, FAUX_EN_PERIO);
 
-      // Calcul de debit_u_imp et debit_rho_u_imp
+      // Computation of debit_u_imp and debit_rho_u_imp
       for (int n_bord = 0; n_bord < le_dom->nb_front_Cl(); n_bord++)
         {
           const Cond_lim_base& la_cl = le_dom_Cl->les_conditions_limites(n_bord).valeur();
@@ -159,11 +159,11 @@ double EDO_Pression_th_VEF_Gaz_Parfait::resoudre(double Pth_n)
               exit();
             }
         }
-      // On fait la somme sur les procs
+      // Sum over all procs
       // Optimization: combine 2 mp_sum into 1 collective call
       mp_sum_for_each(debit_u_imp, debit_rho_u_imp);
 
-      // Calcul de Pth(n+1)
+      // Computation of Pth(n+1)
       Pth = Pth_n * (masse_n - dt * debit_rho_u_imp) / (masse_np1 + dt * debit_u_imp);
     }
 
@@ -175,14 +175,14 @@ void EDO_Pression_th_VEF_Gaz_Parfait::resoudre(DoubleTab& Pth_n)
 
   const int traitPth = le_fluide_->getTraitementPth();
   if (traitPth == 2)
-    return; // rien a faire
+    return; // nothing to do
   else if (traitPth == 0)
     {
       for (int n_bord = 0; n_bord < le_dom->nb_front_Cl(); n_bord++)
         {
           const Cond_lim& la_cl = le_dom_Cl->les_conditions_limites(n_bord);
           if (sub_type(Neumann_sortie_libre, la_cl.valeur()))
-            return; // rien a faire
+            return; // nothing to do
         }
 
       Cerr << "EDO_Pression_th_VEF_Gaz_Parfait::" << __func__ << " not yet coded ! Call the 911 !!" << finl;
@@ -198,27 +198,27 @@ void EDO_Pression_th_VEF_Gaz_Parfait::resoudre(DoubleTab& Pth_n)
       const int nb_faces = le_dom->nb_faces();
       const Domaine_VEF& domaine_vef = ref_cast(Domaine_VEF, le_dom.valeur());
 
-      // On veut Masse(n+1) - Masse(n) = dt * Debits_aux_bords
-      // or Masse = Pth / R * sum(Vi/Ti) en volume
-      // et Debit = Pth / R * sum(Sj.Uj/Tj) aux faces Dirichlet
+      // We want Mass(n+1) - Mass(n) = dt * Boundary_fluxes
+      // where Mass = Pth / R * sum(Vi/Ti) in volume
+      // and Flux = Pth / R * sum(Sj.Uj/Tj) at Dirichlet faces
 
-      // Donc si on note masse_n = sum(Vi/Ti(n))
-      // debit_u_imp = sum(Sj.Uj(impose)/Tj(n+1)) pour les vitesses imposees
-      // et debit_rho_u_imp = sum(Sj.Uj(impose)/Tj(n+1)) pour les rho_u imposes
-      //                      ou U(impose) = (rho.U)(impose) / rho(Pth(n),T(n+1))
-      // il faut Pth(n+1)*masse_np1 - Pth(n)*masse_n = Pth(n+1) * debit_u_imp * dt
+      // So if we denote masse_n = sum(Vi/Ti(n))
+      // debit_u_imp = sum(Sj.Uj(imposed)/Tj(n+1)) for imposed velocities
+      // and debit_rho_u_imp = sum(Sj.Uj(imposed)/Tj(n+1)) for imposed rho_u
+      //                      where U(imposed) = (rho.U)(imposed) / rho(Pth(n),T(n+1))
+      // we need Pth(n+1)*masse_np1 - Pth(n)*masse_n = Pth(n+1) * debit_u_imp * dt
       //                                             + Pth(n) * debit_rho_u_imp * dt
 
-      // Attention il faudrait prendre en compte les porosites dans les integrales !!!
+      // Warning: porosity should be taken into account in the integrals !!!
 
       double debit_u_imp = 0, debit_rho_u_imp = 0;
 
-      // On veut que rho_np1 soit calcule avec T(n+1) et Pth_n pour les CLs en rho_u impose
+      // We want rho_np1 to be computed with T(n+1) and Pth_n for boundary conditions with imposed rho_u
       le_fluide_->calculer_masse_volumique();
 
-      // Calcul de masse_n et masse_np1
+      // Computation of masse_n and masse_np1
       DoubleVect tmp;
-      tmp.copy(tempn, RESIZE_OPTIONS::NOCOPY_NOINIT); // copier uniquement la structure
+      tmp.copy(tempn, RESIZE_OPTIONS::NOCOPY_NOINIT); // copy the structure only
       for (int i = 0; i < nb_faces; i++)
         tmp[i] = 1. / tempn[i];
       const double masse_n = Champ_P1NC::calculer_integrale_volumique(domaine_vef, tmp, FAUX_EN_PERIO);
@@ -226,7 +226,7 @@ void EDO_Pression_th_VEF_Gaz_Parfait::resoudre(DoubleTab& Pth_n)
         tmp[i] = 1. / tempnp1[i];
       const double masse_np1 = Champ_P1NC::calculer_integrale_volumique(domaine_vef, tmp, FAUX_EN_PERIO);
 
-      // Calcul de debit_u_imp et debit_rho_u_imp
+      // Computation of debit_u_imp and debit_rho_u_imp
       for (int n_bord = 0; n_bord < le_dom->nb_front_Cl(); n_bord++)
         {
           const Cond_lim_base& la_cl = le_dom_Cl->les_conditions_limites(n_bord).valeur();
@@ -256,11 +256,11 @@ void EDO_Pression_th_VEF_Gaz_Parfait::resoudre(DoubleTab& Pth_n)
               exit();
             }
         }
-      // On fait la somme sur les procs
+      // Sum over all procs
       // Optimization: combine 2 mp_sum into 1 collective call
       mp_sum_for_each(debit_u_imp, debit_rho_u_imp);
 
-      // Calcul de Pth(n+1)
+      // Computation of Pth(n+1)
       for (int f = 0; f < nb_faces; f++)
         Pth_n(f) = Pth_n(f) * (masse_n - dt * debit_rho_u_imp) / (masse_np1 + dt * debit_u_imp);
     }

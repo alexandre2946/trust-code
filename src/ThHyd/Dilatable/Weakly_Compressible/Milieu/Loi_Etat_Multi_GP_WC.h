@@ -19,9 +19,7 @@
 #include <Loi_Etat_Multi_GP_base.h>
 
 
-/*! @brief classe Loi_Etat_Multi_GP_WC Cette classe represente la loi d'etat pour un melange de gaz parfaits.
- *
- *
+/*! @brief @brief State law class for a mixture of ideal gases in the weakly compressible (WC) framework.
  *
  * @sa Fluide_Dilatable_base Loi_Etat_base Loi_Etat_Multi_GP_base
  */
@@ -41,7 +39,7 @@ public :
   double calculer_masse_volumique(double,double) const override;
   double calculer_masse_volumique(double P,double T,double r) const override;
 
-  // Methodes inlines
+  // Inline methods
   inline const Champ_Don_base& masse_molaire_especes() const { return molar_mass_; }
   inline const Champ_Don_base& visc_dynamique_especes() const { return mu_; }
   inline const Champ_Don_base& coeff_diffusion_especes() const { return diffusion_coeff_; }

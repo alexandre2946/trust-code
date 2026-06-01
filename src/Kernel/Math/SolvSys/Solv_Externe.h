@@ -22,7 +22,7 @@
 class Matrice_Morse;
 class Matrice_Morse_Sym;
 
-/*! Common stuff for several external solvers.
+/*! @brief Common stuff for several external solvers.
  *
  * Note: here we use trustIdType for potentially big identifiers, this maps to PetscInt type in Solv_Petsc class
  * (type equality between the both is checked when creating the solver).
@@ -48,11 +48,11 @@ protected:
 protected:
   const ArrOfInt& indice_coeff_to_keep(const Matrice_Morse&);
 
-  int matrice_symetrique_;      // Drapeau sur la symetrie de la matrice
-  ArrOfDouble lhs_;             // Premier membre sans les items communs
-  ArrOfDouble rhs_;             // Second membre sans les items communs
+  int matrice_symetrique_;      // Flag for matrix symmetry
+  ArrOfDouble lhs_;             // Left-hand side without shared items
+  ArrOfDouble rhs_;             // Right-hand side without shared items
 private:
-  ArrOfInt indice_coeff_to_keep_; // Coefficients de la matrice CSR a garder dans la matrice TRUST
+  ArrOfInt indice_coeff_to_keep_; // CSR matrix coefficients to keep in the TRUST matrix
 };
 
 

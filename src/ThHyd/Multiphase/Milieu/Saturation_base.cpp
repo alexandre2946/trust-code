@@ -49,7 +49,7 @@ void Saturation_base::mettre_a_jour(double temps)
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, pb_.valeur());
   const DoubleTab& press = ref_cast(QDM_Multiphase, pbm.equation_qdm()).pression().valeurs();
 
-  // on suppose pour le moment que le champ de pression a 1 comp.
+  // for now we assume the pressure field has 1 component
   assert(press.line_size() == 1);
   Tsat(press.get_span_tot(), Tsat_tab.get_span_tot(), 1, 0);
 

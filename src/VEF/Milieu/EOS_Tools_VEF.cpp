@@ -41,10 +41,10 @@ Entree& EOS_Tools_VEF::readOn(Entree& is)
   return is;
 }
 
-/*! @brief Associe les domaines a l'EDO
+/*! @brief Associates the domains to the ODE.
  *
- * @param (Domaine_dis_base& domaine) domaine
- * @param (Domaine_Cl_dis_base& domaine_cl) domaine cl
+ * @param (Domaine_dis_base& domaine) domain
+ * @param (Domaine_Cl_dis_base& domaine_cl) boundary condition domain
  */
 void EOS_Tools_VEF::associer_domaines(const Domaine_dis_base& dds, const Domaine_Cl_dis_base& domaine_cl)
 {
@@ -58,9 +58,9 @@ void EOS_Tools_VEF::associer_domaines(const Domaine_dis_base& dds, const Domaine
     }
 }
 
-/*! @brief Renvoie rho avec la meme discretisation que la vitesse : une valeur par face en VEF
+/*! @brief Returns rho with the same discretization as the velocity: one value per face in VEF.
  *
- * @return (DoubleTab&) rho discretise par face
+ * @return (DoubleTab&) rho discretized per face
  */
 const DoubleTab& EOS_Tools_VEF::rho_discvit() const
 {
@@ -77,16 +77,16 @@ const DoubleTab& EOS_Tools_VEF::rho_face_np1() const
   return le_fluide_->rho_np1();
 }
 
-/*! @brief Calcule la moyenne volumique de la grandeur P1NC donnee
+/*! @brief Computes the volumetric average of the given P1NC quantity.
  *
- * @return (DoubleTab&) rho discretise par face
+ * @return (DoubleTab&) rho discretized per face
  */
 double EOS_Tools_VEF::moyenne_vol(const DoubleTab& tab) const
 {
   assert(tab.line_size() == 1);
   double x = Champ_P1NC::calculer_integrale_volumique(le_dom.valeur(), tab, FAUX_EN_PERIO);
-  // La facon simple de faire serait celle-ci, mais c'est faux a cause de FAUX_EN_PERIO
-  //  qui compte deux fois les volumes entrelaces des faces periodiques:
+  // The simple approach would be to compute this directly, but it is incorrect because of FAUX_EN_PERIO
+  //  which counts the interlaced volumes of periodic faces twice:
   double y = Champ_P1NC::calculer_integrale_volumique(le_dom.valeur(), un_, FAUX_EN_PERIO);
   return x / y;
 }
@@ -98,7 +98,7 @@ void EOS_Tools_VEF::divu_discvit(const DoubleTab& DivVelocityElements, DoubleTab
 {
   ToDo_Kokkos("critical");
   assert_espace_virtuel_vect(DivVelocityElements);
-  //Corrections pour moyenner div(u) sur les faces
+  // Corrections to average div(u) on faces
   const DoubleVect& volumes = le_dom->volumes();
   const DoubleVect& volumes_entrelaces = le_dom->volumes_entrelaces();
   const DoubleVect& volumes_entrelaces_Cl = ref_cast(Domaine_Cl_VEF,le_dom_Cl.valeur()).volumes_entrelaces_Cl();
@@ -106,7 +106,7 @@ void EOS_Tools_VEF::divu_discvit(const DoubleTab& DivVelocityElements, DoubleTab
   IntTab& face_voisins = le_dom->face_voisins();
   int premiere_fac_std=le_dom->premiere_face_std();
 
-  //remplissage de div(u) sur les faces
+  // Fill div(u) on faces
   for (int face=0; face<premiere_fac_std; face++)
     {
       int nb_comp=0;
@@ -141,11 +141,11 @@ void EOS_Tools_VEF::divu_discvit(const DoubleTab& DivVelocityElements, DoubleTab
     }
 }
 
-/*! @brief Calcule le second membre de l'equation de continuite pour une discretisation VEF_P1B: div(U) = W = dZ/dT + U.
+/*! @brief Computes the right-hand side of the continuity equation for a VEF_P1B discretization: div(U) = W = dZ/dT + U.
  *
- * grad(Z)    avec Z=ln(rho)
+ * grad(Z)    with Z=ln(rho)
  *
- * @return rho discretise par face
+ * @return rho discretized per face
  */
 void EOS_Tools_VEF::secmembre_divU_Z(DoubleTab& tab_W) const
 {
@@ -169,7 +169,7 @@ void EOS_Tools_VEF::secmembre_divU_Z(DoubleTab& tab_W) const
   int nsf = le_dom->nb_som_face();
   const Domaine& dom = le_dom->domaine();
 
-  // calcul de la somme des volumes entrelacees autour d'un sommet
+  // compute the sum of interlaced volumes around a vertex
   DoubleTrav volume_int_som(nb_som_tot);
   CIntTabView face_sommets_v = face_sommets.view_ro();
   CDoubleArrView volumes_entrelaces_v = static_cast<const DoubleVect&>(volumes_entrelaces).view_ro();
@@ -186,7 +186,7 @@ void EOS_Tools_VEF::secmembre_divU_Z(DoubleTab& tab_W) const
   });
   end_gpu_timer(__KERNEL_NAME__);
 
-  //discretisation de rho sur les sommets
+  // discretization of rho on the vertices
   DoubleTrav tab_rhon_som(nb_som_tot);
   DoubleTrav tab_rhonp1_som(nb_som_tot);
 
@@ -208,8 +208,8 @@ void EOS_Tools_VEF::secmembre_divU_Z(DoubleTab& tab_W) const
   });
   end_gpu_timer(__KERNEL_NAME__);
 
-//Corrections pour test de la moyenne de la derivee de la masse volumique
-  // Dimensionnement de tab_dZ
+// Corrections for testing the mean of the density derivative
+  // Sizing of tab_dZ
   const Navier_Stokes_std& eqns = ref_cast(Navier_Stokes_std, eq);
   const DoubleVect& pression = eqns.pression().valeurs();
   Debog::verifier("EOS_Tools_VEF::secmembre_divU_Z pression=",pression);
@@ -264,14 +264,14 @@ void EOS_Tools_VEF::secmembre_divU_Z(DoubleTab& tab_W) const
   tab_dZ.echange_espace_virtuel();
   Debog::verifier("EOS_Tools_VEF::secmembre_divU_Z tab_dZ=",tab_dZ);
 
-  // Ajout des termes sources speciaux de l'equation de masse:
+  // Adding special source terms of the mass equation:
   const bool has_mass_flux = (sub_type(Navier_Stokes_Fluide_Dilatable_base, le_fluide().vitesse().equation())) ?
                              ref_cast(Navier_Stokes_Fluide_Dilatable_base, le_fluide().vitesse().equation()).has_source_masse() : false;
 
   if (has_mass_flux)
     {
       const Source_Masse_Fluide_Dilatable_base& src_mass = ref_cast(Navier_Stokes_Fluide_Dilatable_base, le_fluide().vitesse().equation()).source_masse();
-      src_mass.ajouter_projection(le_fluide(),tab_dZ); // attention : tab_dZ a taille comme pression
+      src_mass.ajouter_projection(le_fluide(),tab_dZ); // note: tab_dZ has the same size as the pressure array
     }
 
   CDoubleArrView dZ = static_cast<DoubleVect&>(tab_dZ).view_ro();
@@ -305,7 +305,7 @@ void EOS_Tools_VEF::secmembre_divU_Z(DoubleTab& tab_W) const
     {
       for (int ar = 0; ar < nb_ar_tot; ar++)
         {
-          //pour l'instant on n'a pas calcule tab_dZ aux aretes
+          // for now, tab_dZ has not been computed at edges
           assert(tab_dZ(decal + ar) == 0);
           tab_W(decal + ar) = 0.;
         }

@@ -31,9 +31,9 @@ Sortie& Champ_Generique_Predefini::printOn(Sortie& s ) const
   return s << que_suis_je() << " " << le_nom();
 }
 
-//-cf Champ_Gen_de_Champs_Gen::readOn
-//-Creation de l expression en fonction de type_champ_ qui a ete lu
-//-Lecture de champ_
+//-see Champ_Gen_de_Champs_Gen::readOn
+//-Build the expression based on type_champ_ that has been read
+//-Read champ_
 Entree& Champ_Generique_Predefini::readOn(Entree& s )
 {
   Champ_Gen_de_Champs_Gen::readOn(s);
@@ -44,8 +44,8 @@ Entree& Champ_Generique_Predefini::readOn(Entree& s )
   return s ;
 }
 
-//  methode : indique le nom du probleme a considerer
-//              et le champ predefini a construire
+//  methode : indicates the name of the problem to consider
+//              and the predefined field to build
 //
 void Champ_Generique_Predefini::set_param(Param& param) const
 {
@@ -56,7 +56,7 @@ int Champ_Generique_Predefini::lire_motcle_non_standard(const Motcle& mot, Entre
 {
   if (mot=="Pb_champ")
     {
-      // Lecture du nom du probleme et du champ a construire
+      // Read the problem name and the field to build
       is >> nom_pb_ >> type_champ_;
       return 1;
     }
@@ -166,7 +166,7 @@ Nom Champ_Generique_Predefini::construit_expression()
   }
 
   Nom expression("");
-  // on recupere la dimension du problem
+  // we retrieve the problem dimension
   int dim=Objet_U::dimension;
   int rang = les_mots.search(type_champ_);
   switch(rang)

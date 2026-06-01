@@ -44,10 +44,10 @@ Sortie_Fichier_base::~Sortie_Fichier_base()
 
 void Sortie_Fichier_base::set_toFlush()
 {
-  // Les acces disques ont ete optimises depuis
-  // donc par defaut on flushe a nouveau car
-  // sinon les sondes pas ecrites...
-  // Si lent, mettre export TRIOU_FLUSHFILES=0 dans son sub_file
+  // Disk accesses have been optimized since then,
+  // so by default we flush again because
+  // otherwise probes are not written...
+  // If slow, set export TRIOU_FLUSHFILES=0 in your sub_file
   toFlush_ = 1;
   char* theValue = getenv("TRUST_FLUSHFILES");
   if (theValue != nullptr)
@@ -61,8 +61,8 @@ void Sortie_Fichier_base::set_buffer()
   if (!toFlush_)
     {
       char* theValue = getenv("TRUST_BUFFSIZE");
-      // On fixe une valeur a 3000000 par defaut pour buffSize
-      // Elle peut etre changee par la variable d'environnement
+      // Set a default value of 3000000 for buffSize
+      // It can be changed via the environment variable
       int buffSize = 3000000;
       if (theValue != nullptr)
         {
@@ -173,7 +173,7 @@ int Sortie_Fichier_base::ouvrir(const char* name,IOS_OPEN_MODE mode)
   return 1;
 }
 
-/*! @brief Force l'ecriture sur disque des donnees dans le tampon Utilise l'implementation de la classe ofstream
+/*! @brief Forces the data in the buffer to be written to disk. Uses the ofstream class implementation.
  *
  * @return (Sortie&) *this
  */

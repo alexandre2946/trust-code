@@ -27,13 +27,13 @@ class Domaine_dis_base;
 class Matrice_Morse;
 class Matrice_Base;
 
-/*! @brief classe Solveur_Masse_base Represente la matrice de masse d'une equation.
+/*! @brief Solveur_Masse_base Represents the mass matrix of an equation.
  *
- * Une equation
- *      contient une reference a une matrice de masse.
- *      Cette classe est la base de la hierarchie des matrices de masse.
+ * An equation
+ *      contains a reference to a mass matrix.
+ *      This class is the base of the mass matrix hierarchy.
  *
- * @sa SolveurMasse Equation_base, Classe abstraite., Methodes abstraites:, DoubleTab& appliquer(DoubleTab&) const, void associer_domaine_dis_base(const Domaine_dis_base& ), void associer_domaine_cl_dis_base(const Domaine_Cl_dis_base& )
+ * @sa SolveurMasse Equation_base, Abstract class., Abstract methods:, DoubleTab& appliquer(DoubleTab&) const, void associer_domaine_dis_base(const Domaine_dis_base& ), void associer_domaine_cl_dis_base(const Domaine_Cl_dis_base& )
  */
 
 class Solveur_Masse_base : public Objet_U, public MorEqn
@@ -68,11 +68,11 @@ public :
     return name_of_coefficient_temporel_;
   }
 
-  // cette methode remplace la methode appliquer des version avant 154
+  // this method replaces the appliquer method from versions before 154
   virtual DoubleTab& appliquer_impl(DoubleTab& x) const =0;
 
-  // j'ajoute une methode dimensionner()
-  // qui dimensionne la matrice pour le cas ou tous les operateurs sont negligeables
+  // adding a dimensionner() method
+  // that dimensions the matrix for the case where all operators are negligible
   virtual void dimensionner(Matrice_Morse& matrix) const;
 
   /* interface {dimensionner,ajouter}_blocs -> cf Equation_base.h */
@@ -83,21 +83,21 @@ public :
   virtual void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const;
   virtual void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, double dt, const tabs_t& semi_impl, int resoudre_en_increments) const;
 
-  // j'ajoute une methode completer()
-  // qui est appelee par la methode completer() des equations.
-  // L'implementation par defaut ne fait rien.
+  // adding a completer() method
+  // called by the completer() method of equations.
+  // Default implementation does nothing.
   virtual void completer();
 
-  // j'ajoute une methode preparer_calcul()
-  // qui est appelee par la methode preparer_calcul des equations
-  // L'implementation par defaut ne fait rien
+  // adding a preparer_calcul() method
+  // called by the preparer_calcul method of equations
+  // Default implementation does nothing
   virtual void preparer_calcul();
 
   inline void set_penalisation_flag(int pen) { penalisation_flag_ = pen;  }
 
 
 protected :
-  Nom name_of_coefficient_temporel_; // nom du coefficient temporelle
+  Nom name_of_coefficient_temporel_; // name of the temporal coefficient
   int has_coefficient_temporel_;
   mutable int penalisation_flag_;
 private:

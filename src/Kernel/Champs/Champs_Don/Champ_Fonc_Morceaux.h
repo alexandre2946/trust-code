@@ -18,9 +18,9 @@
 
 #include <TRUSTChamp_Morceaux_generique.h>
 
-/*! @brief classe Champ_Fonc_Morceaux Cette classe represente un champ prenant par morceaux des valuers fonctions
+/*! @brief Champ_Fonc_Morceaux This class represents a field taking piecewise values as functions
  *
- *      de l'espace et d'un autre champ scalaire passe en parametre .
+ *      of space and of another scalar field passed as a parameter.
  *
  * @sa : TRUSTChamp_Morceaux_generique
  */

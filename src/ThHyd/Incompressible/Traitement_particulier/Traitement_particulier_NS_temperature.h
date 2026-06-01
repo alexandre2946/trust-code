@@ -22,9 +22,9 @@
 
 #include <SFichier.h>
 
-/*! @brief classe Traitement_particulier_NS_temperature Cette classe permet de faire les traitements particuliers
+/*! @brief Traitement_particulier_NS_temperature This class performs specific post-processing treatments
  *
- *      pour les calculs de  l'energie cinetique totale
+ *      for computations of the total temperature field.
  *
  *
  * @sa Navier_Stokes_Turbulent, Traitement_particulier_NS_base, Traitement_particulier_VEF

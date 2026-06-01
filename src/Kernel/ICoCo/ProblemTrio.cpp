@@ -158,16 +158,16 @@ bool ProblemTrio::initialize()
   int argc=2;
   char** argv=new char*[argc];
   string code="TRUST wrapper";
-  // Les copies sont necessaires pour se debarrasser des const...
+  // Copies are necessary to get rid of the const qualifiers...
   argv[0]=new char[code.length()+1];
   strcpy(argv[0],code.c_str());
   argv[1]=new char[(*my_params).data_file.length()+1];
   strcpy(argv[1],(*my_params).data_file.c_str());
-  // pour salome
+  // for salome
   if (p) delete p;
   p=nullptr;
   int res;
-  // on lance avec ou sans mpi
+  // launch with or without mpi
   res=main_TRUST(argc,argv,p,(*my_params).is_mpi);
 
   // Re-open top level counter (it was closed at the end of main_TRUST
@@ -250,9 +250,9 @@ void ProblemTrio::terminate()
 /*! @brief Returns the present time.
  *
  * This value may change only at the call of validateTimeStep.
- *  A surcharger
+ *  To be overridden in derived classes.
  *
- * @return (double) present time
+ * @return the present time
  * @throws WrongContext
  */
 double ProblemTrio::presentTime() const
@@ -573,7 +573,7 @@ void ProblemTrio::getInputMEDDoubleFieldTemplate(const std::string& name, MEDDou
 void ProblemTrio::setInputMEDDoubleField(const std::string& name, const MEDDoubleField& afield)
 {
 #ifndef NO_MEDFIELD
-  // bof en attendant mieux
+  // temporary workaround until a better solution is available
   TrioField  triofield;
   getInputFieldTemplate(name,triofield);
 #ifdef OLD_MEDCOUPLING
@@ -582,7 +582,7 @@ void ProblemTrio::setInputMEDDoubleField(const std::string& name, const MEDDoubl
   const MEDCoupling::DataArrayDouble *fieldArr=afield.getMCField()->getArray();
 #endif
   triofield._field=const_cast<double*> (fieldArr->getConstPointer());
-  // il faut copier les valeurs
+  // the values must be copied
   setInputField(name,triofield);
   triofield._field=0;
   //fieldArr->decrRef();

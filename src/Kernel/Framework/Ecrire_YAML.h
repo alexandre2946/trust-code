@@ -25,7 +25,7 @@
 
 class Probleme_base;
 
-/*! @brief classe Ecrire_YAML Use this to generate a yaml file that will then be read by the PDI library (for checkpoint/restart or for domain partitioning)
+/*! @brief class Ecrire_YAML Use this to generate a yaml file that will then be read by the PDI library (for checkpoint/restart or for domain partitioning)
  *
  * The data that will be written are the ones that have been set in Equation_base::data_a_sauvegarder() (+overloads)
  * and Postraitement_base::data_a_sauvegarder() (+ overloads)

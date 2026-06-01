@@ -37,13 +37,13 @@ Implemente_instanciable(Pb_Thermohydraulique, "Pb_Thermohydraulique", Pb_Hydraul
 Sortie& Pb_Thermohydraulique::printOn(Sortie& os) const { return Pb_Hydraulique::printOn(os); }
 Entree& Pb_Thermohydraulique::readOn(Entree& is) { return Pb_Hydraulique::readOn(is); }
 
-/*! @brief Renvoie l'equation d'hydraulique de type Navier_Stokes_std si i=0 Renvoie l'equation de la thermique de type
+/*! @brief Returns the hydraulic equation of type Navier_Stokes_std if i=0, returns the thermal equation of type
  *
- *     Convection_Diffusion_Temperature si i=1
- *     (version const)
+ *     Convection_Diffusion_Temperature if i=1
+ *     (const version)
  *
- * @param (int i) l'index de l'equation a renvoyer
- * @return (Equation_base&) l'equation correspondante a l'index
+ * @param i the index of the equation to return
+ * @return the equation corresponding to the index
  */
 const Equation_base& Pb_Thermohydraulique::equation(int i) const
 {
@@ -58,12 +58,12 @@ const Equation_base& Pb_Thermohydraulique::equation(int i) const
   return eq_hydraulique;
 }
 
-/*! @brief Renvoie l'equation d'hydraulique de type Navier_Stokes_std si i=0 Renvoie l'equation de la thermique de type
+/*! @brief Returns the hydraulic equation of type Navier_Stokes_std if i=0, returns the thermal equation of type
  *
- *     Convection_Diffusion_Temperature si i=1
+ *     Convection_Diffusion_Temperature if i=1
  *
- * @param (int i) l'index de l'equation a renvoyer
- * @return (Equation_base&) l'equation correspondante a l'index
+ * @param i the index of the equation to return
+ * @return the equation corresponding to the index
  */
 Equation_base& Pb_Thermohydraulique::equation(int i)
 {
@@ -78,10 +78,10 @@ Equation_base& Pb_Thermohydraulique::equation(int i)
   return eq_hydraulique;
 }
 
-/*! @brief Associe le milieu au probleme Le milieu doit etre de type fluide incompressible
+/*! @brief Associates the medium to the problem. The medium must be of type incompressible fluid.
  *
- * @param (Milieu_base& mil) le milieu physique a associer au probleme
- * @throws mauvais type de milieu physique
+ * @param mil the physical medium to associate with the problem
+ * @throws wrong type of physical medium
  */
 void Pb_Thermohydraulique::associer_milieu_base(const Milieu_base& mil)
 {
@@ -92,14 +92,13 @@ void Pb_Thermohydraulique::associer_milieu_base(const Milieu_base& mil)
     eq_thermique.associer_milieu_base(mil);
 }
 
-/*! @brief Teste la compatibilite des equations de la thermique et de l'hydraulique.
+/*! @brief Tests the compatibility of the thermal and hydraulic equations.
  *
- * Le test se fait sur les conditions
- *     aux limites discretisees de chaque equation.
- *     Appel la fonction de librairie hors classe:
+ * The test is performed on the discretized boundary conditions of each equation.
+ *     Calls the library function:
  *       tester_compatibilite_hydr_thermique(const Domaine_Cl_dis_base&,const Domaine_Cl_dis_base&)
  *
- * @return (int) code de retour propage
+ * @return propagated return code
  */
 int Pb_Thermohydraulique::verifier()
 {

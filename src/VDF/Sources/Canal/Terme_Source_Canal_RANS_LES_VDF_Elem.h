@@ -26,9 +26,9 @@ class Probleme_base;
 class Domaine_Cl_VDF;
 class Domaine_VDF;
 
-/*! @brief class Terme_Source_Canal_RANS_LES_VDF_Elem Cette classe concerne un terme source calcule en partie grace
+/*! @brief class Terme_Source_Canal_RANS_LES_VDF_Elem This class concerns a source term computed partly using
  *
- *   a un calcul RANS preliminaire et applique au calcul LES en cours
+ *   a preliminary RANS computation and applied to the current LES computation
  *
  *
  */
@@ -56,7 +56,7 @@ protected :
   OBS_PTR(Domaine_Cl_VDF) le_dom_Cl_VDF;
 
 private :
-  int moyenne = 0; //type de moyenne
+  int moyenne = 0; //type of average
   int compteur_reprise = 0;
   double alpha_tau = -100., Ly = -100.;
   double f_start = 0., t_av = -1;

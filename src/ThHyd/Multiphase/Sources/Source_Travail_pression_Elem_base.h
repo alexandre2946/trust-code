@@ -18,12 +18,10 @@
 
 #include <Sources_Multiphase_base.h>
 
-/*! @brief Classe Source_Travail_pression_Elem_base
+/*! @brief Implements the pressure work term:
  *
- *  Cette classe implemente le travail de la pression
- *
- *     - p (d alpha_k / dt + div(alpha_k v_k) )
- *     dans l'equation d'energie ecrite en energie interne (cf. CATHARE 3D)
+ *     - p (d alpha_k / dt + div(alpha_k v_k))
+ *     in the internal energy equation (cf. CATHARE 3D).
  *
  */
 class Source_Travail_pression_Elem_base: public Sources_Multiphase_base
@@ -34,7 +32,7 @@ public :
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
 
 protected:
-  double alp = 1.0; /* decentrament de l'operateur de convection */
+  double alp = 1.0; /* upwinding of the convection operator */
 };
 
 #endif /* Source_Travail_pression_Elem_base_included */

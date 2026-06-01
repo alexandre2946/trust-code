@@ -30,12 +30,12 @@ Sortie& Pb_Hydraulique_Melange_Binaire_QC::printOn(Sortie& os) const { return Pr
 
 Entree& Pb_Hydraulique_Melange_Binaire_QC::readOn(Entree& is) { return Probleme_base::readOn(is); }
 
-/*! @brief Renvoie 2 car il y a 2 equations : Navier_Stokes_QC et Convection_Diffusion_Espece_Binaire_QC
+/*! @brief Returns 2 because there are 2 equations: Navier_Stokes_QC and Convection_Diffusion_Espece_Binaire_QC.
  *
  */
 int Pb_Hydraulique_Melange_Binaire_QC::nombre_d_equations() const { return 2; }
 
-/*! @brief Renvoie l'equation d'hydraulique de type Navier_Stokes_QC si i=0 Renvoie l'equation de conv/diff fraction massique de type Convection_Diffusion_Espece_Binaire_QC si i=1
+/*! @brief Returns the hydraulic equation of type Navier_Stokes_QC if i=0. Returns the mass fraction convection/diffusion equation of type Convection_Diffusion_Espece_Binaire_QC if i=1.
  *
  */
 const Equation_base& Pb_Hydraulique_Melange_Binaire_QC::equation(int i) const
@@ -48,7 +48,7 @@ Equation_base& Pb_Hydraulique_Melange_Binaire_QC::equation(int i)
   return equation_impl(i,eq_hydraulique,eq_frac_mass);
 }
 
-/*! @brief Teste la compatibilite des equations de la fraction massique et de l'hydraulique.
+/*! @brief Tests the compatibility of the mass fraction and hydraulic equations.
  *
  */
 int Pb_Hydraulique_Melange_Binaire_QC::verifier()

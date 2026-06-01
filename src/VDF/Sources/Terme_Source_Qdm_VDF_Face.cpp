@@ -73,9 +73,9 @@ void Terme_Source_Qdm_VDF_Face::ajouter_blocs(matrices_t matrices, DoubleTab& re
     {
       const DoubleVect& s = la_source->valeurs();
 
-      // Boucle sur les conditions limites pour traiter les faces de bord : pour chaque Condition Limite on regarde son type
-      // Si face de Dirichlet ou de Symetrie on ne fait rien
-      // Si face de Neumann on calcule la contribution au terme source
+      // Loop over boundary conditions to process boundary faces: for each boundary condition, check its type
+      // If Dirichlet or Symmetry face, do nothing
+      // If Neumann face, compute the contribution to the source term
       for (int n_bord = 0; n_bord < domaine_VDF.nb_front_Cl(); n_bord++)
         {
           const Cond_lim& la_cl = domaine_Cl_VDF.les_conditions_limites(n_bord);
@@ -123,7 +123,7 @@ void Terme_Source_Qdm_VDF_Face::ajouter_blocs(matrices_t matrices, DoubleTab& re
           else if ((sub_type(Dirichlet, la_cl.valeur())) || (sub_type(Dirichlet_homogene, la_cl.valeur()))) { /* Do nothing */}
         }
 
-      // Boucle sur les faces internes
+      // Loop over internal faces
       ndeb = domaine_VDF.premiere_face_int();
       for (int k = 0; k < nb_comp; k++)
         for (num_face = domaine_VDF.premiere_face_int(); num_face < domaine_VDF.nb_faces(); num_face++)
@@ -140,7 +140,7 @@ void Terme_Source_Qdm_VDF_Face::ajouter_blocs(matrices_t matrices, DoubleTab& re
             resu(num_face, k) += s(nb_comp * ncomp + k) * vol * alpha_rho;
           }
     }
-  else // le champ source n'est plus uniforme
+  else // the source field is no longer uniform
     {
       const DoubleTab *s_tmp = nullptr;
       DoubleTab eval;
@@ -156,9 +156,9 @@ void Terme_Source_Qdm_VDF_Face::ajouter_blocs(matrices_t matrices, DoubleTab& re
         s_tmp = &(la_source->valeurs());
       const DoubleTab& s = *s_tmp;
 
-      // Boucle sur les conditions limites pour traiter les faces de bord : pour chaque Condition Limite on regarde son type
-      // Si face de Dirichlet ou de Symetrie on ne fait rien
-      // Si face de Neumann on calcule la contribution au terme source
+      // Loop over boundary conditions to process boundary faces: for each boundary condition, check its type
+      // If Dirichlet or Symmetry face, do nothing
+      // If Neumann face, compute the contribution to the source term
       for (int n_bord = 0; n_bord < domaine_VDF.nb_front_Cl(); n_bord++)
         {
           const Cond_lim& la_cl = domaine_Cl_VDF.les_conditions_limites(n_bord);
@@ -206,7 +206,7 @@ void Terme_Source_Qdm_VDF_Face::ajouter_blocs(matrices_t matrices, DoubleTab& re
             }
         }
 
-      // Boucle sur les faces internes
+      // Loop over internal faces
       ndeb = domaine_VDF.premiere_face_int();
 
       for (int k = 0; k < nb_comp; k++)

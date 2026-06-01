@@ -83,7 +83,7 @@ int Energie_Multiphase::lire_motcle_non_standard(const Motcle& mot, Entree& is)
   return 1;
 }
 
-/*! @brief Discretise l'equation.
+/*! @brief Discretizes the equation.
  *
  */
 void Energie_Multiphase::discretiser()
@@ -100,44 +100,46 @@ void Energie_Multiphase::discretiser()
   Cerr << "Energie_Multiphase::discretiser() ok" << finl;
 }
 
-/*! @brief Impression des flux sur les bords sur un flot de sortie.
+/*! @brief Prints the boundary fluxes to an output stream.
  *
- * Appelle Equation_base::impr(Sortie&)
+ * Calls Equation_base::impr(Sortie&).
  *
- * @param (Sortie& os) un flot de sortie
- * @return (int) code de retour propage
+ * @param os Output stream.
+ * @return Propagated return code.
  */
 int Energie_Multiphase::impr(Sortie& os) const
 {
   return Equation_base::impr(os);
 }
 
-/*! @brief Verification du nombre de composantes lues pour la specification d un champ.
+/*! @brief Verifies the number of components read for a field specification.
  *
- * Dans Energie_Multiphase, les conditions aux limites de type "paroi" ne prennent
- *  qu'une compposante lorsqu'une correlation "flux_parietal" est definie au niveau du probleme.
+ * In Energie_Multiphase, "wall" boundary conditions only take
+ *  one component when a "flux_parietal" correlation is defined at the problem level.
  *
- * @param (ch_ref  : un champ inconnu de l equation consideree)
+ * @param ch_ref Unknown field of the considered equation.
+ * @param nb_comp Number of components.
+ * @param cl Boundary condition.
  */
 void Energie_Multiphase::verifie_ch_init_nb_comp_cl(const Champ_Inc_base& ch_ref, const int nb_comp, const Cond_lim_base& cl) const
 {
-  //si on verifie une CL de type
+  // if we are checking a boundary condition of type
   if (probleme().has_correlation("flux_parietal")
       && (sub_type(Neumann_paroi, cl) || sub_type(Scalaire_impose_paroi, cl) || sub_type(Echange_global_impose, cl)))
     {
-      if (nb_comp == 1) return; //OK
+      if (nb_comp == 1) return; // OK
       Cerr << "Energie_Multiphase : when using a Flux_parietal correlation, only one wall temperature/heat flux "
            << "can be specified at the boundary " << cl.le_nom() << " . Please provide 1 component instead of " << nb_comp << "!" << finl;
       Process::exit();
     }
-  else Convection_Diffusion_Temperature_base::verifie_ch_init_nb_comp(ch_ref, nb_comp); //traitement normal
+  else Convection_Diffusion_Temperature_base::verifie_ch_init_nb_comp(ch_ref, nb_comp); // standard treatment
 }
 
-/*! @brief Renvoie le nom du domaine d'application de l'equation.
+/*! @brief Returns the name of the equation's application domain.
  *
- * Ici "Thermique".
+ * Here "Thermique".
  *
- * @return (Motcle&) le nom du domaine d'application de l'equation
+ * @return Name of the equation's application domain.
  */
 const Motcle& Energie_Multiphase::domaine_application() const
 {
@@ -158,7 +160,7 @@ int Energie_Multiphase::has_interface_blocs() const
   return ok;
 }
 
-/* l'evanescence passe en dernier */
+/* evanescence is processed last */
 void Energie_Multiphase::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   Convection_Diffusion_Temperature_base::dimensionner_blocs(matrices, semi_impl);
@@ -178,13 +180,13 @@ void Energie_Multiphase::calculer_alpha_rho_e_conv(const Objet_U& obj, DoubleTab
   const Fluide_base& fl = ref_cast(Fluide_base, eqn.milieu());
   const Champ_base& ch_rho = fl.masse_volumique();
   const Champ_Inc_base& ch_alpha = ref_cast(Pb_Multiphase, eqn.probleme()).equation_masse().inconnue(),
-                        &ch_en = ref_cast(Champ_Inc_base, fl.energie_interne()), //toujours un Champ_Inc
-                         *pch_rho = sub_type(Champ_Inc_base, ch_rho) ? &ref_cast(Champ_Inc_base, ch_rho) : nullptr; //pas toujours un Champ_Inc
+                        &ch_en = ref_cast(Champ_Inc_base, fl.energie_interne()), // always a Champ_Inc
+                         *pch_rho = sub_type(Champ_Inc_base, ch_rho) ? &ref_cast(Champ_Inc_base, ch_rho) : nullptr; // not always a Champ_Inc
   const DoubleTab& alpha = ch_alpha.valeurs(),
                    &rho = ch_rho.valeurs(),
                     &en = ch_en.valeurs();
 
-  /* valeurs du champ */
+  /* field values */
   const int N = val.line_size(),
             Nl = val.dimension_tot(0),
             cR = sub_type(Champ_Uniforme, ch_rho);
@@ -192,7 +194,7 @@ void Energie_Multiphase::calculer_alpha_rho_e_conv(const Objet_U& obj, DoubleTab
     for (int n = 0; n < N; n++)
       val(i, n) = (alpha(i, n) - pbm.alpha_inf_phase(n)) * rho(!cR * i, n) * en(i, n);
 
-  /* on ne peut utiliser valeur_aux_bords que si ch_rho a un domaine_dis_base */
+  /* valeur_aux_bords can only be used if ch_rho has a domaine_dis_base */
   DoubleTrav b_al, b_rho, b_en;
   b_al = ch_alpha.valeur_aux_bords();
   b_en = ch_en.valeur_aux_bords();
@@ -209,19 +211,19 @@ void Energie_Multiphase::calculer_alpha_rho_e_conv(const Objet_U& obj, DoubleTab
     for (int n = 0; n < N; n++)
       bval(i, n) = (b_al(i, n) - pbm.alpha_inf_phase(n)) * b_rho(i, n) * b_en(i, n);
 
-  DoubleTab& d_a = deriv["alpha"]; //derivee en alpha : rho * en
+  DoubleTab& d_a = deriv["alpha"]; // derivative with respect to alpha: rho * en
   d_a.resize(Nl, N);
 
   for (int i = 0; i < Nl; i++)
     for (int n = 0; n < N; n++)
       d_a(i, n) = rho(!cR * i, n) * en(i, n);
 
-  /* derivees a travers rho et en */
+  /* derivatives through rho and en */
   const tabs_t d_vide = {},
                &d_rho = pch_rho ? pch_rho->derivees() : d_vide,
                 &d_en = ch_en.derivees();
 
-  std::set<std::string> vars; //liste de toutes les derivees possibles
+  std::set<std::string> vars; // list of all possible derivatives
   for (auto &&d_c : d_rho)
     vars.insert(d_c.first);
   for (auto &&d_c : d_en)
@@ -247,13 +249,13 @@ void Energie_Multiphase::calculer_alpha_rho_e(const Objet_U& obj, DoubleTab& val
   const Fluide_base& fl = ref_cast(Fluide_base, eqn.milieu());
   const Champ_base& ch_rho = fl.masse_volumique();
   const Champ_Inc_base& ch_alpha = ref_cast(Pb_Multiphase, eqn.probleme()).equation_masse().inconnue(),
-                        &ch_en = ref_cast(Champ_Inc_base, fl.energie_interne()), //toujours un Champ_Inc
-                         *pch_rho = sub_type(Champ_Inc_base, ch_rho) ? &ref_cast(Champ_Inc_base, ch_rho) : nullptr; //pas toujours un Champ_Inc
+                        &ch_en = ref_cast(Champ_Inc_base, fl.energie_interne()), // always a Champ_Inc
+                         *pch_rho = sub_type(Champ_Inc_base, ch_rho) ? &ref_cast(Champ_Inc_base, ch_rho) : nullptr; // not always a Champ_Inc
   const DoubleTab& alpha = ch_alpha.valeurs(),
                    &rho = ch_rho.valeurs(),
                     &en = ch_en.valeurs();
 
-  /* valeurs du champ */
+  /* field values */
   const int N = val.line_size(),
             Nl = val.dimension_tot(0),
             cR = sub_type(Champ_Uniforme, ch_rho);
@@ -261,7 +263,7 @@ void Energie_Multiphase::calculer_alpha_rho_e(const Objet_U& obj, DoubleTab& val
     for (int n = 0; n < N; n++)
       val(i, n) = alpha(i, n) * rho(!cR * i, n) * en(i, n);
 
-  /* on ne peut utiliser valeur_aux_bords que si ch_rho a un domaine_dis_base */
+  /* valeur_aux_bords can only be used if ch_rho has a domaine_dis_base */
   DoubleTrav b_al, b_rho, b_en;
   b_al = ch_alpha.valeur_aux_bords();
   b_en = ch_en.valeur_aux_bords();
@@ -279,19 +281,19 @@ void Energie_Multiphase::calculer_alpha_rho_e(const Objet_U& obj, DoubleTab& val
     for (int n = 0; n < N; n++)
       bval(i, n) = b_al(i, n) * b_rho(i, n) * b_en(i, n);
 
-  DoubleTab& d_a = deriv["alpha"]; //derivee en alpha : rho * en
+  DoubleTab& d_a = deriv["alpha"]; // derivative with respect to alpha: rho * en
   d_a.resize(Nl, N);
 
   for (int i = 0; i < Nl; i++)
     for (int n = 0; n < N; n++)
       d_a(i, n) = rho(!cR * i, n) * en(i, n);
 
-  /* derivees a travers rho et en */
+  /* derivatives through rho and en */
   const tabs_t d_vide = { },
                &d_rho = pch_rho ? pch_rho->derivees() : d_vide,
                 &d_en = ch_en.derivees();
 
-  std::set < std::string > vars; //liste de toutes les derivees possibles
+  std::set < std::string > vars; // list of all possible derivatives
   for (auto &&d_c : d_rho)
     vars.insert(d_c.first);
   for (auto &&d_c : d_en)
@@ -317,13 +319,13 @@ void Energie_Multiphase::calculer_alpha_rho_h(const Objet_U& obj, DoubleTab& val
   const Fluide_base& fl = ref_cast(Fluide_base, eqn.milieu());
   const Champ_base& ch_rho = fl.masse_volumique();
   const Champ_Inc_base& ch_alpha = ref_cast(Pb_Multiphase, eqn.probleme()).equation_masse().inconnue(),
-                        &ch_h = ref_cast(Champ_Inc_base, fl.enthalpie()), //toujours un Champ_Inc
-                         *pch_rho = sub_type(Champ_Inc_base, ch_rho) ? &ref_cast(Champ_Inc_base, ch_rho) : nullptr; //pas toujours un Champ_Inc
+                        &ch_h = ref_cast(Champ_Inc_base, fl.enthalpie()), // always a Champ_Inc
+                         *pch_rho = sub_type(Champ_Inc_base, ch_rho) ? &ref_cast(Champ_Inc_base, ch_rho) : nullptr; // not always a Champ_Inc
   const DoubleTab& alpha = ch_alpha.valeurs(),
                    &rho = ch_rho.valeurs(),
                     &h = ch_h.valeurs();
 
-  /* valeurs du champ */
+  /* field values */
   const int N = val.line_size(),
             Nl = val.dimension_tot(0),
             cR = sub_type(Champ_Uniforme, ch_rho);
@@ -332,7 +334,7 @@ void Energie_Multiphase::calculer_alpha_rho_h(const Objet_U& obj, DoubleTab& val
     for (int n = 0; n < N; n++)
       val(i, n) = alpha(i, n) * rho(!cR * i, n) * h(i, n);
 
-  /* on ne peut utiliser valeur_aux_bords que si ch_rho a un domaine_dis_base */
+  /* valeur_aux_bords can only be used if ch_rho has a domaine_dis_base */
   DoubleTrav b_al, b_rho, b_h ;
   b_al = ch_alpha.valeur_aux_bords();
   b_h = ch_h.valeur_aux_bords();
@@ -350,19 +352,19 @@ void Energie_Multiphase::calculer_alpha_rho_h(const Objet_U& obj, DoubleTab& val
     for (int n = 0; n < N; n++)
       bval(i, n) = b_al(i, n) * b_rho(i, n) * b_h(i, n);
 
-  DoubleTab& d_a = deriv["alpha"]; //derivee en alpha : rho * h
+  DoubleTab& d_a = deriv["alpha"]; // derivative with respect to alpha: rho * h
   d_a.resize(Nl, N);
 
   for (int i = 0; i < Nl; i++)
     for (int n = 0; n < N; n++)
       d_a(i, n) = rho(!cR * i, n) * h(i, n);
 
-  /* derivees a travers rho et en */
+  /* derivatives through rho and en */
   const tabs_t d_vide = { },
                &d_rho = pch_rho ? pch_rho->derivees() : d_vide,
                 &d_h = ch_h.derivees();
 
-  std::set < std::string > vars; //liste de toutes les derivees possibles
+  std::set < std::string > vars; // list of all possible derivatives
   for (auto &&d_c : d_rho)
     vars.insert(d_c.first);
   for (auto &&d_c : d_h)
@@ -385,13 +387,13 @@ void Energie_Multiphase::calculer_alpha_rho_h(const Objet_U& obj, DoubleTab& val
 void Energie_Multiphase::init_champ_convecte() const
 {
   if (champ_convecte_)
-    return; //deja fait
+    return; // already done
 
   const int Nt = inconnue().nb_valeurs_temporelles(),
             Nl = inconnue().valeurs().size_reelle_ok() ? inconnue().valeurs().dimension(0) : -1,
             Nc = inconnue().valeurs().line_size();
 
-  //champ_convecte_ : meme type / support que l'inconnue
+  // champ_convecte_: same type / support as the unknown
   discretisation().creer_champ(champ_convecte_, domaine_dis(), inconnue().que_suis_je(), "N/A", "N/A", Nc, Nl, Nt, schema_temps().temps_courant());
 
   champ_convecte_->associer_eqn(*this);

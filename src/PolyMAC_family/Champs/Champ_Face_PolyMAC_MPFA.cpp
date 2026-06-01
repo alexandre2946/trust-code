@@ -70,17 +70,17 @@ Entree& Champ_Face_PolyMAC_MPFA::readOn(Entree& is) { return is; }
 
 int Champ_Face_PolyMAC_MPFA::fixer_nb_valeurs_nodales(int n)
 {
-  // j'utilise le meme genre de code que dans Champ_Fonc_P0_base sauf que je recupere le nombre de faces au lieu du nombre d'elements
-  // je suis tout de meme etonne du code utilise dans Champ_Fonc_P0_base::fixer_nb_valeurs_nodales() pour recuperer le domaine discrete...
+  // use the same kind of code as in Champ_Fonc_P0_base, but retrieve the number of faces instead of the number of elements
+  // note: the code used in Champ_Fonc_P0_base::fixer_nb_valeurs_nodales() to retrieve the discrete domain is somewhat surprising...
 
   assert(n == domaine_PolyMAC_MPFA().nb_faces() || n < 0);
 
-  // Probleme: nb_comp vaut dimension mais on ne veut qu'une dimension !!!
-  // HACK :
+  // Problem: nb_comp equals dimension but we only want one dimension !!!
+  // HACK:
   int old_nb_compo = nb_compo_;
   if(nb_compo_ != 1) nb_compo_ /= dimension;
 
-  /* variables : valeurs normales aux faces, puis valeurs aux elements par blocs -> pour que line_size() marche */
+  /* variables: normal values at faces, then values at elements in blocks -> so that line_size() works */
   creer_tableau_distribue(domaine_PolyMAC_MPFA().md_vector_faces());
   nb_compo_ = old_nb_compo;
   return n;
@@ -91,9 +91,9 @@ void Champ_Face_PolyMAC_MPFA::init_auxiliary_variables()
   for (int n = 0; n < nb_valeurs_temporelles(); n++)
     {
       DoubleTab& vals = futur(n);
-      vals.set_md_vector(MD_Vector()); //on enleve le MD_Vector...
-      vals.resize_dim0(domaine_PolyMAC_MPFA().mdv_ch_face->get_nb_items_tot()); //...on dimensionne a la bonne taille...
-      vals.set_md_vector(domaine_PolyMAC_MPFA().mdv_ch_face); //...et on remet le bon MD_Vector
+      vals.set_md_vector(MD_Vector()); //remove the MD_Vector...
+      vals.resize_dim0(domaine_PolyMAC_MPFA().mdv_ch_face->get_nb_items_tot()); //...resize to the correct size...
+      vals.set_md_vector(domaine_PolyMAC_MPFA().mdv_ch_face); //...and restore the correct MD_Vector
       update_ve(vals);
     }
 }
@@ -105,12 +105,12 @@ int Champ_Face_PolyMAC_MPFA::reprendre(Entree& fich)
   const Pb_Multiphase * pbm = mon_equation_non_nul() ? (sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()) : nullptr) : nullptr;
   if (pbm) return Champ_Inc_base::reprendre(fich);
 
-  // sinon on fait ca ...
+  // otherwise do this ...
   const Domaine_PolyMAC_MPFA* domaine = le_dom_VF ? &ref_cast( Domaine_PolyMAC_MPFA,le_dom_VF.valeur()) : nullptr;
-  valeurs().set_md_vector(MD_Vector()); //on enleve le MD_Vector...
+  valeurs().set_md_vector(MD_Vector()); //remove the MD_Vector...
   valeurs().resize(0);
   int ret = Champ_Inc_base::reprendre(fich);
-  //et on remet le bon si on peut
+  //restore the correct one if possible
   if (domaine) valeurs().set_md_vector(valeurs().dimension_tot(0) > domaine->nb_faces_tot() ? domaine->mdv_faces_aretes : domaine->md_vector_faces());
   return ret;
 }
@@ -153,7 +153,7 @@ Champ_base& Champ_Face_PolyMAC_MPFA::affecter_(const Champ_base& ch)
               val(f, n) += eval(unif ? 0 : f, N * d + n) * nf(f, d) / fs(f);
 
       update_ve(val);
-      //copie dans toutes les cases
+      //copy into all time slots
       val.echange_espace_virtuel();
       for (int i = 1; i < les_valeurs->nb_cases(); i++)
         les_valeurs[i].valeurs() = val;
@@ -176,7 +176,7 @@ void Champ_Face_PolyMAC_MPFA::update_ve(DoubleTab& val) const
 {
   const Domaine_PolyMAC_MPFA& domaine = domaine_PolyMAC_MPFA();
   if (valeurs().get_md_vector() != domaine.mdv_ch_face)
-    return; //pas de variables auxiliaires -> rien a faire
+    return; //no auxiliary variables -> nothing to do
 
   const DoubleVect& fs = domaine.face_surfaces(), &ve = domaine.volumes(),
                     *pf = mon_equation_non_nul() ? &equation().milieu().porosite_face() : nullptr,
@@ -222,7 +222,7 @@ void Champ_Face_PolyMAC_MPFA::init_ve2() const
   const Domaine_PolyMAC_MPFA& domaine = domaine_PolyMAC_MPFA();
 
   if (ve2d.dimension(0) || valeurs().get_md_vector() != domaine.mdv_ch_face)
-    return; //deja initialise ou pas de variables auxiliaires
+    return; //already initialized or no auxiliary variables
 
   const DoubleVect& pf = equation().milieu().porosite_face(),
                     &pe = equation().milieu().porosite_elem(),
@@ -238,7 +238,7 @@ void Champ_Face_PolyMAC_MPFA::init_ve2() const
 
   init_fcl();
 
-  //position des points aux faces de bord : CG si interne ou Dirichlet, projection si Neumann
+  //position of boundary face points: centroid if internal or Dirichlet, projection if Neumann
   DoubleTrav xfb(domaine.nb_faces_tot(), D), ve2, ve2i, A, B, P, W(1);
   IntTrav pvt;
 
@@ -264,7 +264,7 @@ void Champ_Face_PolyMAC_MPFA::init_ve2() const
           xfb(f, d) = xv(f, d); //Dirichlet
       }
 
-  /* connectivites som-elem et elem-elem */
+  /* vertex-element and element-element connectivities */
   std::vector<std::set<int>> s_f(domaine.domaine().nb_som()), e_s_f(domaine.nb_elem());
   for (int f = 0; f < domaine.nb_faces_tot(); f++)
     for (int i = 0; i < f_s.dimension(1); i++)
@@ -288,12 +288,12 @@ void Champ_Face_PolyMAC_MPFA::init_ve2() const
 
   ve2d.resize(1, 2);
   ve2bj.resize(0, 2);
-  std::map<std::array<int, 2>, int> v_i; // v_i[{f, -1 (interne) ou composante }] = indice
+  std::map<std::array<int, 2>, int> v_i; // v_i[{f, -1 (internal) or component }] = index
   std::vector<std::array<int, 2>> i_v; // v_i[i_v[f]] = f
 
   for (int e = 0; e < domaine.nb_elem(); e++, v_i.clear(), i_v.clear())
     {
-      /* stencil : faces de l'element et de ses voisins par som-elem + toutes composantes a ses faces de bord */
+      /* stencil: faces of the element and its vertex-connected neighbors + all components at its boundary faces */
       for (auto &&fa : e_s_f[e])
         if (!v_i.count( { { fa, -1 } }))
       v_i[ { { fa, -1 } }] = (int) i_v.size(), i_v.push_back( { { fa, -1 } });
@@ -307,7 +307,7 @@ void Champ_Face_PolyMAC_MPFA::init_ve2() const
               v_i[ { { f, d } }] = (int) i_v.size(), i_v.push_back( { { f, d } });
         }
 
-      /* coeffs de l'interpolation d'ordre 1, ponderations (comme dans Domaine_PolyMAC_MPFA::{e,f}grad)  */
+      /* first-order interpolation coefficients and weights (as in Domaine_PolyMAC_MPFA::{e,f}grad) */
       const int nc = (int) i_v.size();
 
       ve2.resize(nc, D);
@@ -336,7 +336,7 @@ void Champ_Face_PolyMAC_MPFA::init_ve2() const
           P(i) = 1. / sqrt(domaine.dot(xf, xf, &xp(e, 0), &xp(e, 0)));
         }
 
-      /* par composante : correction pour etre d'ordre 2 */
+      /* per component: correction to achieve second-order accuracy */
       for (int d = 0; d < D; d++)
         {
           /* systeme A.x = b */
@@ -357,7 +357,7 @@ void Champ_Face_PolyMAC_MPFA::init_ve2() const
                     fac = (db < 0 ? nf(f, j) / fs(f) : (db == j)) * (k < D ? xf[k] - xp(e, k) : 1);
                     A(i, jb) = fac * P(i);
                     if (k < D)
-                      B(jb) -= fac * ve2(i, d); //erreur de l'interp d'ordre 1 a corriger
+                      B(jb) -= fac * ve2(i, d); //first-order interpolation error to be corrected
                   }
             }
 
@@ -376,7 +376,7 @@ void Champ_Face_PolyMAC_MPFA::init_ve2() const
             ve2(i, d) += P(i) * B(i);
         }
 
-      /* implicitation des CLs de Neumann / Symetrie */
+      /* implicit treatment of Neumann / Symmetry boundary conditions */
       Matrice33 M(1, 0, 0, 0, 1, 0, 0, 0, 1), iM;
 
       for (int i = 0; i < nc; i++)
@@ -395,7 +395,7 @@ void Champ_Face_PolyMAC_MPFA::init_ve2() const
               ve2i(i, j) += iM(j, k) * ve2(i, k);
           }
 
-      /* stockage */
+      /* storage */
       for (int d = 0; d < D; d++, ve2d.append_line(ve2c.size(), ve2bc.size()))
         for (int i = 0; i < nc; i++)
           if (std::fabs(ve2i(i, d)) > 1e-6 && (i_v[i][1] < 0 || fcl_(i_v[i][0], 0) == 3))
@@ -426,7 +426,7 @@ void Champ_Face_PolyMAC_MPFA::update_ve2(DoubleTab& val, int incr) const
 {
   const Domaine_PolyMAC_MPFA& domaine = domaine_PolyMAC_MPFA();
   if (valeurs().get_md_vector() != domaine.mdv_ch_face)
-    return; //pas de variables auxiliaires -> on sort
+    return; //no auxiliary variables -> exit
 
   const Conds_lim& cls = domaine_Cl_dis().les_conditions_limites();
   const int D = dimension,  N = val.line_size(), nf_tot = domaine.nb_faces_tot();
@@ -440,13 +440,13 @@ void Champ_Face_PolyMAC_MPFA::update_ve2(DoubleTab& val, int incr) const
     for (int d = 0; d < D; d++, ed++, i++)
       for (int n = 0; n < N; n++)
         {
-          /* partie "interne" */
+          /* "internal" part */
           val(i, n) = 0;
 
           for (int j = ve2d(ed, 0); j < ve2d(ed + 1, 0); j++)
             val(i, n) += ve2c(j) * val(ve2j(j), n);
 
-          /* partie "faces de bord de Dirichlet" (sauf si on fait des increments) */
+          /* "Dirichlet boundary faces" part (except when computing increments) */
           if (!incr)
             for (int j = ve2d(ed, 1); j < ve2d(ed + 1, 1); j++)
               if (sub_type(Dirichlet, cls[fcl_(ve2bj(j, 0), 1)].valeur()))

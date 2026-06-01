@@ -18,12 +18,12 @@
 
 #include <Cond_lim_base.h>
 
-/*! @brief classe Dirichlet Cette classe est la classe de base de la hierarchie des conditions aux limites de type Dirichlet.
+/*! @brief Dirichlet This class is the base class of the hierarchy of Dirichlet-type boundary conditions.
  *
- *     Une condition aux limites de type Dirichlet impose la valeur d'un champ inconnue sur une frontiere, ce qui correspond a:
+ *     A Dirichlet boundary condition imposes the value of an unknown field on a boundary, which corresponds to:
  *
- *      - vitesse imposee pour l'equation de Navier-Stokes
- *      - scalaire impose pour l'equation de transport d'un scalaire
+ *      - imposed velocity for the Navier-Stokes equation
+ *      - imposed scalar for a scalar transport equation
  *
  * @sa Cond_lim_base Dirichlet_homogene
  */
@@ -39,7 +39,7 @@ public:
   const DoubleTab& tab_val_imp_au_temps(double temps) const { return tab_val_imp(temps); }
   void verifie_ch_init_nb_comp() const override;
 protected:
-  mutable DoubleTab tab_; // Stocke toutes les valeurs sur toutes les faces de la frontiere (pas d'hypothese sur un champ uniforme). Utile pour le GPU.
+  mutable DoubleTab tab_; // Stores all values on all faces of the boundary (no assumption of a uniform field). Useful for GPU.
 };
 
 #endif

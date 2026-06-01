@@ -51,7 +51,7 @@ Entree& Loi_Etat_rhoT_GR_QC::readOn(Entree& is)
     les_mots[1] = "masse_molaire";
     les_mots[2] = "Poly_rho";
     les_mots[3] = "Poly_T";
-    //     les_mots[4] = "Cp";   //pour debuggage
+    //     les_mots[4] = "Cp";   //for debugging
   }
   is >> motlu;
   while(motlu != accferme )
@@ -190,17 +190,17 @@ double Loi_Etat_rhoT_GR_QC::calculer_masse_volumique(double P, double h) const
     }
   else
     {
-      //debuggage
+      //debug
       res = P*Cp_/(R*h);
     }
   return res;
 }
 
-/*! @brief Calcule la temperature ponctuelle
+/*! @brief Computes the pointwise temperature.
  *
- * @param (double P) pression
- * @param (double h) enthalpie
- * @return (double) masse volumique correspondante
+ * @param P Pressure.
+ * @param h Enthalpy.
+ * @return Corresponding temperature value.
  */
 double Loi_Etat_rhoT_GR_QC::calculer_temperature(double P, double h)
 {
@@ -215,13 +215,13 @@ double Loi_Etat_rhoT_GR_QC::calculer_temperature(double P, double h)
     }
   else
     {
-      //debuggage
+      //debug
       res = h/Cp_;
     }
   return res;
 }
 
-/*! @brief Cas gaz Reel : doit recalculer l'enthalpie a partir de la pression et la temperature
+/*! @brief Real gas case: recomputes enthalpy from pressure and temperature.
  *
  */
 double Loi_Etat_rhoT_GR_QC::calculer_H(double Pth_, double T_) const
@@ -229,7 +229,7 @@ double Loi_Etat_rhoT_GR_QC::calculer_H(double Pth_, double T_) const
   double res=0;
   if (R==-1)
     {
-      //il faut resoudre c0-T_ + c1.H + c2.H^2 +...=0
+      //need to solve c0-T_ + c1.H + c2.H^2 +...=0
       int i,j, it,max_iter = 1000;
       double eps = 1.e-6;
       DoubleVect coef(PolyT_.line_size());
@@ -274,7 +274,7 @@ double Loi_Etat_rhoT_GR_QC::calculer_H(double Pth_, double T_) const
     }
   else
     {
-      //debuggage
+      //debug
       res = Cp_*T_;
     }
   return res;
@@ -293,13 +293,13 @@ double Loi_Etat_rhoT_GR_QC::Drho_DP(double P, double h) const
     }
   else
     {
-      //debuggage
+      //debug
       res = 1/(R*h/Cp_);
     }
   return res;
 }
 
-//correspond a Drho_DH en fait
+//actually corresponds to Drho_DH
 double Loi_Etat_rhoT_GR_QC::Drho_DT(double P, double h) const
 {
   double res = 0;
@@ -313,7 +313,7 @@ double Loi_Etat_rhoT_GR_QC::Drho_DT(double P, double h) const
     }
   else
     {
-      //debuggage
+      //debug
       res = -P*Cp_/(R*h*h);
     }
   return res;
@@ -332,7 +332,7 @@ double Loi_Etat_rhoT_GR_QC::DT_DH(double P, double h) const
     }
   else
     {
-      //debuggage
+      //debug
       res = Cp_-R;
     }
   return res;

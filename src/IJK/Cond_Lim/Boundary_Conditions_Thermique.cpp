@@ -30,7 +30,7 @@ Boundary_Conditions_Thermique::Boundary_Conditions_Thermique()
   flux_impose_kmax_ = invalid_thermal_value;
 }
 
-// SYNTAXE:
+// SYNTAX:
 //  {
 //    BCTYPE_KMIN Paroi_Temperature_imposee|Paroi_Flux_impose|perio
 //    temperature_imposee_kmin double (optional)

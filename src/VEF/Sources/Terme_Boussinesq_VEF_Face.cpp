@@ -49,7 +49,7 @@ DoubleTab& Terme_Boussinesq_VEF_Face::ajouter(DoubleTab& tab_resu) const
   ArrOfDouble T0 = getScalaire0();
   if(equation_scalaire().que_suis_je()=="Convection_Diffusion_Temperature_sensibility")
     T0=0.;
-  // Verifie la validite de T0:
+  // Check the validity of T0:
   check();
 
   const DoubleTab& tab_param = equation_scalaire().inconnue().valeurs();
@@ -67,7 +67,7 @@ DoubleTab& Terme_Boussinesq_VEF_Face::ajouter(DoubleTab& tab_resu) const
   CIntTabView face_voisins = domaine_VEF.face_voisins().view_ro();
   DoubleTabView resu = tab_resu.view_rw();
 
-  // Boucle sur toutes les faces
+  // Loop over all faces
   int nb_faces = domaine_VEF.nb_faces();
   int dim = Objet_U::dimension;
   const int beta_dimension0 = beta().valeurs().dimension(0);
@@ -87,7 +87,7 @@ DoubleTab& Terme_Boussinesq_VEF_Face::ajouter(DoubleTab& tab_resu) const
     for (int comp = 0; comp < dim; comp++)
       {
         double delta_coord;
-        if (elem2 == -1) // Face de bord
+        if (elem2 == -1) // Boundary face
           delta_coord = xv(face,comp) - xp(elem1,comp);
         else
           delta_coord = xp(elem2,comp) - xp(elem1,comp);

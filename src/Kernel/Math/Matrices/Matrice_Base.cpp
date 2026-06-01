@@ -32,14 +32,14 @@ readOn(Entree& s )
   return s ;
 }
 
-/*! @brief Fonction (hors classe) amie de la classe Matrice_Base.
+/*! @brief Friend function (outside the class) of the Matrice_Base class.
  *
- * Operateur de multiplication: renvoie (A*vect)
- *     Appelle  Matrice_base::multv(const DoubleVect&) sur A.
+ * Multiplication operator: returns (A*vect)
+ *     Calls Matrice_base::multv(const DoubleVect&) on A.
  *
- * @param (Matrice_Base& A) la matrice multiplicatrice
- * @param (DoubleVect& vect) le vecteur a multiplier
- * @return (DoubleVect) le vecteur resultat de l'operation
+ * @param (Matrice_Base& A) the multiplying matrix
+ * @param (DoubleVect& vect) the vector to multiply
+ * @return (DoubleVect) the result vector of the operation
  */
 DoubleVect operator * (const Matrice_Base& A, const DoubleVect& vect)
 {

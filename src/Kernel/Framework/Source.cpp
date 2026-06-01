@@ -36,7 +36,7 @@ Entree& Source::readOn(Entree& is)
 
 /*! @brief
  *
- * @param (Nom& typ) le nom de type a donner a la source
+ * @param (Nom& typ) the type name to assign to the source
  */
 void Source::typer_direct(const Nom& typ)
 {
@@ -44,10 +44,10 @@ void Source::typer_direct(const Nom& typ)
 }
 
 
-/*! @brief Type la source en calculant le nom du type necessaire grace aux parametres fournis.
+/*! @brief Types the source by computing the required type name from the provided parameters.
  *
- * @param (Nom& typ) le debut du type
- * @param (Equation_base& eqn) l'equation associee a la source
+ * @param (Nom& typ) the beginning of the type name
+ * @param (Equation_base& eqn) the equation associated with the source
  */
 void Source::typer(const Nom& typ, const Equation_base& eqn)
 {
@@ -78,12 +78,12 @@ DoubleTab& Source::ajouter(DoubleTab& xx) const
   return tmp;
 }
 
-/*! @brief Appel a l'objet sous-jacent.
+/*! @brief Call to the underlying object.
  *
- * Affecte le terme source au tableau passe en parametre.
+ * Assigns the source term to the array passed as parameter.
  *
- * @param (DoubleTab& xx) le tableau dans lequel on stocke la valeur de la source
- * @return (DoubleTab&) le parametre xx modifie
+ * @param (DoubleTab& xx) the array in which the source value is stored
+ * @return (DoubleTab&) the modified parameter xx
  */
 DoubleTab& Source::calculer(DoubleTab& xx) const
 {

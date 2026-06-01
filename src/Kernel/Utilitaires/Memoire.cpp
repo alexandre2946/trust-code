@@ -25,9 +25,9 @@ int Memoire::step=4096;
 static int max_sz_mem=0;
 static int min_sz_mem=0;
 
-/*! @brief Retourne un pointeur sur l'instance de la memoire Cree un nouvel objet memoire si aucune instance n'a deja ete creee
+/*! @brief Returns a pointer to the memory instance. Creates a new memory object if no instance has been created yet.
  *
- * @return (Memoire*) pointeur sur l'instance de la memoire
+ * @return (Memoire*) pointer to the memory instance
  */
 Memoire& Memoire::Instance()
 {
@@ -36,7 +36,7 @@ Memoire& Memoire::Instance()
   return *_instance;
 }
 
-/*! @brief Constructeur Initialize une zone de travail pour les Objet_U, les "double" et les "int"
+/*! @brief Constructor. Initializes a working area for Objet_U, "double", and "int" objects.
  *
  */
 Memoire::Memoire() :
@@ -46,10 +46,10 @@ Memoire::Memoire() :
     data[i].next=i+1;
 }
 
-/*! @brief Ajoute un Objet_U dans la Memoire de TRUST
+/*! @brief Adds an Objet_U to the TRUST memory.
  *
- * @param (Objet_U* obj) pointeur sur l'Objet_U a ajouter
- * @return (int) le numero affecte a l'objet dans la memoire
+ * @param (Objet_U* obj) pointer to the Objet_U to add
+ * @return (int) the index assigned to the object in memory
  */
 int Memoire::add(Objet_U* obj)
 {
@@ -97,10 +97,10 @@ int Memoire::add(Objet_U* obj)
   return old_size;
 }
 
-/*! @brief Suppression de la memoire de l'Objet_U de numero num L'Objet_U n'est pas supprime, seul son pointeur dans la memoire l'est.
+/*! @brief Removes from memory the Objet_U with index num. The Objet_U itself is not deleted; only its pointer in memory is removed.
  *
- * @param (int num) le numero de l'Objet_U a supprimer
- * @return (int) code de retour, retourne toujours 1
+ * @param (int num) the index of the Objet_U to remove
+ * @return (int) return code, always returns 1
  */
 int Memoire::suppr(int num)
 {
@@ -114,7 +114,7 @@ int Memoire::suppr(int num)
   if((size>4*compteur)&&(size>step))
     //if((size-compteur)>step)
     {
-      compacte(); // Plantage obscur avec le compilateur NVidia a la fin du calcul
+      compacte(); // Obscure crash with the NVidia compiler at end of computation
     }
 #endif
   /*
@@ -139,7 +139,7 @@ int Memoire::suppr(int num)
     }
   */
 
-  //GF quand on n'a plus d'objet_u on detruit tout
+  //GF when there are no more objet_u, destroy everything
 
   if (compteur==0)
     {
@@ -157,11 +157,11 @@ int Memoire::suppr(int num)
 }
 
 
-/*! @brief Retourne le rang dans la memoire de l'objet de type et de nom indiques
+/*! @brief Returns the index in memory of the object with the given type and name.
  *
- * @param (const Nom& type) le type de l'objet
- * @param (const Nom& nom) le nom de l'objet
- * @return (int) le rang de l'objet s'il est trouve dans la memoire, -1 sinon
+ * @param (const Nom& type) the type of the object
+ * @param (const Nom& nom) the name of the object
+ * @return (int) the index of the object if found in memory, -1 otherwise
  */
 int Memoire::rang(const Nom& type, const Nom& nom) const
 {
@@ -178,10 +178,10 @@ int Memoire::rang(const Nom& type, const Nom& nom) const
 }
 
 
-/*! @brief Retourne le rang dans la memoire de l'objet de nom indique
+/*! @brief Returns the index in memory of the object with the given name.
  *
- * @param (const Nom& nom) le nom de l'objet
- * @return (int) le rang de l'objet s'il est trouve dans la memoire, -1 sinon
+ * @param (const Nom& nom) the name of the object
+ * @return (int) the index of the object if found in memory, -1 otherwise
  */
 int Memoire::rang(const Nom& nom) const
 {
@@ -197,11 +197,11 @@ int Memoire::rang(const Nom& nom) const
 }
 
 
-/*! @brief Retoune une reference sur l'Objet_U de rang num dans la memoire
+/*! @brief Returns a reference to the Objet_U at index num in memory.
  *
- * @param (int num) le rang de l'objet dans la memoire
- * @return (Objet_U&) reference sur l'Objet_U trouve
- * @throws Sort en erreur si la memoire comporte une erreur a la case de rang num
+ * @param (int num) the index of the object in memory
+ * @return (Objet_U&) reference to the found Objet_U
+ * @throws Exits with an error if the memory has an error at index num
  */
 Objet_U& Memoire::objet_u(int num)
 {
@@ -223,11 +223,11 @@ Objet_U& Memoire::objet_u(int num)
 }
 
 
-/*! @brief Retoune une reference constante sur l'Objet_U de rang num dans la memoire
+/*! @brief Returns a const reference to the Objet_U at index num in memory.
  *
- * @param (int num) le rang de l'objet dans la memoire
- * @return (const Objet_U&) reference sur l'Objet_U trouve
- * @throws Sort en erreur si la memoire comporte une erreur a la case de rang num
+ * @param (int num) the index of the object in memory
+ * @return (const Objet_U&) const reference to the found Objet_U
+ * @throws Exits with an error if the memory has an error at index num
  */
 const Objet_U& Memoire::objet_u(int num) const
 {
@@ -249,11 +249,11 @@ const Objet_U& Memoire::objet_u(int num) const
 }
 
 
-/*! @brief Retoune un pointeur sur l'Objet_U de rang num dans la memoire
+/*! @brief Returns a pointer to the Objet_U at index num in memory.
  *
- * @param (int num) le rang de l'objet dans la memoire
- * @return (Objet_U&) reference sur l'Objet_U trouve
- * @throws Sort en erreur si la memoire comporte une erreur a la case de rang num
+ * @param (int num) the index of the object in memory
+ * @return (Objet_U*) pointer to the found Objet_U
+ * @throws Exits with an error if the memory has an error at index num
  */
 Objet_U* Memoire::objet_u_ptr(int num)
 {
@@ -275,11 +275,11 @@ Objet_U* Memoire::objet_u_ptr(int num)
 }
 
 
-/*! @brief Retoune un pointeur constant sur l'Objet_U de rang num dans la memoire
+/*! @brief Returns a const pointer to the Objet_U at index num in memory.
  *
- * @param (int num) le rang de l'objet dans la memoire
- * @return (Objet_U&) reference sur l'Objet_U trouve
- * @throws Sort en erreur si la memoire comporte une erreur a la case de rang num
+ * @param (int num) the index of the object in memory
+ * @return (const Objet_U*) const pointer to the found Objet_U
+ * @throws Exits with an error if the memory has an error at index num
  */
 const Objet_U* Memoire::objet_u_ptr(int num)const
 {
@@ -300,7 +300,7 @@ const Objet_U* Memoire::objet_u_ptr(int num)const
   return &objet;
 }
 
-/*! @brief Compacte la memoire Ce compactage est effectue automatiquement lorsqu'il devient necessaire
+/*! @brief Compacts memory. This compaction is performed automatically when it becomes necessary.
  *
  */
 void Memoire::compacte()
@@ -340,9 +340,9 @@ void Memoire::compacte()
   verifie();
 }
 
-/*! @brief Imprime un etat sur la memoire sur la sortie des erreurs
+/*! @brief Prints a memory state summary to the error output stream.
  *
- * @return (int) code de retour; retourne toujours 1
+ * @return (int) return code; always returns 1
  */
 int Memoire::imprime() const
 {
@@ -381,9 +381,9 @@ int Memoire::imprime() const
   return 1;
 }
 
-/*! @brief Verifie le contenu de toutes les cases de la memoire
+/*! @brief Verifies the content of all memory slots.
  *
- * @return (int) code de retour; retourne toujours 1
+ * @return (int) return code; always returns 1
  */
 int Memoire::verifie() const
 {
@@ -403,11 +403,11 @@ int Memoire::verifie() const
   return 1;
 }
 
-/*! @brief Operateur d'affichage d'un etat de la memoire mem sur le flot de sortie os
+/*! @brief Output operator that prints the state of memory mem to output stream os.
  *
- * @param (Sortie& os) le flot de sortie a utiliser
- * @param (const Memoire& mem) la memoire a examiner
- * @return (Sortie& le flot de sortie modifie)
+ * @param (Sortie& os) the output stream to use
+ * @param (const Memoire& mem) the memory to examine
+ * @return (Sortie&) the modified output stream
  */
 Sortie& operator << (Sortie& os, const Memoire& mem)
 {
@@ -417,8 +417,8 @@ Sortie& operator << (Sortie& os, const Memoire& mem)
   int tmp1=0;
   for(i=0; i<mem.size; i++)
     if(! mem.data[i].libre()) tmp++;
-  os << "\n il y a " << mem.size << " cases memoires";
-  os << "\n dont " << tmp << " ==(const char*)" << compteur << " sont occupees" << finl;
+  os << "\n There are " << mem.size << " memory slots";
+  os << "\n of which " << tmp << " ==(const char*)" << compteur << " are used" << finl;
   for(i=0; i<mem.size; i++)
     if(! mem.data[i].libre())
       {
@@ -426,8 +426,8 @@ Sortie& operator << (Sortie& os, const Memoire& mem)
         const Objet_U& obj=mem.objet_u(i);
         os << " :: ";
         os << "TYPE :" << obj.le_type();
-        if(sub_type(Nom,obj)) os << " NOM : " << obj.le_nom() ;
-        os << " adresse : " << (long)(&(obj));
+        if(sub_type(Nom,obj)) os << " NAME : " << obj.le_nom() ;
+        os << " address : " << (long)(&(obj));
 
         const ArrOfInt* intA = dynamic_cast<const ArrOfInt*>(&obj);
         const ArrOfDouble* intAD = dynamic_cast<const ArrOfDouble*>(&obj);
@@ -435,14 +435,14 @@ Sortie& operator << (Sortie& os, const Memoire& mem)
           {
             const ArrOfInt& toto = *intA;
             tmp = obj.taille_memoire() + (int) ((toto.size_array()*sizeof(int))/toto.ref_count());
-            os << " TAILLE ArrOfInt : " << tmp<< " octets ";
+            os << " SIZE ArrOfInt:" << tmp<< " bytes";
 
             const IntVect* intV = dynamic_cast<const IntVect*>(&obj);
             if(intV)
               {
                 const IntVect& titi = *intV;
                 tmp1 = obj.taille_memoire() + (int) ((titi.size()*sizeof(int))/titi.ref_count());
-                os << " dont : " << (tmp-tmp1) << " octets virtuels ";
+                os << " of which:" << (tmp-tmp1) << " virtual bytes ";
               }
             os << "\n";
           }
@@ -450,13 +450,13 @@ Sortie& operator << (Sortie& os, const Memoire& mem)
           {
             const ArrOfDouble& toto = *intAD;
             tmp = obj.taille_memoire() + (int) ((toto.size_array()*sizeof(double))/toto.ref_count());
-            os << " TAILLE ArrOfDouble : " << tmp<< " octets ";
+            os << " SIZE ArrOfDouble:" << tmp<< " bytes";
             /* PL: Plante en P1Bulle donc je commente
              * const DoubleVect* intVD = dynamic_cast<const DoubleVect*>(&obj);
                if(intVD){
                const DoubleVect& titi = *intVD;
                tmp1 = obj.taille_memoire() + (int) ((titi.size()*sizeof(double))/titi.ref_count());
-               os << " dont : " << (tmp-tmp1) << " octets virtuels ";
+               os << " of which:" << (tmp-tmp1) << " virtual bytes ";
                } */
             os << "\n";
           }
@@ -467,21 +467,21 @@ Sortie& operator << (Sortie& os, const Memoire& mem)
               {
                 const ArrOfFloat& toto = *intAF;
                 tmp = obj.taille_memoire() + (int) ((toto.size_array()*sizeof(float))/toto.ref_count());
-                os << " TAILLE ArrOfFloat : " << tmp<< " octets ";
+                os << " SIZE ArrOfFloat:" << tmp<< " bytes";
                 os << "\n";
               }
             else
               {
-                os << " TAILLE : " << (tmp=obj.taille_memoire())<< " octets \n ";
+                os << " SIZE : " << (tmp=obj.taille_memoire())<< " bytes\n ";
               }
           }
         total += tmp;
         os.flush();
       }
-  os << "Taille memoire max: " <<  max_sz_mem << finl;
-  os << "Taille memoire min: " <<  min_sz_mem << finl;
-  os << "Taille memoire occupee en Mo: " <<  (max_sz_mem-min_sz_mem)/1024/1024 << finl;
+  os << "Max memory size (MB): " <<  max_sz_mem << finl;
+  os << "Min memory size (MB): " <<  min_sz_mem << finl;
+  os << "Used memory size (MB): " <<  (max_sz_mem-min_sz_mem)/1024/1024 << finl;
 
-  return os << "Occupation taille memoire totale en Mo: " << total/1024/1024 << finl;
+  return os << "Total occupied memory size (MB): " << total/1024/1024 << finl;
 }
 

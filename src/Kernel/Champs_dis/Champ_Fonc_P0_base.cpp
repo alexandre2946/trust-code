@@ -33,8 +33,8 @@ Entree& Champ_Fonc_P0_base::readOn(Entree& is) { return is; }
 
 int Champ_Fonc_P0_base::fixer_nb_valeurs_nodales(int n)
 {
-  // Encore une syntaxe a la con, sinon on ne sait pas s'il faut appeler
-  // domaine_dis_base() de champ_inc_base ou de champ_impl...
+  // Ugly syntax, otherwise we don't know whether to call
+  // domaine_dis_base() from champ_inc_base or from champ_impl...
   const Domaine_dis_base& domainedis = ref_cast(Champ_Fonc_base, *this).domaine_dis_base();
   assert(n == domainedis.domaine().nb_elem());
   const MD_Vector& md = domainedis.domaine().md_vector_elements();
@@ -50,7 +50,7 @@ Champ_base& Champ_Fonc_P0_base::affecter_(const Champ_base& ch)
     return Champ_Fonc_base::affecter_(ch);
 }
 
-/*! @brief Trace du champ P0 sur la frontiere
+/*! @brief Trace of the P0 field on the boundary
  *
  */
 DoubleTab& Champ_Fonc_P0_base::trace(const Frontiere_dis_base& fr, DoubleTab& x, double tps, int distant) const

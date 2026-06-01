@@ -24,30 +24,30 @@ class Domaine_PolyMAC_MPFA : public Domaine_PolyMAC_HFV
 public :
   void discretiser() override;
 
-  //stencil du gradient aux faces fgrad : fsten_eb([fsten_d(f), fsten_d(f + 1)[]) -> elements e, faces de bord ne_tot + f
+  //stencil of the face gradient fgrad: fsten_eb([fsten_d(f), fsten_d(f + 1)[]) -> elements e, boundary faces ne_tot + f
   void init_stencils() const;
   mutable IntTab fsten_d, fsten_eb;
 
-  //pour u.n champ T aux elements, interpole [n_f.nu.grad T]_f
-  //en preservant exactement les champs verifiant [nu grad T]_e = cte.
-  //Entrees : N             : nombre de composantes
-  //          is_p          : 1 si on traite le champ de pression (inversion Neumann / Dirichlet)
-  //          cls           : conditions aux limites
-  //          fcl(f, 0/1/2) : donnes sur les CLs (type de CL, indice de CL, indice dans la CL) (cf. Champ_{P0,Face}_PolyMAC_MPFA)
-  //          nu(e, n, ..)  : diffusivite aux elements (optionnel)
-  //          som_ext       : liste de sommets a ne pas traiter (ex. : traitement direct des Echange_Contact dans Op_Diff_PolyMAC_MPFA_Elem)
-  //          virt          : 1 si on veut aussi le flux aux faces virtuelles
-  //          full_stencil  : 1 si on veut le stencil complet (pour dimensionner())
-  //Sorties : phif_d(f, 0/1)                       : indices dans phif_{e,c} / phif_{pe,pc} du flux a f dans [phif_d(f, 0/1), phif_d(f + 1, 0/1)[
-  //          phif_e(i), phif_c(i, n, c)           : indices/coefficients locaux (pas d'Echange_contact) et diagonaux (composantes independantes)
+  //for a scalar field T at elements, interpolates [n_f.nu.grad T]_f
+  //while exactly preserving fields satisfying [nu grad T]_e = const.
+  //Inputs : N             : number of components
+  //         is_p          : 1 if treating the pressure field (swap Neumann / Dirichlet)
+  //         cls           : boundary conditions
+  //         fcl(f, 0/1/2) : boundary condition data (type, index, local index) (cf. Champ_{P0,Face}_PolyMAC_MPFA)
+  //         nu(e, n, ..)  : diffusivity at elements (optional)
+  //         som_ext       : list of vertices to skip (e.g. direct treatment of Echange_Contact in Op_Diff_PolyMAC_MPFA_Elem)
+  //         virt          : 1 if also wanting flux at virtual faces
+  //         full_stencil  : 1 if wanting the full stencil (for dimensionner())
+  //Outputs: phif_d(f, 0/1)                       : indices in phif_{e,c} / phif_{pe,pc} of the flux at f in [phif_d(f, 0/1), phif_d(f + 1, 0/1)[
+  //         phif_e(i), phif_c(i, n, c)           : local indices/coefficients (no Echange_contact) and diagonal (independent components)
   void fgrad(int N, int is_p, const Conds_lim& cls, const IntTab& fcl, const DoubleTab *nu, const IntTab *som_ext,
              int virt, int full_stencil, IntTab& phif_d, IntTab& phif_e, DoubleTab& phif_c) const;
 
-  //MD_Vectors pour Champ_Face_PolyMAC_MPFA (faces + d x elems)
+  //MD_Vectors for Champ_Face_PolyMAC_MPFA (faces + d x elems)
   MD_Vector mdv_ch_face;
 
 protected:
-  mutable int first_fgrad_ = 1; //pour n'afficher le message "MPFA-O MPFA-O(h) VFSYM" qu'une seule fois par calcul
+  mutable int first_fgrad_ = 1; //to print the "MPFA-O MPFA-O(h) VFSYM" message only once per computation
 };
 
 #endif /* Domaine_PolyMAC_MPFA_included */

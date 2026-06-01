@@ -21,13 +21,11 @@
 #include <vector>
 #include <map>
 
-/*! @brief Classe Fluide_MUSIG
+/*! @brief Instantiates several MUSIG sub-phases at once.
  *
- *  Cette classe permettant d'instancier plusieurs phases d'un coup
+ *  Each sub-phase shares the same equation of state.
  *
- *  Chaque sous phase possede la meme loi d'etat
- *
- *  Deux parametres : 'nbPhases' et 'fluide'
+ *  Two parameters: 'nbPhases' and 'fluide'.
  *
  * @sa Fluide_base
  */

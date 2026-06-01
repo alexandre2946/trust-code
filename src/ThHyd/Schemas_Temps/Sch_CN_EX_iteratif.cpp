@@ -53,16 +53,16 @@ void Sch_CN_EX_iteratif::set_param(Param& param) const
   Sch_CN_iteratif::set_param(param);
 }
 
-/*! @brief Ne tient compte que de l'equation de Navier Stokes du probleme (s'il y en a une) Les autres ne sont pas limitantes : elles font autant de sous-pas de temps que necessaire.
+/*! @brief Only takes into account the Navier-Stokes equation of the problem (if there is one). The other equations are not limiting: they perform as many sub-time-steps as needed.
  *
- *  Code honteusement recopie de Probleme_base::calculer_pas_de_temps()
+ *  Code shamelessly copied from Probleme_base::calculer_pas_de_temps()
  *
  *
  */
 void Sch_CN_EX_iteratif::mettre_a_jour_dt_stab()
 {
   imprimer(Cout);
-  //  dt_=dt_max_; La majoration par dt_max_ est faite dans corriger_dt_calcule
+  //  dt_=dt_max_; The upper bound by dt_max_ is applied in corriger_dt_calcule
   dt_stab_=DMAXFLOAT;
   const Probleme_base& prob=pb_base();
 
@@ -72,7 +72,7 @@ void Sch_CN_EX_iteratif::mettre_a_jour_dt_stab()
       if (sub_type(Navier_Stokes_std,eqn))
         {
           dt_stab_=std::min(dt_stab_,eqn.calculer_pas_de_temps());
-          break; // Max une equation de Navier Stokes par probleme
+          break; // At most one Navier-Stokes equation per problem
         }
     }
 }
@@ -81,15 +81,15 @@ bool Sch_CN_EX_iteratif::iterateTimeStepOnEquation(int i,bool& converged)
   Probleme_base& pb = pb_base();
   Equation_base& eqn = pb.equation(i);
 
-  // Choix selon que l'equation est de type Navier_Stokes ou non
+  // Choose based on whether the equation is of Navier_Stokes type or not
   if (sub_type(Navier_Stokes_std,eqn))
     return iterateTimeStepOnNS(i,converged);
   else
     return iterateTimeStepOnOther(i,converged);
 }
 
-// Tres similaire a Sch_CN_iteratif::iterateTimeStepOnEquation mais on applique
-// un facteur d'attenuation omega entre les iterations.
+// Very similar to Sch_CN_iteratif::iterateTimeStepOnEquation but applies
+// a relaxation factor omega between iterations.
 
 bool Sch_CN_EX_iteratif::iterateTimeStepOnNS(int i,bool& converged)
 {
@@ -111,24 +111,24 @@ bool Sch_CN_EX_iteratif::iterateTimeStepOnNS(int i,bool& converged)
   DoubleTab delta(intermediaire);
   DoubleTab old(intermediaire);
 
-  // On impose les CLs Dirichlet au temps intermediaire.
-  // En effet, les operateurs de diffusion n'utilisent que
-  // l'inconnue et ne vont pas lire les CLs.
-  // Cela permet en particulier d'avoir l'egalite des flux en pb
-  // couple thermique VEF avec Chap_front_contact_VEF, meme avant convergence.
-  // WEC :  /!\ la vitesse au temps intermediaire
-  // n'est pas forcement a divergence nulle.
+  // Impose the Dirichlet BCs at the intermediate time.
+  // Indeed, the diffusion operators only use the unknown
+  // and do not read the BCs.
+  // This ensures in particular flux equality in a
+  // coupled thermal VEF problem with Champ_front_contact_VEF, even before convergence.
+  // WEC : /!\ the velocity at the intermediate time
+  // is not necessarily divergence-free.
   eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_intermediaire);
 
-  // Calcul de la derivee dudt pour la valeur intermediaire de l'inconnue.
-  // Bidouille : Comme les operateurs prennent par defaut le present,
-  // on avance temporairement l'inconnue.
+  // Compute the derivative dudt for the intermediate value of the unknown.
+  // Workaround: since operators take the present value by default,
+  // the unknown is temporarily advanced.
 
   eqn.inconnue().avancer();
   eqn.derivee_en_temps_inco(dudt);
   eqn.inconnue().reculer();
 
-  // Mise a jour des valeurs de l'inconnue aux temps intermediaire et final
+  // Update the unknown values at intermediate and final times:
   // intermediaire = present + dt_intermediaire * dudt;
   // intermediaire = (1-omega)*new_intermediaire + omega*old_intermediaire
   // final =  present + dt_final * dudt;
@@ -148,16 +148,16 @@ bool Sch_CN_EX_iteratif::iterateTimeStepOnNS(int i,bool& converged)
   final.echange_espace_virtuel();
 
   delta*=-1;
-  delta+=intermediaire; // delta = Contient u(n+1/2,p+1) - u(n+1/2,p)
+  delta+=intermediaire; // delta = contains u(n+1/2,p+1) - u(n+1/2,p)
 
-  // Si l'equation a diverge
+  // If the equation has diverged
   if (divergence(present,intermediaire,delta,iteration))
     {
       converged=false;
       return false;
     }
 
-  // Si l'equation a converge
+  // If the equation has converged
   if (convergence(present,intermediaire,delta,iteration))
     {
       converged=true;
@@ -175,9 +175,9 @@ bool Sch_CN_EX_iteratif::iterateTimeStepOnNS(int i,bool& converged)
 
 }
 
-// Faire plusieurs pas de temps d'Euler explicite a facsec<=1
-// On impose qu'un pas de temps tombe pile sur le temps intermediaire
-// et un autre pile sur le temps final.
+// Perform several explicit Euler time steps with facsec<=1.
+// One step is required to land exactly on the intermediate time
+// and another exactly on the final time.
 
 bool Sch_CN_EX_iteratif::iterateTimeStepOnOther(int i,bool& converged)
 {
@@ -197,22 +197,22 @@ bool Sch_CN_EX_iteratif::iterateTimeStepOnOther(int i,bool& converged)
 
   DoubleTab dIdt(present); // Pour dimensionner.
 
-  // Voir Schema_Temps_base::limpr pour information sur epsilon et modf
+  // See Schema_Temps_base::limpr for information on epsilon and modf
   double nb_dt_1, nb_dt_2;
-  modf(ceil(dt_1/dt_eq), &nb_dt_1); // Nombre de pas de temps dans le premier, le deuxieme intervalle.
+  modf(ceil(dt_1/dt_eq), &nb_dt_1); // Number of time steps in the first and second interval.
   modf(ceil(dt_2/dt_eq), &nb_dt_2);
 
-  double dt_eq_1=dt_1/nb_dt_1; // Duree des pas de temps dans le premier, le deuxieme intervalle.
+  double dt_eq_1=dt_1/nb_dt_1; // Duration of time steps in the first and second interval.
   double dt_eq_2=dt_2/nb_dt_2;
 
-  // Calculs sur le premier pas de temps
+  // Computations on the first time step
   intermediaire=present;
   for (double k=0.; k<nb_dt_1; k=k+1.)
     {
 
-      // Calcul de la derivee dIdt sur la valeur intermediaire de l'inconnue.
-      // Bidouille : Comme les operateurs prennent par defaut le present,
-      // on avance temporairement l'inconnue.
+      // Compute the derivative dIdt for the intermediate value of the unknown.
+      // Workaround: since operators take the present value by default,
+      // the unknown is temporarily advanced.
       eqn.inconnue().avancer();
       eqn.derivee_en_temps_inco(dIdt);
       eqn.inconnue().reculer();
@@ -224,16 +224,16 @@ bool Sch_CN_EX_iteratif::iterateTimeStepOnOther(int i,bool& converged)
 
     }
 
-  // On impose les CLs au temps intermediaire
+  // Impose the BCs at the intermediate time
   eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_intermediaire);
 
 
-  // Calculs (idem) sur le deuxieme pas de temps
+  // Computations (same) on the second time step
   final=intermediaire;
   for (double k=0.; k<nb_dt_2; k=k+1.)
     {
 
-      // Calcul de la derivee dIdt sur la valeur finale de l'inconnue.
+      // Compute the derivative dIdt for the final value of the unknown.
       eqn.inconnue().avancer();
       eqn.inconnue().avancer();
       eqn.derivee_en_temps_inco(dIdt);
@@ -250,7 +250,7 @@ bool Sch_CN_EX_iteratif::iterateTimeStepOnOther(int i,bool& converged)
   dIdt-=present;
   dIdt/=dt_2;
   update_critere_statio(dIdt, eqn);
-  // On impose les CLs au temps final
+  // Impose the BCs at the final time
   eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_final);
 
   converged=true;
@@ -262,38 +262,38 @@ bool Sch_CN_EX_iteratif::iterateTimeStepOnOther(int i,bool& converged)
 void Sch_CN_EX_iteratif::ajuster_facsec(type_convergence cv)
 {
 
-  if (facsec_!=last_facsec) // On n'ajuste qu'une fois pour un initTimeStep.
+  if (facsec_!=last_facsec) // Adjust only once per initTimeStep.
     return;
 
   switch (cv)
     {
     case DIVERGENCE:
-      // le critere de divergence a ete atteint
+      // the divergence criterion has been reached
       facsec_=last_facsec/1.5;
-      omega=0.5*(0.5+omega); // fait tendre omega vers 0.5
+      omega=0.5*(0.5+omega); // drives omega towards 0.5
       break;
     case NON_CONVERGENCE:
-      // ni le critere de divergence ni le critere de convergence
-      // n'ont ete atteints en niter_max iterations
+      // neither the divergence criterion nor the convergence criterion
+      // was reached in niter_max iterations
       facsec_=last_facsec/1.5;
-      omega=0.5*(0.5+omega); // (0.5+3*omega)/4; // fait tendre omega vers 0.5, plus lentement
+      omega=0.5*(0.5+omega); // (0.5+3*omega)/4; // drives omega towards 0.5, more slowly
       break;
     case CONVERGENCE_LENTE:
-      // le critere de convergence a ete atteint en plus que niter_avg
+      // the convergence criterion was reached in more than niter_avg
       // iterations
       facsec_=last_facsec*0.9;
       if(omega>0.1)
         omega*=0.95;
       break;
     case CONVERGENCE_RAPIDE:
-      // le critere de convergence a ete atteint en moins que niter_avg
+      // the convergence criterion was reached in fewer than niter_avg
       // iterations
       facsec_=last_facsec*1.1;
       if(omega>0.1)
         omega*=0.75;
       break;
     case CONVERGENCE_OK:
-      // le critere de convergence a ete atteint en niter_avg iterations
+      // the convergence criterion was reached in exactly niter_avg iterations
       facsec_=last_facsec*1.01;
       break;
     default:

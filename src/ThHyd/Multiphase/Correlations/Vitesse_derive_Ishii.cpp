@@ -33,7 +33,7 @@ void Vitesse_derive_Ishii::evaluate_C0_vg0(const input_t& input) const
   const double norm_g = sqrt(local_carre_norme_vect(input.g));
 
   int N = input.v.dimension(0);
-  int ind_trav = 0 ; // Et oui ! matrice triang sup !
+  int ind_trav = 0 ; // upper triangular matrix indexing!
   if (n_g>n_l) ind_trav = (n_l*(N-1)-(n_l-1)*(n_l)/2) + (n_g-n_l-1);
   else         ind_trav = (n_g*(N-1)-(n_g-1)*(n_g)/2) + (n_l-n_g-1);
 

@@ -21,9 +21,9 @@
 #include <Eval_Source_C_VDF_Elem.h>
 #include <Terme_Source_VDF_base.h>
 
-/*! @brief class Terme_Source_Constituant_VDF_Elem Cette classe represente un terme source de l'equation de la thermique
+/*! @brief class Terme_Source_Constituant_VDF_Elem This class represents a source term of the heat equation
  *
- *  du type degagement volumique de puissance thermique uniforme sur un domaine
+ *  of the type uniform volumetric thermal power release over a domain
  *
  * @sa Terme_Source_Constituant, Terme_Source_VDF_base
  */

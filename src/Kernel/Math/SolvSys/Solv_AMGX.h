@@ -51,7 +51,7 @@ protected :
         amgx_initialized_ = false;
       }
   }
-  AmgXSolver SolveurAmgX_; // Instance de AmgXWrapper
+  AmgXSolver SolveurAmgX_; // AmgXWrapper instance
 
   PetscErrorCode petscToCSR(Mat& A, Vec& lhs_petsc, Vec& rhs_petsc);
   PetscInt nRowsLocal, nRowsGlobal, nNz;

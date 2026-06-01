@@ -19,7 +19,8 @@
 #include <TRUST_List.h>
 #include <Sonde_Int.h>
 
-/*! @brief classe Sondes_Int Cette classe represente une liste d'objets de type Sonde_Int.
+/*! @brief class Sondes_Int
+ * @brief Represents a list of Sonde_Int objects.
  *
  * @sa Sonde_Int Postraitement
  */
@@ -38,7 +39,7 @@ private:
   OBS_PTR(Postraitement) mon_post;
 };
 
-/*! @brief Ouvre tous les fichiers associes a chacune des sondes de la liste.
+/*! @brief Opens all files associated with each probe in the list.
  *
  */
 inline void Sondes_Int::ouvrir_fichiers()
@@ -46,7 +47,7 @@ inline void Sondes_Int::ouvrir_fichiers()
   for (auto &itr : *this) itr.ouvrir_fichier();
 }
 
-/*! @brief Ferme tous les fichiers des sondes de la liste.
+/*! @brief Closes all files associated with the probes in the list.
  *
  */
 inline void Sondes_Int::fermer_fichiers()

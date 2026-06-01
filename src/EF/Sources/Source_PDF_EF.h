@@ -49,7 +49,7 @@ public:
   // void ouvrir_fichier_partage(EcrFicPartage&, const Nom&, const Nom&) const;
   // void imprimer_ustar_yplus__mean_only(Sortie&, const Nom& ) const override;
 
-  // Methodes de l interface des champs postraitables
+  // Methods of the postprocessable fields interface
   void creer_champ(const Motcle& motlu) override;
   const Champ_base& get_champ(const Motcle& nom) const override;
   bool has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const override;
@@ -68,10 +68,10 @@ protected:
   void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override;
   void compute_indicateur_nodal_champ_aire() override;
 
-  DoubleVect tab_u_star_ibm_;                //!< valeurs des u* IBM calculees localement
-  DoubleVect tab_y_plus_ibm_;                //!< valeurs des d+ IBM calculees localement
-  mutable OWN_PTR(Champ_Fonc_base)  champ_u_star_ibm_;          //!< Champ pour postraitement
-  mutable OWN_PTR(Champ_Fonc_base)  champ_y_plus_ibm_;          //!< Champ pour postraitement
+  DoubleVect tab_u_star_ibm_;                //!< locally computed IBM u* values
+  DoubleVect tab_y_plus_ibm_;                //!< locally computed IBM d+ values
+  mutable OWN_PTR(Champ_Fonc_base)  champ_u_star_ibm_;          //!< Field for post-processing
+  mutable OWN_PTR(Champ_Fonc_base)  champ_y_plus_ibm_;          //!< Field for post-processing
 };
 
 #endif

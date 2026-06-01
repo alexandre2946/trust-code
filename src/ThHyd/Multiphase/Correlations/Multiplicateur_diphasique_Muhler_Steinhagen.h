@@ -17,12 +17,12 @@
 #define Multiplicateur_diphasique_Muhler_Steinhagen_included
 #include <Multiplicateur_diphasique_base.h>
 
-/*! @brief classe Multiplicateur_diphasique_Muhler_Steinhagen multiplicateur diphasique par la correlation de Muhler-Steinhagen :
+/*! @brief Two-phase multiplier using the Muhler-Steinhagen correlation:
  *
  *       Phi^2 f_m / rho_m = (f_lo / rho_l + C (f_go / rho_g -  f_lo / rho_l) x) (1 - x)^(1/3) + f_go / rho_g x^3
- *       avec C = 2 par defaut
- *     - applique a la phase liquide pour alpha < alpha_min
- *     - applique a la phase vapeur pour alpha > alpha_max
+ *       with C = 2 by default
+ *     - applied to the liquid phase for alpha < alpha_min
+ *     - applied to the vapor phase for alpha > alpha_max
  *
  *
  */
@@ -36,7 +36,7 @@ public:
                    const double Fm, DoubleTab& coeff) const override;
 protected:
   double alpha_min_ = 1, alpha_max_ = 1.1, a_ = 2, b_ = 1, c_ = 3;
-  int n_l = -1, n_g = -1, min_lottes_flinn_ = 0, min_sensas_ = 0; //indices des phases frottantes : liquide, gaz
+  int n_l = -1, n_g = -1, min_lottes_flinn_ = 0, min_sensas_ = 0; //indices of the friction phases: liquid, gas
 };
 
 #endif

@@ -19,9 +19,9 @@
 // XD source_qdm source_base source_qdm NO_BRACE Momentum source term in the Navier-Stokes equations.
 // XD attr ch field_base champ REQ Field type.
 
-/*! @brief Renvoie le champ donne representant le terme source
+/*! @brief Returns the given field representing the source term.
  *
- * @return (Champ_Don_base&) le champ donne representant le terme source
+ * @return (Champ_Don_base&) the given field representing the source term
  */
 const Champ_Don_base& Terme_Source_Qdm::source() const
 {

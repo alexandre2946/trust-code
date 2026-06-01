@@ -21,9 +21,9 @@
 
 #include <Interprete.h>
 
-/*! @brief classe Resoudre Interprete qui resoud un probleme:
+/*! @brief Resoudre Interpreter that solves a problem:
  *
- *       [DANS LE JEU DE DONNEES] Resoudre pb
+ *       [IN THE DATA FILE] Resoudre pb
  *
  * @sa Interprete Probleme
  */

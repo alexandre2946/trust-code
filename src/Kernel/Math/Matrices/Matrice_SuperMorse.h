@@ -17,19 +17,19 @@
 
 #include <Matrice_Base.h>
 
-/*! @brief : Matrice avec un stockage encore plus creux que Matrice_Morse: On stocke uniquement les lignes non vides (economie sur la taille de tab1_,
+/*! @brief : Matrix with an even sparser storage than Matrice_Morse: only non-empty rows are stored (saving on the size of tab1_,
  *
- *   tab2_ et coeff_ restent identiques)
+ *   tab2_ and coeff_ remain identical)
  *
  */
 class Matrice_SuperMorse
 {
 public :
-  const auto& tab1(int i) const { return tab1_[i]; }  // i de 0 a n
+  const auto& tab1(int i) const { return tab1_[i]; }  // i from 0 to n
   auto& tab1(int i) { return tab1_[i]; }
-  const int& tab2(int i) const { return tab2_[i]; } // i de 0 a nnz-1
+  const int& tab2(int i) const { return tab2_[i]; } // i from 0 to nnz-1
   int& tab2(int i) { return tab2_[i]; }
-  const double& coeff(int i) const { return coeff_[i]; } // i de 0 a nnz-1
+  const double& coeff(int i) const { return coeff_[i]; } // i from 0 to nnz-1
   double& coeff(int i) { return coeff_[i]; }
 
   auto& get_set_tab1() { return tab1_ ; }
@@ -41,9 +41,9 @@ public :
   const auto& get_coeff() const { return coeff_ ; }
 
   double ajouter_mult_vect_et_prodscal(const DoubleVect& x, DoubleVect& resu) const;
-  // Tableau contenant les indices des lignes non vides (indices fortran)
+  // Array containing the indices of non-empty rows (Fortran indices)
   ArrOfInt lignes_non_vides_;
-  // tab1_ est de taille lignes_non_vides_.size_array()+1
+  // tab1_ has size lignes_non_vides_.size_array()+1
 
 
 protected :

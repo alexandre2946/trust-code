@@ -14,10 +14,10 @@
 *****************************************************************************/
 #include <Octree_Int.h>
 
-static constexpr int max_levels_ = 32; // 1 de plus que le nombre de bits=1 dans coords_max
-// La valeur suivante doit etre une puissance de deux
+static constexpr int max_levels_ = 32; // 1 more than the number of bits=1 in coords_max
+// The following value must be a power of two
 template<> const int Octree_Int_32_64<int>::root_octree_half_width_ = 1073741824; /* 2^30   = 0100 0000  0000 0000  0000 0000  0000 0000b */
-// La valeur suivante doit etre egale a (root_octree_half_width_ * 2 - 1)
+// The following value must be equal to (root_octree_half_width_ * 2 - 1)
 template<> const int Octree_Int_32_64<int>::coord_max_ = 2147483647;              /* 2^31-1 = 0111 1111  1111 1111  1111 1111  1111 1111b */
 
 
@@ -26,11 +26,11 @@ template<> const int Octree_Int_32_64<trustIdType>::root_octree_half_width_ = 10
 template<> const int Octree_Int_32_64<trustIdType>::coord_max_ = 2147483647;
 #endif
 
-/*! @brief construction d'un octree_id (voir octree_structure_)
+/*! @brief builds an octree_id (see octree_structure_)
  *
- *   Si type==EMPTY, l'octree_id est 0
- *   Si type==OCTREE, on suppose que index est un indice dans octree_structure_
- *   Si type==FLOOR, on suppose que index est un indice dans floor_elements_
+ *   If type==EMPTY, the octree_id is 0
+ *   If type==OCTREE, index is assumed to be an index into octree_structure_
+ *   If type==FLOOR, index is assumed to be an index into floor_elements_
  */
 template <typename _SIZE_>
 inline typename Octree_Int_32_64<_SIZE_>::int_t Octree_Int_32_64<_SIZE_>::octree_id(int_t index, Octree_Type type)
@@ -47,9 +47,9 @@ inline typename Octree_Int_32_64<_SIZE_>::int_t Octree_Int_32_64<_SIZE_>::octree
   return -1;
 }
 
-/*! @brief calcul de l'index de l'octree dans octree_structure ou floor_elements en fonction du type de l'octree et de son octree_id.
+/*! @brief computes the index of the octree in octree_structure or floor_elements based on the type of the octree and its octree_id.
  *
- *   En general on a deja determine le type avant, on le passe en parametre pour optimiser.
+ *   In general the type is already known, so it is passed as a parameter for efficiency.
  *
  */
 template <typename _SIZE_>
@@ -68,7 +68,7 @@ inline typename Octree_Int_32_64<_SIZE_>::int_t Octree_Int_32_64<_SIZE_>::octree
   return -1;
 }
 
-/*! @brief Renvoie le type d'un octree en fonction de son octree_id.
+/*! @brief Returns the type of an octree based on its octree_id.
  *
  */
 template <typename _SIZE_>
@@ -82,17 +82,17 @@ inline typename Octree_Int_32_64<_SIZE_>::Octree_Type Octree_Int_32_64<_SIZE_>::
     return FLOOR;
 }
 
-/*! @brief construction de l'octree.
+/*! @brief builds the octree.
  *
- * On donne la dimension (1, 2 ou 3) et un tableau d'elements a stocker dans l'octree. Deux possibilites:
- *   1) les elements sont ponctuels si elements_boxes.dimension(1) == dimension.
- *      Dans ce cas, chaque element se trouve dans un et un seul octree_floor
- *   2) les elements sont des parallelipipedes, si elements_boxes.dimension(1) == dimension*2
- *      Les "dimension" premieres colonnes sont les coordonnees inferieures,
- *      les "dimension" suivantes sont les coordonnees superieures.
- *      Un parallelipipede peut etre affecte a plusieurs octree_floor.
- *   Les coordonnees stockees dans elements_boxes peuvent aller de 0 a coord_max_ inclus.
- *   Il vaut mieux utiliser toute la plage des entiers en multipliant par un facteur adequat.
+ * The dimension (1, 2 or 3) and an array of elements to store in the octree are given. Two possibilities:
+ *   1) elements are point-like if elements_boxes.dimension(1) == dimension.
+ *      In this case, each element belongs to exactly one octree_floor
+ *   2) elements are parallelepipeds, if elements_boxes.dimension(1) == dimension*2
+ *      The first "dimension" columns are the lower coordinates,
+ *      the next "dimension" columns are the upper coordinates.
+ *      A parallelepiped may be assigned to several octree_floors.
+ *   Coordinates stored in elements_boxes range from 0 to coord_max_ inclusive.
+ *   It is best to use the full integer range by multiplying by an appropriate factor.
  *
  */
 template <typename _SIZE_>
@@ -127,11 +127,11 @@ void Octree_Int_32_64<_SIZE_>::build(const int dimension, const IntTab_t& elemen
                                              tmp_elem_flags);
 }
 
-/*! @brief renvoie la liste des elements contenant potentiellement le point (x,y,z) On renvoie n=nombre d'elements de la liste et les elements sont dans
+/*! @brief returns the list of elements potentially containing the point (x,y,z). Returns n=number of elements in the list, and the elements are in
  *
- *   floor_elements()[index+i] pour 0 <= i < n.
- *   En realite on renvoie tous les elements qui ont une intersection non vide avec l'octree_floor
- *   contenant le point (x,y,z)
+ *   floor_elements()[index+i] for 0 <= i < n.
+ *   In practice, all elements with a non-empty intersection with the octree_floor
+ *   containing the point (x,y,z) are returned.
  *
  */
 template <typename _SIZE_>
@@ -139,9 +139,9 @@ typename Octree_Int_32_64<_SIZE_>::int_t Octree_Int_32_64<_SIZE_>::search_elemen
 {
   const int nb_octrees = octree_structure_.dimension_int(1);
   if (nb_octrees == 2)
-    y = 0; // important pour ne pas tomber sur des cubes inexistants
+    y = 0; // important to avoid landing on non-existent cubes
   if (nb_octrees <= 4)
-    z = 0; // idem
+    z = 0; // same
   assert(x >= 0 && x <= coord_max_);
   assert(y >= 0 && y <= coord_max_);
   assert(z >= 0 && z <= coord_max_);
@@ -177,9 +177,9 @@ struct IntBoxData
   AOBit_ *markers_;
 };
 
-/*! @brief cherche les elements ayant potentiellement une intersection non vide
- * avec la boite xmin..zmax.
- *   Les elements peuvent apparaitre plusieurs fois dans le tableau "elements"
+/*! @brief searches for elements potentially having a non-empty intersection
+ * with the box xmin..zmax.
+ *   Elements may appear more than once in the "elements" array.
  */
 template <typename _SIZE_>
 typename Octree_Int_32_64<_SIZE_>::int_t Octree_Int_32_64<_SIZE_>::search_elements_box(int xmin, int ymin, int zmin,
@@ -188,9 +188,9 @@ typename Octree_Int_32_64<_SIZE_>::int_t Octree_Int_32_64<_SIZE_>::search_elemen
 {
   const int nb_octrees = octree_structure_.dimension_int(1);
   if (nb_octrees == 2)
-    ymin = ymax = 0; // important pour ne pas tomber sur des cubes inexistants
+    ymin = ymax = 0; // important to avoid landing on non-existent cubes
   if (nb_octrees <= 4)
-    zmin = zmax = 0; // idem
+    zmin = zmax = 0; // same
   assert(xmin >= 0 && xmin <= coord_max_);
   assert(ymin >= 0 && ymin <= coord_max_);
   assert(zmin >= 0 && zmin <= coord_max_);
@@ -217,7 +217,7 @@ typename Octree_Int_32_64<_SIZE_>::int_t Octree_Int_32_64<_SIZE_>::search_elemen
   return n;
 }
 
-/*! @brief ajoute des elements de l'octree_floor a boxdata.
+/*! @brief adds elements from the octree_floor to boxdata.
  *
  * elements_
  *
@@ -243,17 +243,17 @@ void Octree_Int_32_64<_SIZE_>::search_elements_box_floor(IntBoxData<_SIZE_>& box
       }
 }
 
-// Pour chaque direction, drapeaux des cubes de la rangee inferieure
-static int sub_cube_flags_min[3] = { 1+4+16+64, /* drapeaux des cubes 0,2,4,6 */
-                                     1+2+16+32, /* drapeaux des cubes 0,1,4,5 */
-                                     1+2+4+8    /* drapeaux des cubes 0,1,2,3 */
+// For each direction, flags of the cubes in the lower row
+static int sub_cube_flags_min[3] = { 1+4+16+64, /* flags of cubes 0,2,4,6 */
+                                     1+2+16+32, /* flags of cubes 0,1,4,5 */
+                                     1+2+4+8    /* flags of cubes 0,1,2,3 */
                                    };
-static int sub_cube_flags_max[3] = { 2+8+32+128, /* drapeaux des cubes 1,3,5,7 */
-                                     4+8+64+128, /* drapeaux des cubes 2,3,7,8 */
-                                     16+32+64+128 /* drapeaux des cubes 4,5,6,7 */
+static int sub_cube_flags_max[3] = { 2+8+32+128, /* flags of cubes 1,3,5,7 */
+                                     4+8+64+128, /* flags of cubes 2,3,7,8 */
+                                     16+32+64+128 /* flags of cubes 4,5,6,7 */
                                    };
 
-/*! @brief cherche recursivement les elements inclus dans la boite boxdata pour l'octree_id donne, de centre cx, cy, cz.
+/*! @brief recursively searches for elements included in the box boxdata for the given octree_id, centred at cx, cy, cz.
  *
  */
 template <typename _SIZE_>
@@ -263,9 +263,9 @@ void Octree_Int_32_64<_SIZE_>::search_elements_box_recursively(IntBoxData<_SIZE_
                                                                int half_width) const
 {
   int flags = 255;
-  if (cx > boxdata.xmax_) // les cubes superieurs en x ne sont pas dedans
+  if (cx > boxdata.xmax_) // upper cubes in x are not inside
     flags &= sub_cube_flags_min[0];
-  if (cx <= boxdata.xmin_) // les cubes inferieurs ne sont pas dedans
+  if (cx <= boxdata.xmin_) // lower cubes are not inside
     flags &= sub_cube_flags_max[0];
   if (cy > boxdata.ymax_)
     flags &= sub_cube_flags_min[1];
@@ -314,7 +314,7 @@ void Octree_Int_32_64<_SIZE_>::reset()
   floor_elements_.reset();
 }
 
-/*! @brief construit un octree_floor avec la liste d'elements donnee et renvoie l'octree_id de cet octree_floor
+/*! @brief builds an octree_floor with the given list of elements and returns the octree_id of that octree_floor
  *
  */
 template <typename _SIZE_>
@@ -329,11 +329,11 @@ typename Octree_Int_32_64<_SIZE_>::int_t Octree_Int_32_64<_SIZE_>::build_octree_
   return octree_id(index, FLOOR);
 }
 
-/*! @brief octree_center_i est le premier int de la moitie superieure de l'octree dans la direction i.
+/*! @brief octree_center_i is the first int of the upper half of the octree in direction i.
  *
- * octree_half_width est une puissance de 2 egale a octree_center_i-octree_min_i (octree_min_i
- *    est le premier int inclu dans cet octree dans la direction i)
- *  Valeur de retour: octree_id de l'octree construit (void octree_structure_)
+ * octree_half_width is a power of 2 equal to octree_center_i-octree_min_i (octree_min_i
+ *    is the first int included in this octree in direction i)
+ *  Return value: octree_id of the built octree (see octree_structure_)
  *
  */
 template <typename _SIZE_>
@@ -346,20 +346,20 @@ typename Octree_Int_32_64<_SIZE_>::int_t Octree_Int_32_64<_SIZE_>::build_octree_
                                                                                             const int level,
                                                                                             AOFlagS_& tmp_elem_flags)
 {
-  // Criteres d'arret de la subdivision:
-  // Nombre maximal d'elements dans un sous-cube floor
+  // Stopping criteria for subdivision:
+  // Maximum number of elements in a floor sub-cube
   constexpr int OCTREE_FLOOR_MAX_ELEMS = 8;
-  // S'il y a beaucoup d'elements dupliques, mais pas trop, et que le nombre d'elements
-  //  dans l'octree est superieur a cette valeur, on subdivise quand-meme
+  // If there are many duplicate elements, but not too many, and the number of elements
+  //  in the octree is above this value, we still subdivide
   constexpr int OCTREE_DUPLICATE_ELEMENTS_LIMIT = 64;
   const ArrOfInt_t& elements_list = vect_elements_list[level];
-  // Si le nombre d'elements est inferieur a la limite, on cree un floor_element,
-  // sinon on subdivise
+  // If the number of elements is below the limit, create a floor_element,
+  // otherwise subdivide
   const int_t nb_elems = elements_list.size_array();
   if (nb_elems == 0)
     return octree_id(0, EMPTY);
 
-  if (nb_elems < OCTREE_FLOOR_MAX_ELEMS || octree_half_width == 1 /* dernier niveau */)
+  if (nb_elems < OCTREE_FLOOR_MAX_ELEMS || octree_half_width == 1 /* last level */)
     {
       const int_t the_octree_id = build_octree_floor(elements_list);
       return the_octree_id;
@@ -371,21 +371,21 @@ typename Octree_Int_32_64<_SIZE_>::int_t Octree_Int_32_64<_SIZE_>::build_octree_
   const int nb_octrees = octree_structure_.dimension_int(1);
   assert(nb_octrees == 2 || nb_octrees == 4 || nb_octrees == 8);
   const int elem_box_dim = elements_boxes.dimension_int(1);
-  // Soit elements_boxes contient dimension colonnes, soit dimension*2
+  // Either elements_boxes contains dimension columns, or dimension*2
   const int box_delta = (elem_box_dim > 3) ? (elem_box_dim >> 1) : 0;
-  // Nombre d'elements stockes en double dans l'octree (a cause des elements a cheval
-  //  sur plusieurs sous-octrees)
+  // Number of elements stored twice in the octree (due to elements straddling
+  //  several sub-octrees)
   int_t nb_duplicate_elements = 0;
-  // On range les elements de la liste dans 8 sous-cubes (remplissage de elem_flags)
+  // Assign the elements of the list to 8 sub-cubes (filling elem_flags)
   for (int_t i_elem = 0; i_elem < nb_elems; i_elem++)
     {
       const int_t elem = elements_list[i_elem];
-      // dir_flag vaut 1 pour la direction x, 2 pour y et 4 pour z
+      // dir_flag is 1 for direction x, 2 for y and 4 for z
       int dir_flag = 1;
-      // sub_cube_flags contient 2^dim drapeaux binaires (1 par sous-cube),
-      // et indique les sous-cubes coupes par l'element
+      // sub_cube_flags contains 2^dim binary flags (1 per sub-cube),
+      // indicating which sub-cubes are crossed by the element
       int octree_flags = 255;
-      // dans combien de sous-octree cet element est-il stocke ?
+      // in how many sub-octrees is this element stored?
       int_t nb_duplicates = 1;
 
       for (int direction = 0; direction < 3; direction++)
@@ -393,15 +393,15 @@ typename Octree_Int_32_64<_SIZE_>::int_t Octree_Int_32_64<_SIZE_>::build_octree_
           const int_t elem_min = elements_boxes(elem, direction);
           const int_t elem_max = elements_boxes(elem, box_delta+direction);
           assert(elem_max >= elem_min);
-          // coordonnee du centre du cube dans la direction j:
+          // coordinate of the cube center in direction j:
           const int center = (direction==0) ? octree_center_x : ((direction==1) ? octree_center_y : octree_center_z);
-          // L'element coupe-t-il la partie inferieure et la partie superieure du cube dans la "direction" ?
-          if (elem_min >= center) // non -> on retire les flags des cubes de la partie inferieure
+          // Does the element cut both the lower and upper parts of the cube in "direction"?
+          if (elem_min >= center) // no -> remove flags of cubes in the lower part
             octree_flags &= sub_cube_flags_max[direction];
-          else if (elem_max < center) // non -> on retire les flags des cubes de la partie superieure
+          else if (elem_max < center) // no -> remove flags of cubes in the upper part
             octree_flags &= sub_cube_flags_min[direction];
           else
-            nb_duplicates <<= 1; // l'element coupe les deux parties !
+            nb_duplicates <<= 1; // the element crosses both parts!
           dir_flag = dir_flag << 1;
           if (dir_flag == nb_octrees)
             break;
@@ -410,32 +410,32 @@ typename Octree_Int_32_64<_SIZE_>::int_t Octree_Int_32_64<_SIZE_>::build_octree_
       nb_duplicate_elements += nb_duplicates - 1;
     }
 
-  // Critere un peu complique : s'il y a vraiment beaucoup d'elements
-  //  dans cet octree, on autorise jusqu'a dupliquer tous les elements,
-  //  ce qui permet de ranger des elements tres alonges qui sont forcement
-  //  dupliques dans une direction (>OCTREE_DUPLICATE_ELEMENTS_LIMIT).
+  // Slightly complex criterion: if there are really many elements
+  //  in this octree, we allow duplicating all elements,
+  //  which handles very elongated elements that are necessarily
+  //  duplicated in one direction (>OCTREE_DUPLICATE_ELEMENTS_LIMIT).
   if ((nb_duplicate_elements * 2 >= nb_elems && nb_elems < OCTREE_DUPLICATE_ELEMENTS_LIMIT)
       || nb_duplicate_elements > nb_elems)
     {
       const int_t the_octree_id = build_octree_floor(elements_list);
-      // On renvoie un index d'octreefloor
+      // Return an octreefloor index
       return the_octree_id;
     }
 
-  // On reserve une case a la fin de octree_structure pour stocker cet octree:
+  // Reserve a slot at the end of octree_structure to store this octree:
   const int_t index_octree = octree_structure_.dimension(0);
   octree_structure_.resize_dim0(index_octree + 1, RESIZE_OPTIONS::COPY_NOINIT);
   ArrOfInt_t& new_liste_elems = vect_elements_list[level+1];
   new_liste_elems.resize_array(0);
   const int width = octree_half_width >> 1;
   const int m_width = - width;
-  // Traitement recursif des sous-cubes de l'octree:
+  // Recursive processing of the sub-cubes of the octree:
   for (int i_cube = 0; i_cube < nb_octrees; i_cube++)
     {
       const int octree_flag = 1 << i_cube;
       new_liste_elems.resize_array(nb_elems, RESIZE_OPTIONS::NOCOPY_NOINIT);
       int_t count = 0;
-      // Liste des elements inclus dans le sous-cube:
+      // List of elements included in the sub-cube:
       for (int_t i_elem = 0; i_elem < nb_elems; i_elem++)
         if ((elem_flags[i_elem] & octree_flag) != 0)
           new_liste_elems[count++] = elements_list[i_elem];
@@ -446,7 +446,7 @@ typename Octree_Int_32_64<_SIZE_>::int_t Octree_Int_32_64<_SIZE_>::build_octree_
         sub_octree_id = octree_id(-1, EMPTY);
       else
         {
-          // Coordonnees du nouveau sous-cube
+          // Coordinates of the new sub-cube
           const int cx = octree_center_x + ((i_cube&1) ? width : m_width);
           const int cy = octree_center_y + ((i_cube&2) ? width : m_width);
           const int cz = octree_center_z + ((i_cube&4) ? width : m_width);
@@ -462,7 +462,7 @@ typename Octree_Int_32_64<_SIZE_>::int_t Octree_Int_32_64<_SIZE_>::build_octree_
   return octree_id(index_octree, OCTREE);
 }
 
-/*! @brief renvoie l'octree_id de l'octree_floor contenant le sommet (x,y,z) (peut renvoyer l'octree EMPTY)
+/*! @brief returns the octree_id of the octree_floor containing the vertex (x,y,z) (may return the EMPTY octree)
  *
  */
 template <typename _SIZE_>
@@ -470,21 +470,21 @@ typename Octree_Int_32_64<_SIZE_>::int_t Octree_Int_32_64<_SIZE_>::search_octree
 {
   if (octree_type(root_octree_id_) != OCTREE)
     return root_octree_id_;
-  // Le test pour savoir si on est dans la partie superieure ou inferieure d'un octree au niveau i consiste simplement a tester
-  // le i-ieme bit de la position.
+  // The test to determine whether we are in the upper or lower part of an octree at level i
+  // simply consists of testing the i-th bit of the position.
   int flag = root_octree_half_width_;
 
   int_t index = octree_index(root_octree_id_, OCTREE);
 
-  // Descendre dans la hierarchie d'octree subdivises jusqu'au cube le plus petit
+  // Descend the hierarchy of subdivided octrees down to the smallest cube
   while (1)
     {
-      // Numero du sous-cube dans lequel se trouve le sommet x,y,z
+      // Index of the sub-cube containing the vertex x,y,z
       const int ix = (x & flag) ? 1 : 0;
       const int iy = (y & flag) ? 2 : 0;
       const int iz = (z & flag) ? 4 : 0;
       int i_sous_cube = ix + iy + iz;
-      // On entre dans le sous-cube :
+      // Enter the sub-cube:
       const int_t the_octree_id = octree_structure_(index, i_sous_cube);
       if (octree_type(the_octree_id) != OCTREE) // floor or empty
         return the_octree_id;
@@ -492,7 +492,7 @@ typename Octree_Int_32_64<_SIZE_>::int_t Octree_Int_32_64<_SIZE_>::search_octree
       index = octree_index(the_octree_id, OCTREE);
       flag >>= 1;
     }
-  //return -1; // On n'arrive jamais ici !
+  //return -1; // We never reach here!
 }
 
 

@@ -53,11 +53,11 @@ int Convection_Diffusion_Espece_Multi_base::lire_motcle_non_standard(const Motcl
   if (mot=="diffusion")
     {
       Cerr << "Reading and typing of the diffusion operator : " << finl;
-      //associe mu_sur_Sc dans la diffusivite
+      // associate mu_sur_Sc in the diffusivity
       terme_diffusif.associer_diffusivite(diffusivite_pour_transport());
       ref_cast_non_const(Champ_base,terme_diffusif.diffusivite()).nommer("mu_sur_Schmidt");
       is >> terme_diffusif;
-      // Il faut appeler associer_diffusivite_pour_pas_de_temps
+      // Must call associer_diffusivite_pour_pas_de_temps
       terme_diffusif.associer_diffusivite_pour_pas_de_temps(diffusivite_pour_pas_de_temps());
       return 1;
     }
@@ -70,11 +70,11 @@ bool Convection_Diffusion_Espece_Multi_base::has_champ(const Motcle& nom, OBS_PT
   if (Convection_Diffusion_Espece_Fluide_Dilatable_base::has_champ(nom, ref_champ))
     return true;
 
-  // a revoir ..... a mon avis
+  // to be reviewed
   if (probleme().equation(0).has_champ(nom, ref_champ))
     return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 bool Convection_Diffusion_Espece_Multi_base::has_champ(const Motcle& nom) const
@@ -82,11 +82,11 @@ bool Convection_Diffusion_Espece_Multi_base::has_champ(const Motcle& nom) const
   if (Convection_Diffusion_Espece_Fluide_Dilatable_base::has_champ(nom))
     return true;
 
-  // a revoir ..... a mon avis
+  // to be reviewed
   if (probleme().equation(0).has_champ(nom))
     return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 const Champ_base& Convection_Diffusion_Espece_Multi_base::get_champ(const Motcle& nom) const
@@ -96,7 +96,7 @@ const Champ_base& Convection_Diffusion_Espece_Multi_base::get_champ(const Motcle
   if (Convection_Diffusion_Espece_Fluide_Dilatable_base::has_champ(nom, ref_champ))
     return ref_champ;
 
-  // a revoir ..... a mon avis
+  // to be reviewed
   if (probleme().equation(0).has_champ(nom, ref_champ))
     return ref_champ;
 

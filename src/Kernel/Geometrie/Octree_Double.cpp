@@ -24,17 +24,17 @@ void Octree_Double_32_64<_SIZE_>::reset()
   factor_.reset();
 }
 
-/*! @brief cherche les elements ou les points contenus dans l'octree_floor qui contient le point (x,y,z).
+/*! @brief searches for the elements or points contained in the octree_floor that contains the point (x,y,z).
  *
- * Renvoie le nombre n de ces elements.
- *   Les indices des elements sont dans floor_elements()[index+i] pour 0 <= i < n
+ * Returns the number n of these elements.
+ *   The indices of the elements are in floor_elements()[index+i] for 0 <= i < n
  *
  */
 template <typename _SIZE_>
 typename Octree_Double_32_64<_SIZE_>::int_t Octree_Double_32_64<_SIZE_>::search_elements(double x, double y, double z, int_t& index) const
 {
   if (dim_ == 0)
-    return 0; // octree vide
+    return 0; // empty octree
   int ix = 0, iy = 0, iz = 0;
   int ok = integer_position(x, 0, ix)
            && integer_position(y, 1, iy)
@@ -42,14 +42,14 @@ typename Octree_Double_32_64<_SIZE_>::int_t Octree_Double_32_64<_SIZE_>::search_
   return ok ? octree_int_.search_elements(ix, iy, iz, index) : 0;
 }
 
-/*! @brief construit un octree contenant les points de coordonnees coords.
+/*! @brief builds an octree containing the points with coordinates coords.
  *
- * Si include_virtual=1, on stocke coords.dimension_tot(0) elements, sinon on en
- *   stocke coords.dimension(0)
- *   Si epsilon = 0, on construit un octree de points de taille nulle (chaque point
- *    se trouve dans un seul octree_floor)
- *   Sinon, on construit un octree d'elements cubiques centres sur les coords, de demie-largeur epsilon.
- *    Un point peut alors se trouver dans plusieurs octree_floor.
+ * If include_virtual=1, stores coords.dimension_tot(0) elements, otherwise stores
+ *   coords.dimension(0) elements.
+ *   If epsilon = 0, builds an octree of zero-size points (each point
+ *    is in a single octree_floor).
+ *   Otherwise, builds an octree of cubic elements centered on the coords, with half-width epsilon.
+ *    A point can then be found in several octree_floors.
  *
  */
 template <typename _SIZE_>
@@ -59,7 +59,7 @@ void Octree_Double_32_64<_SIZE_>::build_nodes(const DoubleTab_t& coords, const b
   compute_origin_factors(coords, epsilon, include_virtual);
   const int_t nb_som = include_virtual ? coords.dimension_tot(0) : coords.dimension(0);
   if (nb_som == 0)
-    return; // octree vide
+    return; // empty octree
   const int dim = coords.dimension_int(1);
   if (epsilon < 0.)
     {
@@ -97,7 +97,7 @@ void Octree_Double_32_64<_SIZE_>::build_nodes(const DoubleTab_t& coords, const b
   octree_int_.build(dim, elements_boxes);
 }
 
-/*! @brief cherche tous les elements ou points ayant potentiellement une intersection non vide avec la boite donnee.
+/*! @brief searches for all elements or points potentially having a non-empty intersection with the given box.
  *
  */
 template <typename _SIZE_>
@@ -126,8 +126,12 @@ typename Octree_Double_32_64<_SIZE_>::int_t Octree_Double_32_64<_SIZE_>::search_
   return elements.size_array();
 }
 
-/*! @brief cherche tous les elements ou points ayant potentiellement une intersection non vide avec la boite donnee (centre + ou - radius dans chaque direction)
+/*! @brief Searches for all elements or points potentially having a non-empty intersection with the given box (center +/- radius in each direction).
  *
+ * @param center Center of the box.
+ * @param radius Half-width of the box in each direction.
+ * @param elements Array filled with the indices of the matching elements.
+ * @return Number of elements found.
  */
 template <typename _SIZE_>
 typename Octree_Double_32_64<_SIZE_>::int_t
@@ -144,11 +148,11 @@ Octree_Double_32_64<_SIZE_>::search_elements_box(const ArrOfDouble& center, cons
   return i;
 }
 
-/*! @brief Methode hors classe Cherche parmi les sommets de la liste node_list ceux qui sont a une
+/*! @brief Non-member method. Searches among the vertices in node_list for those within a distance
  *
- *   distance inferieure a epsilon du point (x,y,z). node_list contient des indices de
- *   sommets dans le tableau coords. La liste des noeuds verifiant le critere est mise
- *   dans node_list. On renvoie l'indice dans le tableau coords du sommet le plus proche.
+ *   less than epsilon from the point (x,y,z). node_list contains indices of
+ *   vertices in the coords array. The list of nodes satisfying the criterion is placed
+ *   in node_list. Returns the index in the coords array of the nearest vertex.
  *
  */
 template <typename _SIZE_>
@@ -184,9 +188,7 @@ typename Octree_Double_32_64<_SIZE_>::int_t  Octree_Double_32_64<_SIZE_>::search
   return nearest;
 }
 
-/*! @brief Idem que search_nodes_close_to(double x, double y, double z, .
- *
- * ..)
+/*! @brief Same as search_nodes_close_to(double x, double y, double z, ...)
  *
  */
 template <typename _SIZE_>

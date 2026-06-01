@@ -84,10 +84,10 @@ int PrecondA::preconditionner_(const Matrice_Base& matrice,
       solution=b;
       return 1;
     }
-  // On calcule solution = inverse(C)*b avec:
+  // We compute solution = inverse(C)*b with:
   //   inverse(C) = inverse((1/w D - E)) *(2-w/w D) * inverse((1/wD -E)t)
-  //   D :partie diagonale des blocs de la matrice
-  //   E :partie triangulaire inferieure des blocs de la matrice
+  //   D : diagonal part of the matrix blocks
+  //   E : lower triangular part of the matrix blocks
   const Matrice_Bloc_Sym& matbloc=ref_cast(Matrice_Bloc_Sym, matrice);
   if (matbloc.nb_bloc_lignes()<2
       || matbloc.nb_bloc_colonnes()<2

@@ -43,12 +43,12 @@ int Champ_Elem_PolyMAC_MPFA::reprendre(Entree& fich)
   const Pb_Multiphase * pbm = mon_equation_non_nul() ? (sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()) : nullptr) : nullptr;
   if (pbm) return Champ_Inc_base::reprendre(fich);
 
-  // sinon on fait ca ...
+  // otherwise do this ...
   const Domaine_PolyMAC_MPFA* domaine = le_dom_VF ? &ref_cast( Domaine_PolyMAC_MPFA,le_dom_VF.valeur()) : nullptr;
-  valeurs().set_md_vector(MD_Vector()); //on enleve le MD_Vector...
+  valeurs().set_md_vector(MD_Vector()); //remove the MD_Vector...
   valeurs().resize(0);
   int ret = Champ_Inc_base::reprendre(fich);
-  //et on remet le bon si on peut
+  //restore the correct one if possible
   if (domaine) valeurs().set_md_vector(valeurs().dimension_tot(0) > domaine->nb_elem_tot() ? domaine->mdv_elems_faces : domaine->domaine().md_vector_elements());
   return ret;
 }
@@ -58,7 +58,7 @@ void Champ_Elem_PolyMAC_MPFA::init_grad(int full_stencil) const
   if (fgrad_d.size()) return;
   const IntTab& f_cl = fcl();
   const Domaine_PolyMAC_MPFA& domaine = ref_cast(Domaine_PolyMAC_MPFA, le_dom_VF.valeur());
-  const Conds_lim& cls = domaine_Cl_dis().les_conditions_limites(); // CAL du champ a deriver
+  const Conds_lim& cls = domaine_Cl_dis().les_conditions_limites(); // boundary conditions for the field to differentiate
   domaine.fgrad(1, 0, cls, f_cl, nullptr, nullptr, 1, full_stencil, fgrad_d, fgrad_e, fgrad_w);
 }
 
@@ -67,7 +67,7 @@ void Champ_Elem_PolyMAC_MPFA::calc_grad(int full_stencil) const
   if (grad_a_jour) return;
   const IntTab& f_cl = fcl();
   const Domaine_PolyMAC_MPFA& domaine = ref_cast(Domaine_PolyMAC_MPFA, le_dom_VF.valeur());
-  const Conds_lim& cls = domaine_Cl_dis().les_conditions_limites(); // CAL du champ a deriver
+  const Conds_lim& cls = domaine_Cl_dis().les_conditions_limites(); // boundary conditions for the field to differentiate
   domaine.fgrad(1, 0, cls, f_cl, nullptr, nullptr, 1, full_stencil, fgrad_d, fgrad_e, fgrad_w);
   grad_a_jour = 1;
   tps_last_calc_grad_ = temps();

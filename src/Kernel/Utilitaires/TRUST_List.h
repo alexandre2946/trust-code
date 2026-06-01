@@ -19,14 +19,14 @@
 #include <type_traits>
 #include <algorithm> // for std::find
 #include <Motcle.h>
-#include <list> // pour stl list
+#include <list> // for stl list
 
 #define LIST(_TYPE_) TRUST_List<_TYPE_>
 
-/*! @brief classe TRUST_List
+/*! @brief TRUST_List class
  *
- *  - La classe template TRUST_List est utilisable pour n'importe quelle classe
- *      Utilisation (par exemple):
+ *  - The template class TRUST_List can be used for any class.
+ *      Usage examples:
  *
  *        - TRUST_List<Milieu_base>
  */
@@ -117,7 +117,7 @@ public:
   _CLASSE_& add(const _CLASSE_ &t)
   {
     list_.push_back(t);
-    return static_cast<_CLASSE_&>(list_.back()); /* attention pour retourner une reference de t dans la liste !!!! */
+    return static_cast<_CLASSE_&>(list_.back()); /* Note: returns a reference to t in the list */
   }
 
   /* Add element to list if it is not already inside */
@@ -136,7 +136,7 @@ public:
   }
 
   // XXX : Elie Saikali
-  // j'ai tente de supprimer tout ce bordel mais ... bon courage je te laisse faire
+  // I tried to remove all this mess but ... good luck to whoever tries
   _CLASSE_& operator[](int i)
   {
     assert (size() > 0);

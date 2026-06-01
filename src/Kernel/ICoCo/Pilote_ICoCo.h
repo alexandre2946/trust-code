@@ -18,7 +18,7 @@
 
 #include <Interprete.h>
 
-/*! @brief classe Pilote_ICoCo Exemple de pilotage de Trio via ICoCo en C++
+/*! @brief class Pilote_ICoCo Example of driving TRUST via ICoCo in C++
  *
  */
 class Pilote_ICoCo : public Interprete

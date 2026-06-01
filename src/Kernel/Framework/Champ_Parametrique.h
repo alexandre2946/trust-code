@@ -27,7 +27,7 @@ class Champ_Parametrique : public Champ_Don_base
 {
   Declare_instanciable( Champ_Parametrique ) ;
 public:
-  // Methodes surchargees:
+  // Overridden methods:
   void mettre_a_jour(double temps) override { champ().mettre_a_jour(temps); }
   int imprime(Sortie& os, int j) const override { return champ().imprime(os,j); }
   int fixer_nb_valeurs_nodales(int nb_noeuds) override { return champ().fixer_nb_valeurs_nodales(nb_noeuds); }
@@ -45,10 +45,10 @@ public:
   DoubleTab& valeur_aux_elems(const DoubleTab& positions, const IntVect& les_polys, DoubleTab& valeurs) const override { return champ().valeur_aux_elems(positions, les_polys, valeurs); };
   bool instationnaire() const override { return champ().instationnaire(); }
 
-  // Methodes surchargees avec boucles sur les champs
+  // Overridden methods with loops over fields
   int initialiser(const double temps) override { for (auto& ch : champs_) ch->initialiser(temps); return 1; }
 
-  // Methodes specifiques:
+  // Specific methods:
   std::string newCompute() const;
   static bool enabled;
   static std::string dirnameDefault;

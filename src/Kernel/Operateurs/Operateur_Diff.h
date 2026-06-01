@@ -23,10 +23,10 @@
 
 class Champ_base;
 
-/*! @brief classe Operateur_Diff Classe generique de la hierarchie des operateurs representant un terme
+/*! @brief Operateur_Diff Generic class of the hierarchy of operators representing a diffusion
  *
- *     de diffusion. Un objet Operateur_Diff peut referencer n'importe quel
- *     objet derivant de Operateur_Diff_base.
+ *     term. An Operateur_Diff object can reference any object
+ *     derived from Operateur_Diff_base.
  *
  * @sa Operateur_Diff_base Operateur
  */

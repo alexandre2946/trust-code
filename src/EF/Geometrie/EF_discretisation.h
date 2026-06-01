@@ -15,18 +15,17 @@
 
 #ifndef EF_discretisation_included
 #define EF_discretisation_included
-/*! @brief class EF_discretisation (schema de base) Classe qui gere la dicretisation EF du probleme
+/*! @brief class EF_discretisation (base scheme)
  *
- *     c'est ici que :
- *     * l'on discretise les proprietes physiques du fluide et notamment celui du fluide
- *        d'Ostwald( K, N, Mu, ...)
- *     * l'on associe le champ d'Ostwald et l'equation hydraulique, le fluide et la
- *     domaine_dis_base
- *     ** ( nouvelles procedures :
+ * @brief Class that manages the EF discretisation of the problem.
+ *     This is where:
+ *     * the physical properties of the fluid are discretised, including Ostwald fluid properties (K, N, Mu, ...)
+ *     * the Ostwald field is associated with the hydraulic equation, the fluid, and domaine_dis_base.
+ *     New procedures:
  *   void proprietes_physiques_fluide_Ostwald(Domaine_dis_base& ,Fluide_Ostwald& ,
  *            const Navier_Stokes_std& , const Champ_Inc_base& ) const;
- *    a besoin de la classe Fluide_Ostwald pour avoir acces au fluide etudie
- *                          Navier_Stokes_Std pour avoir acces a l'equation hydraulique
+ *    requires class Fluide_Ostwald to access the studied fluid,
+ *    and Navier_Stokes_Std to access the hydraulic equation.
  *
  * @sa Discret_Thyd_Turb
  */
@@ -44,7 +43,7 @@ class EF_discretisation: public Discret_Thyd
 
 public:
   //
-  // Methodes surchargees de Discretisation_base
+  // Overridden methods from Discretisation_base
   //
   void discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& nom, const Noms& unite, int nb_comp, int nb_pas_dt, double temps,
                          OWN_PTR(Champ_Inc_base) &champ, const Nom& sous_type = NOM_VIDE) const override;

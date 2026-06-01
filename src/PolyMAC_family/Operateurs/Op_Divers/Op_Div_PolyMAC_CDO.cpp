@@ -48,10 +48,10 @@ DoubleTab& Op_Div_PolyMAC_CDO::ajouter(const DoubleTab& vit, DoubleTab& div) con
   const IntTab& face_voisins = domaine_PolyMAC_CDO.face_voisins();
   const DoubleVect& porosite_surf = equation().milieu().porosite_face();
 
-  // L'espace virtuel du tableau div n'est pas mis a jour par l'operateur,
+  // The virtual space of the div array is not updated by the operator,
   //  assert(invalide_espace_virtuel(div));
   declare_espace_virtuel_invalide(div);
-  // calcul de flux bord
+  // compute boundary fluxes
 
   DoubleTab& tab_flux_bords = flux_bords_;
   tab_flux_bords.resize(domaine_PolyMAC_CDO.nb_faces_bord(), 1);
@@ -106,7 +106,7 @@ void Op_Div_PolyMAC_CDO::contribuer_a_avec(const DoubleTab& incoo, Matrice_Morse
 
   for (int face = 0; face < nb_faces; face++)
     {
-      // flux * -1 car contribuer_a_avec renvoie  -d/dI
+      // flux * -1 because contribuer_a_avec returns -d/dI
       const double flux = -porosite_surf[face] * surface[face];
 
       const int elem1 = face_voisins(face, 0);
@@ -173,7 +173,7 @@ int Op_Div_PolyMAC_CDO::impr(Sortie& os) const
 
   const int nb_compo = flux_bords_.dimension(1);
 
-  // On parcours les frontieres pour sommer les flux par frontiere dans le tableau flux_bord
+  // Loop over boundaries to sum fluxes per boundary into the flux_bord array
   DoubleVect flux_bord(nb_compo);
   DoubleVect bilan(nb_compo);
   bilan = 0.;
@@ -196,7 +196,7 @@ int Op_Div_PolyMAC_CDO::impr(Sortie& os) const
         {
           for (int k = 0; k < nb_compo; k++)
             {
-              //Ajout pour impression sur fichiers separes
+              //Addition for printing to separate files
               Flux_div.add_col(flux_bord(k));
               bilan(k) += flux_bord(k);
             }

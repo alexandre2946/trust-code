@@ -19,9 +19,9 @@
 
 
 
-/*! @brief class Terme_Source_Canal_perio_VDF_P0 Cette classe permet de conserver le debit dans une simulation
+/*! @brief class Terme_Source_Canal_perio_VDF_P0 This class conserves the flow rate in a transient
  *
- *   temporelle de Canal
+ *   channel simulation
  *
  *
  * @sa Terme_Source_Canal_perio

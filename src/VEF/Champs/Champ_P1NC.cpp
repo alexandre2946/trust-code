@@ -46,9 +46,9 @@ Entree& Champ_P1NC::readOn(Entree& s)
   return s;
 }
 
-// PQ : 01/10/04 : mettre_a_jour permet de calculer qu'une seule fois le champ conforme u_bar (defini aux sommets)
-//                   pour pouvoir etre utilise dans les differents operateurs ou lors de l'appel
-//                   des sondes definies a partir des valeurs "smooth" (dans le cas present : u_bar)
+// PQ : 01/10/04 : mettre_a_jour computes only once the conforming field u_bar (defined at vertices)
+//                   so it can be reused in the various operators or when calling
+//                   probes defined from "smooth" values (in the present case: u_bar)
 void Champ_P1NC::mettre_a_jour(double un_temps)
 {
   Champ_Inc_base::mettre_a_jour(un_temps);
@@ -132,7 +132,7 @@ void calculer_gradientP1NC_2D(const DoubleTab& tab_variable, const Domaine_VEF& 
   {
     int type_face = est_face_bord(fac);
 
-    // Faces de bord periodiques
+    // Periodic boundary faces
     if (type_face == 2)
       {
         int elem1 = face_voisins(fac, 0);
@@ -145,7 +145,7 @@ void calculer_gradientP1NC_2D(const DoubleTab& tab_variable, const Domaine_VEF& 
             Kokkos::atomic_add(&gradient_elem(elem2, i), -grad);
           }
       }
-    // Faces de bord non periodiques
+    // Non-periodic boundary faces
     else if (type_face == 1)
       {
         int elem1 = face_voisins(fac,0);
@@ -156,7 +156,7 @@ void calculer_gradientP1NC_2D(const DoubleTab& tab_variable, const Domaine_VEF& 
             Kokkos::atomic_add(&gradient_elem(elem1, i), grad);
           }
       }
-    // Faces internes
+    // Internal faces
     else if (type_face == 0)
       {
         int elem1 = face_voisins(fac, 0);
@@ -172,7 +172,7 @@ void calculer_gradientP1NC_2D(const DoubleTab& tab_variable, const Domaine_VEF& 
   });
   end_gpu_timer(__KERNEL_NAME__);
 
-  // Division par le volume de l'element
+  // Divide by the element volume
   auto vol_div = KOKKOS_LAMBDA (int elem, int i)
   {
     gradient_elem(elem, i) *= inverse_volumes(elem);
@@ -388,19 +388,17 @@ void calculer_gradientP1NC(const DoubleTab& tab_variable, const Domaine_VEF& dom
   const int nb_comp = tab_variable.line_size();
   tab_gradient_elem = 0.;
 
-  // Cas du calcul du gradient d'un tableau de vecteurs ou
-  // tableau de scalaires tab_gradient_elem(,,)
+  // Case: gradient of a vector array or scalar array tab_gradient_elem(,,)
   if (nb_comp != 1 || tab_gradient_elem.nb_dim() == 3)
     calculer_gradientP1NC_3D(tab_variable, domaine_VEF, domaine_Cl_VEF, tab_gradient_elem);
-  // Cas du calcul du gradient d'un tableau de scalaire dans un
-  // tableau gradient_elem(,)
+  // Case: gradient of a scalar array stored in gradient_elem(,)
   else
     calculer_gradientP1NC_2D(tab_variable, domaine_VEF, domaine_Cl_VEF, tab_gradient_elem);
 }
 
 void Champ_P1NC::gradient(DoubleTab& gradient_elem) const
 {
-  // Calcul du gradient: par exemple gradient de la vitesse pour le calcul de la vorticite
+  // Compute the gradient: e.g. velocity gradient for vorticity computation
   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF, equation().domaine_Cl_dis());
   calculer_gradientP1NC(valeurs(), domaine_vef(), domaine_Cl_VEF, gradient_elem);
 
@@ -461,8 +459,8 @@ Champ_base& Champ_P1NC::affecter_(const Champ_base& ch)
 #endif
 }
 
-//-Cas CL periodique : assure que les valeurs sur des faces periodiques
-// en vis a vis sont identiques. Pour cela on prend la demi somme des deux valeurs.
+// Periodic BC case: ensures that values on facing periodic boundary faces are identical.
+// To do so, the half-sum of the two values is used.
 void Champ_P1NC::verifie_valeurs_cl()
 {
   const Domaine_Cl_dis_base& zcl = equation().domaine_Cl_dis();
@@ -532,10 +530,10 @@ void Champ_P1NC::calcul_critere_Q(DoubleVect& tab_Critere_Q) const
 
 void Champ_P1NC::calcul_y_plus(const Domaine_Cl_VEF& domaine_Cl_VEF, DoubleVect& y_plus) const
 {
-  // On initialise le champ y_plus avec une valeur negative,
-  // comme ca lorsqu'on veut visualiser le champ pres de la paroi,
-  // on n'a qu'a supprimer les valeurs negatives et n'apparaissent
-  // que les valeurs aux parois.
+  // Initialize the y_plus field with a negative value,
+  // so that when visualizing the field near the wall,
+  // one only needs to remove the negative values and only
+  // the values at the walls remain.
 
   int ndeb, nfin, l_unif;
   double visco0 = -1.;
@@ -558,7 +556,7 @@ void Champ_P1NC::calcul_y_plus(const Domaine_Cl_VEF& domaine_Cl_VEF, DoubleVect&
     l_unif = 0;
 
   if ((!l_unif) && (tab_visco.local_min_vect() < DMINFLOAT))
-    // GF on ne doit pas changer tab_visco ici !
+    // GF we must not modify tab_visco here!
     {
       Cerr << "In Champ_P1NC::calcul_y_plus : visco = " << tab_visco.local_min_vect() << " <= 0 ? " << finl;
       exit();
@@ -633,12 +631,12 @@ void Champ_P1NC::calcul_y_plus(const Domaine_Cl_VEF& domaine_Cl_VEF, DoubleVect&
                   }
 
                 double dist = distance(dim, num_face, elem, xp, xv, face_normale);
-                dist *= (dim + 1.) / dim; // pour se ramener a distance paroi / milieu de num[0]-num[1]
+                dist *= (dim + 1.) / dim; // to convert to wall distance / midpoint of num[0]-num[1]
                 double val[3];
                 double norm_v = norm_vit1_lp(dim, vit, num_face, nfac, num, face_normale, val);
                 double d_visco = l_unif ? visco0:visco[elem];
 
-                // PQ : 01/10/03 : corrections par rapport a la version premiere
+                // PQ : 01/10/03 : corrections relative to the first version
                 double norm_tau = d_visco * norm_v / dist;
                 double u_etoile = sqrt(norm_tau);
                 Kokkos::atomic_add(&y_plus_view(elem), dist * u_etoile / d_visco);
@@ -652,9 +650,9 @@ void Champ_P1NC::calcul_y_plus(const Domaine_Cl_VEF& domaine_Cl_VEF, DoubleVect&
           });
           end_gpu_timer(__KERNEL_NAME__);
 
-        } // Fin de paroi fixe
+        } // End of fixed wall
 
-    } // Fin boucle sur les bords
+    } // End loop over boundary conditions
 }
 
 void Champ_P1NC::calcul_grad_U(const Domaine_Cl_VEF& domaine_Cl_VEF, DoubleTab& tab_grad_u) const
@@ -688,8 +686,8 @@ void Champ_P1NC::calcul_grad_T(const Domaine_Cl_VEF& domaine_Cl_VEF, DoubleTab& 
   calculer_gradientP1NC(temp, domaine_vef(), domaine_Cl_VEF, grad_T);
 
   // *******************************************************************
-  //  PQ : 12/12/05 : pour pouvoir visualiser les oscillations a partir
-  //                    des changements de signes du gradient de T
+  //  PQ : 12/12/05 : to be able to visualize oscillations from
+  //                    sign changes in the gradient of T
   // *******************************************************************
   /*
    const IntTab& face_voisins = domaine_VEF.face_voisins();
@@ -728,18 +726,18 @@ void Champ_P1NC::calcul_grad_T(const Domaine_Cl_VEF& domaine_Cl_VEF, DoubleTab& 
 
 }
 
-// Calcul du coefficient d'echange
+// Compute the heat transfer coefficient
 void Champ_P1NC::calcul_h_conv(const Domaine_Cl_VEF& domaine_Cl_VEF, DoubleTab& h_conv, int temp_ref) const
 {
   const DoubleTab& temp = valeurs();
   const IntTab& face_voisins = domaine_vef().face_voisins();
   const DoubleTab& face_normale = domaine_vef().face_normales();
 
-  // On recupere le flux aux frontieres
+  // Retrieve the flux at boundaries
   DoubleTab Flux;
   Flux = equation().operateur(0).l_op_base().flux_bords();
 
-  // On initialise a -1
+  // Initialize to -1
   h_conv = -1.;
 
   double T_ref = double(temp_ref);
@@ -752,7 +750,7 @@ void Champ_P1NC::calcul_h_conv(const Domaine_Cl_VEF& domaine_Cl_VEF, DoubleTab& 
       int ndeb = le_bord.num_premiere_face();
       int nfin = ndeb + le_bord.nb_faces();
       double h_moy = 0.;
-      // Selon les conditions limites
+      // Depending on the boundary conditions
       if (sub_type(Echange_externe_impose, la_cl.valeur()))
         {
           const Champ_base& rho = equation().milieu().masse_volumique();
@@ -789,8 +787,8 @@ void Champ_P1NC::calcul_h_conv(const Domaine_Cl_VEF& domaine_Cl_VEF, DoubleTab& 
                 h_conv(elem) = 0.;
               else
                 {
-                  //La mise a jour de ce champ est faite quand on demande son postraitement
-                  //et par consequent les flux ont ete mis a jour et sont deja multiplies par rho*Cp
+                  //This field is updated when its post-processing is requested,
+                  //and consequently the fluxes have been updated and are already multiplied by rho*Cp
                   h_conv(elem) = sqrt(norme_flux / surf) / DT;
                 }
               h_moy += h_conv(elem);
@@ -864,36 +862,35 @@ double Champ_P1NC::norme_H1(const Domaine& dom) const
   CDoubleTabView tab = valeurs().view_ro();
   CDoubleArrView volumes = domaine_vef().volumes().view_ro();
 
-  //On va calculer la norme H1 d'une inconnue P1NC.
-  //L'algorithme tient compte des contraintes suivantes:
-  //- l'inconnue peut avoir plusieurs composantes
-  //  (i.e etre un scalaire ou etre un vecteur)
-  //- la dimension du probleme est arbitraire (1, 2 ou 3).
-  //ATTENTION: les prismes ne sont pas supportes.
+  // Compute the H1 norm of a P1NC unknown.
+  // The algorithm accounts for the following constraints:
+  // - the unknown may have several components (i.e. be a scalar or a vector)
+  // - the problem dimension is arbitrary (1, 2 or 3).
+  // WARNING: prisms are not supported.
   dnorme_H1 = 0.;
-  Kokkos::parallel_reduce(start_gpu_timer(__KERNEL_NAME__), nb_comp(), //cas scalaire ou vectoriel
+  Kokkos::parallel_reduce(start_gpu_timer(__KERNEL_NAME__), nb_comp(), //scalar or vector case
                           KOKKOS_LAMBDA (const int composante, double& norme_H1_comp)
   {
-    for (int K = 0; K < nb_elem; K++) //boucle sur les elements
+    for (int K = 0; K < nb_elem; K++) //loop over elements
       {
-        double norme_grad_elem = 0.; //pour eviter les accumulations
-        for (int i = 0; i < dim; i++) //boucle sur la dimension du pb
+        double norme_grad_elem = 0.; //to avoid accumulation errors
+        for (int i = 0; i < dim; i++) //loop over problem dimension
           {
-            double int_grad_elem = 0.; //pour eviter les accumulations
-            for (int face = 0; face < nb_faces_elem; face++) //boucle sur les faces d'un "K"
+            double int_grad_elem = 0.; //to avoid accumulation errors
+            for (int face = 0; face < nb_faces_elem; face++) //loop over faces of element "K"
               {
                 int face_globale = elem_faces(K, face);
 
                 int_grad_elem += tab(face_globale, composante) * face_normales(face_globale, i) * oriente_normale(face_globale, K, face_voisins);
-              } //fin du for sur "face"
+              } //end for on "face"
 
             norme_grad_elem += int_grad_elem * int_grad_elem;
-          } //fin du for sur "i"
+          } //end for on "i"
 
         norme_H1_comp += norme_grad_elem / volumes(K);
-      } //fin du for sur "K"
+      } //end for on "K"
 
-  }, dnorme_H1); // fin du for sur "composante"
+  }, dnorme_H1); // end for on "composante"
   end_gpu_timer(__KERNEL_NAME__);
 
   return sqrt(dnorme_H1);
@@ -907,9 +904,9 @@ double Champ_P1NC::norme_L2_H1(const Domaine& dom) const
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-//Methode qui renvoie gij aux elements a partir du champ aux faces
-//(gij represente la derivee partielle dGi/dxj)
-//A partir de gij, on peut calculer Sij = 0.5(gij(i,j)+gij(j,i))
+// Method that returns gij at elements from the face field.
+// (gij represents the partial derivative dGi/dxj)
+// From gij, one can compute Sij = 0.5(gij(i,j)+gij(j,i))
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 DoubleTab& Champ_P1NC::calcul_gradient(const DoubleTab& champ, DoubleTab& gij, const Domaine_Cl_VEF& domaine_Cl_VEF)
@@ -924,43 +921,43 @@ DoubleTab& Champ_P1NC::calcul_duidxj_paroi(DoubleTab& tab_gij, const DoubleTab& 
 {
   const Domaine_VEF& domaine_VEF = domaine_Cl_VEF.domaine_vef();
 
-  // On va modifier Sij pour les faces de Dirichlet (Paroi_fixe) si nous n utilisons pas Paroi_negligeable!!!!
-  // On aura : (grad u)_f = (grad u) - (grad u . n) x n + (grad u . n)_lp x n
+  // Modify Sij for Dirichlet faces (Paroi_fixe) if Paroi_negligeable is not used!
+  // We will have: (grad u)_f = (grad u) - (grad u . n) x n + (grad u . n)_lp x n
   //
 
-  // PQ : 25/01/08 : Mise au propre de la methode pour ne plus etre embete par les histoires de signes notamment
-  //                     et savoir reellement ce qu'on fait !!
+  // PQ : 25/01/08 : Method cleaned up to avoid being confused by sign issues
+  //                     and to know exactly what is being computed.
   //
-  // PRINCIPE :
-  // (expose en 2D, l'extension au 3D ne pose pas de probleme particulier)
+  // PRINCIPLE:
+  // (described in 2D; the extension to 3D poses no particular difficulty)
   //
-  // On considere 2 reperes : le repere global (x,y) et le repere local (t,n) ou n designe la normale a la paroi
-  // Le frottement retourne par la loi de paroi correspond a : || tau_tan || = u*^2 = nu.d(u_t)/dn
-  // Soit P la matrice de passage permettant de passer d'un repere a l'autre
+  // Consider 2 frames: the global frame (x,y) and the local frame (t,n) where n is the wall normal.
+  // The friction returned by the wall law corresponds to: || tau_tan || = u*^2 = nu.d(u_t)/dn
+  // Let P be the change-of-basis matrix from one frame to the other:
   //
   //   P = ( tx  nx )
   //           ( ty  ny )
   //
-  // Les matrices des gradients de vitesse dans chacun des reperes :
+  // The velocity gradient matrices in each frame:
   //
-  //  G_(x,y) =  ( du/dx  du/dy )    et   F_(t,n) = ( du_t/dt   du_t/dn )
+  //  G_(x,y) =  ( du/dx  du/dy )    and   F_(t,n) = ( du_t/dt   du_t/dn )
   //                 ( dv/dx  dv/dy )                    ( du_n/dt   du_n/dn )
   //
   //                                                                     -1
-  // sont reliees l'une a l'autre par :   G_(x,y)  =  P . F_(t,n) . P
+  // are related by:   G_(x,y)  =  P . F_(t,n) . P
   //
   //
-  //  Ainsi la correction apportee dans F = ( du_t/dt   du_t/dn + C  )  ou  C = -du_t/dn + tau_tan/nu
+  //  Thus the correction applied in F = ( du_t/dt   du_t/dn + C  )  where  C = -du_t/dn + tau_tan/nu
   //                                            ( du_n/dt   du_n/dn             )
   //
-  //  se reporte dans G de la maniere suivante :
+  //  maps into G as follows:
   //
   //                                              -1
   //  G*_(x,y) = G_(x,y) +  P . ( 0  C ). P   =  G_(x,y) + ( C.nx.tx  C.ny.tx )
   //                                ( 0  0 )                   ( C.nx.ty  C.ny.ty )
   //
   //
-  // c'est ce dernier terme qu'il s'agit donc de determiner ici
+  // it is this last term that must be determined here
 
   const Conds_lim& les_cl = domaine_Cl_VEF.les_conditions_limites();
   int nb_cl = les_cl.size();
@@ -971,7 +968,7 @@ DoubleTab& Champ_P1NC::calcul_duidxj_paroi(DoubleTab& tab_gij, const DoubleTab& 
 
   for (int num_cl = 0; num_cl < nb_cl; num_cl++)
     {
-      //Boucle sur les bords
+      // Loop over the boundaries
       const Cond_lim& la_cl = les_cl[num_cl];
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) || sub_type(Dirichlet_paroi_defilante, la_cl.valeur()) || la_cl->que_suis_je() == "Frontiere_ouverte_vitesse_imposee_ALE")
         {
@@ -979,7 +976,7 @@ DoubleTab& Champ_P1NC::calcul_duidxj_paroi(DoubleTab& tab_gij, const DoubleTab& 
           int ndeb = la_front_dis.num_premiere_face();
           int nfin = ndeb + la_front_dis.nb_faces();
           int dim = Objet_U::dimension;
-          // Boucle sur les faces
+          // Loop over the faces
           CDoubleTabView face_normale = domaine_VEF.face_normales().view_ro();
           CIntTabView face_voisins = domaine_VEF.face_voisins().view_ro();
           CDoubleArrView porosite_face = domaine_Cl_VEF.equation().milieu().porosite_face().view_ro();
@@ -991,9 +988,9 @@ DoubleTab& Champ_P1NC::calcul_duidxj_paroi(DoubleTab& tab_gij, const DoubleTab& 
           {
             double P[3][3];
             int num1 = face_voisins(fac, 0);
-            // definition des vecteurs unitaires constituant le repere local
-            // stockes dans la matrice de passage P
-            // vecteur tangentiel (porte par la vitesse tangentielle)
+            // definition of the unit vectors forming the local frame,
+            // stored in the change-of-basis matrix P
+            // tangential vector (aligned with the tangential velocity)
             double sum = 0.;
             for (int i = 0; i < dim; i++)
               sum += tau_tan(fac, i) * tau_tan(fac, i);
@@ -1001,26 +998,26 @@ DoubleTab& Champ_P1NC::calcul_duidxj_paroi(DoubleTab& tab_gij, const DoubleTab& 
             for (int i = 0; i < dim; i++)
               P[i][0] = tau_tan(fac, i) / (norme_tau_tan + DMINFLOAT);
 
-            // vecteur normal a la paroi
+            // vector normal to the wall
             sum = 0.;
             for (int i = 0; i < dim; i++)
               sum += face_normale(fac, i) * face_normale(fac, i);
             double norme = sqrt(sum);
 
-            int signe = -oriente_normale(fac, num1, face_voisins); // orientation vers l'interieur
+            int signe = -oriente_normale(fac, num1, face_voisins); // inward orientation
             for (int i = 0; i < dim; i++)
               P[i][1] = signe * face_normale(fac, i) / norme;
 
-            // (3D) on complete la base par le deuxieme vecteur tangentiel
+            // (3D) complete the basis with the second tangential vector
             if (dim == 3)
               {
                 P[0][2] = P[1][0] * P[2][1] - P[2][0] * P[1][1];
                 P[1][2] = P[2][0] * P[0][1] - P[0][0] * P[2][1];
                 P[2][2] = P[0][0] * P[1][1] - P[1][0] * P[0][1];
               }
-            //         determination du terme d(u_t)/dn a enlever
+            //         determine the term d(u_t)/dn to be removed
             //                                                       -1
-            //         terme identifie a l'aide du produit : F =  P . G . P
+            //         term identified using the product: F =  P . G . P
             //
             double dutdn_old = 0.;
             for (int i = 0; i < dim; i++)
@@ -1030,11 +1027,11 @@ DoubleTab& Champ_P1NC::calcul_duidxj_paroi(DoubleTab& tab_gij, const DoubleTab& 
                   dutdn_old += gij_value * P[j][1] * P[i][0];
                 }
 
-            //         Correction finale apportee a la matrice G
+            //         Final correction applied to matrix G
             double C = -dutdn_old + norme_tau_tan / (nu[num1] + nu_turb[num1]) * porosite_face(fac);
 
-            // la division par (nu[num1]+nu_turb[num1]) s'impose du fait que l'operateur de diffusion
-            // fait intervenir le produit : (nu[num1]+nu_turb[num1])*g(i,j)
+            // the division by (nu[num1]+nu_turb[num1]) is required because the diffusion operator
+            // involves the product: (nu[num1]+nu_turb[num1])*g(i,j)
             for (int i = 0; i < dim; i++)
               for (int j = 0; j < dim; j++)
                 Kokkos::atomic_add(&gij(num1, i, j), C * P[j][1] * P[i][0]);
@@ -1047,7 +1044,7 @@ DoubleTab& Champ_P1NC::calcul_duidxj_paroi(DoubleTab& tab_gij, const DoubleTab& 
 }
 
 ////////////////////
-// Calcul de 2SijSij
+// Compute 2SijSij
 ////////////////////
 DoubleVect& Champ_P1NC::calcul_S_barre(const DoubleTab& la_vitesse, DoubleVect& SMA_barre, const Domaine_Cl_VEF& domaine_Cl_VEF)
 {

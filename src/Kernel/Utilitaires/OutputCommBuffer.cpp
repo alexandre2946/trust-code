@@ -25,8 +25,8 @@ OutputCommBuffer::OutputCommBuffer()
   // Typed view - memory is managed by Sortie:
   stream_ = static_cast<std::ostringstream *>(ostream_.get());
 
-  // Initialisation avec les 2 lignes suivantes car sinon plantage sur PAR_Cx 7 procs sur AIX:
-  // La STD est specifique sur cette machine
+  // Initialization with the following 2 lines, otherwise crashes on PAR_Cx 7 procs on AIX:
+  // The STD is specific on that machine
   *this << "";
   stream_->seekp(0);
 }

@@ -22,7 +22,7 @@
 
 Implemente_instanciable(Segment_EF,"Segment_EF",Elem_EF_base);
 
-// printOn et readOn
+// printOn and readOn
 
 
 Sortie& Segment_EF::printOn(Sortie& s ) const
@@ -36,8 +36,14 @@ Entree& Segment_EF::readOn(Entree& s )
 }
 
 
-/*! @brief remplit le tableau face_normales dans le Domaine_EF
+/*! @brief Fills the face_normales array in the Domaine_EF.
  *
+ * @param num_Face Local face index.
+ * @param Face_normales Array of face normals to fill.
+ * @param Face_sommets Face-to-vertex connectivity table.
+ * @param Face_voisins Face neighbour element table.
+ * @param elem_faces Element-to-face connectivity table.
+ * @param domaine_geom Geometric domain.
  */
 void Segment_EF::normale(int num_Face,DoubleTab& Face_normales,
                          const  IntTab& Face_sommets,
@@ -45,7 +51,7 @@ void Segment_EF::normale(int num_Face,DoubleTab& Face_normales,
                          const IntTab& elem_faces,
                          const Domaine& domaine_geom) const
 {
-  // pas de sens simple a normale
+  // no simple meaning for a normal here
   Face_normales(num_Face,0) = 1;
 
   {
@@ -76,8 +82,8 @@ void Segment_EF::normale(int num_Face,DoubleTab& Face_normales,
 
     //int n1 = Face_sommets(num_Face,1);
 
-    // Orientation de la normale de elem1 vers elem2
-    // pour cela recherche du sommet de elem1 qui n'est pas sur la Face
+    // Orient the normal from elem1 toward elem2
+    // by searching for the vertex of elem1 that is not on the Face
     int f0,no3;
     int elem1 = Face_voisins(num_Face,0);
     Cerr<<num_Face<<" iii "<<elem1<< " "<<Face_voisins(num_Face,1)<<" "<<(Face_voisins(num_Face,0)==elem1)	  <<finl;
@@ -107,8 +113,8 @@ void Segment_EF::normale(int num_Face,DoubleTab& Face_normales,
   nx = -y1;
   ny = x1;
 
-  // Orientation de la normale de elem1 vers elem2
-  // pour cela recherche du sommet de elem1 qui n'est pas sur la Face
+  // Orient the normal from elem1 toward elem2
+  // by searching for the vertex of elem1 that is not on the Face
   int elem1 = Face_voisins(num_Face,0);
   if ( (f0 = elem_faces(elem1,0)) == num_Face )
     f0 = elem_faces(elem1,1);
@@ -142,14 +148,14 @@ void Segment_EF::calcul_vc(const ArrOfInt& Face,ArrOfDouble& vc,
   //Cerr << " type_cl " <<  type_cl << finl;
   switch(type_cl)
     {
-    case 0: // le triangle n'a pas de Face de Dirichlet
+    case 0: // the element has no Dirichlet face
       {
         vc[0] = vs[0]/3;
         vc[1] = vs[1]/3;
         break;
       }
 
-    case 1: // le triangle a une Face de Dirichlet :la Face 2
+    case 1: // the element has one Dirichlet face: face 2
       {
         vc[0]= vitesse.valeurs()(Face[2],0)*porosite_face[Face[2]];
         vc[1]= vitesse.valeurs()(Face[2],1)*porosite_face[Face[2]];
@@ -158,7 +164,7 @@ void Segment_EF::calcul_vc(const ArrOfInt& Face,ArrOfDouble& vc,
         break;
       }
 
-    case 2: // le triangle a une Face de Dirichlet :la Face 1
+    case 2: // the element has one Dirichlet face: face 1
       {
         vc[0]= vitesse.valeurs()(Face[1],0)*porosite_face[Face[1]];
         vc[1]= vitesse.valeurs()(Face[1],1)*porosite_face[Face[1]];
@@ -167,7 +173,7 @@ void Segment_EF::calcul_vc(const ArrOfInt& Face,ArrOfDouble& vc,
         break;
       }
 
-    case 4: // le triangle a une Face de Dirichlet :la Face 0
+    case 4: // the element has one Dirichlet face: face 0
       {
         vc[0]= vitesse.valeurs()(Face[0],0)*porosite_face[Face[0]];
         vc[1]= vitesse.valeurs()(Face[0],1)*porosite_face[Face[0]];
@@ -176,35 +182,40 @@ void Segment_EF::calcul_vc(const ArrOfInt& Face,ArrOfDouble& vc,
         break;
       }
 
-    case 3: // le triangle a deux faces de Dirichlet :les faces 1 et 2
+    case 3: // the element has two Dirichlet faces: faces 1 and 2
       {
         vc[0]= vsom(0,0);
         vc[1]= vsom(0,1);
         break;
       }
 
-    case 5: // le triangle a deux faces de Dirichlet :les faces 0 et 2
+    case 5: // the element has two Dirichlet faces: faces 0 and 2
       {
         vc[0]= vsom(1,0);
         vc[1]= vsom(1,1);
         break;
       }
 
-    case 6: // le triangle a deux faces de Dirichlet :les faces 0 et 1
+    case 6: // the element has two Dirichlet faces: faces 0 and 1
       {
         vc[0]= vsom(2,0);
         vc[1]= vsom(2,1);
         break;
       }
 
-    } // fin du switch
+    } // end of switch
 
 }
 
-/*! @brief calcule les coord xg du centre d'un element non standard calcule aussi idirichlet=nb de faces de Dirichlet de l'element
+/*! @brief Computes the coordinates xg of the centre of a non-standard element.
  *
- *  si idirichlet=2, n1 est le numero du sommet confondu avec G
- *
+ * @brief Also computes idirichlet = number of Dirichlet faces of the element.
+ *  If idirichlet=2, n1 is the index of the vertex coinciding with G.
+ * @param xg Output centre coordinates.
+ * @param x Vertex coordinate table for the element.
+ * @param type_elem_Cl Element boundary condition type.
+ * @param idirichlet Output number of Dirichlet faces.
+ * @param n1 Output index of the vertex coinciding with G (when idirichlet=2).
  */
 void Segment_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
                            const int type_elem_Cl,int& idirichlet,int& n1,int& ,int& ) const
@@ -213,8 +224,8 @@ void Segment_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
   switch(type_elem_Cl)
     {
 
-    case 0:  // le triangle n'a pas de Face de dirichlet: il a 3 Facettes
-      //  le point G est le barycentre des sommets du triangle
+    case 0:  // the element has no Dirichlet face; it has 3 facets
+      //  G is the barycentre of the element vertices
       {
         for (j=0; j<dim; j++)
           xg[j]=(x(0,j)+x(1,j)+x(2,j))/3;
@@ -223,8 +234,8 @@ void Segment_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
         break;
       }
 
-    case 1:  // le triangle a une Face de dirichlet: la Face 2
-      // le point G est le barycentre des sommets de la Face 2
+    case 1:  // the element has one Dirichlet face: face 2
+      // G is the barycentre of the vertices of face 2
 
       {
         for (j=0; j<dim; j++)
@@ -234,8 +245,8 @@ void Segment_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
         break;
       }
 
-    case 2:  // le triangle a une Face de dirichlet: la Face 1
-      // le point G est le barycentre des sommets de la Face 1
+    case 2:  // the element has one Dirichlet face: face 1
+      // G is the barycentre of the vertices of face 1
 
       {
         for (j=0; j<dim; j++)
@@ -245,8 +256,8 @@ void Segment_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
         break;
       }
 
-    case 4:  // le triangle a une Face de dirichlet: la Face 0
-      // le point G est le barycentre des sommets de la Face 0
+    case 4:  // the element has one Dirichlet face: face 0
+      // G is the barycentre of the vertices of face 0
 
       {
         for (j=0; j<dim; j++)
@@ -256,8 +267,8 @@ void Segment_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
         break;
       }
 
-    case 6 : // le triangle a deux faces de Dirichlet : les faces 0,1
-      // le point G est le sommet 2 du triangle
+    case 6 : // the element has two Dirichlet faces: faces 0 and 1
+      // G is vertex 2 of the element
 
       {
         for (j=0; j<dim; j++)
@@ -269,8 +280,8 @@ void Segment_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
 
       }
 
-    case 5 : // le triangle a deux faces de Dirichlet : les faces 0,2
-      // le point G est le sommet 1 du triangle
+    case 5 : // the element has two Dirichlet faces: faces 0 and 2
+      // G is vertex 1 of the element
 
       {
         for (j=0; j<dim; j++)
@@ -282,8 +293,8 @@ void Segment_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
 
       }
 
-    case 3 : // le triangle a deux faces de Dirichlet : les faces 1,2
-      // le point G est le sommet 0 du triangle
+    case 3 : // the element has two Dirichlet faces: faces 1 and 2
+      // G is vertex 0 of the element
 
       {
         for (j=0; j<dim; j++)
@@ -295,6 +306,6 @@ void Segment_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
 
       }
 
-    } // fin du switch
+    } // end of switch
 
 }

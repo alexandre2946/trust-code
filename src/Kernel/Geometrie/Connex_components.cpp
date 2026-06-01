@@ -18,13 +18,13 @@
 #include <TRUSTTab.h>
 #include <ArrOfBit.h>
 
-/*! @brief Calcul des ensembles connexes par faces d'elements non "marques" (les elements sont relies entre eux par un graphe
+/*! @brief Computes the connected sets by faces of non-"marked" elements (elements are connected to each other via a symmetric graph
  *
- *   symetrique passant par les faces).
- *   Une portion de domaine connexe porte un numero 0 <= i < N
- *   unique et est delimite soit par un bord, soit par un element voisin "marque"
- *   par num_compo[elem] = -1.
- *   Cette methode est sequentielle (peut etre appelee sur un seul processeur)
+ *   passing through the faces).
+ *   A connected domain portion has a unique number 0 <= i < N
+ *   and is delimited either by a boundary, or by a neighbor element "marked"
+ *   by num_compo[elem] = -1.
+ *   This method is sequential (may be called on a single processor)
  *
  * @param (elem_faces)
  * @param (faces_elem)
@@ -49,12 +49,12 @@ int search_connex_components_local(const IntTab& elem_faces, const IntTab& faces
 
   do
     {
-      // Cherche le prochain element non attribue a une composante connexe
+      // Find the next element not yet assigned to a connected component
       while (start_element < nbelem && num_compo[start_element] >= -1)
         start_element++;
       if (start_element == nbelem)
         break;
-      // Recherche des elements de la composante connexe a partir de cet element
+      // Search for the elements of the connected component starting from this element
       liste_elems.resize_array(1);
       liste_elems[0] = start_element;
       num_compo[start_element] = num_compo_courant;
@@ -65,8 +65,8 @@ int search_connex_components_local(const IntTab& elem_faces, const IntTab& faces
           for (int i_elem = 0; i_elem < liste_elems_size; i_elem++)
             {
               const int elem = liste_elems[i_elem];
-              // Ajout des voisins non attribues de cet element dans la liste a
-              // traiter a l'etape suivante
+              // Add the unassigned neighbors of this element to the list to
+              // be processed in the next step
               for (int j = 0; j < nb_voisins; j++)
                 {
                   const int face = elem_faces(elem, j);
@@ -87,44 +87,44 @@ int search_connex_components_local(const IntTab& elem_faces, const IntTab& faces
       num_compo_courant++;
     }
   while (1);
-  // Renvoie le nombre de composantes connexes locales trouvees
+  // Returns the number of local connected components found
   return num_compo_courant;
 }
 
-/*! @brief recherche des composantes connexes d'un graphe local (non distribue sur les processeurs) non symetrique.
+/*! @brief Searches for the connected components of a local (non-distributed across processors) non-symmetric graph.
  *
  * @param (graph)
  * @param (connex_components)
  */
 int compute_graph_connex_components(const IntTab& graph, ArrOfInt& connex_components)
 {
-  // connex_components doit deja avoir la bonne taille en entree !
+  // connex_components must already have the correct size on entry!
   const int nb_sommets = connex_components.size_array();
 
-  // renum_data definit des listes chainees de numeros de "sommets" appartenant a
-  //  la meme composante connexe.
-  // renum_data(i,0)= numero du premier "sommet" de la liste a laquelle appartient i
-  // renum_data(i,1)= numero du "sommet" suivant dans la liste
+  // renum_data defines linked lists of "vertex" numbers belonging to
+  //  the same connected component.
+  // renum_data(i,0) = number of the first "vertex" in the list to which i belongs
+  // renum_data(i,1) = number of the next "vertex" in the list
   IntTab renum_data(nb_sommets, 2);
-  // Au debut, chaque sommet est toute seule dans une liste:
+  // At the start, each vertex is alone in a list:
   int i_sommet;
   for (i_sommet = 0; i_sommet < nb_sommets; i_sommet++)
     {
       renum_data(i_sommet, 0) = i_sommet;
-      renum_data(i_sommet, 1) = -1; // fin de liste
+      renum_data(i_sommet, 1) = -1; // end of list
     }
   const int nbcouples = graph.dimension(0);
   for (int i_couple = 0; i_couple < nbcouples; i_couple++)
     {
-      const int compo1 = graph(i_couple, 0); // la plus petite
-      const int compo2 = graph(i_couple, 1); // la plus grande
+      const int compo1 = graph(i_couple, 0); // the smaller one
+      const int compo2 = graph(i_couple, 1); // the larger one
       assert(compo1 != compo2);
-      // Si les deux composantes sont deja dans la meme liste,
-      // ne rien faire.
+      // If the two components are already in the same list,
+      // do nothing.
       if (renum_data(compo1, 0) == renum_data(compo2, 0))
         continue;
-      // Reunir la liste1 contenant compo1 et la liste2 contenant compo2:
-      // 1) trouver la fin de la premiere liste
+      // Merge list1 containing compo1 and list2 containing compo2:
+      // 1) find the end of the first list
       int fin_liste1 = compo1;
       for (;;)
         {
@@ -133,10 +133,10 @@ int compute_graph_connex_components(const IntTab& graph, ArrOfInt& connex_compon
             break;
           fin_liste1 = next;
         }
-      // 2) brancher la liste2 a la fin de la liste1 :
+      // 2) append list2 at the end of list1:
       const int debut_liste2 = renum_data(compo2, 0);
       renum_data(fin_liste1, 1) = debut_liste2;
-      // 2) mettre a jour le debut de liste pour liste2 :
+      // 2) update the beginning of list for list2:
       i_sommet = debut_liste2;
       const int debut_liste1 = renum_data(compo1, 0);
       do
@@ -147,31 +147,31 @@ int compute_graph_connex_components(const IntTab& graph, ArrOfInt& connex_compon
       while (i_sommet >= 0);
     }
 
-  // Creation d'une numerotation contigue pour les composantes:
-  // Prochain numero a attribuer
+  // Create a contiguous numbering for the components:
+  // Next number to assign
   int count = 0;
   connex_components = -1;
   for (i_sommet = 0; i_sommet < nb_sommets; i_sommet++)
     {
       if (connex_components[i_sommet] < 0)
         {
-          // sommet pas encore traite
-          // Associe un nouveau numero a tous les sommets de la composante
-          // connexe a laquelle appartient i_sommet:
+          // vertex not yet processed
+          // Assign a new number to all vertices of the connected component
+          // to which i_sommet belongs:
           for (int i = renum_data(i_sommet, 0); i >= 0; i = renum_data(i, 1))
             connex_components[i] = count;
-          // Nouveau numero pour la prochaine composante
+          // New number for the next component
           count++;
         }
     }
-  // On renvoie le nombre de composantes connexes trouvees
+  // Return the number of connected components found
   return count;
 }
 
-/*! @brief Recherche les composantes connexes d'un ensemble d'elements distribue sur tous les processeurs.
+/*! @brief Searches for the connected components of a set of elements distributed across all processors.
  *
- * Cette methode est parallele et doit etre appelee en
- *   meme temps sur tous les processeurs.
+ * This method is parallel and must be called at the
+ *   same time on all processors.
  *
  * @param (num_compo)
  * @param (nb_local_components)
@@ -182,53 +182,53 @@ int compute_global_connex_components(IntVect& num_compo, int nb_local_components
   const int nbelem_tot = num_compo.size_totale();
   //int i;
 
-  // Transformation des indices locaux de composantes connexes en un indice global
-  // (on ajoute un decalage aux indices globaux avec mppartial_sum())
+  // Transform local connected component indices into a global index
+  // (a shift is added to the global indices using mppartial_sum())
   const int decalage = static_cast<int>(Process::mppartial_sum(nb_local_components)); // compo number are never huge
   const int nb_total_components = static_cast<int>(Process::mp_sum(nb_local_components));
   for (int i = 0; i < nbelem_tot; i++)
     if (num_compo[i] >= 0)
       num_compo[i] += decalage;
 
-  // Pour trouver les correspondances entre un numero de composante locale et un
-  // numero de la meme composante sur le processeur voisin, on cree une copie du
-  // tableau num_compo sur laquelle on fait un echange_espace_virtuel(). Ainsi,
-  // sur les cases virtuelles du tableau, on a dans num_compo le numero de la
-  // composante locale et dans copie_compo le numero de cette meme composante sur
-  // le processeur proprietaire de l'element. Donc ces deux numeros designent
-  // la meme composante connexe.
+  // To find correspondences between a local component number and a
+  // number of the same component on the neighboring processor, we create a copy of
+  // the num_compo array on which we perform an echange_espace_virtuel(). Thus,
+  // in the virtual entries of the array, num_compo holds the number of the
+  // local component and copie_compo holds the number of that same component on
+  // the processor that owns the element. These two numbers therefore designate
+  // the same connected component.
   IntVect copie_compo(num_compo);
   copie_compo.echange_espace_virtuel();
 
-  // Recherche des equivalences entre les numeros des composantes locales et
-  // les numeros des composantes voisines. On construit un graphe dont les
-  // liens relient les composantes equivalentes.
-  // Tableau de marqeurs pour les equivalences deja trouvees.
-  // Dimensions = nb composantes locales * nb_composantes total
-  //  (pour ne pas prendre en compte la meme composante plusieurs fois).
+  // Search for equivalences between local component numbers and
+  // neighboring component numbers. We build a graph whose
+  // edges connect equivalent components.
+  // Marker array for equivalences already found.
+  // Dimensions = nb local components * nb total components
+  //  (to avoid counting the same component more than once).
   ArrOfBit markers(nb_local_components * nb_total_components);
   markers = 0;
-  // Tableau de correspondances entre composantes connexes locales et distantes
+  // Correspondence table between local and remote connected components
   IntTab graph;
 
   int graph_size = 0;
-  // Parcours des elements virtuels uniquement
+  // Iterate over virtual elements only
   for (int i = nbelem; i < nbelem_tot; i++)
     {
       int compo = num_compo[i];
       if (compo < 0)
         continue;
       int compo2 = copie_compo[i];
-      // Index du couple compo2/compo dans le tableau markers
-      // Le tableau num_compo ne doit contenir que des composantes locales:
+      // Index of the pair compo2/compo in the markers array
+      // The num_compo array must contain only local components:
       assert(compo >= decalage && compo - decalage < nb_local_components);
-      // compo2 est forcement une composante distante.
+      // compo2 is necessarily a remote component.
       assert(compo2 < decalage || compo2 - decalage >= nb_local_components);
       const int index = (compo - decalage) * nb_total_components + compo2;
       if (!markers.testsetbit(index))
         {
           graph.resize(graph_size+1, 2);
-          // On met le plus petit numero de composante en colonne 0:
+          // Put the smaller component number in column 0:
           if (compo2 < compo)
             {
               int tmp = compo;
@@ -244,7 +244,7 @@ int compute_global_connex_components(IntVect& num_compo, int nb_local_components
   ArrOfInt renum;
   if (Process::je_suis_maitre())
     {
-      // Reception des portions de graphe des autres processeurs
+      // Receive graph portions from other processors
       IntTab tmp;
       const int nproc = Process::nproc();
       int pe;
@@ -260,21 +260,21 @@ int compute_global_connex_components(IntVect& num_compo, int nb_local_components
               graph_size++;
             }
         }
-      // Calcul des composantes connexes du graphe
+      // Compute the connected components of the graph
       renum.resize_array(nb_total_components);
       const int n = compute_graph_connex_components(graph, renum);
       Process::Journal() << "compute_global_connex_components: nb_components=" << n << finl;
     }
   else
     {
-      // Envoi du graphe local au processeur 0
+      // Send the local graph to processor 0
       envoyer(graph, 0, 54 /* tag */);
     }
 
-  // Reception des composantes connexes
-  envoyer_broadcast(renum, 0 /* processeur source */);
+  // Receive the connected components
+  envoyer_broadcast(renum, 0 /* source processor */);
 
-  // Renumerotation des composantes dans num_compo
+  // Renumber the components in num_compo
   for (int i = 0; i < nbelem_tot; i++)
     {
       const int x = num_compo[i];
@@ -284,13 +284,12 @@ int compute_global_connex_components(IntVect& num_compo, int nb_local_components
           num_compo[i] = new_x;
         }
     }
-  // Verification: si on fait un echange espace virtuel,
-  //  cela ne doit par changer le numero des composantes
-  //  connexes !
+  // Verification: if we do a virtual space exchange,
+  //  this should not change the connected component numbers!
 
   int nb_components = 0;
-  // Tous les processeurs possedent le meme tableau renum, tout le monde
-  //  calcule donc le meme maximum !
+  // All processors hold the same renum array, so all compute
+  //  the same maximum!
   if (renum.size_array() > 0)
     nb_components = max_array(renum) + 1;
   return nb_components;

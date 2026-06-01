@@ -26,20 +26,20 @@ class Champ_base;
 class Motcle;
 class Param;
 
-/*! @brief : Classe de base des lois de fermetures.
+/*! @brief : Base class of closure laws.
  *
- * Cette classe calcule des champs qui peuvent dependre
- *   de plusieurs inconnues, de grandeurs physiques du milieu etc.
- *   Les champs de la classe sont rendus accessibles a tout le probleme
- *   a travers la methode get_champ() et leur mise a jour est declenchee
- *   par le probleme, apres la mise a jour du milieu et des equations.
+ * This class calculates fields that can depend
+ *   on several unknowns, physical quantities of the medium, etc.
+ *   The fields of the class are made accessible to the entire problem
+ *   through the get_champ() method and their update is triggered
+ *   by the problem, after updating the medium and equations.
  *
  */
 class Loi_Fermeture_base : public Objet_U, public Champs_compris_interface
 {
   Declare_base(Loi_Fermeture_base);
 public:
-  // Reimplementation de Objet_U
+  // Reimplementation of Objet_U
   void nommer(const Nom& nom) override
   {
     nom_ = nom;
@@ -48,13 +48,13 @@ public:
   {
     return nom_;
   }
-  // Implementation des methodes de Champs_compris_interface:
+  // Implementation of Champs_compris_interface methods:
   void creer_champ(const Motcle& motlu) override { }
   const Champ_base& get_champ(const Motcle& nom) const override;
   bool has_champ(const Motcle& nom, OBS_PTR(Champ_base)& ref_champ) const override;
   bool has_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom, Option opt=NONE) const override;
-  // Nouvelles methodes:
+  // New methods:
   virtual void associer_pb_base(const Probleme_base&);
   virtual void discretiser(const Discretisation_base& );
   virtual void set_param(Param& param) const override;
@@ -72,7 +72,7 @@ protected:
 
 private:
   Nom nom_;
-  // Prive car ce membre donne acces au probleme non const. On le cache.
+  // Private because this member gives access to the non-const problem. We hide it.
   OBS_PTR(Probleme_base) mon_probleme_;
 
 

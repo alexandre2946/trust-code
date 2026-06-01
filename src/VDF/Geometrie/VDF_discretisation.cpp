@@ -46,16 +46,16 @@ Entree& VDF_discretisation::readOn(Entree& s)
 
 Sortie& VDF_discretisation::printOn(Sortie& s) const { return s; }
 
-/*! @brief Discretisation d'un OWN_PTR(Champ_Inc_base) pour le VDF en fonction d'une directive de discretisation.
+/*! @brief Discretizes a OWN_PTR(Champ_Inc_base) for VDF based on a discretization directive.
  *
- * La directive est un Motcle comme "vitesse", "pression",
- *  "temperature", "champ_elem" (cree un champ de type P0 ...), ...
- *  Cette methode determine le type du champ a creer en fonction du type d'element
- *  et de la directive de discretisation. Elle determine ensuite le nombre de ddl
- *  et fixe l'ensemble des parametres du champ (type, nb_compo, nb_ddl, nb_pas_dt,
- *  nom(s), unite(s), nature du champ et attribue un temps) et associe le Domaine_dis au champ.
- *  Voir le code pour avoir la correspondance entre les directives et
- *  le type de champ cree.
+ * The directive is a Motcle such as "vitesse", "pression",
+ *  "temperature", "champ_elem" (creates a P0-type field ...), ...
+ *  This method determines the type of field to create based on the element type
+ *  and the discretization directive. It then determines the number of dofs
+ *  and sets all field parameters (type, nb_compo, nb_ddl, nb_pas_dt,
+ *  name(s), unit(s), nature of the field and assigns a time) and associates the Domaine_dis with the field.
+ *  See the code for the correspondence between directives and
+ *  the type of field created.
  *
  */
 void VDF_discretisation::discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, int nb_pas_dt, double temps,
@@ -64,13 +64,13 @@ void VDF_discretisation::discretiser_champ(const Motcle& directive, const Domain
   const Domaine_VDF& domaine_vdf = ref_cast(Domaine_VDF, z);
 
   Motcles motcles(7);
-  motcles[0] = "vitesse";     // Choix standard pour la vitesse
-  motcles[1] = "pression";    // Choix standard pour la pression
-  motcles[2] = "temperature"; // Choix standard pour la temperature
-  motcles[3] = "divergence_vitesse"; // Le type de champ obtenu en calculant div v
-  motcles[4] = "gradient_pression";  // Le type de champ obtenu en calculant grad P
-  motcles[5] = "champ_face";   // Creer un champ aux faces
-  motcles[6] = "champ_elem";   // Creer un champ aux elements (de type P0)
+  motcles[0] = "vitesse";     // Standard choice for velocity
+  motcles[1] = "pression";    // Standard choice for pressure
+  motcles[2] = "temperature"; // Standard choice for temperature
+  motcles[3] = "divergence_vitesse"; // Field type obtained by computing div v
+  motcles[4] = "gradient_pression";  // Field type obtained by computing grad P
+  motcles[5] = "champ_face";   // Create a face field
+  motcles[6] = "champ_elem";   // Create an element field (P0 type)
 
   Nom type;
   int default_nb_comp = -1;
@@ -116,15 +116,15 @@ void VDF_discretisation::discretiser_champ(const Motcle& directive, const Domain
   if (sous_type != NOM_VIDE)
     rang = verifie_sous_type(type, sous_type, directive);
 
-  // Si on n'a pas compris la directive (ou si c'est une demande_description)
-  // alors on appelle l'ancetre :
+  // If the directive was not understood (or if it is a demande_description),
+  // call the ancestor:
   if (rang < 0)
     {
       Discret_Thyd::discretiser_champ(directive, z, nature, noms, unites, nb_comp, nb_pas_dt, temps, champ);
       return;
     }
 
-  // Calcul du nombre de ddl
+  // Compute the number of dofs
   int nb_ddl = 0;
   if (type.debute_par("Champ_P0_VDF"))
     nb_ddl = z.nb_elem();
@@ -147,9 +147,9 @@ void VDF_discretisation::discretiser_champ(const Motcle& directive, const Domain
 
 }
 
-/*! @brief Idem que VDF_discretisation::discretiser_champ(.
+/*! @brief Same as VDF_discretisation::discretiser_champ(.
  *
- * .. , Champ_Inc) pour un Champ_Fonc.
+ * .. , Champ_Inc) for a Champ_Fonc.
  *
  */
 void VDF_discretisation::discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, double temps,
@@ -158,9 +158,9 @@ void VDF_discretisation::discretiser_champ(const Motcle& directive, const Domain
   discretiser_champ_fonc_don(directive, z, nature, noms, unites, nb_comp, temps, champ);
 }
 
-/*! @brief Idem que VDF_discretisation::discretiser_champ(.
+/*! @brief Same as VDF_discretisation::discretiser_champ(.
  *
- * .. , Champ_Inc) pour un Champ_Don.
+ * .. , Champ_Inc) for a Champ_Don.
  *
  */
 void VDF_discretisation::discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, double temps,
@@ -169,29 +169,29 @@ void VDF_discretisation::discretiser_champ(const Motcle& directive, const Domain
   discretiser_champ_fonc_don(directive, z, nature, noms, unites, nb_comp, temps, champ);
 }
 
-/*! @brief Idem que VEF_discretisation::discretiser_champ(.
+/*! @brief Same as VEF_discretisation::discretiser_champ(.
  *
- * .. , Champ_Inc) Traitement commun aux champ_fonc et champ_don.
- *  Cette methode est privee (passage d'un Objet_U pas propre vu
- *  de l'exterieur ...)
+ * .. , Champ_Inc). Common treatment for champ_fonc and champ_don.
+ *  This method is private (passing an Objet_U is not clean from
+ *  an external viewpoint ...)
  *
  */
 void VDF_discretisation::discretiser_champ_fonc_don(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, double temps,
                                                     Objet_U& champ) const
 {
-  // Deux pointeurs pour acceder facilement au champ_don ou au champ_fonc, suivant le type de l'objet champ.
+  // Two pointers to access the champ_don or champ_fonc easily, depending on the type of the champ object.
   OWN_PTR(Champ_Fonc_base) *champ_fonc = dynamic_cast<OWN_PTR(Champ_Fonc_base)*>(&champ);
   OWN_PTR(Champ_Don_base) *champ_don = dynamic_cast<OWN_PTR(Champ_Don_base)*>(&champ);
 
   Motcles motcles(8);
   motcles[0] = "pression";
   motcles[1] = "temperature";
-  motcles[2] = "divergence_vitesse"; // Le type de champ obtenu en calculant div v
-  motcles[3] = "champ_elem";  // Creer un champ aux elements (de type P0)
-  motcles[4] = "vitesse";     // Creer un champ comme la vitesse
-  motcles[5] = "gradient_pression";  // Le type de champ obtenu en calculant grad P
-  motcles[6] = "champ_face";   // Creer un champ aux faces
-  motcles[7] = "champ_sommets";   // Creer un champ aux sommets
+  motcles[2] = "divergence_vitesse"; // Field type obtained by computing div v
+  motcles[3] = "champ_elem";  // Create an element field (P0 type)
+  motcles[4] = "vitesse";     // Create a field like velocity
+  motcles[5] = "gradient_pression";  // Field type obtained by computing grad P
+  motcles[6] = "champ_face";   // Create a face field
+  motcles[7] = "champ_sommets";   // Create a vertex field
 
   Nom type;
   int rang = motcles.search(directive);
@@ -235,8 +235,8 @@ void VDF_discretisation::discretiser_champ_fonc_don(const Motcle& directive, con
   if (directive == DEMANDE_DESCRIPTION)
     Cerr << "VDF_discretisation : " << motcles;
 
-  // Si on n'a pas compris la directive (ou si c'est une demande_description)
-  // alors on appelle l'ancetre :
+  // If the directive was not understood (or if it is a demande_description),
+  // call the ancestor:
   if (rang < 0)
     {
       if (champ_fonc)
@@ -246,7 +246,7 @@ void VDF_discretisation::discretiser_champ_fonc_don(const Motcle& directive, con
       return;
     }
 
-  // Calcul du nombre de ddl
+  // Compute the number of dofs
   int nb_ddl = 0;
   const Domaine_VDF& domaine_vdf = ref_cast(Domaine_VDF, z);
   if (type == "Champ_Fonc_P0_VDF")
@@ -259,7 +259,7 @@ void VDF_discretisation::discretiser_champ_fonc_don(const Motcle& directive, con
     assert(0);
 
   if (nb_comp < 0)
-    nb_comp = default_nb_comp; // Nombre de composantes par defaut
+    nb_comp = default_nb_comp; // Default number of components
   if (champ_fonc)
     creer_champ(*champ_fonc, z, type, noms[0], unites[0], nb_comp, nb_ddl, temps, directive, que_suis_je());
   else
@@ -465,7 +465,7 @@ void VDF_discretisation::t_paroi(const Domaine_dis_base& z,const Domaine_Cl_dis_
   ch_tp.associer_champ(temp);
   ch_tp.nommer("temperature_paroi");
   ch_tp.add_synonymous("wall_temperature");
-  ch_tp.fixer_nb_comp(ch_temp.valeurs().line_size()); // pour multiphase ...
+  ch_tp.fixer_nb_comp(ch_temp.valeurs().line_size()); // for multiphase ...
   ch_tp.fixer_nb_valeurs_nodales(domaine_vdf.nb_elem());
   ch_tp.fixer_unite("K-C");
   ch_tp.changer_temps(ch_temp.temps());

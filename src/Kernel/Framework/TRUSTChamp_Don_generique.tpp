@@ -49,7 +49,7 @@ double TRUSTChamp_Don_generique<_TYPE_>::valeur_a_compo(const DoubleVect& x, int
 {
   static constexpr bool IS_XYZ = (_TYPE_ == Champ_Don_Type::XYZ);
   if (!IS_XYZ)
-    return Champ_Don_base::valeur_a_compo(x, ncomp); // appel simple si TXYZ ou LU !
+    return Champ_Don_base::valeur_a_compo(x, ncomp); // simple call for TXYZ or LU !
   else
     {
       if (ncomp > nb_compo_) erreur_champ_(__func__); // asking ncomp > nb_compo_ ?????
@@ -82,10 +82,10 @@ void TRUSTChamp_Don_generique<_TYPE_>::mettre_a_jour_positions(DoubleTab& positi
     }
 }
 
-/*! @brief Renvoie la valeur du champ au point specifie par ses coordonnees.
+/*! @brief Returns the value of the field at the point specified by its coordinates.
  *
- * @param (DoubleVect& x) les coordonnees du point de calcul
- * @param (DoubleVect& val) la valeur du champ au point specifie
+ * @param (DoubleVect& x) the coordinates of the computation point
+ * @param (DoubleVect& val) the value of the field at the specified point
  */
 template <Champ_Don_Type _TYPE_> template<Champ_Don_Type T>
 std::enable_if_t<T != Champ_Don_Type::LU, DoubleVect&>
@@ -107,11 +107,11 @@ TRUSTChamp_Don_generique<_TYPE_>::valeur_a_(const DoubleVect& x, DoubleVect& val
   return valeur_a_elem(x,val,le_poly(0));
 }
 
-/*! @brief Renvoie la valeur du champ au point specifie par ses coordonnees, en indiquant que ce point est situe dans un element specifie.
+/*! @brief Returns the value of the field at the point specified by its coordinates, indicating that this point is located in a specified element.
  *
- * @param (DoubleVect&) les coordonnees du point de calcul
- * @param (DoubleVect& val) la valeur du champ au point specifie
- * @param (int le_poly) l'element dans lequel est situe le point de calcul
+ * @param (DoubleVect&) the coordinates of the computation point
+ * @param (DoubleVect& val) the value of the field at the specified point
+ * @param (int le_poly) the element in which the computation point is located
  */
 template <Champ_Don_Type _TYPE_> template<Champ_Don_Type T>
 std::enable_if_t<T != Champ_Don_Type::LU, DoubleVect&>
@@ -132,11 +132,11 @@ TRUSTChamp_Don_generique<_TYPE_>::valeur_a_elem_(const DoubleVect& , DoubleVect&
   return val;
 }
 
-/*! @brief Renvoie la valeur d'une composante du champ au point specifie par ses coordonnees, en indiquant que ce point est situe dans un element specifie.
+/*! @brief Returns the value of one component of the field at the point specified by its coordinates, indicating that this point is located in a specified element.
  *
- * @param (DoubleVect&) les coordonnees du point de calcul
- * @param (int le_poly) l'element dans lequel est situe le point de calcul
- * @param (int ncomp) l'index de la composante du champ a calculer
+ * @param (DoubleVect&) the coordinates of the computation point
+ * @param (int le_poly) the element in which the computation point is located
+ * @param (int ncomp) the index of the field component to compute
  */
 template <Champ_Don_Type _TYPE_> template <Champ_Don_Type T>
 std::enable_if_t<T != Champ_Don_Type::TXYZ, double> /* XYZ ou LU */
@@ -161,10 +161,10 @@ TRUSTChamp_Don_generique<_TYPE_>::valeur_a_elem_compo_(const DoubleVect& x, int 
   return val_fct(0);
 }
 
-/*! @brief Renvoie les valeurs du champ aux points specifies par leurs coordonnees.
+/*! @brief Returns the values of the field at the points specified by their coordinates.
  *
- * @param (DoubleTab& x) le tableau des coordonnees des points de calcul
- * @param (DoubleTab& val) le tableau des valeurs du champ aux points specifies
+ * @param (DoubleTab& x) the array of coordinates of the computation points
+ * @param (DoubleTab& val) the array of field values at the specified points
  */
 template <Champ_Don_Type _TYPE_> template <Champ_Don_Type T>
 std::enable_if_t<T != Champ_Don_Type::LU, DoubleTab&>
@@ -186,14 +186,14 @@ TRUSTChamp_Don_generique<_TYPE_>::valeur_aux_(const DoubleTab& x, DoubleTab& val
 {
   IntVect les_polys(mon_domaine->nb_elem());
   mon_domaine->chercher_elements(x,les_polys);
-  return valeur_aux_elems(x,les_polys,val); // VTABLE pour Champ_som_lu
+  return valeur_aux_elems(x,les_polys,val); // VTABLE for Champ_som_lu
 }
 
-/*! @brief Renvoie les valeurs d'une composante du champ aux points specifies par leurs coordonnees.
+/*! @brief Returns the values of one component of the field at the points specified by their coordinates.
  *
- * @param (DoubleVect& x) le tableau des coordonnees des points de calcul
- * @param (DoubleVect& valeurs) le tableau des valeurs de la composante du champ aux points specifies
- * @param (int ncomp) l'index de la composante du champ a calculer
+ * @param (DoubleVect& x) the array of coordinates of the computation points
+ * @param (DoubleVect& valeurs) the array of values of the field component at the specified points
+ * @param (int ncomp) the index of the field component to compute
  */
 template <Champ_Don_Type _TYPE_> template<Champ_Don_Type T>
 std::enable_if_t<T != Champ_Don_Type::LU, DoubleVect&>
@@ -210,14 +210,14 @@ TRUSTChamp_Don_generique<_TYPE_>::valeur_aux_compo_(const DoubleTab& x, DoubleVe
 {
   IntVect les_polys(mon_domaine->nb_elem());
   mon_domaine->chercher_elements(x,les_polys);
-  return valeur_aux_elems_compo(x,les_polys,val,ncomp); // VTABLE pour Champ_som_lu
+  return valeur_aux_elems_compo(x,les_polys,val,ncomp); // VTABLE for Champ_som_lu
 }
 
-/*! @brief Renvoie les valeurs du champ aux points specifies par leurs coordonnees, en indiquant que les points de calculs sont situes dans les elements indiques.
+/*! @brief Returns the values of the field at the points specified by their coordinates, indicating that the computation points are located in the specified elements.
  *
- * @param (DoubleTab&) le tableau des coordonnees des points de calcul
- * @param (IntVect& les_polys) le tableau des elements dans lesquels sont situes les points de calcul (inutile)
- * @param (DoubleTab& val) le tableau des valeurs du champ aux points specifies
+ * @param (DoubleTab&) the array of coordinates of the computation points
+ * @param (IntVect& les_polys) the array of elements in which the computation points are located (unused)
+ * @param (DoubleTab& val) the array of field values at the specified points
  */
 template <Champ_Don_Type _TYPE_> template<Champ_Don_Type T>
 std::enable_if_t<T != Champ_Don_Type::LU, DoubleTab&>
@@ -243,12 +243,12 @@ TRUSTChamp_Don_generique<_TYPE_>::valeur_aux_elems_(const DoubleTab&, const IntV
   return val;
 }
 
-/*! @brief Renvoie les valeurs d'une composante du champ aux points specifies par leurs coordonnees, en indiquant que les points de calculs sont situes dans les elements indiques.
+/*! @brief Returns the values of one component of the field at the points specified by their coordinates, indicating that the computation points are located in the specified elements.
  *
- * @param (DoubleTab& x) le tableau des coordonnees des points de calcul
- * @param (IntVect& les_polys) le tableau des elements dans lesquels sont situes les points de calcul
- * @param (DoubleVect& val) le tableau des valeurs de la composante du champ aux points specifies
- * @param (int ncomp) l'index de la composante du champ a calculer
+ * @param (DoubleTab& x) the array of coordinates of the computation points
+ * @param (IntVect& les_polys) the array of elements in which the computation points are located
+ * @param (DoubleVect& val) the array of values of the field component at the specified points
+ * @param (int ncomp) the index of the field component to compute
  */
 template <Champ_Don_Type _TYPE_> template<Champ_Don_Type T>
 std::enable_if_t<T != Champ_Don_Type::LU, DoubleVect&>

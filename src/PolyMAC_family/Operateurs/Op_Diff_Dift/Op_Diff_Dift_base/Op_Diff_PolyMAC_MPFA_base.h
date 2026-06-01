@@ -20,7 +20,7 @@
 
 /*! @brief class Op_Diff_PolyMAC_MPFA_base
  *
- *  Classe de base des operateurs de diffusion PolyMAC_MPFA
+ *  Base class for PolyMAC_MPFA diffusion operators.
  *
  */
 class Op_Diff_PolyMAC_MPFA_base: public Op_Diff_PolyMAC_CDO_Gen_base
@@ -31,7 +31,7 @@ public:
 
   void mettre_a_jour(double t) override;
 
-  /* flux aux faces (hors Echange_contact): cf. Domaine_PolyMAC_MPFA::fgrad */
+  /* face fluxes (excluding Echange_contact): cf. Domaine_PolyMAC_MPFA::fgrad */
   void update_phif(int full_stencil = 0) const;
 
   inline IntTab& tab_som_ext() { return som_ext; }
@@ -47,16 +47,16 @@ public:
   inline const DoubleTab& tab_phif_c() const { return phif_c; }
 
 protected:
-  mutable IntTab pe_ext; // tableau aux faces de bord : (indice dans op_ext, indice d'element) pour les faces de type Echange_contact
-  //indices : elems locaux dans phif_e([phif_d(f), phif_d(f + 1)[)
+  mutable IntTab pe_ext; // array at boundary faces: (index in op_ext, element index) for faces of type Echange_contact
+  //indices : local elements in phif_e([phif_d(f), phif_d(f + 1)[)
   mutable IntTab phif_d, phif_e; //stencils
   mutable DoubleTab phif_c; //coefficients
-  double t_last_maj_ = -1e10; //pour detecter quand on doit recalculer nu, xh, wh et fgrad
+  double t_last_maj_ = -1e10; //to detect when nu, xh, wh and fgrad need to be recomputed
 
-  /* diffusivite aux elems */
-  void update_nu() const override; //mise a jour
+  /* diffusivity at elements */
+  void update_nu() const override; //update
 
-  /* liste de sommets traites directement par l'operateur et non par Domaine_PolyMAC_MPFA::fgrad() (cf. Op_Diff_PolyMAC_MPFA_Elem) */
+  /* list of vertices handled directly by the operator and not by Domaine_PolyMAC_MPFA::fgrad() (cf. Op_Diff_PolyMAC_MPFA_Elem) */
   mutable IntTab som_ext;
 
   mutable int s_dist_init_ = 0, som_ext_init_ = 0, phif_a_jour_ = 0;

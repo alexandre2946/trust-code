@@ -35,7 +35,7 @@ Sortie& Partitionneur_Partition::printOn(Sortie& os) const
   return os;
 }
 
-/*! @brief La syntaxe est { Domaine NOM_DOM }
+/*! @brief The syntax is { Domaine NOM_DOM }
  *
  */
 void Partitionneur_Partition::set_param(Param& param) const
@@ -66,7 +66,7 @@ void Partitionneur_Partition::validate_params() const
     }
 }
 
-/*! @brief Premiere etape d'initialisation du partitionneur: on associe un domaine.
+/*! @brief First initialisation step of the partitioner: associate a domain.
  *
  */
 void Partitionneur_Partition::associer_domaine(const Domaine& domaine)
@@ -74,12 +74,12 @@ void Partitionneur_Partition::associer_domaine(const Domaine& domaine)
   ref_domaine_interpol_ = domaine;
 }
 
-/*! @brief Deuxieme etape d'initialisation: on definit le nombre de tranches.
+/*! @brief Second initialisation step: define the number of slices.
  *
- * (on peut utiliser readOn a la place).
+ * (readOn can be used instead).
  *
- * WARNING: le message ci dessus est un copier-coller de Partitionneur_Tranche et est faux
- * merci a une personne sachante de corriger ça.
+ * WARNING: the message above is copy-pasted from Partitionneur_Tranche and is incorrect;
+ * please correct this if you know better.
  */
 void Partitionneur_Partition::initialiser()
 {
@@ -144,23 +144,23 @@ void Partitionneur_Partition::construire_partition(IntVect& elem_part, int& nb_p
       exit();
     }
 
-  // Centre de gravite des elements de dom_interpol
+  // Centre of gravity of the elements of dom_interpol
   DoubleTab coord_g_interpol;
-  //Calcul des centres de gravite des elements de dom_interpol
+  // Compute the centres of gravity of the elements of dom_interpol
   dom_interpol.calculer_centres_gravite(coord_g_interpol);
   assert(coord_g_interpol.dimension(0) == nb_elem_interpol);
   assert(coord_g_interpol.dimension(1) == dim_interpol);
 
-  // Centre de gravite des elements de dom_calcul
+  // Centre of gravity of the elements of dom_calcul
   DoubleTab coord_g_calcul;
-  //Calcul des centres de gravite des elements de dom_calcul
+  // Compute the centres of gravity of the elements of dom_calcul
   dom_calcul.calculer_centres_gravite(coord_g_calcul);
   assert(coord_g_calcul.dimension(0) == nb_elem_calcul);
   assert(coord_g_calcul.dimension(1) == dim_calcul);
 
   elem_part.resize(nb_elem_interpol);
   elem_part = 0;
-  // Recherche des centres de gravite les plus proche les uns des autres
+  // Find the nearest centres of gravity
   {
     int i,j;
     double distance_min,distance;
@@ -188,19 +188,19 @@ void Partitionneur_Partition::construire_partition(IntVect& elem_part, int& nb_p
   int nb_parties_interpol, nb_parties_calcul;
   nb_parties_interpol=0;
   nb_parties_calcul=0;
-  // Nombre de proc sur elem_part
+  // Number of procs in elem_part
   if (elem_part.size_array() > 0)
     nb_parties_interpol = max_array(elem_part) + 1;
-  // Nombre de proc sur elem_part_calcul
+  // Number of procs in elem_part_calcul
   if (elem_part_calcul.size_array() > 0)
     nb_parties_calcul = max_array(elem_part_calcul) + 1;
-  // Si partie vide, on les prends en compte
+  // If empty parts, take them into account
   if (nb_parties_calcul < nb_parts_tot_calcul)
     nb_parties_calcul = nb_parts_tot_calcul;
   else
     nb_parts_tot_calcul = nb_parties_calcul;
 
-  // Nombre de partie total a generer
+  // Total number of parts to generate
   if ((nb_parties_interpol < nb_parties_calcul) && nb_parts_tot==-1)
     nb_parts_tot=nb_parties_calcul;
   if (nb_parts_tot_calcul < nb_parts_tot)

@@ -123,7 +123,7 @@ void OrienteFacesBord_32_64<_SIZE_>::oriente_faces_bord(const Nom& nom_dom)
                   const double r3=coords(som(j,3),0);
                   const double z3=coords(som(j,3),2);
                   double t3=coords(som(j,3),1);
-                  // Cas ou on repasse a teta=0;
+                  // Case where we wrap back to theta=0;
                   if (t3<t0) t3+=2*M_PI;
 
                   if (est_egal(r0,r3))

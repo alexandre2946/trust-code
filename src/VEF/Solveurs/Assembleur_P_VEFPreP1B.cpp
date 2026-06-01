@@ -36,7 +36,7 @@
 
 Implemente_instanciable(Assembleur_P_VEFPreP1B,"Assembleur_P_VEFPreP1B",Assembleur_P_VEF);
 
-// printOn et readOn
+// printOn and readOn
 
 Sortie& Assembleur_P_VEFPreP1B::printOn(Sortie& s ) const
 {
@@ -91,7 +91,7 @@ void Assembleur_P_VEFPreP1B::completer(const Equation_base& eqn)
   Assembleur_P_VEF::completer(eqn);
   if (domaine_Vef().get_P1Bulle())
     {
-      // Pour changer de base et retrouver le P1Bulle
+      // To change basis and recover P1Bulle
       alpha_=1./Objet_U::dimension;
       beta_=1./(Objet_U::dimension*(Objet_U::dimension+1));
     }
@@ -188,7 +188,7 @@ int Assembleur_P_VEFPreP1B::assembler_rho_variable(Matrice& la_matrice, const Ch
   for (int i=0; i<size; i++)
     quantitee_entrelacee(i)=(volumes_entrelaces(i)*masse_volumique(i));
 
-  // On assemble la matrice
+  // Assemble the matrix
   return assembler_mat(la_matrice,quantitee_entrelacee,1,1);
 }
 
@@ -257,8 +257,8 @@ int Assembleur_P_VEFPreP1B::assembler_mat(Matrice& la_matrice,const DoubleVect& 
           coef_som.echange_espace_virtuel();
         }
 
-      // Assemblage de la matrice complete selon les supports choisis
-      Matrice la_matrice_de_travail_;                // Matrice de travail
+      // Assemble the complete matrix according to the chosen supports
+      Matrice la_matrice_de_travail_;                // Working matrix
       la_matrice_de_travail_.typer("Matrice_Bloc_Sym");
       Matrice_Bloc_Sym& la_matrice_bloc_sym_de_travail = ref_cast(Matrice_Bloc_Sym, la_matrice_de_travail_.valeur());
       if (la_matrice_bloc_sym_de_travail.nb_bloc_lignes()==0)
@@ -288,10 +288,10 @@ int Assembleur_P_VEFPreP1B::assembler_mat(Matrice& la_matrice,const DoubleVect& 
             assemblerP0Pa(domaine_vef, domaine_Cl_VEF, la_matrice_bloc_sym_de_travail.get_bloc(P0, Pa),
                           inverse_quantitee_entrelacee);
         }
-      // On met a zero la matrice meme si elle a ete correctement construite et remplie dans les methodes
-      // assemblerPiPi et on la remplit a nouveau. Pourquoi? Pour avoir une couverture de tests
-      // suffisante des methodes updatePiPi en attendant de factoriser correctement les
-      // methodes assemblerPiPi et updatePiPi
+      // Set the matrix to zero even if it was correctly built and filled by the
+      // assemblerPiPi methods, then refill it. Why? To have sufficient test coverage
+      // of the updatePiPi methods while waiting to properly factorize the
+      // assemblerPiPi and updatePiPi methods
       zero(la_matrice_bloc_sym_de_travail);
       {
         if (domaine_vef.get_alphaE())
@@ -325,46 +325,46 @@ int Assembleur_P_VEFPreP1B::assembler_mat(Matrice& la_matrice,const DoubleVect& 
       //trustIdType ordre_matrice = mp_sum(la_matrice_bloc_sym_de_travail.nb_lignes());
       //Cerr << "Order of the matrix = " << ordre_matrice << finl;
 
-      // Methode verifier
+      // Verification method
       char *theValue = getenv("TRUST_VERIFIE_MATRICE_VEF");
       if (theValue != nullptr) verifier(*this, la_matrice_bloc_sym_de_travail, domaine_vef, inverse_quantitee_entrelacee);
 
       ////////////////////////////////////////////
-      // Changement de base eventuel P0P1->P1Bulle
+      // Optional basis change P0P1->P1Bulle
       ////////////////////////////////////////////
       if (changement_base())
         changer_base_matrice(la_matrice_de_travail_); // A->A~
 
       /////////////////////////////////////////////////////////////
-      // Modification de la matrice si pas de pression de reference
+      // Modify the matrix if there is no reference pressure
       /////////////////////////////////////////////////////////////
       modifier_matrice(la_matrice_de_travail_);
 
-      // Conversion eventuelle en Matrice_Morse_Sym
+      // Optional conversion to Matrice_Morse_Sym
       if (ref_cast(Navier_Stokes_std, mon_equation.valeur()).solveur_pression()->supporte_matrice_morse_sym() &&
-          domaine_vef.get_alphaE() != nombre_supports) // On n'est pas en P0
+          domaine_vef.get_alphaE() != nombre_supports) // We are not in P0 only
         {
           //////////////////////////////////////////////////////////
-          // La matrice retournee est une Matrice_Morse_Sym nettoyee
-          // si le solveur utilisee supporte ce type de matrice
-          // et si on n'est pas en P0 seulement (dans ce cas la, la
-          // conversion en Mat_Morse_Sym n'apporte rien, et plante le SSOR
-          // car la matrice morse contient alors des parties virtuelles
-          // alors qu'il n'y a pas d'items communs et on tombe sur
-          // l'assert assert(*tab2_ptr<=n); Deux autres solutions:
-          // -Modifier le SSOR pour ne resoudre que la partie reelle
-          // -Dans le cas de P0 seul, il faudrait vider VV et RV dans la Mat_Bloc_Sym
+          // The returned matrix is a cleaned Matrice_Morse_Sym
+          // if the solver used supports this matrix type
+          // and if we are not in P0 only (in that case,
+          // conversion to Mat_Morse_Sym brings nothing and crashes SSOR
+          // because the Morse matrix then contains virtual parts
+          // with no shared items and we hit
+          // the assert assert(*tab2_ptr<=n); Two other solutions:
+          // -Modify SSOR to solve only the real part
+          // -For P0 only, empty VV and RV in Mat_Bloc_Sym
           //////////////////////////////////////////////////////////
           la_matrice.typer("Matrice_Morse_Sym");
           ref_cast(Matrice_Bloc_Sym, la_matrice_de_travail_.valeur()).BlocSymToMatMorseSym(
             ref_cast(Matrice_Morse_Sym, la_matrice.valeur()));
           ref_cast(Matrice_Morse_Sym, la_matrice.valeur()).compacte(
-            2);// Suppression des coefficients nuls et quasi non nuls
+            2);// Removal of zero and near-zero coefficients
         }
       else
         {
           /////////////////////////////////////////////////////////
-          // La matrice retournee est une Matrice_Bloc_Sym nettoyee
+          // The returned matrix is a cleaned Matrice_Bloc_Sym
           /////////////////////////////////////////////////////////
           la_matrice = la_matrice_de_travail_;
           for (int i = 0; i < nombre_supports; i++)
@@ -373,12 +373,12 @@ int Assembleur_P_VEFPreP1B::assembler_mat(Matrice& la_matrice,const DoubleVect& 
                 Matrice_Bloc_Sym& mat_bloc_sym = ref_cast(Matrice_Bloc_Sym, la_matrice.valeur());
                 Matrice_Bloc& bloc_ij = ref_cast(Matrice_Bloc, mat_bloc_sym.get_bloc(i, j).valeur());
                 ref_cast(Matrice_Morse, bloc_ij.get_bloc(0, 0).valeur()).compacte(
-                  2); // Suppression des coefficients nuls et quasi non nuls
+                  2); // Removal of zero and near-zero coefficients
               }
         }
     }
 
-  // Si pas deja fait, on prends un solveur (SolveurPP1B) qui fera les changements de base pour la solution et le second membre
+  // If not already done, use a solver (SolveurPP1B) that will perform basis changes for the solution and the right-hand side
   if (changement_base() && solveur_pression->que_suis_je() != "SolveurPP1B")
     {
       SolveurSys solveur_pression_lu = solveur_pression;
@@ -439,14 +439,14 @@ int Assembleur_P_VEFPreP1B::modifier_secmem(DoubleTab& b)
         int k=renum_som_perio(i);
         if((k!=i)&& b_v(nps+i)!=0.)
           {
-            printf("Pb div Som, la pression sur le sommet %ld (qui est periodique) n'est pas nulle.\n",(long)i);
-            printf("En terme clair, le second membre n'est pas nul sur un sommet periodique.\n");
+            printf("Pb div Som, the pressure on vertex %ld (which is periodic) is not zero.\n",(long)i);
+            printf("In plain terms, the right-hand side is not zero on a periodic vertex.\n");
             if (b_v(nps+i)!=b_v(nps+k))
               {
-                printf("En outre, le second membre n'a pas la meme valeur sur les 2 sommets periodiques.\n");
+                printf("Moreover, the right-hand side does not have the same value on the 2 periodic vertices.\n");
                 printf("b(nps+i)=%f <> b(nps+k)=%f\n",b_v(nps+i),b_v(nps+k));
               }
-            Kokkos::abort("Il y'a probabilite que le modele utilise soit mal implemente pour\nune condition de periodicite. Contacter le support TRUST.");
+            Kokkos::abort("There is a probability that the model used is poorly implemented for\na periodicity condition. Contact TRUST support.");
           }
       });
       end_gpu_timer(__KERNEL_NAME__);
@@ -462,13 +462,13 @@ int Assembleur_P_VEFPreP1B::modifier_secmem(DoubleTab& b)
       const int nb_cond_lim = domaine_Cl.nb_cond_lim();
 
       /**************************/
-      /* Recuperation de Gpoint */
+      /* Retrieval of Gpoint */
       /**************************/
       DoubleTrav tab_Gpoint(equation().inconnue().valeurs());
       DoubleTabView Gpoint = tab_Gpoint.view_wo();
 
-      //Gpoint=0.; Un DoubleTrav initialise a 0
-      int Gpoint_nul = 1; // Drapeau pour economiser potentiellement un echange_espace_virtuel
+      //Gpoint=0.; A DoubleTrav is initialized to 0
+      int Gpoint_nul = 1; // Flag to potentially save a echange_espace_virtuel call
       for (int cond_lim=0; cond_lim<nb_cond_lim; cond_lim++)
         {
           const Cond_lim_base& cl_base = domaine_Cl.les_conditions_limites(cond_lim).valeur();
@@ -479,7 +479,7 @@ int Assembleur_P_VEFPreP1B::modifier_secmem(DoubleTab& b)
           const int ndeb = front_VF.num_premiere_face();
           const int nfin = ndeb+front_VF.nb_faces();
 
-          /* Test sur la nature du champ au bord du domaine */
+          /* Test on the nature of the field at the domain boundary */
           if (sub_type(Entree_fluide_vitesse_imposee, cl_base) && champ_front.instationnaire())
             {
               Gpoint_nul = 0;
@@ -497,15 +497,15 @@ int Assembleur_P_VEFPreP1B::modifier_secmem(DoubleTab& b)
             }
         }
 
-      //Pour le parallele
+      //For parallelism
       if (!Gpoint_nul) tab_Gpoint.echange_espace_virtuel();
 
       /******************************/
-      /* Fin recuperation de Gpoint */
+      /* End of Gpoint retrieval */
       /******************************/
 
       /*********************************/
-      /* Modification du second membre */
+      /* Modification of the right-hand side */
       /*********************************/
 
       if (domaine_VEF.get_alphaE()) modifier_secmem_elem(tab_Gpoint,b);
@@ -513,7 +513,7 @@ int Assembleur_P_VEFPreP1B::modifier_secmem(DoubleTab& b)
       if (domaine_VEF.get_alphaA()) modifier_secmem_aretes(tab_Gpoint,b);
 
       /**********************************/
-      /* Fin modification second membre */
+      /* End of right-hand side modification */
       /**********************************/
 
       b.echange_espace_virtuel();
@@ -533,10 +533,10 @@ int Assembleur_P_VEFPreP1B::modifier_secmem_elem(const DoubleTab& tab_Gpoint, Do
 
       const Front_VF& front_VF = ref_cast(Front_VF,cl_base.frontiere_dis());
       const Champ_front_base& champ_front = cl_base.champ_front();
-      /* Test sur la nature du champ au bord du domaine */
+      /* Test on the nature of the field at the domain boundary */
       if (sub_type(Entree_fluide_vitesse_imposee, cl_base) && champ_front.instationnaire() )
         {
-          // Construction de la liste des faces a traiter (reelles + virtuelles)
+          // Build the list of faces to process (real + virtual)
           const int nb_faces_bord_tot = front_VF.nb_faces_tot();
           int dimension_ = Objet_U::dimension;
           CIntTabView face_voisins = domaine_VEF.face_voisins().view_ro();
@@ -579,10 +579,10 @@ int Assembleur_P_VEFPreP1B::modifier_secmem_som(const DoubleTab& tab_Gpoint, Dou
       const Front_VF& front_VF = ref_cast(Front_VF,cl_base.frontiere_dis());
       const Champ_front_base& champ_front = cl_base.champ_front();
 
-      /* Test sur la nature du champ au bord du domaine */
+      /* Test on the nature of the field at the domain boundary */
       if (sub_type(Entree_fluide_vitesse_imposee, cl_base)  && champ_front.instationnaire())
         {
-          // Construction de la liste des faces a traiter (reelles + virtuelles)
+          // Build the list of faces to process (real + virtual)
           const int nb_faces_bord_tot = front_VF.nb_faces_tot();
           int dimension_ = Objet_U::dimension;
           CIntTabView elem_faces = domaine_VEF.elem_faces().view_ro();
@@ -601,7 +601,7 @@ int Assembleur_P_VEFPreP1B::modifier_secmem_som(const DoubleTab& tab_Gpoint, Dou
             const int elem = face_voisins(num_face,0);
             assert(elem!=-1);
 
-            //Calcul de la vitesse au centre de l'element
+            //Compute the velocity at the element centre
             for (int i_sigma = 0; i_sigma < 3; ++i_sigma)
               sigma[i_sigma] = 0;
 
@@ -613,7 +613,7 @@ int Assembleur_P_VEFPreP1B::modifier_secmem_som(const DoubleTab& tab_Gpoint, Dou
                   sigma[comp] += Gpoint(face, comp);
               }
 
-            //Calcul de la divergence de la vitesse
+            //Compute the divergence of the velocity
             for(int face_loc=0; face_loc<nb_faces_elem; face_loc++)
               {
                 const int som = nb_elem_tot + renum_som_perio(elem_sommets(elem,face_loc));
@@ -640,7 +640,7 @@ int Assembleur_P_VEFPreP1B::modifier_secmem_som(const DoubleTab& tab_Gpoint, Dou
                 // DOUBT_HARI: Should it be atomic?
                 Kokkos::atomic_add(&b(som), -flux);
               }
-            //Fin du calcul de la divergence de la vitesse
+            //End of velocity divergence computation
           });
           end_gpu_timer(__KERNEL_NAME__);
         }
@@ -704,10 +704,10 @@ int Assembleur_P_VEFPreP1B::modifier_solution(DoubleTab& tab_pression)
       end_gpu_timer(__KERNEL_NAME__);
     }
   // pression.echange_espace_virtuel();
-  // pour retirer le min de la pression si pas de Pref et si que PO sinon on filtre plus tard
+  // to remove the pressure minimum if no Pref and if only P0, otherwise filter later
   if (le_dom.get_alphaE() && (le_dom.get_alphaS()==0) && (le_dom.get_alphaA()==0) )
     Assembleur_P_VEF::modifier_solution(tab_pression);
-  // Verification possible par variable d'environnement:
+  // Verification possible via environment variable:
   char* theValue = getenv("TRUST_VERIFIE_DIRICHLET");
   if(theValue != nullptr) verifier_dirichlet();
 
@@ -832,12 +832,12 @@ void Assembleur_P_VEFPreP1B::projete_L2(DoubleTab& pression)
     pression(i)-=pmoy;
 }
 
-/*! @brief Modifier eventuellement la matrice pour la rendre definie si elle ne l'est pas Valeurs par defaut:
+/*! @brief Optionally modify the matrix to make it definite if it is not. Default values:
  *
- *     Contraintes:
- *     Acces: entree
+ *     Constraints:
+ *     Access: input
  *
- * @return (int) renvoie 1 si la matrice est modifiee 0 sinon
+ * @return 1 if the matrix was modified, 0 otherwise.
  */
 int Assembleur_P_VEFPreP1B::modifier_matrice(Matrice& la_matrice)
 {
@@ -879,7 +879,7 @@ int Assembleur_P_VEFPreP1B::modifier_matrice(Matrice& la_matrice)
   ////////////
   if (domaine_VEF.get_alphaE())
     {
-      // On impose une pression de reference sur un element si pas de CL de Neumann
+      // Impose a reference pressure on an element if no Neumann boundary condition
       if (has_P_ref)
         {
           Matrice_Bloc& mat_bloc=ref_cast(Matrice_Bloc,matrice.get_bloc(P0,P0).valeur());
@@ -896,7 +896,7 @@ int Assembleur_P_VEFPreP1B::modifier_matrice(Matrice& la_matrice)
     {
       Matrice_Bloc& mat_bloc_p1_p1 = ref_cast(Matrice_Bloc, matrice.get_bloc(P1,P1).valeur());
       Matrice_Morse_Sym& A11RR = ref_cast(Matrice_Morse_Sym,mat_bloc_p1_p1.get_bloc(0,0).valeur());
-      // On impose une pression de reference sur un sommet si support P0 ou si pas de CL de Neumann
+      // Impose a reference pressure on a vertex if P0 support or if no Neumann boundary condition
       const bool is_first_proc_with_real_elems = Process::me() == Process::mp_min(le_dom_VEF->nb_elem() ? Process::me() : 1e8);
       if (((!(Process::mp_max(CL_neumann))) || ((domaine_VEF.get_alphaE()) && (domaine_VEF.get_cl_pression_sommet_faible()==1) ) ) && is_first_proc_with_real_elems)
         {
@@ -930,7 +930,7 @@ int Assembleur_P_VEFPreP1B::modifier_matrice(Matrice& la_matrice)
     {
       Matrice_Bloc& mat_bloc_pa_pa = ref_cast(Matrice_Bloc, matrice.get_bloc(Pa,Pa).valeur());
       Matrice_Morse_Sym& A22RR = ref_cast(Matrice_Morse_Sym,mat_bloc_pa_pa.get_bloc(0,0).valeur());
-      // On impose une pression de reference sur une arete en P0+Pa uniquement
+      // Impose a reference pressure on an edge in P0+Pa mode only
       const bool is_first_proc_with_real_elems = Process::me() == Process::mp_min(le_dom_VEF->nb_elem() ? Process::me() : 1e8);
       if ((domaine_VEF.get_alphaE() && !domaine_VEF.get_alphaS()) && is_first_proc_with_real_elems)
         {
@@ -990,7 +990,7 @@ void operation11(Matrice_Bloc& A00, Matrice_Bloc& A01, Matrice_Bloc& A11, double
   const Domaine& dom=domaine;
   int nb_som=A11RR.nb_lignes();
   int nb_som_elem=les_elems.dimension(1);
-  // On parcours les elements de la matrice A00
+  // Traverse the elements of matrix A00
   //Cerr << "[" << Process::me() << "] Contribution de A00 dans A11~" << finl;
   int ligne=0;
   for (int i_bloc=0; i_bloc<A00.nb_bloc_lignes(); i_bloc++)
@@ -1013,7 +1013,7 @@ void operation11(Matrice_Bloc& A00, Matrice_Bloc& A01, Matrice_Bloc& A11, double
                   int k2=colonne+tab2[n]-1; // Element k2
                   if (k2>=k1)
                     {
-                      double prod = beta * beta * coeff[n];        // Calcul de beta*beta*Ak1k2
+                      double prod = beta * beta * coeff[n];        // Compute beta*beta*Ak1k2
                       for (int som1=0; som1<nb_som_elem; som1++)
                         {
                           int s1 = dom.get_renum_som_perio(les_elems(k1,som1));
@@ -1042,7 +1042,7 @@ void operation11(Matrice_Bloc& A00, Matrice_Bloc& A01, Matrice_Bloc& A11, double
         }
       ligne+=nb_lignes;
     }
-  // On parcours les elements de la matrice A01
+  // Traverse the elements of matrix A01
   //Cerr << "[" << Process::me() << "] Contribution de A01 dans A11~" << finl;
   ligne=0;
   for (int i_bloc=0; i_bloc<A01.nb_bloc_lignes(); i_bloc++)
@@ -1062,11 +1062,11 @@ void operation11(Matrice_Bloc& A00, Matrice_Bloc& A01, Matrice_Bloc& A11, double
               int k=ligne+i; // Element k
               for (auto n=tab1[i]-1; n<tab1[i+1]-1; n++)
                 {
-                  int s1 = dom.get_renum_som_perio(colonne+tab2[n]-1); // Sommet s1
-                  double prod = -beta * coeff[n];        // Calcul de -beta*Aks
+                  int s1 = dom.get_renum_som_perio(colonne+tab2[n]-1); // Vertex s1
+                  double prod = -beta * coeff[n];        // Compute -beta*Aks
                   for (int som=0; som<nb_som_elem; som++)
                     {
-                      int s2 = dom.get_renum_som_perio(les_elems(k,som)); // Sommet s2
+                      int s2 = dom.get_renum_som_perio(les_elems(k,som)); // Vertex s2
                       if (s2>=s1) range(prod,s1,nb_som,s2,nb_som,A11RR,A11RV,A11VR,A11VV);
                       if (s1>=s2) range(prod,s2,nb_som,s1,nb_som,A11RR,A11RV,A11VR,A11VV);
                     }
@@ -1090,7 +1090,7 @@ void operation01(Matrice_Bloc& A00, Matrice_Bloc& A01, double alpha, double beta
   int nb_elem=A01RR.nb_lignes();
   int nb_som=A01RR.nb_colonnes();
   int nb_som_elem=les_elems.dimension(1);
-  // On parcours les coefficients de A00
+  // Iterate over the coefficients of A00
   int ligne=0;
   for (int i_bloc=0; i_bloc<A00.nb_bloc_lignes(); i_bloc++)
     {
@@ -1113,7 +1113,7 @@ void operation01(Matrice_Bloc& A00, Matrice_Bloc& A01, double alpha, double beta
                   int k2=colonne+tab2[n]-1; // Element k2
                   if (k2>=k1)
                     {
-                      double prod = -alpha * beta * coeff[n];        // Calcul de -alpha*beta*Ak1k2
+                      double prod = -alpha * beta * coeff[n];        // Compute -alpha*beta*Ak1k2
                       for (int som=0; som<nb_som_elem; som++)
                         {
                           s = dom.get_renum_som_perio(les_elems(k2,som));
@@ -1159,7 +1159,7 @@ void Assembleur_P_VEFPreP1B::changer_base_matrice(Matrice& la_matrice)
 
 void Assembleur_P_VEFPreP1B::changer_base_second_membre(DoubleVect& y)
 {
-  // ys~ = ys - beta * somme(yk)(s appartenant a k)
+  // ys~ = ys - beta * somme(yk)(s belonging to k)
   // yk~ = alpha * yk
   changer_base<vecteur::second_membre>(y);
   y.echange_espace_virtuel();
@@ -1167,7 +1167,7 @@ void Assembleur_P_VEFPreP1B::changer_base_second_membre(DoubleVect& y)
 
 void Assembleur_P_VEFPreP1B::changer_base_pression_inverse(DoubleVect& x)
 {
-  // xk = alpha * xk~ - beta * somme(xs~)(s appartenant a k)
+  // xk = alpha * xk~ - beta * somme(xs~)(s belonging to k)
   // xs = xs~
   changer_base<vecteur::pression_inverse>(x);
   assert(check_espace_virtuel_vect(x));
@@ -1175,7 +1175,7 @@ void Assembleur_P_VEFPreP1B::changer_base_pression_inverse(DoubleVect& x)
 
 void Assembleur_P_VEFPreP1B::changer_base_pression(DoubleVect& x)
 {
-  // xk~ = xk / alpha + beta / alpha * somme(xs)(s appartenant a k)
+  // xk~ = xk / alpha + beta / alpha * somme(xs)(s belonging to k)
   // xs~ = xs
   changer_base<vecteur::pression>(x);
   assert(check_espace_virtuel_vect(x));
@@ -1185,7 +1185,7 @@ template<vecteur _v_>
 void Assembleur_P_VEFPreP1B::changer_base(DoubleVect& tab_v)
 {
   assert(domaine_Vef().get_alphaE() && domaine_Vef().get_alphaS() && !domaine_Vef().get_alphaA()); // P0+P1 uniquement
-  // xk~ = xk / alpha + beta / alpha * somme(xs)(s appartenant a k)
+  // xk~ = xk / alpha + beta / alpha * somme(xs)(s belonging to k)
   // xs~ = xs
   double alpha = alpha_;
   double beta = beta_;

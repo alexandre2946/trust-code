@@ -21,7 +21,9 @@
 #include <Domaine_VEF.h>
 #include <TRUST_Ref.h>
 
-/*! @brief CLASS: Paroi_hyd_base_VEF Classe de base des lois de paroi hydraulique en VEF
+/*! @brief CLASS: Paroi_hyd_base_VEF
+ *
+ * @brief Base class for hydraulic wall laws in VEF.
  *
  */
 class Paroi_hyd_base_VEF: public Turbulence_paroi_base
@@ -35,7 +37,7 @@ public:
   inline const ArrOfInt& face_keps_imposee() const { return face_keps_imposee_; }
 
 protected:
-  IntVect face_keps_imposee_; // avec descripteur parallele
+  IntVect face_keps_imposee_; // with parallel descriptor
   int flag_face_keps_imposee_ = 0;
 };
 

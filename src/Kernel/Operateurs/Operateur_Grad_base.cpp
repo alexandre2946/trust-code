@@ -19,10 +19,10 @@
 Implemente_base(Operateur_Grad_base,"Operateur_Grad_base",Operateur_base);
 
 
-/*! @brief NE FAIT RIEN A surcharger dans les classes derivees
+/*! @brief DOES NOTHING To be overridden in derived classes
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the output stream
  */
 Sortie& Operateur_Grad_base::printOn(Sortie& os) const
 {
@@ -30,10 +30,10 @@ Sortie& Operateur_Grad_base::printOn(Sortie& os) const
 }
 
 
-/*! @brief NE FAIT RIEN A surcharger dans les classes derivees
+/*! @brief DOES NOTHING To be overridden in derived classes
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the input stream
  */
 Entree& Operateur_Grad_base::readOn(Entree& is)
 {
@@ -42,7 +42,7 @@ Entree& Operateur_Grad_base::readOn(Entree& is)
 
 void Operateur_Grad_base::dimensionner(Matrice_Morse& mat) const
 {
-  /* on tente dimensionner_blocs(), mais en pression! */
+  /* try dimensionner_blocs(), but for pressure! */
   if (has_interface_blocs()) dimensionner_blocs({{ "pression", &mat }});
   else Process::exit(que_suis_je() + " : dimensionner() not coded!");
 }
@@ -50,7 +50,7 @@ void Operateur_Grad_base::dimensionner(Matrice_Morse& mat) const
 DoubleTab& Operateur_Grad_base::ajouter(const DoubleTab& inco, DoubleTab& secmem) const
 {
   if (has_interface_blocs())
-    secmem *= -1, ajouter_blocs({}, secmem, {{ "pression", inco }}), secmem *= -1; /* pour avoir le bon signe */
+    secmem *= -1, ajouter_blocs({}, secmem, {{ "pression", inco }}), secmem *= -1; /* to get the correct sign */
   else Process::exit(que_suis_je() + " : ajouter() not coded!");
   return secmem;
 }
@@ -89,6 +89,6 @@ DoubleVect& Operateur_Grad_base::multvect(const DoubleTab& x, DoubleTab& b) cons
   calculer(x,b);
   b-=b0;
 
-  // On a soustrait au resultat la contribution des conditions aux limites.
+  // We have subtracted from the result the contribution of the boundary conditions.
   return b;
 }

@@ -24,9 +24,9 @@
 
 class Champ_Inc_base;
 
-/*! @brief classe Traitement_particulier_Brech_VEF Cette classe permet de faire les traitements particuliers
+/*! @brief class Traitement_particulier_Brech_VEF This class performs special post-processing
  *
- *      pour le calcul des flux pour le cas Brech :
+ *      for flux computations in the Brech case.
  *
  *
  * @sa Navier_Stokes_Turbulent, Traitement_particulier_base, Traitement_particulier_VEF

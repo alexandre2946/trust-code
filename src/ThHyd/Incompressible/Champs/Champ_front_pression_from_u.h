@@ -24,8 +24,7 @@ class Champ_Inc_base;
 
 /*! @brief class Champ_front_pression_from_u
  *
- *  Classe derivee de Champ_front_base qui represente les
- *  champs aux frontieres normaux :
+ *  Derived from Champ_front_base; represents normal boundary fields.
  *
  * @sa Champ_front_base
  */

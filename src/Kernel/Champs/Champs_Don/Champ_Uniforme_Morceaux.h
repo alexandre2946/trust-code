@@ -18,9 +18,9 @@
 
 #include <TRUSTChamp_Morceaux_generique.h>
 
-/*! @brief classe Champ_Uniforme_Morceaux Cette classe represente champ constant par morceaux dans l'espace
+/*! @brief Champ_Uniforme_Morceaux This class represents a piecewise constant-in-space field
  *
- *      et constant dans le temps.
+ *      that is also constant in time.
  *
  * @sa : TRUSTChamp_Morceaux_generique
  */

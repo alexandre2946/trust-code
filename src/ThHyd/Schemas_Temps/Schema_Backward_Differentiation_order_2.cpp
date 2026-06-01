@@ -42,10 +42,10 @@ Implemente_instanciable(Schema_Backward_Differentiation_order_2,"Schema_Backward
 
 
 
-/*! @brief Simple appel a: Schema_Temps_base::printOn(Sortie& ) Ecrit le schema en temps sur un flot de sortie.
+/*! @brief Simple call to Schema_Temps_base::printOn(Sortie&). Writes the time scheme to an output stream.
  *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& s) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Schema_Backward_Differentiation_order_2::printOn(Sortie& s) const
 {
@@ -53,12 +53,12 @@ Sortie& Schema_Backward_Differentiation_order_2::printOn(Sortie& s) const
 }
 
 
-/*! @brief Lit le schema en temps a partir d'un flot d'entree.
+/*! @brief Reads the time scheme from an input stream.
  *
- * Simple appel a: Schema_Temps_base::readOn(Entree& )
+ * Simple call to Schema_Temps_base::readOn(Entree&).
  *
- * @param (Entree& s) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& s) an input stream
+ * @return (Entree&) the modified input stream
  */
 Entree& Schema_Backward_Differentiation_order_2::readOn(Entree& s)
 {
@@ -67,14 +67,14 @@ Entree& Schema_Backward_Differentiation_order_2::readOn(Entree& s)
 
 ////////////////////////////////
 //                            //
-// Caracteristiques du schema //
+// Scheme characteristics     //
 //                            //
 ////////////////////////////////
 
 
-/*! @brief Renvoie le nombre de valeurs temporelles a conserver.
+/*! @brief Returns the number of time values to retain.
  *
- * Ici : n-1, n et n+1 donc 3.
+ * Here: n-1, n and n+1, so 3.
  *
  */
 int Schema_Backward_Differentiation_order_2::nb_valeurs_temporelles() const
@@ -94,7 +94,7 @@ int Schema_Backward_Differentiation_order_2::nb_pas_dt_seuil() const
 
 /////////////////////////////////////////
 //                                     //
-// Fin des caracteristiques du schema  //
+// End of scheme characteristics       //
 //                                     //
 /////////////////////////////////////////
 

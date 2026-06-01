@@ -21,7 +21,7 @@
 
 /*! @brief : class Champ_Fonc_Q1_base
  *
- *  Decrire ici la classe Champ_Fonc_Q1_base
+ *  Describe here the Champ_Fonc_Q1_base class
  *
  */
 class Champ_Fonc_Q1_base: public Champ_Fonc_base, public Champ_implementation_Q1

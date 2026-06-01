@@ -23,20 +23,20 @@
 
 class Postraitement_base;
 
-/*! @brief class Champ_Generique_Moyenne OWN_PTR(Champ_base) destine a post-traiter une moyenne d un champ generique
+/*! @brief class Champ_Generique_Moyenne OWN_PTR(Champ_base) intended to post-process an average of a generic field
  *
- *  La classe porte un operateur statistique "Op_Moyenne"
+ *  The class carries a statistical operator "Op_Moyenne"
  *
  */
 
-//// Syntaxe a respecter pour jdd
+//// Data file syntax to follow
 //
-// "nom_champ" Moyenne { t_deb "val_tdeb" t_fin "val_tfin"
-//                source "type_champ_gen" { ...source ref_Champ { Pb_champ "nom_pb" "nom_champ_discret" } }
+// "field_name" Moyenne { t_deb "val_tdeb" t_fin "val_tfin"
+//                source "generic_field_type" { ...source ref_Champ { Pb_champ "pb_name" "discrete_field_name" } }
 //               }
-// "nom_champ" fixe par utilisateur sera le nom du champ generique
-// "val_tdeb" et "val_tfin" valeur de debut et fin des statistiques pour ce champ
-// "type_champ_gen" type d'un champ generique
+// "field_name" set by the user will be the name of the generic field
+// "val_tdeb" and "val_tfin" value of the start and end of statistics for this field
+// "generic_field_type" type of a generic field
 
 class Champ_Generique_Moyenne : public Champ_Generique_Statistiques_base
 {

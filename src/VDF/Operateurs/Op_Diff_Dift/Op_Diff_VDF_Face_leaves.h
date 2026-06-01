@@ -26,10 +26,10 @@ class Op_Diff_VDF_Face_leaves
 { };
 /// \endcond
 
-/*! @brief class Op_Diff_VDF_Face Cette classe represente l'operateur de diffusion associe a une equation de la quantite de mouvement.
+/*! @brief class Op_Diff_VDF_Face This class represents the diffusion operator associated with a momentum equation.
  *
- *   La discretisation est VDF. Le champ diffuse est un Champ_Face_VDF. Le champ de diffusivite n'est pas uniforme
- *   L'iterateur associe est de type Iterateur_VDF_Face. L'evaluateur associe est de type Eval_Diff_VDF_Face
+ *   The discretization is VDF. The diffused field is a Champ_Face_VDF. The diffusivity field is non-uniform.
+ *   The associated iterator is of type Iterateur_VDF_Face. The associated evaluator is of type Eval_Diff_VDF_Face
  *
  */
 class Op_Diff_VDF_Face : public Op_Diff_VDF_Face_base, public Op_Diff_Dift_VDF<Op_Diff_VDF_Face>
@@ -48,10 +48,10 @@ public:
   }
 };
 
-/*! @brief class Op_Diff_VDF_Face_Axi Cette classe represente l'operateur de diffusion associe aux equations de quantite de mouvement en coordonnees cylindriques.
+/*! @brief class Op_Diff_VDF_Face_Axi This class represents the diffusion operator associated with momentum equations in cylindrical coordinates.
  *
- *   La discretisation est VDF. Le champ diffuse est un Champ_Face_VDF. Le champ de diffusivite n'est pas uniforme
- *   Cette classe n'utilise ni iterateur ni evaluateur (il y avait trop de termes supplementaires dus aux coordonnees cylindriques)
+ *   The discretization is VDF. The diffused field is a Champ_Face_VDF. The diffusivity field is non-uniform.
+ *   This class uses neither an iterator nor an evaluator (there were too many supplementary terms due to cylindrical coordinates)
  *
  */
 class Op_Diff_VDF_Face_Axi : public Op_Diff_VDF_Face_Axi_base

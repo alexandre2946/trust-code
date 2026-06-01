@@ -12,7 +12,7 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//   Nouveau champ frontiere
+//   New boundary field
 
 #include <Champ_front_txyz.h>
 #include <Domaine.h>
@@ -25,13 +25,13 @@ Implemente_instanciable(Champ_front_txyz,"Champ_front_fonc_txyz",Ch_front_var_in
 // XD_CONT space and in time.
 // XD attr val listchaine val REQ Values of field components (mathematical expressions).
 
-/*! @brief Imprime le champ sur flot de sortie.
+/*! @brief Print the field to an output stream.
  *
- * Imprime la taille du champ et la valeur (constante) sur
- *     la frontiere.
+ * Prints the field size and the (constant) value on
+ *     the boundary.
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Champ_front_txyz::printOn(Sortie& os) const
 {
@@ -44,13 +44,13 @@ Sortie& Champ_front_txyz::printOn(Sortie& os) const
 }
 
 
-/*! @brief Lit le champ a partir d'un flot d'entree.
+/*! @brief Read the field from an input stream.
  *
  * Format:
  *       Champ_front_txyz nb_compo vrel_1 ... [vrel_i]
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree& is) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree& is) the modified input stream
  */
 Entree& Champ_front_txyz::readOn(Entree& is)
 {
@@ -86,10 +86,10 @@ Entree& Champ_front_txyz::readOn(Entree& is)
 
 
 
-/*! @brief Renvoie l'objet upcaste en Champ_front_base&
+/*! @brief Returns the object upcast to Champ_front_base&
  *
  * @param (Champ_front_base& ch)
- * @return (Champ_front_base&) (*this) upcaste en Champ_front_base&
+ * @return (Champ_front_base&) (*this) upcast to Champ_front_base&
  */
 Champ_front_base& Champ_front_txyz::affecter_(const Champ_front_base& ch)
 {

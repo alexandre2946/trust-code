@@ -18,10 +18,10 @@
 
 #include <Elem_geom_base.h>
 
-/*! @brief Classe Quadrangle_VEF Cette classe represente l'element geometrique Quadrangle_VEF.
+/*! @brief Quadrangle_VEF class — represents the Quadrangle_VEF geometric element.
  *
- *     Un Quadrangle_VEF a 4 faces, 4 sommets et un seul type de face ayant
- *     2 sommets par face.
+ *     A Quadrangle_VEF has 4 faces, 4 vertices and a single face type with
+ *     2 vertices per face.
  *
  * @sa Elem_geom_base Elem_geom
  */
@@ -67,10 +67,10 @@ protected:
 };
 
 
-/*! @brief Renvoie le nombre de faces du type specifie que possede l'element geometrique.
+/*! @brief Returns the number of faces of the specified type that the geometric element has.
  *
- * @param (int i) le type de face
- * @return (int) le nombre de faces de type i
+ * @param (int i) the face type
+ * @return (int) the number of faces of type i
  */
 template <typename _SIZE_>
 inline int Quadrangle_VEF_32_64<_SIZE_>::nb_faces(int i) const
@@ -80,10 +80,10 @@ inline int Quadrangle_VEF_32_64<_SIZE_>::nb_faces(int i) const
 }
 
 
-/*! @brief Renvoie le nombre de sommets des faces du type specifie.
+/*! @brief Returns the number of vertices of faces of the specified type.
  *
- * @param (int i) le type de face
- * @return (int) le nombre de sommets des faces de type i
+ * @param (int i) the face type
+ * @return (int) the number of vertices of faces of type i
  */
 template <typename _SIZE_>
 inline int Quadrangle_VEF_32_64<_SIZE_>::nb_som_face(int i) const
@@ -91,11 +91,11 @@ inline int Quadrangle_VEF_32_64<_SIZE_>::nb_som_face(int i) const
   assert(i==0);
   return 2;
 }
-/*! @brief Renvoie le numero du j-ieme sommet de la i-ieme face de l'element.
+/*! @brief Returns the index of the j-th vertex of the i-th face of the element.
  *
- * @param (int i) un numero de face
- * @param (int j) un numero de sommet
- * @return (int) le numero du j-ieme sommet de la i-ieme face
+ * @param (int i) a face index
+ * @param (int j) a vertex index
+ * @return (int) the index of the j-th vertex of the i-th face
  */
 template <typename _SIZE_>
 inline int Quadrangle_VEF_32_64<_SIZE_>::face_sommet(int i, int j) const
@@ -117,10 +117,10 @@ inline int Quadrangle_VEF_32_64<_SIZE_>::face_sommet(int i, int j) const
 }
 
 
-/*! @brief Renvoie le numero du i-ieme sommet de la face 0
+/*! @brief Returns the index of the i-th vertex of face 0.
  *
- * @param (int i) le numero du sommet a renvoyer
- * @return (int) le numero du i-ieme sommet de la face 0
+ * @param (int i) the vertex index to return
+ * @return (int) the index of the i-th vertex of face 0
  */
 template <typename _SIZE_>
 inline int Quadrangle_VEF_32_64<_SIZE_>::face_sommet0(int i) const
@@ -133,10 +133,10 @@ inline int Quadrangle_VEF_32_64<_SIZE_>::face_sommet0(int i) const
 }
 
 
-/*! @brief Renvoie le numero du i-ieme sommet de la face 1
+/*! @brief Returns the index of the i-th vertex of face 1.
  *
- * @param (int i) le numero du sommet a renvoyer
- * @return (int) le numero du i-ieme sommet de la face 1
+ * @param (int i) the vertex index to return
+ * @return (int) the index of the i-th vertex of face 1
  */
 template <typename _SIZE_>
 inline int Quadrangle_VEF_32_64<_SIZE_>::face_sommet1(int i) const
@@ -149,10 +149,10 @@ inline int Quadrangle_VEF_32_64<_SIZE_>::face_sommet1(int i) const
 }
 
 
-/*! @brief Renvoie le numero du i-ieme sommet de la face 2
+/*! @brief Returns the index of the i-th vertex of face 2.
  *
- * @param (int i) le numero du sommet a renvoyer
- * @return (int) le numero du i-ieme sommet de la face 2
+ * @param (int i) the vertex index to return
+ * @return (int) the index of the i-th vertex of face 2
  */
 template <typename _SIZE_>
 inline int Quadrangle_VEF_32_64<_SIZE_>::face_sommet2(int i) const
@@ -164,10 +164,10 @@ inline int Quadrangle_VEF_32_64<_SIZE_>::face_sommet2(int i) const
   return 2*i+1;
 }
 
-/*! @brief Renvoie le numero du i-ieme sommet de la face 3
+/*! @brief Returns the index of the i-th vertex of face 3.
  *
- * @param (int i) le numero du sommet a renvoyer
- * @return (int) le numero du i-ieme sommet de la face 3
+ * @param (int i) the vertex index to return
+ * @return (int) the index of the i-th vertex of face 3
  */
 template <typename _SIZE_>
 inline int Quadrangle_VEF_32_64<_SIZE_>::face_sommet3(int i) const
@@ -180,12 +180,12 @@ inline int Quadrangle_VEF_32_64<_SIZE_>::face_sommet3(int i) const
 }
 
 
-/*! @brief Renvoie le i-ieme type de face.
+/*! @brief Returns the i-th face type.
  *
- * Un Quadrangle_VEF n'a qu'un seul type de face.
+ * A Quadrangle_VEF has only one face type.
  *
- * @param (int i) le rang du type de face a renvoyer
- * @return (Type_Face) un type de face
+ * @param (int i) the rank of the face type to return
+ * @return (Type_Face) a face type
  */
 template <typename _SIZE_>
 inline Type_Face Quadrangle_VEF_32_64<_SIZE_>::type_face(int i) const

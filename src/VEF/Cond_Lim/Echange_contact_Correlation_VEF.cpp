@@ -57,7 +57,7 @@ void Echange_contact_Correlation_VEF::set_param(Param& param) const
 {
   param.ajouter("dir",&dir); // XD_ADD_P entier
   // XD_CONT Direction (0 : axis X, 1 : axis Y, 2 : axis Z) of the 1D model.
-  param.ajouter_condition("(value_of_dir_ge_0)_AND_(value_of_dir_le_2)", "La direction doit etre 0, 1 ou 2 dans Echange_contact_Correlation_VDF");
+  param.ajouter_condition("(value_of_dir_ge_0)_AND_(value_of_dir_le_2)", "Direction must be 0, 1, or 2 in Echange_contact_Correlation_VDF");
   param.ajouter("Tinf",&Tinf); // XD_ADD_P floattant
   // XD_CONT Inlet fluid temperature of the 1D model (oC or K).
   param.ajouter("Tsup",&Tsup); // XD_ADD_P floattant
@@ -87,10 +87,10 @@ void Echange_contact_Correlation_VEF::set_param(Param& param) const
   // XD_CONT Position of the outlet of the 1D mesh on the axis direction.
   param.ajouter_non_std("Nu",(this)); // XD_ADD_P chaine
   // XD_CONT Nusselt number which may be a function of the Reynolds number (Re) and the Prandtl number (Pr).
-  // Le mot cle suivant n'est pas encore commente car les hypotheses sur ce rayonnement sont restrictives
+  // The following keyword is not yet documented because the assumptions on this radiation model are restrictive
   param.ajouter_non_std("emissivite_pour_rayonnement_entre_deux_plaques_quasi_infinies",(this)); // XD_ADD_P floattant
   // XD_CONT Coefficient of emissivity for radiation between two quasi infinite plates.
-  // Rajout Cyril MALOD (14/09/2006)
+  // Added by Cyril MALOD (14/09/2006)
   param.ajouter_flag("Reprise_correlation",&Reprise_temperature); // XD_ADD_P rien
   // XD_CONT Keyword in the case of a resuming calculation with this correlation.
 }
@@ -167,11 +167,11 @@ int Echange_contact_Correlation_VEF::lire_motcle_non_standard(const Motcle& mot,
 
 
 /**
- * Calcule le coeff d echange local dans la maille solide.
+ * @brief Computes the local heat exchange coefficient in the solid cell.
  */
 void Echange_contact_Correlation_VEF::calculer_h_solide(DoubleTab& tab)
 {
-  // forcement local
+  // necessarily local
 
 
   const Equation_base& mon_eqn = domaine_Cl_dis().equation();
@@ -202,7 +202,7 @@ void Echange_contact_Correlation_VEF::calculer_h_solide(DoubleTab& tab)
             tab(face-ndeb,i) = pdt_scalSqrt(zvef,face,face,elem,dimension,tab_lambda(elem,i)) ;
         }
     }
-  else  // la conductivite est un OWN_PTR(Champ_base) uniforme
+  else  // the conductivity is a uniform OWN_PTR(Champ_base)
     {
       const DoubleTab& tab_lambda = mon_milieu.conductivite().valeurs();
 
@@ -225,7 +225,7 @@ void Echange_contact_Correlation_VEF::calculer_h_solide(DoubleTab& tab)
 
 
 /**
- * Complete et initialise les attributs de la classe
+ * @brief Completes and initializes the class attributes.
  */
 
 void Echange_contact_Correlation_VEF::completer()
@@ -272,7 +272,7 @@ void Echange_contact_Correlation_VEF::completer()
         elem =  face_voisins(face,1);
 
 
-      // on recupere les faces 2, 3 et 4 de l'element contenant "face"
+      // retrieve faces 2, 3 and 4 of the element containing "face"
       int face2 = zvef.elem_faces(elem,0);
       int face3 = zvef.elem_faces(elem,1);
       if (face2 == face)
@@ -298,21 +298,21 @@ void Echange_contact_Correlation_VEF::completer()
 
   init_tab_echange();
 
-  //Mise a jour car pas de dependance a des donnees d un autre probleme
-  //dans le cas de probleme couple
-  //Methode completer() peut etre a remplacer par methode initialiser()
+  // Update because there is no dependency on data from another problem
+  // in the case of a coupled problem.
+  // Method completer() may need to be replaced by method initialiser()
   const double temps = mon_eqn.schema_temps().temps_courant();
   mettre_a_jour(temps);
 }
 
 /**
- * Initialise le tab tab_ech pour le parallele
+ * @brief Initializes the tab_ech array for parallel execution.
  */
 void Echange_contact_Correlation_VEF::init_tab_echange()
 {
 }
 /**
- * Calcule les CL a appliquer sur l'equation d'energie
+ * @brief Computes the boundary conditions to apply to the energy equation.
  */
 void Echange_contact_Correlation_VEF::calculer_CL()
 {
@@ -359,7 +359,7 @@ void Echange_contact_Correlation_VEF::calculer_CL()
 }
 
 /**
- * Calcule rho, mu et lambda du fluide pour la temperature courante
+ * @brief Computes rho, mu, and lambda of the fluid at the current temperature.
  */
 void Echange_contact_Correlation_VEF::calculer_prop_physique()
 {
@@ -375,7 +375,7 @@ void Echange_contact_Correlation_VEF::calculer_prop_physique()
 }
 
 /**
- * Calcule le coeff d echange suivant la correlation entree dans le jdd
+ * @brief Computes the heat exchange coefficient using the correlation specified in the data file.
  */
 double Echange_contact_Correlation_VEF::calculer_coefficient_echange(int i)
 {
@@ -389,7 +389,7 @@ double Echange_contact_Correlation_VEF::calculer_coefficient_echange(int i)
 
 
 /**
- * Calcul du terme source  de puissance volumique dans l'equation d'energie 1D fluide.
+ * @brief Computes the volumetric power source term in the 1D fluid energy equation.
  */
 void Echange_contact_Correlation_VEF::calculer_Q()
 {
@@ -430,15 +430,15 @@ void Echange_contact_Correlation_VEF::init()
   const int ndeb = ma_front_vf.num_premiere_face();
   const int nb_faces_bord = ma_front_vf.nb_faces();
 
-  // N entre par l'utilisateur = Nombre de mailles 1D
+  // N as entered by the user = number of 1D cells
   N=N/Process::nproc()+2;
-  // N modifie pour que cela soit le nombre de noeuds 1D par processeur
+  // N is modified to be the number of 1D nodes per processor
 
-  // Ici, on suppose que l'utilisateur a decoupe en tranche selon la direction 1D
+  // Here we assume the user has partitioned in slices along the 1D direction
   double delta=(xsup-xinf)/Process::nproc();
   xinf=xinf+Process::me()*delta;
   xsup=xinf+delta;
-  // on dimensionne
+  // size the arrays
   coord.resize(N);
   U.resize(N);
   T.resize(N);
@@ -450,7 +450,7 @@ void Echange_contact_Correlation_VEF::init()
   diam.resize(N);
   h_correlation.resize(N);
 
-  // on remplit les coordonnees des noeuds du maillages 1D dans le fluide
+  // fill the coordinates of the 1D mesh nodes in the fluid
   coord(0)=xinf;
   coord(N-1)=xsup;
   double dx = (xsup-xinf)/(N-2);
@@ -459,7 +459,7 @@ void Echange_contact_Correlation_VEF::init()
       coord(i) = xinf+dx*(i-0.5);
     }
 
-  // on remplit les correspondances elements solides -> elements fluides
+  // fill the solid element -> fluid element correspondence map
   correspondance_solide_fluide.resize(nb_faces_bord);
   for(int i=0; i<nb_faces_bord; i++)
     {
@@ -483,13 +483,13 @@ void Echange_contact_Correlation_VEF::init()
   if (avec_rayo == 1)
     {
       const double precision = 1.e-6;
-      const int MAX_FACES_PATCH = 500; //!!! a revoir
+      const int MAX_FACES_PATCH = 500; //!!! to be revisited
       int nb_patches = 2*(N-2);
       patches_rayo.resize(nb_patches,MAX_FACES_PATCH);
       nb_faces_patch.resize(nb_patches);
       IntVect traite(nb_faces_bord);
-      correspondance_fluide_patch.resize(N,2); // en dur, deux patches associes a un point fluide
-      correspondance_face_patch.resize(nb_faces_bord); // fournit pour chaque face du bord, le numero du patch auquel elle appartient
+      correspondance_fluide_patch.resize(N,2); // hard-coded: two patches associated with each fluid point
+      correspondance_face_patch.resize(nb_faces_bord); // provides, for each boundary face, the index of the patch it belongs to
       traite=0;
       correspondance_fluide_patch=-1;
       int compteur_patches = 0;
@@ -561,27 +561,27 @@ void Echange_contact_Correlation_VEF::init()
 
 
     }
-  // calcul du diametre hydraulique
+  // compute the hydraulic diameter
   for (int i=0; i<N; i++)
     {
       fct_Dh.setVar("x",coord(i));
       diam(i)=fct_Dh.eval();
     }
-  // calcul des volumes des tranches
+  // compute the slice volumes
   vol=0.;
-  const double dz = (coord(2)-coord(1)); // pour l'instant dz est constant, le maillage fluide est regulier (hormis pour le premier et dernier point)
+  const double dz = (coord(2)-coord(1)); // for now dz is constant; the fluid mesh is uniform (except for the first and last point)
   for (int i=1; i<N-1; i++)
     {
       fct_vol.setVar("Dh",getDh(i));
       fct_vol.setVar("x",coord(i));
       vol(i)=fct_vol.eval()*dz;
     }
-  vol(0) = vol(N-1) = 1.; // ne sert pas mais evite une division par zero dans le calcul de Qvol.
+  vol(0) = vol(N-1) = 1.; // unused but avoids a division by zero in the Qvol computation.
 }
 
 
 /**
- * Calcule la vitesse par conservation de la masse
+ * @brief Computes the velocity by mass conservation.
  */
 void Echange_contact_Correlation_VEF::calculer_Vitesse()
 {
@@ -591,18 +591,18 @@ void Echange_contact_Correlation_VEF::calculer_Vitesse()
 
 
 /**
- * Calcule la temperature 1D dans le fluide en resolvant la conservation de l'energie
+ * @brief Computes the 1D fluid temperature by solving energy conservation.
  */
 void Echange_contact_Correlation_VEF::calculer_Tfluide()
 {
   const Equation_base& mon_eqn = domaine_Cl_dis().equation();
   const double dt = mon_eqn.schema_temps().pas_de_temps();
 
-  DoubleVect ma(N); // diagonale
-  DoubleVect mb(N-1); // sous-diagonale
-  DoubleVect mc(N-1); // sur-diagonale
+  DoubleVect ma(N); // main diagonal
+  DoubleVect mb(N-1); // sub-diagonal
+  DoubleVect mc(N-1); // super-diagonal
   DoubleVect sm(N);
-  const int sgn = (debit>0) ? 1 : -1; // schema amont pour le transport
+  const int sgn = (debit>0) ? 1 : -1; // upwind scheme for the transport
 
 
   ma(0) = 1.;
@@ -650,11 +650,11 @@ void Echange_contact_Correlation_VEF_sauvegarder(const Nom& filename, const doub
                          << filename << finl;
       SFichier file(filename);
       file << "Temps = " << temps << finl;
-      DoubleVect tmp(T); // copie de T
+      DoubleVect tmp(T); // copy of T
       int count = 0;
       for (int pe = 0; pe < nproc; pe++)
         {
-          recevoir(tmp, pe, canal); // ne fait rien si pe==0
+          recevoir(tmp, pe, canal); // no-op if pe==0
           const int sz = tmp.size();
           for (int i = 0; i < sz; i++)
             {
@@ -777,7 +777,7 @@ void Echange_contact_Correlation_VEF::mettre_a_jour(double temps)
         elem =  face_voisins(face,1);
 
 
-      // on recupere les faces 2, 3 et 4 de l'element contenant "face"
+      // retrieve faces 2, 3 and 4 of the element containing "face"
       int face2 = zvef.elem_faces(elem,0);
       int face3 = zvef.elem_faces(elem,1);
       if (face2 == face)
@@ -843,7 +843,7 @@ void Echange_contact_Correlation_VEF::mettre_a_jour(double temps)
         }
       Tparoi(ii,0) = (h_solide(ii,0)*Tint+flux_radiatif(patch_courant)+ h_correlation(correspondance_solide_fluide(ii))*T(correspondance_solide_fluide(ii)))/(h_solide(ii,0)+h_correlation(correspondance_solide_fluide(ii)));
     }
-  // Mise a jour des CLs pour avoir une impression correcte des resultats
+  // Update the BCs to ensure correct output of results
   calculer_CL();
   if (limpr(temps,mon_eqn.schema_temps().pas_de_temps())) imprimer(temps);
 
@@ -854,17 +854,17 @@ void Echange_contact_Correlation_VEF::mettre_a_jour(double temps)
 
 
 /**
- * Teste si l'impression est demandee
+ * @brief Tests whether output printing is requested.
  */
 int Echange_contact_Correlation_VEF::limpr(double temps_courant,double dt) const
 {
   const Schema_Temps_base& sch = domaine_Cl_dis().equation().schema_temps();
-  // Test un peu tordu, mais ca fonctionne !!!! (CM 05/07/2007)
+  // Slightly convoluted test, but it works!!!! (CM 05/07/2007)
   if (dt_impr<=dt || ((sch.temps_max()<=temps_courant || sch.nb_pas_dt_max()<=(sch.nb_pas_dt()+1) || (temps_courant!=sch.temps_courant() && sch.nb_pas_dt()==0)) && dt_impr!=1e10))
     return 1;
   else
     {
-      // Voir Schema_Temps_base::limpr pour information sur epsilon et modf
+      // See Schema_Temps_base::limpr for information on epsilon and modf
       static const double epsilon = 1.e-9;
       double i, j;
       modf(temps_courant/dt_impr + epsilon, &i);
@@ -875,7 +875,7 @@ int Echange_contact_Correlation_VEF::limpr(double temps_courant,double dt) const
 
 
 /**
- * Imprime les resultats
+ * @brief Prints the results.
  */
 void Echange_contact_Correlation_VEF::imprimer(double temps) const
 {
@@ -976,9 +976,9 @@ void Echange_contact_Correlation_VEF::imprimer(double temps) const
 
 }
 
-// Attention : la normale a la face num_face est suppose sortante
-// tandis que celle a la face num2 est reorientee dans la methode
-// afin d etre sortante.
+// Warning: the normal to face num_face is assumed to be outward,
+// while the normal to face num2 is reoriented inside the method
+// to be outward as well.
 double Echange_contact_Correlation_VEF::pdt_scalSqrt(const Domaine_VEF& le_dom,int num_face,int num2,
                                                      int num_elem,int dim,double diffu)
 {
@@ -993,9 +993,9 @@ double Echange_contact_Correlation_VEF::pdt_scalSqrt(const Domaine_VEF& le_dom,i
   return (pscal*diffu)/le_dom.volumes(num_elem);
 }
 
-// Attention : la normal a la face num_face est suppose sortante
-// tandis que celle a la face num2 est reorientee dans la methode
-// afin d etre sortante.
+// Warning: the normal to face num_face is assumed to be outward,
+// while the normal to face num2 is reoriented inside the method
+// to be outward as well.
 double Echange_contact_Correlation_VEF::pdt_scal(const Domaine_VEF& le_dom,int num_face,int num2,
                                                  int num_elem,int dim,double diffu)
 {

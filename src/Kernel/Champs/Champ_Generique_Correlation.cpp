@@ -101,8 +101,8 @@ const Champ_base& Champ_Generique_Correlation::get_champ_without_evaluation(OWN_
 {
   int nb_comp = integrale().le_champ_calcule().nb_comp();
   //Nature_du_champ nature_source = source.nature_du_champ();
-  //Pas completement exact car il y a le cas de la correlation vecteur-vecteur et dans
-  //ce cas c est un tenseur qui est manipule (la nature n est pas scalaire ou vectorielle)
+  //Not completely exact because there is the vector-vector correlation case where
+  //a tensor is manipulated (the nature is neither scalar nor vectorial)
   Nature_du_champ nature_source = (nb_comp==1)?scalaire:vectoriel;
   OWN_PTR(Champ_Fonc_base)  es_tmp;
   espace_stockage = creer_espace_stockage(nature_source,nb_comp,es_tmp);
@@ -113,8 +113,8 @@ const Champ_base& Champ_Generique_Correlation::get_champ(OWN_PTR(Champ_base)& es
 {
   int nb_comp = integrale().le_champ_calcule().nb_comp();
   //Nature_du_champ nature_source = source.nature_du_champ();
-  //Pas completement exact car il y a le cas de la correlation vecteur-vecteur et dans
-  //ce cas c est un tenseur qui est manipule (la nature n est pas scalaire ou vectorielle)
+  //Not completely exact because there is the vector-vector correlation case where
+  //a tensor is manipulated (the nature is neither scalar nor vectorial)
   Nature_du_champ nature_source = (nb_comp==1)?scalaire:vectoriel;
   if (!espace_stockage_)
     creer_espace_stockage(nature_source,nb_comp,espace_stockage_);
@@ -128,7 +128,7 @@ const Champ_base& Champ_Generique_Correlation::get_champ(OWN_PTR(Champ_base)& es
 
 const Noms Champ_Generique_Correlation::get_property(const Motcle& query) const
 {
-  //Creation des composantes serait a faire de maniere dynamique (Correlation_...)
+  //Component creation should be done dynamically (Correlation_...)
   Motcles motcles(2);
   motcles[0] = "unites";
   motcles[1] = "composantes";
@@ -143,9 +143,9 @@ const Noms Champ_Generique_Correlation::get_property(const Motcle& query) const
       }
     case 1:
       {
-        //On fixe les composantes specifiques pour le Champ_Generique_Moyenne
-        //car dans Format_Post_Lml::ecrire_champ_lml() dans le cas d une localisation ELEM
-        //elles sont utilisees
+        //We set the specific components for Champ_Generique_Moyenne
+        //because in Format_Post_Lml::ecrire_champ_lml() in the case of ELEM localisation
+        //they are used
 
         /*
           const Noms compo_cibles = get_source(0).get_property("composantes");
@@ -179,7 +179,7 @@ const Noms Champ_Generique_Correlation::get_property(const Motcle& query) const
   return Champ_Gen_de_Champs_Gen::get_property(query);
 }
 
-//Nomme le champ en tant que source par defaut
+//Name the field as a source by default
 //"Correlation_"+nom_champ_source_1+nom_champ_source_2
 void Champ_Generique_Correlation::nommer_source()
 {
@@ -200,7 +200,7 @@ void Champ_Generique_Correlation::nommer_source()
     }
 }
 
-//Renvoie 1 si tenseur a post-traiter, sinon 0
+//Returns 1 if tensor to post-process, otherwise 0
 int Champ_Generique_Correlation::get_info_type_post() const
 {
   const Noms compo = get_property("composantes");

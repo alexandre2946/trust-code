@@ -18,9 +18,9 @@
 
 #include <Schema_Temps_base.h>
 
-/*! @brief classe Schema_Temps_Inutile
+/*! @brief class Schema_Temps_Inutile
  *
- * Cette classe represente un schema de temps vide pour utiliser l'heritage TRUST sur probleme base et postraitement avec Pb_STT
+ * This class represents an empty time scheme used to leverage TRUST inheritance on base problem and post-processing with Pb_STT.
  *
  */
 class Schema_Temps_Inutile: public Schema_Temps_base

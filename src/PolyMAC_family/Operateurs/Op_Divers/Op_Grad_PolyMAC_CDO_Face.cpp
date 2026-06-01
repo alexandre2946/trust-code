@@ -77,14 +77,14 @@ DoubleTab& Op_Grad_PolyMAC_CDO_Face::ajouter(const DoubleTab& inco, DoubleTab& r
   double coef;
   int n0, n1;
 
-  // Boucle sur les bords pour traiter les conditions aux limites
+  // Loop over boundaries to handle boundary conditions
   int ndeb, nfin, num_face;
   for (int n_bord = 0; n_bord < zPolyMAC_HFV.nb_front_Cl(); n_bord++)
     {
 
-      // pour chaque Condition Limite on regarde son type
-      // Si face de Dirichlet ou de Symetrie on ne fait rien
-      // Si face de Neumann on calcule la contribution au terme source
+      // for each boundary condition, check its type
+      // If Dirichlet or Symmetry face: do nothing
+      // If Neumann face: compute the contribution to the source term
 
       const Cond_lim& la_cl = zclPolyMAC_HFV.les_conditions_limites(n_bord);
       if (sub_type(Neumann_sortie_libre, la_cl.valeur()))
@@ -111,10 +111,10 @@ DoubleTab& Op_Grad_PolyMAC_CDO_Face::ajouter(const DoubleTab& inco, DoubleTab& r
                 }
             }
         }
-      // Fin de la boucle for
+      // End of boundary loop
     }
 
-  // Boucle sur les faces internes
+  // Loop over internal faces
   for (num_face = zPolyMAC_HFV.premiere_face_int(); num_face < zPolyMAC_HFV.nb_faces(); num_face++)
     {
       n0 = face_voisins(num_face, 0);
@@ -148,14 +148,14 @@ void Op_Grad_PolyMAC_CDO_Face::contribuer_a_avec(const DoubleTab& inco, Matrice_
   double coef;
   int n0, n1;
 
-  // Boucle sur les bords pour traiter les conditions aux limites
+  // Loop over boundaries to handle boundary conditions
   int ndeb, nfin, num_face;
   for (int n_bord = 0; n_bord < zPolyMAC_HFV.nb_front_Cl(); n_bord++)
     {
 
-      // pour chaque Condition Limite on regarde son type
-      // Si face de Dirichlet ou de Symetrie on ne fait rien
-      // Si face de Neumann on calcule la contribution au terme source
+      // for each boundary condition, check its type
+      // If Dirichlet or Symmetry face: do nothing
+      // If Neumann face: compute the contribution to the source term
 
       const Cond_lim& la_cl = zclPolyMAC_HFV.les_conditions_limites(n_bord);
       if (sub_type(Neumann_sortie_libre, la_cl.valeur()))
@@ -180,10 +180,10 @@ void Op_Grad_PolyMAC_CDO_Face::contribuer_a_avec(const DoubleTab& inco, Matrice_
                 }
             }
         }
-      // Fin de la boucle for
+      // End of boundary loop
     }
 
-  // Boucle sur les faces internes
+  // Loop over internal faces
   for (num_face = zPolyMAC_HFV.premiere_face_int(); num_face < zPolyMAC_HFV.nb_faces(); num_face++)
     {
       n0 = face_voisins(num_face, 0);

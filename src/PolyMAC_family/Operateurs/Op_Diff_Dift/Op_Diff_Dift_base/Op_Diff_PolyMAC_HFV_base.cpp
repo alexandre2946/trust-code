@@ -33,7 +33,7 @@ Entree& Op_Diff_PolyMAC_HFV_base::readOn(Entree& s) { return s; }
 void Op_Diff_PolyMAC_HFV_base::mettre_a_jour(double t)
 {
   Operateur_base::mettre_a_jour(t);
-  //si le champ est constant en temps, alors pas besoin de recalculer nu_ et les interpolations
+  //if the field is constant in time, no need to recompute nu_ and the interpolations
   if (t <= t_last_nu_)
     return;
 
@@ -68,7 +68,7 @@ void Op_Diff_PolyMAC_HFV_base::update_nu() const
   int e, i, m, n, N = equation().inconnue().valeurs().line_size(), N_nu = nu_.line_size(), N_nu_src = nu_src.line_size(), mult = N_nu / N, c_nu = nu_src.dimension_tot(0) == 1, d, db, D = dimension;
   assert(N_nu % N == 0);
 
-  /* nu_ : si necessaire, on doit etendre la champ source */
+  /* nu_: if necessary, the source field must be extended */
   if (N_nu == N_nu_src)
     for (e = 0; e < domaine.nb_elem_tot(); e++)
       for (n = 0; n < N_nu; n++)
@@ -87,24 +87,24 @@ void Op_Diff_PolyMAC_HFV_base::update_nu() const
   else
     abort();
 
-  /* ponderation de nu par la porosite et par alpha (si pb_Multiphase) */
+  /* weighting of nu by porosity and by alpha (if pb_Multiphase) */
   const DoubleTab *alp = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()).equation_masse().inconnue().passe() : nullptr;
   for (e = 0; e < domaine.nb_elem_tot(); e++)
     for (n = 0, i = 0; n < N; n++)
       for (m = 0; m < mult; m++, i++)
         nu_.addr()[N_nu * e + i] *= equation().milieu().porosite_elem()(e) * (alp ? std::max((*alp)(e, n), 1e-8) : 1);
 
-  /* modification par une classe fille */
+  /* modification by a derived class */
   modifier_mu(nu_);
 
   nu_a_jour_ = 1;
 }
 
-/* calcul des variables auxiliaires en semi-implicite */
+/* compute the auxiliary variables in semi-implicit mode */
 void Op_Diff_PolyMAC_HFV_base::update_aux(double t) const
 {
   const std::string& nom_inco = (le_champ_inco ? le_champ_inco.valeur() : equation().inconnue()).le_nom().getString();
-  int i, j, n_ext = (int) op_ext.size(), first_run = mat_aux.nb_lignes() == 0; /* nombre d'operateurs */
+  int i, j, n_ext = (int) op_ext.size(), first_run = mat_aux.nb_lignes() == 0; /* number of operators */
   if (first_run)
     for (mat_aux.dimensionner(n_ext, n_ext), i = 0; i < n_ext; i++)
       for (j = 0; j < n_ext; j++)
@@ -112,19 +112,19 @@ void Op_Diff_PolyMAC_HFV_base::update_aux(double t) const
   std::vector<const Op_Diff_PolyMAC_HFV_base*> opp_ext(n_ext);
   for (i = 0; i < n_ext; i++)
     opp_ext[i] = &ref_cast(Op_Diff_PolyMAC_HFV_base, *op_ext[i]);
-  std::vector<matrices_t> lines(n_ext); /* sous forme d'arguments pour dimensionner/assembler_blocs */
+  std::vector<matrices_t> lines(n_ext); /* in the form of arguments for dimensionner/assembler_blocs */
   for (i = 0; i < n_ext; i++)
     for (j = 0; j < n_ext; j++)
       lines[i][nom_inco + (j == i ? "" : "/" + op_ext[j]->equation().probleme().le_nom().getString())] = &ref_cast(Matrice_Morse, mat_aux.get_bloc(i, j).valeur());
   if (first_run)
     for (i = 0; i < n_ext; i++)
-      opp_ext[i]->dimensionner_blocs_ext(1, lines[i]); //dimensionnement
+      opp_ext[i]->dimensionner_blocs_ext(1, lines[i]); //sizing
 
-  /* inconnue / second membre */
+  /* unknown / right-hand side */
   std::deque<ConstDoubleTab_parts> v_part;
   for (i = 0; i < n_ext; i++)
     v_part.emplace_back(op_ext[i]->has_champ_inco() ? op_ext[i]->mon_inconnue().valeurs() : op_ext[i]->equation().inconnue().valeurs());
-  MD_Vector_composite mdc; //MD_Vector composite : a partir de tous les seconds blocs
+  MD_Vector_composite mdc; //composite MD_Vector: built from all second blocks
   for (i = 0; i < n_ext; i++)
     mdc.add_part(v_part[i][1].get_md_vector(), v_part[i][1].line_size());
   MD_Vector mdv;
@@ -142,13 +142,13 @@ void Op_Diff_PolyMAC_HFV_base::update_aux(double t) const
         ref_cast(Matrice_Morse, mat_aux.get_bloc(i, j).valeur()).get_set_coeff() = 0;
   for (i = 0; i < n_ext; i++)
     opp_ext[i]->ajouter_blocs_ext(1, lines[i], p_sec[i]);
-  /* passage incremente/inconnues */
+  /* incremented/unknown transition */
   mat_aux.ajouter_multvect(inco, secmem);
   /* resolution */
   if (first_run)
     {
       if (equation().parametre_equation())
-        solv_aux = ref_cast(Parametre_implicite, equation().parametre_equation().valeur()).solveur(); //on copie le solveur de l'equation
+        solv_aux = ref_cast(Parametre_implicite, equation().parametre_equation().valeur()).solveur(); //copy the solver from the equation
       else
         {
           EChaine chl("petsc cholesky { }");
@@ -159,7 +159,7 @@ void Op_Diff_PolyMAC_HFV_base::update_aux(double t) const
 
   solv_aux->reinit();
   solv_aux.resoudre_systeme(mat_aux, secmem, inco);
-  /* maj de var_aux / t_last_aux dans tous les operateurs */
+  /* update var_aux / t_last_aux in all operators */
   for (i = 0; i < n_ext; i++)
     opp_ext[i]->var_aux = p_inc[i], opp_ext[i]->t_last_aux_ = t, opp_ext[i]->use_aux_ = 1;
 }

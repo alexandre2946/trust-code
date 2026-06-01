@@ -22,9 +22,9 @@
 #include <ctype.h>
 #include <math.h>
 
-// Methode a remonter dans une classe au dessus de toutes les classes lire_...
-// Ou a placer dans le constructeur d'EFichier avec eventuellement un
-// effacement du fichier decompresse dans le desctructeur d'EFichier
+// Method to be moved to a base class above all lire_... classes,
+// or to be placed in the EFichier constructor with optional deletion
+// of the decompressed file in the EFichier destructor.
 inline void decompression(Nom& nom_fichier)
 {
   Nom tmp(nom_fichier);
@@ -55,30 +55,30 @@ int chartoint(char c)
     return (c-'0');
 }
 
-// Convertit une chaine au format hexa (00aad22) en une valeur entiere
+// Converts a hex-format string (e.g. "00aad22") to an integer value
 int htoi(const char * szChaine)
 {
   int lResult = 0;
   int iLength = 0;
-  // Pointeur null, on renvoi -1
+  // Null pointer: return -1
   if (szChaine == nullptr)
     return -1;
-  // On calcule la longueur de la chaine
+  // Compute the string length
   iLength = (int)strlen(szChaine);
 
-  // On met la chaine en majuscule dans une nouvelle chaine (allouee par strdup)
+  // Convert the string to uppercase in a new string (allocated by strdup)
   char * szHexaString = strdup(szChaine);
-  // Pour chaque caractere on calcule sa valeur
+  // For each character, compute its integer value
   for (int i = iLength - 1; i >= 0; i--)
     {
       char cCharacter = szHexaString[i];
       int iValue = 0;
-      // C'est un digit, on le convertit en entier
+      // It's a digit, convert it to integer
       if (isdigit(cCharacter))
         {
           //iValue = atoi(&cCharacter);
-          // atoi a l'air mechamment bugge !
-          // Je code un chartoint correct !
+          // atoi seems badly buggy!
+          // Using a correct chartoint implementation:
           iValue = chartoint(cCharacter);
           if (iValue>9)
             {
@@ -86,7 +86,7 @@ int htoi(const char * szChaine)
               Process::exit();
             }
         }
-      // C'est un caractere, on lui associe une valeur entiere
+      // It's a letter, assign it an integer value
       else if (isalpha(cCharacter))
         {
           switch(cCharacter)
@@ -116,18 +116,18 @@ int htoi(const char * szChaine)
               iValue = 15;
               break;
             default  :
-              return -3;              // Caractere invalide en Hexa.
+              return -3;              // Invalid hex character.
             }
         }
-      // Ce n'est ni un caractere ni un digit.
+      // Neither a letter nor a digit.
       else
-        return -4;   // Caractere non valide.
+        return -4;   // Invalid character.
       //lResult += iValue * pow(16, iLength - i - 1);
       for (int puissance=0; puissance<iLength - i - 1; puissance++)
         iValue *= 16;
       lResult += iValue;
     }
-  // Liberation de la chaine allouee
+  // Free the allocated string
   free (szHexaString);
   //Cerr << lResult << finl;
   return lResult;
@@ -187,12 +187,13 @@ inline void va_a_la_parenthese_ouvrante(EFichier& fic)
     }
 }
 
-/*! @brief Lecture d'un fichier Avec 2 arguments nom1 et nom2 , lit l'objet du fichier nom2 dans l'objet nom1
+/*! @brief Main function of the Lire_Tgrid interpreter. Reads a Tgrid mesh file.
  *
- *     Avec un seul argument nom1, interprete le fichier de nom nom1
+ * With 2 arguments nom1 and nom2, reads the object from file nom2 into object nom1.
+ * With a single argument nom1, interprets the file named nom1.
  *
- * @param (Entree& is)
- * @return (Entree&)
+ * @param is An input stream.
+ * @return The modified input stream.
  */
 Entree& Lire_Tgrid::interpreter_(Entree& is)
 {
@@ -200,7 +201,7 @@ Entree& Lire_Tgrid::interpreter_(Entree& is)
   associer_domaine(is);
   Domaine& dom=domaine();
   DoubleTab& coord_sommets=dom.les_sommets();
-  // Declaration des variables
+  // Variable declarations
   int dim = -1;
   int nb_som = 0;
   int nb_elem = 0;
@@ -208,17 +209,17 @@ Entree& Lire_Tgrid::interpreter_(Entree& is)
   int nb_som_elem = 0;
   int type_elements = 0;
   int compteur = 0;
-  // Tableau de travail
+  // Work array
   ArrOfInt nb_som_lu_elem;
   Motcle motlu;
-  // Gestion fichier
+  // File management
   Nom nom_fichier;
   is >> nom_fichier;
   decompression(nom_fichier);
   Cerr << "Reading of the file " << nom_fichier << " ..." << finl;
   EFichier lecture(nom_fichier);
-  // On teste tout de suite l'existence du fichier car s'il
-  // n'existe pas, cela bloque dans le eof();
+  // Check immediately that the file exists, because if it does not,
+  // execution hangs in eof();
   if (!lecture.good())
     {
       Cerr << "Problem to open the file " << nom_fichier << finl;
@@ -226,9 +227,8 @@ Entree& Lire_Tgrid::interpreter_(Entree& is)
       exit();
     }
 
-  // Premiere lecture du fichier .msh
-  //pour trouver le nombre d'element car
-  // il est parfois place en fin de fichier !
+  // First pass through the .msh file
+  // to find the number of elements, as it is sometimes placed at the end of the file!
   while (!lecture.eof())
     {
       lecture >> motlu;
@@ -237,47 +237,47 @@ Entree& Lire_Tgrid::interpreter_(Entree& is)
           lecture >> motlu;
           if (motlu=="(0")
             {
-              lecture >> motlu;        // Numero premier element
-              lecture >> motlu;        // Nombre d'element
+              lecture >> motlu;        // Index of the first element
+              lecture >> motlu;        // Number of elements
               nb_elem=htoi(motlu);
               Cerr << "The total number of elements to read is " << nb_elem << finl;
-              lecture >> motlu;        // Type du domaine (0=dead domaine; 1=active domaine; 32=inactive domaine) ou 0))
-              if (motlu!="0))") lecture >> motlu; // On saut le type s'il existe
+              lecture >> motlu;        // Domain type (0=dead; 1=active; 32=inactive) or "0))"
+              if (motlu!="0))") lecture >> motlu; // Skip the type if it exists
             }
-          else if (motlu=="(id") lecture >> motlu;        // evite de lire la description de la balise (12
+          else if (motlu=="(id") lecture >> motlu;        // skip reading the description of the (12 tag
           else
             {
-              lecture >> motlu;        // Numero premier element
-              lecture >> motlu;        // Nombre d'element
-              lecture >> motlu;        // Type de domaine (1:fluid ou 0x11:solid)
-              lecture >> motlu;        // Type des elements
+              lecture >> motlu;        // Index of the first element
+              lecture >> motlu;        // Number of elements
+              lecture >> motlu;        // Domain type (1:fluid or 0x11:solid)
+              lecture >> motlu;        // Element type
               if (motlu=="1))")
                 {
-                  // On lit des triangles
+                  // Reading triangles
                   type_elements=1;
                   Cerr << "2D elements of type Triangle" << finl;
                 }
               else if (motlu=="3))")
                 {
-                  // On lit des quadrangles
+                  // Reading quadrangles
                   type_elements=3;
                   Cerr << "2D elements of type Quadrangle" << finl;
                 }
               else if (motlu=="2))")
                 {
-                  // On lit des tetraedres
+                  // Reading tetrahedra
                   type_elements=2;
                   Cerr << "3D elements of type Tetrahedron" << finl;
                 }
               else if (motlu=="4))")
                 {
-                  // On lit des hexaedres
+                  // Reading hexahedra
                   type_elements=4;
                   Cerr << "3D elements of type Hexahedron" << finl;
                 }
               else
                 {
-                  // On ne sait pas ce qu'on lit
+                  // Unknown element type
                   Cerr << "Elements unknown !" << finl;
                   Cerr << "It should probably crashed !!!!!" << finl;
                 }
@@ -285,7 +285,7 @@ Entree& Lire_Tgrid::interpreter_(Entree& is)
             }
         }
     }
-  // Deuxieme lecture du fichier .msh
+  // Second pass through the .msh file
   EFichier fic(nom_fichier);
   while (!fic.eof())
     {
@@ -323,13 +323,13 @@ Entree& Lire_Tgrid::interpreter_(Entree& is)
           fic >> motlu;
           if (motlu=="(0")
             {
-              fic >> motlu;        // Numero du premier sommet
-              fic >> motlu;        // Nombre de sommets
+              fic >> motlu;        // Index of the first vertex
+              fic >> motlu;        // Number of vertices
               nb_som=htoi(motlu);
               Cerr << "The total number of nodes to read is " << nb_som << finl;
-              // On dimensionne le tableau des sommets
+              // Resize the vertex array
               coord_sommets.resize(nb_som,dim);
-              // Depend du format
+              // Format-dependent
               fic >> motlu;
               Nom tmp=motlu;
               if (tmp==motlu.prefix("))"))
@@ -338,12 +338,12 @@ Entree& Lire_Tgrid::interpreter_(Entree& is)
           else
             {
               int idomaine=htoi(motlu.suffix("("));
-              fic >> motlu;        // Debut
+              fic >> motlu;        // Start index
               int ideb=htoi(motlu);
-              fic >> motlu;        // Fin
+              fic >> motlu;        // End index
               int ifin=htoi(motlu);
               Cerr << ifin-ideb+1 << " nodes are read in the area " << idomaine << finl;
-              // Depend du format, on va donc a la paranthese ouvrante
+              // Format-dependent: advance to the opening parenthesis
               va_a_la_parenthese_ouvrante(fic);
               /*
                 fic >> motlu;        // Type (0: virtual, 1:any, 2:boundary)
@@ -364,11 +364,11 @@ Entree& Lire_Tgrid::interpreter_(Entree& is)
           fic >> motlu;
           if (motlu=="(0")
             {
-              // Informations obtenues lors de la premiere lecture
-              fic >> motlu;        // Numero premier element
-              fic >> motlu;        // Nombre d'element
-              fic >> motlu;        // Type du domaine (0=dead domaine; 1=active domaine; 32=inactive domaine) ou 0))
-              if (motlu!="0))") fic >> motlu; // On saut le type s'il existe
+              // Information already obtained in the first pass
+              fic >> motlu;        // Index of the first element
+              fic >> motlu;        // Number of elements
+              fic >> motlu;        // Domain type (0=dead; 1=active; 32=inactive) or "0))"
+              if (motlu!="0))") fic >> motlu; // Skip the type if it exists
             }
           else
             {
@@ -383,22 +383,22 @@ Entree& Lire_Tgrid::interpreter_(Entree& is)
               fic >> motlu;        // Type cell (0:mixed,1:tri,2:tetra,3:quad,4:hexa,5:pyramid,6:wedge)
               if (motlu=="2))")
                 {
-                  // On lit bien des tetraedres
+                  // Reading tetrahedra
                   dom.type_elem().typer("Tetraedre");
                 }
               else if (motlu=="4))")
                 {
-                  // On lit bien des hexaedres
+                  // Reading hexahedra
                   dom.type_elem().typer("Hexaedre_VEF");
                 }
               else if (motlu=="1))")
                 {
-                  // On lit bien des triangles
+                  // Reading triangles
                   dom.type_elem().typer("Triangle");
                 }
               else if (motlu=="3))")
                 {
-                  // On lit bien des quadrangles
+                  // Reading quadrangles
                   dom.type_elem().typer("Quadrangle");
                 }
               else
@@ -419,24 +419,24 @@ Entree& Lire_Tgrid::interpreter_(Entree& is)
             fic >> motlu;
           if (motlu=="(0")
             {
-              fic >> motlu;        // Numero de la premiere face
-              fic >> motlu;        // Nombre de faces
+              fic >> motlu;        // Index of the first face
+              fic >> motlu;        // Number of faces
               nb_face=htoi(motlu);
               Cerr << "The total number of faces to read is " << nb_face << finl;
-              fic >> motlu;        // Type de face ou 0))
-              if (motlu != "0))") fic >> motlu;        // On saut le type s'il existe
+              fic >> motlu;        // Face type or "0))"
+              if (motlu != "0))") fic >> motlu;        // Skip the type if it exists
             }
           else
             {
               int idomaine=htoi(motlu.suffix("("));
-              fic >> motlu;        // Debut
+              fic >> motlu;        // Start index
               int ideb=htoi(motlu);
-              fic >> motlu;        // Fin
+              fic >> motlu;        // End index
               int ifin=htoi(motlu);
-              fic >> motlu;        // Type (2: interior, >2: boundary condition): ne semble pas vrai (voir page C-8)!
+              fic >> motlu;        // Type (2: interior, >2: boundary condition): this does not seem accurate (see page C-8)!
               int type=htoi(motlu);
-              fic >> motlu;        // Type face (0:mixed, 2:linear, 3:triangular, 4:quadrilateral)
-              // Depend du format:
+              fic >> motlu;        // Face type (0:mixed, 2:linear, 3:triangular, 4:quadrilateral)
+              // Format-dependent:
               Nom tmp=motlu;
               int nb_som_face,mixte=0;
               if (tmp!=motlu.prefix(")"))
@@ -484,7 +484,7 @@ Entree& Lire_Tgrid::interpreter_(Entree& is)
               ArrOfInt elem(2),som(nb_som_face);
               int nb_face_lu=ifin-ideb+1;
               OBS_PTR(Frontiere) nouveau_bord;
-              // On lit les sommets de la face et les 2 elements au contact de la face
+              // Read the face vertices and the 2 elements adjacent to the face
               for (int i=0; i<nb_face_lu; i++)
                 {
                   if (mixte && i>0)
@@ -502,23 +502,23 @@ Entree& Lire_Tgrid::interpreter_(Entree& is)
                       fic >> motlu;
                       som[j]=htoi(motlu)-1;
                     }
-                  // Pour les hexaedres a cause de la numerotation TRUST, on inverse les sommets 2 et 3
+                  // For hexahedra due to TRUST numbering, swap vertices 2 and 3
                   if (nb_som_face==4)
                     {
                       int tmp2=som[2];
                       som[2]=som[3];
                       som[3]=tmp2;
                     }
-                  fic >> motlu;        // premier element voisin de la face (nul si frontiere)
+                  fic >> motlu;        // first element neighboring the face (zero if boundary)
                   elem[0]=htoi(motlu)-1;
-                  fic >> motlu;        // deuxieme element voisin de la face (nul si frontiere)
-                  // Debut Rajout Cyril MALOD : 15-06-2006
+                  fic >> motlu;        // second element neighboring the face (zero if boundary)
+                  // Start addition by Cyril MALOD : 15-06-2006
                   Nom tmp2=motlu;
                   if (tmp2!=motlu.prefix("))"))
                     {
                       tmp2=motlu.prefix("))");
                       elem[1]=htoi(tmp2)-1;
-                      compteur=1; // Ce compteur sert a ne pas lire le "motlu" suivant
+                      compteur=1; // This counter prevents reading the next "motlu"
                     }
                   else
                     {
@@ -526,23 +526,23 @@ Entree& Lire_Tgrid::interpreter_(Entree& is)
                         {
                           tmp2=motlu.prefix(")");
                           elem[1]=htoi(motlu)-1;
-                          compteur=-1; // Ce compteur sert a lire le "motlu" suivant
+                          compteur=-1; // This counter triggers reading the next "motlu"
                         }
                       else
                         {
                           elem[1]=htoi(motlu)-1;
-                          compteur=0; // Ce compteur sert a lire le "motlu" suivant
+                          compteur=0; // This counter triggers reading the next "motlu"
                         }
                     }
 
                   //                        elem(1)=htoi(motlu)-1;
-                  // Fin Rajout Cyril MALOD : 15-06-2006
-                  // Premier passage, on verifie bien qu'on lit une frontiere
+                  // End addition by Cyril MALOD : 15-06-2006
+                  // First pass: verify that we are reading a boundary
                   if (i==0)
                     {
                       if (elem[0]<0 || elem[1]<0)
                         {
-                          // C'est bien une frontiere donc on dimensionne le necessaire
+                          // Confirmed as a boundary: allocate the necessary structures
                           type=3;
                           Cerr << nb_face_lu << " faces are read from the boundary number " << idomaine << finl;
                           nouveau_bord=dom.faces_bord().add(Bord());
@@ -566,17 +566,17 @@ Entree& Lire_Tgrid::interpreter_(Entree& is)
                           Cerr << nb_face_lu << " internal faces are read in the area " << idomaine << finl;
                         }
                     }
-                  // Les faces internes sont lues mais pas stockees, les faces frontieres sont stockees
+                  // Internal faces are read but not stored; boundary faces are stored
                   if (type!=2)
                     for (int j=0; j<nb_som_face; j++)
                       nouveau_bord->faces().sommet(i,j)=som[j];
 
-                  // On construit le tableau les_elems a partir des faces lues
+                  // Build the les_elems array from the faces read
                   for (int i2=0; i2<2; i2++)
                     {
-                      if (elem[i2]>=0) // On ne traite pas les elements -1 voisins des faces frontieres
+                      if (elem[i2]>=0) // Skip elements with index -1 (neighbors of boundary faces)
                         {
-                          // Premier remplissage de elem(i)
+                          // First fill of elem(i)
                           if (nb_som_lu_elem[elem[i2]]==0)
                             {
                               for (int j=0; j<nb_som_face; j++)
@@ -587,7 +587,7 @@ Entree& Lire_Tgrid::interpreter_(Entree& is)
                               int face_opposee=1;
                               for (int j=0; j<nb_som_face; j++)
                                 {
-                                  // On ajoute le sommet s'il n'est pas deja dans les_elems
+                                  // Add the vertex if it is not already in les_elems
                                   int k=0,trouve=0;
                                   while (k<nb_som_lu_elem[elem[i2]] && trouve==0)
                                     {
@@ -599,7 +599,7 @@ Entree& Lire_Tgrid::interpreter_(Entree& is)
                                       else
                                         k++;
                                     }
-                                  // On ne complete que pour les tetraedres ou les triangles
+                                  // Only complete for tetrahedra or triangles
                                   if ((trouve==0 && nb_som_face==3) || (trouve==0 && nb_som_face==2 && type_elements==1))
                                     les_elems(elem[i2],nb_som_lu_elem[elem[i2]]++)=som[j];
 
@@ -613,7 +613,7 @@ Entree& Lire_Tgrid::interpreter_(Entree& is)
                                       exit();
                                     }
                                 }
-                              // On complete la face opposee de l'hexaedre ou du quadrangle
+                              // Fill the opposite face of the hexahedron or quadrangle
                               if ((nb_som_face==4 && face_opposee==1) || (nb_som_face==2 && face_opposee==1 && type_elements==3))
                                 {
                                   for (int j=0; j<nb_som_face; j++)
@@ -625,7 +625,7 @@ Entree& Lire_Tgrid::interpreter_(Entree& is)
                 }
               if (compteur==0 || compteur==-1)
                 {
-                  fic >> motlu;        // ) ou ))
+                  fic >> motlu;        // ) or ))
                   if (motlu==")" && compteur==0)
                     fic >> motlu;        // )
                 }
@@ -635,19 +635,19 @@ Entree& Lire_Tgrid::interpreter_(Entree& is)
       else if ((motlu=="(45") || (motlu=="(39"))
         {
           Cerr << "Reading of a name:" << finl;
-          fic >> motlu;        // Numero du domaine
-          // Attention le numero du domaine est en decimal !
+          fic >> motlu;        // Domain number
+          // Note: the domain number is in decimal!
           //int idomaine=htoi(motlu.suffix("("));
           int idomaine=atoi(motlu.suffix("("));
-          fic >> motlu;        // Type du domaine
+          fic >> motlu;        // Domain type
           Nom Nomdomaine;
-          fic >> Nomdomaine;        // Nom du domaine)())
+          fic >> Nomdomaine;        // Domain name)())
           Nom nom_domaine=Nomdomaine;
           nom_domaine.prefix(")())");
           if (nom_domaine==Nomdomaine)
             if (1)
               {
-                // retour a la ligne ?
+                // line break?
                 Nom app;
                 fic >> app;
                 Nomdomaine+=app;
@@ -656,7 +656,7 @@ Entree& Lire_Tgrid::interpreter_(Entree& is)
 
               }
           Cerr << "The area " << idomaine << " is called " << nom_domaine << finl;
-          // On parcourt les bords pour renommer
+          // Iterate through boundaries to rename them
           Bords& les_bords=dom.faces_bord();
           les_bords.associer_domaine(dom);
           if (les_bords.est_vide())
@@ -691,7 +691,7 @@ Entree& Lire_Tgrid::interpreter_(Entree& is)
             }
         }
     }
-  // Verification si le tableau les_elems a ete rempli completement
+  // Verify that the les_elems array has been fully filled
   IntTab& les_elems=dom.les_elems();
   for (int i=0; i<nb_elem; i++)
     for (int j=0; j<nb_som_elem; j++)
@@ -702,12 +702,12 @@ Entree& Lire_Tgrid::interpreter_(Entree& is)
           exit();
         }
 
-  // On reordonne le domaine (utile surtout pour les hexaedres)
+  // Reorder the domain (useful especially for hexahedra)
   dom.type_elem()->reordonner();
 
-  // Nettoie le domaine pour enlever les noeuds inutiles
-  // Mettre une methode a Domaine::nettoie
-  // Attention: les lignes suivantes pas compatibles avec TRUST < v1.4.6
+  // Clean the domain to remove unused nodes
+  // A method should be added to Domaine::nettoie
+  // Note: the following lines are not compatible with TRUST < v1.4.6
 
   if (Process::is_sequential() && (NettoieNoeuds::NettoiePasNoeuds==0) )
     NettoieNoeuds::nettoie(dom);

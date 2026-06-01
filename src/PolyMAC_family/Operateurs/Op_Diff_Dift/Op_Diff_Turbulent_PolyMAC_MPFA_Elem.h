@@ -21,22 +21,23 @@
 
 /*! @brief : class Op_Diff_Turbulent_PolyMAC_MPFA_Elem
  *
- *  Version de Op_Diff_PolyMAC_MPFA_Elem prenant en compte l'effet de la turbulence par le biais d'une correlation de type Transport_turbulent.
- *  (celle-ci reposera sur la modelisation de la viscosite turbulente fournie par la correlation Viscosite_turbulente de l'operateur de diffusion de la QDM)
+ *  Variant of Op_Diff_PolyMAC_MPFA_Elem that accounts for turbulence effects
+ *  through a Transport_turbulent correlation (relying on the turbulent viscosity
+ *  provided by the Viscosite_turbulente correlation of the momentum diffusion operator).
  *
  */
 
 class Op_Diff_Turbulent_PolyMAC_MPFA_Elem: public Op_Diff_PolyMAC_MPFA_Elem, public Op_Dift_Multiphase_proto
 {
   Declare_instanciable( Op_Diff_Turbulent_PolyMAC_MPFA_Elem );
-  int dimension_min_nu() const override //pour que la correlation force l'anisotrope (cf. GGDH)
+  int dimension_min_nu() const override //so that the correlation forces the anisotropic case (cf. GGDH)
   {
     return ref_cast(Transport_turbulent_base, corr_.valeur()).dimension_min_nu();
   }
 
   void get_noms_champs_postraitables(Noms& nom, Option opt = NONE) const override;
   void completer() override;
-  void modifier_mu(DoubleTab&) const override; // prend en compte la diffusivite turbulente
+  void modifier_mu(DoubleTab&) const override; // accounts for turbulent diffusivity
   void creer_champ(const Motcle& motlu) override;
   void mettre_a_jour(double temps) override;
 

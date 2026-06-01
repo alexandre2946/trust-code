@@ -34,7 +34,7 @@ Boundary_Conditions::Boundary_Conditions()
   resolution_u_prime_=0;
 }
 
-// SYNTAXE:
+// SYNTAX:
 //  {
 //    BCTYPE_KMIN paroi|symetrie|perio|Mixte_shear
 //    BCTYPE_KMAX paroi|symetrie|perio|Mixte_shear

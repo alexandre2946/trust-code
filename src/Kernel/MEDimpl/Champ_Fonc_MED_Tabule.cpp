@@ -32,13 +32,13 @@ Entree& Champ_Fonc_MED_Tabule::readOn(Entree& is)
 void Champ_Fonc_MED_Tabule::mettre_a_jour(double le_temps)
 {
 
-  // temps1_ temps2_ tel que temps [temps1_ , temps2_[
+  // temps1_ temps2_ such that time is in [temps1_, temps2_[
   if (est_egal(le_temps, temps_calc_))
     return;
 
   if ((temps2_ < -1e8) || (le_temps <= temps_calc_))
     {
-      // initialisation   de -1e9 a T[0] on met la meme chose
+      // initialization: from -1e9 to T[0], set the same value
       lire(temps_sauv_[0]);
       tab1_ = valeurs();
       tab2_ = valeurs();

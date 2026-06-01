@@ -20,7 +20,7 @@
 #include <Fluide_base.h>
 #include <TRUST_Ref.h>
 
-/*! @brief classe Aire_interfaciale Equation de transport de l'aire interfaciale
+/*! @brief Transport equation for the interfacial area.
  *
  * @sa Conv_Diffusion_std Convection_Diffusion_Temperature
  */

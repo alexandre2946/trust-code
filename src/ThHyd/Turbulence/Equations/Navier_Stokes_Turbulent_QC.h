@@ -19,11 +19,10 @@
 #include <Navier_Stokes_Fluide_Dilatable_Proto.h>
 #include <Navier_Stokes_Turbulent.h>
 
-/*! @brief classe Navier_Stokes_Turbulent Cette classe represente l'equation de la dynamique pour un fluide
+/*! @brief Navier-Stokes equation for a quasi-compressible fluid with turbulence modelling.
  *
- *      visqueux verifiant la condition d'incompressibilite div U = 0 avec
- *      modelisation de la turbulence.
- *      Un membre de type OWN_PTR(Modele_turbulence_hyd_base)  representera le modele de turbulence.
+ *      Inherits from Navier_Stokes_Turbulent and Navier_Stokes_Fluide_Dilatable_Proto.
+ *      Contains an OWN_PTR(Modele_turbulence_hyd_base) member representing the turbulence model.
  *
  * @sa Navier_Stokes_Turbulent OWN_PTR(Modele_turbulence_hyd_base)  Pb_Thermohydraulique_Turbulent_QC
  */

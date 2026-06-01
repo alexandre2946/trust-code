@@ -17,7 +17,7 @@
 #define Portance_interfaciale_Tomiyama_included
 #include <Portance_interfaciale_base.h>
 
-/*! @brief classe Portance_interfaciale_Tomiyama coefficients de portance interfaciale d'un ecoulement a bulles deformables
+/*! @brief Interfacial lift coefficients for a deformable bubbly flow (Tomiyama model).
  *
  *
  *
@@ -30,7 +30,7 @@ public:
   void coefficient(const input_t& input, output_t& output) const override;
 protected:
   double g_=9.81;
-  int n_l = -1; //phase liquide
+  int n_l = -1; //liquid phase
 
 };
 

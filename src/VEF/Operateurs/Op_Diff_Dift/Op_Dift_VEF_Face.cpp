@@ -23,7 +23,7 @@ Implemente_instanciable_sans_constructeur(Op_Dift_VEF_Face, "Op_Dift_VEF_P1NC", 
 
 Op_Dift_VEF_Face::Op_Dift_VEF_Face()
 {
-  declare_support_masse_volumique(1); // pour FT ... BOF
+  declare_support_masse_volumique(1); // for FT ... BOF
 }
 
 Sortie& Op_Dift_VEF_Face::printOn(Sortie& s) const { return s << que_suis_je(); }
@@ -32,20 +32,20 @@ Entree& Op_Dift_VEF_Face::readOn(Entree& s) { return s; }
 
 DoubleTab& Op_Dift_VEF_Face::ajouter(const DoubleTab& inconnue_org, DoubleTab& resu) const
 {
-  remplir_nu(nu_); // On remplit le tableau nu car ajouter peut se faire avant le premier pas de temps
+  remplir_nu(nu_); // Fill the nu array because ajouter may be called before the first time step
 
   const DoubleTab& nu_turb = diffusivite_turbulente().valeurs();
   DoubleTrav nu, nu_turb_m, tab_inconnue;
   const int nb_comp = resu.line_size();
 
-  // On dimensionne et initialise le tableau des bilans de flux:
+  // Size and initialize the flux balance array:
   flux_bords_.resize(le_dom_vef->nb_faces_bord(), nb_comp);
   flux_bords_ = 0.;
 
   int marq = phi_psi_diffuse(equation());
   const DoubleVect& porosite_face = equation().milieu().porosite_face(), &porosite_elem = equation().milieu().porosite_elem();
 
-  // soit on a div(phi nu grad inco) OU on a div(nu grad phi inco) : cela depend si on diffuse phi_psi ou psi
+  // either div(phi nu grad inco) or div(nu grad phi inco): depending on whether phi_psi or psi is diffused
   modif_par_porosite_si_flag(nu_, nu, !marq, porosite_elem);
   modif_par_porosite_si_flag(nu_turb, nu_turb_m, !marq, porosite_elem);
   const DoubleTab& inconnue = modif_par_porosite_si_flag(inconnue_org, tab_inconnue, marq, porosite_face);
@@ -79,7 +79,7 @@ DoubleTab& Op_Dift_VEF_Face::ajouter(const DoubleTab& inconnue_org, DoubleTab& r
 void Op_Dift_VEF_Face::contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& matrice) const
 {
   modifier_matrice_pour_periodique_avant_contribuer(matrice, equation());
-  remplir_nu(nu_); // On remplit le tableau nu car l'assemblage d'une matrice avec ajouter_contribution peut se faire avant le premier pas de temps
+  remplir_nu(nu_); // Fill the nu array because matrix assembly with ajouter_contribution may be performed before the first time step
 
   const DoubleTab& nu_turb_ = diffusivite_turbulente().valeurs();
   DoubleTrav nu, nu_turb;
@@ -87,7 +87,7 @@ void Op_Dift_VEF_Face::contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& m
   int marq = phi_psi_diffuse(equation());
   const DoubleVect& porosite_elem = equation().milieu().porosite_elem();
 
-  // soit on a div(phi nu grad inco) OU on a div(nu grad phi inco) : cela depend si on diffuse phi_psi ou psi
+  // either div(phi nu grad inco) or div(nu grad phi inco): depending on whether phi_psi or psi is diffused
   modif_par_porosite_si_flag(nu_, nu, !marq, porosite_elem);
   modif_par_porosite_si_flag(nu_turb_, nu_turb, !marq, porosite_elem);
 
@@ -109,7 +109,7 @@ void Op_Dift_VEF_Face::contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& m
   modifier_matrice_pour_periodique_apres_contribuer(matrice, equation());
 }
 
-// bientot a la poubelle// bientot a la poubelle
+// to be removed soon// to be removed soon
 void Op_Dift_VEF_Face::contribuer_au_second_membre(DoubleTab& resu) const
 {
   const Domaine_Cl_VEF& domaine_Cl_VEF = domaine_cl_vef();
@@ -118,7 +118,7 @@ void Op_Dift_VEF_Face::contribuer_au_second_membre(DoubleTab& resu) const
   const DoubleTab& face_normale = domaine_VEF.face_normales();
   const int nb_faces = domaine_VEF.nb_faces(), nb_comp = resu.line_size();
 
-  // On traite les faces bord
+  // Process boundary faces
   if (equation().inconnue().nature_du_champ() == vectoriel)
     {
       const DoubleTab& nu_turb = diffusivite_turbulente().valeurs(), &inconnue_org = equation().inconnue().valeurs();
@@ -128,7 +128,7 @@ void Op_Dift_VEF_Face::contribuer_au_second_membre(DoubleTab& resu) const
 
       const DoubleVect& porosite_face = equation().milieu().porosite_face(), &porosite_elem = equation().milieu().porosite_elem();
 
-      // soit on a div(phi nu grad inco) OU on a div(nu grad phi inco) : cela depend si on diffuse phi_psi ou psi
+      // either div(phi nu grad inco) or div(nu grad phi inco): depending on whether phi_psi or psi is diffused
       modif_par_porosite_si_flag(nu_, nu, !marq, porosite_elem);
       modif_par_porosite_si_flag(nu_turb, nu_turb_m, !marq, porosite_elem);
 

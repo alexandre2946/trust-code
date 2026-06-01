@@ -19,7 +19,7 @@
 #include <Frottement_interfacial_base.h>
 #include <Correlation_base.h>
 
-/*! @brief classe Frottement_interfacial_Garnier coefficients de frottement interfacial d'un ecoulement a bulles en prennant en compte la densite
+/*! @brief Garnier interfacial friction correlation for bubbly flows, accounting for density.
  *
  */
 class Frottement_interfacial_Garnier : public Frottement_interfacial_base

@@ -22,10 +22,10 @@ Implemente_instanciable(Dilate,"Dilate",Interprete_geometrique_base);
 // XD attr alpha floattant alpha REQ Value of dilatation coefficient.
 
 
-/*! @brief Simple appel a: Interprete::printOn(Sortie&)
+/*! @brief Simple call to: Interprete::printOn(Sortie&)
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Dilate::printOn(Sortie& os) const
 {
@@ -33,23 +33,23 @@ Sortie& Dilate::printOn(Sortie& os) const
 }
 
 
-/*! @brief Simple appel a: Interprete::readOn(Entree&)
+/*! @brief Simple call to: Interprete::readOn(Entree&)
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
  */
 Entree& Dilate::readOn(Entree& is)
 {
   return Interprete::readOn(is);
 }
 
-/*! @brief Fonction principale de l'interprete Dilate Structure du jeu de donnee (en dimension 2) :
+/*! @brief Main function of the Dilate interpreter Data set structure (in dimension 2):
  *
  *     Dilate dom alpha
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree
- * @throws l'objet a mailler n'est pas du type Domaine
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the input stream
+ * @throws the object to be meshed is not of Domaine type
  */
 Entree& Dilate::interpreter_(Entree& is)
 {

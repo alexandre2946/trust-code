@@ -21,7 +21,7 @@
 #include <math.h>
 #include <vector>
 
-/* produit matricel et transposee de DoubleTab */
+/* matrix product and transpose of DoubleTab */
 static inline DoubleTab prod(DoubleTab a, DoubleTab b)
 {
   int i, j, k, m = a.dimension(0), n = a.dimension(1), p = b.dimension(1);
@@ -68,9 +68,9 @@ static inline double kersol(const DoubleTab& M, DoubleTab& b, double eps, Double
   for (i = 0, nk = n; i < k && S(i) > eps * S(0); i++) nk--;
   if (P) P->resize(n, nk);
   for (i = 0, jP = -1; i < n; i++)
-    if (i < k && S(i) > eps * S(0)) iS(i, i) = 1 / S(i); //terme diagonal de iS
+    if (i < k && S(i) > eps * S(0)) iS(i, i) = 1 / S(i); //diagonal term of iS
     else if (P)
-      for (iP = 0, jP++; iP < n; iP++) (*P)(iP, jP) = Vt(i, iP); //colonne de V -> colonne de P
+      for (iP = 0, jP++; iP < n; iP++) (*P)(iP, jP) = Vt(i, iP); //column of V -> column of P
   x = prod(transp(Vt), prod(iS, prod(transp(U), b)));
   DoubleTab res = prod(M, x);
   for (i = 0; i < m; i++) res2 += std::pow(res(i, 0) - b(i, 0), 2);

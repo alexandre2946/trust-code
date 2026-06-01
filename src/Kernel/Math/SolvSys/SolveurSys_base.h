@@ -49,7 +49,7 @@ public :
   bool nouvelle_matrice() const { return nouvelle_matrice_; }
   void fixer_nouvelle_matrice(bool i) { nouvelle_matrice_ = i; }
 
-  // Par defaut tous les solveurs acceptent les Matrice_Morse_Sym (surcharger sinon)
+  // By default all solvers accept Matrice_Morse_Sym (override otherwise)
   virtual int supporte_matrice_morse_sym() { return 1; };
 
   // Call this to know if "b" (right hand side) must have an updated virtual space before calling resoudre(m, b, x)
@@ -72,21 +72,21 @@ public :
   inline void nommer(const Nom& nom) override { nom_ = nom; };
 
 protected :
-  bool nouvelle_matrice_ = true; // Drapeau pour savoir si un stockage ou une factorisation est a refaire
+  bool nouvelle_matrice_ = true; // Flag indicating whether storage or factorisation must be recomputed
 
-  // Valeur pour savoir si une matrice est a sauver (entier car plusieurs formats possibles: 1: TRUST 2: PETSc format 3: Matrix Market)
-  // ATTENTION: pas un flag au sens de Param::ajouter_flag !!!
+  // Whether to save the matrix (integer because multiple formats are possible: 1: TRUST 2: PETSc format 3: Matrix Market)
+  // WARNING: not a flag in the Param::ajouter_flag sense !!!
   int save_matrice_ = 0;
 
-  bool return_on_error_ = false; //drapeau pour savoir si on doit faire exit() ou renvoyer -1 si resoudre_
+  bool return_on_error_ = false; // Flag indicating whether to call exit() or return -1 if resoudre_ fails
 
-  // Pour lecture/stockage des parametres des solveurs:
+  // For reading/storing solver parameters:
   Nom chaine_lue_;
   void lecture(Entree&);
 private:
   Nom nom_;
-  bool read_matrix_ = false; // Drapeau pour savoir si une matrice est a lire
-  int limpr_ = 0;            // Drapeau pour impression ou non de la convergence du solveur
+  bool read_matrix_ = false; // Flag indicating whether a matrix should be read from file
+  int limpr_ = 0;            // Flag to enable or disable printing of solver convergence
   int schema_temps_limpr_ = 1; // Authorization printing flag set by the time scheme
   bool echange_ev_resu_ = true;  // User set flag to tell if the solver must do echange_espace_virtuel() on the result.
   bool reuse_preconditioner_ = false; // Flag to reuse previous preconditioner (default false)

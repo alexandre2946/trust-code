@@ -18,9 +18,9 @@
 
 
 
-/*! @brief class Tetra_homogene Realise un maillage en decoupant chaque pave en 40 tetraedres
+/*! @brief class Tetra_homogene Creates a mesh by splitting each block into 40 tetrahedra.
  *
- *  Le maillage obtenu n'a pas de directions preferentielles
+ *  The resulting mesh has no preferred directions.
  *
  *
  * @sa Interprete

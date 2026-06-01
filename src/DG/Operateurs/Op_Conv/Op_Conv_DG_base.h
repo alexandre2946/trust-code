@@ -46,7 +46,7 @@ protected:
   mutable SFichier Flux, Flux_moment, Flux_sum;
 };
 
-/*! @brief calcule la contribution de la convection, la range dans resu renvoie resu
+/*! @brief Computes the convection contribution and stores it in resu, then returns resu.
  *
  */
 inline DoubleTab& Op_Conv_DG_base::calculer(const DoubleTab& inco, DoubleTab& resu) const

@@ -74,7 +74,7 @@ Entree& Flux_radiatif_base::readOn(Entree& is)
 void Flux_radiatif_base::completer()
 {
   Neumann_paroi::completer();
-  // On type le champ_front flux_radiatif_ qui est associe a la condition a la limite
+  // Type the champ_front flux_radiatif_ associated with the boundary condition
   const Front_VF& front_vf = ref_cast(Front_VF, le_champ_front->frontiere_dis());
   int nb_comp = 1;
 
@@ -88,7 +88,7 @@ void Flux_radiatif_base::completer()
   emissivite_->associer_fr_dis_base(front_vf);
 }
 
-/*! @brief Renvoie la valeur de flux imposes a la paroi radiative
+/*! @brief Returns the imposed flux value at the radiative wall.
  *
  */
 double Flux_radiatif_base::flux_impose(int i) const

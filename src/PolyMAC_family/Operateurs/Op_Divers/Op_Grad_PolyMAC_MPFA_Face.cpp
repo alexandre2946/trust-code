@@ -45,7 +45,7 @@ void Op_Grad_PolyMAC_MPFA_Face::completer()
 
   const Domaine_PolyMAC_MPFA& domaine = ref_cast(Domaine_PolyMAC_MPFA, ref_domaine.valeur());
 
-  /* besoin d'un joint de 1 */
+  /* requires a ghost layer of width 1 */
   if (domaine.domaine().nb_joints() && domaine.domaine().joint(0).epaisseur() < 1)
     {
       Cerr << "Op_Grad_PolyMAC_MPFA_Face : largeur de joint insuffisante (minimum 1)!" << finl;
@@ -68,7 +68,7 @@ void Op_Grad_PolyMAC_MPFA_Face::update_grad(int full_stencil) const
   const int M = press.line_size();
   double t_past = equation().inconnue().recuperer_temps_passe();
   if (!domaine.domaine().mesh_update_required() && !full_stencil && (alp ? (last_gradp_ >= t_past) : (last_gradp_ != -DBL_MAX)))
-    return; //deja calcule a ce temps -> rien a faire
+    return; //already computed at this time step, nothing to do
 
   /* gradient */
   domaine.fgrad(M, 1, ref_dcl->les_conditions_limites(), ch.fcl(), nullptr, nullptr, 1, full_stencil, fgrad_d, fgrad_e, fgrad_c);
@@ -85,16 +85,16 @@ void Op_Grad_PolyMAC_MPFA_Face::dimensionner_blocs(matrices_t matrices, const ta
   const int ne_tot = domaine.nb_elem_tot(), nf_tot = domaine.nb_faces_tot(), D = dimension, N = ch.valeurs().line_size(),
             M = (le_champ_inco ? le_champ_inco->valeurs() : ref_cast(Navier_Stokes_std, equation()).pression().valeurs()).line_size();
 
-  update_grad(domaine.domaine().deformable() || sub_type(Pb_Multiphase, equation().probleme())); //provoque le calcul du gradient
+  update_grad(domaine.domaine().deformable() || sub_type(Pb_Multiphase, equation().probleme())); //triggers gradient computation
 
-  Stencil sten_p(0, 2), sten_v(0, 2); //stencils (NS, pression), (NS, vitesse)
+  Stencil sten_p(0, 2), sten_v(0, 2); //stencils (NS, pressure), (NS, velocity)
 
   const std::string& nom_inc = ch.le_nom().getString();
   Matrice_Morse *mat_p = matrices["pression"],
                  *mat_v = !semi_impl.count(nom_inc) && matrices.count(nom_inc) ? matrices.at(nom_inc) : nullptr,
                   mat2_p, mat2_v;
 
-  std::map<int, std::set<int>> dpb_v, dgp_pb; //dependances vitesses -(dpb_v)-> pressions au bord -(dgp_pb)-> gradient
+  std::map<int, std::set<int>> dpb_v, dgp_pb; //dependencies: velocities -(dpb_v)-> boundary pressures -(dgp_pb)-> gradient
 
   if (mat_v)
     for (int f = 0; f < domaine.nb_faces_tot(); f++)
@@ -116,12 +116,12 @@ void Op_Grad_PolyMAC_MPFA_Face::dimensionner_blocs(matrices_t matrices, const ta
             }
         }
 
-  /* aux faces : gradient aux faces + remplissage de dgp_pb */
-  std::vector<std::set<int>> dfgpf(N); //dfgpf[n][idx] = coeff : dependance en les pfb variables (presents dans dpf_ve)
+  /* at faces: gradient at faces + filling of dgp_pb */
+  std::vector<std::set<int>> dfgpf(N); //dfgpf[n][idx] = coeff: dependency on pfb variables (present in dpf_ve)
   for (int f = 0; f < domaine.nb_faces_tot(); f++)
     {
       /* |f| grad p */
-      for (int i = fgrad_d(f); i < fgrad_d(f + 1); i++) //face interne -> flux multipoints
+      for (int i = fgrad_d(f); i < fgrad_d(f + 1); i++) //internal face -> multi-point flux
         {
           const int e = fgrad_e(i);
           int m = 0;
@@ -144,11 +144,11 @@ void Op_Grad_PolyMAC_MPFA_Face::dimensionner_blocs(matrices_t matrices, const ta
               dgp_pb[N * f + n].insert(M * c + m);
         }
 
-      /* elems amont/aval -> ve(e) * phi grad p */
+      /* upwind/downwind elements -> ve(e) * phi grad p */
       for (int i = 0; i < 2; i++)
         {
           const int e = f_e(f, i);
-          if (e < 0) continue; // elem virt
+          if (e < 0) continue; // virtual element
 
           if (e < domaine.nb_elem())
             for (int d = 0; d < D; d++)
@@ -165,7 +165,7 @@ void Op_Grad_PolyMAC_MPFA_Face::dimensionner_blocs(matrices_t matrices, const ta
         dfgpf[n].clear();
     }
 
-  /* aux elements : gradient aux elems */
+  /* at elements: gradient at elements */
   for (int e = 0; e < domaine.nb_elem(); e++)
     for (int i = 0; i < e_f.dimension(1); i++)
       {
@@ -186,13 +186,13 @@ void Op_Grad_PolyMAC_MPFA_Face::dimensionner_blocs(matrices_t matrices, const ta
           }
       }
 
-  /* sten_v en une ligne */
+  /* sten_v in a single row */
   for (auto &i_sc : dgp_pb)
     for (auto &c : i_sc.second)
       for (auto &k : dpb_v.at(c))
         sten_v.append_line(i_sc.first, k);
 
-  /* allocation / remplissage */
+  /* allocation / filling */
   tableau_trier_retirer_doublons(sten_p);
   tableau_trier_retirer_doublons(sten_v);
 
@@ -237,29 +237,29 @@ void Op_Grad_PolyMAC_MPFA_Face::ajouter_blocs(matrices_t matrices, DoubleTab& se
   Matrice_Morse *mat_p = !semi_impl.count("pression") && matrices.count("pression") ? matrices.at("pression") : nullptr, *mat_v =
                            !semi_impl.count(nom_inc) && matrices.count(nom_inc) ? matrices.at(nom_inc) : nullptr;
 
-  DoubleTrav gb(nf_tot, M), gf(N), a_v(N); //-grad p aux bords , (grad p)_f, produit alpha * vol
+  DoubleTrav gb(nf_tot, M), gf(N), a_v(N); //-grad p at boundaries, (grad p)_f, alpha * vol product
 
-  //std::map<int, std::map<int, double>> dgp_gb, dgb_v; //dependances vitesses -(dgb_v)-> -grad p aux bords -(dgp_gb)-> grad p ailleurs
+  //std::map<int, std::map<int, double>> dgp_gb, dgb_v; //velocity dependencies -(dgb_v)-> -grad p at boundaries -(dgp_gb)-> grad p elsewhere
   dgp_gb_.clear();
   dgb_v_.clear();
 
   for (int f = 0; f < domaine.nb_faces_tot(); f++)
-    if (fs(f) > 0 && fcl(f, 0) > 1)  //Dirichlet/Symetrie : pression du voisin + correction en regardant l'eq de NS dans celui-ci
+    if (fs(f) > 0 && fcl(f, 0) > 1)  //Dirichlet/Symmetry: neighbor pressure + correction from the NS equation in that cell
       {
         const int e = f_e(f, 0);
         int m = 0;
         for (int n = 0; n < N; n++, m += (M > 1))
           {
             double fac = 1. / (fs(f) * ve(e));
-            std::map<int, double> *dv = mat_v ? &dgb_v_[M * f + m] : nullptr; //dv[indice dans mat_NS] = coeff
+            std::map<int, double> *dv = mat_v ? &dgb_v_[M * f + m] : nullptr; //dv[index in mat_NS] = coeff
             int i = nf_tot + D * e;
             for (int d = 0; d < D; d++, i++)
-              if (std::fabs(nf(f, d)) > 1e-6 * fs(f)) //boucle sur la direction : i est l'indice dans mat_v
+              if (std::fabs(nf(f, d)) > 1e-6 * fs(f)) //loop over directions: i is the index in mat_v
                 {
-                  gb(f, m) += fac * nf(f, d) * secmem(i, n); //partie constante -> directement dans pfb
+                  gb(f, m) += fac * nf(f, d) * secmem(i, n); //constant part -> directly into pfb
 
                   if (dv)
-                    for (auto j = mat_v->get_tab1()(N * i + n) - 1; j < mat_v->get_tab1()(N * i + n + 1) - 1; j++) //partie lineaire -> dans dgb_v
+                    for (auto j = mat_v->get_tab1()(N * i + n) - 1; j < mat_v->get_tab1()(N * i + n + 1) - 1; j++) //linear part -> into dgb_v
                       if (mat_v->get_coeff()(j))
                         (*dv)[mat_v->get_tab2()(j) - 1] -= fac * nf(f, d) * mat_v->get_coeff()(j);
                 }
@@ -270,8 +270,8 @@ void Op_Grad_PolyMAC_MPFA_Face::ajouter_blocs(matrices_t matrices, DoubleTab& se
     if (fgrad_d(f + 1) == fgrad_d(f))
       abort();
 
-  /* aux faces */
-  //std::vector<std::map<int, double>> dgf_pe(N), dgf_gb(N); //dependance de [grad p]_f en les pressions aux elements, en les grad p aux faces de bord
+  /* at faces */
+  //std::vector<std::map<int, double>> dgf_pe(N), dgf_gb(N); //dependence of [grad p]_f on element pressures and on grad p at boundary faces
   if (dgf_pe_.size()==0)
     {
       dgf_pe_.resize(N);
@@ -334,7 +334,7 @@ void Op_Grad_PolyMAC_MPFA_Face::ajouter_blocs(matrices_t matrices, DoubleTab& se
             }
         }
 
-      /* elems amont/aval -> ve(e) * phi grad p */
+      /* upwind/downwind elements -> ve(e) * phi grad p */
       for (int i = 0; i < 2; i++)
         {
           const int e = f_e(f, i);
@@ -361,7 +361,7 @@ void Op_Grad_PolyMAC_MPFA_Face::ajouter_blocs(matrices_t matrices, DoubleTab& se
         }
     }
 
-  /* correction de mat_NS : en une seule ligne! */
+  /* correction of mat_NS: in a single line! */
   if (mat_v)
     for (auto &i_jc : dgp_gb_)
       for (auto &j_c : i_jc.second)

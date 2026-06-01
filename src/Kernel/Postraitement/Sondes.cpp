@@ -23,15 +23,15 @@ Implemente_instanciable(Sondes, "Sondes|Probes", LIST(OWN_PTR(Sonde)));
 
 Sortie& Sondes::printOn(Sortie& s ) const { return s ; }
 
-/*! @brief Lit une liste de sondes a partir d'un flot d'entree Format:
+/*! @brief Reads a list of probes from an input stream. Format:
  *
  *     {
- *       [LIRE UNE SONDE AUTANT DE FOIS QUE NECESSAIRE]
+ *       [READ A PROBE AS MANY TIMES AS NEEDED]
  *     }
  *
- * @param (Entree& s) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws accolade ouvrante attendue
+ * @param s an input stream
+ * @return the modified input stream
+ * @throws opening brace expected
  */
 Entree& Sondes::readOn(Entree& s )
 {
@@ -101,7 +101,7 @@ void Sondes::completer()
   for (auto &itr : *this) itr->completer();
 }
 
-/*! @brief Effectue le postraitement sur chacune des sondes de la liste.
+/*! @brief Performs post-processing on each probe in the list.
  *
  */
 void Sondes::postraiter()
@@ -129,7 +129,7 @@ OBS_PTR(Champ_base) Sondes::get_from_cache(OBS_PTR(Champ_Generique_base)& mon_ch
       sourceList.add(ma_source);
       espaceStockageList.add(espace_stockage);
       sourceNoms.add(nom_champ_lu_);
-      // Voir Champ_Generique_base pour la definition de l'espace stockage
+      // See Champ_Generique_base for the definition of the storage space
       return espace_stockage ? espaceStockageList.dernier().valeur() : ma_source;
     }
   else if (espaceStockageList(num))
@@ -138,10 +138,10 @@ OBS_PTR(Champ_base) Sondes::get_from_cache(OBS_PTR(Champ_Generique_base)& mon_ch
     return sourceList(num);
 }
 
-/*! @brief Effectue une mise a jour en temps de chacune des sondes de la liste.
+/*! @brief Updates each probe in the list in time.
  *
- * @param (double temps) le temps de mise a jour
- * @param (double tinit) le temps initial des sondes
+ * @param temps the update time
+ * @param tinit the initial time of the probes
  */
 void Sondes::mettre_a_jour(double temps, double tinit)
 {
@@ -150,7 +150,7 @@ void Sondes::mettre_a_jour(double temps, double tinit)
   clear_cache();
 }
 
-/*! @brief Associe un postraitement a la liste des sondes.
+/*! @brief Associates a post-processing object with the probe list.
  *
  */
 void Sondes::associer_post(const Postraitement& post)
@@ -158,7 +158,7 @@ void Sondes::associer_post(const Postraitement& post)
   mon_post = post;
 }
 
-/*! @brief Modifie le parametrage des sondes mobiles
+/*! @brief Modifies the update-positions setting for mobile probes.
  *
  */
 void Sondes::set_update_positions(bool update_positions_)
@@ -166,8 +166,9 @@ void Sondes::set_update_positions(bool update_positions_)
   update_positions=update_positions_;
 }
 
-/*! @brief Renvoie le parametrage des sondes mobiles
+/*! @brief Returns the update-positions setting for mobile probes.
  *
+ * @return true if probe positions are updated at each time step, false otherwise.
  */
 bool Sondes::get_update_positions()
 {

@@ -44,7 +44,7 @@ inline SpanD Tc_(const SpanD& T)
   return T;
 }
 
-// XXX : Elie Saikali : ATTENTION A L'ORDRE SINON RIEN VA MARCHER
+// XXX : Elie Saikali : WARNING: ORDER MATTERS — changing it will break everything
 enum class Loi_en_T
 {
   RHO, RHO_DP, RHO_DT,
@@ -53,7 +53,7 @@ enum class Loi_en_T
   MU, MU_DP, MU_DT,
   LAMBDA, LAMBDA_DP, LAMBDA_DT,
   SIGMA, SIGMA_DP, SIGMA_DT,
-  BETA /* pour l'incompressible si besoin */
+  BETA /* for the incompressible case when needed */
 };
 
 static constexpr std::array<PairCharArray, 19> EOS_prop_en_T =
@@ -77,7 +77,7 @@ enum class Loi_en_h
   MU, MU_DP, MU_DH,
   LAMBDA, LAMBDA_DP, LAMBDA_DH,
   SIGMA, SIGMA_DP, SIGMA_DH,
-  BETA /* pour l'incompressible si besoin */
+  BETA /* for the incompressible case when needed */
 };
 
 static constexpr std::array<PairCharArray, 19> EOS_prop_en_h =
@@ -103,7 +103,7 @@ enum class SAT
   RHOV_SAT, RHOV_SAT_DP,
   CPL_SAT, CPL_SAT_DP,
   CPV_SAT, CPV_SAT_DP,
-  SIGMA, SIGMA_DP, /* pour coco seulement */
+  SIGMA, SIGMA_DP, /* for coco only */
   LV_SAT, LV_SAT_DP,
   LAMBDA, MU
 };
@@ -119,7 +119,7 @@ static constexpr std::array<PairCharArray, 18> EOS_prop_sat =
     { "rhovsat", "rho_v_sat" }, { "drhovsatdp", "d_rho_v_sat_d_p" },
     { "cplsat", "cp_l_sat" }, { "dcplsatdp", "d_cp_l_sat_d_p" },
     { "cpvsat", "cp_v_sat" }, {  "dcpvsatdp", "d_cp_v_sat_d_p" },
-    { "sigma", "sigma" }, { "dsigmadp", "d_sigma_d_p_h" } /* on utilise h la */
+    { "sigma", "sigma" }, { "dsigmadp", "d_sigma_d_p_h" } /* using h here */
   }
 };
 

@@ -19,15 +19,14 @@
 #include <Eq_rayo_semi_transp.h>
 #include <Probleme_base.h>
 
-/*! @brief Le Pb_rayo_semi_transp est un Probleme_base qui a 4 particularites : * Son equation doit etre typee en fonction de la dicretisation.
+/*! @brief Semi-transparent radiation problem. Pb_rayo_semi_transp is a Probleme_base with 4 specific features:
  *
- *     Cela impose de differer certaines initialisations jusqu'a
- *     connaitre la discretisation utilisee.
- *   * Il partage son domaine avec un probleme de type hydraulique
- *   * Il n'y a qu'une seule valeur temporelle (futur=present).
- *     Il faudrait en faire un probleme independant du temps.
- *   * Il conserve une ref sur le probleme hydraulique. Cette ref est utilisee de
- *     maniere intensive.
+ *   * Its equation must be typed according to the discretisation.
+ *     This requires deferring certain initialisations until the discretisation is known.
+ *   * It shares its domain with a hydraulic-type problem.
+ *   * There is only one time value (future = present).
+ *     It should ideally be made time-independent.
+ *   * It holds a reference to the hydraulic problem, used extensively.
  *
  *
  * @sa Pb_Couple_rayo_semi_transp Eq_rayo_semi_transp
@@ -53,7 +52,7 @@ public:
 
   double calculer_pas_de_temps() const override  {  return DMAXFLOAT;  }
 
-  // Cette methode ne doivent pas servir : on passe par l'interface de Problem
+  // This method should not be used: use the Problem interface instead
   void mettre_a_jour(double temps) override { Process::exit(); }
 
   void preparer_calcul() override;

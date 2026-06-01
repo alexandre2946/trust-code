@@ -21,11 +21,10 @@
 
 /*! @brief class Op_Conv_Centre_old_VEF_Face
  *
- *   Cette classe represente l'operateur de convection associe a une equation de
- *   transport d'un scalaire.
- *   La discretisation est VEF
- *   Le champ convecte est scalaire ou vecteur de type Champ_Inc_Base (P1NC et Q1NC)
- *   Le schema de convection est du type Centre
+ * @brief This class represents the convection operator associated with a scalar transport equation.
+ *   The discretization is VEF.
+ *   The convected field is scalar or vector of type Champ_Inc_Base (P1NC and Q1NC).
+ *   The convection scheme is of Centre type.
  *
  *
  * @sa Operateur_Conv_base

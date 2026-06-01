@@ -29,13 +29,13 @@ Implemente_instanciable(Champ_front_lu,"Champ_front_lu",Ch_front_var_stationnair
 // XD attr file chaine file REQ path for the read file
 
 
-/*! @brief Imprime le champ sur flot de sortie.
+/*! @brief Print the field to an output stream.
  *
- * Imprime la taille du champ et la valeur (constante) sur
- *     la frontiere.
+ * Prints the field size and the (constant) value on
+ *     the boundary.
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Champ_front_lu::printOn(Sortie& os) const
 {
@@ -47,13 +47,13 @@ Sortie& Champ_front_lu::printOn(Sortie& os) const
 }
 
 
-/*! @brief Lit le champ a partir d'un flot d'entree.
+/*! @brief Read the field from an input stream.
  *
  * Format:
  *       Champ_front_lu nb_compo vrel_1 ... [vrel_i]
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree& is) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree& is) the modified input stream
  */
 Entree& Champ_front_lu::readOn(Entree& is)
 {
@@ -69,7 +69,7 @@ Entree& Champ_front_lu::readOn(Entree& is)
   dim=lire_dimension(is,que_suis_je());
   fixer_nb_comp(dim);
   is >> nom_fic;
-  // Lecture des valeurs dans le fichier fic
+  // Reading values from file fic
   return is;
 }
 
@@ -129,7 +129,7 @@ int Champ_front_lu::initialiser(double temps, const Champ_Inc_base& inco)
   int nb_val_lues;
   fic >> nb_val_lues;
 
-  // Verification (il se peut que le fichier contienne PLUS de faces que la frontiere, exemple en periodique)
+  // Verification (the file may contain MORE faces than the boundary, e.g. in periodic cases)
   trustIdType nb_faces_tot = mp_sum(nb_faces);
   if ((trustIdType)nb_val_lues<nb_faces_tot)
     {
@@ -138,11 +138,11 @@ int Champ_front_lu::initialiser(double temps, const Champ_Inc_base& inco)
       exit();
     }
 
-  // PQ 20/06/06 : pour permettre une recherche "rapide" des faces
-  //                 on s'appuie sur mon_dom.chercher_elements(x,y,z)
-  //                 (methode inspiree de EcritureLectureSpecial::lecture_special)
+  // PQ 20/06/06 : to enable a "fast" search of faces
+  //               we rely on mon_dom.chercher_elements(x,y,z)
+  //               (method inspired by EcritureLectureSpecial::lecture_special)
   //
-  //                Restriction --> champs aux faces
+  //               Restriction --> face fields only
 
   int nb_elems = domaine.nb_elem();
   int nbfacelem=domaine.nb_faces_elem();
@@ -173,12 +173,12 @@ int Champ_front_lu::initialiser(double temps, const Champ_Inc_base& inco)
       y=point[1];
       if (Objet_U::dimension==3) z=point[2];
       int Case=-1;
-      // Premier algorithme (le plus rapide) cherchant l'element
-      // contenant le centre de gravite de la face
+      // First algorithm (the fastest) searching for the element
+      // containing the face centre of gravity
       int num_elem=domaine.chercher_elements(x,y,z);
       if ((num_elem!=-1) && (num_elem<nb_elems))
         {
-          // On cherche la face de l'element
+          // Find the face of the element
           for (int fac=0; fac<nbfacelem; fac++)
             {
               int face=elem_faces(num_elem,fac);
@@ -196,8 +196,8 @@ int Champ_front_lu::initialiser(double temps, const Champ_Inc_base& inco)
         }
       else
         {
-          // Deuxieme algorithme (plus lent) utilise dans le cas ou le point se trouve a l'exterieur du domaine
-          // Dans ce cas la, on parcours les faces de la frontiere
+          // Second algorithm (slower) used when the point is outside the domain
+          // In that case, we scan the faces of the boundary
           for (int face=0; face<nb_faces; face++)
             if (compteur[face] == 0)
               {
@@ -211,7 +211,7 @@ int Champ_front_lu::initialiser(double temps, const Champ_Inc_base& inco)
                   }
               }
         }
-      // Face trouvee
+      // Face found
       if (Case!=-1)
         {
           int face_loc=Case-ndeb;
@@ -227,7 +227,7 @@ int Champ_front_lu::initialiser(double temps, const Champ_Inc_base& inco)
     }
   Cerr<<"\rProcess "<<Process::me()<<" has read 100% of values"<<finl;
 
-  // On verifie que toutes les faces de la frontiere ont ete affectees
+  // We verify that all faces of the boundary have been assigned
   bool err=false;
   for (int face=0; face<nb_faces; face++)
     if (compteur[face] != 1)
@@ -248,9 +248,9 @@ int Champ_front_lu::initialiser(double temps, const Champ_Inc_base& inco)
   return 1;
 }
 
-/*! @brief Renvoie le format du fichier lu
+/*! @brief Returns the format of the read file
  *
- * @param (Nom name) un flot d'entree
+ * @param (Nom name) an input stream
  * @return (int)
  */
 int Champ_front_lu::is_bin(Nom name)

@@ -20,10 +20,11 @@
 #include <Op_Diff_PolyMAC_MPFA_Elem.h>
 #include <Domaine_forward.h>
 
-/*! @brief classe : Echange_contact_PolyMAC_MPFA Outre le champ_front representant la temperature de paroi,
+/*! @brief class : Echange_contact_PolyMAC_MPFA
  *
- *   cette classe possede un autre champ_front avec autant de valeurs
- *   temporelles qui represente la temperature dans l'autre probleme.
+ *  @brief In addition to the champ_front representing the wall temperature,
+ *   this class holds another champ_front with as many time values
+ *   that represents the temperature in the other problem.
  *
  */
 class Echange_contact_PolyMAC_MPFA  : public Echange_contact_PolyMAC_HFV
@@ -32,11 +33,11 @@ class Echange_contact_PolyMAC_MPFA  : public Echange_contact_PolyMAC_HFV
 public :
   void init_op() const;
 
-  mutable OBS_PTR(Op_Diff_PolyMAC_MPFA_Elem) diff, o_diff; //operateurs de diffusion de chaque cote
+  mutable OBS_PTR(Op_Diff_PolyMAC_MPFA_Elem) diff, o_diff; //diffusion operators on each side
 
-  /* faces, sommets de l'autre cote de la frontiere */
-  void init_fs_dist() const; //initialisation de f_dist, s_dist
-  mutable std::map<int, int> s_dist; //s_dist[sommet de ce cote] = sommet de l'autre cote
+  /* faces and vertices on the other side of the boundary */
+  void init_fs_dist() const; //initialization of f_dist and s_dist
+  mutable std::map<int, int> s_dist; //s_dist[vertex on this side] = vertex on the other side
   mutable int fs_dist_init_ = 0;
 };
 

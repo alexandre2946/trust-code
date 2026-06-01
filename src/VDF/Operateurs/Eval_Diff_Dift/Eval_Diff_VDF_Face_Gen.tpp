@@ -165,10 +165,10 @@ Eval_Diff_VDF_Face_Gen<DERIVED_T>::flux_arete(const DoubleTab& inco, const Doubl
           vit_imp = 0.5*(Champ_Face_get_val_imp_face_bord_sym(inco,tps,rang1,ori,la_zcl.valeur())+ Champ_Face_get_val_imp_face_bord_sym(inco,tps,rang2,ori,la_zcl.valeur()));
           coeff = 0.5 * (Champ_Face_coeff_frottement_face_bord(fac1, k, la_zcl.valeur()) + Champ_Face_coeff_frottement_face_bord(fac2, k, la_zcl.valeur()));
         }
-      else if (is_PAR_FL) // On ne sait pas qui de fac1 ou de fac2 est la face de paroi
+      else if (is_PAR_FL) // We don't know which of fac1 or fac2 is the wall face
         {
-          if (est_egal(inco(fac1,k),0)) vit_imp = Champ_Face_get_val_imp_face_bord(tps,rang2,ori,la_zcl.valeur()); // fac1 est la face de paroi
-          else vit_imp = Champ_Face_get_val_imp_face_bord(tps,rang1,ori,la_zcl.valeur()); // fac2 est la face de paroi
+          if (est_egal(inco(fac1,k),0)) vit_imp = Champ_Face_get_val_imp_face_bord(tps,rang2,ori,la_zcl.valeur()); // fac1 is the wall face
+          else vit_imp = Champ_Face_get_val_imp_face_bord(tps,rang1,ori,la_zcl.valeur()); // fac2 is the wall face
         }
       else vit_imp =  0.5*(Champ_Face_get_val_imp_face_bord(tps,rang1,ori,la_zcl.valeur())+Champ_Face_get_val_imp_face_bord(tps,rang2,ori,la_zcl.valeur()));
 

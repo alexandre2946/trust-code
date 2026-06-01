@@ -19,11 +19,10 @@
 #include <Transport_turbulent_base.h>
 #include <TRUSTTab.h>
 
-/*! @brief classe Transport_turbulent_aire_interfaciale Transport turbulent de type aire_interfaciale:
+/*! @brief Turbulent transport of interfacial area, using the closure:
  *
  *     < u'_i theta'> = - nu_t / Pr_t d_i theta = - sigma_t nu_t d_i theta
- *     (l'utilisateur peut donner sigma_t ou Pr_t)
- *
+ *     (the user may supply either sigma_t or Pr_t)
  *
  */
 class Transport_turbulent_aire_interfaciale : public Transport_turbulent_base

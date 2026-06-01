@@ -42,8 +42,9 @@ void Op_Conv_Amont_PolyMAC_CDO_Elem::associer(const Domaine_dis_base& domaine_di
   eval_conv.associer_inconnue(inco);        // Eval_PolyMAC_CDO_Elem::associer_inconnue
 }
 
-/*! @brief associe le champ de vitesse a l'evaluateur
+/*! @brief Associates the velocity field to the evaluator.
  *
+ * @param ch_vit The velocity field to associate (must be of type Champ_Face_PolyMAC_CDO).
  */
 void Op_Conv_Amont_PolyMAC_CDO_Elem::associer_vitesse(const Champ_base& ch_vit)
 {

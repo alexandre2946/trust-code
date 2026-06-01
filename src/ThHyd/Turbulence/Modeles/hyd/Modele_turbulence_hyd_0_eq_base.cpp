@@ -122,10 +122,10 @@ int Modele_turbulence_hyd_0_eq_base::comprend_champ(const Motcle& mot) const
 
 void Modele_turbulence_hyd_0_eq_base::completer()
 {
-  // creation de K_eps_sortie et du fichier med si on a demande ecrire_K_eps
+  // creation of K_eps_sortie and the med file if ecrire_K_eps was requested
   if (fichier_K_eps_sortie_ != Nom())
     {
-      // 1) on cree le fichier med et on postraite le domaine
+      // 1) create the med file and post-process the domain
       const Domaine& dom = mon_equation_->domaine_dis().domaine();
       Ecrire_MED ecr_med(fichier_K_eps_sortie_.nom_me(me()), dom);
       ecr_med.ecrire_domaine(false);
@@ -171,7 +171,7 @@ void Modele_turbulence_hyd_0_eq_base::imprimer(Sortie& os) const
         double temps = mon_equation_->schema_temps().temps_courant();
         K_eps_sortie_->mettre_a_jour(temps);
 
-        //  calcul de K_eps
+        //  compute K_eps
 
         DoubleTab& K_Eps = K_eps_sortie_->valeurs();
         const DoubleTab& visco_turb = la_viscosite_turbulente_->valeurs();
@@ -180,9 +180,9 @@ void Modele_turbulence_hyd_0_eq_base::imprimer(Sortie& os) const
 
         const double Kappa = 0.415;
         double Cmu = CMU;
-        // PQ : 27/06/07 : expressions de k et eps basees sur :
+        // PQ: 27/06/07: expressions for k and eps based on:
         //
-        //   nu_t = C_mu.K.L.k^(1/2)  et nu_t = C_mu.k^2/eps
+        //   nu_t = C_mu.K.L.k^(1/2)  and nu_t = C_mu.k^2/eps
 
         for (int elem = 0; elem < nb_elem; elem++)
           {
@@ -194,8 +194,8 @@ void Modele_turbulence_hyd_0_eq_base::imprimer(Sortie& os) const
               K_Eps(elem, 1) = Cmu * K_Eps(elem, 0) * K_Eps(elem, 0) / visco_turb(elem);
           }
 
-        // PQ : recalibrage de k et eps d'apres resultats
-        //        sur Canal plan a Re = 100 000 et Re = 1 000 000
+        // PQ: recalibration of k and eps based on results
+        //        for a plane channel at Re = 100 000 and Re = 1 000 000
         for (int elem = 0; elem < nb_elem; elem++)
           {
             K_Eps(elem, 0) /= 47.;
@@ -204,7 +204,7 @@ void Modele_turbulence_hyd_0_eq_base::imprimer(Sortie& os) const
             //Cerr<<visco_turb(elem)<<" "<<wall_length(elem)<<finl;
           }
 
-        // enfin ecriture du champ aux elems (il y est deja)
+        // finally write the field at elements (already there)
         const Domaine& dom = mon_equation_->domaine_dis().domaine();
         Nom fic = fichier_K_eps_sortie_.nom_me(me());
 

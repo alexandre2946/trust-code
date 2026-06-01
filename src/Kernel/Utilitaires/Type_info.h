@@ -22,7 +22,7 @@ class Sortie;
 class Synonyme_info;
 
 
-/*! @brief modelise une information de type pour les Objet_U
+/*! @brief Models type information for Objet_U objects.
  *
  * @sa Objet_U Nom
  */
@@ -47,7 +47,7 @@ public:
   Objet_U*   instance() const;
   int     instanciable() const;
 
-  // Methodes statiques :
+  // Static methods:
   static Sortie&           hierarchie(Sortie&) ;
   static int            est_un_type(const char*) ;
   static int            les_sous_types(const Nom&, Noms& sous_types);
@@ -58,8 +58,8 @@ public:
 protected:
 
 private:
-  Type_info(Type_info&) {}; // Constructeur par copie invalide
-  Type_info&    operator=(Type_info&); // Operateur= invalide
+  Type_info(Type_info&) {}; // Copy constructor disabled
+  Type_info&    operator=(Type_info&); // Assignment operator disabled
   void   ajouter_type(const Type_info& type_info);
   static int search_type_info_name(const char *nom, int& index);
 
@@ -71,31 +71,31 @@ private:
   // Object synonym:
   Synonyme_info* synonym_= nullptr; // Synonym
 
-  // Nombre de classes de base de cette classe
+  // Number of base classes of this class
   int nb_bases_ = -1;
-  // Liste des Type_info des classes de base de cette classe
+  // List of Type_info for the base classes of this class
   const Type_info** b= nullptr;
-  // Pointeur vers la methode statique "cree_instance" de la classe
-  // (nul si la classe n'est pas instanciable)
+  // Pointer to the static "cree_instance" method of the class
+  // (null if the class is not instantiable)
   Objet_U* (*cree_instance)()= nullptr;
 
-  // Liste des Type_info des classes declarees par declare_base/declare_instanciable
-  // La liste est triee par ordre alphabetique (minuscules/majuscules indifferentes)
+  // List of Type_info for classes declared by declare_base/declare_instanciable
+  // The list is sorted alphabetically (case-insensitive)
   static const Type_info** les_types;
-  // Pour chaque type enregistre dans "les_types", s'il existe plusieurs classes
-  // ayant le meme "nom", alors types_homonymes != 0.
+  // For each type registered in "les_types", if multiple classes share the same name,
+  // then types_homonymes != 0.
   static int * types_homonymes;
-  // Nombre de classes enregistrees dans "les_types" et "types_homonymes"
+  // Number of classes registered in "les_types" and "types_homonymes"
   static int nb_classes;
-  // Taille memoire du tableau "les_types" et "types_homonymes"
-  // (tableau redimensionne par blocs)
+  // Memory size of the "les_types" and "types_homonymes" arrays
+  // (arrays resized by blocks)
   static int les_types_memsize;
 };
 
-/*! @brief Exploration de la hierarchie des types retourne 1 si p pointe sur un sous type du type considere
+/*! @brief Traverses the type hierarchy. Returns 1 if p points to a subtype of the current type.
  *
- * @param (const Type_info* p) pointeur sur le type a tester
- * @return (int) 1 si p pointe sur un sous type du type considere, 0 sinon
+ * @param p Pointer to the type to test.
+ * @return 1 if p points to a subtype of the current type, 0 otherwise.
  */
 inline int Type_info::can_cast(const Type_info* p) const
 {

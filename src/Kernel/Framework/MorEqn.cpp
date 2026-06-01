@@ -18,19 +18,19 @@
 #include <Motcle.h>
 
 // XD mor_eqn objet_u mor_eqn INHERITS_BRACE Class of equation pieces (morceaux d\'equation).
-/*! @brief Associe une equation a l'objet.
+/*! @brief Associates an equation with the object.
  *
- * Affecte le membre MorEqn::mon_equation avec l'objet
- *     passe en parametre.
+ * Sets the MorEqn::mon_equation member with the object
+ *     passed as parameter.
  *
- * @param (Equation_base& eqn) l'equation a laquelle on veut s'associer
+ * @param (Equation_base& eqn) the equation with which we want to associate
  */
 void MorEqn::associer_eqn(const Equation_base& eqn)
 {
   mon_equation=eqn;
 }
 
-// Calcul des valeurs liees a un morceau d equation (Operateurs, ...) pour postraitement
+// Calculation of values related to a piece of equation (Operators, ...) for post-processing
 //
 void MorEqn::calculer_pour_post(Champ_base& espace_stockage,const Nom& option, int comp) const
 {
@@ -50,7 +50,7 @@ Motcle MorEqn::get_localisation_pour_post(const Nom& option) const
 void MorEqn::check_multiphase_compatibility() const
 {
   const Objet_U *obj = dynamic_cast<const Objet_U *>(this);
-  if (!obj) abort(); //on n'est meme pas un Objet_U ?
+  if (!obj) abort(); //we're not even an Objet_U ?
   Cerr << obj->que_suis_je() << " is not compatible with " << mon_equation->que_suis_je() <<"!" << finl;
   Process::exit();
 }

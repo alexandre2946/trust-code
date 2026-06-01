@@ -19,7 +19,7 @@ Implemente_instanciable(Lire_Fichier_Bin,"Lire_Fichier_Bin|Read_File_Binary",Lir
 // XD read_file_bin read_file lire_fichier_bin INHERITS_BRACE Keyword to read an object name_obj in the unformatted type
 // XD_CONT file filename.
 
-/*! @brief appel a la methode printOn de la classe Interprete
+/*! @brief Calls the printOn method of the Interprete class.
  *
  */
 Sortie& Lire_Fichier_Bin::printOn(Sortie& os) const
@@ -27,7 +27,7 @@ Sortie& Lire_Fichier_Bin::printOn(Sortie& os) const
   return Interprete::printOn(os);
 }
 
-/*! @brief appel a la methode readOn de la classe Interprete
+/*! @brief Calls the readOn method of the Interprete class.
  *
  */
 Entree& Lire_Fichier_Bin::readOn(Entree& is)
@@ -35,9 +35,9 @@ Entree& Lire_Fichier_Bin::readOn(Entree& is)
   return Interprete::readOn(is);
 }
 
-/*! @brief Lecture d'un fichier au format binaire Avec 2 arguments nom1 et nom2 , lit l'objet du fichier nom2 dans l'objet nom1
+/*! @brief Reads a binary-format file. With 2 arguments nom1 and nom2, reads the object from file nom2 into object nom1.
  *
- *     Avec un seul argument nom1, interprete le fichier de nom nom1
+ *     With a single argument nom1, interprets the file named nom1.
  *
  * @param (Entree& is)
  * @return (Entree&)

@@ -18,7 +18,7 @@
 
 #include <Scalaire_impose_paroi.h>
 
-/*! @brief classe Temperature_imposee_paroi Impose la temperature de la paroi dans une equation de type Convection_Diffusion_Temperature
+/*! @brief Temperature_imposee_paroi Imposes the wall temperature in a Convection_Diffusion_Temperature type equation.
  *
  * @sa Dirichlet Convection_Diffusion_Temperature
  */

@@ -40,7 +40,7 @@ inline const OWN_PTR(Operateur_Statistique_tps_base)& recherche(Operateurs_Stati
 
 int Operateurs_Statistique_tps::sauvegarder(Sortie& os) const
 {
-  // en mode ecriture special seul le maitre ecrit l'entete
+  // in special write mode only the master writes the header
   int a_faire,special;
   EcritureLectureSpecial::is_ecriture_special(special,a_faire);
 
@@ -90,8 +90,8 @@ int Operateurs_Statistique_tps::reprendre(Entree& is)
           is >> bidon;
           if (bidon=="fin")
             {
-              // Ce test evite un beau segmentation fault a la lecture
-              // du deuxieme bidon lors d'une sauvegarde/reprise au format binaire
+              // This test avoids a nasty segmentation fault when reading
+              // the second dummy value during a save/restart in binary format
               Cerr << "The end of the restarting file is reached." << finl;
               Cerr << "This file does not contain statistics." << finl;
               Cerr << "The restarting time tinit must therefore be lower" << finl;
@@ -117,7 +117,7 @@ int Operateurs_Statistique_tps::reprendre(Entree& is)
         }
       else if (!est_egal(tstat_deb_sauv,this->dernier()->tstat_deb()))
         {
-          // t_deb est modifie : on refait une statistique sans reprendre dans certains cas
+          // t_deb has been modified: statistics are restarted from scratch without resuming in some cases
           if (inf_strict(this->dernier()->tstat_deb(),tinit,1.e-5))
             {
               Cerr << "t_deb has been modified to carry out a new statistics calculation without restarting" << finl;
@@ -133,31 +133,31 @@ int Operateurs_Statistique_tps::reprendre(Entree& is)
               double dbidon;
               BigDoubleTab tab_bidon;
               auto& list = get_stl_list();
-              for (auto&& itr = list.begin(); itr != list.end(); ) // On saute les champs
+              for (auto&& itr = list.begin(); itr != list.end(); ) // Skipping fields
                 {
                   is >> bidon2 >> bidon2;
                   is >> dbidon;
-                  tab_bidon.reset(); // sinon erreur sur la taille dans lit()
+                  tab_bidon.reset(); // otherwise size error in lit()
                   tab_bidon.jump(is);
                   ++itr;
                 }
             }
         }
-      else // tinit=>temps_derniere_mise_a_jour_stats : on fait la reprise
+      else // tinit=>temps_derniere_mise_a_jour_stats: resuming statistics
         {
           Nom bidon2;
           for (auto &itr : *this)
             {
               if(!TRUST_2_PDI::is_PDI_restart())
-                is >> bidon2 >> bidon2; // On saute l'identificateur et le type des champs
+                is >> bidon2 >> bidon2; // Skipping the field identifier and type
               itr->reprendre(is);
             }
-          // On modifie l'attribut tstat_deb_ des champs pour tenir compte de la reprise
+          // Updating the tstat_deb_ attribute of the fields to account for the restart
           for (auto &itr : *this)
             itr->fixer_tstat_deb(tstat_deb_sauv,temps_derniere_mise_a_jour_stats);
         }
     }
-  else  // lecture pour sauter le bloc
+  else  // reading to skip the block
     {
       if(TRUST_2_PDI::is_PDI_restart())
         {
@@ -177,7 +177,7 @@ int Operateurs_Statistique_tps::reprendre(Entree& is)
         {
           is >> bidon >> bidon;
           is >> dbidon;
-          tab_bidon.reset(); // sinon erreur sur la taille dans lit()
+          tab_bidon.reset(); // otherwise size error in lit()
           tab_bidon.jump(is);
         }
     }

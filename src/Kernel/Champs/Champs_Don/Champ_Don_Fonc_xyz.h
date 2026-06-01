@@ -18,11 +18,11 @@
 
 #include <TRUSTChamp_Don_generique.h>
 
-/*! @brief class Champ_Don_Fonc_xyz Cette classe represente un champ de donnees fonction
+/*! @brief class Champ_Don_Fonc_xyz This class represents a data field that is a function
  *
- *      des variables d'espaces x,y,z. La fonction est fournie
- *         directement dans le jeu de donnees sous la forme d'une expression
- *         mathematique contenant les variables x,y,z (en minuscules)
+ *      of the spatial variables x,y,z. The function is provided
+ *         directly in the data file as a mathematical expression
+ *         containing the variables x,y,z (in lowercase).
  *
  * @sa : TRUSTChamp_Don_generique
  */

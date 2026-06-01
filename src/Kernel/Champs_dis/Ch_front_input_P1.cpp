@@ -74,7 +74,7 @@ int  Ch_front_input_P1::initialiser(double temps, const Champ_Inc_base& inco)
      sommets.resize(ntot,dimension);
 
 
-     // on refait les faces
+     // rebuild the faces
      for (int f=0;f<faces.dimension(0);f++)
      for (int s=0;s<faces.dimension(1);s++)
      faces(f,s)=faces(f,marqueur(s));

@@ -18,10 +18,10 @@
 
 #include <Neumann_homogene.h>
 
-/*! @brief Classe Neumann_paroi_adiabatique Cette condition limite correspond a une paroi adiabatique dans une
+/*! @brief Classe Neumann_paroi_adiabatique This boundary condition corresponds to an adiabatic wall in a
  *
- *     equation de type Convection_Diffusion_Temperature.
- *     Le flux de temperature est nul a la frontiere.
+ *     Convection_Diffusion_Temperature type equation.
+ *     The temperature flux is zero at the boundary.
  *
  * @sa Neumann_homogene
  */

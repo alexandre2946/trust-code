@@ -23,11 +23,12 @@
 class Domaine_dis_base;
 class Probleme_base;
 
-/*! @brief classe Operateur_Statistique_tps_base Represente des operations statistiques sur les champs.
+/*! @brief class Operateur_Statistique_tps_base
  *
- *      Des operateurs statistiques sont utilises pour le postraitement.
+ * @brief Represents statistical operations on fields.
+ *      Statistical operators are used for post-processing.
  *
- * @sa Operateurs_Statistique_tps Postraitement, Classe abstraite, Methodes abstraites:, void completer(const Probleme_base& )
+ * @sa Operateurs_Statistique_tps Postraitement, Abstract class, Abstract methods:, void completer(const Probleme_base& )
  */
 class Operateur_Statistique_tps_base : public Objet_U
 {
@@ -58,8 +59,8 @@ public:
 protected:
   Nom localisation_post_;
   double tstat_deb_=-123.;         //
-  double tstat_dernier_calcul_=-123.;     // dernier temps auquel les statistiques ont ete calcules
-  double tstat_fin_=-123.;         // valeur choisie par l'utilisateur
+  double tstat_dernier_calcul_=-123.;     // last time at which statistics were computed
+  double tstat_fin_=-123.;         // value chosen by the user
 };
 
 #endif /* Operateur_Statistique_tps_base_included */

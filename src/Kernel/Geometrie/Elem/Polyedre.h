@@ -18,9 +18,9 @@
 
 #include <Poly_geom_base.h>
 
-/*! @brief Classe Polyedre Cette represente l'element geometrique Polyedre.
+/*! @brief Class Polyedre: represents the Polyedre geometric element.
  *
- * Un polyedre est un element defini par ses faces de type Type_Face::polygone_3D
+ * A polyhedron is an element defined by its faces of type Type_Face::polygone_3D.
  *
  * @sa Poly_geom_base Elem_geom
  */
@@ -44,7 +44,7 @@ public :
   using Domaine_t = Domaine_32_64<_SIZE_>;
 
   void calculer_un_centre_gravite(const int_t elem,DoubleVect& xp) const override;
-  // Fonctions d'acces aux membres prives:
+  // Accessor functions for private members:
   inline int face_sommet(int i, int j) const override;
   inline int nb_som() const override;
   inline int nb_faces(int=0) const override;
@@ -79,7 +79,7 @@ protected:
   // Members herited from top classes:
   using Objet_U::dimension;
   using Elem_geom_base_32_64<_SIZE_>::mon_dom;
-  // FacesIndex_[f] premier indice de sommet de la face f dans Nodes
+  // FacesIndex_[f] first vertex index of face f in Nodes
   using Poly_geom_base_32_64<_SIZE_>::FacesIndex_;
   using Poly_geom_base_32_64<_SIZE_>::nb_som_elem_max_;
   using Poly_geom_base_32_64<_SIZE_>::nb_face_elem_max_;
@@ -93,11 +93,11 @@ protected:
 };
 
 
-/*! @brief Renvoie le numero du j-ieme sommet de la i-ieme face de l'element.
+/*! @brief Returns the index of the j-th vertex of the i-th face of the element.
  *
- * @param (int i) un numero de face
- * @param (int j) un numero de sommet
- * @return (int) le numero du j-ieme sommet de la i-ieme face
+ * @param face Face index.
+ * @param sommet Vertex index within the face.
+ * @return Index of the j-th vertex of the i-th face.
  */
 template <typename _SIZE_>
 inline int Polyedre_32_64<_SIZE_>::face_sommet(int face, int sommet) const
@@ -107,9 +107,9 @@ inline int Polyedre_32_64<_SIZE_>::face_sommet(int face, int sommet) const
 }
 
 
-/*! @brief Renvoie le nombre de sommets d'un Polyedre
+/*! @brief Returns the maximum number of vertices of a polyhedron.
  *
- * @return (int) le nombre de sommets maximum d'un polyedre
+ * @return Maximum number of vertices of a polyhedron.
  */
 template <typename _SIZE_>
 inline int Polyedre_32_64<_SIZE_>::nb_som() const
@@ -118,11 +118,12 @@ inline int Polyedre_32_64<_SIZE_>::nb_som() const
 }
 
 
-/*! @brief Renvoie le nombre de faces du type specifie que possede l'element geometrique.
+/*! @brief Returns the number of faces of the specified type for this geometric element.
  *
- *     Un Polyedre a 1 type de faces: polygon_3D
+ * A Polyedre has 1 type of face: polygon_3D.
  *
- * @param (int i) le type de face
+ * @param i Face type index.
+ * @return Number of faces of the given type.
  */
 template <typename _SIZE_>
 inline int Polyedre_32_64<_SIZE_>::nb_faces(int i) const
@@ -140,10 +141,10 @@ inline int Polyedre_32_64<_SIZE_>::nb_faces(int i) const
 }
 
 
-/*! @brief Renvoie le nombre maximum de sommets des faces du type specifie.
+/*! @brief Returns the maximum number of vertices of faces of the specified type.
  *
- * @param (int i) le type de face
- * @return (int) le nombre de sommets des faces de type i
+ * @param i Face type index.
+ * @return Number of vertices of faces of type i.
  */
 template <typename _SIZE_>
 inline int Polyedre_32_64<_SIZE_>::nb_som_face(int i) const
@@ -153,12 +154,12 @@ inline int Polyedre_32_64<_SIZE_>::nb_som_face(int i) const
 }
 
 
-/*! @brief Renvoie le i-ieme type de face.
+/*! @brief Returns the i-th face type.
  *
- * Un polyedre a 2 types de face: quadrangle et triangle
+ * A polyhedron has 2 types of face: quadrangle and triangle.
  *
- * @param (int i) le rang du type de face a renvoyer
- * @return (Type_Face) le type de la face i
+ * @param i Rank of the face type to return.
+ * @return Type of face i.
  */
 template <typename _SIZE_>
 inline Type_Face Polyedre_32_64<_SIZE_>::type_face(int i) const

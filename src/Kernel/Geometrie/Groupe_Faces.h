@@ -18,7 +18,7 @@
 
 #include <Frontiere.h>
 
-/*! @brief Classe Groupe_Face La classe sert a representer une selection de faces lu dans le fichier med
+/*! @brief Groupe_Face class — represents a selection of faces read from a med file.
  *
  * @sa Frontiere Domaine
  */

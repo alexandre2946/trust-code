@@ -24,7 +24,7 @@
 class Domaine_Cl_VDF;
 class Champ_Face_VDF;
 
-/*! @brief classe Critere_Q_Champ_Face
+/*! @brief class Critere_Q_Champ_Face
  *
  * @sa Champ_Critere_Q Champ_Fonc_P0_VDF
  */

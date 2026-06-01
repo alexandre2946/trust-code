@@ -23,53 +23,52 @@
 //Ref. Numerical heat Transfer Vol. 10 P. 209-228
 // D. S. Jang - R. Jetli - S. Acharya
 
-// La convergence de la pression dans l'algorithme Simple (voir classe Simple) est faible
-// du fait de la non prise en compte des termes non diagonaux pour resoudre l equation de
-// Poisson sur la correction en pression.
-// L objectif de l algorithme Simpler est de realiser une evaluation plus precise de la pression
-// et d utiliser celle ci pour appliquer ensuite l algorithme Simple.
+// Pressure convergence in the Simple algorithm (see class Simple) is slow
+// because the off-diagonal terms are neglected when solving the Poisson equation
+// for the pressure correction.
+// The goal of the Simpler algorithm is to compute a more accurate pressure estimate
+// and then apply the Simple algorithm with it.
 
 // A = (M/dt + C(Uk) + D)
-// Bt et -B designent respectivement les operateurs gradient et divergence
+// Bt and -B denote the gradient and divergence operators respectively
 
-// -Estimation de la pression
-// On evalue dans un premier temps le champ de vitesse UPk en resolvant le systeme
-// (Da partie diagonale de A et E partie non diagonale) :
+// -Pressure estimation
+// First evaluate the velocity field UPk by solving (Da = diagonal part of A, E = off-diagonal part):
 //        Da[Uk-1]UPk = E[Uk-1]Uk-1 + Sv + Ss                        -> UPk
 //
-// L equation de q.d.m. peut alors s ecrire sous la forme :
-//        Da[Uk-1]Uk = Da[Uk-1]UPk -BtPk
-// En combinant cette equation de q.d.m. avec celle de continuite (-BUk = 0) on a :
+// The momentum equation can then be written as:
+//        Da[Uk-1]Uk = Da[Uk-1]UPk - BtPk
+// Combining this with the continuity equation (-BUk = 0):
 //        (BDa-1Bt)Pk = BUPk                                -> Pk
 //
 //
-// -Application de l algorithme Simple pour determiner la solution (Uk,Pk)
+// -Applying the Simple algorithm to find the solution (Uk,Pk)
 //
-// (U*k,Pk) satisfait l equation de q.d.m. suivante :
+// (U*k, Pk) satisfies the following momentum equation:
 //        A[Uk-1]U*k = -BtPk + Sv + Ss + (M/dt)Uk-1        -> U*k
 //
-// p'k est evalue en resolvant le systeme suivant :
+// p'k is evaluated by solving:
 //     (BDa-1Bt)p'k = BU*k                                -> p'k
 //
-// La correction de vitesse u'k est deduite en resolvant le systeme :
+// The velocity correction u'k is deduced by solving:
 //        Da[Uk-1] (Uk-U*k) = -Btp'k                        -> U'k
 //
-// Le champ de pression Pk n est pas modifie par la correction p'k
-// alors que la vitesse est modifiee par la relation : Uk = U*k + U'k
+// The pressure field Pk is not modified by the correction p'k,
+// while the velocity is updated by: Uk = U*k + U'k
 //
-// L algorithme peut etre repete jusqu a convergence du systeme ||Uk-Uk-1|| < seuil_convergence_implicite_
-// en pratique on peut ne faire qu une seule iteration (seuil_convergence_implicite_ = 1e6)
+// The algorithm can be repeated until convergence ||Uk-Uk-1|| < seuil_convergence_implicite_.
+// In practice, only one iteration is needed (seuil_convergence_implicite_ = 1e6).
 
-// L algorithme code dans cette classe (iterer_NS) differe legerement de celui rappele ci-dessus :
-// Dans l etape d evaluation UPk :
-//   -le gradient de pression est pris en compte et la relation traitee est
-//         Da[Uk-1]UPk = E[Uk-1]Uk-1 + Sv + Ss -BtPk
+// The algorithm coded in this class (iterer_NS) differs slightly from the above description:
+// In the UPk evaluation step:
+//   - the pressure gradient is taken into account and the relation becomes:
+//         Da[Uk-1]UPk = E[Uk-1]Uk-1 + Sv + Ss - BtPk
 //
-//   -la resolution de (BDa-1Bt)Pcor = BUPk fournit alors une correction de pression
-//    et le champ de pression est evalue par : Pk = Pk-1 + Pcor
-//    (Pcor remplace la notation Pk utilisee plus haut)
+//   - solving (BDa-1Bt)Pcor = BUPk gives a pressure correction
+//     and the pressure field is updated: Pk = Pk-1 + Pcor
+//     (Pcor replaces the notation Pk used above)
 //
-//   -resu est reajuste (BtPk = BtPk-1 + BtPcor) pour contenir -BtPk
+//   - resu is readjusted (BtPk = BtPk-1 + BtPcor) to contain -BtPk
 
 class Simpler : public Simple
 {

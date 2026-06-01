@@ -26,29 +26,29 @@ Sortie& Dirichlet::printOn(Sortie& s) const { return s << que_suis_je() << finl;
 
 Entree& Dirichlet::readOn(Entree& s) { return Cond_lim_base::readOn(s); }
 
-/*! @brief Renvoie la valeur imposee sur la i-eme composante du champ a la frontiere au temps par defaut du champ_front.
+/*! @brief Returns the imposed value on the i-th component of the field at the boundary at the default time of champ_front.
  *
- * @param (int i) indice suivant la premiere dimension du champ
- * @return (double) la valeur imposee sur la composante du champ specifiee
- * @throws deuxieme dimension du champ de frontiere superieur a 1
+ * @param (int i) index along the first dimension of the field
+ * @return (double) the imposed value on the specified field component
+ * @throws second dimension of the boundary field greater than 1
  */
 double Dirichlet::val_imp(int i) const
 {
   return val_imp_au_temps(le_champ_front->get_temps_defaut(), i);
 }
 
-/*! @brief Renvoie la valeur imposee sur la (i,j)-eme composante du champ a la frontiere au temps par defaut du champ_front.
+/*! @brief Returns the imposed value on the (i,j)-th component of the field at the boundary at the default time of champ_front.
  *
- * @param (int i) indice suivant la premiere dimension du champ
- * @param (int j) indice suivant la deuxieme dimension du champ
- * @return (double) la valeur imposee sur la composante du champ specifiee
+ * @param (int i) index along the first dimension of the field
+ * @param (int j) index along the second dimension of the field
+ * @return (double) the imposed value on the specified field component
  */
 double Dirichlet::val_imp(int i, int j) const
 {
   return val_imp_au_temps(le_champ_front->get_temps_defaut(), i, j);
 }
 
-/*! @brief Renvoie la valeur imposee sur la i-eme composante du champ a la frontiere au temps precise.
+/*! @brief Returns the imposed value on the i-th component of the field at the boundary at the specified time.
  *
  */
 double Dirichlet::val_imp_au_temps(double temps, int i) const
@@ -98,7 +98,7 @@ const DoubleTab& Dirichlet::tab_val_imp(double temps) const
   return tab_;
 }
 
-/*! @brief Renvoie la valeur imposee sur la (i,j)-eme composante du champ a la frontiere au temps precise.
+/*! @brief Returns the imposed value on the (i,j)-th component of the field at the boundary at the specified time.
  *
  */
 double Dirichlet::val_imp_au_temps(double temps, int i, int j) const

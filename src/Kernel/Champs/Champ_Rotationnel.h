@@ -16,9 +16,9 @@
 #ifndef Champ_Rotationnel_included
 #define Champ_Rotationnel_included
 
-/*! @brief classe Champ_Rotationnel
+/*! @brief class Champ_Rotationnel
  *
- * @sa Classe abstraite, Methode abstraite, void me_calculer(double )
+ * @sa Abstract class, Abstract method, void me_calculer(double )
  */
 class Champ_Rotationnel
 {

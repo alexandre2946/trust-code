@@ -19,7 +19,7 @@
 #include <Champ_val_tot_sur_vol_base.h>
 
 
-/*! @brief classe Champ_val_tot_sur_vol_VEF derivee de Champ_val_tot_sur_vol_base Evaluation Somme_vol_poro_loc :
+/*! @brief class Champ_val_tot_sur_vol_VEF derived from Champ_val_tot_sur_vol_base. Evaluation Somme_vol_poro_loc:
  *
  *      sommation de vol_entrelaces*poro_surface pour les faces contenues dans la localisation loc
  *

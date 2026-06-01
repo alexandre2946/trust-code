@@ -17,9 +17,9 @@
 #define Portance_interfaciale_Sugrue_included
 #include <Portance_interfaciale_base.h>
 
-/*! @brief classe Portance_interfaciale_Tomiyama coefficients de portance interfaciale d'un ecoulement a bulles deformables
+/*! @brief Interfacial lift coefficients for deformable bubbly flows (Sugrue/Tomiyama model).
  *
- *       Le coefficient renvoye par cette classe est toujours >0, c'est Portanc_interfaciale_PolyMAC_MPFA qui gere les signes
+ *       The coefficient returned by this class is always >0; the sign handling is done by Portance_interfaciale_PolyMAC_MPFA.
  *
  *
  */
@@ -31,7 +31,7 @@ public:
   void coefficient(const input_t& input, output_t& output) const override;
 protected:
   double g_=9.81;
-  int n_l = -1; //phase liquide
+  int n_l = -1; //liquid phase
 };
 
 #endif

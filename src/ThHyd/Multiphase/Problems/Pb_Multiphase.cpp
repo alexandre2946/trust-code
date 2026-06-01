@@ -117,8 +117,8 @@ Entree& Pb_Multiphase::lire_equations(Entree& is, Motcle& mot)
 
 void Pb_Multiphase::typer_lire_milieu(Entree& is)
 {
-  le_milieu_.resize(1); /* Un milieu .. mais composite !! */
-  is >> le_milieu_[0]; // On commence par la lecture du milieu
+  le_milieu_.resize(1); /* One medium ... but composite! */
+  is >> le_milieu_[0]; // Start by reading the medium
   if (!sub_type(Milieu_composite, le_milieu_[0].valeur()))
     {
       Cerr << "Error: Fluid of type " << le_milieu_[0]->le_type() << " is not compatible with " << que_suis_je() << " problem which accepts only Milieu_composite medium" << finl;
@@ -130,35 +130,34 @@ void Pb_Multiphase::typer_lire_milieu(Entree& is)
   alpha_inf_phases_ = 0.0;
   associer_milieu_base(le_milieu_[0].valeur());
 
-  // On discretise les equations maintenant ! voir avec Elie si t'es pas d'accord
+  // Discretize equations now
   Probleme_base::discretiser_equations();
-  // remontee de l'inconnue vers le milieu
+  // propagate unknown back to the medium
   for (int i = 0; i < nombre_d_equations(); i++)
     equation(i).associer_milieu_equation();
-  // On discretise le milieu composite
+  // Discretize the composite medium
   equation(0).milieu().discretiser((*this), la_discretisation_.valeur());
 }
 
-/*! @brief Renvoie le nombre d'equation, Renvoie 2 car il y a 2 equations a un probleme de
+/*! @brief Returns the number of equations.
  *
- *     thermo-hydraulique standard:
- *         l'equation de Navier Stokes
- *         l' equation de la thermique de type Convection_Diffusion_Temperature
+ *     Returns 3 for a multiphase problem (QDM, mass, energy)
+ *     plus any optional equations.
  *
- * @return (int) le nombre d'equation
+ * @return The number of equations.
  */
 int Pb_Multiphase::nombre_d_equations() const
 {
   return 3 + eq_opt_.size();
 }
 
-/*! @brief Renvoie l'equation d'hydraulique de type Navier_Stokes_std si i=0 Renvoie l'equation de la thermique de type
+/*! @brief Returns the equation at index i (const version).
  *
- *     Convection_Diffusion_Temperature si i=1
- *     (version const)
+ *     i=0: QDM_Multiphase, i=1: Masse_Multiphase, i=2: Energie_Multiphase,
+ *     i>=3: optional equations.
  *
- * @param (int i) l'index de l'equation a renvoyer
- * @return (Equation_base&) l'equation correspondante a l'index
+ * @param i The index of the equation to return.
+ * @return The equation corresponding to the index.
  */
 const Equation_base& Pb_Multiphase::equation(int i) const
 {
@@ -175,15 +174,16 @@ const Equation_base& Pb_Multiphase::equation(int i) const
       Cerr << "Pb_Multiphase::equation() : Wrong equation number" << i << "!" << finl;
       Process::exit();
     }
-  return eq_qdm_; //pour renvoyer quelque chose
+  return eq_qdm_; // unreachable; needed to satisfy the compiler
 }
 
-/*! @brief Renvoie l'equation d'hydraulique de type Navier_Stokes_std si i=0 Renvoie l'equation de la thermique de type
+/*! @brief Returns the equation at index i.
  *
- *     Convection_Diffusion_Temperature si i=1
+ *     i=0: QDM_Multiphase, i=1: Masse_Multiphase, i=2: Energie_Multiphase,
+ *     i>=3: optional equations.
  *
- * @param (int i) l'index de l'equation a renvoyer
- * @return (Equation_base&) l'equation correspondante a l'index
+ * @param i The index of the equation to return.
+ * @return The equation corresponding to the index.
  */
 Equation_base& Pb_Multiphase::equation(int i)
 {
@@ -200,30 +200,31 @@ Equation_base& Pb_Multiphase::equation(int i)
       Cerr << "Pb_Multiphase::equation() : Wrong equation number" << i << "!" << finl;
       Process::exit();
     }
-  return eq_qdm_; //pour renvoyer quelque chose
+  return eq_qdm_; // unreachable; needed to satisfy the compiler
 }
 
-/*! @brief Associe le milieu au probleme Le milieu doit etre de type fluide incompressible
+/*! @brief Associates the medium with the problem.
  *
- * @param (Milieu_base& mil) le milieu physique a associer au probleme
- * @throws mauvais type de milieu physique
+ * The medium must be of type Milieu_composite.
+ *
+ * @param mil The physical medium to associate with the problem.
+ * @throws If the medium is of the wrong type.
  */
 void Pb_Multiphase::associer_milieu_base(const Milieu_base& mil)
 {
-  /* controler le type de milieu ici */
+  /* check the medium type here */
   equation_qdm().associer_milieu_base(mil);
   equation_energie().associer_milieu_base(mil);
   equation_masse().associer_milieu_base(mil);
 }
 
-/*! @brief Teste la compatibilite des equations de la thermique et de l'hydraulique.
+/*! @brief Checks the compatibility of the thermal and hydraulic equations.
  *
- * Le test se fait sur les conditions
- *     aux limites discretisees de chaque equation.
- *     Appel la fonction de librairie hors classe:
+ * The test is performed on the discretized boundary conditions of each equation.
+ * Calls the library function:
  *       tester_compatibilite_hydr_thermique(const Domaine_Cl_dis_base&,const Domaine_Cl_dis_base&)
  *
- * @return (int) code de retour propage
+ * @return Propagated return code.
  */
 int Pb_Multiphase::verifier()
 {

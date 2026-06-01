@@ -22,26 +22,26 @@ class Champ_Face_base : public Champ_Inc_base
 {
   Declare_base(Champ_Face_base) ;
 public:
-  //tableaux de correspondance lies aux CLs : fcl(f, .) = { type de CL, num de la CL, indice de la face dans la CL }
-  //types de CL : 0 -> pas de CL
-  //              1 -> Neumann
-  //              2 -> Navier
-  //              3 -> Dirichlet ou Neumann_homogene
-  //              4 -> Dirichlet_homogene
-  //              5 -> Periodique
+  //correspondence arrays related to BCs : fcl(f, .) = { BC type, BC index, face index in the BC }
+  //BC types : 0 -> no BC
+  //           1 -> Neumann
+  //           2 -> Navier
+  //           3 -> Dirichlet or Neumann_homogene
+  //           4 -> Dirichlet_homogene
+  //           5 -> Periodique
   inline const IntTab& fcl() const
   {
     if (!fcl_init_) init_fcl();
     return fcl_;
   }
 
-  // methodes utile pour constuire un champ vectoriel aux elems
+  // methods useful for building a vector field at elements
   virtual DoubleTab& get_elem_vector_field(DoubleTab& , bool passe = false) const;
   virtual DoubleVect& get_elem_vector(const int, DoubleVect& ) const;
 
 protected:
   void init_fcl() const;
-  mutable IntTab fcl_; // fcl_(f, .) = { type de CL, num de la CL, indice de la face dans la CL }
+  mutable IntTab fcl_; // fcl_(f, .) = { BC type, BC index, face index in the BC }
   mutable int fcl_init_ = 0;
 };
 

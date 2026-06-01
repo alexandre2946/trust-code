@@ -36,16 +36,16 @@ Entree& PolyMAC_CDO_discretisation::readOn(Entree& s) { return s; }
 
 Sortie& PolyMAC_CDO_discretisation::printOn(Sortie& s) const { return s; }
 
-/*! @brief Discretisation d'un champ pour le PolyMAC_CDO en fonction d'une directive de discretisation.
+/*! @brief Discretizes a field for PolyMAC_CDO based on a discretization directive.
  *
- * La directive est un Motcle comme "vitesse", "pression",
- *  "temperature", "champ_elem" (cree un champ de type P0), ...
- *  Cette methode determine le type du champ a creer en fonction du type d'element
- *  et de la directive de discretisation. Elle determine ensuite le nombre de ddl
- *  et fixe l'ensemble des parametres du champ (type, nb_compo, nb_ddl, nb_pas_dt,
- *  nom(s), unite(s) et nature du champ) et associe la Domaine_dis au champ.
- *  Voir le code pour avoir la correspondance entre les directives et
- *  le type de champ cree.
+ * @brief The directive is a Motcle such as "vitesse", "pression",
+ *  "temperature", "champ_elem" (creates a P0-type field), ...
+ *  This method determines the type of field to create based on the element type
+ *  and the discretization directive. It then determines the number of degrees of freedom
+ *  and sets all field parameters (type, nb_compo, nb_ddl, nb_pas_dt,
+ *  name(s), unit(s), and field nature) and associates the Domaine_dis with the field.
+ *  See the code for the correspondence between directives and
+ *  the type of field created.
  *
  */
 void PolyMAC_CDO_discretisation::discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, int nb_pas_dt,
@@ -54,19 +54,19 @@ void PolyMAC_CDO_discretisation::discretiser_champ(const Motcle& directive, cons
   const Domaine_PolyMAC_CDO& domaine_PolyMAC_CDO = ref_cast(Domaine_PolyMAC_CDO, z);
 
   Motcles motcles(7);
-  motcles[0] = "vitesse";     // Choix standard pour la vitesse
-  motcles[1] = "pression";    // Choix standard pour la pression
-  motcles[2] = "temperature"; // Choix standard pour la temperature
-  motcles[3] = "divergence_vitesse"; // Le type de champ obtenu en calculant div v
-  motcles[4] = "gradient_pression";  // Le type de champ obtenu en calculant grad P
-  motcles[5] = "champ_elem";    // Creer un champ aux elements (de type P0)
-  motcles[6] = "champ_sommets"; // Creer un champ aux sommets (type P1)
+  motcles[0] = "vitesse";     // Standard choice for velocity
+  motcles[1] = "pression";    // Standard choice for pressure
+  motcles[2] = "temperature"; // Standard choice for temperature
+  motcles[3] = "divergence_vitesse"; // Type of field obtained by computing div v
+  motcles[4] = "gradient_pression";  // Type of field obtained by computing grad P
+  motcles[5] = "champ_elem";    // Create a field at elements (of type P0)
+  motcles[6] = "champ_sommets"; // Create a field at vertices (type P1)
 
-  // Le type de champ de vitesse depend du type d'element :
+  // The velocity field type depends on the element type:
   Nom type_champ_vitesse("Champ_Face_PolyMAC_CDO");
   Nom type_elem("Champ_Elem_PolyMAC_CDO");
   Nom type;
-  int default_nb_comp = 0; // Valeur par defaut du nombre de composantes
+  int default_nb_comp = 0; // Default value of the number of components
   int rang = motcles.search(directive);
   switch(rang)
     {
@@ -93,15 +93,15 @@ void PolyMAC_CDO_discretisation::discretiser_champ(const Motcle& directive, cons
   if (sous_type != NOM_VIDE)
     rang = verifie_sous_type(type, sous_type, directive);
 
-  // Si on n'a pas compris la directive (ou si c'est une demande_description)
-  // alors on appelle l'ancetre :
+  // If the directive was not understood (or if it is a demande_description)
+  // call the parent class:
   if (rang < 0)
     {
       Discret_Thyd::discretiser_champ(directive, z, nature, noms, unites, nb_comp, nb_pas_dt, temps, champ);
       return;
     }
 
-  // Calcul du nombre de ddl
+  // Compute the number of degrees of freedom
   int nb_ddl = 0;
   if (type.debute_par(type_elem))
     nb_ddl = z.nb_elem() + domaine_PolyMAC_CDO.nb_faces();
@@ -124,9 +124,9 @@ void PolyMAC_CDO_discretisation::discretiser_champ(const Motcle& directive, cons
     }
 }
 
-/*! @brief Idem que PolyMAC_CDO_discretisation::discretiser_champ(.
+/*! @brief Same as PolyMAC_CDO_discretisation::discretiser_champ(.
  *
- * .. , Champ_Inc)
+ * @brief .. , Champ_Inc)
  *
  */
 void PolyMAC_CDO_discretisation::discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, double temps,
@@ -135,9 +135,9 @@ void PolyMAC_CDO_discretisation::discretiser_champ(const Motcle& directive, cons
   discretiser_champ_fonc_don(directive, z, nature, noms, unites, nb_comp, temps, champ);
 }
 
-/*! @brief Idem que PolyMAC_CDO_discretisation::discretiser_champ(.
+/*! @brief Same as PolyMAC_CDO_discretisation::discretiser_champ(.
  *
- * .. , Champ_Inc)
+ * @brief .. , Champ_Inc)
  *
  */
 void PolyMAC_CDO_discretisation::discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, double temps,
@@ -146,38 +146,38 @@ void PolyMAC_CDO_discretisation::discretiser_champ(const Motcle& directive, cons
   discretiser_champ_fonc_don(directive, z, nature, noms, unites, nb_comp, temps, champ);
 }
 
-/*! @brief Idem que PolyMAC_CDO_discretisation::discretiser_champ(.
+/*! @brief Same as PolyMAC_CDO_discretisation::discretiser_champ(.
  *
- * .. , Champ_Inc) Traitement commun aux champ_fonc et champ_don.
- *  Cette methode est privee (passage d'un Objet_U pas propre vu
- *  de l'exterieur ...)
+ * @brief .. , Champ_Inc) Common processing for champ_fonc and champ_don.
+ *  This method is private (passing an Objet_U is not clean from
+ *  the outside ...)
  *
  */
 void PolyMAC_CDO_discretisation::discretiser_champ_fonc_don(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, double temps,
                                                             Objet_U& champ) const
 {
-  // Deux pointeurs pour acceder facilement au champ_don ou au champ_fonc, suivant le type de l'objet champ.
+  // Two pointers for easy access to champ_don or champ_fonc, depending on the type of the champ object.
   OWN_PTR(Champ_Fonc_base)  * champ_fonc = dynamic_cast<OWN_PTR(Champ_Fonc_base)*>(&champ);
   OWN_PTR(Champ_Don_base) * champ_don = dynamic_cast<OWN_PTR(Champ_Don_base)*>(&champ);
 
   const Domaine_PolyMAC_CDO& domaine_PolyMAC_CDO = ref_cast(Domaine_PolyMAC_CDO, z);
 
   Motcles motcles(8);
-  motcles[0] = "pression";    // Choix standard pour la pression
-  motcles[1] = "temperature"; // Choix standard pour la temperature
-  motcles[2] = "divergence_vitesse"; // Le type de champ obtenu en calculant div v
-  motcles[3] = "champ_elem";  // Creer un champ aux elements (de type P0)
-  motcles[6] = "champ_sommets";  // Creer un champ aux elements (de type P1)
-  motcles[4] = "vitesse";     // Choix standard pour la vitesse
-  motcles[7] = "champ_face";     // Choix standard pour la vitesse
-  motcles[5] = "gradient_pression";  // Le type de champ obtenu en calculant grad P
+  motcles[0] = "pression";    // Standard choice for pressure
+  motcles[1] = "temperature"; // Standard choice for temperature
+  motcles[2] = "divergence_vitesse"; // Type of field obtained by computing div v
+  motcles[3] = "champ_elem";  // Create a field at elements (of type P0)
+  motcles[6] = "champ_sommets";  // Create a field at elements (of type P1)
+  motcles[4] = "vitesse";     // Standard choice for velocity
+  motcles[7] = "champ_face";     // Standard choice for velocity
+  motcles[5] = "gradient_pression";  // Type of field obtained by computing grad P
 
-  // Le type de champ de vitesse depend du type d'element :
+  // The velocity field type depends on the element type:
   Nom type_champ_vitesse("Champ_Fonc_Face_PolyMAC_CDO");
   Nom type_elem("Champ_Fonc_Elem_PolyMAC_CDO");
 
   Nom type;
-  int default_nb_comp = 0; // Valeur par defaut du nombre de composantes
+  int default_nb_comp = 0; // Default value of the number of components
   int rang = motcles.search(directive);
   switch(rang)
     {
@@ -206,8 +206,8 @@ void PolyMAC_CDO_discretisation::discretiser_champ_fonc_don(const Motcle& direct
   if (directive == DEMANDE_DESCRIPTION)
     Cerr << "PolyMAC_CDO_discretisation : " << motcles;
 
-  // Si on n'a pas compris la directive (ou si c'est une demande_description)
-  // alors on appelle l'ancetre :
+  // If the directive was not understood (or if it is a demande_description)
+  // call the parent class:
   if (rang < 0)
     {
       if (champ_fonc)
@@ -217,7 +217,7 @@ void PolyMAC_CDO_discretisation::discretiser_champ_fonc_don(const Motcle& direct
       return;
     }
 
-  // Calcul du nombre de ddl
+  // Compute the number of degrees of freedom
   int nb_ddl = 0;
   if (type == "Champ_Fonc_Elem_PolyMAC_CDO")
     nb_ddl = z.nb_elem();
@@ -228,7 +228,7 @@ void PolyMAC_CDO_discretisation::discretiser_champ_fonc_don(const Motcle& direct
   else
     assert(0);
 
-  // Si c'est un champ multiscalaire, uh !
+  // If it is a multi-scalar field, handle accordingly!
   if (nb_comp < 0)
     nb_comp = default_nb_comp;
   if (champ_fonc)
@@ -263,12 +263,12 @@ void PolyMAC_CDO_discretisation::distance_paroi(const Schema_Temps_base& sch, Do
 }
 
 
-/*! @brief discretise en PolyMAC_CDO le fluide incompressible, donc  K e N
+/*! @brief Discretizes the incompressible fluid in PolyMAC_CDO, i.e., K and N.
  *
- * Postcondition: la methode ne modifie pas l'objet
+ * @brief Postcondition: the method does not modify the object.
  *
- * @param (Domaine_dis_base&) domaine a discretiser
- * @param (Fluide_Ostwald&) fluide a discretiser
+ * @param (Domaine_dis_base&) domain to discretize
+ * @param (Fluide_Ostwald&) fluid to discretize
  * @param (Champ_Inc_base&) ch_vitesse
  * @param (Champ_Inc_base&) temperature
  */

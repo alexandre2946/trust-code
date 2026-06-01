@@ -77,8 +77,8 @@ const Champ_base& Champ_Generique_modifier_pour_QC::get_champ(OWN_PTR(Champ_base
   return espace_stockage;
 }
 
-//Nomme le champ en tant que source par defaut
-//"Modifier_pour_QC_"+nom_champ_source
+// Names the field as a default source:
+// "Modifier_pour_QC_"+nom_champ_source
 void Champ_Generique_modifier_pour_QC::nommer_source()
 {
   if (nom_post_=="??")

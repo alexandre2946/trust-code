@@ -18,10 +18,10 @@
 Implemente_instanciable_sans_constructeur(Descripteur,"Descripteur",Objet_U);
 
 
-/*! @brief Lecture d'un espace virtuel dans un flot d'entree Un espace virtuel est represente par ses 3 attributs deb_ ,nb_ et stride_
+/*! @brief Reads a virtual space from an input stream. A virtual space is represented by its 3 attributes deb_, nb_ and stride_.
  *
- * @param (Entree& is) le flot d'entree a utiliser
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) the input stream to use
+ * @return (Entree&) the modified input stream
  */
 Entree& Descripteur::readOn(Entree& is)
 {
@@ -32,10 +32,10 @@ Entree& Descripteur::readOn(Entree& is)
 }
 
 
-/*! @brief Ecriture d'un espace virtuel sur un flot de sortie Un espace virtuel est represente par ses 3 attributs deb_, nb_ et stride_
+/*! @brief Writes a virtual space to an output stream. A virtual space is represented by its 3 attributes deb_, nb_ and stride_
  *
- * @param (Sortie& os) le flot de sortie a utiliser
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) the output stream to use
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Descripteur::printOn(Sortie& os) const
 {

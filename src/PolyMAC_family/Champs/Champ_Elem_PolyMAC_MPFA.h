@@ -23,8 +23,8 @@ class Domaine_PolyMAC_MPFA;
 
 /*! @brief : class Champ_Elem_PolyMAC_MPFA
  *
- *  Champ correspondant a une inconnue scalaire (type temperature ou pression)
- *  Degres de libertes : valeur aux elements + flux aux faces
+ *  @brief Field corresponding to a scalar unknown (e.g. temperature or pressure).
+ *  Degrees of freedom: value at elements + flux at faces.
  *
  */
 class Champ_Elem_PolyMAC_MPFA: public Champ_Elem_PolyMAC_HFV
@@ -39,7 +39,7 @@ public:
   Champ_base& affecter_(const Champ_base& ch) override { return Champ_Inc_P0_base::affecter_(ch); }
   int reprendre(Entree& fich) override;
 
-  // Fonctions pour le calcul des coefficients du gradient
+  // Functions for computing gradient coefficients
   mutable IntTab fgrad_d, fgrad_e;             // Tables used in domaine_PolyMAC_MPFA::fgrad
   mutable DoubleTab fgrad_w;
   void init_grad(int full_stencil) const;      // Call to initialise the tables ; no updates necessary

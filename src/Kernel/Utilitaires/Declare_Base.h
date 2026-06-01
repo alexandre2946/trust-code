@@ -15,16 +15,16 @@
 
 
 // .SECTION Description
-// les macros Declare_base_sans_destructeur et
+// The macros Declare_base_sans_destructeur and
 // Implemente_base_sans_destructeur
-// permettent de creer simplement des classes
-// de bases conforme a TRUST.
+// allow simple creation of base classes
+// conforming to TRUST.
 
-// .SECTION Description du header
+// .SECTION Header description
 // class A_base : public B {
 // Declare_base_sans_destructeur(A_base);
 // };
-// .SECTION Description du source
+// .SECTION Source description
 // Implemente_base_sans_destructeur(A_base, "A_base", B);
 
 #include <arch.h>
@@ -48,7 +48,7 @@
   static const Type_info info_obj;                                \
   static const Type_info* info();                                \
   const Type_info* get_info() const override;                                \
-  /* methode rajoutee pour caster en python */                        \
+  /* method added to cast in python */                        \
   static _TYPE_& self_cast( Objet_U&) ;                                \
   static const _TYPE_& self_cast(const Objet_U&) ;                \
   protected :                                                        \
@@ -62,10 +62,10 @@
   const Type_info _TYPE_::info_obj(_NOM_, 1, name2(_TYPE_,bases));        \
                                                                         \
   _TYPE_& _TYPE_::self_cast( Objet_U& r)   {                                \
-    return ref_cast_non_const(_TYPE_,r); /* _non_const important sinon recursion dans ref_cast */ \
+    return ref_cast_non_const(_TYPE_,r); /* _non_const important otherwise recursion in ref_cast */ \
   }                                                                        \
   const _TYPE_& _TYPE_::self_cast(const Objet_U& r)   {                        \
-    return ref_cast_non_const(_TYPE_,r); /* _non_const important sinon recursion dans ref_cast */ \
+    return ref_cast_non_const(_TYPE_,r); /* _non_const important otherwise recursion in ref_cast */ \
   }                                                                        \
   const Type_info*  _TYPE_::get_info() const {                                \
     return &info_obj;                                                        \
@@ -159,10 +159,10 @@
   info_obj_def_macro_base(_NOM_, _TYPE_)                               \
                                                                         \
   template <typename _T_> _TYPE_<_T_>& _TYPE_<_T_>::self_cast( Objet_U& r)   {                                \
-    return ref_cast_non_const(_TYPE_<_T_>,r); /* _non_const important sinon recursion dans ref_cast */ \
+    return ref_cast_non_const(_TYPE_<_T_>,r); /* _non_const important otherwise recursion in ref_cast */ \
   }                                                                        \
   template <typename _T_> const _TYPE_<_T_>& _TYPE_<_T_>::self_cast(const Objet_U& r)   {                        \
-    return ref_cast_non_const(_TYPE_<_T_>,r); /* _non_const important sinon recursion dans ref_cast */ \
+    return ref_cast_non_const(_TYPE_<_T_>,r); /* _non_const important otherwise recursion in ref_cast */ \
   }                                                                        \
   template <typename _T_> const Type_info*  _TYPE_<_T_>::get_info() const {                                \
     return &info_obj;                                                        \

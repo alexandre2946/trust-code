@@ -16,10 +16,10 @@
 #ifndef Terme_Source_Solide_SWIFT_VDF_included
 #define Terme_Source_Solide_SWIFT_VDF_included
 
-/*! @brief class Terme_Source_Solide_SWIFT_VDF Cette classe permet le forcage d'un champ moyen de temperature
+/*! @brief class Terme_Source_Solide_SWIFT_VDF This class enables forcing of a mean temperature field
  *
- *   d'un solide issu d'un calcul SWIFT vers le champ moyen du calcul
- *   LES grossier correspondant.
+ *   from a solid obtained by a SWIFT computation towards the mean field of the
+ *   corresponding coarse LES computation.
  *
  *
  */
@@ -57,15 +57,15 @@ protected :
   OBS_PTR(Conduction) eq_swift;
   OBS_PTR(Conduction) eq_corse;
 
-  double tau = -123.;                                // tau est la constante de temps du forcage.
+  double tau = -123.;                                // tau is the time constant of the forcing.
 
-  DoubleVect Y_swift;                         // Coordonnees des points ou est definie la temperature dans le solide
-  DoubleVect Y_corse;                        // ou doit etre fait le forcage.
+  DoubleVect Y_swift;                         // Coordinates of points where the solid temperature is defined
+  DoubleVect Y_corse;                        // where the forcing must be applied.
 
-  IntVect compt_swift;                        // Nombre de points a meme Y.
+  IntVect compt_swift;                        // Number of points at the same Y.
   IntVect compt_corse;
 
-  IntVect corresp_swift;                  // Correspondance numerotation globale -> numerotation locale dans Y.
+  IntVect corresp_swift;                  // Correspondence global numbering -> local numbering in Y.
   IntVect corresp_corse;
   IntVect corresp_SC;
 

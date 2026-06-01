@@ -29,10 +29,9 @@ const int StringTokenizer::STRING=-3;
 const int StringTokenizer::EOS=-1;
 
 
-// On ne definit les identificateurs des operateurs qu'une seule fois entre la classe Parser et StringTokenizer.
-// Pour l'instant, on les place dans cette classe et donc on les supprime de la classe Parser
-// => on pourra envisager de les mettre dans une classe a part entiere si ca parait plus clair.
-/* attention il faut que les constantes suivantes soit superieur a 0 pour eviter les conflits avec les fonctions unaires
+// Operator identifiers are defined only once, shared between the Parser and StringTokenizer classes.
+// They are placed here and removed from the Parser class; they could be moved to a dedicated class if clearer.
+/* Note: the following constants must be greater than 0 to avoid conflicts with unary function identifiers.
  */
 const int StringTokenizer::ADD = 0;
 const int StringTokenizer::SUBTRACT = 1;
@@ -50,13 +49,13 @@ const int StringTokenizer::AND = 12;
 const int StringTokenizer::OR = 13;
 const int StringTokenizer::EQ = 14;
 const int StringTokenizer::NEQ = 15;
-// les parentheses :
+// Parentheses:
 const int StringTokenizer::GRP = 1000;
 const int StringTokenizer::ENDGRP = 1001;
 
 
-// Nb d'operateurs et mot-cles pour les identifier (ne concerne pas les parentheses"(" et ")").
-// Attention a l'ordre des operateurs ci dessous : ils doivent etre positionnes dans les tableaux  keyword_op et keyword_op_bis en fonction des valeurs des constantes statiques ADD, SUB etc... definies ci-dessus
+// Number of operators and keywords (parentheses "(" and ")" are not included).
+// The order of operators below must match the values of the static constants ADD, SUB, etc. defined above.
 //
 const int StringTokenizer::nb_op=16;
 const int StringTokenizer::nb_op_bis=11;
@@ -131,7 +130,7 @@ int StringTokenizer::nextToken()
         {
           if ( ((reste[0] >= '0') && ( reste[0] <= '9')) || (reste[0] == '.')  )
             {
-              // ajout OC pour provoquer une erreur avec 2x
+              // Added by OC to raise an error when input is like "2x"
               int ind=(int)strlen(reste)-1;
               if ( ((reste[ind] < '0') || (reste[ind] > '9')) && (reste[ind] != '.') )
                 {
@@ -267,12 +266,12 @@ int StringTokenizer::nextToken()
 
 
 
-//methodes privees :
+// Private methods:
 
 void StringTokenizer::init_keyword_op()
 {
   op_sep = new char*[nb_op];
-  // on encadre le mot-cle de chaque operateur par des "_" :
+  // Each operator keyword is surrounded by "_":
   // LT =>  _LT_  etc...
   for (int i=0; i<nb_op; i++)
     {
@@ -286,9 +285,9 @@ void StringTokenizer::init_keyword_op()
 
 
 /**
- * Cherche dans la chaine "ch" la prochaine apparition d'un separateur.
- * Renvoie dans le parametre "type_sep", le type de separateur ((, ), +, - etc...)
- * Renvoie egalement la longueur de la chaine correspondante au separateur trouve
+ * Searches the string "ch" for the next occurrence of a separator.
+ * Returns the separator type ((, ), +, -, etc.) in the "type_sep" parameter.
+ * Also returns the length of the string corresponding to the separator found.
  */
 char* StringTokenizer::find_sep(char* ch, int& type_sep, int& length)
 {

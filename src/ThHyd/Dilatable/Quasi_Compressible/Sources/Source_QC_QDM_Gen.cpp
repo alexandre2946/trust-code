@@ -55,9 +55,9 @@ DoubleTab& Source_QC_QDM_Gen::ajouter(DoubleTab& resu) const
 }
 /*! @brief DOES NOTHING - to override in derived classes.
  *
- *     Mise a jour en temps du terme source.
+ *     Time update of the source term.
  *
- * @param (double) le pas de temps de mise a jour
+ * @param (double) the time update step
  */
 void Source_QC_QDM_Gen::mettre_a_jour(double t)
 {

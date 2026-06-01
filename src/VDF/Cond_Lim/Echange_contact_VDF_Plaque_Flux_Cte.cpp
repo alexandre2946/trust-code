@@ -34,7 +34,7 @@ Entree& Echange_contact_VDF_Plaque_Flux_Cte::readOn(Entree& is)
 }
 
 /**
- * Calcule le coeff d echange suivant la correlation de Shah
+ * @brief Computes the heat exchange coefficient using the Shah correlation.
  */
 double Echange_contact_VDF_Plaque_Flux_Cte::calculer_coefficient_echange(int i)
 {

@@ -25,10 +25,10 @@ Implemente_instanciable_32_64(Reordonner_32_64,"Reordonner",Interprete_geometriq
 // XD attr domain_name ref_domaine domain_name REQ Name of domain to resequence.
 
 
-/*! @brief Ecrit le type de l'objet sur un flot de sortie.
+/*! @brief Writes the object type to an output stream.
  *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& s) an output stream
+ * @return (Sortie&) the modified output stream
  */
 template <typename _SIZE_>
 Sortie& Reordonner_32_64<_SIZE_>::printOn(Sortie& s ) const
@@ -37,10 +37,10 @@ Sortie& Reordonner_32_64<_SIZE_>::printOn(Sortie& s ) const
 }
 
 
-/*! @brief NE FAIT RIEN
+/*! @brief DOES NOTHING
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the input stream
  */
 template <typename _SIZE_>
 Entree& Reordonner_32_64<_SIZE_>::readOn(Entree& is )
@@ -49,14 +49,14 @@ Entree& Reordonner_32_64<_SIZE_>::readOn(Entree& is )
 }
 
 
-/*! @brief Fonction principale de l'interprete Mailler Reordonne les noeuds du domaine specifie par
+/*! @brief Main function of the Mailler interpreter. Reorders the nodes of the domain specified by
  *
- *     la directive.
+ *     the directive.
  *        Reordonner_32_64 dom
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws l'objet a reordonner n'est pas du type Domaine
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
+ * @throws the object to reorder is not of type Domaine
  */
 template <typename _SIZE_>
 Entree& Reordonner_32_64<_SIZE_>::interpreter_(Entree& is)

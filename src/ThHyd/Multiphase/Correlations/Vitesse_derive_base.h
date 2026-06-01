@@ -19,9 +19,9 @@
 #include <Vitesse_relative_base.h>
 #include <TRUSTTab.h>
 
-/*! @brief classe Vitesse_derive_base
+/*! @brief Vitesse_derive_base class
  *
- *  correlations de vitesse de derive de la forme
+ *  drift velocity correlations of the form
  *
  *  ur = ((C0 - 1) * v_l + vg0) / (1 - C0 alpha_g)
  *

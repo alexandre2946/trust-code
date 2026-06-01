@@ -66,15 +66,15 @@ void Paroi_Knudsen_non_negligeable::completer()
   Cerr << "Paroi_Knudsen_non_negligeable::completer" << finl;
   Nom type = "Champ_front_fonc_gradient_";
   type += domaine_Cl_dis().equation().discretisation().que_suis_je();
-  // Typage definitif en fonction de la discretisation
+  // Final type based on the discretization
   Frontiere_dis_base& fr = le_champ_front->frontiere_dis();
   le_champ_front.typer(type);
   le_champ_front->associer_fr_dis_base(fr);
-  // Paroi defilante : le champ_front est la vitesse de nombre
-  // de composantes la dimension du pb ... Est ce utile de dimensionner
-  // maintenant cela ?
+  // Sliding wall: le_champ_front is the velocity with
+  // as many components as the problem dimension... Is it useful to size
+  // it now?
   le_champ_front->fixer_nb_comp(dimension);
-  // On associe l'inconnue:
+  // Associate the unknown:
   Champ_front_fonc_gradient& ch = ref_cast(Champ_front_fonc_gradient, le_champ_front.valeur());
   ch.associer_ch_inc_base(domaine_Cl_dis().equation().inconnue());
   Cerr << "Paroi_Knudsen_non_negligeable::completer OK" << finl;

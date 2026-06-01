@@ -27,11 +27,11 @@ class Domaine_VF;
 
 #include <Domaine_forward.h>
 
-/*! @brief classe Champ_Fonc_base Classe de base des champs qui sont fonction d'une grandeur calculee
+/*! @brief class Champ_Fonc_base Base class of fields that are functions of a calculated quantity
  *
- *      au cours du temps
+ *      over time
  *
- * @sa Champ_base Champ_Don_base, Classe abstraite., Methodes abstraites:, void mettre_a_jour(double temps), void associer_domaine_dis_base(const Domaine_dis_base&), const Domaine_dis_base& domaine_dis_base() const
+ * @sa Champ_base Champ_Don_base, Abstract class., Abstract methods:, void mettre_a_jour(double temps), void associer_domaine_dis_base(const Domaine_dis_base&), const Domaine_dis_base& domaine_dis_base() const
  */
 class Champ_Fonc_base : public Champ_Don_base
 {
@@ -62,7 +62,7 @@ public:
   virtual const Domaine_VF& domaine_vf() const;
 
 protected:
-  // Par defaut on initialise les valeurs a zero
+  // By default, initialize values to zero
   virtual void creer_tableau_distribue(const MD_Vector&, RESIZE_OPTIONS = RESIZE_OPTIONS::COPY_INIT);
   OBS_PTR(Domaine_VF) le_dom_VF;
   Nom pdi_name_; // name to use when saving the field with PDI (ensures that the name is unique among all the other fields, as we can't the same data declared multiples times with PDI)

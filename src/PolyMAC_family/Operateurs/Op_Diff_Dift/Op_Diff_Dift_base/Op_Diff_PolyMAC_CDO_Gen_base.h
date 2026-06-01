@@ -25,7 +25,7 @@ class Domaine_PolyMAC_CDO;
 
 /*! @brief class Op_Diff_PolyMAC_CDO_Gen_base
  *
- *  Classe de base generique pour la diffusion PolyMAC_CDO
+ *  Generic base class for PolyMAC_CDO diffusion operators.
  *
  */
 class Op_Diff_PolyMAC_CDO_Gen_base: public Operateur_Diff_base
@@ -39,20 +39,20 @@ public:
   DoubleTab& calculer(const DoubleTab&, DoubleTab&) const override;
   virtual void modifier_mu(DoubleTab&) const { }
 
-  /* methodes surchargeables dans des classes derivees pour modifier nu avant de calculer les gradients dans update_nu_xwh */
-  virtual int dimension_min_nu() const /* dimension minimale de nu / nu_bord par composante */
+  /* overridable methods in derived classes to modify nu before computing the gradients in update_nu_xwh */
+  virtual int dimension_min_nu() const /* minimum dimension of nu / nu_bord per component */
   {
     return 1;
   }
 
-  /* diffusivite / conductivite. Attension : stockage nu(element, composante[, dim 1[, dim 2]]) */
-  inline const DoubleTab& nu() const /* aux elements */
+  /* diffusivity / conductivity. Note: stored as nu(element, component[, dim 1[, dim 2]]) */
+  inline const DoubleTab& nu() const /* at elements */
   {
     if (!nu_a_jour_) update_nu();
     return nu_;
   }
 
-  virtual void update_nu() const = 0; //mise a jour
+  virtual void update_nu() const = 0; //update
 
   int impr(Sortie& os) const override;
 
@@ -61,8 +61,8 @@ public:
 
 protected:
   mutable SFichier Flux, Flux_moment, Flux_sum; // Fichiers .out
-  mutable DoubleTab nu_; // diffusivite aux elements
-  mutable int nu_a_jour_ = 0, nu_constant_ = 0 /* Elie : pour valgrind */; // si on doit mettre a jour nu, nu constant
+  mutable DoubleTab nu_; // diffusivity at elements
+  mutable int nu_a_jour_ = 0, nu_constant_ = 0 /* Elie: for valgrind */; // whether nu needs updating, whether nu is constant
 
   OBS_PTR(Domaine_PolyMAC_CDO) le_dom_poly_;
   OBS_PTR(Domaine_Cl_PolyMAC_family) la_zcl_poly_;

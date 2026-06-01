@@ -19,7 +19,7 @@
 #include <Format_Post_base.h>
 #include <Ecrire_CGNS.h>
 
-/*! @brief classe Format_Post_CGNS
+/*! @brief class Format_Post_CGNS
  *
  *  The CFD General Notation System (CGNS) provides a general, portable, and extensible standard for the storage and
  *  retrieval of computational fluid dynamics (CFD) analysis data. It consists of a collection of conventions,
@@ -85,7 +85,7 @@ public:
   int ecrire_champ(const Domaine&, const Noms&, const Noms&, int, double, const Nom&, const Nom&, const Nom&, const Nom&, const DoubleTab&) override;
 
 #ifdef HAS_CGNS
-  // pour simplifier la vie
+  // for convenience
   inline Ecrire_CGNS& get_cgns_writer() { return cgns_writer_; }
   inline const Ecrire_CGNS& get_cgns_writer() const { return cgns_writer_; }
 #endif

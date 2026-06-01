@@ -19,11 +19,9 @@
 #include <Convection_Diffusion_Temperature_base.h>
 #include <Operateur_Evanescence.h>
 
-/*! @brief classe Energie_Multiphase Cas particulier de Convection_Diffusion_std pour un fluide quasi conpressible
- *
- *      quand le scalaire subissant le transport est la temperature en gaz parfaits,
- *      ou l'enthalpie en gaz reels.
- *      (generalisation de Convection_Diffusion_Temperature pour les gaz reels)
+/*! @brief Specialisation of Convection_Diffusion_std for multiphase flows where the transported scalar
+ *      is temperature (for ideal gases) or enthalpy (for real gases).
+ *      (Generalisation of Convection_Diffusion_Temperature to real gases.)
  *
  * @sa Conv_Diffusion_std Convection_Diffusion_Temperature
  */
@@ -42,7 +40,7 @@ public :
 
   /*
     interface {dimensionner,assembler}_blocs
-    specificites : prend en compte l'evanescence (en dernier)
+    specifics: evanescence is taken into account (last)
   */
   int has_interface_blocs() const override;
   void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
@@ -50,7 +48,7 @@ public :
   const Motcle& domaine_application() const override;
   void verifie_ch_init_nb_comp_cl(const Champ_Inc_base& ch_ref, const int nb_comp, const Cond_lim_base& cl) const override;
 
-  /* champ convecte : alpha * rho * e */
+  /* convected field: alpha * rho * e */
   static void calculer_alpha_rho_e(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv);
   std::pair<std::string, fonc_calc_t> get_fonc_champ_conserve() const override
   {
@@ -64,7 +62,7 @@ public :
     return { "alpha_rho_e_conv", calculer_alpha_rho_e_conv };
   }
 
-  Champ_Inc_base& champ_convecte() const override //par defaut le champ conserve
+  Champ_Inc_base& champ_convecte() const override // by default the conserved field
   {
     return champ_convecte_.valeur();
   }
@@ -72,7 +70,7 @@ public :
   {
     return bool(champ_convecte_);
   }
-  void init_champ_convecte() const override; //a appeller dans le completer() des operateurs/sources qui auront besoin de champ_convecte_
+  void init_champ_convecte() const override; // to be called in the completer() of operators/sources that will need champ_convecte_
 
 protected :
 
@@ -80,18 +78,18 @@ protected :
   Operateur_Evanescence evanescence_;
 };
 
-/*! @brief Renvoie le champ inconnue representant l'inconnue (T ou H) (version const)
+/*! @brief Returns the unknown field representing the unknown (T or H) (const version).
  *
- * @return (Champ_Inc_base&) le champ inconnue representant la temperature (GP) ou l'enthalpie (GR)
+ * @return (Champ_Inc_base&) the unknown field representing temperature (ideal gas) or enthalpy (real gas)
  */
 inline const Champ_Inc_base& Energie_Multiphase::inconnue() const
 {
   return l_inco_ch_;
 }
 
-/*! @brief Renvoie le champ inconnue representant l'inconnue (T ou H)
+/*! @brief Returns the unknown field representing the unknown (T or H).
  *
- * @return (Champ_Inc_base&) le champ inconnue representant la temperature (GP) ou l'enthalpie (GR)
+ * @return (Champ_Inc_base&) the unknown field representing temperature (ideal gas) or enthalpy (real gas)
  */
 inline Champ_Inc_base& Energie_Multiphase::inconnue()
 {

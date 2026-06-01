@@ -22,7 +22,7 @@
 
 /*! @brief class Terme_Puissance_Thermique_PolyMAC_CDO_Elem
  *
- *  Cette classe represente un terme source de l'equation de la thermique du type degagement volumique de puissance thermique
+ *  This class represents a source term of the heat equation of the type volumetric thermal power release
  *
  * @sa Terme_Puissance_Thermique, Terme_Source_PolyMAC_CDO_base
  */

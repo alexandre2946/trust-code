@@ -165,14 +165,14 @@ void Traitement_particulier_NS_Profils_VDF::post_traitement_particulier()
         }
     }
 
-  ////// Moyenne temporelle*********************************************//
+  ////// Temporal average *********************************************//
   if (oui_stat != 0)
     {
       double tpsbis = mon_equation->inconnue().temps();
       if ((tpsbis>=temps_deb)&&(tpsbis<=temps_fin))
         {
           static int init_stat_temps = 0;
-          if((init_stat_temps==0)&&( oui_repr != 1))  // si ce n est pas une reprise : sinon valeurs lues dans le fichier de reprise
+          if((init_stat_temps==0)&&( oui_repr != 1))  // if this is not a restart: otherwise values are read from the restart file
             {
               double dt_v = mon_equation->schema_temps().pas_de_temps();
               temps_deb = tpsbis-dt_v;
@@ -226,9 +226,9 @@ void Traitement_particulier_NS_Profils_VDF::post_traitement_particulier()
 
 void Traitement_particulier_NS_Profils_VDF::init_calcul_moyenne()
 {
-  // On va initialiser les differents parametres membres de la classe
-  // utiles au calcul des differentes moyennes
-  // Initialisation de : Yu,Yv,Yw,Yuv + compt_x,compt_y,compt_z,compt_uv
+  // Initialize the various member parameters of the class
+  // useful for computing the different averages
+  // Initialization of: Yu,Yv,Yw,Yuv + compt_x,compt_y,compt_z,compt_uv
   // + corresp_u,corresp_v,corresp_w,corresp_uv
   const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
   const Domaine_VDF& domaine_VDF=ref_cast(Domaine_VDF, zdisbase);
@@ -250,7 +250,7 @@ void Traitement_particulier_NS_Profils_VDF::init_calcul_moyenne()
   indicw_m = indicw_p = 0;
   indicuv_m = indicuv_p = 0;
 
-  // initialisation des differentes tailles de tableaux
+  // initialization of the various array sizes
   Nxy.resize(n_probes);
   Nyy.resize(n_probes);
   Nzy.resize(n_probes);
@@ -260,7 +260,7 @@ void Traitement_particulier_NS_Profils_VDF::init_calcul_moyenne()
   Nzy = Nap;
   Nuv = Nap;
 
-  // dimensionnement aux valeurs rentrees dans le jeu de donnees
+  // sizing according to the values provided in the data set
   // The points before the value of the probe
   xUm.resize(n_probes);
   xWm.resize(n_probes);
@@ -320,12 +320,12 @@ void Traitement_particulier_NS_Profils_VDF::init_calcul_moyenne()
   Cerr << (int)system("mkdir Space_Avg") << finl;
   Cerr << (int)system("mkdir Time_Avg") << finl;
 
-  // remplissage des tableaux ci-dessus
+  // filling the arrays above
 
-  // On cherche tout d'abord les coordonnees des points les plus proches de chaque cote et on les stocke
+  // First we look for the coordinates of the closest points on each side and store them
   for(i=0; i<n_probes; i++)
     {
-      //Boucle sur les faces
+      //Loop over faces
       for (num_face=0; num_face<nb_faces; num_face++)
         {
           ori = orientation(num_face);
@@ -400,7 +400,7 @@ void Traitement_particulier_NS_Profils_VDF::init_calcul_moyenne()
         }
 
 
-      //Boucle sur les elements
+      //Loop over elements
       for (num_elem=0; num_elem<nb_elems; num_elem++)
         {
           if((xp(num_elem,dir_profil)-positions(i))>=0)
@@ -419,13 +419,13 @@ void Traitement_particulier_NS_Profils_VDF::init_calcul_moyenne()
                   delta_UVm(i)=positions(i)-xp(num_elem,dir_profil);
                 }
             }
-        }//Fin boucle sur les elements
+        }//End loop over elements
 
     }
 
   int numb_del_probes=0;
-  //Verification des sondes pour voir si elles sont bien toutes definies
-  //dans le domaine de calcul
+  //Verification of probes to check that they are all well defined
+  //within the computational domain
   for(i=0; i<n_probes; i++)
     {
       if((delta_Um(i)==10000000)||(delta_Up(i)==10000000)||
@@ -509,23 +509,23 @@ void Traitement_particulier_NS_Profils_VDF::init_calcul_moyenne()
 
 
 
-  //On remplit les tableaux de correspondances
+  //We fill the correspondence tables
   for(i=0; i<n_probes; i++)
     {
       indic_m = indic_p = 0;
       indicv_m = indicv_p = 0;
       indicw_m = indicw_p = 0;
       indicuv_m = indicuv_p = 0;
-      //Boucle sur les faces pour avoir la correspondance pour les composantes de la vitesse.
+      //Loop over faces to get the correspondence for velocity components.
       for (num_face=0; num_face<nb_faces; num_face++)
         {
           ori = orientation(num_face);
           switch(ori)
             {
-              //Pour la composante de vitesse U
+              //For the U velocity component
             case 0:
               {
-                //Point avant
+                //Point before
                 if(xv(num_face,dir_profil)==xUm(i))
                   {
                     y = xv(num_face,3-homo_dir-dir_profil);
@@ -554,7 +554,7 @@ void Traitement_particulier_NS_Profils_VDF::init_calcul_moyenne()
                         indic_m++;
                       }
                   }
-                //Point apres
+                //Point after
                 else if(xv(num_face,dir_profil)==xUp(i))
                   {
                     y = xv(num_face,3-homo_dir-dir_profil);
@@ -585,10 +585,10 @@ void Traitement_particulier_NS_Profils_VDF::init_calcul_moyenne()
                   }
                 break;
               }
-              //Pour la composante de vitesse V
+              //For the V velocity component
             case 1 :
               {
-                //Point avant
+                //Point before
                 if(xv(num_face,dir_profil)==xVm(i))
                   {
                     y = xv(num_face,3-homo_dir-dir_profil);
@@ -617,7 +617,7 @@ void Traitement_particulier_NS_Profils_VDF::init_calcul_moyenne()
                         indicv_m++;
                       }
                   }
-                //Point apres
+                //Point after
                 else if(xv(num_face,dir_profil)==xVp(i))
                   {
                     y = xv(num_face,3-homo_dir-dir_profil);
@@ -648,10 +648,10 @@ void Traitement_particulier_NS_Profils_VDF::init_calcul_moyenne()
                   }
                 break;
               }
-              //Pour la composante de vitesse W
+              //For the W velocity component
             case 2 :
               {
-                //Point avant
+                //Point before
                 if(xv(num_face,dir_profil)==xWm(i))
                   {
                     y = xv(num_face,3-homo_dir-dir_profil);
@@ -680,7 +680,7 @@ void Traitement_particulier_NS_Profils_VDF::init_calcul_moyenne()
                         indicw_m++;
                       }
                   }
-                //Point apres
+                //Point after
                 else if(xv(num_face,dir_profil)==xWp(i))
                   {
                     y = xv(num_face,3-homo_dir-dir_profil);
@@ -747,7 +747,7 @@ void Traitement_particulier_NS_Profils_VDF::init_calcul_moyenne()
                   indicuv_m++;
                 }
             }
-          //Point apres
+          //Point after
           if(xp(num_elem,dir_profil)==xUVp(i))
             {
               y = xp(num_elem,3-homo_dir-dir_profil);
@@ -770,12 +770,12 @@ void Traitement_particulier_NS_Profils_VDF::init_calcul_moyenne()
                   indicuv_p++;
                 }
             }
-        }//Fin de boucle sur elements
+        }//End loop over elements
 
 
-      //Verification pour voir si avant et apres le profil on a le meme nombre de points...
-      //Ce n'est pas le cas si par exemple on a une marche et un profil juste sur l'arete :
-      //dans ce cas, on a plus de points du cote du bas de la marche que du cote du haut de la marche.
+      //Check to see if before and after the profile we have the same number of points...
+      //This is not the case if, for example, we have a step and a profile just at the edge:
+      //in this case, there are more points on the lower side of the step than on the upper side.
       if(indic_p!=indic_m)
         {
           Cerr << "indic_m = " << indic_m << " != indic_p = " << indic_p << finl;
@@ -801,12 +801,12 @@ void Traitement_particulier_NS_Profils_VDF::init_calcul_moyenne()
           exit();
         }
 
-      Nxy(i) = indic_m;    // nombre de y pour umoy
+      Nxy(i) = indic_m;    // number of y values for umoy
       Nyy(i) = indicv_m;
       Nzy(i) = indicw_m;
-      Nuv(i) = indicuv_m;  // nombre de y pour uv_moy (et pour nu_t!!)
+      Nuv(i) = indicuv_m;  // number of y values for uv_moy (and for nu_t!!)
 
-    }//Fin de boucle sur probes
+    }//End loop over probes
 }
 
 
@@ -835,16 +835,16 @@ void Traitement_particulier_NS_Profils_VDF::calculer_moyenne_spatiale_nut(Double
   u_moy = 0.;
   for(i=0; i<n_probes; i++)
     {
-      // Calcul de nut
+      // Compute nut
       for (num_elem=0; num_elem<nb_elems; num_elem++)
         if(xp(num_elem,dir_profil)==xUV(i))
           {
             u_moy(i,corresp(i,num_elem)) += nu_t[num_elem];
           }
-    } // on a parcouru tous les profils
+    } // all profiles have been iterated over
 
 
-  // POUR LE PARALLELE
+  // FOR PARALLEL
   IntTab compt_p(compt);
   envoyer(compt_p,Process::me(),0,Process::me());
 
@@ -873,7 +873,7 @@ void Traitement_particulier_NS_Profils_VDF::calculer_moyenne_spatiale_nut(Double
           u_moy(i,j) = u_moy_tot(i,j)/compt_tot(i,j);
 
     }
-  // FIN DU PARALLELE
+  // END OF PARALLEL SECTION
 
 }
 
@@ -911,9 +911,9 @@ void Traitement_particulier_NS_Profils_VDF::calculer_moyenne_spatiale_vitesse(Do
               u_moy_4(i,corresp(i,num_face)) += vit*vit*vit*vit;
             }
         }
-    }// On a parcouru tous les profils
+    }// All profiles have been iterated over
 
-  // POUR LE PARALLELE
+  // FOR PARALLEL
   IntTab compt_p(compt);
   envoyer(compt_p,Process::me(),0,Process::me());
 
@@ -970,10 +970,10 @@ void Traitement_particulier_NS_Profils_VDF::calculer_moyenne_spatiale_vitesse(Do
             u_moy_4(i,j) = u_moy_4_tot(i,j)/compt_tot(i,j);
           }
     }
-  // FIN DU PARALLELE
+  // END OF PARALLEL SECTION
 
-  // commente par guillaume
-  //Calcul de uprime2 ou vprime2 ou wprime2
+  // commented out by guillaume
+  //Compute uprime2 or vprime2 or wprime2
   //  for (j=0;j<NN(i);j++)
   //    u_moy_2(i,j) -= u_moy(i,j)*u_moy(i,j);
 }
@@ -1005,7 +1005,7 @@ void Traitement_particulier_NS_Profils_VDF::calculer_moyenne_spatiale_uv(DoubleT
 
   for(i=0; i<n_probes; i++)
     {
-      // Calcul de uv
+      // Compute uv
       for (num_elem=0; num_elem<nb_elems; num_elem++)
         {
           if(xp(num_elem,dir_profil)==xUV(i))
@@ -1021,9 +1021,9 @@ void Traitement_particulier_NS_Profils_VDF::calculer_moyenne_spatiale_uv(DoubleT
               v_moy_cent(i,corresp(i,num_elem)) += vitv;
             }
         }
-    } // On a parcouru tous les profils
+    } // All profiles have been iterated over
 
-  // POUR LE PARALLELE
+  // FOR PARALLEL
   IntTab compt_p(compt);
   envoyer(compt_p,Process::me(),0,Process::me());
 
@@ -1076,7 +1076,7 @@ void Traitement_particulier_NS_Profils_VDF::calculer_moyenne_spatiale_uv(DoubleT
             uv_moy(i,j) += u_moy_cent(i,j)*v_moy_cent(i,j);
         }
     }
-  // FIN DU PARALLELE
+  // END OF PARALLEL SECTION
 
 }
 
@@ -1157,7 +1157,7 @@ void Traitement_particulier_NS_Profils_VDF::ecriture_fichiers_moy_spat(const Dou
       nom_fic   += temps;
       nom_fic   += ".dat";
 
-      //Pour calculer les interpolations lineaires...
+      //To compute the linear interpolations...
       DoubleTab umoy(umoy_m);
       DoubleTab umoy_2(umoy_2_m);
       DoubleTab umoy_3(umoy_3_m);
@@ -1185,7 +1185,7 @@ void Traitement_particulier_NS_Profils_VDF::ecriture_fichiers_moy_spat(const Dou
           for (j=0; j<NN(i)  ; j++)
             {
               val_moy = umoy(i,j);
-              // Pour eviter NAN, on prend le std::max(,0):
+              // To avoid NAN, we take the std::max(,0):
               val2 = sqrt(std::max(umoy_2(i,j)-val_moy*val_moy,0.0));
 
               if (val2 ==0 )
@@ -1207,8 +1207,8 @@ void Traitement_particulier_NS_Profils_VDF::ecriture_fichiers_moy_spat(const Dou
             }
           fic.flush();
           fic.close();
-        } // Fin du si je suis maitre
-    }//FIN boucle sur les probes
+        } // End of "if I am master"
+    }//END loop over probes
 }
 
 
@@ -1262,7 +1262,7 @@ void Traitement_particulier_NS_Profils_VDF::ecriture_fichiers_moy_spat_1col(cons
         {
           SFichier fic (nom_fic);
 
-          //Pour calculer les interpolations lineaires...
+          //To compute the linear interpolations...
           DoubleTab umoy(umoy_m);
           for(j=0; j<NN(i); j++)
             {
@@ -1274,8 +1274,8 @@ void Traitement_particulier_NS_Profils_VDF::ecriture_fichiers_moy_spat_1col(cons
             fic << Y (i,j) << " " << umoy(i,j) << finl;
           fic.flush();
           fic.close();
-        } // Fin de si je suis maitre
-    }//FIN boucle sur les probes
+        } // End of "if I am master"
+    }//END loop over probes
 }
 
 
@@ -1347,7 +1347,7 @@ void Traitement_particulier_NS_Profils_VDF::ecriture_fichiers_moy_temp(const Dou
             {
               val_moy = umoy(i,j)/dt;
               val2 = umoy_2(i,j)/dt -val_moy*val_moy;
-              // Pour eviter NAN, on prend le std::max(,0):
+              // To avoid NAN, we take the std::max(,0):
               val2 = sqrt(std::max(val2,0.0));
 
               if (val2 ==0.0 )
@@ -1368,8 +1368,8 @@ void Traitement_particulier_NS_Profils_VDF::ecriture_fichiers_moy_temp(const Dou
             }
           fic.flush();
           fic.close();
-        } // Fin de si je suis maitre
-    }//FIN boucle sur les probes
+        } // End of "if I am master"
+    }//END loop over probes
 }
 
 
@@ -1427,7 +1427,7 @@ void Traitement_particulier_NS_Profils_VDF::ecriture_fichiers_moy_temp_1col(cons
             fic << Y (i,j) << " " << umoy(i,j)/dt << finl;
           fic.flush();
           fic.close();
-        } // Fin de si je suis maitre
-    }//FIN boucle sur les probes
+        } // End of "if I am master"
+    }//END loop over probes
 }
 

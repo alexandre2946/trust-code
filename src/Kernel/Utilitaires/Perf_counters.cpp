@@ -1205,8 +1205,8 @@ void Perf_counters::Impl::print_global_TU(const std::string& message)
   double theoric_comm_time = 0.0;
   if(max_bandwidth)
     theoric_comm_time = static_cast<double>(comm_allreduce_c) * allreduce_peak_perf + static_cast<double>(comm_sendrecv_c) / max_bandwidth;
-  // Je suppose que le temps minimum pour realiser les communications sur un proc
-  //  depend du processeur qui a le plus de donnees a envoyer:
+  // I assume that the minimum time to perform communications on a proc
+  //  depends on the processor that has the most data to send:
   theoric_comm_time = Process::mp_max(theoric_comm_time);
   double total_time_avg=0.0, total_time_max=0.0;
   if(nb_ts >0)

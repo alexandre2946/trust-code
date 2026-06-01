@@ -42,12 +42,12 @@ void Terme_Source_Qdm_Face_PolyMAC_HFV::ajouter_blocs(matrices_t matrices, Doubl
                     &fs = domaine.face_surfaces();
   const IntTab& f_e = domaine.face_voisins(), &fcl = ch.fcl();
   int e, f, i, cS = (vals.dimension_tot(0) == 1), cR = rho ? (*rho).dimension_tot(0) == 1 : 0, nf_tot = domaine.nb_faces_tot(), n, N = equation().inconnue().valeurs().line_size(), d,
-               D = dimension, calc_cl = !sub_type(Domaine_PolyMAC_MPFA, domaine); //en PolyMAC_HFV V1, on calcule aux CL
+               D = dimension, calc_cl = !sub_type(Domaine_PolyMAC_MPFA, domaine); //in PolyMAC_HFV V1, we compute at BCs
 
-  /* contributions aux faces (par chaque voisin), aux elems */
+  /* contributions to faces (from each neighbor) and to elements */
   DoubleTrav a_f(N), rho_m(2);
   for (a_f = 1, f = 0; f < domaine.nb_faces(); f++)
-    if (!fcl(f, 0)) //face interne
+    if (!fcl(f, 0)) //internal face
       {
         if (1)
           {
@@ -80,10 +80,10 @@ void Terme_Source_Qdm_Face_PolyMAC_HFV::ajouter_blocs(matrices_t matrices, Doubl
       }
     else if (calc_cl || fcl(f, 0) < 2)
       for (e = f_e(f, 0), n = 0; n < N; n++)
-        for (d = 0; d < D; d++) //face de bord non imposee -> avec le (alpha rho) de la maille
+        for (d = 0; d < D; d++) //non-imposed boundary face -> using (alpha rho) from the cell
           secmem(f, n) += pf(f) * vf(f) * (alp ? (*alp)(e, n) * (*rho)(!cR * e, n) : 1) * nf(f, d) / fs(f) * vals(!cS * e, N * d + n);
 
-  /* en PolyMAC_CDO V2 : partie aux elements */
+  /* in PolyMAC_CDO V2: element part */
   if (sub_type(Domaine_PolyMAC_MPFA, domaine))
     for (e = 0; e < domaine.nb_elem_tot(); e++)
       for (d = 0; d < D; d++)

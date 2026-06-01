@@ -19,7 +19,7 @@
 #include <Correlation_base.h>
 #include <Champ_Fonc_base.h>
 
-/*! @brief classe Gravite_Multiphase Contient un champ de gravite defini par l'utilisateur
+/*! @brief Holds a gravity field defined by the user.
  *
  *
  *

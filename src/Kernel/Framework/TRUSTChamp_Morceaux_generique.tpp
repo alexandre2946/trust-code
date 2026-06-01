@@ -33,10 +33,10 @@ Champ_base& TRUSTChamp_Morceaux_generique<_TYPE_>::affecter_(const Champ_base& c
   return *this;
 }
 
-/*! @brief Renvoie la valeur du champ au point specifie par ses coordonnees.
+/*! @brief Returns the value of the field at the point specified by its coordinates.
  *
- * @param (DoubleVect& positions) les coordonnees du point de calcul
- * @param (DoubleVect& valeurs) la valeur du champ au point specifie
+ * @param (DoubleVect& positions) the coordinates of the computation point
+ * @param (DoubleVect& valeurs) the value of the field at the specified point
  */
 template<Champ_Morceaux_Type _TYPE_>
 DoubleVect& TRUSTChamp_Morceaux_generique<_TYPE_>::valeur_a(const DoubleVect& positions, DoubleVect& tab_valeurs) const
@@ -47,11 +47,11 @@ DoubleVect& TRUSTChamp_Morceaux_generique<_TYPE_>::valeur_a(const DoubleVect& po
   return valeur_a_elem(positions, tab_valeurs, le_poly[0]);
 }
 
-/*! @brief Renvoie la valeur du champ au point specifie par ses coordonnees, en indiquant que ce point est situe dans un element specifie.
+/*! @brief Returns the value of the field at the point specified by its coordinates, indicating that this point is located in a specified element.
  *
- * @param (DoubleVect&) les coordonnees du point de calcul
- * @param (DoubleVect& val) la valeur du champ au point specifie
- * @param (int le_poly) l'element dans lequel est situe le point de calcul
+ * @param (DoubleVect&) the coordinates of the computation point
+ * @param (DoubleVect& val) the value of the field at the specified point
+ * @param (int le_poly) the element in which the computation point is located
  */
 template<Champ_Morceaux_Type _TYPE_>
 DoubleVect& TRUSTChamp_Morceaux_generique<_TYPE_>::valeur_a_elem(const DoubleVect&, DoubleVect& val, int le_poly) const
@@ -64,11 +64,11 @@ DoubleVect& TRUSTChamp_Morceaux_generique<_TYPE_>::valeur_a_elem(const DoubleVec
   return val;
 }
 
-/*! @brief Renvoie la valeur d'une composante du champ au point specifie par ses coordonnees, en indiquant que ce point est situe dans un element specifie.
+/*! @brief Returns the value of one component of the field at the point specified by its coordinates, indicating that this point is located in a specified element.
  *
- * @param (DoubleVect&) les coordonnees du point de calcul
- * @param (int le_poly) l'element dans lequel est situe le point de calcul
- * @param (int ncomp) l'index de la composante du champ a calculer
+ * @param (DoubleVect&) the coordinates of the computation point
+ * @param (int le_poly) the element in which the computation point is located
+ * @param (int ncomp) the index of the field component to compute
  */
 template<Champ_Morceaux_Type _TYPE_>
 double TRUSTChamp_Morceaux_generique<_TYPE_>::valeur_a_elem_compo(const DoubleVect&, int le_poly, int ncomp) const
@@ -81,10 +81,10 @@ double TRUSTChamp_Morceaux_generique<_TYPE_>::valeur_a_elem_compo(const DoubleVe
   return val;
 }
 
-/*! @brief Renvoie les valeurs du champ aux points specifies par leurs coordonnees.
+/*! @brief Returns the values of the field at the points specified by their coordinates.
  *
- * @param (DoubleTab& positions) le tableau des coordonnees des points de calcul
- * @param (DoubleTab& valeurs) le tableau des valeurs du champ aux points specifies
+ * @param (DoubleTab& positions) the array of coordinates of the computation points
+ * @param (DoubleTab& valeurs) the array of field values at the specified points
  */
 template<Champ_Morceaux_Type _TYPE_>
 DoubleTab& TRUSTChamp_Morceaux_generique<_TYPE_>::valeur_aux(const DoubleTab& positions, DoubleTab& tab_valeurs) const
@@ -95,11 +95,11 @@ DoubleTab& TRUSTChamp_Morceaux_generique<_TYPE_>::valeur_aux(const DoubleTab& po
   return valeur_aux_elems(positions, les_polys, tab_valeurs);
 }
 
-/*! @brief Renvoie les valeurs d'une composante du champ aux points specifies par leurs coordonnees.
+/*! @brief Returns the values of one component of the field at the points specified by their coordinates.
  *
- * @param (DoubleTab& positions) le tableau des coordonnees des points de calcul
- * @param (DoubleVect& valeurs) le tableau des valeurs de la composante du champ aux points specifies
- * @param (int ncomp) l'index de la composante du champ a calculer
+ * @param (DoubleTab& positions) the array of coordinates of the computation points
+ * @param (DoubleVect& valeurs) the array of values of the field component at the specified points
+ * @param (int ncomp) the index of the field component to compute
  */
 template<Champ_Morceaux_Type _TYPE_>
 DoubleVect& TRUSTChamp_Morceaux_generique<_TYPE_>::valeur_aux_compo(const DoubleTab& positions, DoubleVect& tab_valeurs, int ncomp) const
@@ -110,11 +110,11 @@ DoubleVect& TRUSTChamp_Morceaux_generique<_TYPE_>::valeur_aux_compo(const Double
   return valeur_aux_elems_compo(positions, les_polys, tab_valeurs, ncomp);
 }
 
-/*! @brief Renvoie les valeurs du champ aux points specifies par leurs coordonnees, en indiquant que les points de calculs sont situes dans les elements indiques.
+/*! @brief Returns the values of the field at the points specified by their coordinates, indicating that the computation points are located in the specified elements.
  *
- * @param (DoubleTab&) le tableau des coordonnees des points de calcul
- * @param (IntVect& les_polys) le tableau des elements dans lesquels sont situes les points de calcul
- * @param (DoubleTab& val) le tableau des valeurs du champ aux points specifies
+ * @param (DoubleTab&) the array of coordinates of the computation points
+ * @param (IntVect& les_polys) the array of elements in which the computation points are located
+ * @param (DoubleTab& val) the array of field values at the specified points
  */
 template<Champ_Morceaux_Type _TYPE_>
 DoubleTab& TRUSTChamp_Morceaux_generique<_TYPE_>::valeur_aux_elems(const DoubleTab&, const IntVect& polys, DoubleTab& tab_val) const
@@ -143,12 +143,12 @@ DoubleTab& TRUSTChamp_Morceaux_generique<_TYPE_>::valeur_aux_elems(const DoubleT
   return tab_val;
 }
 
-/*! @brief Renvoie les valeurs d'une composante du champ aux points specifies par leurs coordonnees, en indiquant que les points de calculs sont situes dans les elements indiques.
+/*! @brief Returns the values of one component of the field at the points specified by their coordinates, indicating that the computation points are located in the specified elements.
  *
- * @param (DoubleTab&) le tableau des coordonnees des points de calcul
- * @param (IntVect& les_polys) le tableau des elements dans lesquels sont situes les points de calcul
- * @param (DoubleVect& val) le tableau des valeurs de la composante du champ aux points specifies
- * @param (int ncomp) l'index de la composante du champ a calculer
+ * @param (DoubleTab&) the array of coordinates of the computation points
+ * @param (IntVect& les_polys) the array of elements in which the computation points are located
+ * @param (DoubleVect& val) the array of values of the field component at the specified points
+ * @param (int ncomp) the index of the field component to compute
  */
 template<Champ_Morceaux_Type _TYPE_>
 DoubleVect& TRUSTChamp_Morceaux_generique<_TYPE_>::valeur_aux_elems_compo(const DoubleTab&, const IntVect& les_polys, DoubleVect& val, int ncomp) const
@@ -205,7 +205,7 @@ void TRUSTChamp_Morceaux_generique<_TYPE_>::mettre_a_jour(double time)
       const int nb_comp = (int)tab.extent(1);
       Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), mon_domaine->nb_elem_tot(), KOKKOS_LAMBDA(const int i)
       {
-        /* xs : coordonnees du poly par barycentre des sommets -> pas top */
+        /* xs : coordinates of the poly via barycenter of vertices -> not ideal */
         double xs[3] = {0,0,0};
         int nb_som = 0, s, r;
         for (int j = 0; j < nb_som_elem && (s = les_elems(i, j)) >= 0; j++)
@@ -214,7 +214,7 @@ void TRUSTChamp_Morceaux_generique<_TYPE_>::mettre_a_jour(double time)
         for (r = 0; r < dim; r++)
           xs[r] /= nb_som;
 
-        /* calcul de chaque composante */
+        /* compute each component */
         double val = has_champ ? tab_ch(i, 0) : 0;
         for (int k = 0; k < nb_comp; k++)
           {
@@ -279,7 +279,7 @@ Entree& TRUSTChamp_Morceaux_generique<_TYPE_>::complete_readOn(const int dim, co
       Process::exit();
     }
 
-  /* parsers par defaut */
+  /* default parsers */
   for (k = 0; k < dim; k++)
     {
       Parser_U psr;

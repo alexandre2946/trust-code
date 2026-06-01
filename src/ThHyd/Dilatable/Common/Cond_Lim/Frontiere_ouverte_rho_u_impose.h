@@ -21,9 +21,9 @@
 
 class Fluide_Dilatable_base;
 
-/*! @brief Frontiere ouverte sur laquelle on impose le flux massique rho.
+/*! @brief @brief Open boundary on which the mass flux rho.U is imposed instead of the velocity U.
  *
- * U et non la vitesse U. La vitesse est calculee par division par rho(n+1) trouve dans le fluide au moment de l'appel a val_imp.
+ * The velocity is computed by dividing by rho(n+1) found in the fluid at the time of the val_imp call.
  *
  * @sa Dirichlet_entree_fluide
  */

@@ -128,11 +128,11 @@ Entree& Declarer_bord_perio_32_64<_SIZE_>::interpreter_(Entree& is)
 }
 
 
-/*! @brief Pour chaque sommet du bord periodique, on cherche son sommet oppose dans la direction + ou - vecteur_perio et dans un rayon search_radius.
+/*! @brief For each vertex of the periodic boundary, its opposite vertex is searched in the + or - vecteur_perio direction and within a search_radius.
  *
- *   Parmi le couple de sommets forme, on deplace celui qui se trouve en +vecteur_perio
- *   pour le mettre en face de l'autre sommet.
- *   Exit en cas d'erreur (si les sommets sont trop eloignes de leur sommet associe)
+ *   Among the pair of vertices formed, the one located in the +vecteur_perio direction is moved
+ *   to align it with the other vertex.
+ *   Exits with an error if vertices are too far from their associated vertex.
  */
 template <typename _SIZE_>
 void Declarer_bord_perio_32_64<_SIZE_>::corriger_coordonnees_sommets_perio()
@@ -165,12 +165,12 @@ void Declarer_bord_perio_32_64<_SIZE_>::corriger_coordonnees_sommets_perio()
 
   const int_t nb_som_bord = som_bord.dimension(0);
   const int dim = static_cast<int>(som_bord.dimension(1));
-  // Un tableau contenant le deplacement applique aux sommets (pour postraitement)
+  // Array containing the displacement applied to the vertices (for post-processing)
   DoubleTab_t delta(nb_som_bord, dim);
-  // Un tableau pour detecter les erreurs de periodicite: sommets associes plusieurs fois
+  // Array to detect periodicity errors: vertices associated more than once
   ArrOfBit_t marker(nb_som_bord);
   marker = 0;
-  // Tableau temporaire pour l'octree:
+  // Temporary array for the octree:
   ArrOfInt_t nodes_list;
 
   DoubleTab_t& sommets_src = dom.les_sommets();
@@ -178,12 +178,12 @@ void Declarer_bord_perio_32_64<_SIZE_>::corriger_coordonnees_sommets_perio()
   for (int_t som = 0; som < nb_som_bord; som++)
     {
       if (marker.testsetbit(som))
-        continue; // Sommet deja traite
+        continue; // Vertex already processed
 
-      // Cherche le sommet oppose dans les deux directions (-1. et +1.)
+      // Search for the opposite vertex in both directions (-1. and +1.)
       double facteur;
       int_t som2 = -1;
-      // Recherche du sommet dans un rayon de plus en plus grand en commencant par epsilon:
+      // Search for the vertex in an increasingly large radius starting from epsilon:
       double epsilon = epsilon_initial;
       do
         {
@@ -198,7 +198,7 @@ void Declarer_bord_perio_32_64<_SIZE_>::corriger_coordonnees_sommets_perio()
             }
           if (som2 >= 0)
             break;
-          // Sommet non trouve, on recommence avec un rayon de recherche plus grand
+          // Vertex not found, retry with a larger search radius
           epsilon *= 4.;
         }
       while (1);
@@ -212,12 +212,12 @@ void Declarer_bord_perio_32_64<_SIZE_>::corriger_coordonnees_sommets_perio()
         }
       else
         {
-          // On deplace le sommet vers lequel pointe vecteur_perio:
+          // Move the vertex pointed to by vecteur_perio:
           const int_t som_ref = som;
           const int_t som_deplace = som2;
-          // Indice du sommet a deplacer dans le domaine source:
+          // Index of the vertex to move in the source domain:
           const int_t s = renum_som[som_deplace];
-          // Deplacement
+          // Displacement
           for (int i = 0; i < dim; i++)
             {
               double old_x = som_bord(som_deplace, i);
@@ -255,8 +255,8 @@ void Declarer_bord_perio_32_64<_SIZE_>::corriger_coordonnees_sommets_perio()
       compos.add("dy");
       if (dim==3) compos.add("dz");
       post.ecrire_champ(domaine_bord,
-                        unites, compos, -1 /* ecrire toutes les composantes */,
-                        0., /* temps */
+                        unites, compos, -1 /* write all components */,
+                        0., /* time */
                         "vitesse", domaine_bord.le_nom(), "SOM","vector", delta);
       int fin=1;
       post.finir(fin);

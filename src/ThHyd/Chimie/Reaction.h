@@ -57,15 +57,15 @@ protected:
   Nom activite_ = "0"; // not REQUIRED, has default value
 
   double constante_taux_reaction_=1e30;
-  double enthalpie_reaction_ = -100.; // en J/mol
-  double contre_reaction_=-1.;     // prefacteur
-  double c_r_Ea_=0.;              // en J/mol
-  double Sc_t_=0.8;               // Nombre de Schmidt turbulent (e.g. 0.8)
-  double Ea_=0.;                 // en J/mol
+  double enthalpie_reaction_ = -100.; // in J/mol
+  double contre_reaction_=-1.;     // prefactor
+  double c_r_Ea_=0.;              // in J/mol
+  double Sc_t_=0.8;               // Turbulent Schmidt number (e.g. 0.8)
+  double Ea_=0.;                 // in J/mol
   double beta_=0./*,exp_comb_,exp_oxy_*/;
   ArrOfDouble coeff_Y_,coeff_stoechio_;
   ArrOfDouble coeff_activite_;
-  Motcles save_alias_; //pour verifier que les Yi arrivent dans le meme ordre que lors de l'interpretation de la reaction
+  Motcles save_alias_; // to verify that Yi values arrive in the same order as during reaction parsing
   mutable OWN_PTR(Champ_Fonc_base)  omega_;
 
   mutable double proportion_max_sur_delta_t_=1;

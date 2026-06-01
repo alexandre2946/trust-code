@@ -25,58 +25,58 @@
 // R. I. Issa
 
 // A = (M/dt + C(Uk) + D)
-// Bt et -B designent respectivement les operateurs gradient et divergence
-// delta_x designe l operateur Laplacien
-// H designe l operateur convection+diffusion
+// Bt and -B denote the gradient and divergence operators respectively
+// delta_x denotes the Laplacian operator
+// H denotes the convection+diffusion operator
 
-// L algorithme PISO (Pressure Implicit Splitting Operator) est non iteratif
-// et se decompose en trois etapes * ** et ***.
-// Les etapes de l algorithme sont :
+// The PISO (Pressure Implicit Splitting Operator) algorithm is non-iterative
+// and consists of three steps * ** and ***.
+// The steps of the algorithm are:
 
-// -ETAPE DE PREDICTION
+// -PREDICTION STEP
 //
-// Recherche du champ de vitesse U* staisfaisant l equation de q.d.m. (avec pression Pn)
+// Find the velocity field U* satisfying the momentum equation (with pressure Pn)
 //        (rho/dt)*(U*-Un) = H(U*) - BtP + S
-// U* ne satisfait pas l equation de continuite
+// U* does not satisfy the continuity equation
 
-// L etape de prediction est realisee en traitant le systeme suivant :
+// The prediction step is performed by solving the following system:
 //        AU* = -BtPn + Sv + Ss + (M/dt)Un                -> U*
 
 
-// -PREMIERE ETAPE DE CORRECTION
+// -FIRST CORRECTION STEP
 //
-// Recherche de U** et P* satisfaisant la q.d.m. et l equation de continuite (a partir de U* et Un)
+// Find U** and P* satisfying the momentum equation and continuity equation (from U* and Un)
 //        (rho/dt)*(U**-Un) = H(U*) - BtP* + S
 //        delta_x U** = 0
 
-// Afin de stabiliser le systeme a traiter on implicite la partie diagonale de convection-diffusion
-//        (rho/dt-Ao)*U** - (rho/dt)*Un = H'(U*) -BtP* + S avec H(U) = H'(U) + AoU
-// En retranchant l equation de prediction :
-//        (rho/dt-Ao)*(U**-U*) = -Bt(P*-Pn)        et d autre part delta_x U** = 0
+// To stabilise the system, the diagonal part of convection-diffusion is treated implicitly
+//        (rho/dt-Ao)*U** - (rho/dt)*Un = H'(U*) -BtP* + S with H(U) = H'(U) + AoU
+// Subtracting the prediction equation:
+//        (rho/dt-Ao)*(U**-U*) = -Bt(P*-Pn)        and on the other hand delta_x U** = 0
 //
-// L etape de premiere correction est realisee en traitant (Da = rho/dt-Ao):
+// The first correction step is performed by solving (Da = rho/dt-Ao):
 //        (BDa-1Bt)P' = BU*                                -> P' -> P* = Pn + P'
-// puis   Da[Un]U' = -BtP'                                -> U' -> U** = U* + U'
+// then   Da[Un]U' = -BtP'                                -> U' -> U** = U* + U'
 
 
-//-SECONDE ETAPE DE CORRECTION
+//-SECOND CORRECTION STEP
 //
-// Recherche de U*** et P** satisfaisant la q.d.m. et l equation de continuite (a partir de U** et Un)
+// Find U*** and P** satisfying the momentum equation and continuity equation (from U** and Un)
 //        (rho/dt)*(U***-Un) = H(U**) - BtP** + S
 //        delta_x U*** = 0
 
-// Afin de stabiliser le systeme a traiter on implicite la partie diagonale de convection-diffusion
+// To stabilise the system, the diagonal part of convection-diffusion is treated implicitly
 //        (rho/dt-Ao)*U*** - (rho/dt)*Un = H'(U**) -BtP** + S
-// En retranchant l equation de premiere correction reformulee a l equation de seconde correction reformulee :
-//        (rho/dt-Ao)*(U***-U**) = H'(U**-U*) -Bt(P**-P*)        et d autre part delta_x U*** = 0 et delta_x U** = 0
+// Subtracting the reformulated first correction equation from the reformulated second correction equation:
+//        (rho/dt-Ao)*(U***-U**) = H'(U**-U*) -Bt(P**-P*)        and on the other hand delta_x U*** = 0 and delta_x U** = 0
 //
-// L etape de seconde correction est realisee en traitant (E = H'):
+// The second correction step is performed by solving (E = H'):
 //        (BDa-1Bt)P'' =  (BDa-1E)U'                        -> P'' -> P** = P* + P''
 //         DaU'' = EU' -BtP''                                -> U'' -> U*** = U** + U''
 
-// Rq : Des etapes de correction supplementaires peuvent etre realisees.
-// La version codee ici poursuit les corrections (compt_max-1 maximum)
-// sauf si le residu augmente par rapport a la correction precedente.
+// Note: Additional correction steps can be performed.
+// The implementation here continues corrections (compt_max-1 maximum)
+// unless the residual increases compared to the previous correction.
 
 class Piso : public Simpler
 {
@@ -85,9 +85,9 @@ public :
   void iterer_NS(Equation_base&, DoubleTab& current, DoubleTab& pression, double, Matrice_Morse&, double, DoubleTrav&,int nb_iter,int& converge, int& ok) override;
 protected :
 
-  int nb_corrections_max_ = 21; //nombre de corrections maximum pour affinet la projection
-  int avancement_crank_ = 0;   // on ne fait pas vraiment du piso mais plutot du CN
-  int with_sources_ = 0;   //prise en compte des termes sources dans la matrice de pression -> plus de termes en implicite, moins de termes en PISO
+  int nb_corrections_max_ = 21; // maximum number of corrections to refine the projection
+  int avancement_crank_ = 0;   // not pure PISO but rather Crank-Nicolson
+  int with_sources_ = 0;   // include source terms in the pressure matrix -> more implicit terms, fewer PISO terms
 
   Entree& lire(const Motcle&, Entree&) override;
 
@@ -103,34 +103,34 @@ private:
 //Description
 // Ref. G. Fauchet
 
-// L algorithme IMPLICITE est non iteratif et se decompose en deux etapes * et **.
-// Les etapes de l algorithme sont :
+// The IMPLICITE algorithm is non-iterative and consists of two steps * and **.
+// The steps of the algorithm are:
 
-// -ETAPE DE PREDICTION
+// -PREDICTION STEP
 //
-// Recherche du champ de vitesse U* staisfaisant l equation de q.d.m. (avec pression Pn)
-// De facon identique a l algorithme PISO le terme de diffusion est exprime sous forme implicite
-// et le terme de convection sous forme semi-implicite.
+// Find the velocity field U* satisfying the momentum equation (with pressure Pn)
+// As in the PISO algorithm, the diffusion term is expressed implicitly
+// and the convection term semi-implicitly.
 
 //         (U*-Un)/dt = H(U*) - BtPn + Sv + Ss
-// U* ne satisfait pas l equation de continuite
+// U* does not satisfy the continuity equation
 
-// L etape de prediction est realisee en traitant le systeme suivant :
+// The prediction step is performed by solving the following system:
 //        AU* = -BtPn + Sv + Ss + (M/dt)Un                -> U*
 
-// -ETAPE DE CORRECTION
+// -CORRECTION STEP
 //
-// L equation de q.d.m. a l etape n+1 peut s ecrire :
+// The momentum equation at step n+1 can be written:
 //         (Un+1-Un)/dt = H(Un+1) - BtPn+1 + Sv + Ss
-// En retranchant l 'equation de q.d.m. ecrite pour U* et en negligeant
-// les termes de convection et diffusion sur U' = Un+1 - U* on a la relation :
-//         (Un+1-U*)/dt = -BtP'        avec P' = Pn+1 - Pn
+// Subtracting the momentum equation written for U* and neglecting
+// the convection and diffusion terms on U' = Un+1 - U*, we get:
+//         (Un+1-U*)/dt = -BtP'        with P' = Pn+1 - Pn
 //
-// L etape de correction est realisee en traitant (M matrice de masse) :
+// The correction step is performed by solving (M = mass matrix):
 //        (BM-1Bt)dt*P' = BU*                                -> dt*P' -> P'
 //         Un+1 = U* -dt*BtP'                                -> Un+1
 //
-// Rq : La matrice de masse est constante par consequent le systeme (BM-1Bt) n est assemble qu une seule fois.
+// Note: The mass matrix is constant, therefore the system (BM-1Bt) is assembled only once.
 class Implicite : public Piso
 {
   Declare_instanciable(Implicite);

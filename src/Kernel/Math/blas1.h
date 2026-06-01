@@ -18,7 +18,7 @@
 
 
 
-/*! @brief Appel aux blas1
+/*! @brief Forward declarations for BLAS level-1 routines.
  *
  */
 
@@ -27,7 +27,7 @@
 
 #ifndef _NO_BLAS1_
 extern "C"
-/*! @brief Appel aux blas1
+/*! @brief External C declarations for BLAS level-1 routines.
  *
  */
 {
@@ -161,7 +161,7 @@ extern "C"
 #endif
 }
 
-/*! @brief
+/*! @brief Wrapper: calls dasum (sum of absolute values of a vector).
  *
  */
 #ifndef F77_Majuscule
@@ -174,7 +174,7 @@ inline double F77NAME(DASUM)(const integer *n,
 
 
 
-/*! @brief
+/*! @brief Wrapper: calls daxpy (constant times a vector plus a vector).
  *
  */
 inline void F77NAME(DAXPY)(const integer *n,
@@ -188,7 +188,7 @@ inline void F77NAME(DAXPY)(const integer *n,
 }
 
 
-/*! @brief
+/*! @brief Wrapper: calls dcopy (copies a vector to another vector).
  *
  */
 inline void F77NAME(DCOPY)(const integer *n,
@@ -202,7 +202,7 @@ inline void F77NAME(DCOPY)(const integer *n,
 
 
 
-/*! @brief
+/*! @brief Wrapper: calls ddot (dot product of two vectors).
  *
  */
 inline double F77NAME(DDOT)(const integer *n,
@@ -215,7 +215,7 @@ inline double F77NAME(DDOT)(const integer *n,
 }
 
 
-/*! @brief
+/*! @brief Wrapper: calls dnrm2 (Euclidean norm of a vector).
  *
  */
 inline double F77NAME(DNRM2)(const integer *n,
@@ -226,7 +226,7 @@ inline double F77NAME(DNRM2)(const integer *n,
 }
 
 
-/*! @brief
+/*! @brief Wrapper: calls drot (applies a plane rotation to two vectors).
  *
  */
 inline void F77NAME(DROT)(const integer *n,
@@ -241,7 +241,7 @@ inline void F77NAME(DROT)(const integer *n,
 }
 
 
-/*! @brief
+/*! @brief Wrapper: calls drotg (constructs a Givens plane rotation).
  *
  */
 inline void F77NAME(DROTG)(double * const da,
@@ -253,7 +253,7 @@ inline void F77NAME(DROTG)(double * const da,
 }
 
 
-/*! @brief
+/*! @brief Wrapper: calls dscal (scales a vector by a scalar).
  *
  */
 inline void F77NAME(DSCAL)(const integer *n,
@@ -265,7 +265,7 @@ inline void F77NAME(DSCAL)(const integer *n,
 }
 
 
-/*! @brief
+/*! @brief Wrapper: calls dswap (swaps two vectors).
  *
  */
 inline void F77NAME(DSWAP)(const integer *n,
@@ -278,7 +278,7 @@ inline void F77NAME(DSWAP)(const integer *n,
 }
 
 
-/*! @brief
+/*! @brief Wrapper: calls idamax (finds the index of the element with maximum absolute value).
  *
  */
 inline integer F77NAME(IDAMAX)(const integer *n,
@@ -289,7 +289,7 @@ inline integer F77NAME(IDAMAX)(const integer *n,
 }
 
 
-/*! @brief
+/*! @brief Wrapper: calls sdot (single-precision dot product of two vectors).
  *
  */
 inline float F77NAME(SDOT)(const integer *n,
@@ -302,7 +302,7 @@ inline float F77NAME(SDOT)(const integer *n,
 }
 
 
-/*! @brief
+/*! @brief Wrapper: calls saxpy (single-precision constant times a vector plus a vector).
  *
  */
 inline void F77NAME(SAXPY)(const integer *n,
@@ -316,7 +316,7 @@ inline void F77NAME(SAXPY)(const integer *n,
 }
 
 
-/*! @brief
+/*! @brief Wrapper: calls scopy (single-precision copy of a vector).
  *
  */
 inline void F77NAME(SCOPY)(const integer *n,
@@ -329,7 +329,7 @@ inline void F77NAME(SCOPY)(const integer *n,
 }
 
 
-/*! @brief
+/*! @brief Wrapper: calls sasum (single-precision sum of absolute values).
  *
  */
 inline float F77NAME(SASUM)(const integer *n,
@@ -340,7 +340,7 @@ inline float F77NAME(SASUM)(const integer *n,
 }
 
 
-/*! @brief
+/*! @brief Wrapper: calls snrm2 (single-precision Euclidean norm of a vector).
  *
  */
 inline float F77NAME(SNRM2)(const integer *n,
@@ -351,7 +351,7 @@ inline float F77NAME(SNRM2)(const integer *n,
 }
 
 
-/*! @brief
+/*! @brief Wrapper: calls sscal (single-precision scale a vector by a constant).
  *
  */
 inline void F77NAME(SSCAL)(const integer *n,
@@ -363,7 +363,7 @@ inline void F77NAME(SSCAL)(const integer *n,
 }
 
 
-/*! @brief
+/*! @brief Wrapper: calls isamax (single-precision index of maximum absolute value element).
  *
  */
 inline integer F77NAME(ISAMAX)(const integer *n,
@@ -374,7 +374,7 @@ inline integer F77NAME(ISAMAX)(const integer *n,
 }
 
 
-/*! @brief
+/*! @brief Wrapper: calls sswap (single-precision swap of two vectors).
  *
  */
 inline void F77NAME(SSWAP)(const integer *n,
@@ -408,7 +408,7 @@ inline void F77NAME(SROTG)(double * const da,
 
 #else //_NO_BLAS1_
 
-/*! @brief
+/*! @brief Prints an error message and exits (fallback stub for missing BLAS).
  *
  */
 static inline void ERREUR(const char* const ch)
@@ -417,7 +417,7 @@ static inline void ERREUR(const char* const ch)
   exit();
 }
 
-/*! @brief
+/*! @brief Fallback implementation of DASUM (sum of absolute values).
  *
  */
 inline double F77NAME(DASUM)(const integer *n,
@@ -431,7 +431,7 @@ inline double F77NAME(DASUM)(const integer *n,
 }
 
 
-/*! @brief
+/*! @brief Fallback implementation of DAXPY (constant times a vector plus a vector).
  *
  */
 inline void F77NAME(DAXPY)(const integer *n,
@@ -449,7 +449,7 @@ inline void F77NAME(DAXPY)(const integer *n,
     }
 }
 
-/*! @brief
+/*! @brief Fallback implementation of DCOPY (copies a vector to another vector).
  *
  */
 inline void F77NAME(DCOPY)(const integer *n,
@@ -468,7 +468,7 @@ inline void F77NAME(DCOPY)(const integer *n,
 }
 
 
-/*! @brief
+/*! @brief Fallback implementation of DDOT (dot product of two vectors).
  *
  */
 inline double F77NAME(DDOT)(const integer *n,
@@ -487,7 +487,7 @@ inline double F77NAME(DDOT)(const integer *n,
   return psc;
 }
 
-/*! @brief
+/*! @brief Fallback implementation of DNRM2 (Euclidean norm of a vector).
  *
  */
 inline double F77NAME(DNRM2)(const integer *n,
@@ -498,7 +498,7 @@ inline double F77NAME(DNRM2)(const integer *n,
   return sqrt(F77NAME(DDOT)(n, dx, &un, dx, &un));
 }
 
-/*! @brief
+/*! @brief Fallback stub for DROT (not implemented).
  *
  */
 inline void F77NAME(DROT)(const integer *n,
@@ -512,7 +512,7 @@ inline void F77NAME(DROT)(const integer *n,
   ERREUR("DROT : pas code!");
 }
 
-/*! @brief
+/*! @brief Fallback stub for DROTG (not implemented).
  *
  */
 inline void F77NAME(DROTG)(double * const da,
@@ -523,7 +523,7 @@ inline void F77NAME(DROTG)(double * const da,
   ERREUR("DROTG : pas code!");
 }
 
-/*! @brief
+/*! @brief Fallback implementation of DSCAL (scales a vector by a scalar).
  *
  */
 inline void F77NAME(DSCAL)(const integer *n,
@@ -535,7 +535,7 @@ inline void F77NAME(DSCAL)(const integer *n,
     dx[i]*=*da;
 }
 
-/*! @brief
+/*! @brief Fallback implementation of DSWAP (swaps two vectors).
  *
  */
 inline void F77NAME(DSWAP)(const integer *n,
@@ -556,7 +556,7 @@ inline void F77NAME(DSWAP)(const integer *n,
 
 }
 
-/*! @brief
+/*! @brief Fallback implementation of IDAMAX (index of maximum absolute value element).
  *
  */
 inline integer F77NAME(IDAMAX)(const integer *n,
@@ -574,7 +574,7 @@ inline integer F77NAME(IDAMAX)(const integer *n,
   return imax;
 }
 
-/*! @brief
+/*! @brief Fallback stub for SDOT (not implemented).
  *
  */
 inline float F77NAME(SDOT)(const integer *n,
@@ -587,7 +587,7 @@ inline float F77NAME(SDOT)(const integer *n,
   return 0;
 }
 
-/*! @brief
+/*! @brief Fallback stub for SAXPY (not implemented).
  *
  */
 inline void F77NAME(SAXPY)(const integer *n,
@@ -600,7 +600,7 @@ inline void F77NAME(SAXPY)(const integer *n,
   ERREUR("SAXPY : pas code!");
 }
 
-/*! @brief
+/*! @brief Fallback stub for SCOPY (not implemented).
  *
  */
 inline void F77NAME(SCOPY)(const integer *n,
@@ -612,7 +612,7 @@ inline void F77NAME(SCOPY)(const integer *n,
   ERREUR("SCOPY : pas code!");
 }
 
-/*! @brief
+/*! @brief Fallback stub for SASUM (not implemented).
  *
  */
 inline float F77NAME(SASUM)(const integer *n,
@@ -623,7 +623,7 @@ inline float F77NAME(SASUM)(const integer *n,
   return 0;
 }
 
-/*! @brief
+/*! @brief Fallback stub for SNRM2 (not implemented).
  *
  */
 inline float F77NAME(SNRM2)(const integer *n,
@@ -634,7 +634,7 @@ inline float F77NAME(SNRM2)(const integer *n,
   return 0;
 }
 
-/*! @brief
+/*! @brief Fallback stub for SSCAL (not implemented).
  *
  */
 inline void F77NAME(SSCAL)(const integer *n,
@@ -645,7 +645,7 @@ inline void F77NAME(SSCAL)(const integer *n,
   ERREUR("SSCAL : pas code!");
 }
 
-/*! @brief
+/*! @brief Fallback stub for ISAMAX (not implemented).
  *
  */
 inline integer F77NAME(ISAMAX)(const integer *n,
@@ -656,7 +656,7 @@ inline integer F77NAME(ISAMAX)(const integer *n,
   return 0;
 }
 
-/*! @brief
+/*! @brief Fallback stub for SSWAP (not implemented).
  *
  */
 inline void F77NAME(SSWAP)(const integer *n,

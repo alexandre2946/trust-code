@@ -50,13 +50,13 @@ void EDO_Pression_th_VEF::calculer_grad(const DoubleTab& inco, DoubleTab& grad)
   double diff;
   int face, comp1;
 
-  // Gradient d'un champ scalaire localise aux centres des elements
-  // On initialise grad a zero
+  // Gradient of a scalar field located at element centers
+  // Initialize grad to zero
   grad = 0;
   if (1 == 1)
     {
       int elem1, elem2;
-      // On traite les faces des joints:
+      // Process joint faces:
       for (face = 0; face < dom.nb_faces_joint(); face++)
         {
           elem1 = face_voisins(face, 0);
@@ -67,8 +67,8 @@ void EDO_Pression_th_VEF::calculer_grad(const DoubleTab& inco, DoubleTab& grad)
             grad(face, comp1) = diff * face_normales(face, comp1);
         }
 
-      // On traite les conditions limites
-      // Seule la condition aux limites de type Periodicite modifie le gradient
+      // Process boundary conditions
+      // Only the Periodique boundary condition type modifies the gradient
       for (int n_bord = 0; n_bord < dom.nb_front_Cl(); n_bord++)
         {
           const Cond_lim& la_cl = le_dom_Cl->les_conditions_limites(n_bord);
@@ -99,7 +99,7 @@ void EDO_Pression_th_VEF::calculer_grad(const DoubleTab& inco, DoubleTab& grad)
           for (int comp = 0; comp < dimension; comp++)
             grad(face, comp) = diff * face_normales(face, comp);
         }
-      // On divise par le volume!!!
+      // Divide by the volume!!!
       int premiere_fac_std = dom.premiere_face_std();
       for (face = 0; face < premiere_fac_std; face++)
         {
@@ -133,7 +133,7 @@ void EDO_Pression_th_VEF::calculer_grad(const DoubleTab& inco, DoubleTab& grad)
           incosom = 0;
           volsom = 0;
           double v, inc;
-          //calcul de P aux sommets
+          // compute P at vertices
           for (elem = 0; elem < dom.nb_elem(); elem++)
             {
               v = dom.volumes(elem);
@@ -150,7 +150,7 @@ void EDO_Pression_th_VEF::calculer_grad(const DoubleTab& inco, DoubleTab& grad)
               incosom(nsom) /= volsom(nsom);
             }
           double xs0, ys0, xs1, ys1, xe0, ye0, xe1, ye1, ds, de;
-          //faces de bord
+          // boundary faces
           for (int n_bord = 0; n_bord < dom.nb_front_Cl(); n_bord++)
             {
               const Cond_lim& la_cl = le_dom_Cl->les_conditions_limites(n_bord);
@@ -173,7 +173,7 @@ void EDO_Pression_th_VEF::calculer_grad(const DoubleTab& inco, DoubleTab& grad)
                 }
             }
 
-          //faces internes
+          // internal faces
           for (face = dom.premiere_face_int(); face < dom.nb_faces(); face++)
             {
               s0 = face_sommets(face, 0);

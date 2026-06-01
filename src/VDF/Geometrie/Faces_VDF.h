@@ -36,10 +36,10 @@ public:
 
 private :
 
-  IntVect orientation_;       // orientation des faces :
-  //    0 pour une face d'equation x = cte
-  //    1 pour une face d'equation y = cte
-  //    2 pour une face d'equation z = cte
+  IntVect orientation_;       // face orientation:
+  //    0 for a face with equation x = const
+  //    1 for a face with equation y = const
+  //    2 for a face with equation z = const
   OBS_PTR(Domaine_VDF) le_dom_VDF;
 
 };
@@ -54,7 +54,7 @@ inline int Faces_VDF::orientation(int i)
   return orientation_(i);
 }
 
-/*! @brief se lie au domaine
+/*! @brief Associates with the domain.
  *
  */
 inline void Faces_VDF::associer(const Domaine_VDF& un_domaine_VDF)
@@ -62,7 +62,7 @@ inline void Faces_VDF::associer(const Domaine_VDF& un_domaine_VDF)
   le_dom_VDF=un_domaine_VDF;
 }
 
-/*! @brief Renvoie le domaine
+/*! @brief Returns the domain.
  *
  */
 inline const Domaine_VDF& Faces_VDF::domaine_VDF() const

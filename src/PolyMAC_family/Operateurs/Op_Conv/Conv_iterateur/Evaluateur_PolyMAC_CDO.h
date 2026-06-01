@@ -24,12 +24,12 @@ class Domaine_PolyMAC_CDO;
 
 /*! @brief class Evaluateur_PolyMAC_CDO
  *
- *  Classe de base des evaluateurs PolyMAC_CDO. Cette classe n'appartient pas a la
- *  hierarchie des Objet_U.
- *  Cette classe porte une reference a un objet de type Domaine_PolyMAC_CDO et une
- *  reference a un objet de type Domaine_Cl_PolyMAC_family. Elle porte des tableaux locaux
- *  qui sont en fait des references aux tableaux de l'objet de type Domaine_PolyMAC_CDO
- *  (ces tableaux locaux n'existent pas en memoire).
+ *  Base class for PolyMAC_CDO evaluators. This class does not belong to the
+ *  Objet_U hierarchy.
+ *  It holds a reference to a Domaine_PolyMAC_CDO object and a reference to a
+ *  Domaine_Cl_PolyMAC_family object. It also holds local arrays that are
+ *  references to the arrays of the Domaine_PolyMAC_CDO object
+ *  (these local arrays do not exist in memory independently).
  *
  */
 class Evaluateur_PolyMAC_CDO
@@ -47,11 +47,11 @@ protected:
   OBS_PTR(Domaine_Cl_PolyMAC_family) la_zcl;
   int dimension = -3;
   int premiere_face_bord = -100;
-  IntTab elem_;                       // les 2 elements voisins d'une face
-  DoubleVect surface;          // surfaces des faces
-  DoubleVect porosite;               // porosites surfaciques
+  IntTab elem_;                       // the 2 neighboring elements of a face
+  DoubleVect surface;          // face surface areas
+  DoubleVect porosite;               // surface porosities
   DoubleVect volume_entrelaces;//
-  DoubleTab xv;                // coord des centres des faces
+  DoubleTab xv;                // coordinates of face centers
 };
 
 #endif /* Evaluateur_PolyMAC_CDO_included */

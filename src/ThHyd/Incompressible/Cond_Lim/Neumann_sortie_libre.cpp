@@ -27,16 +27,16 @@ Implemente_instanciable(Neumann_sortie_libre, "Frontiere_ouverte", Neumann_val_e
 
 Sortie& Neumann_sortie_libre::printOn(Sortie& s) const { return s << que_suis_je() << finl; }
 
-/*! @brief Type le_champ_front en "Champ_front_uniforme".
+/*! @brief Types le_champ_front as "Champ_front_uniforme".
  *
- * Lit les valeurs du champ exterieur si les conditions
- *     aux limites sont specifiees: "T_ext","C_ext","Y_ext","K_Eps_ext","Fluctu_Temperature_ext","Flux_Chaleur_Turb_ext","V2_ext","a_ext","tau_ext","k_ext","omega_ext","H_ext"
- *     Produit une erreur sinon.
+ * Reads the values of the external field if the boundary conditions
+ *     are specified as: "T_ext","C_ext","Y_ext","K_Eps_ext","Fluctu_Temperature_ext","Flux_Chaleur_Turb_ext","V2_ext","a_ext","tau_ext","k_ext","omega_ext","H_ext"
+ *     Raises an error otherwise.
  *
- * @param (Entree& s) un flot d'entree
- * @return (Entree& s) le flot d'entree modifie
- * @throws type de champ exterieur non reconnu,
- * les types reconnus sont: "T_ext","C_ext","Y_ext","K_Eps_ext","Fluctu_Temperature_ext","Flux_Chaleur_Turb_ext","V2_ext","a_ext","tau_ext","k_ext","omega_ext","H_ext", "a_i_ext"
+ * @param (Entree& s) input stream
+ * @return (Entree& s) the modified input stream
+ * @throws external field type not recognized;
+ * recognized types are: "T_ext","C_ext","Y_ext","K_Eps_ext","Fluctu_Temperature_ext","Flux_Chaleur_Turb_ext","V2_ext","a_ext","tau_ext","k_ext","omega_ext","H_ext", "a_i_ext"
  */
 Entree& Neumann_sortie_libre::readOn(Entree& s)
 {
@@ -68,7 +68,7 @@ Entree& Neumann_sortie_libre::readOn(Entree& s)
     les_motcles[12] = "k_WIT_ext";
     les_motcles[13] = "a_i_ext";
     les_motcles[14] = "K_Omega_ext";
-    les_motcles[15] = "H_ext"; // enthalpie
+    les_motcles[15] = "H_ext"; // enthalpy
   }
   s >> motlu;
   int rang = les_motcles.search(motlu);
@@ -87,9 +87,9 @@ Entree& Neumann_sortie_libre::readOn(Entree& s)
   return s;
 }
 
-//Dans le cas ou la condition limite porte sur la pression
-//il faut le specifier explicitement sinon inconnue() rend
-//la vitesse
+// In the case where the boundary condition concerns pressure,
+// it must be specified explicitly; otherwise inconnue() returns
+// the velocity.
 
 void Neumann_sortie_libre::verifie_ch_init_nb_comp() const
 {
@@ -111,11 +111,11 @@ void Neumann_sortie_libre::verifie_ch_init_nb_comp() const
     }
 }
 
-/*! @brief Renvoie la valeur de la i-eme composante du champ impose a l'exterieur de la frontiere.
+/*! @brief Returns the value of the i-th component of the field imposed on the exterior of the boundary.
  *
- * @param (int i) indice suivant la premiere dimension du champ
- * @return (double) la valeur imposee sur la composante du champ specifiee
- * @throws deuxieme dimension du champ de frontiere superieur a 1
+ * @param (int i) index along the first dimension of the field
+ * @return (double) the value imposed on the specified component of the field
+ * @throws second dimension of the boundary field greater than 1
  */
 double Neumann_sortie_libre::val_ext(int i) const
 {
@@ -147,11 +147,11 @@ void Neumann_sortie_libre::associer_fr_dis_base(const Frontiere_dis_base& fr)
   modifier_val_imp = 0;
 }
 
-/*! @brief Renvoie la valeur de la (i,j)-eme composante du champ impose a l'exterieur de la frontiere.
+/*! @brief Returns the value of the (i,j)-th component of the field imposed on the exterior of the boundary.
  *
- * @param (int i) indice suivant la premiere dimension du champ
- * @param (int j) indice suivant la deuxieme dimension du champ
- * @return (double) la valeur imposee sur la composante du champ specifiee
+ * @param (int i) index along the first dimension of the field
+ * @param (int j) index along the second dimension of the field
+ * @return (double) the value imposed on the specified component of the field
  */
 double Neumann_sortie_libre::val_ext(int i, int j) const
 {

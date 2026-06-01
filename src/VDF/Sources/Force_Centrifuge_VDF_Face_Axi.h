@@ -26,8 +26,8 @@ class Domaine_VDF;
 
 /*! @brief class Force_Centrifuge_VDF_Face_Axi
  *
- *  Cette classe represente la force centrifuge a prendre en compte dans les equations de Navier-Stokes
- *  en coordonnees cylindriques pour une dicretisation VDF
+ *  This class represents the centrifugal force to be taken into account in the Navier-Stokes equations
+ *  in cylindrical coordinates for a VDF discretization
  *
  *
  * @sa Source_base

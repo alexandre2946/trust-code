@@ -34,7 +34,7 @@ Entree& Saturation_generique_EOS::readOn(Entree& is)
 
 void Saturation_generique_EOS::set_param(Param& param) const
 {
-  Saturation_base::set_param(param); // T_ref_ et P_ref_ ?? sais pas si utile ...
+  Saturation_base::set_param(param); // T_ref_ and P_ref_ ?? not sure if useful ...
   param.ajouter("model|modele", &model_name_, Param::REQUIRED);
   param.ajouter("fluid|fluide", &fluid_name_, Param::REQUIRED);
   param.ajouter("user_uniform_sigma", &user_uniform_sigma_, Param::OPTIONAL); // optional : because of issues when we call surface tension in TTSE in coolprop ! Try without and if calculation doesn't pass, input sigma

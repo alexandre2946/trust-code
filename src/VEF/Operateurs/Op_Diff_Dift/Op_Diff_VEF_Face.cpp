@@ -50,7 +50,7 @@ Entree& Op_Diff_VEF_Face::readOn(Entree& s )
   return s ;
 }
 
-/*! @brief associe le champ de diffusivite
+/*! @brief Associate the diffusivity field.
  *
  */
 void Op_Diff_VEF_Face::associer_diffusivite(const Champ_base& diffu)
@@ -93,7 +93,7 @@ void Op_Diff_VEF_Face::ajouter_cas_scalaire(const DoubleTab& tab_inconnue,
     CDoubleTabView inconnue = tab_inconnue.view_ro();
     DoubleArrView flux_bords = static_cast<ArrOfDouble&>(tab_flux_bords).view_rw();
     DoubleArrView resu = static_cast<ArrOfDouble&>(tab_resu).view_rw();
-    // On traite les faces bord
+    // Process boundary faces
     for (int n_bord = 0; n_bord < nb_bords; n_bord++)
       {
         const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -133,10 +133,10 @@ void Op_Diff_VEF_Face::ajouter_cas_scalaire(const DoubleTab& tab_inconnue,
             });
             end_gpu_timer(__KERNEL_NAME__);
           }
-        else     // Il n'y a qu'une seule composante, donc on traite
-          // une equation scalaire (pas la vitesse) on a pas a utiliser
-          // le tau tangentiel (les lois de paroi thermiques ne calculent pas
-          // d'echange turbulent a la paroi pour l'instant
+        else     // There is only one component, so we handle
+          // a scalar equation (not velocity): no need to use
+          // the tangential tau (wall thermal laws do not compute
+          // turbulent exchange at the wall for now)
           {
             Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__),
                                  Kokkos::RangePolicy<>(num1, num2), KOKKOS_LAMBDA(
@@ -170,7 +170,7 @@ void Op_Diff_VEF_Face::ajouter_cas_scalaire(const DoubleTab& tab_inconnue,
           }
       }
 
-    // Faces internes :
+    // Internal faces:
     Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__),
                          Kokkos::MDRangePolicy<Kokkos::Rank<2>>({premiere_face_int, 0}, {nb_faces, 2}),
                          KOKKOS_LAMBDA(const int num_face, const int k)
@@ -183,7 +183,7 @@ void Op_Diff_VEF_Face::ajouter_cas_scalaire(const DoubleTab& tab_inconnue,
             {
               int contrib = 1;
 
-              if (j >= nb_faces) // C'est une face virtuelle
+              if (j >= nb_faces) // This is a virtual face
                 {
                   int el1 = face_voisins(j, 0);
                   int el2 = face_voisins(j, 1);
@@ -197,7 +197,7 @@ void Op_Diff_VEF_Face::ajouter_cas_scalaire(const DoubleTab& tab_inconnue,
                                       face_normale, inverse_volumes);
                   double flux = valA * (inconnue(j, 0) - inconnue(num_face, 0));
                   Kokkos::atomic_add(&resu(num_face), flux);
-                  if (j < nb_faces) // On traite les faces reelles
+                  if (j < nb_faces) // Process real faces
                     Kokkos::atomic_add(&resu(j), -flux);
                 }
             }
@@ -297,7 +297,7 @@ void Op_Diff_VEF_Face::ajouter_cas_vectoriel(const DoubleTab& inconnue,
 {
   assert(nb_comp==dimension);
 
-  // Construction du tableau grad_ si necessaire
+  // Build grad_ array if necessary
   if(!grad_.get_md_vector())
     {
       grad_.resize(0, Objet_U::dimension, Objet_U::dimension);
@@ -305,11 +305,11 @@ void Op_Diff_VEF_Face::ajouter_cas_vectoriel(const DoubleTab& inconnue,
     }
   Champ_P1NC::calcul_gradient(inconnue,grad_,domaine_Cl_VEF);
 
-  /* ToDo OpenMP : factoriser avec Op_Dift_VEF_Face.cpp dans une classe template
+  /* ToDo OpenMP: refactor with Op_Dift_VEF_Face.cpp into a template class
   if (le_modele_turbulence->utiliser_loi_paroi())
    {
       Champ_P1NC::calcul_duidxj_paroi(grad_,nu,nu_turb,tau_tan_,domaine_Cl_VEF);
-      grad_.echange_espace_virtuel(); // gradient_elem a jour sur les elements virtuels
+      grad_.echange_espace_virtuel(); // gradient_elem up to date on virtual elements
   }
   DoubleTab Re;
   Re.resize(0, Objet_U::dimension, Objet_U::dimension);
@@ -512,7 +512,7 @@ void Op_Diff_VEF_Face::ajouter_cas_multi_scalaire(const DoubleTab& inconnue,
                               resu(num_face,nc)-=valA*inconnue(num_face,nc);
                               if(j<nb_faces) // face reelle
                                 {
-                                  ////ATENTION DIFF NUM_face avec ma version
+                                  ////WARNING: NUM_face differs from the reference version
                                   resu(j,nc)+=0.5*valA*inconnue(num_face,nc);
                                   resu(j,nc)-=0.5*valA*inconnue(j,nc);
                                 }
@@ -521,7 +521,7 @@ void Op_Diff_VEF_Face::ajouter_cas_multi_scalaire(const DoubleTab& inconnue,
                     }
                 }
             }
-        }// fin if periodique
+        }// end if periodic
       else
         {
           for (ind_face=num1; ind_face<num2; ind_face++)
@@ -529,7 +529,7 @@ void Op_Diff_VEF_Face::ajouter_cas_multi_scalaire(const DoubleTab& inconnue,
               num_face = le_bord.num_face(ind_face);
               int elem=face_voisins(num_face,0);
 
-              // Boucle sur les faces :
+              // Loop over faces:
               for (int i=0; i<nb_faces_elem; i++)
                 if (( (j= elemfaces(elem,i)) > num_face ) || (ind_face>=nb_faces_bord_reel))
                   {
@@ -552,9 +552,9 @@ void Op_Diff_VEF_Face::ajouter_cas_multi_scalaire(const DoubleTab& inconnue,
                   }
             }
         }
-    }//Fin for n_bord
+    }// End for n_bord
 
-  // On traite les faces internes
+  // Process internal faces
 
   for (num_face=domaine_VEF.premiere_face_int(); num_face<nb_faces; num_face++)
     {
@@ -567,7 +567,7 @@ void Op_Diff_VEF_Face::ajouter_cas_multi_scalaire(const DoubleTab& inconnue,
                 {
                   int el1,el2;
                   int contrib=1;
-                  if(j>=nb_faces) // C'est une face virtuelle
+                  if(j>=nb_faces) // This is a virtual face
                     {
                       el1 = face_voisins(j,0);
                       el2 = face_voisins(j,1);
@@ -581,24 +581,24 @@ void Op_Diff_VEF_Face::ajouter_cas_multi_scalaire(const DoubleTab& inconnue,
                           double valA = viscA(num_face,j,elem,nu(elem,nc));
                           resu(num_face,nc)+=valA*inconnue(j,nc);
                           resu(num_face,nc)-=valA*inconnue(num_face,nc);
-                          if(j<nb_faces) // On traite les faces reelles
+                          if(j<nb_faces) // Process real faces only
                             {
                               resu(j,nc)+=valA*inconnue(num_face,nc);
                               resu(j,nc)-=valA*inconnue(j,nc);
                             }
                           else
                             {
-                              // La face j est virtuelle
+                              // Face j is virtual
                             }
                         }
                     }
                 }
             }
         }
-    }// Fin faces internes
+    }// End internal faces
 
 
-  //On se base sur ce qui est fait pour le cas scalaire
+  //Based on what is done for the scalar case
   for (n_bord=0; n_bord<nb_bords; n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -691,16 +691,16 @@ DoubleTab& Op_Diff_VEF_Face::ajouter(const DoubleTab& inconnue_org, DoubleTab& r
   int marq=phi_psi_diffuse(equation());
   const DoubleVect& porosite_face = equation().milieu().porosite_face();
   const DoubleVect& porosite_elem = equation().milieu().porosite_elem();
-  // soit on a div(phi nu grad inco)
-  // soit on a div(nu grad phi inco)
-  // cela depend si on diffuse phi_psi ou psi
+  // either div(phi nu grad inco)
+  // or div(nu grad phi inco)
+  // depending on whether phi_psi or psi is diffused
   modif_par_porosite_si_flag(nu_,nu,!marq,porosite_elem);
   const DoubleTab& inconnue=modif_par_porosite_si_flag(inconnue_org,tab_inconnue,marq,porosite_face);
 
   const Champ_base& inco = equation().inconnue();
   const Nature_du_champ nature_champ = inco.nature_du_champ();
 
-  // On dimensionne et initialise le tableau des bilans de flux:
+  // Size and initialize the flux balance array:
   if (flux_bords_.size_array()!=domaine_VEF.nb_faces_bord()) flux_bords_.resize(domaine_VEF.nb_faces_bord(),nature_champ==scalaire ? 1 : nb_comp);
   flux_bords_=0.;
 
@@ -728,15 +728,14 @@ void Op_Diff_VEF_Face::ajouter_contribution(const DoubleTab& tab_transporte, Mat
 
   modifier_matrice_pour_periodique_avant_contribuer(tab_matrice,equation());
 
-  // On remplit le tableau nu car l'assemblage d'une
-  // matrice avec ajouter_contribution peut se faire
-  // avant le premier pas de temps
+  // Fill the nu array because matrix assembly with ajouter_contribution
+  // may be performed before the first time step
   remplir_nu(nu_);
   DoubleTrav tab_nu;
 
-  // soit on a div(phi nu grad inco)
-  // soit on a div(nu grad phi inco)
-  // cela depend si on diffuse phi_psi ou psi
+  // either div(phi nu grad inco)
+  // or div(nu grad phi inco)
+  // depending on whether phi_psi or psi is diffused
   int marq = phi_psi_diffuse(equation());
   modif_par_porosite_si_flag(nu_,tab_nu,!marq,equation().milieu().porosite_elem());
 
@@ -750,9 +749,9 @@ void Op_Diff_VEF_Face::ajouter_contribution(const DoubleTab& tab_transporte, Mat
   IntTrav tab_fac2b_idx(domaine_VEF.nb_faces());
 
 
-  // Recuperer les indices des faces de bord periodiques et les
-  // faces associees dans des tableaux au prealable pour
-  // permettre un acces structure dans le kernel ensuite
+  // Retrieve the indices of periodic boundary faces and the
+  // associated faces into arrays beforehand to
+  // allow structured access in the kernel afterwards
   for (int n_bord = 0; n_bord < nb_bords; n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -766,9 +765,8 @@ void Op_Diff_VEF_Face::ajouter_contribution(const DoubleTab& tab_transporte, Mat
           int nb_faces = le_bord.nb_faces();
           int num2b = num1 + nb_faces / 2;
 
-          // on ne parcourt que la moitie des faces periodiques
-          // on copiera a la fin le resultat dans la face
-          // associee...
+          // only iterate over half the periodic faces
+          // the result will be copied to the associated face at the end...
           ToDo_Kokkos("critical");
           for (int fac = num1; fac < num2b; fac++)
             {
@@ -848,7 +846,7 @@ void Op_Diff_VEF_Face::ajouter_contribution(const DoubleTab& tab_transporte, Mat
               }
           }
       }
-    else if (type_face == 1) // faces bord non perio
+    else if (type_face == 1) // non-periodic boundary faces
       {
         int elem1 = face_voisins(fac,0);
         for (int i = 0; i < nb_faces_elem; i++)
@@ -912,8 +910,7 @@ void Op_Diff_VEF_Face::ajouter_contribution(const DoubleTab& tab_transporte, Mat
   DoubleTrav tab_h_impose(premiere_face_int);
   DoubleTrav tab_derivee_flux_exterieur_imposee(premiere_face_int);
 
-  // Neumann: remplir les tableaux avec les conditions aux
-  // bords pour le kernel Kokkos
+  // Neumann: fill arrays with boundary conditions for the Kokkos kernel
   for (int n_bord = 0; n_bord < nb_bords; n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -1002,7 +999,7 @@ void Op_Diff_VEF_Face::ajouter_contribution(const DoubleTab& tab_transporte, Mat
   CDoubleArrView derivee_flux_exterieur_imposee = static_cast<const ArrOfDouble&>(tab_derivee_flux_exterieur_imposee).view_ro();
   CDoubleArrView face_surfaces = domaine_VEF.face_surfaces().view_ro();
 
-  // Neumann: calcul des contributions aux bords
+  // Neumann: compute contributions on boundaries
   auto neumann = KOKKOS_LAMBDA (const int face)
   {
     double h = h_impose(face);
@@ -1020,9 +1017,8 @@ void Op_Diff_VEF_Face::ajouter_contribution_multi_scalaire(const DoubleTab& tab_
 {
   modifier_matrice_pour_periodique_avant_contribuer(tab_matrice, equation());
 
-  // On remplit le tableau nu car l'assemblage d'une matrice
-  // avec ajouter_contribution peut se faire avant le premier
-  // pas de temps
+  // Fill the nu array because matrix assembly with ajouter_contribution
+  // may be performed before the first time step
   remplir_nu(nu_);
 
   const Domaine_Cl_VEF& domaine_Cl_VEF = la_zcl_vef.valeur();
@@ -1038,9 +1034,9 @@ void Op_Diff_VEF_Face::ajouter_contribution_multi_scalaire(const DoubleTab& tab_
   int marq = phi_psi_diffuse(equation());
   const DoubleVect& porosite_elem = equation().milieu().porosite_elem();
 
-  // soit on a div(phi nu grad inco)
-  // soit on a div(nu grad phi inco)
-  // cela depend si on diffuse phi_psi ou psi
+  // either div(phi nu grad inco)
+  // or div(nu grad phi inco)
+  // depending on whether phi_psi or psi is diffused
   modif_par_porosite_si_flag(nu_, tab_nu, !marq, porosite_elem);
   DoubleVect tab_porosite_eventuelle(equation().milieu().porosite_face());
   if (!marq)
@@ -1053,9 +1049,9 @@ void Op_Diff_VEF_Face::ajouter_contribution_multi_scalaire(const DoubleTab& tab_
   IntVect tab_face_associee(domaine_VEF.premiere_face_int());
   IntVect tab_fac2b_idx(domaine_VEF.nb_faces_tot());
 
-  // Recuperer les indices des faces de bord periodiques et les
-  // faces associees dans des tableaux au prealable pour acces
-  // structure dans le kernel ensuite
+  // Retrieve the indices of periodic boundary faces and the
+  // associated faces into arrays beforehand for structured
+  // access in the kernel afterwards
   for (int n_bord = 0; n_bord < nb_bords; n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -1069,9 +1065,8 @@ void Op_Diff_VEF_Face::ajouter_contribution_multi_scalaire(const DoubleTab& tab_
           int nb_faces = le_bord.nb_faces();
           int num2b = num1 + nb_faces / 2;
 
-          // on ne parcourt que la moitie des faces periodiques
-          // on copiera a la fin le resultat dans la face
-          // associee...
+          // only iterate over half the periodic faces
+          // the result will be copied to the associated face at the end...
           ToDo_Kokkos("critical");
           for (int fac = num1; fac < num2b; fac++)
             {
@@ -1152,7 +1147,7 @@ void Op_Diff_VEF_Face::ajouter_contribution_multi_scalaire(const DoubleTab& tab_
               }
           }
       }
-    // Faces de bord non periodiques
+    // Non-periodic boundary faces
     else if (type_face == 1)
       {
         int elem1 = face_voisins(fac, 0);

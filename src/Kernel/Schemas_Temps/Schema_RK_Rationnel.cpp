@@ -29,23 +29,23 @@ Sortie& RRK2::printOn(Sortie& s) const { return  TRUSTSchema_RK<Ordre_RK::RATIO_
 
 Entree& RRK2::readOn(Entree& s) { return TRUSTSchema_RK<Ordre_RK::RATIO_DEUX>::readOn(s) ; }
 
-/*! @brief Effectue un pas de temps de Runge Kutta rationnel d'ordre 2, sur l'equation passee en parametre.
+/*! @brief Performs a second-order rational Runge-Kutta time step on the equation passed as parameter.
  *
- * Le schema de Runge Kutta rationel d'ordre 2:
+ * The second-order rational Runge-Kutta scheme:
  *      g1=hf(y0)
  *      g2=hf(y0+c2g1)
  *      y1=y0+(g1g1)/(b1g1+b2g2)
- *      ou ab/d = (a(b,d)+b(d,a)-d(a,b)/(d,d)
+ *      where ab/d = (a(b,d)+b(d,a)-d(a,b)/(d,d)
  *      y1=y0+(2g1(g1,b1g1+b2g2)-(b1g1+b2g2)(g1,g1)/(b1g1+b2g2,b1g1+b2g2)
  *      y1=y0+(2g1(g1,"g2")-("g2")(g1,g1)/("g2","g2")
- *       ordre2 si b2c2=-1/2
- *      b2c2<=-1/2 A0 stabilite et I stabilite
- *      b2c2<= 1/(2cos(alpha)(2-cos(alpha))) O<=alpha<pi/2 Aalpha stabilite
+ *       order 2 if b2c2=-1/2
+ *      b2c2<=-1/2 A0 stability and I stability
+ *      b2c2<= 1/(2cos(alpha)(2-cos(alpha))) 0<=alpha<pi/2 Aalpha stability
  *
  */
 int RRK2::faire_un_pas_de_temps_eqn_base(Equation_base& eqn)
 {
-  // Warning sur les 100 premiers pas de temps si facsec est egal a 1 pour faire reflechir l'utilisateur
+  // Warning on the first 100 time steps if facsec equals 1, to prompt the user to reconsider
   if (nb_pas_dt() >= 0 && nb_pas_dt() <= NW && facsec_ == 1) print_warning(NW);
 
   const double b1 = 2.0, b2 = -1, c2 = 0.5;

@@ -90,7 +90,7 @@ protected:
   int has_P_ref = 0;
   int stencil_done = 0;
 
-  Matrice_Morse rec; //pour reconstruire les vitesses
+  Matrice_Morse rec; //for reconstructing the velocities
 };
 
 #endif /* Assembleur_P_DG_included */

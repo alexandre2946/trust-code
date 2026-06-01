@@ -23,7 +23,7 @@
 class Probleme_Couple;
 class Matrice_Base;
 
-/*! @brief classe Schema_Backward_Differentiation_base
+/*! @brief Base class for Backward Differentiation Formula (BDF) time schemes.
  *
  * @sa Schema_Temps_base
  */

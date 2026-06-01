@@ -20,8 +20,8 @@
 #include <Champ_Inc_P0_base.h>
 #include <Operateur.h>
 
-// Champ correspondant a une inconnue scalaire (type temperature ou pression)
-// Degres de libertes : valeur aux elements + flux aux faces
+// Field corresponding to a scalar unknown (e.g. temperature or pressure)
+// Degrees of freedom: value at elements + flux at faces
 class Champ_Elem_PolyMAC_CDO: public Champ_Inc_P0_base
 {
   Declare_instanciable(Champ_Elem_PolyMAC_CDO);
@@ -31,7 +31,7 @@ public:
 
   int fixer_nb_valeurs_nodales(int n) override;
 
-  /* fonctions reconstruisant de maniere plus precise le champ aux faces */
+  /* functions reconstructing the field at faces more precisely */
   DoubleTab& valeur_aux_faces(DoubleTab& vals) const override;
   inline DoubleTab& trace(const Frontiere_dis_base& fr, DoubleTab& x, double t, int distant) const override;
 
@@ -39,13 +39,13 @@ public:
 
 inline DoubleTab& Champ_Elem_PolyMAC_CDO::trace(const Frontiere_dis_base& fr, DoubleTab& x, double t, int distant) const
 {
-  /* dimensionnement du tableau de destination x si necessaire */
+  /* resize the destination array x if necessary */
   const DoubleTab& src = valeurs();
   const Front_VF& fvf = ref_cast(Front_VF, fr);
   const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_dis_base());
   const IntTab& f_e = domaine.face_voisins();
 
-  DoubleTrav dst; //reconstruction du champ aux faces (on ne le remplit que sur le bord concerne)
+  DoubleTrav dst; //reconstruction of the field at faces (filled only on the relevant boundary)
   int i, n, e, f, N = src.nb_dim() > 1 ? src.dimension(1) : 1;
   int has_faces = polymac_flica5 ? false : src.dimension_tot(0) > domaine.nb_elem_tot();
   if (!x.dimension(0) && !x.get_md_vector()) x.resize(fvf.nb_faces(), N);

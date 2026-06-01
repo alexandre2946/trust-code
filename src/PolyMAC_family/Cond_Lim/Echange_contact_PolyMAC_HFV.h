@@ -26,10 +26,11 @@ class Domaine_PolyMAC_HFV;
 class Front_VF;
 #include <Domaine_forward.h>
 
-/*! @brief classe : Echange_contact_PolyMAC_HFV Outre le champ_front representant la temperature de paroi,
+/*! @brief class : Echange_contact_PolyMAC_HFV
  *
- *   cette classe possede un autre champ_front avec autant de valeurs
- *   temporelles qui represente la temperature dans l'autre probleme.
+ *  @brief In addition to the champ_front representing the wall temperature,
+ *   this class holds another champ_front with as many time values
+ *   that represents the temperature in the other problem.
  *
  */
 class Echange_contact_PolyMAC_HFV  : public Echange_externe_impose
@@ -37,23 +38,23 @@ class Echange_contact_PolyMAC_HFV  : public Echange_externe_impose
   Declare_instanciable(Echange_contact_PolyMAC_HFV);
 public :
   void init_op() const;
-  void mettre_a_jour(double temps) override { } //non utilise
-  void verifie_ch_init_nb_comp() const override { } //pas de contrainte sur les composantes de chaque cote
+  void mettre_a_jour(double temps) override { } //not used
+  void verifie_ch_init_nb_comp() const override { } //no constraint on the number of components on each side
 
-  mutable OBS_PTR(Front_VF) fvf, o_fvf; //frontiere dans l'autre probleme
-  mutable int i_fvf = -1 , i_o_fvf = -1;  //indices de frontiere de chaque cote
-  mutable OBS_PTR(Op_Diff_PolyMAC_HFV_Elem) diff, o_diff; //operateurs de diffusion de chaque cote
-  mutable int o_idx = -1; //indice de l'autre operateur dans le tableau op_ext de Op_Diff_PolyMAC_HFV_Elem (a remplir par celui-ci)
+  mutable OBS_PTR(Front_VF) fvf, o_fvf; //boundary in the other problem
+  mutable int i_fvf = -1 , i_o_fvf = -1;  //boundary indices on each side
+  mutable OBS_PTR(Op_Diff_PolyMAC_HFV_Elem) diff, o_diff; //diffusion operators on each side
+  mutable int o_idx = -1; //index of the other operator in the op_ext array of Op_Diff_PolyMAC_HFV_Elem (to be filled by that operator)
 
-  /* faces de l'autre cote de la frontiere */
-  void init_f_dist() const; //initialisation de f_dist
-  mutable IntTab f_dist;     //face de l'autre cote de chaque face de la frontiere
+  /* faces on the other side of the boundary */
+  void init_f_dist() const; //initialization of f_dist
+  mutable IntTab f_dist;     //face on the other side of each boundary face
   mutable int f_dist_init_ = 0;
 
-  double invh_paroi = 1e30; //resistance thermique (1 / h) de la paroi
+  double invh_paroi = 1e30; //thermal resistance (1 / h) of the wall
 
 protected :
-  Nom nom_autre_pb_, nom_bord_, nom_champ_; //nom du probleme distant, du bord, du champ
+  Nom nom_autre_pb_, nom_bord_, nom_champ_; //name of the remote problem, the boundary, and the field
 };
 
 #endif /* Echange_contact_PolyMAC_HFV_included */

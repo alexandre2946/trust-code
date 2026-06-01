@@ -35,7 +35,7 @@ Entree& Champ_front_Parametrique::readOn(Entree& is)
   param.ajouter("fichier", &fichier, Param::REQUIRED); // XD_ADD_P chaine
   // XD_CONT Filename where boundary fields are read
   param.lire_avec_accolades_depuis(is);
-  // Lecture de tous les lignes du fichier parametrique:
+  // Reading of all lines of the parametric file:
   EFichier fic(fichier);
   Motcle motlu;
   fic >> motlu;
@@ -48,7 +48,7 @@ Entree& Champ_front_Parametrique::readOn(Entree& is)
       //Cerr << "[Parameter] Reading: " << ch->que_suis_je() << finl; //" " << ch.valeur() << finl;
       fic >> motlu;
     }
-  // On fixe le premier parametre:
+  // We set the first parameter:
   Sortie_Fichier_base::set_root(newCompute());
   return is;
 }
@@ -76,7 +76,7 @@ void Champ_front_Parametrique::calculer_derivee_en_temps(double t1, double t2)
 {
   if (t1<last_t2_ && index_>1)
     {
-      // Pour assurer la continuite avec le champ precedent:
+      // To ensure continuity with the previous field:
       if (std::abs(t2-t1) < DMINFLOAT)
         {
           Gpoint_ = 0;
@@ -87,7 +87,7 @@ void Champ_front_Parametrique::calculer_derivee_en_temps(double t1, double t2)
           const DoubleTab& v2 = valeurs_au_temps(t2);
           if (v1.dimension(0) == 1)
             {
-              // Champ instationnaire uniforme
+              // Unsteady uniform field
               int dim = v1.dimension(1);
               if (Gpoint_.size() != dim) Gpoint_.resize(dim);
               for (int i = 0; i < dim; i++)
@@ -95,7 +95,7 @@ void Champ_front_Parametrique::calculer_derivee_en_temps(double t1, double t2)
             }
           else
             {
-              // Champs instationnaire variable
+              // Unsteady variable fields
               Gpoint_ = v1;
               Gpoint_ *= -1;
               Gpoint_ += v2;

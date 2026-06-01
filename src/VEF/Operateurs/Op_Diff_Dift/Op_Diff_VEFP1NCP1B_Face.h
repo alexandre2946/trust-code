@@ -27,10 +27,10 @@
 #include <ArrOfBit.h>
 
 
-/*! @brief class Op_Diff_VEF_Face Cette classe represente l'operateur de diffusion
+/*! @brief class Op_Diff_VEF_Face
  *
- *   La discretisation est VEF
- *   Le champ diffuse est scalaire
+ *  @brief This class represents the diffusion operator with VEF discretization.
+ *         The diffused field is scalar.
  *
  */
 class Op_Diff_VEFP1NCP1B_Face : public Op_Diff_VEF_Face
@@ -44,16 +44,16 @@ public:
                 const Champ_Inc_base& ) override;
   void completer() override;
 
-  //Methodes pour l'explicite
+  //Methods for explicit scheme
   DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const override;
   DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const override;
   double calculer_dt_stab() const override;
 
-  //Acces aux domaines
+  //Access to domains
   const Domaine_VEF& domaine_vef() const;
   const Domaine_Cl_VEF& domaine_Cl_VEFPreP1B() const;
 
-  //Methodes pour l'implicite.
+  //Methods for implicit scheme.
   void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override;
   void dimensionner(Matrice_Morse&) const override;
   void ajouter_contribution(const DoubleTab&,Matrice_Morse&) const;
@@ -62,12 +62,12 @@ public:
 
 protected :
 
-  // Fonction de dimensionnement et de remplissage
+  // Sizing and filling function
   void initialiser();
   void remplir_nu_p1(const DoubleTab&,DoubleTab&) const;
   void remplir_nu_pA(const DoubleTab&,DoubleTab&) const;
 
-  // Fonction pour l'explicite
+  // Functions for explicit scheme
   DoubleVect& calculer_gradient_elem(const DoubleVect&) const;
   DoubleVect& calculer_gradient_som(const DoubleVect&) const;
   DoubleVect& calculer_gradient_aretes(const DoubleVect&) const;
@@ -87,7 +87,7 @@ protected :
   void calculer_dt_stab_som(const DoubleTab&,DoubleTab&) const;
   void calculer_dt_stab_aretes(const DoubleTab&,DoubleTab&) const;
 
-  // Fonction pour l'implicite
+  // Functions for implicit scheme
   void ajouter_contribution_elem(const DoubleTab&,const DoubleVect&, const DoubleTab&,Matrice_Morse&) const;
   void ajouter_contribution_som(const DoubleTab&,const DoubleVect&,const DoubleTab&,Matrice_Morse&) const;
   void ajouter_contribution_aretes(const DoubleTab&,const DoubleVect&,const DoubleTab&,Matrice_Morse&) const;
@@ -111,12 +111,12 @@ protected :
 
   void liste_face(IntLists&,int&) const;
 
-  // Fonction de test
+  // Test function
   void test() const;
   void corriger_Cl_test(DoubleTab&) const;
   int test_ = 0;
 
-  // Attributs de la classe
+  // Class attributes
   mutable DoubleTab gradient_p0_;
   mutable DoubleTab gradient_p1_;
   mutable DoubleTab gradient_pa_;
@@ -124,17 +124,17 @@ protected :
   mutable int is_laplacian_filled_ = 0;
   mutable int is_laplacian_built_ = 0;
 
-  double convexite_ = 1.e-3; //attribut pour definir la convexite
-  double coeff_ = 1.; //pour la matrice lumpee
-  int alphaE = 1; //attribut pour calculer la partie P0 de l'operateur
-  int alphaS = 1; //attribut pour calculer la partie P1 de l'operateur
-  int alphaA = 0; //attribut pour calculer la partie Pa de l'operateur
-  int dim_ch_ = -1; //attribut donnant le nombre de dimension de l'inconnue
-  int decentrage_ = 1; //attribut autorisant le decentrage de l'operateur
+  double convexite_ = 1.e-3; //attribute defining the convexity
+  double coeff_ = 1.; //coefficient for the lumped matrix
+  int alphaE = 1; //attribute for computing the P0 part of the operator
+  int alphaS = 1; //attribute for computing the P1 part of the operator
+  int alphaA = 0; //attribute for computing the Pa part of the operator
+  int dim_ch_ = -1; //attribute giving the number of dimensions of the unknown
+  int decentrage_ = 1; //attribute enabling upwinding of the operator
 };
 
 /* //Description: */
-/* //on assemble la matrice. */
+/* //Assemble the matrix. */
 
 inline void Op_Diff_VEFP1NCP1B_Face::contribuer_a_avec(const DoubleTab& inco,
                                                        Matrice_Morse& matrice) const
@@ -143,7 +143,7 @@ inline void Op_Diff_VEFP1NCP1B_Face::contribuer_a_avec(const DoubleTab& inco,
 }
 
 /* //Description: */
-/* //on ajoute la contribution du second membre. */
+/* //add the right-hand side contribution. */
 
 inline void Op_Diff_VEFP1NCP1B_Face::contribuer_au_second_membre(DoubleTab& resu) const
 {

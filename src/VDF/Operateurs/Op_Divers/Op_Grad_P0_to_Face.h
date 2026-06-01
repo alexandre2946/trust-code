@@ -19,10 +19,10 @@
 #include <Op_Grad_VDF_Face_base.h>
 #include <Domaine_VDF.h>
 
-/*! @brief class Op_Grad_P0_to_Face Cette classe represente l'operateur de gradient
+/*! @brief class Op_Grad_P0_to_Face This class represents the gradient operator
  *
- *   La discretisation est VDF. On calcule le gradient d'un champ_P0 (autre que la pression)
- *   et le champ de sortie est aux Faces
+ *   The discretization is VDF. The gradient of a P0 field (other than pressure) is computed
+ *   and the output field is at Faces
  *
  */
 class Op_Grad_P0_to_Face : public Op_Grad_VDF_Face_base

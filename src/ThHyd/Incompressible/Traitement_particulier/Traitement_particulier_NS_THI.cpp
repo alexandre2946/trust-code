@@ -154,7 +154,7 @@ void Traitement_particulier_NS_THI::post_traitement_particulier()
 
 void Traitement_particulier_NS_THI::en_cours_de_resolution(int nb_op, DoubleTab& u, DoubleTab& u_av, double dt)
 {
-  // il n'est en fait jamais appele cf. ci-dessous
+  // it is actually never called, cf. below
   if (oui_transf == 1)
     {
       calcul_spectre_operateur( nb_op, u, u_av,dt);
@@ -166,10 +166,10 @@ int& Traitement_particulier_NS_THI::calcul_nb_som_dir(const Domaine& domaine)
 {
   const char* methode_actuelle="Traitement_particulier_NS_THI::calcul_nb_som_dir";
 
-  // Sert a calculer le nombre de sommet commun en parallele
+  // Used to compute the number of common vertices in parallel
   ArrOfBit unused;
   trustIdType nb_som = domaine.les_sommets().get_md_vector()->get_sequential_items_flags(unused);
-  // Somme sur tous les processeurs
+  // Sum over all processors
   nb_som = mp_sum(nb_som);
 
   // [ABN] OMG, the below is so ugly ... how could this ever work?!
@@ -190,7 +190,7 @@ int& Traitement_particulier_NS_THI::calcul_nb_elem_dir(const Domaine& domaine)
   const char* methode_actuelle="Traitement_particulier_NS_THI::calcul_nb_elem_dir";
   trustIdType nb_elem = domaine.nb_elem();
 
-  // Somme sur tous les processeurs
+  // Sum over all processors
   nb_elem=mp_sum(nb_elem);
 
   // [ABN] (same as above) -> OMG, the below is so ugly ... how could this ever work?!

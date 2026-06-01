@@ -24,9 +24,9 @@ Implemente_base(Champ_Don_base,"Champ_Don_base",Champ_base);
 Sortie& Champ_Don_base::printOn(Sortie& os) const { return Champ_base::printOn(os); }
 Entree& Champ_Don_base::readOn(Entree& is) { return Champ_base::readOn(is); }
 
-/*! @brief Fixe le nombre de degres de liberte par composante
+/*! @brief Sets the number of degrees of freedom per component
  *
- * @param (int nb_noeuds) le nombre de degre de liberte par composante
+ * @param (int nb_noeuds) the number of degrees of freedom per component
  */
 int Champ_Don_base::fixer_nb_valeurs_nodales(int nb_noeuds)
 {
@@ -34,7 +34,7 @@ int Champ_Don_base::fixer_nb_valeurs_nodales(int nb_noeuds)
   return nb_noeuds;
 }
 
-/*! @brief Provoque une erreur !  A surcharger par les classes derivees ! non virtuelle pure par commoditees de developpement !
+/*! @brief Causes an error! To be overridden by derived classes! Not a pure virtual for development convenience!
  *
  */
 Champ_base& Champ_Don_base::affecter_(const Champ_base&)
@@ -43,7 +43,7 @@ Champ_base& Champ_Don_base::affecter_(const Champ_base&)
   throw;
 }
 
-/*! @brief Provoque une erreur ! A surcharger par les classes derivees ! non virtuelle pure par commoditees de developpement !
+/*! @brief Causes an error! To be overridden by derived classes! Not a pure virtual for development convenience!
  *
  */
 Champ_base& Champ_Don_base::affecter_compo(const Champ_base&, int)
@@ -52,9 +52,9 @@ Champ_base& Champ_Don_base::affecter_compo(const Champ_base&, int)
   throw;
 }
 
-/*! @brief Mise a jour en temps.
+/*! @brief Time update.
  *
- * @param (double) le temps de mise a jour
+ * @param (double) the update time
  */
 void Champ_Don_base::mettre_a_jour(double t)
 {
@@ -70,9 +70,9 @@ void Champ_Don_base::resetTime(double time)
   mettre_a_jour(time);
 }
 
-/*! @brief NE FAIT RIEN.
+/*! @brief DOES NOTHING.
  *
- * A surcharger dans les classes derivees. Provoque l'initialisation du champ si necessaire
+ * To be overridden in derived classes. Causes the field initialization if necessary
  *
  */
 int Champ_Don_base::initialiser(const double un_temps)
@@ -81,9 +81,9 @@ int Champ_Don_base::initialiser(const double un_temps)
   return 1;
 }
 
-/*! @brief NE FAIT RIEN.
+/*! @brief DOES NOTHING.
  *
- * A surcharger dans les classes derivees
+ * To be overridden in derived classes
  *
  */
 int Champ_Don_base::reprendre(Entree& )
@@ -91,9 +91,9 @@ int Champ_Don_base::reprendre(Entree& )
   return 1;
 }
 
-/*! @brief NE FAIT RIEN.
+/*! @brief DOES NOTHING.
  *
- * A surcharger dans les classes derivees
+ * To be overridden in derived classes
  *
  */
 int Champ_Don_base::sauvegarder(Sortie& ) const
@@ -101,9 +101,9 @@ int Champ_Don_base::sauvegarder(Sortie& ) const
   return 1;
 }
 
-/*! @brief NE FAIT RIEN.
+/*! @brief DOES NOTHING.
  *
- * EXIT ! A surcharger dans les classes derivees
+ * EXIT! To be overridden in derived classes
  *
  */
 int Champ_Don_base::imprime(Sortie& os, int ncomp) const
@@ -113,10 +113,10 @@ int Champ_Don_base::imprime(Sortie& os, int ncomp) const
   return 1;
 }
 
-/*! @brief Fixe le nombre de composantes et le nombre de valeurs nodales.
+/*! @brief Sets the number of components and the number of nodal values.
  *
- * @param (int) le nombre de noeud par composante du champ (le nombre de dl par composante)
- * @param (int) le nombre de composante du champ
+ * @param (int) the number of nodes per component of the field (the number of dof per component)
+ * @param (int) the number of components of the field
  */
 void Champ_Don_base::dimensionner(int nb_noeuds, int nb_compo)
 {

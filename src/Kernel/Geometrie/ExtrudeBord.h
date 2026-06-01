@@ -24,19 +24,19 @@
  *
  */
 /**
- * Realise une extrusion d'un bord.
- * ExtrudeBord peut extruder un bord maille soit en triangle soit en quadrangle
- *  - si  le bord est maille en quadrangle, le domaine extrude sera compose d'hexaedre
- *  - si  le bord est maille en triangle, le domaine extrude sera compose de tetraedres
- * La syntaxte est la suivante :
+ * Performs an extrusion of a boundary.
+ * ExtrudeBord can extrude a boundary meshed either with triangles or quadrangles:
+ *  - if the boundary is meshed with quadrangles, the extruded domain will be composed of hexahedra
+ *  - if the boundary is meshed with triangles, the extruded domain will be composed of tetrahedra
+ * The syntax is as follows:
  *         ExtrudeBord
  *                 {
- *                 domaine_init         NOM_DOMAINE_DE_DEPART
+ *                 domaine_init         NAME_OF_SOURCE_DOMAIN
  *                 direction         X Y Z
  *                 nb_tranches         N
- *                 domaine_final         NOM_DU_DOMAINE_EXTRUDE
- *                 nom_bord         NOM_BORD_A_EXTRUDER
- *                hexa_old  //mot cle a mettre pour utiliser l'ancienne version de l'extrusion des hexas
+ *                 domaine_final         NAME_OF_EXTRUDED_DOMAIN
+ *                 nom_bord         NAME_OF_BOUNDARY_TO_EXTRUDE
+ *                hexa_old  //keyword to use the old version of hexa extrusion
  *                 }
  *
  * (MODIF OC 12/2004)
@@ -53,9 +53,9 @@ private:
 
   void extruder_bord(Nom& nom_front, Nom& nom_dom2, DoubleVect& vect_dir, int nbpas);
   void extruder_hexa_old(Nom& nom_front, Nom& nom_dom2, DoubleVect& vect_dir, int nbpas);
-  bool hexa_old=false;    // flag pour ancienne version de l'extrusion des hexas : 0 = ancienne version
-  bool Trois_Tetra=false; // flag pour extrusion en trois tetraedres plutot qu'en 14 (option par defaut)
-  bool Vingt_Tetra=false; // flag pour extrusion en vingr tetraedres plutot qu'en 14 (option par defaut)
+  bool hexa_old=false;    // flag for old version of hexa extrusion: 0 = old version
+  bool Trois_Tetra=false; // flag for extrusion into three tetrahedra rather than 14 (default option)
+  bool Vingt_Tetra=false; // flag for extrusion into twenty tetrahedra rather than 14 (default option)
   int en3D_=1;
 };
 

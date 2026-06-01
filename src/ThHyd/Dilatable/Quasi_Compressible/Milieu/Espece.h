@@ -19,7 +19,7 @@
 
 #include <Fluide_Quasi_Compressible.h>
 
-/*! @brief classe Espece
+/*! @brief Espece
  *
  * @sa Milieu_base Fluide_Incompressible Fluide_Quasi_Compressible
  */

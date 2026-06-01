@@ -21,12 +21,12 @@
 
 class Pb_rayo_semi_transp;
 
-/*! @brief classe derivee de Probleme_Couple Cette classe couple, outre des Probleme_base, un pb de
+/*! @brief Coupled problem class for semi-transparent radiation.
  *
- *      rayonnement semi transparent.
- *      Seule l'etape d'initialisation impose actuellement que le
- *      pb de rayonnement soit differencie, et donc l'existence de
- *      la classe Pb_Couple_rayo_semi_transp.
+ *      This class couples, in addition to Probleme_base instances, a semi-transparent
+ *      radiation problem.
+ *      Only the initialization step currently requires the radiation problem to be
+ *      distinguished, hence the existence of the Pb_Couple_rayo_semi_transp class.
  *
  *
  * @sa Probleme_Couple Pb_rayo_semi_transp

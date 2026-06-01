@@ -19,11 +19,10 @@
 
 #include <Schema_Adams_Bashforth_base.h>
 
-/*! @brief classe Schema_Adams_Bashforth_order_2 Cette classe represente un schema en temps d'Adams-Bashforth d'ordre 2
+/*! @brief class Schema_Adams_Bashforth_order_2 This class represents a variable time-step second-order Adams-Bashforth time scheme:
  *
- *      a pas de temps variable :
- *      U(n+1) = U(n) + dt*(3/2*(dU/dt)(n)-1/2(dU/dt)(n-1)) si le pas de temps
- *      est constant
+ *      U(n+1) = U(n) + dt*(3/2*(dU/dt)(n)-1/2(dU/dt)(n-1)) when the time step
+ *      is constant.
  *
  * @sa Schema_Temps_base
  */

@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 
-/*! @brief classe YAML_data : collection of all needed information for data to save/restore in order to write the YAML file used to initialize PDI
+/*! @brief YAML_data class: collection of all needed information for data to save/restore in order to write the YAML file used to initialize PDI.
  *
  */
 class YAML_data

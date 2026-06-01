@@ -41,7 +41,7 @@ void PDC_Anisotrope_PolyMAC_CDO::coeffs_perte_charge_impl(const DoubleVect& u, c
                                                           double dh, double nu, double reynolds, double K, double& coeff_ortho,
                                                           double& coeff_long, double& u_l, DoubleVect& v_valeur, Parser_U& lambda) const
 {
-  // Calcul de lambda
+  // Compute lambda
   lambda.setVar(0, reynolds);
   lambda.setVar(1, t);
   lambda.setVar(2, pos[0]);
@@ -50,7 +50,7 @@ void PDC_Anisotrope_PolyMAC_CDO::coeffs_perte_charge_impl(const DoubleVect& u, c
   if (Objet_U::dimension > 2)
     lambda.setVar(4, pos[2]);
 
-  // Calcul de lambda_ortho
+  // Compute lambda_ortho
   lambda_ortho.setVar(0, reynolds);
   lambda_ortho.setVar(1, t);
   lambda_ortho.setVar(2, pos[0]);
@@ -58,21 +58,21 @@ void PDC_Anisotrope_PolyMAC_CDO::coeffs_perte_charge_impl(const DoubleVect& u, c
     lambda_ortho.setVar(3, pos[1]);
   if (Objet_U::dimension > 2)
     lambda_ortho.setVar(4, pos[2]);
-  double l_ortho = lambda_ortho.eval(); // Pour ne pas evaluer 2 fois le parser
+  double l_ortho = lambda_ortho.eval(); // to avoid evaluating the parser twice
 
-  // Calcul de v et ||v||^2
+  // Compute v and ||v||^2
   //  DoubleVect v_valeur(dimension);
   double vcarre = 0;
   v->valeur_a(pos, v_valeur);
   for (int dim = 0; dim < Objet_U::dimension; dim++)
     vcarre += v_valeur[dim] * v_valeur[dim];
   v_valeur /= sqrt(vcarre);
-  // Calcul de u.v
+  // Compute u.v
   double scal = 0;
   for (int dim = 0; dim < Objet_U::dimension; dim++)
     scal += u[dim] * v_valeur[dim];
 
-  // Calcul du resultat
+  // Compute the result
   /*
    for (int dim=0;dim<dimension;dim++)
    p_charge[dim] = -l_ortho*norme_u/2./dh*u[dim]
@@ -107,30 +107,30 @@ void PDC_Circulaire_PolyMAC_CDO::coeffs_perte_charge_impl(const DoubleVect& u, c
                                                           double norme_u, double dh, double nu, double reynolds, double K, double& coeff_ortho,
                                                           double& coeff_long, double& u_l, DoubleVect& av_valeur, Parser_U& lambda) const
 {
-  // calcul de dh_ortho
+  // compute dh_ortho
   double dh_ortho = diam_hydr_ortho->valeur_a_compo(pos, 0);
 
-  // calcul de u.d/||d||
-  // Calcul de v et ||v||^2
+  // compute u.d/||d||
+  // Compute v and ||v||^2
   av_valeur.resize(Objet_U::dimension);
 
   v->valeur_a(pos, av_valeur);
-  // on norme v
+  // normalize v
   {
     double vcarre = 0;
     for (int dim = 0; dim < Objet_U::dimension; dim++)
       vcarre += av_valeur[dim] * av_valeur[dim];
     av_valeur /= sqrt(vcarre);
   }
-  // Calcul de u.v/||v||
+  // Compute u.v/||v||
   u_l = 0;
 
   for (int dim = 0; dim < Objet_U::dimension; dim++)
     u_l += u[dim] * av_valeur[dim];
 
   double u_ortho = sqrt(norme_u * norme_u - u_l * u_l);
-  // calcule de Re_l et Re_ortho
-  // Calcul du reynolds
+  // compute Re_l and Re_ortho
+  // Compute the Reynolds number
   /* PL: To avoid a possible division by zero, we replace:
    double nu=norme_u*dh/reynolds;
    double Re_l=std::fabs(u_l)*dh/nu; */
@@ -144,7 +144,7 @@ void PDC_Circulaire_PolyMAC_CDO::coeffs_perte_charge_impl(const DoubleVect& u, c
   double Re_ortho = dh_ortho * u_ortho / nu;
   if (Re_ortho < 1e-10)
     Re_ortho = 1e-10;
-  // Calcul de lambda
+  // Compute lambda
   lambda.setVar(0, reynolds);
   lambda.setVar(1, Re_l);
   lambda.setVar(2, t);
@@ -154,7 +154,7 @@ void PDC_Circulaire_PolyMAC_CDO::coeffs_perte_charge_impl(const DoubleVect& u, c
   if (Objet_U::dimension > 2)
     lambda.setVar(5, pos[2]);
 
-  // Calcul de lambda_ortho
+  // Compute lambda_ortho
   lambda_ortho.setVar(0, reynolds);
   lambda_ortho.setVar(1, Re_ortho);
   lambda_ortho.setVar(2, t);
@@ -163,7 +163,7 @@ void PDC_Circulaire_PolyMAC_CDO::coeffs_perte_charge_impl(const DoubleVect& u, c
     lambda_ortho.setVar(4, pos[1]);
   if (Objet_U::dimension > 2)
     lambda_ortho.setVar(5, pos[2]);
-  double l_ortho = lambda_ortho.eval(); // Pour ne pas evaluer 2 fois le parser
+  double l_ortho = lambda_ortho.eval(); // to avoid evaluating the parser twice
   double l_long = lambda.eval();
   coeff_ortho = K * l_ortho * u_ortho / 2. / dh_ortho;
   coeff_long = K * l_long * std::fabs(u_l) / 2. / dh;
@@ -173,7 +173,7 @@ void PDC_Directionnelle_PolyMAC_CDO::coeffs_perte_charge_impl(const DoubleVect& 
                                                               double dh, double nu, double reynolds, double K, double& coeff_ortho,
                                                               double& coeff_long, double& u_l, DoubleVect& v_valeur, Parser_U& lambda) const
 {
-  // Calcul de lambda
+  // Compute lambda
   lambda.setVar(0, reynolds);
   lambda.setVar(1, t);
   lambda.setVar(2, pos[0]);
@@ -182,19 +182,19 @@ void PDC_Directionnelle_PolyMAC_CDO::coeffs_perte_charge_impl(const DoubleVect& 
   if (Objet_U::dimension > 2)
     lambda.setVar(4, pos[2]);
 
-  // Calcul de v et ||v||^2
+  // Compute v and ||v||^2
   //  DoubleVect v_valeur(dimension);
   double vcarre = 0;
   v->valeur_a(pos, v_valeur);
   for (int dim = 0; dim < Objet_U::dimension; dim++)
     vcarre += v_valeur[dim] * v_valeur[dim];
   v_valeur /= sqrt(vcarre);
-  // Calcul de u.v
+  // Compute u.v
   double scal = 0;
   for (int dim = 0; dim < Objet_U::dimension; dim++)
     scal += u[dim] * v_valeur[dim];
   /*
-   // Calcul du resultat
+   // Compute the result
    for (int dim=0;dim<dimension;dim++)
    p_charge[dim] = -lambda.eval()*scal*v_valeur[dim]*norme_u/2./dh;
    */
@@ -207,7 +207,7 @@ void PDC_Isotrope_PolyMAC_CDO::coeffs_perte_charge_impl(const DoubleVect& u, con
                                                         double dh, double nu, double reynolds, double K, double& coeff_ortho,
                                                         double& coeff_long, double& u_l, DoubleVect& v_valeur, Parser_U& lambda) const
 {
-  // Calcul de lambda
+  // Compute lambda
   lambda.setVar(0, reynolds);
   lambda.setVar(1, t);
   lambda.setVar(2, pos[0]);
@@ -216,10 +216,10 @@ void PDC_Isotrope_PolyMAC_CDO::coeffs_perte_charge_impl(const DoubleVect& u, con
   if (Objet_U::dimension > 2)
     lambda.setVar(4, pos[2]);
 
-  // Calcul du resultat
+  // Compute the result
   coeff_ortho = K * lambda.eval() * norme_u / 2. / dh;
   coeff_long = coeff_ortho;
-  // v ne sert pas, car coeff_ortho=coeff_long
+  // v is not used because coeff_ortho=coeff_long
   //  for (int dim=0;dim<dimension;dim++)
   //  p_charge[dim] = -lambda.eval()*norme_u/2./dh*u[dim];
   u_l = 0;

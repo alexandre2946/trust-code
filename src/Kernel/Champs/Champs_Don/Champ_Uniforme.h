@@ -18,7 +18,7 @@
 
 #include <TRUSTChamp_Divers_generique.h>
 
-/*! @brief classe Champ_Uniforme Represente un champ constant dans l'espace et dans le temps.
+/*! @brief Champ_Uniforme Represents a field that is constant in space and time.
  *
  * @sa : TRUSTChamp_Divers_generique
  */

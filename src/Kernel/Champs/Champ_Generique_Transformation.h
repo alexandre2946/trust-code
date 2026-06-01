@@ -23,60 +23,60 @@
 
 /*! @brief class Champ_Generique_Transformation
  *
- *  Champ destine a post-traiter une "transformation" dependant de champs generiques et (ou) de x,y,z et t
- *  La classe porte un  :
- *    -vecteur de Parseur (fxyz)
- *    -la (les) expression(s) pour exprimer la transformation (les_fct)
- *    -la methode de transformation choisie (methode_)
+ *  Field intended to post-process a "transformation" depending on generic fields and (or) on x,y,z and t
+ *  The class carries:
+ *    -vector of Parser (fxyz)
+ *    -the expression(s) to express the transformation (les_fct)
+ *    -the chosen transformation method (methode_)
  *
  */
 
-//// Syntaxe a respecter pour jdd
+//// Data file syntax to follow
 //
-// "nom_champ" Transformation {
-//                 "type_transfo" "type_info"
-//                sources { ...{ ...source ref_Champ { Pb_champ "nom_pb" "nom_champ_discret1" } } ,
-//                          ...{ ...source ref_Champ { Pb_champ "nom_pb" "nom_champ_discret2" } } ,
+// "field_name" Transformation {
+//                 "transform_type" "type_info"
+//                sources { ...{ ...source ref_Champ { Pb_champ "pb_name" "discrete_field_name1" } } ,
+//                          ...{ ...source ref_Champ { Pb_champ "pb_name" "discrete_field_name2" } } ,
 //                            ...
 //                          }
-//                  [localisation "loc"]
+//                  [localization "loc"]
 //             }
 //
-// "nom_champ" fixe par l'utilisateur sera le nom du champ generique.
-// "type_transfo" peut etre :
-//          "fonction"              permet d'appliquer une formule utilisant les valeurs des champs sources specifies et peut dependre de x,y,z et t.
-//                              -> type_info : f(nom_ch1,nom_ch2...,x,y,z,t) expression analytique
+// "field_name" set by the user will be the name of the generic field.
+// "transform_type" can be:
+//          "function"           allows to apply a formula using the values of the specified source fields and can depend on x,y,z and t.
+//                              -> type_info: f(field_name1,field_name2...,x,y,z,t) analytical expression
 //
-//          "produit_scalaire"  permet de calculer le produit scalaire de deux vecteurs.
-//                              -> type_info : vide car l'expression de transformation est construite automatiquement.
-//                                 2 sources de nature vectoriel doivent etre specifiees.
+//          "dot_product"        allows to calculate the dot product of two vectors.
+//                              -> type_info: empty since the transformation expression is constructed automatically.
+//                                 2 sources of vector nature must be specified.
 //
-//          "norme"              permet de calculer la norme d'un vecteur.
-//                              -> type_info : idem a produit_scalaire
-//                                 1 source de nature vectoriel doit etre specifiee.
+//          "norm"               allows to calculate the norm of a vector.
+//                              -> type_info: same as dot_product
+//                                 1 source of vector nature must be specified.
 //
-//          "vecteur"              permet de construire un champ de nature vectoriel a partir des composantes specifiees.
-//                              -> type_info : nom_pb nb_compo f1(nom_ch1,nom_ch2...,x,y,z,t) ...fn(nom_ch1,nom_ch2...,x,y,z,t)
-//                                 nom_pb    : nom du probleme.
-//                                 nb_compo  : nombre de composantes du champ vectoriel a creer.
-//                                 f1,...,fn : expression des composantes du champ vectoriel a creeer.
-//                                Si des sources sont specifiees, elles doivent etre de nature scalaire.
-//                                 Rq : si aucune source n'est specifiee par l''utilisateur, la version actuelle attribue une
-//                                     source par defaut qui se base sur le champ inconnu de la premiere equation du probleme.
-//                                     A terme (apres revision de la conception) ce contournement sera a eliminer.
+//          "vector"             allows to construct a field of vector nature from the specified components.
+//                              -> type_info: pb_name nb_compo f1(field_name1,field_name2...,x,y,z,t) ...fn(field_name1,field_name2...,x,y,z,t)
+//                                 pb_name   : name of the problem.
+//                                 nb_compo  : number of components of the vector field to create.
+//                                 f1,...,fn : expression of the components of the vector field to create.
+//                                If sources are specified, they must be of scalar nature.
+//                                 Note: if no source is specified by the user, the current version assigns a
+//                                     default source based on the unknown field of the first equation of the problem.
+//                                     Eventually (after design review) this workaround will be eliminated.
 //
-//          "composante"              permet de construire un champ scalaire par extraction d'une composante d'un champ vectoriel.
-//                              -> type_info : num_compo : numero de la composante a extraire.
-//                                1 source de nature vectoriel doit etre specifiee.
+//          "component"          allows to construct a scalar field by extracting a component of a vector field.
+//                              -> type_info: num_component: number of the component to extract.
+//                                1 source of vector nature must be specified.
 //
-// "type_champ_gen" type d'un champ generique
-// "nom_champ_discret1" designe le nom du champ constituant la premiere source
-// "nom_champ_discret2" designe le nom du champ constituant la seconde source
+// "generic_field_type" type of a generic field
+// "discrete_field_name1" designates the name of the field constituting the first source
+// "discrete_field_name2" designates the name of the field constituting the second source
 // ...
-// "loc" permet de specifier une localisation particuliere pour evaluer les valeurs de l espace de stockage
-// "unite" permet a l'utilisateur de donner une unite au champ obtenu
-//  valeurs possibles : "elem", "som", "faces", "elem_dg" et "elem_som".
-//  Dans le cas ou aucune localisation n'est specifiee, la localisation retenue est celle du support de la premiere source.
+// "loc" allows to specify a particular localization to evaluate the values of the storage space
+// "unit" allows the user to give a unit to the obtained field
+//  possible values: "elem", "som", "faces", "elem_dg" and "elem_som".
+//  In the case where no localization is specified, the retained localization is that of the first source support.
 //
 
 class Champ_Generique_Transformation : public Champ_Gen_de_Champs_Gen
@@ -104,13 +104,13 @@ public:
 
 protected:
 
-  Nom methode_;                //Methode indiquant le type de transformation retenue
-  Noms les_fct;                //Contient l expression de la combinaison
-  mutable VECT(Parser_U) fxyz; //Parser utilise pour evaluer la valeur prise par la combinaison
-  int nb_comp_ = 1;                //Nombre de composantes du champ evalue
-  Motcle localisation_;        //Localisation du support d evaluation de l expression
-  Nom unite_;                 //unite du champ obtenu (a specifier par l'utilisateur)
-  Nature_du_champ nature_ch = scalaire;   //Nature du champ evalue
+  Nom methode_;                //Method indicating the type of transformation selected
+  Noms les_fct;                //Contains the expression of the combination
+  mutable VECT(Parser_U) fxyz; //Parser used to evaluate the value taken by the combination
+  int nb_comp_ = 1;                //Number of components of the evaluated field
+  Motcle localisation_;        //Localisation of the support for evaluating the expression
+  Nom unite_;                 //unit of the obtained field (to be specified by the user)
+  Nature_du_champ nature_ch = scalaire;   //Nature of the evaluated field
   bool fictive_source_ = false;
 
 private:

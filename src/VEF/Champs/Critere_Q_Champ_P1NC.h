@@ -22,7 +22,7 @@
 
 class Champ_P1NC;
 
-/*! @brief classe Critere_Q_Champ_P1NC
+/*! @brief class Critere_Q_Champ_P1NC
  *
  * @sa Champ_Critere_Q Champ_Fonc_P0_VDF
  */

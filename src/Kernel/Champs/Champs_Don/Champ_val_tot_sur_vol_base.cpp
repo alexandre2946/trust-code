@@ -28,13 +28,13 @@ Sortie& Champ_val_tot_sur_vol_base::printOn(Sortie& os) const { return Champ_Uni
 
 Entree& Champ_val_tot_sur_vol_base::readOn(Entree& is) { return Champ_Uniforme_Morceaux::readOn(is); }
 
-//Evaluation du champ sur le domaine par defaut et les sous domaines specifiees
-//-Pour chacun des sous domaines et pour le domaine complet on calcul CONTRIB_loc:
-//   loc designe une localisation (sous domaine i ou domaine par defaut)
-//   cas VDF : CONTRIB_loc = somme de volume(elem)*porosite(elem) pour les elements de loc
-//   cas VEF : CONTRIB_loc = somme de vol_entrelaces(face)*por_face(face) pour les faces de loc
-//-On retranche CONTRIB_loc de chaque sous domaine a celle du domaine complet
-//-Estimation de la puissance aux elements pour chaque localisation par la relation :
+//Evaluation of the field on the default domain and the specified sub-domains
+//-For each sub-domain and for the full domain, CONTRIB_loc is computed:
+//   loc designates a localisation (sub-domain i or default domain)
+//   VDF case: CONTRIB_loc = sum of volume(elem)*porosity(elem) for elements in loc
+//   VEF case: CONTRIB_loc = sum of vol_entrelaces(face)*por_face(face) for faces in loc
+//-CONTRIB_loc of each sub-domain is subtracted from that of the full domain
+//-Estimate of the power at elements for each localisation by the relation:
 //  P(elem,compo) = P_lue/CONTRIB_loc
 //
 void Champ_val_tot_sur_vol_base::evaluer(const Domaine_dis_base& zdis,const Domaine_Cl_dis_base& zcldis)

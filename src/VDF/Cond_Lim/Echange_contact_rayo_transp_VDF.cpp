@@ -32,19 +32,19 @@ int Echange_contact_rayo_transp_VDF::initialiser(double temps)
 {
   assert (!le_modele_rayo_);
 
-  // on recupere le modele rayo ... mais faut le bon probleme !
-  // XXX pas encore entrer dans Echange_contact_VDF::initialiser ... donc faut faire des choses a la main ici ...
+  // Retrieve the radiation model ... but we need the correct problem!
+  // XXX not yet entered Echange_contact_VDF::initialiser ... so things must be done manually here ...
   const Probleme_base& this_pb = domaine_Cl_dis().equation().probleme();
-  if (this_pb.milieu().is_rayo_transp()) // c'est bon on est côte fluide !!
+  if (this_pb.milieu().is_rayo_transp()) // good, we are on the fluid side!!
     {
       assert (sub_type(Pb_Fluide_base, this_pb));
       le_modele_rayo_ =ref_cast(Pb_Fluide_base, this_pb).get_mod_rayo_transp();
     }
-  else // l'autre pb !
+  else // the other problem!
     {
       // const Probleme_base& other_pb = ref_cast(Champ_front_calc, T_autre_pb()).inconnue().equation().probleme(); // encore tot deso ...
       const Probleme_base& other_pb = ref_cast(Probleme_base, Interprete::objet(nom_autre_pb_));
-      if (other_pb.milieu().is_rayo_transp()) // pb fluide trouve !!
+      if (other_pb.milieu().is_rayo_transp()) // fluid problem found!!
         {
           assert (sub_type(Pb_Fluide_base, other_pb));
           le_modele_rayo_ = ref_cast(Pb_Fluide_base, other_pb).get_mod_rayo_transp();
@@ -66,7 +66,7 @@ void Echange_contact_rayo_transp_VDF::completer()
   Echange_contact_VDF::completer();
   preparer_surface(frontiere_dis(), domaine_Cl_dis());
 
-  // calcul de teta_i_ 0
+  // Compute teta_i_ at time 0
   const Equation_base& mon_eqn = domaine_Cl_dis().equation();
   const DoubleTab& mon_inco = mon_eqn.inconnue().valeurs();
   const Domaine_VDF& ma_zvdf = ref_cast(Domaine_VDF, domaine_Cl_dis().domaine_dis());
@@ -108,7 +108,7 @@ void Echange_contact_rayo_transp_VDF::mettre_a_jour(double temps)
       int m = 0;
       if (mon_eqn.probleme().milieu().is_rayo_transp())
         {
-          // on est du cote fluide
+          // we are on the fluid side
           eqn = &mon_eqn;
           m++;
         }
@@ -145,7 +145,7 @@ void Echange_contact_rayo_transp_VDF::mettre_a_jour(double temps)
   assert(nb_comp == 1);
   int is_pb_fluide = 0;
 
-  // ATTENTION : regarder equation pour determiner is_pb_fluide necessaire pour le rayonnement
+  // WARNING: look at the equation to determine is_pb_fluide, which is needed for radiation
   DoubleTab& mon_h = h_imp_->valeurs();
   int opt = 0;
   assert(h_paroi != 0.);
@@ -157,7 +157,7 @@ void Echange_contact_rayo_transp_VDF::mettre_a_jour(double temps)
 
   calculer_Teta_paroi(T_ext().valeurs_au_temps(temps), mon_h, autre_h, is_pb_fluide, temps);
 
-  // on a calculer Teta paroi, on peut calculer htot dans himp (= mon_h)
+  // Teta_paroi has been computed; now compute htot in himp (= mon_h)
 
   int taille = mon_h.dimension(0);
   for (int ii = 0; ii < taille; ii++)
@@ -196,7 +196,7 @@ void Echange_contact_rayo_transp_VDF::calculer_Teta_paroi(DoubleTab& Teta_equiv,
   if (modrayo.relaxation() == 0)
     alpha_ = 0;
 
-  // on est oblige de tracer le flux_radiatif en // pour le pb solide
+  // The radiative flux must be traced in parallel for the solid problem
   Champ_front_calc& ch = ref_cast(Champ_front_calc, T_autre_pb());
   DoubleTab& t_autre = ch.valeurs_au_temps(temps);
   const Front_VF& autre_front_vf = ref_cast(Front_VF, ch.front_dis());

@@ -18,9 +18,9 @@
 
 #include <Fluide_Dilatable_base.h>
 
-/*! @brief classe Fluide_Weakly_Compressible Cette classe represente un d'un fluide faiblement compressible
+/*! @brief Fluide_Weakly_Compressible class This class represents a weakly compressible fluid,
  *
- *     c'est a dire heritant de Fluide_Dilatable_base
+ *     i.e. inheriting from Fluide_Dilatable_base
  *
  * @sa Milieu_base Fluide_Dilatable_base
  */

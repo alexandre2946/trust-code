@@ -26,8 +26,8 @@ class Domaine_Cl_VEF;
 
 /*! @brief class Op_Div_VEFP1B_Elem
  *
- *   Cette classe represente l'operateur de divergence. La discretisation est VEF
- *   On calcule la divergence d'un champ_P1NC (la vitesse)
+ *   This class represents the divergence operator with VEF discretization.
+ *   It computes the divergence of a champ_P1NC field (the velocity).
  *
  *
  * @sa Operateur_Div_base

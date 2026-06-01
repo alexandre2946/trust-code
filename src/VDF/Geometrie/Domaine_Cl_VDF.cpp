@@ -50,23 +50,23 @@ void Domaine_Cl_VDF::completer(const Domaine_dis_base& un_domaine_dis)
     {
       const Domaine_VDF& le_dom_VDF = ref_cast(Domaine_VDF,un_domaine_dis);
 
-      //  Remplissage du tableau d'entiers type_arete_bord_ + tableau intermediaire : les_faces_Cl
-      //  On remplit le tableau d'entiers local les_faces_Cl qui donne la condition aux limites pour chaque face de bord  avec les conventions suivantes :
-      //    0 pour une condition de paroi
-      //    1 pour une condition d'entree ou de sortie de fluide (face "fluide")
-      //    2 pour une condition de navier (symmetrie/paroi frottante)
-      //    3 pour une condition de periodicite
-      //    0 pour toute autre Cl.
-      //  On ne considere que les conditions aux limites qui interviennent pour la quantite de mouvement
+      //  Fill the integer array type_arete_bord_ and the intermediate array les_faces_Cl.
+      //  les_faces_Cl gives the boundary condition for each boundary face using the following conventions:
+      //    0 for a wall condition
+      //    1 for a fluid inlet or outlet condition ("fluid" face)
+      //    2 for a Navier condition (symmetry/slip wall)
+      //    3 for a periodicity condition
+      //    0 for any other BC.
+      //  Only boundary conditions that affect the momentum equation are considered.
 
       int nb_aretes_bord = le_dom_VDF.nb_aretes_bord();
       IntVect les_faces_Cl;
       le_dom_VDF.creer_tableau_faces_bord(les_faces_Cl);
 
-      // Boucle sur les conditions aux limites pour remplir les_faces_Cl:
+      // Loop over boundary conditions to fill les_faces_Cl:
       for (int n_bord = 0; n_bord < le_dom_VDF.nb_front_Cl(); n_bord++)
         {
-          // pour chaque Condition Limite on regarde son type
+          // for each boundary condition, determine its type
           const Cond_lim_base& la_cl = les_conditions_limites_[n_bord].valeur();
 
           int numero_cl = 0;
@@ -75,7 +75,7 @@ void Domaine_Cl_VDF::completer(const Domaine_dis_base& un_domaine_dis)
             numero_cl = 0;
           else if ((sub_type(Dirichlet_entree_fluide, la_cl)) || (sub_type(Neumann_sortie_libre, la_cl)))
             numero_cl = 1;
-          else if (sub_type(Navier, la_cl)) // (symmetrie/paroi frottante)
+          else if (sub_type(Navier, la_cl)) // (symmetry/slip wall)
             numero_cl = 2;
           else if (sub_type(Periodique, la_cl))
             numero_cl = 3;
@@ -91,9 +91,9 @@ void Domaine_Cl_VDF::completer(const Domaine_dis_base& un_domaine_dis)
 
       les_faces_Cl.echange_espace_virtuel();
 
-      // Boucle sur les aretes bord pour remplir type_arete_bord_
+      // Loop over boundary edges to fill type_arete_bord_
 
-      type_arete_bord_ = TypeAreteBordVDF::VIDE; // on initialise
+      type_arete_bord_ = TypeAreteBordVDF::VIDE; // initialize
 
       int face1, face2, rang1, rang2;
       int ndeb = le_dom_VDF.premiere_arete_bord(), nfin = ndeb + nb_aretes_bord;
@@ -188,9 +188,9 @@ void Domaine_Cl_VDF::completer(const Domaine_dis_base& un_domaine_dis)
         }
 
       // MODIFS CA : 21/09/99
-      // Boucle sur les aretes coin pour remplir type_arete_coin_
+      // Loop over corner edges to fill type_arete_coin_
 
-      type_arete_coin_= TypeAreteCoinVDF::VIDE; // on initialise
+      type_arete_coin_= TypeAreteCoinVDF::VIDE; // initialize
 
       ndeb = le_dom_VDF.premiere_arete_coin();
       nfin = ndeb + le_dom_VDF.nb_aretes_coin();
@@ -200,7 +200,7 @@ void Domaine_Cl_VDF::completer(const Domaine_dis_base& un_domaine_dis)
         {
           num_arete_ = num_arete - ndeb;
 
-          // On cherche les 2 valeurs differentes de -1
+          // Find the 2 values different from -1
           fac1 = le_dom_VDF.Qdm(num_arete_, 0);
           fac2 = le_dom_VDF.Qdm(num_arete_, 1);
           fac3 = le_dom_VDF.Qdm(num_arete_, 2);
@@ -362,8 +362,8 @@ void Domaine_Cl_VDF::imposer_cond_lim(Champ_Inc_base& ch, double temps)
             {
               if (init == 0)
                 {
-                  // On fait en sorte que le champ ait la meme valeur
-                  // sur deux faces de periodicite qui sont en face l'une de l'autre
+                  // Ensure that the field has the same value
+                  // on two periodic faces that are facing each other
                   const Periodique& la_cl_perio = ref_cast(Periodique,la_cl);
                   const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
                   ndeb = le_bord.num_premiere_face();
@@ -382,7 +382,7 @@ void Domaine_Cl_VDF::imposer_cond_lim(Champ_Inc_base& ch, double temps)
                           ch_tab[voisine] = moy;
                         }
                     }
-                  // Il ne faut pas le faire a la premiere cl mais une fois toutes les cl faites une fois, cas multi perio avec ci non perio
+                  // This should not be done on the first BC but once all BCs have been processed once, for multi-perio case with non-periodic IC
                   // init = 1;
                 }
             }
@@ -405,7 +405,7 @@ void Domaine_Cl_VDF::imposer_cond_lim(Champ_Inc_base& ch, double temps)
               for (num_face = ndeb; num_face < nfin; num_face++)
                 for (int n = 0; n < N; n++)
                   {
-                    // WEC : optimisable (pour chaque face recherche le bon temps !)
+                    // WEC : optimizable (for each face searches for the right time!)
                     ch_tab(num_face, n) = la_cl_diri.val_imp_au_temps(temps, num_face - ndeb, N * mon_dom_VDF.orientation(num_face) + n);
                   }
             }

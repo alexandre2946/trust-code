@@ -22,7 +22,7 @@
 class Motcle;
 #include <Domaine_forward.h>
 
-/*! @brief enum Type_Face Les differents types geometriques de faces.
+/*! @brief enum Type_Face The different geometric types of faces.
  * @sa Faces
  */
 enum class Type_Face
@@ -40,8 +40,8 @@ enum class Type_Face
 };
 
 
-/*! @brief Classe Faces Faces decrit un ensemble de faces par leur type (point ,segment, triangle ou quadrangle),
- * leurs sommets et leurs elements adjacents.
+/*! @brief Class Faces Faces describes a set of faces by their type (point, segment, triangle or quadrangle),
+ * their vertices and their adjacent elements.
  *
  * @sa IntTab Frontiere
  */
@@ -64,13 +64,13 @@ public:
 
   inline Type_Face type_face() const {   return type_face_; }
   inline int_t nb_faces() const {  return sommets.dimension(0); }
-  /// @brief Renvoie le nombre total de Faces i (reelles et virt) sur le proc courant
+  /// @brief Returns the total number of Faces i (real and virtual) on the current processor
   inline int_t nb_faces_tot() const { return sommets.dimension_tot(0); }
   inline int nb_som_faces() const;
 
   inline int_t sommet(int_t, int) const;
   inline int_t& sommet(int_t, int);
-  /// Renvoie le tableau des sommets de toutes les faces
+  /// Returns the array of vertices of all faces
   inline const IntTab_t& les_sommets() const { return sommets; }
   inline IntTab_t& les_sommets() { return sommets; }
 
@@ -85,7 +85,7 @@ public:
 
   inline int_t voisin(int_t, int) const;
   inline int_t& voisin(int_t, int);
-  /// @brief Renvoie le tableau des voisins (des faces).
+  /// @brief Returns the array of neighbors (of the faces).
   inline IntTab_t& voisins() { return faces_voisins; }
   inline const IntTab_t& voisins() const { return faces_voisins; }
 
@@ -120,11 +120,11 @@ private :
 };
 
 
-/*! @brief Renvoie le numero du j-ieme sommet de la i-ieme face
+/*! @brief Returns the number of the j-th vertex of the i-th face
  *
- * @param (int i) indice de la face du sommet a renvoyer
- * @param (int j) indice du sommet a renvoyer
- * @return (int) le numero du j-ieme sommet de la i-ieme face
+ * @param (int i) index of the face of the vertex to return
+ * @param (int j) index of the vertex to return
+ * @return (int) the number of the j-th vertex of the i-th face
  */
 template <typename _SIZE_>
 inline typename Faces_32_64<_SIZE_>::int_t Faces_32_64<_SIZE_>::sommet(int_t i, int j) const
@@ -132,11 +132,11 @@ inline typename Faces_32_64<_SIZE_>::int_t Faces_32_64<_SIZE_>::sommet(int_t i, 
   return sommets(i,j);
 }
 
-/*! @brief Renvoie une reference sur le numero du j-ieme sommet de la i-ieme face
+/*! @brief Returns a reference to the number of the j-th vertex of the i-th face
  *
- * @param (int i) indice de la face du sommet a renvoyer
- * @param (int j) indice du sommet a renvoyer
- * @return (int&) reference sur le numero du j-ieme sommet de la i-ieme face
+ * @param (int i) index of the face of the vertex to return
+ * @param (int j) index of the vertex to return
+ * @return (int&) reference to the number of the j-th vertex of the i-th face
  */
 template <typename _SIZE_>
 inline typename Faces_32_64<_SIZE_>::int_t& Faces_32_64<_SIZE_>::sommet(int_t i, int j)
@@ -144,7 +144,7 @@ inline typename Faces_32_64<_SIZE_>::int_t& Faces_32_64<_SIZE_>::sommet(int_t i,
   return sommets(i,j);
 }
 
-/// @brief Renvoie le nombre de sommet par face.
+/// @brief Returns the number of vertices per face.
 template <typename _SIZE_>
 inline int Faces_32_64<_SIZE_>::nb_som_faces() const
 {
@@ -155,11 +155,11 @@ inline int Faces_32_64<_SIZE_>::nb_som_faces() const
 }
 
 
-/*! @brief Renvoie le numero du i-ieme voisin de face.
+/*! @brief Returns the number of the i-th neighbor of face.
  *
- * @param (int face) le numero de la face dont on cherche un voisin
- * @param (int i) l'indice du voisin a renvoyer
- * @return (int) le numero i-ieme voisin de face
+ * @param (int face) the number of the face whose neighbor we seek
+ * @param (int i) the index of the neighbor to return
+ * @return (int) the i-th neighbor number of face
  */
 template <typename _SIZE_>
 inline typename Faces_32_64<_SIZE_>::int_t Faces_32_64<_SIZE_>::voisin(int_t face, int i) const
@@ -167,11 +167,11 @@ inline typename Faces_32_64<_SIZE_>::int_t Faces_32_64<_SIZE_>::voisin(int_t fac
   return faces_voisins(face,i);
 }
 
-/*! @brief Renvoie une reference le numero du i-ieme voisin de face.
+/*! @brief Returns a reference to the number of the i-th neighbor of face.
  *
- * @param (int face) le numero de la face dont on cherche un voisin
- * @param (int i) l'indice du voisin a renvoyer
- * @return (int&) reference sur le numero du i-ieme voisin de face
+ * @param (int face) the number of the face whose neighbor we seek
+ * @param (int i) the index of the neighbor to return
+ * @return (int&) reference to the number of the i-th neighbor of face
  */
 template <typename _SIZE_>
 inline typename Faces_32_64<_SIZE_>::int_t& Faces_32_64<_SIZE_>::voisin(int_t face, int i)

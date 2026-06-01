@@ -21,13 +21,13 @@
 #include <PE_Groups.h>
 #include <arch.h>
 
-// Ces methodes sont volontairement separees de communications.h car plus dangereuses a l'usage.
-// Les tableaux passes en parametres doivent absolument avoir au moins n cases et n doit etre
-// identique sur tous les processeurs qui communiquent entre eux.
+// These methods are intentionally separated from communications.h as they are more dangerous to use.
+// The arrays passed as parameters must have at least n elements, and n must be
+// identical on all processors communicating with each other.
 
-// Attention: le template ne marche que pour les types simples (pas Objet_U !)
-// On ne passe pas par un buffer Entree / Sortie mais on envoie directement le tableau sous sa forme binaire.
-// Un seul message envoye, sauf en mode check() ou on envoie aussi la taille pour verifier.
+// Warning: the template only works for simple types (not Objet_U!)
+// We do not go through an Entree/Sortie buffer but send the array directly in binary form.
+// A single message is sent, except in check() mode where the size is also sent for verification.
 template<typename _TYPE_> std::enable_if_t<std::is_arithmetic<_TYPE_>::value,bool >
 inline envoyer_array(const _TYPE_ *objet, int n, int source, int cible, int canal)
 {
@@ -48,7 +48,7 @@ inline envoyer_array(const _TYPE_ *objet, int n, int source, int cible, int cana
         {
           if (i != moi)
             {
-              // En mode check, on verifie que n est bien le meme sur l'expediteur et le recepteur
+              // In check mode, we verify that n is the same on both sender and receiver
               if (grp.check_enabled())
                 grp.send(i, &sz, (int)sizeof(int), canal);
               if (sz > 0)

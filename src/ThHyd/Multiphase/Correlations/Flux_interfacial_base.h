@@ -19,23 +19,23 @@
 #include <Correlation_base.h>
 #include <TRUSTTabs.h>
 
-/*! @brief classe Flux_interfacial_base correlations de flux de chaleur interfacial de la forme
+/*! @brief Base class for interfacial heat flux correlations of the form:
  *
  *       Phi_{kl} = h_{kl}(T_k - T_l)
- *       cette classe definit une fonction flux avec :
- *     entrees :
- *         D_h       -> diametre hyd
- *         alpha[n]  -> taux de presence de la phase n
- *         T[n]      -> temperature de la phase n
- *         p         -> pression
- *         nv[N * n + k]     -> norme de la vitesse de la phase n en si k == n, norme de v_k-v_n si k != n
- *         lambda[n], mu[n], rho[n], Cp[n] -> diverses proprietes physiques de la phase n
+ *       This class defines a flux function with:
+ *     inputs:
+ *         D_h       -> hydraulic diameter
+ *         alpha[n]  -> void fraction of phase n
+ *         T[n]      -> temperature of phase n
+ *         p         -> pressure
+ *         nv[N * n + k]     -> norm of the velocity of phase n if k == n, norm of v_k-v_n otherwise
+ *         lambda[n], mu[n], rho[n], Cp[n] -> various physical properties of phase n
  *
- *     sorties :
- *        hi(k, l)    -> coeff d'echange entre la phase k et l'interface avec la phase l (hi(l, k) != hi(k, l) !)
- *     dT_hi(k, l, n) -> derivee de hi(k, l) en T[n]
- *     da_hi(k, l, n) -> derivee de hi(k, l) en a[n]
- *     dp_hi(k, l)    -> derivee de hi(k, l) en p
+ *     outputs:
+ *        hi(k, l)    -> heat transfer coefficient between phase k and the interface with phase l (hi(l, k) != hi(k, l) !)
+ *     dT_hi(k, l, n) -> derivative of hi(k, l) w.r.t. T[n]
+ *     da_hi(k, l, n) -> derivative of hi(k, l) w.r.t. a[n]
+ *     dp_hi(k, l)    -> derivative of hi(k, l) w.r.t. p
  *
  *
  */
@@ -43,40 +43,40 @@ class Flux_interfacial_base : public Correlation_base
 {
   Declare_base(Flux_interfacial_base);
 public:
-  /* parametres d'entree */
+  /* input parameters */
   struct input_t
   {
-    double dh;            // diametre hyd
-    const double *alpha;  // alpha[n] : taux de vide de la phase n
-    const double *T;      // T[n]     : temperature de la phase n
-    const double *T_passe;// T_passe[n]: temperature de la phase n a l'iteration precedente
-    double p;             // pression
-    const double *nv;     // nv[N * k + l] : norme de ||v_k - v_l||
-    const double *lambda; // lambda[n]     : conductivite de la phase n
-    const double *mu;     // mu[n]         : viscosite dynamique de la phase n
-    const double *rho;    // rho[n]        : masse volumique de la phase n
-    const double *Cp;     // CP[n]         : capacite calorifique de la phase n
-    const double *Lvap;   // Lvap[ind_trav]  : chaleur latente changement de phase n=>k ou ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1)
-    const double *dP_Lvap;//dP_Lvap[ind_trav]: chaleur latente changement de phase n=>k ou ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1)
-    const double *h;      // h[n]          : enthalpie de la phase n
-    const double *dP_h;   // dP_h[n]       : derivee en pression de l'enthalpie de la phase n
-    const double *dT_h;   // dT_h[n]       : deritee en temperature de la phase n de l'enthalpie de la phase n
-    const double *d_bulles;//d_bulles[n]   : diametre de bulles de la phase n
-    const double *k_turb; // k_turb[n]     : energie cinetique turbulente de la phase n
-    const double *nut;    // nut[n]        : viscosite turbulente de bulles de la phase n
-    const double *sigma;  //sigma[ind_trav]: tension superficielle sigma(ind_trav), ind_trav = (n*(N-1)-(n-1)*(n)/2) + (m-n-1)
-    const double *Tsat;   // Tsat[ind_trav]: temperature de saturation du changement de phase n <=> k
-    const double *dP_Tsat;//dP_Tsat[ind_trav]: derivee de la temperature de saturation du changement de phase n=>k ou ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1)
-    DoubleTab v;          // v(n, d)       : vitesse de la phase n dans la direction d
-    int e;                // indice d'element
+    double dh;            // hydraulic diameter
+    const double *alpha;  // alpha[n] : void fraction of phase n
+    const double *T;      // T[n]     : temperature of phase n
+    const double *T_passe;// T_passe[n]: temperature of phase n at the previous iteration
+    double p;             // pressure
+    const double *nv;     // nv[N * k + l] : norm of ||v_k - v_l||
+    const double *lambda; // lambda[n]     : thermal conductivity of phase n
+    const double *mu;     // mu[n]         : dynamic viscosity of phase n
+    const double *rho;    // rho[n]        : density of phase n
+    const double *Cp;     // CP[n]         : heat capacity of phase n
+    const double *Lvap;   // Lvap[ind_trav]  : latent heat of phase change n=>k, ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1)
+    const double *dP_Lvap;//dP_Lvap[ind_trav]: pressure derivative of latent heat, ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1)
+    const double *h;      // h[n]          : enthalpy of phase n
+    const double *dP_h;   // dP_h[n]       : pressure derivative of enthalpy of phase n
+    const double *dT_h;   // dT_h[n]       : temperature derivative of enthalpy of phase n
+    const double *d_bulles;//d_bulles[n]   : bubble diameter of phase n
+    const double *k_turb; // k_turb[n]     : turbulent kinetic energy of phase n
+    const double *nut;    // nut[n]        : turbulent viscosity of phase n
+    const double *sigma;  //sigma[ind_trav]: surface tension sigma(ind_trav), ind_trav = (n*(N-1)-(n-1)*(n)/2) + (m-n-1)
+    const double *Tsat;   // Tsat[ind_trav]: saturation temperature for phase change n <=> k
+    const double *dP_Tsat;//dP_Tsat[ind_trav]: pressure derivative of saturation temperature, ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1)
+    DoubleTab v;          // v(n, d)       : velocity of phase n in direction d
+    int e;                // element index
   };
-  /* valeurs de sortie */
+  /* output values */
   struct output_t
   {
-    DoubleTab hi;    //hi(k, l)       : coeff d'echange entre la phase k et l'interface avec la phase l (hi(l, k) != hi(k, l) !)
-    DoubleTab dT_hi; //dT_hi(k, l, n) : derivee de hi(k, l) en T[n]
-    DoubleTab da_hi; //da_hi(k, l, n) : derivee de hi(k, l) en a[n]
-    DoubleTab dp_hi; //dp_hi(k, l)    : derivee de hi(k, l) en p
+    DoubleTab hi;    //hi(k, l)       : heat transfer coefficient between phase k and the interface with phase l (hi(l, k) != hi(k, l) !)
+    DoubleTab dT_hi; //dT_hi(k, l, n) : derivative of hi(k, l) w.r.t. T[n]
+    DoubleTab da_hi; //da_hi(k, l, n) : derivative of hi(k, l) w.r.t. a[n]
+    DoubleTab dp_hi; //dp_hi(k, l)    : derivative of hi(k, l) w.r.t. p
   };
   virtual void coeffs(const input_t& input, output_t& output) const = 0;
   double dv_min() const {return dv_min_;};

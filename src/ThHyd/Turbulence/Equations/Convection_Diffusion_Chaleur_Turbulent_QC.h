@@ -19,13 +19,12 @@
 #include <Convection_Diffusion_Turbulent.h>
 #include <Convection_Diffusion_Chaleur_QC.h>
 
-/*! @brief classe Convection_Diffusion_Chaleur_Turbulent_QC Cette classe represente le cas particulier de
+/*! @brief Turbulent convection-diffusion of heat for a quasi-compressible fluid.
  *
- *      convection diffusion turbulente lorsque le fluide est quasi compressible.
- *      L'inconnue est la temperature si le fluide est un gaz parfait l'enthalpie si le fluide est un gaz reel
- *
- *      Cette classe herite de Convection_Diffusion_Turbulent qui contient le modele de turbulence et de Convection_Diffusion_Chaleur_QC
- *      qui modelise l'equation non turbulente associe a un fluide quasi compressible.
+ *      The unknown is the temperature for a perfect gas, or the enthalpy for a real gas.
+ *      Inherits from Convection_Diffusion_Turbulent (which contains the turbulence model)
+ *      and from Convection_Diffusion_Chaleur_QC (which models the non-turbulent equation
+ *      for a quasi-compressible fluid).
  *
  * @sa Convection_Diffusion_Turbulent  Convection_Diffusion_Chaleur_QC
  */

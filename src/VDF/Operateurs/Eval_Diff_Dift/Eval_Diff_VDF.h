@@ -65,7 +65,7 @@ public:
     is_var_ = sub_type(Champ_Uniforme, diffu) ? 0 : 1;
   }
 
-  virtual void mettre_a_jour() // surcharger pour Multi-incos ...
+  virtual void mettre_a_jour() // override for multi-inco cases ...
   {
     ref_diffusivite_->valeurs().echange_espace_virtuel();
     update_diffusivite();
@@ -101,7 +101,7 @@ public:
   inline double tau_tan_impl(int i, int j) const { return 0.; }
   inline bool uses_wall() const { return false; }
   inline bool uses_mod() const { return false; }
-  inline const DoubleTab& get_k_elem() const { throw; } // pour F5 seulement ...
+  inline const DoubleTab& get_k_elem() const { throw; } // for F5 only ...
 
 protected:
   int is_var_ = 0;

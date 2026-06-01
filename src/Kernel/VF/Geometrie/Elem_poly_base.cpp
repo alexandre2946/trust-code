@@ -18,7 +18,7 @@
 
 Implemente_base(Elem_poly_base,"Elem_poly_base",Objet_U);
 
-// printOn et readOn
+// printOn and readOn
 
 Sortie& Elem_poly_base::printOn(Sortie& s ) const
 {

@@ -48,8 +48,8 @@ double avancer_fichier(Entree& fich, const Nom& id, const int read_header)
   // Possible evolution:
   // avancer_fichier(fich,id) -> fich.avancer_fichier(id);
   // Implementation of double Entree::seek(const Nom& id):
-  // diffuse_ redescend dans LecFicDiffuseBase
-  /* Surcharge par:
+  // diffuse_ goes back down into LecFicDiffuseBase
+  /* Overridden by:
    double LecFicDiffuse::seek(const Nom& id)
    {
       double time;
@@ -112,8 +112,8 @@ double avancer_fichier_with_syno(Entree& fich, const Nom& id, const Nom& syn_id,
   // Possible evolution:
   // avancer_fichier(fich,id) -> fich.avancer_fichier(id);
   // Implementation of double Entree::seek(const Nom& id):
-  // diffuse_ redescend dans LecFicDiffuseBase
-  /* Surcharge par:
+  // diffuse_ goes back down into LecFicDiffuseBase
+  /* Overridden by:
    double LecFicDiffuse::seek(const Nom& id)
    {
       double time;

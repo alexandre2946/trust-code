@@ -21,20 +21,20 @@
 #include <TRUST_Ref.h>
 #include <Champ_Fonc_base.h>
 
-/*! @brief Classe de base des champs generiques ayant comme source d'autres champs generiques L'utilisation des methodes de la classe repose sur un principe de recursivite
+/*! @brief Base class of generic fields having other generic fields as source. The use of the class methods relies on a recursion principle
  *
- *   Une instruction sera de maniere generale appliquee (ou deleguer) a un champ generique
- *   source qui lui meme appliquera (ou deleguera) l action
+ *   An instruction will generally be applied (or delegated) to a generic source
+ *   field which itself will apply (or delegate) the action
  *
  */
 
-// Syntaxe type pour les classes filles instanciables
-//   "nom_champ"  "type_champ_gen" { source "type_champ_gen" { source ... } }
-//  ou
-//   "nom_champ"  "type_champ_gen" { source_reference "nom_source_ref" }
-// "nom_champ" fixe par l utilisateur sera le nom du champ generique
-// "type_champ_gen" designe le type du champ generique selectionne
-// nom_source_ref designe le nom d un champ generique deja defini
+// Typical syntax for instantiable derived classes
+//   "field_name"  "generic_field_type" { source "generic_field_type" { source ... } }
+//  or
+//   "field_name"  "generic_field_type" { source_reference "source_ref_name" }
+// "field_name" set by the user will be the name of the generic field
+// "generic_field_type" designates the type of the selected generic field
+// source_ref_name designates the name of an already defined generic field
 
 class Champ_Gen_de_Champs_Gen : public Champ_Generique_base
 {
@@ -94,17 +94,17 @@ public:
   bool has_champ_post(const Motcle& nom) const override;
   int comprend_champ_post(const Motcle& identifiant) const override;
 
-  //Methode pour changer t_deb et t_fin pour des reprises de statistiques
-  //ou pour les statistiques en_serie
+  //Method to change t_deb and t_fin for statistics restarts
+  //or for series statistics
   virtual void fixer_serie(const double t1,const double t2);
   virtual void fixer_tstat_deb(const double t1,const double t2);
   virtual void lire_bidon(Entree& is) const;
 
 protected:
   Nom parent_name_; //Name of the field for which I am the source
-  LIST(OWN_PTR(Champ_Generique_base)) sources_;        //Attribut qui designent les sources de "premier niveau"
+  LIST(OWN_PTR(Champ_Generique_base)) sources_;        //Attribute designating "first-level" sources
   LIST(Nom) noms_sources_ref_;
-  LIST(OBS_PTR(Champ_Generique_base)) sources_reference_; //permet de creer une source en faisant une reference a un
+  LIST(OBS_PTR(Champ_Generique_base)) sources_reference_; //allows creating a source by referencing a
 };
 
 #endif

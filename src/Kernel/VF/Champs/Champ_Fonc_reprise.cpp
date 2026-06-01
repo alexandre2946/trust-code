@@ -113,14 +113,14 @@ Entree& Champ_Fonc_reprise::readOn(Entree& s)
     }
 
 
-  // On recupere le pb, puis ensuite on cherche le champ; on recupere le domaine_dis
+  // Retrieve the problem, then look for the field; retrieve the domaine_dis
   const Probleme_base& pb =ref_cast(Probleme_base,Interprete::objet(nom_pb));
   int reprend_champ_moyen=0;
   int reprend_modele_k_eps=0;
   int k_eps_realisable = 0;
   Nom nom_champ_inc;
 
-  // Cas des champs moyens
+  // Case of mean fields
   if (((Motcle)nom_champ).debute_par("MOYENNE_"))
     {
       nom_champ_inc=((Motcle)nom_champ).suffix("MOYENNE_");
@@ -128,11 +128,11 @@ Entree& Champ_Fonc_reprise::readOn(Entree& s)
       nom_champ+=pb.domaine().le_nom();
       reprend_champ_moyen=1;
     }
-  // Cas du K-Epsilon
+  // Case of K-Epsilon
   if (((Motcle)nom_champ).debute_par("K_EPS"))
     {
       reprend_modele_k_eps=1;
-      // cas du k-epsilon realisable
+      // case of realizable k-epsilon
       if (Motcle(nom_champ).finit_par("_REALISABLE"))
         {
           k_eps_realisable = 1;
@@ -152,7 +152,7 @@ Entree& Champ_Fonc_reprise::readOn(Entree& s)
     }
 
   associer_domaine_dis_base(pb.domaine_dis());
-  // on cree un champ comme le ch_ref;
+  // create a field like ch_ref;
   const Champ_Inc_base& ch_inc=ref_cast(Champ_Inc_base,ref_ch.valeur());
   vrai_champ_.typer(ch_inc.que_suis_je());
   vrai_champ_->associer_domaine_dis_base(pb.domaine_dis());
@@ -164,7 +164,7 @@ Entree& Champ_Fonc_reprise::readOn(Entree& s)
   vrai_champ_->set_via_ch_fonc_reprise(); // useful for PolyMAC_CDO for the moment !
   nb_compo_ = ch_inc.nb_comp();
 
-  // creation des identifiants pdi (necessaire pour l'initialisation de PDI)
+  // creation of pdi identifiers (necessary for PDI initialization)
   Nom nom_champ_pdi = Motcle(pb.le_nom()) + "_" + Motcle(nom_champ);
 
   statistics().begin_count(STD_COUNTERS::restart,statistics().get_last_opened_counter_level()+1);
@@ -260,7 +260,7 @@ Entree& Champ_Fonc_reprise::readOn(Entree& s)
         fic_rep.valeur() >> format_sauvegarde;
       else
         {
-          // Version anterieure, on referme et on reouvre
+          // Older version, close and reopen
           if (format_rep=="xyz")
             {
               fic_rep->close();
@@ -274,7 +274,7 @@ Entree& Champ_Fonc_reprise::readOn(Entree& s)
         }
     }
 
-  // Creation des identifiants
+  // Creation of identifiers
   Nom nom_temps=Nom(un_temps,time_format_from(format_sauvegarde));
   Nom type=ref_ch->que_suis_je();
   Nom nom_ident;
@@ -336,12 +336,12 @@ Entree& Champ_Fonc_reprise::readOn(Entree& s)
   statistics().end_count(STD_COUNTERS::restart);
 
   ////////////////////////////////////////
-  // Transformation eventuelle du champ lu
+  // Optional transformation of the field read
   ////////////////////////////////////////
   if (fxyz.size())
     {
       DoubleTab& tab_valeurs=le_champ().valeurs();
-      // Boucle sur les noeuds du champs
+      // Loop over the field nodes
       int sz=tab_valeurs.dimension_tot(0);
       int nb_compo=fxyz.size();
       if (tab_valeurs.nb_dim()==1)
@@ -363,7 +363,7 @@ Entree& Champ_Fonc_reprise::readOn(Entree& s)
           for (int j=0; j<nb_compo; j++)
             {
               fxyz[j].setVar("val",tab_valeurs(i,j));
-              // On fait la transformation des valeurs du champs
+              // Apply the transformation to the field values
               tab_valeurs(i,j)=fxyz[j].eval();
             }
         }
@@ -405,7 +405,7 @@ void Champ_Fonc_reprise::read_field_from_file(Entree& jdd, Entree& file, const P
                                               const Nom& nom_ident_champ_stat, int reprend_champ_moyen, const Nom& nom_ident_champ_keps, int reprend_modele_k_eps,
                                               int pdi_format)
 {
-  // Lecture du fichier
+  // Reading the file
   if(!pdi_format)
     {
       Nom field_tag_syno=nom_ident;
@@ -442,7 +442,7 @@ void Champ_Fonc_reprise::read_field_from_file(Entree& jdd, Entree& file, const P
   if (reprend_champ_moyen)
     {
       double tdeb = -1,tfin=-1;
-      int n; // Nombre d'operateurs statistiques
+      int n; // Number of statistical operators
       if(pdi_format)
         {
           TRUST_2_PDI pdi_interface;
@@ -458,10 +458,10 @@ void Champ_Fonc_reprise::read_field_from_file(Entree& jdd, Entree& file, const P
           file >> tfin;
           avancer_fichier(file,nom_ident_champ_stat);
         }
-      // On cree un operateur_statistique qui va nous permettre de relire le champ moyen
+      // Create a statistical operator that will allow us to read back the mean field
       Op_Moyenne champ_moyen;
-      //On construit un Champ_Generique_refChamp pour pouvoir associer un Champ_Generique_base
-      //a l operateur
+      //Build a Champ_Generique_refChamp to be able to associate a Champ_Generique_base
+      //to the operator
       OWN_PTR(Champ_Generique_base) champ;
       Nom ajout("");
       ajout += " refChamp { Pb_champ ";
@@ -478,7 +478,7 @@ void Champ_Fonc_reprise::read_field_from_file(Entree& jdd, Entree& file, const P
       champ_moyen.fixer_tstat_deb(tdeb,tfin);
       champ_moyen.reprendre(file);
 
-      // On remplit le champ
+      // Fill the field
       le_champ().valeurs() = champ_moyen.calculer_valeurs();
     }
   else if (reprend_modele_k_eps)

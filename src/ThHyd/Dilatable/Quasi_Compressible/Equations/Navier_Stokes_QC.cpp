@@ -38,12 +38,9 @@ Entree& Navier_Stokes_QC::readOn(Entree& is)
   return is;
 }
 
-/*! @brief Complete l'equation base, associe la pression a l'equation,
+/*! @brief Completes the base equation: associates pressure, completes divergence, gradient and pressure solver.
  *
- *     complete la divergence, le gradient et le solveur pression.
- *     Ajout de 2 termes sources: l'un representant la force centrifuge
- *     dans le cas axi-symetrique,l'autre intervenant dans la resolution
- *     en 2D axisymetrique
+ * Adds two source terms: one representing the centrifugal force in the axisymmetric case, the other involved in the 2D axisymmetric resolution.
  *
  */
 void Navier_Stokes_QC::completer()

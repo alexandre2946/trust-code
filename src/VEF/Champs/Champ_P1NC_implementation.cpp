@@ -34,15 +34,15 @@
 
 static int methode_calcul_valeurs_sommets_static = 2 ;
 
-// -1 moyenne des faces
-// 1 moyenne des sommets sans min/max
-// 2 moyenne des sommets avec min/max (ancienne version)
+// -1 face average
+// 1 vertex average without min/max
+// 2 vertex average with min/max (old version)
 
 Champ_P1NC_implementation::Champ_P1NC_implementation()
 {
-  // Initialise l'attribut
+  // Initialize the attribute
   filtrer_L2_deja_appele_=0;
-  // definition des types de solveurs par defaut (sinon, lecture dans solveur.bar)
+  // Define default solver types (otherwise read from solveur.bar)
   solveur_L2.typer("Solv_GCP");
   OWN_PTR(Precond_base) p;
   p.typer("SSOR");
@@ -55,11 +55,11 @@ Champ_P1NC_implementation::Champ_P1NC_implementation()
 
 static const double coeff_penalisation = 1e9;
 
-/*! @brief Projection du champ P1NC "cha" sur l'espace des champs P1.
+/*! @brief @brief Project the P1NC field "cha" onto the P1 field space.
  *
- * Le resultat est stocke dans cha.ch_som() et renvoye (valeur de retour)
- *  Voir note technique 2006/010 de Patrick Quemere "Nouvelle approche VEF pour la LES...".
- *  Voir aussi "What is in TRUST" : Scales_Separation_P1_P1NC.
+ *  The result is stored in cha.ch_som() and returned.
+ *  See technical note 2006/010 by Patrick Quemere "Nouvelle approche VEF pour la LES...".
+ *  See also "What is in TRUST": Scales_Separation_P1_P1NC.
  *
  */
 DoubleTab& valeur_P1_L2(Champ_P1NC& cha, const Domaine& dom)
@@ -79,8 +79,8 @@ DoubleTab& valeur_P1_L2(Champ_P1NC& cha, const Domaine& dom)
   DoubleTab secmem(cha.ch_som());
 
   secmem=0.;
-  //  vit_som=0.; // PQ : 06/10/04 : dans la resolution du systeme, "solution" repart de vit_som=cha.ch_som()
-  //                                   pour s'affranchir de recalculer u_bar lors d'un double appel a filtrer_L2
+  //  vit_som=0.; // PQ : 06/10/04 : in the system resolution, "solution" restarts from vit_som=cha.ch_som()
+  //                                   to avoid recomputing u_bar on a double call to filtrer_L2
 
   if(Objet_U::dimension==2)
     {
@@ -155,9 +155,9 @@ DoubleTab& valeur_P1_L2(Champ_P1NC& cha, const Domaine& dom)
             }
         }
 
-      // PQ : pour le remplissage des coefficients de la matrice specifiques au CL Dirichlet,
-      // on commence par traiter les conditions Dirichlet, PUIS Dirichlet_homogene pour s'assurer
-      // de l'"adherence" des points sommets appartenant aux deux types de CL (aretes de bords)
+      // PQ : for filling the Dirichlet BC-specific matrix coefficients,
+      // start by processing Dirichlet conditions, THEN Dirichlet_homogene to ensure
+      // the "adherence" of vertex points belonging to both BC types (boundary edges)
 
       IntVect test_cl_imposee(nb_som);
       test_cl_imposee = 0;
@@ -231,12 +231,12 @@ DoubleTab& valeur_P1_L2(Champ_P1NC& cha, const Domaine& dom)
       mat.compacte() ;
       mat.set_est_definie(1);
 
-      // Modif CD 15/04/03 pour paralleliser le filtrage
-      // On copie la matrice remplie ci-dessus dans une matrice bloc.
-      // Cette modification permet d'utiliser le preconditionnement SSOR
+      // Modif CD 15/04/03 to parallelize the filtering
+      // Copy the matrix filled above into a block matrix.
+      // This modification allows the SSOR preconditioner to be used
 
-      //On fait aussi la transformation en matrice bloc en sequentiel car sinon
-      //probleme avec NP
+      // Also perform the block matrix transformation in sequential to avoid
+      // issues with NP
 
       cha.dimensionner_Mat_Bloc_Morse_Sym(cha.MatP1NC2P1_L2_Parallele);
       cha.Mat_Morse_to_Mat_Bloc(cha.MatP1NC2P1_L2_Parallele);
@@ -278,7 +278,7 @@ DoubleTab& valeur_P1_L2(Champ_P1NC& cha, const Domaine& dom)
 
       if (sub_type(Periodique,la_cl.valeur()))
         {
-          // *0.5 car les faces perio sont parcourues deux fois
+          // *0.5 because periodic faces are traversed twice
           for (int ind_face=num1; ind_face<num2; ind_face++)
             {
               face = le_bord.num_face(ind_face);
@@ -320,7 +320,7 @@ DoubleTab& valeur_P1_L2(Champ_P1NC& cha, const Domaine& dom)
   for(face=premiere_face_int; face<nb_faces_tot; face++)
     {
       int indvirtface=face-nb_faces;
-      // on regarde si la face virtuelle n'a pas deja ete traitee
+      // check if the virtual face has not already been processed
       if (indvirtface>=0)
         if (virtfait[indvirtface]==1) continue;
 
@@ -340,13 +340,13 @@ DoubleTab& valeur_P1_L2(Champ_P1NC& cha, const Domaine& dom)
   // ************************************************************************************************
   // ************************************************************************************************
   //
-  //                               Pour imposer u_som = u donne par CL_Dirichlet
+  //                               To impose u_som = u given by CL_Dirichlet
   ////
   // ************************************************************************************************
   // ************************************************************************************************
 
-  // PQ : on commence par traiter les conditions Dirichlet, PUIS Dirichlet_homogene pour s'assurer
-  // de l'"adherence" des points sommets appartenant aux deux types de CL (aretes de bords)
+  // PQ : start by processing Dirichlet conditions, THEN Dirichlet_homogene to ensure
+  // the "adherence" of vertex points belonging to both types of BC (boundary edges)
 
   IntVect test_cl_imposee(nb_som);
 
@@ -431,8 +431,8 @@ DoubleTab& valeur_P1_L2(Champ_P1NC& cha, const Domaine& dom)
       Debog::verifier(" verif secmem " , secmem);
 
 
-      //ON UTILISE LA MEME MATRICE EN SEQUENTIEL ET PARALLELE
-      //CE QUI PERMET D UTILISER UNE MATRICE BLOC QUAND ON APPELLE LE SOLVEUR NP
+      //THE SAME MATRIX IS USED IN SEQUENTIAL AND PARALLEL MODE
+      //THIS ALLOWS USING A BLOCK MATRIX WHEN CALLING THE NP SOLVER
       solv.resoudre_systeme(cha.MatP1NC2P1_L2_Parallele.valeur(), secmem, solution);
 
       for(int som=0; som<nb_som; som++)
@@ -452,8 +452,8 @@ DoubleTab& valeur_P1_L2(Champ_P1NC& cha, const Domaine& dom)
           solution.echange_espace_virtuel();
           secmemk.echange_espace_virtuel();
 
-          //ON UTILISE LA MEME MATRICE EN SEQUENTIEL ET PARALLELE
-          //CE QUI PERMET D UTILISER UNE MATRICE BLOC QUAND ON APPELLE LE SOLVEUR NP
+          //THE SAME MATRIX IS USED IN SEQUENTIAL AND PARALLEL MODE
+          //THIS ALLOWS USING A BLOCK MATRIX WHEN CALLING THE NP SOLVER
           solv.resoudre_systeme(cha.MatP1NC2P1_L2_Parallele.valeur(), secmemk, solution);
 
           for(som=0; som<nb_som; som++)
@@ -578,12 +578,12 @@ DoubleTab& valeur_P1_L2(Champ_Fonc_P1NC& cha, const Domaine& dom)
       mat.compacte() ;
       mat.set_est_definie(1);
 
-      // Modif CD 15/04/03 pour paralleliser le filtrage
-      // On copie la matrice remplie ci-dessus dans une matrice bloc.
-      // Cette modification permet d'utiliser le preconditionnement SSOR
+      // Modif CD 15/04/03 to parallelize the filtering
+      // Copy the matrix filled above into a block matrix.
+      // This modification allows the SSOR preconditioner to be used
 
-      //On fait aussi la transformation en matrice bloc en sequentiel car sinon
-      //probleme avec NP
+      // Also perform the block matrix transformation in sequential to avoid
+      // issues with NP
 
       cha.dimensionner_Mat_Bloc_Morse_Sym(cha.MatP1NC2P1_L2_Parallele);
       cha.Mat_Morse_to_Mat_Bloc(cha.MatP1NC2P1_L2_Parallele);
@@ -616,7 +616,7 @@ DoubleTab& valeur_P1_L2(Champ_Fonc_P1NC& cha, const Domaine& dom)
   for(face=0; face<nb_faces_tot; face++)
     {
       int indvirtface=face-nb_faces;
-      // on regarde si la face virtuelle n'a pas deja ete traitee
+      // check if the virtual face has not already been processed
       if (indvirtface>=0)
         if (virtfait[indvirtface]==1) continue;
 
@@ -629,8 +629,8 @@ DoubleTab& valeur_P1_L2(Champ_Fonc_P1NC& cha, const Domaine& dom)
         {
           int som=face_sommets(face,isom);
           int som1=dom.get_renum_som_perio(som);
-          //Pour un sommet periodique on ne retient qu une seule contribution
-          //pour deux faces en vis a vis
+          // For a periodic vertex, retain only one contribution
+          // for two facing faces
           if (som1==som)
             for(int k=0; k<nb_comp; k++)
               secmem(som1,k)+=coeff*volume*ch(face,k);
@@ -651,8 +651,8 @@ DoubleTab& valeur_P1_L2(Champ_Fonc_P1NC& cha, const Domaine& dom)
       Debog::verifier(" verif secmem " , secmem);
 
 
-      //ON UTILISE LA MEME MATRICE EN SEQUENTIEL ET PARALLELE
-      //CE QUI PERMET D UTILISER UNE MATRICE BLOC QUAND ON APPELLE LE SOLVEUR NP
+      //THE SAME MATRIX IS USED IN SEQUENTIAL AND PARALLEL MODE
+      //THIS ALLOWS USING A BLOCK MATRIX WHEN CALLING THE NP SOLVER
       solv.resoudre_systeme(cha.MatP1NC2P1_L2_Parallele.valeur(), secmem, solution);
 
       for(int som=0; som<nb_som; som++)
@@ -672,8 +672,8 @@ DoubleTab& valeur_P1_L2(Champ_Fonc_P1NC& cha, const Domaine& dom)
           solution.echange_espace_virtuel();
           secmemk.echange_espace_virtuel();
 
-          //ON UTILISE LA MEME MATRICE EN SEQUENTIEL ET PARALLELE
-          //CE QUI PERMET D UTILISER UNE MATRICE BLOC QUAND ON APPELLE LE SOLVEUR NP
+          //THE SAME MATRIX IS USED IN SEQUENTIAL AND PARALLEL MODE
+          //THIS ALLOWS USING A BLOCK MATRIX WHEN CALLING THE NP SOLVER
           solv.resoudre_systeme(cha.MatP1NC2P1_L2_Parallele.valeur(), secmemk, solution);
 
           for(som=0; som<nb_som; som++)
@@ -961,7 +961,7 @@ void Champ_P1NC_implementation::filtrer_L2(DoubleTab& valeurs) const
                 {
                   tau_tan.ref(loipar.Cisaillement_paroi());
 
-                  //  Interpolation des vitesses a la paroi
+                  //  Interpolate velocities at the wall
 
                   const Domaine_VEF& domaine_VE_chF = ch_inc_P1NC.domaine_vef();
                   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,ch_inc_P1NC.equation().domaine_Cl_dis());
@@ -979,7 +979,7 @@ void Champ_P1NC_implementation::filtrer_L2(DoubleTab& valeurs) const
 
                   for (num_cl=0; num_cl<nb_cl; num_cl++)
                     {
-                      //Boucle sur les bords
+                      // Loop over the boundaries
                       const Cond_lim& la_cl = les_cl[num_cl];
                       const Front_VF& la_front_dis = ref_cast(Front_VF,la_cl->frontiere_dis());
                       int ndeb = 0;
@@ -1003,11 +1003,11 @@ void Champ_P1NC_implementation::filtrer_L2(DoubleTab& valeurs) const
                                   norm_tau=sqrt(tau_tan(fac,0)*tau_tan(fac,0)+tau_tan(fac,1)*tau_tan(fac,1));
                                   u_tau=sqrt(norm_tau);
                                   /*
-                                  // PQ : 06/03 : pour un champ de vitesse 1D, l'incompressibilite genere des vitesses (meme faibles) sur toutes
-                                  // les composantes, qui se repercutent par la suite au niveau de la CL ici.
-                                  //  (se manifestant en cours de calcul en entree par un pic de vitesse en proche paroi).
-                                  // Pour assurer des entrees "correctes" (1D) on remedie a ce probleme via l'operation suivante
-                                  // (en supposant que les entrees sont alignees avec une des directions d'espace)
+                                  // PQ : 06/03 : for a 1D velocity field, incompressibility generates velocities (even weak) on all
+                                  // components, which propagate and affect the BC here.
+                                  //  (manifested during computation at inlets as a velocity spike near the wall).
+                                  // To ensure "correct" (1D) inlets, we remedy this via the following operation
+                                  // (assuming that the inlets are aligned with one of the spatial directions)
 
                                   if(std::fabs(val0)>0.999) {val0=1.;val1=0.;}
                                   if(std::fabs(val1)>0.999) {val0=0.;val1=1.;}
@@ -1033,11 +1033,11 @@ void Champ_P1NC_implementation::filtrer_L2(DoubleTab& valeurs) const
                                   norm_tau=sqrt(tau_tan(fac,0)*tau_tan(fac,0)+tau_tan(fac,1)*tau_tan(fac,1)+tau_tan(fac,2)*tau_tan(fac,2));
                                   u_tau=sqrt(norm_tau);
                                   /*
-                                  // PQ : 06/03 : pour un champ de vitesse 1D, l'incompressibilite genere des vitesses (meme faibles) sur toutes
-                                  // les composantes, qui se repercutent par la suite au niveau de la CL ici.
-                                  //  (se manifestant en cours de calcul en entree par un pic de vitesse en proche paroi).
-                                  // Pour assurer des entrees "correctes" (1D) on remedie a ce probleme via l'operation suivante
-                                  // (en supposant que les entrees sont alignees suivant une des directions d'espace)
+                                  // PQ : 06/03 : for a 1D velocity field, incompressibility generates velocities (even weak) on all
+                                  // components, which propagate and affect the BC here.
+                                  //  (manifested during computation at inlets as a velocity spike near the wall).
+                                  // To ensure "correct" (1D) inlets, we remedy this via the following operation
+                                  // (assuming that the inlets are aligned along one of the spatial directions)
 
                                   if(std::fabs(val0)>0.999) {val0=1.;val1=0.;val2=0.;}
                                   if(std::fabs(val1)>0.999) {val0=0.;val1=1.;val2=0.;}
@@ -1058,7 +1058,7 @@ void Champ_P1NC_implementation::filtrer_L2(DoubleTab& valeurs) const
                                 }
                             }//fac
                         }//Dirichlet_paroi
-                    } //Boucle sur les bords
+                    } //Loop over boundaries
                   valeurs.echange_espace_virtuel();
                 }//!Paroi_negligeable_VEF
             }
@@ -1117,7 +1117,7 @@ void Champ_P1NC_implementation::filtrer_resu(DoubleTab& resu) const
   non_prepare=Process::mp_min(non_prepare);
   if (non_prepare==1)
     {
-      // GF si on n a pas prepare la matrice, on appelle valeur_P1_L2(cha, cha.domaine()); et on remet les anciennes valeurs aux sommets
+      // GF if the matrix has not been prepared, call valeur_P1_L2(cha, cha.domaine()) and restore the old vertex values
       DoubleTab vit_som_sa=cha.ch_som();
       valeur_P1_L2(cha, cha.domaine());
       cha.ch_som()=vit_som_sa;
@@ -1205,7 +1205,7 @@ void Champ_P1NC_implementation::filtrer_resu(DoubleTab& resu) const
     for(face=deb; face<nb_faces_tot; face++)
       {
         int indvirtface=face-nb_faces;
-        // on regarde si la face virtuelle n'a pas deja ete traitee
+        // check if the virtual face has not already been processed
         if (indvirtface>=0)
           if (virtfait[indvirtface]==1) continue;
         for(int isom=0; isom<Objet_U::dimension; isom++)
@@ -1225,7 +1225,7 @@ void Champ_P1NC_implementation::filtrer_resu(DoubleTab& resu) const
   // ************************************************************************************************
   // ************************************************************************************************
   //
-  //                           Pour imposer residu_som = residu donne par CL
+  //                           To impose residu_som = residual given by BC
   //
   // ************************************************************************************************
   // ************************************************************************************************
@@ -1270,7 +1270,7 @@ void Champ_P1NC_implementation::filtrer_resu(DoubleTab& resu) const
   DoubleVect secmem(cha.ch_som_vect());
   DoubleVect solution(cha.ch_som_vect());
 
-  // Modif CD 15/04/03 pour paralleliser le filtrage
+  // Modif CD 15/04/03 to parallelize the filtering
   //  Matrice matrice_tmp;
   //  cha.dimensionner_Mat_Bloc_Morse_Sym(matrice_tmp);
   //  cha.Mat_Morse_to_Mat_Bloc(matrice_tmp);
@@ -1358,7 +1358,7 @@ valeur_a_elem_compo(const DoubleVect& position, int le_poly, int ncomp) const
 
   if (le_poly != -1)
     {
-      // Calcul d'apres les fonctions de forme sur le triangle ou le tetraedre
+      // Computation using shape functions on the triangle or tetrahedron
       const double xs = position(0), ys = position(1),
                    zs = (D == 3) ? position(2) : 0;
       for (int i = 0; i < D + 1; i++)
@@ -1502,7 +1502,7 @@ valeur_aux_elems_compo(const DoubleTab& positions,
   const Domaine& domaine_geom = get_domaine_geom();
   const DoubleTab& coord = domaine_geom.coord_sommets();
   const IntTab& sommet_poly = domaine_geom.les_elems();
-  // Commenter en attendant de comprendre le dimensionnement de xp apres la sortie de version
+  // Commented out pending understanding of the sizing of xp after the version release
   // assert(val.size() == les_polys_size);
   int le_poly, D = Objet_U::dimension;
 
@@ -1514,7 +1514,7 @@ valeur_aux_elems_compo(const DoubleTab& positions,
       if (le_poly == -1) val(rang_poly) = 0;
       else
         {
-          // Calcul d'apres les fonctions de forme sur le triangle ou le tetraedre
+          // Computation using shape functions on the triangle or tetrahedron
           val(rang_poly) = 0;
           xs = positions(rang_poly,0);
           ys = positions(rang_poly,1);
@@ -1579,7 +1579,7 @@ valeur_aux_elems_smooth(const DoubleTab& positions,
       filtrer_L2_deja_appele_=1;
     }
 
-  // calcul de la valeur aux elements suivant les coordonnees barycentriques (repris de Champ_P1)
+  // compute the value at elements using barycentric coordinates (adapted from Champ_P1)
   val = 0.;
   int p;
   ToDo_Kokkos("critical");
@@ -1623,8 +1623,8 @@ valeur_aux_elems_compo_smooth(const DoubleTab& positions,
   const IntTab& sommet_poly = domaine_geom.les_elems();
   if (!filtrer_L2_deja_appele_)
     {
-      // Filtrer L2 ne marche que pour les vecteurs
-      // C.MALOD 19/12/2006 : Ce n'est plus vrai, ca marche aussi avec les scalaires.
+      // filtrer_L2 only works for vectors
+      // C.MALOD 19/12/2006 : This is no longer true, it also works with scalars.
       if (nb_compo_>0)
         {
           DoubleTab val_sauv=cha.valeurs();
@@ -1637,7 +1637,7 @@ valeur_aux_elems_compo_smooth(const DoubleTab& positions,
   val = 0.;
   int p;
 
-  // calcul de la valeur aux elements suivant les coordonnees barycentriques (repris de Champ_P1)
+  // compute the value at elements using barycentric coordinates (adapted from Champ_P1)
   ToDo_Kokkos("critical");
   for(int rang_poly=0; rang_poly<les_polys_size; rang_poly++)
     if ((p = les_polys(rang_poly)) != -1)
@@ -2072,8 +2072,8 @@ void Champ_P1NC_implementation::dimensionner_Mat_Bloc_Morse_Sym(Matrice& matrice
   compteur_MBrr=0;
   compteur_MBrv=0;
 
-  // On parcours les lignes de la_matrice pour compter les elements
-  // non nuls de chaque ligne
+  // Loop over the rows of la_matrice to count the non-zero elements
+  // of each row
   int jcolonne;
   for (iligne=0; iligne<n2; iligne++)
     {
@@ -2082,23 +2082,23 @@ void Champ_P1NC_implementation::dimensionner_Mat_Bloc_Morse_Sym(Matrice& matrice
           jcolonne = tab2(k)-1;
           if (jcolonne < n2)
             {
-              // l'element correspondant est dans la partie RR de la_matrice
+              // the corresponding entry is in the RR part of la_matrice
               if ((jcolonne >= iligne) && (jcolonne < n2))
                 {
-                  // l'element correspondant est  situe au dessus de la diagonale de la_matrice
+                  // the corresponding entry is above the diagonal of la_matrice
                   compteur_MBrr(iligne)++;
                 }
             }
           else
             {
-              // l'element correspondant est dans la partie RV de la_matrice
+              // the corresponding entry is in the RV part of la_matrice
               compteur_MBrv(iligne)++;
             }
         }
     }
 
 
-  // On remplie tab1RR et tab1RV
+  // Fill tab1RR and tab1RV
   tab1RR(0)=1;
   tab1RV(0)=1;
   for(int i=0; i<n2; i++)
@@ -2106,11 +2106,11 @@ void Champ_P1NC_implementation::dimensionner_Mat_Bloc_Morse_Sym(Matrice& matrice
       tab1RR(i+1)=compteur_MBrr(i)+tab1RR(i);
       tab1RV(i+1)=compteur_MBrv(i)+tab1RV(i);
     }
-  // On dimensionne tab2RR et tab2RV
+  // Size tab2RR and tab2RV
   MBrr.dimensionner(n2,tab1RR(n2)-1);
   MBrv.dimensionner(n2,n1-n2,tab1RV(n2)-1);
 
-  // On remplit tab2RR et tab2RV
+  // Fill tab2RR and tab2RV
   for (iligne=0; iligne<n2; iligne++)
     {
       auto compteurRR = tab1RR(iligne)-1;
@@ -2120,17 +2120,17 @@ void Champ_P1NC_implementation::dimensionner_Mat_Bloc_Morse_Sym(Matrice& matrice
           jcolonne = tab2(k)-1;
           if (jcolonne < n2)
             {
-              // l'element correspondant est dans la partie RR de la_matrice
+              // the corresponding entry is in the RR part of la_matrice
               if ((jcolonne >= iligne) && (jcolonne < n2))
                 {
-                  // l'element correspondant est  situe au dessus de la diagonale de la_matrice
+                  // the corresponding entry is above the diagonal of la_matrice
                   tab2RR(compteurRR) = tab2(k);
                   compteurRR++;
                 }
             }
           else
             {
-              // l'element correspondant est dans la partie RV de la_matrice
+              // the corresponding entry is in the RV part of la_matrice
               tab2RV(compteurRV) = tab2(k)-n2;
               compteurRV++;
             }
@@ -2161,16 +2161,16 @@ void Champ_P1NC_implementation::Mat_Morse_to_Mat_Bloc(Matrice& matrice_tmp)
   DoubleTab ligne_tmp(n1);
   for(int i=0; i<n2; i++)
     {
-      // On recopie le premier bloc de la matrice dans un tableau :
+      // Copy the first block of the matrix into an array:
       //      ligne_tmp = 0;
       for (auto k=la_matrice.get_tab1()(i)-1; k<la_matrice.get_tab1()(i+1)-1; k++)
         ligne_tmp(la_matrice.get_tab2()(k) - 1) = la_matrice.get_coeff()(k);
 
-      // On complete la partie reelle de la matrice
+      // Fill the real part of the matrix
       for (auto k=tab1RR(i)-1; k<tab1RR(i+1)-1; k++)
         coeffRR[k] = ligne_tmp(tab2RR[k] - 1);
 
-      // On complete la partie virtuelle
+      // Fill the virtual part
       for (auto k=tab1RV(i)-1; k<tab1RV(i+1)-1; k++)
         coeffRV[k] = ligne_tmp(n2 + tab2RV[k] - 1);
     }

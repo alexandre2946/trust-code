@@ -21,9 +21,9 @@
 
 class Pb_rayo_semi_transp;
 
-/*! @brief classe Source_rayo_semi_transp_base Classe de base de la hierarchie des termes sources de l'eqution de
+/*! @brief Source_rayo_semi_transp_base Base class of the source term hierarchy for the temperature
  *
- *     temperature pour les problemes de rayonnement semi transparent.
+ *     equation in semi-transparent radiation problems.
  *
  */
 class Source_rayo_semi_transp_base: public Source_base

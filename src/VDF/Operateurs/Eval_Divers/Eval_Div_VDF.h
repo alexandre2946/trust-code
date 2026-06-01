@@ -18,7 +18,7 @@
 
 #include <Evaluateur_VDF.h>
 
-/*! @brief class Eval_Div_VDF classe de base des evaluateurs de divergence VDF
+/*! @brief class Eval_Div_VDF Base class for VDF divergence evaluators
  *
  */
 class Eval_Div_VDF : public Evaluateur_VDF

@@ -39,10 +39,10 @@
 
 #include <vector>
 
-/*! @brief Dimensionnement de la matrice qui devra recevoir les coefficients provenant de la convection, de la diffusion pour le cas des faces.
+/*! @brief Sizes the matrix that will receive the coefficients from the convection and diffusion operators for the face-based case.
  *
- *  Cette matrice a une structure de matrice morse.
- *  Nous commencons par calculer les tailles des tableaux tab1 et tab2.
+ *  This matrix has a Morse matrix structure.
+ *  We start by computing the sizes of the arrays tab1 and tab2.
  *
  */
 
@@ -54,7 +54,7 @@ void Op_EF_base::dimensionner(const Domaine_EF& le_dom,
   int matrice_stocke=1;
   if (matrice_stocke)
     {
-      //if (matrice_sto_.nb_colonnes()) PL: non faux en //, nb_colonnes() peut etre nul localement
+      //if (matrice_sto_.nb_colonnes()) PL: not wrong in //, nb_colonnes() may be zero locally
       if (Process::mp_sum(matrice_sto_.nb_colonnes()))
         {
           la_matrice=matrice_sto_;
@@ -62,11 +62,11 @@ void Op_EF_base::dimensionner(const Domaine_EF& le_dom,
         }
 
     }
-  // Dimensionnement de la matrice qui devra recevoir les coefficients provenant de
-  // la convection, de la diffusion pour le cas des faces.
-  // Cette matrice a une structure de matrice morse.
-  // Nous commencons par calculer les tailles des tableaux tab1 et tab2.
-  // Pour ce faire il faut chercher les sommets voisins du sommet considere.
+  // Sizing the matrix that will receive coefficients from
+  // convection and diffusion in the face case.
+  // This matrix has a Morse matrix structure.
+  // We start by computing the sizes of arrays tab1 and tab2.
+  // For this we need to find the neighboring vertices of the considered vertex.
 
   int nb_som=le_dom.nb_som();
   int nfin = le_dom.nb_som_tot();
@@ -76,7 +76,7 @@ void Op_EF_base::dimensionner(const Domaine_EF& le_dom,
   const DoubleTab& champ_inconnue = le_dom_cl.equation().inconnue().valeurs();
   int nb_comp = champ_inconnue.line_size();
 
-  // on ne s'occupe pas dans un premier temps des composantes
+  // for now we don't handle components
 
   const IntTab& elems=le_dom.domaine().les_elems();
   //int nb_elem=le_dom.domaine().nb_elem();
@@ -199,7 +199,7 @@ void Op_EF_base::dimensionner(const Domaine_EF& le_dom,
   else
     {
       int ntot=Indice.dimension(0);
-      // on cree pour chaque coeff d'origine un bloc nb_comp*nb_comp
+      // create a nb_comp*nb_comp block for each original coefficient
       IntTab Indice_v(ntot*nb_comp*nb_comp,2);
       int newcas=0;
       for (int cas=0; cas<ntot; cas++)
@@ -240,7 +240,7 @@ void Op_EF_base::dimensionner(const Domaine_EF& le_dom,
 
 }
 
-/*! @brief Modification des coef de la matrice et du second membre pour les conditions de Dirichlet
+/*! @brief Modification of the matrix coefficients and the right-hand side for Dirichlet conditions.
  *
  */
 
@@ -289,9 +289,9 @@ void Op_EF_base::modifier_pour_Cl(const Domaine_EF& le_dom,
                         coeff[idiag+k]=0;
                       la_matrice.coef(m,m)=1;
                       assert(la_matrice.coef(som*nb_comp+comp,som*nb_comp+comp)==1);
-                      // pour les voisins
+                      // for neighbors
 
-                      // pour le second membre
+                      // for the right-hand side
                       secmem(som,comp)= la_cl_Dirichlet.val_imp(ind_face,comp);
                       secmem(som,comp)= champ_inconnue(som,comp);
                     }
@@ -330,11 +330,11 @@ void Op_EF_base::modifier_pour_Cl(const Domaine_EF& le_dom,
 
       if (sub_type(Symetrie,la_cl.valeur()))
         {
-          // on ne fait rien ici on fait ensuite
+          // do nothing here, handled below
         }
     }
 
-  // On modifie pour la symetrie
+  // Modify for symmetry
 
   if (le_dom_cl.equation().inconnue().nature_du_champ()==vectoriel)
     {
@@ -347,11 +347,11 @@ void Op_EF_base::modifier_pour_Cl(const Domaine_EF& le_dom,
     Cerr<<"scd "<<secmem<<finl;
     */
   //exit();
-  // Prise en compte des conditions de type periodicite
+  // Account for periodic boundary conditions
   //  Cerr << "fin de modifier" << finl;
 }
 
-/*! @brief multiplie le flux bordpar rho cp ou rho si necessaire
+/*! @brief Multiplies the boundary flux by rho cp or rho if necessary.
  *
  */
 void Op_EF_base::modifier_flux( const Operateur_base& op) const
@@ -362,7 +362,7 @@ void Op_EF_base::modifier_flux( const Operateur_base& op) const
   int nb_compo=flux_bords_.dimension(1);
   const Probleme_base& pb=op.equation().probleme();
 
-  // On multiplie par rho si Navier Stokes incompressible
+  // Multiply by rho for incompressible Navier-Stokes
   Nom nom_eqn=op.equation().que_suis_je();
   if (nom_eqn.debute_par("Navier_Stokes") && pb.milieu().que_suis_je()=="Fluide_Incompressible")
     {
@@ -379,7 +379,7 @@ void Op_EF_base::modifier_flux( const Operateur_base& op) const
 
 }
 
-/*! @brief Impression des flux d'un operateur EF aux faces (ie: diffusion, convection)
+/*! @brief Prints the boundary fluxes of an EF operator at faces (i.e., diffusion, convection).
  *
  */
 int Op_EF_base::impr(Sortie& os, const Operateur_base& op) const
@@ -400,7 +400,7 @@ int Op_EF_base::impr(Sortie& os, const Operateur_base& op) const
   int nb_compo=flux_bords_.dimension(1);
   const Probleme_base& pb=op.equation().probleme();
   const Schema_Temps_base& sch=pb.schema_temps();
-  // On n'imprime les moments que si demande et si on traite l'operateur de diffusion de la vitesse
+  // Print moments only if requested and if we are handling the velocity diffusion operator
   int impr_mom=0;
   if (le_dom_EF.domaine().moments_a_imprimer() && sub_type(Operateur_Diff_base,op) && op.equation().inconnue().le_nom()=="vitesse")
     impr_mom=1;
@@ -416,7 +416,7 @@ int Op_EF_base::impr(Sortie& os, const Operateur_base& op) const
   op.ouvrir_fichier_partage(Flux_face,"",impr_bord);
 
 
-  // Impression du temps
+  // Print the current time
   double temps=sch.temps_courant();
   if(Process::je_suis_maitre())
     {
@@ -425,13 +425,13 @@ int Op_EF_base::impr(Sortie& os, const Operateur_base& op) const
       if (impr_sum) Flux_sum.add_col(temps);
     }
 
-  // Calcul des moments
+  // Compute moments
   DoubleTab xgr;
   if (impr_mom) xgr = le_dom_EF.calculer_xgr();
   DoubleVect moment(nb_compo);
   moment=0;
 
-  // On parcours les frontieres pour sommer les flux par frontiere dans le tableau flux_bord
+  // Iterate over boundaries to sum fluxes per boundary into the flux_bord array
   DoubleVect flux_bord(nb_compo);
   DoubleVect bilan(nb_compo);
   bilan = 0;
@@ -450,7 +450,7 @@ int Op_EF_base::impr(Sortie& os, const Operateur_base& op) const
 
           if (impr_mom)
             {
-              // Calcul du moment exerce par le fluide sur le bord (OM/\F)
+              // Compute the moment exerted by the fluid on the boundary (OM/\F)
               if (Objet_U::dimension==2)
                 moment(0)+=flux_bords_(face,1)*xgr(face,0)-flux_bords_(face,0)*xgr(face,1);
               else
@@ -462,14 +462,14 @@ int Op_EF_base::impr(Sortie& os, const Operateur_base& op) const
             }
         }
 
-      // On somme les contributions de chaque processeur
+      // Sum contributions from each processor
       for(int k=0; k<nb_compo; k++)
         {
           flux_bord(k)=Process::mp_sum(flux_bord(k));
           if (impr_mom) moment(k)=Process::mp_sum(moment(k));
         }
 
-      // Ecriture dans les fichiers
+      // Write to output files
       if (Process::je_suis_maitre())
         {
           for(int k=0; k<nb_compo; k++)
@@ -478,13 +478,13 @@ int Op_EF_base::impr(Sortie& os, const Operateur_base& op) const
               if (impr_mom) Flux_moment.add_col(moment(k));
               if (le_dom_EF.domaine().bords_a_imprimer_sum().contient(la_fr.le_nom())) Flux_sum.add_col(flux_bord(k));
 
-              // On somme les flux de toutes les frontieres pour mettre dans le tableau bilan
+              // Sum fluxes from all boundaries into the bilan array
               bilan(k)+=flux_bord(k);
             }
         }
     }
 
-  // On imprime les bilans et on va a la ligne
+  // Print the balance values and move to next line
   if(Process::je_suis_maitre())
     {
       for(int k=0; k<nb_compo; k++)
@@ -495,7 +495,7 @@ int Op_EF_base::impr(Sortie& os, const Operateur_base& op) const
       if (impr_sum) Flux_sum << finl;
     }
 
-  // Impression sur chaque face si demande
+  // Print per-face values if requested
   for (int num_cl=0; num_cl<le_dom_EF.nb_front_Cl(); num_cl++)
     {
       const Frontiere_dis_base& la_fr = op.equation().domaine_Cl_dis().les_conditions_limites(num_cl)->frontiere_dis();
@@ -503,7 +503,7 @@ int Op_EF_base::impr(Sortie& os, const Operateur_base& op) const
       const Front_VF& frontiere_dis = ref_cast(Front_VF,la_cl->frontiere_dis());
       int ndeb = frontiere_dis.num_premiere_face();
       int nfin = ndeb + frontiere_dis.nb_faces();
-      // Impression sur chaque face
+      // Print per-face values
       if (le_dom_EF.domaine().bords_a_imprimer().contient(la_fr.le_nom()))
         {
           Flux_face << "# Flux par face sur " << la_fr.le_nom() << " au temps " << temps << " : " << finl;

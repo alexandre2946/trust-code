@@ -46,11 +46,11 @@ class Reorder_Mesh;
 template <typename _SIZE_> class OctreeRoot_32_64;
 template <typename _SIZE_> class Sous_Domaine_32_64;
 
-/*! @brief classe Domaine_32_64 un Domaine est un maillage compose d'un ensemble d'elements geometriques de meme type.
+/*! @brief class Domaine_32_64 A Domain is a mesh composed of a set of geometric elements of the same type.
  *
- * Les differents types d'elements sont des objets de classes derivees de Elem_geom_base.
- * Une domaine est constitue  de noeuds, d'elements, de bords, de bords periodiques,
- * de joints, de raccords et de bords internes.
+ * The different types of elements are objects of classes derived from Elem_geom_base.
+ * A domain is made up of nodes, elements, boundaries, periodic boundaries,
+ * joints, connections and internal boundaries.
  *
  * This class is templatized on the 32/64 bit configuration.
  * All the methods/members not sensitive to this are in Domaine_base.
@@ -117,9 +117,9 @@ public:
   DoubleTab getBoundingBox() const;
   void ajouter(const DoubleTab_t& soms);
   void ajouter(const DoubleTab_t& soms, IntVect_t& nums);
-  /// Renvoie le nombre de sommets du domaine.
+  /// Returns the number of vertices of the domain.
   int_t nb_som() const { return sommets_.dimension(0); }
-  /// Renvoie le nombre total de sommets du domaine i.e. le nombre de sommets reels et virtuels sur le processeur courant.
+  /// Returns the total number of vertices of the domain i.e. the number of real and virtual vertices on the current processor.
   int_t nb_som_tot() const { return sommets_.dimension_tot(0); }
   void read_vertices(Entree& s);
 
@@ -132,29 +132,29 @@ public:
   inline int_t nb_elem_tot() const { return mes_elems_.dimension_tot(0); }
   inline int nb_som_elem() const;
   inline int nb_faces_elem(int=0) const;
-  /// @brief Renvoie le numero (global) du j-ieme sommet du i-ieme element
+  /// @brief Returns the (global) number of the j-th vertex of the i-th element
   inline int_t sommet_elem(int_t i, int j) const  {  return mes_elems_(i,j); }
 
   //
   // Aretes
   //
 
-  /// Renvoie le nombre d'aretes reelles.
+  /// Returns the number of real edges.
   inline int_t nb_aretes() const { return aretes_som_.dimension(0); }
-  /// renvoie le nombre d'aretes total (reelles+virtuelles).
+  /// returns the total number of edges (real+virtual).
   inline int_t nb_aretes_tot() const { return aretes_som_.dimension_tot(0); }
 
   //
   // Correspondances
   //
 
-  /// renvoie le numero du jeme sommet de la ieme arete.
+  /// returns the number of the j-th vertex of the i-th edge.
   inline int_t arete_sommets(int_t i, int j) const { return aretes_som_(i, j); }
-  /// renvoie le numero de la jeme arete du ieme element.
+  /// returns the number of the j-th edge of the i-th element.
   inline int_t elem_aretes(int_t i, int j) const {  return elem_aretes_(i, j); }
-  /// renvoie le tableau de connectivite aretes/sommets.
+  /// returns the connectivity array edges/vertices.
   inline const IntTab_t& aretes_som() const {  return aretes_som_; }
-  /// renvoie le tableau de connectivite elements/aretes.
+  /// returns the connectivity array elements/edges.
   inline const IntTab_t& elem_aretes() const {   return elem_aretes_; }
   inline IntTab_t& set_aretes_som()   {  return aretes_som_; }
   inline IntTab_t& set_elem_aretes()  {  return elem_aretes_; }
@@ -387,37 +387,37 @@ protected:
   DoubleTab_t sommets_n; // vertex coordinates at beginning of step, needed for implicit iterations
   // Renumbering array for periodicity
   ArrOfInt_t renum_som_perio_;
-  // Description des elements (pour le multi-element, le tableau peut contenir des -1 !!!)
+  // Description of elements (for multi-element, the array may contain -1 values !!!)
   IntTab_t mes_elems_;
-  // Definition des aretes des elements (pour chaque arete, indices des deux sommets)
-  //  (ce tableau n'est pas toujours rempli, selon la discretisation)
+  // Definition of element edges (for each edge, indices of the two vertices)
+  //  (this array is not always filled, depending on the discretisation)
   IntTab_t aretes_som_;
-  // Pour chaque element, indices de ses aretes dans Aretes_som (voir Elem_geom_base::get_tab_aretes_sommets_locaux())
+  // For each element, indices of its edges in Aretes_som (see Elem_geom_base::get_tab_aretes_sommets_locaux())
   IntTab_t elem_aretes_;
-  // Pour les faces virtuelles du Domaine_VF, indices de la meme face dans le tableau des faces de bord
-  // (voir Domaine_32_64<_SIZE_>::init_faces_virt_bord())
-  ArrOfInt_t ind_faces_virt_bord_; // contient les indices des faces virtuelles de bord // BigArrOfTID
-  // Pour chaque element virtuel i avec nb_elem<=i<nb_elem_tot on a :
-  // elem_virt_pe_num_(i-nb_elem,0) = numero du PE qui possede l'element
-  // elem_virt_pe_num_(i-nb_elem,1) = numero local de cet element sur le PE qui le possede
+  // For the virtual faces of Domaine_VF, indices of the same face in the boundary face array
+  // (see Domaine_32_64<_SIZE_>::init_faces_virt_bord())
+  ArrOfInt_t ind_faces_virt_bord_; // contains the indices of the virtual boundary faces // BigArrOfTID
+  // For each virtual element i with nb_elem<=i<nb_elem_tot:
+  // elem_virt_pe_num_(i-nb_elem,0) = number of the PE owning the element
+  // elem_virt_pe_num_(i-nb_elem,1) = local number of this element on the owning PE
   IntTab_t elem_virt_pe_num_;
 
-  // L'octree est mutable: on le construit a la volee lorsqu'il est utilise dans les methodes const
+  // The octree is mutable: it is built on-the-fly when used in const methods
   mutable OWN_PTR(OctreeRoot_t) deriv_octree_;
   ArrOfDouble cg_moments_;  // max dim 3
 
   // List of references to sub domains
   LIST(OBS_PTR(Sous_Domaine_t)) les_ss_domaines_;
 
-  // Bords, raccords et Bords_Internes forment les "faces_frontiere" sur lesquelles
-  //  sont definies les conditions aux limites.
+  // Bords, raccords and Bords_Internes form the "faces_frontiere" on which
+  //  boundary conditions are defined.
   Bords_t mes_faces_bord_;
   Raccords_t mes_faces_raccord_;
   Bords_Internes_t mes_bords_int_;
-  // Groupes_Faces representent les groupes de faces lues dans les fichiers d'entrees
+  // Groupes_Faces represent the groups of faces read from input files
   Groupes_Faces_t mes_groupes_faces_;
-  // Les faces de joint sont les faces communes avec les autres processeurs (bords
-  //  du domaine locaux a ce processeur qui se raccordent a un processeur voisin)
+  // Joint faces are the faces shared with other processors (local domain boundaries
+  //  that connect to a neighboring processor)
   Joints_t mes_faces_joint_;
 
   LIST(OBS_PTR(Domaine_32_64)) domaines_frontieres_;
@@ -448,10 +448,10 @@ private:
   mutable TRUST_Vector<SmallArrOfTID_t> cached_elements_;
 };
 
-/*! @brief Type les elements du domaine avec le nom passe en parametre.
+/*! @brief Sets the element type of the domain using the name passed as parameter.
  *
- * Et associe le type d'element au domaine.
- * @param (Nom& typ) le nom du type des elements geometriques du domaine.
+ * Associates the element type to the domain.
+ * @param (Nom& typ) the name of the geometric element type of the domain.
  */
 template<typename _SIZE_>
 inline void Domaine_32_64<_SIZE_>::typer(const Nom& typ)
@@ -463,51 +463,51 @@ inline void Domaine_32_64<_SIZE_>::typer(const Nom& typ)
 }
 
 
-/*! @brief Renvoie le nombre de sommets des elements geometriques constituants le domaine.
+/*! @brief Returns the number of vertices of the geometric elements that make up the domain.
  *
- * Tous les elements du domaine etant du meme type ils ont tous le meme nombre de sommets
- * qui est le nombre de sommet du type des elements geometriques du domaine.
+ * Since all elements of the domain are of the same type they all have the same number of vertices
+ * which is the number of vertices of the type of the geometric elements of the domain.
  *
- * @return (int) le nombre de sommets par element
+ * @return (int) the number of vertices per element
  */
 template<typename _SIZE_>
 inline int Domaine_32_64<_SIZE_>::nb_som_elem() const {   return elem_->nb_som(); }
 
-/*! @brief Renvoie le nombre de face de type i des elements geometriques constituants le domaine.
+/*! @brief Returns the number of faces of type i of the geometric elements that make up the domain.
  *
- *     Ex: les objets de la classe Prisme ont 2 types de faces: triangle ou quadrangle.
+ *     Ex: objects of the Prism class have 2 types of faces: triangle or quadrangle.
  *
- * @param (int i) le type de face
- * @return (int) le nombre de face de type i des elements geometriques constituants le domaine
+ * @param (int i) the type of face
+ * @return (int) the number of faces of type i of the geometric elements that make up the domain
  */
 template<typename _SIZE_>
 inline int Domaine_32_64<_SIZE_>::nb_faces_elem(int i) const {  return elem_->nb_faces(i); }
 
-///  Renvoie le nombre de faces frontiere du domaine (somme des nombres de  bords, de raccords et de bords internes)
+/// Returns the number of boundary faces of the domain (sum of boundaries, connections, and internal boundaries)
 template<typename _SIZE_>
 inline typename Domaine_32_64<_SIZE_>::int_t Domaine_32_64<_SIZE_>::nb_faces_frontiere() const { return nb_faces_bord() + nb_faces_raccord() + nb_faces_bords_int(); }
 
 
-/*! @brief Renvoie le nombre de faces speciales du domaine.
+/*! @brief Returns the number of special faces of the domain.
  *
- * C'est la somme des nombres de  bords, de raccords, de bords internes et de groupes de faces specifies
+ * It is the sum of the numbers of boundaries, connections, internal boundaries and specified face groups
  */
 template<typename _SIZE_>
 inline typename Domaine_32_64<_SIZE_>::int_t Domaine_32_64<_SIZE_>::nb_faces_specifiques() const { return nb_faces_bord() + nb_faces_raccord() + nb_faces_bords_int() + nb_faces_groupes_faces(); }
 
-/*! @brief Calcule les centres de gravites des elements du domaine.
+/*! @brief Calculates the centers of gravity of the domain elements.
  *
- * @param (DoubleTab_t& xp) le tableau contenant les centres de gravites des elements du domaine
+ * @param (DoubleTab_t& xp) the array containing the centers of gravity of the domain elements
  */
 template<typename _SIZE_>
 inline void Domaine_32_64<_SIZE_>::calculer_centres_gravite(DoubleTab_t& xp) const {  elem_->calculer_centres_gravite(xp); }
 
-/*! @brief Renvoie le nombre de faces frontiere du domaine du type specifie.
+/*! @brief Returns the number of boundary faces of the domain of the specified type.
  *
- *     C'est la somme des nombres de  bords, de raccords et de bords internes du type specifie.
+ *     It is the sum of the numbers of boundaries, connections and internal boundaries of the specified type.
  *
- * @param (Type_Face type) un type de face (certains elements geometriques ont plusieurs types de faces)
- * @return (int) le nombre de faces frontiere du domaine du type specifie
+ * @param (Type_Face type) a type of face (some geometric elements have multiple types of faces)
+ * @return (int) the number of boundary faces of the domain of the specified type
  */
 template<typename _SIZE_>
 inline typename Domaine_32_64<_SIZE_>::int_t Domaine_32_64<_SIZE_>::nb_faces_frontiere(Type_Face type) const
@@ -518,12 +518,12 @@ inline typename Domaine_32_64<_SIZE_>::int_t Domaine_32_64<_SIZE_>::nb_faces_fro
     nb_faces_raccord(type);
 }
 
-/*! @brief Renvoie le nombre de faces specifique du domaine du type specifie.
+/*! @brief Returns the number of specific faces of the domain of the specified type.
  *
- *     C'est la somme des nombres de  bords, de raccords de bords internes et de groupes de faces du type specifie.
+ *     It is the sum of the numbers of boundaries, connections of internal boundaries and groups of faces of the specified type.
  *
- * @param (Type_Face type) un type de face (certains elements geometriques ont plusieurs types de faces)
- * @return (int) le nombre de faces frontiere du domaine du type specifie
+ * @param (Type_Face type) a face type (some geometric elements have several types of faces)
+ * @return (int) the number of boundary faces of the domain of the specified type
  */
 template<typename _SIZE_>
 inline typename Domaine_32_64<_SIZE_>::int_t Domaine_32_64<_SIZE_>::nb_faces_specifiques(Type_Face type) const

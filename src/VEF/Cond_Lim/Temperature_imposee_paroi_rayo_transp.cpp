@@ -29,9 +29,9 @@ int Temperature_imposee_paroi_rayo_transp::initialiser(double temps)
 {
   assert(!le_modele_rayo_);
 
-  // on recupere le modele rayo seulement si pb fluide et rayo ... !
+  // retrieve the radiation model only if the problem is a fluid + radiation problem ... !
   const Probleme_base& this_pb = domaine_Cl_dis().equation().probleme();
-  if (sub_type(Pb_Fluide_base, this_pb)) // sinon Pb_conduction par exemple ;)
+  if (sub_type(Pb_Fluide_base, this_pb)) // otherwise Pb_conduction for example ;)
     {
       if (this_pb.milieu().is_rayo_transp())
         {
@@ -62,7 +62,7 @@ void Temperature_imposee_paroi_rayo_transp::calculer_Teta_i(double temps)
     }
   else
     {
-      // La temperature de paroi etant directement donnee par le champ_front associe a la condition a la limite, il n'y a rien a calculer ici
+      // The wall temperature is directly given by the champ_front associated with the boundary condition, so nothing to compute here
     }
 
   const Front_VF& front_vf = ref_cast(Front_VF, frontiere_dis());

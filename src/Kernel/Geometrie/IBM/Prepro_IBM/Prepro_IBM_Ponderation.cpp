@@ -26,7 +26,7 @@ void Prepro_IBM_Ponderation::set_param(Param& param) const
 {
   Prepro_IBM_base::set_param(param);
   param.ajouter("type_de_ponderation",&pond_,Param::OPTIONAL); // XD_ADD_P entier
-  // XD_CONT choix de la methode de ponderation
+  // XD_CONT choice of the weighting method
 }
 
 Entree& Prepro_IBM_Ponderation::readOn(Entree& is)
@@ -57,7 +57,7 @@ void Prepro_IBM_Ponderation::associer_pb(const Probleme_base& pb)
   Prepro_IBM_base::associer_pb(pb);
   compute_solid_fluid(0);
 
-  // Ecriture eventuelle
+  // Optional output
   if( save_prepro_ == 1) Save_Med_File();
 }
 
@@ -70,9 +70,9 @@ void Prepro_IBM_Ponderation::compute_solid_fluid(int maj_from_ext)
   DoubleTab& aireArray = champ_aire_->valeurs();
   DoubleTab& isNodeDirichletArray = isNodeDirichlet_->valeurs();
   DoubleTab& rotationArray = champ_rotation_->valeurs();
-  int nbElemVol = rotationArray.dimension(0); // Nombre de cellules du maillage volumique
+  int nbElemVol = rotationArray.dimension(0); // Number of cells in the volumetric mesh
 
-  //mise a jour eventuelle de la normal par element et des noeuds Dirichlet  a partir de champ_aire_ et champ_rotation_
+  //optional update of the normal per element and Dirichlet nodes from champ_aire_ and champ_rotation_
   const Domaine_dis_base& le_dom_dis = mon_pb_->domaine_dis();
   const IntTab& elems = le_dom_dis.domaine().les_elems();
   if (maj_from_ext == 1)
@@ -94,20 +94,20 @@ void Prepro_IBM_Ponderation::compute_solid_fluid(int maj_from_ext)
       isNodeDirichletArray.echange_espace_virtuel();
     }
 
-  // calcul des noeuds voisins a un noeud donne
+  // compute neighboring nodes of a given node
   int nb_niveau = 1;
   compute_NeighNode(nb_niveau);
 
-  // calcul des distances caractéristiques
+  // compute characteristic distances
   compute_h_max_elem();
 
-  //Projection solide : calcul des points solides projetes et des contributions ponderees
+  //Solid projection: compute solid projected points and weighted contributions
   projectSolidPoints();
 
-  //Projection fluide : en utilisant les projections solides et normales, on calcule les points fluides
+  //Fluid projection: using solid projections and normals, compute the fluid points
   projectFluidPoints();
 
-//     //Mise à jour de la matrice de rotation elementaire avec les normales nodales
+//     //Update the elementary rotation matrix with nodal normals
   // for (int elem = 0; elem <nbElemVol; elem++)
   //   {
   // 	computeLocalFrame(normalArray, t1Arr, t2Arr, elem);
@@ -117,10 +117,10 @@ void Prepro_IBM_Ponderation::compute_solid_fluid(int maj_from_ext)
 
 void Prepro_IBM_Ponderation::projectSolidPoints()
 {
-  const DoubleTab& normalArray = champ_normal_->valeurs();  // Normales aux faces
+  const DoubleTab& normalArray = champ_normal_->valeurs();  // Face normals
   const DoubleTab& aireArray = champ_aire_->valeurs();
-  const DoubleTab& baryArray = champ_bary_->valeurs();      // Barycentres des faces surfaciques
-  DoubleTab& solideArray = solid_points_->valeurs();  // Tableau des projections solides
+  const DoubleTab& baryArray = champ_bary_->valeurs();      // Barycenters of surface faces
+  DoubleTab& solideArray = solid_points_->valeurs();  // Array of solid projections
   const DoubleTab& isNodeDirichletArray = isNodeDirichlet_->valeurs();
   DoubleTab& solid_elemsArray = solid_elems_->valeurs();
   solideArray=0.0;
@@ -129,13 +129,13 @@ void Prepro_IBM_Ponderation::projectSolidPoints()
   Cout << "============================================================================"<<finl;
   Cout<<"prepro_IBM::projectSolidPoints - Weighting method = "<<pond_<<finl;
 
-  const Domaine_dis_base& le_dom_dis = mon_pb_->domaine_dis();// contient maillage TRUST
+  const Domaine_dis_base& le_dom_dis = mon_pb_->domaine_dis();// contains TRUST mesh
   const Domaine& le_dom =  le_dom_dis.domaine();
   const int nb_elem = le_dom.nb_elem();
   const int nb_som = le_dom.nb_som();
   const int nb_som_elem =le_dom.nb_som_elem();
-  const IntTab& connectDom = le_dom.les_elems() ;// connectivité elements-noeuds
-  const DoubleTab coordsDom3D = le_dom.coord_sommets(); // coordonnées des noeuds TRUST
+  const IntTab& connectDom = le_dom.les_elems() ;// element-node connectivity
+  const DoubleTab coordsDom3D = le_dom.coord_sommets(); // coordinates of TRUST nodes
   const int dim_esp=Objet_U::dimension;
   assert(dim_esp == 3);
 
@@ -148,10 +148,10 @@ void Prepro_IBM_Ponderation::projectSolidPoints()
       if (aireArray(e) > eps_effec_)
         {
           //////////////////////////////////////////
-          //calcul de la projection solide pour e
+          //compute solid projection for e
           //////////////////////////////////////////
 
-          //Parcourt des noeuds de l'element
+          //Traverse the nodes of the element
           for (int noeud=0; noeud<nb_som_elem; noeud++)
             {
               int sommet = connectDom(e,noeud);
@@ -181,7 +181,7 @@ void Prepro_IBM_Ponderation::projectSolidPoints()
               distance = sqrt(distance);
               // Cerr<<"distance_normale : "<<distance_normale<<" distance : "<<distance<<finl;
 
-              // Ponderation type 1 à 4
+              // Weighting type 1 to 4
               double pond;
               switch (pond_)
                 {
@@ -202,14 +202,14 @@ void Prepro_IBM_Ponderation::projectSolidPoints()
                   break;
                 }
 
-              //calcul de la projection solide pour les noeuds de l'element e
+              //compute solid projection for the nodes of element e
               for (int d=0; d<dim_esp; d++) solideArray(sommet,d) += pond * (coordsDom3D(sommet,d)- distance_normale*normalArray(e,d));
               sumContribProjSolidArray(sommet) += pond;
 
               /////////////////////////////////////////////////////////
-              //calcul de la projection solide pour les voisins de e
+              //compute solid projection for the neighbors of e
               /////////////////////////////////////////////////////////
-              //calcul de la projection solide pour les voisins des noeuds de l'element e
+              //compute solid projection for the neighbors of the nodes of element e
               IntList& voisins = sommets_voisins_[sommet];
               int taille = 0;
               if (!(voisins.est_vide())) taille = voisins.size();
@@ -220,10 +220,10 @@ void Prepro_IBM_Ponderation::projectSolidPoints()
                   int num_som_v= voisins[l];
                   if ( isNodeDirichletArray(num_som_v)<0 && !(elemPerNeighbor[num_som_v].contient(e)) )
                     {
-                      // Ajout de l'élément e pour ce voisin
+                      // Add element e for this neighbor
                       // Cerr<<"isNodeDirichletArray = "<<isNodeDirichletArray(num_som_v)<<" elemPerNeighbor[num_som_v]: "<<elemPerNeighbor[num_som_v].contient(e)<<finl;
                       elemPerNeighbor[num_som_v].add(e);
-                      // Calcul du vecteur voisin -> barycentre
+                      // Compute the vector neighbor -> barycenter
                       double dx = coordsDom3D(num_som_v, 0) - baryArray(e, 0);
                       double dy = coordsDom3D(num_som_v, 1) - baryArray(e, 1);
                       double dz = coordsDom3D(num_som_v, 2) - baryArray(e, 2);
@@ -231,7 +231,7 @@ void Prepro_IBM_Ponderation::projectSolidPoints()
                       double distance_normale_v = dx * normalArray(e, 0) + dy * normalArray(e, 1) + dz * normalArray(e, 2);
                       double d1 = sqrt(dx * dx + dy * dy + dz * dz);
 
-                      // pondération
+                      // weighting
                       double pond_v;
                       if (d1 > eps_effec_)
                         {
@@ -254,7 +254,7 @@ void Prepro_IBM_Ponderation::projectSolidPoints()
                           pond_v = (pond_ == 4) ? aireArray(e) : 1.0;
                         }
 
-                      // Contribution pondérée
+                      // Weighted contribution
                       solideArray(num_som_v, 0) += pond_v * (coordsDom3D(num_som_v, 0) - distance_normale_v * normalArray(e, 0));
                       solideArray(num_som_v, 1) += pond_v * (coordsDom3D(num_som_v, 1) - distance_normale_v * normalArray(e, 1));
                       solideArray(num_som_v, 2) += pond_v * (coordsDom3D(num_som_v, 2) - distance_normale_v * normalArray(e, 2));
@@ -288,8 +288,8 @@ void Prepro_IBM_Ponderation::projectSolidPoints()
 void Prepro_IBM_Ponderation::projectFluidPoints()
 {
   const DoubleTab& aire = champ_aire_->valeurs();             // Aire
-  DoubleTab& normalArray = champ_normal_->valeurs();    // Normales aux faces
-  DoubleTab& fluide = fluid_points_->valeurs();         // Tableau des projections fluides
+  DoubleTab& normalArray = champ_normal_->valeurs();    // Face normals
+  DoubleTab& fluide = fluid_points_->valeurs();         // Array of fluid projections
   const DoubleTab& dirichlet = isNodeDirichlet_->valeurs();
   const DoubleTab& hmax_node = h_max_node_->valeurs();
   DoubleVect& elem_fluide = fluid_elems_->valeurs();;
@@ -317,7 +317,7 @@ void Prepro_IBM_Ponderation::projectFluidPoints()
       if (dirichlet(som) == 1.)
         {
           //////////////////////////////////////////
-          //calcul de la projection fluide pour som
+          //compute fluid projection for som
           //////////////////////////////////////////
           x = coordsDom3D(som, 0);
           y = coordsDom3D(som, 1);
@@ -344,56 +344,56 @@ void Prepro_IBM_Ponderation::projectFluidPoints()
                   fluide(som, d) = dimTab_(d) ? coordsDom3D(som, d) + fact * hmax_node(som) * normale_som(som, d) : coordsDom3D(som, d);
                 }
               interFlElem = le_dom.chercher_elements(fluide(som,0),fluide(som,1),fluide(som,2));
-              if (interFlElem == -1) // element non trouve
+              if (interFlElem == -1) // element not found
                 elem_fluide(som) = -3.;
               else
                 {
                   elem_fluide(som) = float(interFlElem);
                   if (aire(interFlElem) > 0.0)
-                    elem_fluide(som) = -1.; // O(h) element traverse par IBC
+                    elem_fluide(som) = -1.; // O(h) element traversed by IBC
                   else
                     {
                       bool flag = false;
                       for (int j = 0; j < nb_som_elem; j++)
                         {
                           int s = connect(interFlElem, j);
-                          if (dirichlet(s) == 1.0) flag = true; // element ayant un som. dirichlet
+                          if (dirichlet(s) == 1.0) flag = true; // element with a Dirichlet vertex
                         }
-                      if (flag) elem_fluide(som) = -1.0; // pour Mean Gradient
+                      if (flag) elem_fluide(som) = -1.0; // for Mean Gradient
                     }
                 }
             }
 
-          // Si on n'a pas trouve d'elements fluide, on etend la zone aux elements voisins en tenant compte du coefficient c_prepro_
+          // If no fluid element was found, extend the zone to neighboring elements taking into account the c_prepro_ coefficient
           if (c_prepro_ > 0 && elem_fluide(som) == -1)
             {
               fact  += c_prepro_;
               for (int d = 0; d < dim_esp; d++)
                 fluide(som, d) = dimTab_(d) ? coordsDom3D(som, d) + fact * hmax_node(som) * normale_som(som, d) : coordsDom3D(som, d);
               interFlElem = le_dom.chercher_elements(fluide(som,0),fluide(som,1),fluide(som,2));
-              if (interFlElem == -1) // element non trouve
+              if (interFlElem == -1) // element not found
                 elem_fluide(som) = -3.;
               else
                 {
                   elem_fluide(som) = float(interFlElem);
                   if (aire(interFlElem) > 0.0)
-                    elem_fluide(som) = -1.; // O(h) element traverse par IBC
+                    elem_fluide(som) = -1.; // O(h) element traversed by IBC
                   else
                     {
                       bool flag = false;
                       for (int j = 0; j < nb_som_elem; j++)
                         {
                           int s = connect(interFlElem, j);
-                          if (dirichlet(s) == 1.0) flag = true; // element ayant un som. dirichlet
+                          if (dirichlet(s) == 1.0) flag = true; // element with a Dirichlet vertex
                         }
-                      if (flag) elem_fluide(som) = -1.0; // pour Mean Gradient
+                      if (flag) elem_fluide(som) = -1.0; // for Mean Gradient
                     }
                 }
               fact  -= c_prepro_;
             }
 
           ///////////////////////////////////////////////////////
-          //calcul de la projection fluide pour les voisins de som
+          //compute fluid projection for the neighbors of som
           ///////////////////////////////////////////////////////
           IntList& voisins = sommets_voisins_[som];
           int taille = 0;
@@ -430,49 +430,49 @@ void Prepro_IBM_Ponderation::projectFluidPoints()
                           fluide(num_som_v, d) = dimTab_(d) ? coordsDom3D(num_som_v, d) + fact * hmax_node(num_som_v) * normale_som(num_som_v, d) : coordsDom3D(num_som_v, d);
                         }
                       interFlElem = le_dom.chercher_elements(fluide(num_som_v,0),fluide(num_som_v,1),fluide(num_som_v,2));
-                      if (interFlElem == -1) // element non trouve
+                      if (interFlElem == -1) // element not found
                         elem_fluide(num_som_v) = -3.;
                       else
                         {
                           elem_fluide(num_som_v) = float(interFlElem);
                           if (aire(interFlElem) > 0.0)
-                            elem_fluide(num_som_v) = -1.; // O(h) element traverse par IBC
+                            elem_fluide(num_som_v) = -1.; // O(h) element traversed by IBC
                           else
                             {
                               bool flag = false;
                               for (int j = 0; j < nb_som_elem; j++)
                                 {
                                   int s = connect(interFlElem, j);
-                                  if (dirichlet(s) == 1.0) flag = true; // element ayant un som. dirichlet
+                                  if (dirichlet(s) == 1.0) flag = true; // element with a Dirichlet vertex
                                 }
-                              if (flag) elem_fluide(num_som_v) = -1.0; // pour Mean Gradient
+                              if (flag) elem_fluide(num_som_v) = -1.0; // for Mean Gradient
                             }
                         }
                     }
 
-                  // Si on n'a pas trouve d'elements fluide, on etend la zone aux elements voisins en tenant compte du coefficient c_prepro_
+                  // If no fluid element was found, extend the zone to neighboring elements taking into account the c_prepro_ coefficient
                   if (c_prepro_ > 0 && elem_fluide(num_som_v) == -1)
                     {
                       fact  += c_prepro_;
                       for (int d = 0; d < dim_esp; d++)
                         fluide(num_som_v, d) = dimTab_(d) ? coordsDom3D(num_som_v, d) + fact * hmax_node(num_som_v) * normale_som(num_som_v, d) : coordsDom3D(num_som_v, d);
                       interFlElem = le_dom.chercher_elements(fluide(num_som_v,0),fluide(num_som_v,1),fluide(num_som_v,2));
-                      if (interFlElem == -1) // element non trouve
+                      if (interFlElem == -1) // element not found
                         elem_fluide(num_som_v) = -3.;
                       else
                         {
                           elem_fluide(num_som_v) = float(interFlElem);
                           if (aire(interFlElem) > 0.0)
-                            elem_fluide(num_som_v) = -1.; // O(h) element traverse par IBC
+                            elem_fluide(num_som_v) = -1.; // O(h) element traversed by IBC
                           else
                             {
                               bool flag = false;
                               for (int j = 0; j < nb_som_elem; j++)
                                 {
                                   int s = connect(interFlElem, j);
-                                  if (dirichlet(s) == 1.0) flag = true; // element ayant un som. dirichlet
+                                  if (dirichlet(s) == 1.0) flag = true; // element with a Dirichlet vertex
                                 }
-                              if (flag) elem_fluide(num_som_v) = -1.0; // pour Mean Gradient
+                              if (flag) elem_fluide(num_som_v) = -1.0; // for Mean Gradient
                             }
                         }
                       fact  -= c_prepro_;
@@ -482,7 +482,7 @@ void Prepro_IBM_Ponderation::projectFluidPoints()
         }
     }
 
-  // On modifie la matrice rotation IBC via les normales nodales
+  // Update the IBC rotation matrix using nodal normals
   // ROTATION MATRIX
 
   Static_Int_Lists connectivite_som_elem;
@@ -522,7 +522,7 @@ void Prepro_IBM_Ponderation::projectFluidPoints()
           if (norme > eps_effec_)
             {
               for (int d = 0; d < dim_esp; d++) normalArray(e,d) /= norme;
-              // calcul de la matrice de rotation
+              // compute the rotation matrix
               computeLocalFrame(normalArray, t1Arr, t2Arr, e);
               computeMatRot(normalArray, t1Arr, t2Arr, e);
             }

@@ -53,7 +53,7 @@ inline void Eval_Dirac_VEF_Face::calculer_terme_source(const int num_face, Type_
   const int size = source.size_array();
   if (size > 1) Process::exit("Eval_Dirac_VEF_Face::calculer_terme_source not available for multi-inco !");
 
-  int elem; // pour recuperer l'element associe a cette face
+  int elem; // to retrieve the element associated with this face
 
   if (face_voisins(num_face, 1) == -1) elem = face_voisins(num_face, 0);
   else elem = face_voisins(num_face, 1);

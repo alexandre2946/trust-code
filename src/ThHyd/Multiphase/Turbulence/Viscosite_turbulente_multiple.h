@@ -20,11 +20,11 @@
 #include <Correlation_base.h>
 #include <map>
 
-/*! @brief classe Viscosite_turbulente_multiple Classe qui peut contenir plusieurs viscosites turbulentes pour faire de la turbulence monophasique + diphasique
+/*! @brief Composite turbulent viscosity class that can hold multiple turbulent viscosity models for single-phase and two-phase turbulence.
  *
- *     En pratique, la viscosite turbulente n'est que monophasique et l'operateur de diffusion reste identique
- *     La classe Source_BIF_PolyMAC_MPFA appelle reynolds_stress_BIF et entre les termes de divergence du tenseur de Reynolds
- *       en explicite dans la QDM
+ *      In practice the turbulent viscosity is single-phase only and the diffusion operator remains unchanged.
+ *      Source_BIF_PolyMAC_MPFA calls reynolds_stress_BIF and adds the Reynolds-stress divergence terms
+ *      explicitly to the momentum equation.
  *
  */
 

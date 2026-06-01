@@ -18,10 +18,10 @@
 
 Implemente_base_32_64(Elem_geom_base_32_64,"Elem_geom_base",Objet_U);
 
-/*! @brief NE FAIT RIEN
+/*! @brief Does nothing.
  *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie
+ * @param s An output stream.
+ * @return The output stream.
  */
 template<class _SIZE_>
 Sortie& Elem_geom_base_32_64<_SIZE_>::printOn(Sortie& s ) const
@@ -29,10 +29,10 @@ Sortie& Elem_geom_base_32_64<_SIZE_>::printOn(Sortie& s ) const
   return s;
 }
 
-/*! @brief NE FAIT RIEN
+/*! @brief Does nothing.
  *
- * @param (Entree& s) un flot d'entree
- * @return (Entree&) le flot d'entree
+ * @param s An input stream.
+ * @return The input stream.
  */
 template<class _SIZE_>
 Entree& Elem_geom_base_32_64<_SIZE_>::readOn(Entree& s )
@@ -41,11 +41,11 @@ Entree& Elem_geom_base_32_64<_SIZE_>::readOn(Entree& s )
 }
 
 
-/*! @brief Renvoie le parametre face si le type de face specifie est le meme que celui de l'element geometrique.
+/*! @brief Returns the face parameter if the specified face type matches that of the geometric element.
  *
- * @param (int face)
- * @param (Type_Face& type) un type de face
- * @throws mauvais type de face specifie
+ * @param face Face index.
+ * @param type A face type.
+ * @throws Bad face type specified.
  */
 template <typename _SIZE_>
 int Elem_geom_base_32_64<_SIZE_>::num_face(int face, Type_Face& type) const
@@ -54,11 +54,11 @@ int Elem_geom_base_32_64<_SIZE_>::num_face(int face, Type_Face& type) const
   return face;
 }
 
-/*! @brief Cree les faces de l'element geometrique specifie du domaine en precisant le type de face a creer.
+/*! @brief Creates the faces of the specified geometric element of the domain using the given face type.
  *
- * @param (Faces_t& les_faces) les faces a creer
- * @param (int num_elem) le numero de l'element dont on veut creer les faces
- * @param (Type_Face type) le type de face a creer
+ * @param les_faces Faces object to fill.
+ * @param num_elem Index of the element whose faces are to be created.
+ * @param type Face type to create.
  */
 template <typename _SIZE_>
 void Elem_geom_base_32_64<_SIZE_>::creer_faces_elem(Faces_t& les_faces ,
@@ -85,9 +85,9 @@ void Elem_geom_base_32_64<_SIZE_>::creer_faces_elem(Faces_t& les_faces ,
 }
 
 
-/*! @brief Calcule les centres de gravites de tous les elements du domaine associe a l'element goemetrique.
+/*! @brief Computes the centers of mass of all elements in the domain associated with this geometric element.
  *
- * @param (DoubleTab& xp) le tableau contenant les coordonnees des centres de gravite
+ * @param tab_xp Array to fill with the coordinates of the centers of mass.
  */
 template <typename _SIZE_>
 void Elem_geom_base_32_64<_SIZE_>::calculer_centres_gravite(DoubleTab_t& tab_xp) const
@@ -124,11 +124,10 @@ void Elem_geom_base_32_64<_SIZE_>::calculer_centres_gravite(DoubleTab_t& tab_xp)
   end_gpu_timer(__KERNEL_NAME__);
 }
 
-/*! @brief Sort en erreur.
+/*! @brief Exits with an error. This method is not pure virtual for convenience.
  *
- * Cette methode n'est pas virtuelle pure pour des raisons de commodite
- *
- * @param (DoubleTab& xp) le tableau contenant les coordonnees des centres de gravite
+ * @param faces_sommets Vertex indices of the faces.
+ * @param face_normales Array to fill with face normals.
  */
 template <typename _SIZE_>
 void Elem_geom_base_32_64<_SIZE_>::calculer_normales(const IntTab_t& faces_sommets , DoubleTab_t& face_normales) const
@@ -138,12 +137,11 @@ void Elem_geom_base_32_64<_SIZE_>::calculer_normales(const IntTab_t& faces_somme
   exit();
 }
 
-/*! @brief Renvoie le nombre de type de face de l'element geometrique.
+/*! @brief Returns the number of face types of the geometric element.
  *
- *     Par exemple un prisme (Classe Prisme)
- *     a 2 types de faces: un triangle ou un quadrangle.
+ * For example, a prism (class Prisme) has 2 face types: triangle and quadrangle.
  *
- * @return (int) renvoie toujours 1
+ * @return Always returns 1 for this base implementation.
  */
 template <typename _SIZE_>
 int Elem_geom_base_32_64<_SIZE_>::nb_type_face() const
@@ -151,14 +149,15 @@ int Elem_geom_base_32_64<_SIZE_>::nb_type_face() const
   return 1;
 }
 
-/*! @brief remplit le tableau faces_som_local(i,j) qui donne pour 0 <= i < nb_faces()  et  0 <= j < nb_som_face(i) le numero local du sommet
+/*! @brief Fills faces_som_local(i,j) giving for 0 <= i < nb_faces() and 0 <= j < nb_som_face(i) the local vertex index on the element.
  *
- *   sur l'element.
- *   On a  0 <= faces_sommets_locaux(i,j) < nb_som()
- *  Si toutes les faces de l'element n'ont pas le meme nombre de sommets, le nombre
- *  de colonnes du tableau est le plus grand nombre de sommets, et les cases inutilisees
- *  du tableau sont mises a -1
- *  On renvoie 1 si toutes les faces ont le meme nombre d'elements, 0 sinon.
+ * We have 0 <= faces_sommets_locaux(i,j) < nb_som().
+ * If faces do not all have the same number of vertices, the number of columns equals the maximum,
+ * and unused entries are set to -1.
+ * Returns 1 if all faces have the same number of vertices, 0 otherwise.
+ *
+ * @param faces_som_local Table to fill with local face-vertex indices.
+ * @return 1 if all faces have the same vertex count, 0 otherwise.
  */
 template <typename _SIZE_>
 int Elem_geom_base_32_64<_SIZE_>::get_tab_faces_sommets_locaux(IntTab& faces_som_local) const
@@ -170,12 +169,13 @@ int Elem_geom_base_32_64<_SIZE_>::get_tab_faces_sommets_locaux(IntTab& faces_som
   return 0;
 }
 
-/*! @brief idem que Elem_geom_base::get_tab_faces_sommets_locaux mais pour les aretes: aretes_som_local.
+/*! @brief Same as Elem_geom_base::get_tab_faces_sommets_locaux but for edges: aretes_som_local.
  *
- * dimension(0) = nombre d'aretes sur l'element de reference
- *   aretes_som_local.dimension(1) = 2  (nombre de sommets par arete)
- *   aretes_som_local(i,j) = numero d'un sommet de l'element (0 <= n < nb_sommets_par_element)
+ * aretes_som_local.dimension(0) = number of edges on the reference element.
+ * aretes_som_local.dimension(1) = 2 (number of vertices per edge).
+ * aretes_som_local(i,j) = index of a vertex of the element (0 <= n < nb_vertices_per_element).
  *
+ * @param aretes_som_local Table to fill with local edge-vertex indices.
  */
 template <typename _SIZE_>
 void Elem_geom_base_32_64<_SIZE_>::get_tab_aretes_sommets_locaux(IntTab& aretes_som_local) const

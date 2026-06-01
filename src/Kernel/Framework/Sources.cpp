@@ -22,21 +22,21 @@ Implemente_instanciable(Sources, "Sources", LIST(Source));
 
 Sortie& Sources::printOn(Sortie& os) const { return LIST(Source)::printOn(os); }
 
-/*! @brief Lecture d'une liste de sources sur un flot d'entree.
+/*! @brief Reading of a list of sources from an input stream.
  *
- * Lit une liste de sources separees par des virgules
- *     et le sajoute a la liste.
+ * Reads a list of sources separated by commas
+ *     and adds it to the list.
  *     format:
  *     {
- *      bloc de lecture d'une source
- *      [, bloc de lecture d'une source]
+ *      reading block of a source
+ *      [, reading block of a source]
  *      ...
  *     }
  *
- * @param (Entree& is) le flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws accolade ouvrante attendue
- * @throws accolade fermante ou virgule attendue
+ * @param (Entree& is) the input stream
+ * @return (Entree&) the modified input stream
+ * @throws opening brace expected
+ * @throws closing brace or comma expected
  */
 Entree& Sources::readOn(Entree& is)
 {
@@ -77,10 +77,10 @@ Entree& Sources::readOn(Entree& is)
 }
 
 
-/*! @brief Ajoute la contribution de toutes les sources de la liste au tableau passe en parametre, et renvoie ce tableau.
+/*! @brief Adds the contribution of all sources in the list to the array passed as parameter, and returns this array.
  *
- * @param (DoubleTab& xx) le tableau dans lequel on doit accumuler la contribution des termes sources
- * @return (DoubleTab&) le parametre xx modifie
+ * @param (DoubleTab& xx) the array in which the contribution of the source terms should be accumulated
+ * @return (DoubleTab&) the modified parameter xx
  */
 DoubleTab& Sources::ajouter(DoubleTab& xx) const
 {
@@ -88,12 +88,12 @@ DoubleTab& Sources::ajouter(DoubleTab& xx) const
   return xx;
 }
 
-/*! @brief Calcule la contribution de toutes les sources de la liste stocke le resultat dans le tableau passe en parametre,
+/*! @brief Calculates the contribution of all sources in the list and stores the result in the array passed as parameter,
  *
- *     et renvoie  ce tableau.
+ *     and returns this array.
  *
- * @param (DoubleTab& xx) le tableau dans lequel on doit stocker la somme des contributions des sources
- * @return (DoubleTab&) le parametre xx modifie
+ * @param (DoubleTab& xx) the array in which the sum of source contributions should be stored
+ * @return (DoubleTab&) the modified parameter xx
  */
 DoubleTab& Sources::calculer(DoubleTab& xx) const
 {
@@ -102,9 +102,9 @@ DoubleTab& Sources::calculer(DoubleTab& xx) const
   return xx;
 }
 
-/*! @brief Mise a jour en temps, de toute les sources de la liste
+/*! @brief Time update of all sources in the list
  *
- * @param (double temps) le pas de temps de mise a jour
+ * @param (double temps) the time step for update
  */
 void Sources::mettre_a_jour(double temps)
 {
@@ -119,9 +119,9 @@ void Sources::resetTime(double temps)
   for (auto& itr : *this) itr->resetTime(temps);
 }
 
-/*! @brief Appelle Source::completer() sur toutes les sources de la liste.
+/*! @brief Calls Source::completer() on all sources in the list.
  *
- * voir Source_base::completer().
+ * See Source_base::completer().
  *
  */
 void Sources::completer()
@@ -129,11 +129,11 @@ void Sources::completer()
   for (auto& itr : *this) itr->completer();
 }
 
-/*! @brief Pour chaque source de la liste, appel a associer_champ_rho de la source.
+/*! @brief For each source in the list, calls the associer_champ_rho method of the source.
  *
- *   Si la masse volumique est variable, il faut declarer le
- *   champ de rho aux sources avec cette methode (front-tracking)
- *   Sinon, par defaut, les calculs sont faits avec rho=1
+ *   If the density is variable, the density field must be declared
+ *   to the sources using this method (front-tracking)
+ *   Otherwise, by default, calculations are performed with rho=1
  *
  */
 void Sources::associer_champ_rho(const Champ_base& champ_rho)
@@ -146,9 +146,9 @@ void Sources::associer_champ_rho(const Champ_base& champ_rho)
     }
 }
 
-/*! @brief Pour chaque source de la liste, appel a a_pour_Champ_Fonc(mot,ch_ref).
+/*! @brief For each source in the list, calls a_pour_Champ_Fonc(mot,ch_ref).
  *
- * Cette methode est appelee par Equation_base::a_pour_Champ_Fonc.
+ * This method is called by Equation_base::a_pour_Champ_Fonc.
  *
  */
 int Sources::a_pour_Champ_Fonc(const Motcle& mot,
@@ -168,9 +168,9 @@ int Sources::a_pour_Champ_Fonc(const Motcle& mot,
   return ok;
 }
 
-/*! @brief Appelle Source::impr() sur toutes les sources de la liste.
+/*! @brief Calls Source::impr() on all sources in the list.
  *
- * voir Source_base::impr().
+ * See Source_base::impr().
  *
  */
 int Sources::impr(Sortie& os) const
@@ -179,9 +179,9 @@ int Sources::impr(Sortie& os) const
   return 1;
 }
 
-/*! @brief Dimensionnement de la matrice implicite des termes sources.
+/*! @brief Sizing of the implicit matrix of source terms.
  *
- * Parcours toutes les sources de la liste pour dimensionner.
+ * Traverses all sources in the list to size the matrix.
  *
  */
 void Sources::dimensionner(Matrice_Morse& matrice) const
@@ -195,7 +195,7 @@ void Sources::dimensionner(Matrice_Morse& matrice) const
       if (mat.nb_colonnes()) matrice += mat;
     }
 }
-/*! @brief contribution a la matrice implicite des termes sources par defaut pas de contribution
+/*! @brief Contribution to the implicit matrix of source terms. By default, no contribution.
  *
  */
 void Sources::contribuer_a_avec(const DoubleTab& a, Matrice_Morse& matrice) const
@@ -218,9 +218,9 @@ void Sources::contribuer_jacobienne(Matrice_Bloc& matrice, int n) const
     }
 }
 
-/*! @brief Appelle Source::initialiser(temps) sur toutes les sources de la liste.
+/*! @brief Calls Source::initialiser(temps) on all sources in the list.
  *
- * voir Source_base::initialiser(double temps).
+ * See Source_base::initialiser(double temps).
  *
  */
 int Sources::initialiser(double temps)

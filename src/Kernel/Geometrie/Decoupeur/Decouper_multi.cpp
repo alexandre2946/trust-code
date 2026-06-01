@@ -53,14 +53,14 @@ Entree& Decouper_multi::readOn(Entree& is)
 
 int Decouper_multi::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {
-  if (mot=="domaine") //parametres de decoupage d'un domaine
+  if (mot=="domaine") //splitting parameters for a domain
     {
       Decouper decoup;
       decoup.lire(is);
       const Nom& nom = decoup.domaine().le_nom();
-      if (doms_lus.count(nom.getString())) //decoupeur deja lu
+      if (doms_lus.count(nom.getString())) //splitter already read
         Process::exit(Nom("Decouper_multi: domain ") + nom + "already read!");
-      else decoupeurs.push_back(decoup), doms_lus.insert(nom.getString()); //sinon, on l'ajoute
+      else decoupeurs.push_back(decoup), doms_lus.insert(nom.getString()); //otherwise, add it
     }
   else return -1;
   return 0;
@@ -69,19 +69,19 @@ int Decouper_multi::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 
 Entree& Decouper_multi::interpreter(Entree& is)
 {
-  //lecture des domaines et des raccords
+  //reading of domains and connectors
   Param param(que_suis_je());
   param.ajouter_non_std("domaine",(this),Param::REQUIRED);
   param.ajouter("tolerance", &tolerance);
   param.lire_avec_accolades_depuis(is);
 
-  /* partition des domaines */
-  std::vector<Decouper*> v_dec; //decoupeurs
-  std::vector<const Domaine*> v_dom; //domaines
-  std::vector<Static_Int_Lists> v_se; //connectivites
-  std::vector<MCAuto<DataArrayDouble>> v_da; //DataArrayDouble de coordonnes
-  std::vector<const DataArrayDouble*> v_pda; //et des pointeurs (ppur Aggregate)
-  std::vector<int> off = { 0 }; //offset des sommets de chaque domaine dans le tableau aggrege
+  /* partitioning of the domains */
+  std::vector<Decouper*> v_dec; //splitters
+  std::vector<const Domaine*> v_dom; //domains
+  std::vector<Static_Int_Lists> v_se; //connectivities
+  std::vector<MCAuto<DataArrayDouble>> v_da; //DataArrayDouble of coordinates
+  std::vector<const DataArrayDouble*> v_pda; //and pointers (for Aggregate)
+  std::vector<int> off = { 0 }; //offset of vertices of each domain in the aggregated array
   for (auto &&dec : decoupeurs)
     {
       const Domaine& dom = dec.domaine();
@@ -103,21 +103,21 @@ Entree& Decouper_multi::interpreter(Entree& is)
     }
 
 #ifdef MEDCOUPLING_
-  /* concatenation des coordonnees et recherche de sommets coincidents */
+  /* concatenation of coordinates and search for coinciding vertices */
   Cerr << "Decouper_multi: searching for coinciding vertices ... ";
-  MCAuto<DataArrayDouble> da(DataArrayDouble::Aggregate(v_pda)); //tous les sommets!
+  MCAuto<DataArrayDouble> da(DataArrayDouble::Aggregate(v_pda)); //all vertices!
   DataArrayIdType* S_i = nullptr, *S = nullptr; //groupes de sommets coincidants : S([S_i(i), S_i(i + 1)[)
   da->findCommonTuples(tolerance, -1, S, S_i); // * heavy lifting *
 
-  /* pour chaque groupe de sommets, recherche de tous les procs les touchant et ajout a chaque sommet des procs qui ne le possedent pas encore */
-  std::vector<std::map<int, std::set<int>>> v_sp(v_dec.size()); //v_sp[d][s] = { processeurs supplementaires ayant besoin du sommet s du domaine d }
-  std::vector<std::set<int>> procs; //processeurs possedant chaque sommet du groupe...
-  std::set<int> u_procs; //et leur union
-  std::vector<std::array<int, 2>> v_ds; //liste (domaine, num sommet local)
+  /* for each vertex group, find all procs touching it and add to each vertex the procs that do not yet own it */
+  std::vector<std::map<int, std::set<int>>> v_sp(v_dec.size()); //v_sp[d][s] = { additional processors needing vertex s of domain d }
+  std::vector<std::set<int>> procs; //processors owning each vertex in the group...
+  std::set<int> u_procs; //and their union
+  std::vector<std::array<int, 2>> v_ds; //list (domain, local vertex number)
   int ns, l, d, count = 0;
   mcIdType j, s;
   for (mcIdType i = 0; i + 1 < S_i->getNumberOfTuples(); i++)
-    if ((ns = static_cast<int>(S_i->getIJ(i + 1, 0) - S_i->getIJ(i, 0))) > 1) //pas besoin de traiter les sommets seuls
+    if ((ns = static_cast<int>(S_i->getIJ(i + 1, 0) - S_i->getIJ(i, 0))) > 1) //no need to process singleton vertices
       {
         count++;
         procs.resize(ns);
@@ -125,14 +125,14 @@ Entree& Decouper_multi::interpreter(Entree& is)
         int k = 0;
         for (j = S_i->getIJ(i, 0); j < S_i->getIJ(i + 1, 0); j++, k++)
           {
-            // Retrouve le numero de dom dans lequel le sommet doublon est localise:
+            // Find the domain number in which the duplicate vertex is located:
             for (s = S->getIJ(j, 0), d = 0; s >= off[d + 1]; )
-              d++; //d : indice du domaine contenant s
+              d++; //d : index of the domain containing s
             const IntVect& elem_part = v_dec[d]->elem_part_;
-            mcIdType som_loc0 = s - off[d]; // son numero local
+            mcIdType som_loc0 = s - off[d]; // its local index
             assert(som_loc0 < std::numeric_limits<int>::max());
             int som_loc = static_cast<int>(som_loc0);
-            v_ds[k] = {{ d, som_loc }}; //stockage du couple (d, s)
+            v_ds[k] = {{ d, som_loc }}; //storage of the pair (d, s)
             procs[k].clear();
             for (l = 0; l < v_se[d].get_list_size(som_loc); l++)
               procs[k].insert(elem_part(v_se[d](som_loc, l))); //processeurs connectes

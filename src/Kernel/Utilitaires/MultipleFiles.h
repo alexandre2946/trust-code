@@ -17,7 +17,7 @@
 #define MultipleFiles_included
 #include <Interprete.h>
 
-/*! @brief classe MultipleFiles Cette classe permet de fixer la limite d'utilisation d'un fichier ecrit par process
+/*! @brief class MultipleFiles. This class sets the usage limit of a file written per process.
  *
  *     Directive:
  *           MultipleFiles integer

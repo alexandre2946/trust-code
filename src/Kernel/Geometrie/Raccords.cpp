@@ -23,9 +23,9 @@ Sortie& Raccords_32_64<_SIZE_>::printOn(Sortie& os) const { return LIST(OWN_PTR(
 template <typename _SIZE_>
 Entree& Raccords_32_64<_SIZE_>::readOn(Entree& is) { return LIST(OWN_PTR(Raccord_base_32_64<_SIZE_>))::readOn(is); }
 
-/*! @brief Associe un domaine a tous les raccords de la liste.
+/*! @brief Associates a domain with all connectors in the list.
  *
- * @param (Domaine& un_domaine) le domaine a associer
+ * @param (Domaine& un_domaine) the domain to associate
  */
 template <typename _SIZE_>
 void Raccords_32_64<_SIZE_>::associer_domaine(const Domaine_t& un_domaine)
@@ -33,12 +33,12 @@ void Raccords_32_64<_SIZE_>::associer_domaine(const Domaine_t& un_domaine)
   for (auto& itr : *this) itr->associer_domaine(un_domaine);
 }
 
-/*! @brief Renvoie le nombre de face total des Raccords_32_64 de la liste.
+/*! @brief Returns the total number of faces of all Raccords_32_64 in the list.
  *
- * (la somme des faces de tous les
- *     raccords de la liste).
+ * (the sum of the faces of all
+ *     connectors in the list).
  *
- * @return (int) le nombre de face total des Raccords_32_64 de la liste
+ * @return (int) total number of faces of all Raccords_32_64 in the list
  */
 template <typename _SIZE_>
 typename Raccords_32_64<_SIZE_>::int_t Raccords_32_64<_SIZE_>::nb_faces() const
@@ -49,13 +49,13 @@ typename Raccords_32_64<_SIZE_>::int_t Raccords_32_64<_SIZE_>::nb_faces() const
   return nombre;
 }
 
-/*! @brief Renvoie le nombre de faces du type specifie contenues dans la liste de raccords.
+/*! @brief Returns the number of faces of the specified type contained in the connector list.
  *
- *     (somme des faces de ce type sur tous les
- *      raccords de la liste)
+ *     (sum of faces of this type across all
+ *      connectors in the list)
  *
- * @param (Type_Face type) le type des faces a compter
- * @return (int) le nombre de faces du type specifie contenues dans la liste de raccords
+ * @param (Type_Face type) the type of faces to count
+ * @return (int) number of faces of the specified type in the connector list
  */
 template <typename _SIZE_>
 typename Raccords_32_64<_SIZE_>::int_t Raccords_32_64<_SIZE_>::nb_faces(Type_Face type) const

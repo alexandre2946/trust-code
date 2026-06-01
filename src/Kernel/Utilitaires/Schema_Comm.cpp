@@ -27,8 +27,10 @@ Schema_Comm::Static_Status Schema_Comm::status_ = UNINITIALIZED;
 InOutCommBuffers   Schema_Comm::buffers_;
 int                Schema_Comm::n_buffers_ = 0;
 
-/*! @brief Accesseur a un membre du tableau obuffers_ (avec verification)
+/*! @brief @brief Accessor to a member of the obuffers_ array (with verification).
  *
+ * @param pe Processor index.
+ * @return Reference to the OutputCommBuffer for processor pe.
  */
 inline OutputCommBuffer& Schema_Comm::obuffer(int pe)
 {
@@ -36,8 +38,10 @@ inline OutputCommBuffer& Schema_Comm::obuffer(int pe)
   return buffers_.obuffers_[pe];
 }
 
-/*! @brief Accesseur a un membre du tableau ebuffers_ (avec verification)
+/*! @brief @brief Accessor to a member of the ebuffers_ array (with verification).
  *
+ * @param pe Processor index.
+ * @return Reference to the InputCommBuffer for processor pe.
  */
 inline InputCommBuffer&   Schema_Comm::ebuffer(int pe)
 {
@@ -52,7 +56,7 @@ static const int END_COMM_TAG = 3;
 static const int COPY_OPERATOR_TAG = 4;
 //static const int CHECK_SEND_RCV_TAG = 5;
 
-/*! @brief Construction d'un nouveau schema de communication.
+/*! @brief Constructs a new communication schema.
  *
  */
 Schema_Comm::Schema_Comm()
@@ -61,8 +65,8 @@ Schema_Comm::Schema_Comm()
 
   me_to_me_ = 0;
   use_all_to_allv_ = 0;
-  // Pour verifier plus tard qu'on est toujours dans le bon groupe,
-  // on conserve une ref au groupe courant.
+  // To verify later that we are still in the correct group,
+  // we keep a reference to the current group.
   ref_group_ = PE_Groups::current_group();
   if (status_ == UNINITIALIZED)
     {
@@ -73,17 +77,16 @@ Schema_Comm::Schema_Comm()
     }
 }
 
-/*! @brief Destruction d'un schema de communication.
+/*! @brief Destructs a communication schema.
  *
  */
 Schema_Comm::~Schema_Comm()
 {
 }
 
-/*! @brief Constructeur par copie (nouveau schema place en mode RESET).
+/*! @brief Copy constructor (new schema placed in RESET mode).
  *
- * Attention : tous les membres du Comm_Group doivent executer
- *  cette fonction simultanement.
+ * Warning: all members of the Comm_Group must execute this function simultaneously.
  *
  */
 Schema_Comm::Schema_Comm(const Schema_Comm& schema)
@@ -93,11 +96,10 @@ Schema_Comm::Schema_Comm(const Schema_Comm& schema)
   operator= (schema);
 }
 
-/*! @brief Operateur copie : on copie la liste des processeurs qui communiquent.
+/*! @brief Copy operator: copies the list of communicating processors.
  *
- * Le nouveau schema est place dans l'etat RESET.
- *  Attention : tous les membres du Comm_Group doivent executer
- *  cette fonction simultanement.
+ * The new schema is placed in the RESET state.
+ *  Note: all members of the Comm_Group must execute this function simultaneously.
  *
  */
 const Schema_Comm& Schema_Comm::operator=(const Schema_Comm& schema)
@@ -114,11 +116,10 @@ const Schema_Comm& Schema_Comm::operator=(const Schema_Comm& schema)
   return *this;
 }
 
-/*! @brief Methode obsolete, le groupe associe au schema est le groupe courant au moment ou on cree le schema.
+/*! @brief Obsolete method. The group associated with the schema is the current group at the time the schema is created.
  *
- * L'appel a cette methode
- *  n'est valide qu'avec le meme groupe que le groupe d'origine.
- *  La methode ne fait rien.
+ * This method is only valid with the same group as the original group.
+ *  The method does nothing.
  *
  */
 void Schema_Comm::set_group(const Comm_Group& group)
@@ -127,7 +128,7 @@ void Schema_Comm::set_group(const Comm_Group& group)
   assert(&group == &PE_Groups::current_group());
 }
 
-/*! @brief Renvoie le groupe auquel est associe le schema.
+/*! @brief Returns the group associated with the schema.
  *
  */
 const Comm_Group& Schema_Comm::get_group() const
@@ -136,10 +137,10 @@ const Comm_Group& Schema_Comm::get_group() const
   return ref_group_.valeur();
 }
 
-/*! @brief Definit la liste des processeurs a qui on va envoyer et de qui on va recevoir des donnees.
+/*! @brief Defines the list of processors to send data to and receive data from.
  *
- *  Si me_to_me est non nul, on autorise l'envoi des messages a soi-meme,
- *  sinon non (argument optionnel : par defaut, me_to_me=0)
+ *  If me_to_me is non-zero, messages to oneself are allowed;
+ *  otherwise not (optional argument: default me_to_me=0).
  *
  */
 void Schema_Comm::set_send_recv_pe_list(const ArrOfInt& send_pe_list,
@@ -150,28 +151,27 @@ void Schema_Comm::set_send_recv_pe_list(const ArrOfInt& send_pe_list,
   send_pe_list_ = send_pe_list;
   recv_pe_list_ = recv_pe_list;
   me_to_me_ = me_to_me;
-  // Verification du principe "tu m'ecoutes quand je te parle"
+  // Verification of the principle "you listen when I speak"
   const Comm_Group& group = ref_group_.valeur();
   assert(&group == &PE_Groups::current_group());
   if (group.check_enabled()) check_send_recv_pe_list();
 }
 
-/*! @brief Reserve les buffers de comm pour une nouvelle communication.
+/*! @brief Reserves communication buffers for a new communication.
  *
- * Le schema passe de RESET a WRITING, on a maintenant le droit
- *  d'appeler send_buffer(). Interdiction d'appeler a nouveau begin_comm
- *  sur tous les objets de comm avant d'avoir fini cette communication
- *  avec end_comm().
+ * The schema transitions from RESET to WRITING; send_buffer() may now be called.
+ * It is forbidden to call begin_comm() again on all communication objects
+ * before finishing this communication with end_comm().
  *
  */
 void Schema_Comm::begin_comm() const
 {
-  // On verifie qu'une autre communication n'est pas en cours.
+  // Verify that no other communication is in progress.
   assert (status_ == RESET && ref_group_);
   status_ = WRITING;
-  // On verifie que tous les membres du groupe executent ceci.
-  // Si ca plante ici, c'est que tous les membres declares ne sont
-  // pas en train de faire la barriere.
+  // Verify that all group members execute this.
+  // If this crashes here, it means that not all declared members
+  // are reaching the barrier.
   const Comm_Group& group = ref_group_.valeur();
   assert(&group == &PE_Groups::current_group());
   if (group.check_enabled()) group.barrier(BEGIN_COMM_TAG);
@@ -186,12 +186,12 @@ static void exchange_data(const ArrOfInt& send_list,
                           const Comm_Group& group,
                           bool use_all_to_all)
 {
-// GF je rajoute le ifdef pour les versions sans MPI comm_group_mpi n'existep pas
+// GF added ifdef for builds without MPI where comm_group_mpi does not exist
 #ifdef MPI_
   if (!use_all_to_all || !sub_type(Comm_Group_MPI, group))
 #else
   //if (!use_all_to_all || !sub_type(Comm_Group_MPI, group))
-  // on n utilise pas le all_to_all car n'exsite pas sans MPI
+  // do not use all_to_all as it does not exist without MPI
   if (1)
 #endif
     {
@@ -254,11 +254,11 @@ static void exchange_data(const ArrOfInt& send_list,
     }
 }
 
-/*! @brief Transmet la taille des messages a envoyer aux processeurs qui vont les recevoir.
+/*! @brief Transmits the size of messages to send to the processors that will receive them.
  *
- * La taille est le nombre de bytes des obuffers.
- *  send_pe_list et recv_pe_list doivent etre initialises.
- *  Le schema doit etre dans l'etat WRITING.
+ * The size is the number of bytes of the obuffers.
+ *  send_pe_list and recv_pe_list must be initialized.
+ *  The schema must be in the WRITING state.
  *
  */
 void Schema_Comm::echange_taille(const ArrOfInt& send_size,
@@ -273,9 +273,8 @@ void Schema_Comm::echange_taille(const ArrOfInt& send_size,
   const Comm_Group& group = ref_group_.valeur();
   assert(&group == &PE_Groups::current_group());
 
-  // On verifie que tous les membres du groupe executent ceci.
-  // Si ca plante ici, c'est que tous les membres declares ne sont
-  // pas en train de faire la barriere.
+  // Verify that all group members execute this.
+  // If this crashes here, it means not all declared members are reaching the barrier.
   if (group.check_enabled()) group.barrier(ECHANGE_MESSAGES_COMM_TAG);
 
   const int n_send = send_pe_list_.size_array();
@@ -286,7 +285,7 @@ void Schema_Comm::echange_taille(const ArrOfInt& send_size,
   const char ** send_buffers = new const char* [n_send];
   char ** recv_buffers = new char* [n_recv];
 
-  send_sz.resize_array(n_send);   // Taille d'un int (on echange une taille)
+  send_sz.resize_array(n_send);   // Size of an int (we exchange a size)
   send_sz = sizeof(int);
   int i;
   for (i = 0; i < n_send; i++)
@@ -307,10 +306,10 @@ void Schema_Comm::echange_taille(const ArrOfInt& send_size,
   delete[] send_buffers;
 }
 
-/*! @brief Cette methode lance l'echange de donnees entre tous les processeurs.
+/*! @brief Launches the data exchange between all processors.
  *
- * La taille des messages recus doit etre deja connue.
- *  Le schema passe de WRITING a EXCHANGED.
+ * The size of received messages must already be known.
+ *  The schema transitions from WRITING to EXCHANGED.
  *
  */
 void Schema_Comm::echange_messages(const ArrOfInt& send_size,
@@ -320,9 +319,8 @@ void Schema_Comm::echange_messages(const ArrOfInt& send_size,
   const Comm_Group& group = ref_group_.valeur();
   assert(&group == &PE_Groups::current_group());
 
-  // On verifie que tous les membres du groupe executent ceci.
-  // Si ca plante ici, c'est que tous les membres declares ne sont
-  // pas en train de faire la barriere.
+  // Verify that all group members execute this.
+  // If this crashes here, it means not all declared members are reaching the barrier.
   if (group.check_enabled()) group.barrier(ECHANGE_MESSAGES_COMM_TAG);
 
   const int n_send = send_pe_list_.size_array();
@@ -342,9 +340,8 @@ void Schema_Comm::echange_messages(const ArrOfInt& send_size,
     {
       int pe = send_pe_list_[i];
       OutputCommBuffer& buf = obuffer(pe);
-      // On verifie que la taille des messages en emission est la meme que
-      // celle enregistree dans send_size_, ce qui garantit que la taille
-      // en reception est juste elle-aussi.
+      // Verify that the outgoing message size matches the size recorded in send_size_,
+      // which guarantees that the receive size is also correct.
       assert(send_size[i] == buf.get_buffer_size());
       send_buffers[i] = buf.get_buffer();
     }
@@ -357,7 +354,7 @@ void Schema_Comm::echange_messages(const ArrOfInt& send_size,
   delete[] recv_buffers;
   delete[] send_buffers;
 
-  // Creation des input streams a partir des buffers recus
+  // Create input streams from received buffers
   for (i = 0; i < n_recv; i++)
     {
       int pe = recv_pe_list_[i];
@@ -365,7 +362,7 @@ void Schema_Comm::echange_messages(const ArrOfInt& send_size,
       buf.create_stream();
     }
 
-  // Cas particulier des messages envoyes a moi-meme:
+  // Special case of messages sent to oneself:
   if (me_to_me_)
     {
       int pe = Process::me();
@@ -377,11 +374,10 @@ void Schema_Comm::echange_messages(const ArrOfInt& send_size,
   status_ = EXCHANGED;
 }
 
-/*! @brief Cette methode lance l'echange de donnees entre tous les processeurs.
+/*! @brief Launches the data exchange between all processors.
  *
- * La taille des messages recus n'a pas besoin d'etre connue a priori,
- *  on la transmet.
- *  Le schema passe de WRITING a EXCHANGED.
+ * The size of received messages does not need to be known a priori; it is transmitted.
+ *  The schema transitions from WRITING to EXCHANGED.
  *
  */
 void Schema_Comm::echange_taille_et_messages() const
@@ -397,16 +393,16 @@ void Schema_Comm::echange_taille_et_messages() const
       send_size[i] = obuffer(pe).get_buffer_size();
     }
 
-  // Methode non optimale: en MPI on pourrait utiliser MPI_Probe mais
-  // cette methode me parait peu sure.
+  // Non-optimal method: in MPI one could use MPI_Probe but
+  // this method seems unreliable.
   echange_taille(send_size, recv_size);
   echange_messages(send_size, recv_size);
 }
 
-/*! @brief Cette methode lance l'echange de donnees.
+/*! @brief Launches the data exchange.
  *
- * On fournit la taille en octets des messages recus dans recv_size (tableau de la meme taille que recv_pe_list)
- *  En mode check_enabled, on verifie que la taille est correcte
+ * The size in bytes of received messages is provided in recv_size (array of the same size as recv_pe_list).
+ *  In check_enabled mode, verifies that the size is correct.
  *
  */
 void Schema_Comm::echange_messages(const ArrOfInt& recv_size) const
@@ -432,9 +428,9 @@ void Schema_Comm::echange_messages(const ArrOfInt& recv_size) const
   echange_messages(send_size, recv_size);
 }
 
-/*! @brief Vide les buffers et libere les ressources: on a fini de lire les donnees recues dans les buffers.
+/*! @brief Clears the buffers and releases resources: reading of received data from buffers is complete.
  *
- *  Le schema passe de EXCHANGED a RESET
+ *  The schema transitions from EXCHANGED to RESET.
  *
  */
 void Schema_Comm::end_comm() const
@@ -443,9 +439,8 @@ void Schema_Comm::end_comm() const
   const Comm_Group& group = ref_group_.valeur();
   assert(&group == &PE_Groups::current_group());
 
-  // On verifie que tous les membres du groupe executent ceci.
-  // Si ca plante ici, c'est que tous les membres declares ne sont
-  // pas en train de faire la barriere.
+  // Check that all group members are executing this.
+  // If it crashes here, it means not all declared members are at the barrier.
   if (group.check_enabled()) group.barrier(END_COMM_TAG);
 
   int i, n;
@@ -482,41 +477,39 @@ static int check_PE_in_list(int num_pe, const ArrOfInt& list)
 }
 #endif
 
-/*! @brief renvoie le buffer correspondant au processeur num_PE pour y entasser des donnees a envoyer.
+/*! @brief Returns the buffer corresponding to processor num_PE to stack data to send.
  *
- * Le schema doit etre dans l'etat WRITING.
+ * The schema must be in the WRITING state.
  *
  */
 Sortie& Schema_Comm::send_buffer(int num_PE) const
 {
-  // Si l'assert suivant plante, c'est qu'on essaie de
-  // mettre des donnees dans le buffer en dehors du bloc
+  // If the following assert fails, it means we are trying to
+  // put data in the buffer outside of the block
   //   begin_comm();
   //    ...
-  ///  echange_xxx();
+  //   echange_xxx();
   assert(status_ == WRITING && ref_group_);
 
-  // On verifie que le PE demande est bien dans la liste
-  // des PEs declares en envoi.
+  // Check that the requested PE is in the list of declared send PEs.
   assert((me_to_me_&&num_PE==Process::me()) || check_PE_in_list(num_PE, send_pe_list_));
   return obuffer(num_PE);
 }
 
-/*! @brief renvoie le buffer correspondant au processeur num_PE pour y lire les donnees recues.
+/*! @brief Returns the buffer corresponding to processor num_PE to read received data.
  *
- * Le schema doit etre dans l'etat EXCHANGED.
+ * The schema must be in the EXCHANGED state.
  *
  */
 Entree& Schema_Comm::recv_buffer(int num_PE) const
 {
-  // Si l'assert suivant plante, c'est qu'on essaie de
-  // lire des donnees dans les buffers en dehors du bloc
+  // If the following assert fails, it means we are trying to
+  // read data from the buffers outside of the block
   //   echange_xxx();
   //    ...
   //   end_comm();
   assert(status_ == EXCHANGED && ref_group_);
-  // On verifie que le PE demande est bien dans la liste
-  // des PEs declares en reception.
+  // Check that the requested PE is in the list of declared receive PEs.
   assert((me_to_me_&&num_PE==Process::me()) || check_PE_in_list(num_PE, recv_pe_list_));
   return ebuffer(num_PE);
 }
@@ -533,10 +526,10 @@ const ArrOfInt& Schema_Comm::get_recv_pe_list() const
   return recv_pe_list_;
 }
 
-/*! @brief renvoie une reference a un tableau qui contient, pour chaque processeur de send_pe_list_, la taille en bytes des donnees
+/*! @brief Returns a reference to an array containing, for each processor in send_pe_list_, the size in bytes of the data
  *
- *   a envoyer.
- *  A FINIR !!!!
+ *   to send.
+ *  TODO: TO FINISH !!!!
  *
  */
 const ArrOfInt& Schema_Comm_statique::get_send_size() const
@@ -546,10 +539,10 @@ const ArrOfInt& Schema_Comm_statique::get_send_size() const
   return send_size_;
 }
 
-/*! @brief renvoie une reference a un tableau qui contient, pour chaque processeur de send_pe_list_, la taille en bytes des donnees
+/*! @brief Returns a reference to an array containing, for each processor in send_pe_list_, the size in bytes of the data
  *
- *   a recues.
- *  A FINIR !!!!
+ *   received.
+ *  TODO: TO FINISH !!!!
  *
  */
 const ArrOfInt& Schema_Comm_statique::get_recv_size() const
@@ -559,13 +552,13 @@ const ArrOfInt& Schema_Comm_statique::get_recv_size() const
   return recv_size_;
 }
 
-/*! @brief Verifie que les send/recv_pe_list verifient la propriete "tu m'ecoutes quand je te parle"
+/*! @brief Verifies that send/recv_pe_list satisfy the property "you listen when I speak".
  *
  */
 void Schema_Comm::check_send_recv_pe_list() const
 {
   assert(status_ == RESET);
-  // On verifie que les indices de processeurs sont dans le groupe
+  // Check that processor indices are in the group
   int fail1 = 0;
   const int np = Process::nproc();
   const int n1 = send_pe_list_.size_array();
@@ -582,8 +575,8 @@ void Schema_Comm::check_send_recv_pe_list() const
   if (!fail1)
     {
       reverse_send_recv_pe_list(send_pe_list_, recv_list);
-      // Le tableau recv_pe_list_ n'est pas forcement trie alors que recv_list l'est toujours
-      // On trie avant de comparer
+      // The array recv_pe_list_ is not necessarily sorted whereas recv_list is always sorted
+      // Sort before comparing
       ArrOfInt copie(recv_pe_list_);
       copie.ordonne_array();
       fail2 = !(recv_list == copie);

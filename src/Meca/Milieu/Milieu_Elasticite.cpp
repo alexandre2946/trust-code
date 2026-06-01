@@ -120,7 +120,7 @@ int Milieu_Elasticite::initialiser(const double temps)
 bool Milieu_Elasticite::initTimeStep(double dt)
 {
   if (!eq_) throw;
-  const Schema_Temps_base& sch = eq_->schema_temps(); //on recupere le schema en temps par la 1ere equation
+  const Schema_Temps_base& sch = eq_->schema_temps(); //retrieve the time scheme from the first equation
 
   for (int i = 1; i <= sch.nb_valeurs_futures(); i++)
     {
@@ -225,7 +225,7 @@ void Milieu_Elasticite::update_fields(double temps, bool update_rho)
       Cerr << "Updating rho_lagrangien field based on current volume scaling at time " << temps << finl;
       ch_rho_lag_->valeurs() = ch_rho_lag_->passe();
       zdb_->domaine().apply_old_to_new_volume_scaling(ch_rho_lag_->valeurs(), zdb_.valeur());
-      const Schema_Temps_base& sch = eq_->schema_temps(); //on recupere le schema en temps par la 1ere equation
+      const Schema_Temps_base& sch = eq_->schema_temps(); //retrieve the time scheme from the first equation
       for (int i = 1; i <= sch.nb_valeurs_futures(); i++)
         ch_rho_lag_->futur(i) = ch_rho_lag_->valeurs();
     }

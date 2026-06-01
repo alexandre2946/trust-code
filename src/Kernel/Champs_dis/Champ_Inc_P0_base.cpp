@@ -45,8 +45,8 @@ Entree& Champ_Inc_P0_base::readOn(Entree& is)
 
 int Champ_Inc_P0_base::fixer_nb_valeurs_nodales(int n)
 {
-  // Encore une syntaxe a la con, sinon on ne sait pas s'il faut appeler
-  // domaine_dis_base() de champ_inc_base ou de champ_impl...
+  // Ugly syntax, otherwise we don't know whether to call
+  // domaine_dis_base() from champ_inc_base or from champ_impl...
   const Domaine_dis_base& domainedis = ref_cast(Champ_Inc_base, *this).domaine_dis_base();
   assert(n == domainedis.domaine().nb_elem());
   const MD_Vector& md = domainedis.domaine().md_vector_elements();
@@ -73,7 +73,7 @@ double Champ_Inc_P0_base::valeur_au_bord(int face) const
   return la_val_bord;
 }
 
-/*! @brief Trace du champ P0 sur la frontiere
+/*! @brief Trace of the P0 field on the boundary
  *
  */
 DoubleTab& Champ_Inc_P0_base::trace(const Frontiere_dis_base& fr, DoubleTab& x, double tps,int distant) const
@@ -81,7 +81,7 @@ DoubleTab& Champ_Inc_P0_base::trace(const Frontiere_dis_base& fr, DoubleTab& x, 
   return Champ_implementation_P0::trace(fr, valeurs(tps), x,  distant);
 }
 
-//utilitaires pour CL
+//utility functions for boundary conditions
 void Champ_Inc_P0_base::init_fcl() const
 {
   const Conds_lim& cls = mon_dom_cl_dis->les_conditions_limites();

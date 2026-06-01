@@ -27,14 +27,12 @@ class Champ_base;
 class Motcle;
 class Param;
 
-/*! @brief Classe Modele_turbulence_scal_base Cette classe represente un modele de turbulence pour une equation de
+/*! @brief Base class for scalar turbulence models coupled to a Navier-Stokes convection-diffusion equation.
  *
- *     convection-diffusion d'un scalaire couplee a Navier_Stokes. On utilise
- *     deux classes derivees de cette classe de base qui representent le
- *     modele de turbulence (k,eps) et le modele de turbulence sous maille.
- *     Ces deux modeles ont en commun le calcul d'une diffusivite turbulente.
+ *      Two main derived categories exist: k-epsilon models and sub-grid scale models.
+ *      Both share the computation of a turbulent diffusivity.
  *
- * @sa Modele_turbulence_scal_Prandtl Modele_turb_scal_Prandtl_sous_maille, Classe abstraite, Methode abstraite, void mettre_a_jour(double ), Entree& lire(const Motcle&, Entree&)
+ * @sa Modele_turbulence_scal_Prandtl Modele_turb_scal_Prandtl_sous_maille
  */
 class Modele_turbulence_scal_base: public Champs_compris_interface, public Objet_U
 {
@@ -83,27 +81,27 @@ protected:
   Champs_compris champs_compris_;
 };
 
-/*! @brief Renvoie la loi de turbulence sur la paroi (version const)
+/*! @brief Returns the scalar wall-law turbulence model (const version).
  *
- * @return (Turbulence_paroi_scal_base&) la loi de turbulence sur la paroi
+ * @return (Turbulence_paroi_scal_base&) the scalar wall-law turbulence model
  */
 inline const Turbulence_paroi_scal_base& Modele_turbulence_scal_base::loi_paroi() const
 {
   return loipar_.valeur();
 }
 
-/*! @brief Renvoie si oui ou non loi de paroi (version const)
+/*! @brief Returns whether a wall law is set (const version).
  *
- * @return (int)
+ * @return (int) 1 if a wall law is set, 0 otherwise
  */
 inline int Modele_turbulence_scal_base::loi_paroi_non_nulle() const
 {
   return bool(loipar_);
 }
 
-/*! @brief Renvoie la loi de turbulence sur la paroi
+/*! @brief Returns the scalar wall-law turbulence model.
  *
- * @return (Turbulence_paroi_scal_base&) la loi de turbulence sur la paroi
+ * @return (Turbulence_paroi_scal_base&) the scalar wall-law turbulence model
  */
 inline Turbulence_paroi_scal_base& Modele_turbulence_scal_base::loi_paroi()
 {

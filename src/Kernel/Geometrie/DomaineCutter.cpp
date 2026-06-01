@@ -49,17 +49,17 @@ Entree& DomaineCutter_32_64<_SIZE_>::readOn(Entree& s)
 namespace  // anonymous namespace
 {
 
-/*! @brief Creation de la liste des sommets du sous-domaine "partie".
+/*! @brief Creation of the vertex list of sub-domain "partie".
  *
- * C'est l'ensemble des sommets des elements appartenant a ce sous-domaine.
- *  On ne traite que les elements reels.
+ * This is the set of vertices of elements belonging to this sub-domain.
+ *  Only real elements are processed.
  *
- * @param (nb_sommets) nombre de sommets du domaine globale
+ * @param (nb_sommets) number of vertices of the global domain
  * @param (les_elems)
- * @param (elem_part) tableau de decoupage (pour chaque element i du domaine global, elem_part[i] est le numero du sous-domaine auquel il est affecte)
- * @param (partie) le numero du sous-domaine a construire
- * @param (liste_sommets) en sortie : liste des sommets du sous-domaine: liste_sommets[i] est l'indice dans le domaine_globale du i-ieme sommet du sous-domaine. Les indices sont classes dans l'ordre croissant.
- * @param (liste_inverse_sommets) en sortie : on lui donne la taille nb_sommets et on l'initialise. liste_inverse_sommet[i] est l'indice du sommet dans le sous-domaine ou -1 si le sommet i n'est pas dans le sous-domaine)
+ * @param (elem_part) partitioning array (for each element i of the global domain, elem_part[i] is the number of the sub-domain to which it is assigned)
+ * @param (partie) the number of the sub-domain to build
+ * @param (liste_sommets) on output: list of vertices of the sub-domain: liste_sommets[i] is the index in domaine_globale of the i-th vertex of the sub-domain. Indices are sorted in ascending order.
+ * @param (liste_inverse_sommets) on output: sized to nb_sommets and initialized. liste_inverse_sommet[i] is the index of the vertex in the sub-domain, or -1 if vertex i is not in the sub-domain)
  */
 template<typename _SIZE_>
 void construire_liste_sommets_sousdomaine(const _SIZE_ nb_sommets,
@@ -75,17 +75,17 @@ void construire_liste_sommets_sousdomaine(const _SIZE_ nb_sommets,
   const int nb_elem_part = Process::check_int_overflow(liste_elements.size_array());
   const int_t nb_sommets_par_element = les_elems.dimension(1);
 
-  // Algorithme : on parcourt les elements: pour les elements de la partie,
-  // on marque les sommets de l'element par un drapeau.
-  // Puis on fait une boucle sur les sommets, et ceux dont le drapeau
-  // est mis sont mis dans la liste.
+  // Algorithm: iterate over elements; for elements of the part,
+  // mark the vertices of the element with a flag.
+  // Then iterate over vertices, and those whose flag is set
+  // are added to the list.
 
-  // D'abord, on compte les sommets de la partie et on
-  // remplit drapeau_sommet
+  // First, count the vertices of the part and
+  // fill drapeau_sommet
   ArrOfBit_32_64<_SIZE_> drapeau_sommet(nb_sommets);
 
   drapeau_sommet = 0;
-  // Nombre de sommets de la partie "part"
+  // Number of vertices of part "part"
   int nb_sommets_part = 0;
   for (int i_elem = 0; i_elem < nb_elem_part; i_elem++)
     {
@@ -96,24 +96,24 @@ void construire_liste_sommets_sousdomaine(const _SIZE_ nb_sommets,
           if (sommet>-1)
             {
               int bit = drapeau_sommet.testsetbit(sommet);
-              // Si le drapeau n'etait pas mis, cela fait un sommet de plus
+              // If the flag was not set, this is one more vertex
               if (! bit)
                 nb_sommets_part++;
             }
         }
     }
-  //sommets a ajouter a cause de som_raccord
+  //vertices to add due to som_raccord
   if (som_raccord)
     for (int s = 0; s < som_raccord->get_nb_lists(); s++)
       for (int_t i = 0; i < som_raccord->get_list_size(s); i++)
-        if ((*som_raccord)(s, i) == i_part && !drapeau_sommet.testsetbit(s)) //le sommet est demande par ce proc
-          nb_sommets_part++; //si on ne l'a pas deja, on le rajoute
+        if ((*som_raccord)(s, i) == i_part && !drapeau_sommet.testsetbit(s)) //the vertex is requested by this proc
+          nb_sommets_part++; //if we don't already have it, add it
 
-  // Remplissage de liste_sommets et liste_inverse_sommets
-  liste_sommets.resize_array(0); // On oublie les valeurs precedentes
+  // Fill liste_sommets and liste_inverse_sommets
+  liste_sommets.resize_array(0); // Forget previous values
   liste_sommets.resize_array(nb_sommets_part);
 
-  liste_inverse_sommets.resize_array(0); // On oublie les valeurs precedentes
+  liste_inverse_sommets.resize_array(0); // Forget previous values
   liste_inverse_sommets.resize_array(nb_sommets,RESIZE_OPTIONS::NOCOPY_NOINIT);
   liste_inverse_sommets = -1;
 
@@ -129,18 +129,18 @@ void construire_liste_sommets_sousdomaine(const _SIZE_ nb_sommets,
     }
 }
 
-/*! Remplissage du tableau des coordonnees des sommets d'une partie
- * a partir des coordonnees des sommets du domaine complet (sommets_glob)
- * et de la liste des sommets de la partie (liste_sommets)
- * On cree sommets_loc comme suit:
+/*! Fill the vertex coordinate array of a part
+ * from the vertex coordinates of the complete domain (sommets_glob)
+ * and the list of vertices of the part (liste_sommets).
+ * sommets_loc is created as follows:
  *   sommets_loc.dimension(0) = liste_sommets.size_array()
  *   sommets_loc.dimension(1) = sommets_glob.dimension(1)
  *
- * Parametre:     sommets_glob
- * Signification: les coordonnees des sommets du domaine global
- * Parametre:     liste_sommets
- * Signification: les indices des sommets de sommets_glob a copier
- *                dans sommets_loc.
+ * Parameter:     sommets_glob
+ * Meaning: the coordinates of the vertices of the global domain
+ * Parameter:     liste_sommets
+ * Meaning: the indices of the vertices of sommets_glob to copy
+ *          into sommets_loc.
  */
 template<typename _SIZE_>
 void remplir_coordsommets_sous_domaine(const DoubleTab_T<_SIZE_>& sommets_glob,
@@ -160,12 +160,12 @@ void remplir_coordsommets_sous_domaine(const DoubleTab_T<_SIZE_>& sommets_glob,
     }
 }
 
-/*! Construction du tableau elems des elements de la partie "part".
- * elems(i, j) sera le nouveau numero du sommet j de l'element i
- * dans la partie part. On utilise la liste_inverse pour obtenir les
- * nouveaux numeros des sommets.
- * Les elements du domaine local sont crees dans l'ordre croissant de
- * leur indice dans le domaine global.
+/*! Build the elems array of elements of part "part".
+ * elems(i, j) will be the new number of vertex j of element i
+ * in part. The liste_inverse is used to obtain the
+ * new vertex numbers.
+ * The elements of the local domain are created in ascending order of
+ * their index in the global domain.
  */
 template<typename _SIZE_>
 void construire_elems_sous_domaine(const IntTab_T<_SIZE_>&    elems_domaine_globale,
@@ -182,19 +182,19 @@ void construire_elems_sous_domaine(const IntTab_T<_SIZE_>&    elems_domaine_glob
   liste_inverse_elements.resize(nb_elem_tot,RESIZE_OPTIONS::NOCOPY_NOINIT);
   liste_inverse_elements = -1;
 
-  // Premier passage: comptage du nombre d'elements de la partie
+  // First pass: count the number of elements in the part
   const int nb_elem_part = Process::check_int_overflow(liste_elements.size_array());
   elems_domaine_locale.resize(nb_elem_part, nb_sommets_par_element);
 
-  // Deuxieme passage: remplissage du tableau
+  // Second pass: fill the array
   for (int i_elem = 0; i_elem < nb_elem_part; i_elem++)
     {
       int_t elem = liste_elements[i_elem];
 
-      // Nouveau numero de l'element dans la partie
+      // New element number in the part
       liste_inverse_elements[elem] = i_elem;
-      // Copie de l'element avec traduction du numero des sommets en
-      // numero local dans le sous-domaine
+      // Copy the element with vertex numbers translated to
+      // local numbers in the sub-domain
       for (int i = 0; i < nb_sommets_par_element; i++)
         {
           int_t sommet = elems_domaine_globale(elem, i);
@@ -213,18 +213,18 @@ void construire_elems_sous_domaine(const IntTab_T<_SIZE_>&    elems_domaine_glob
     }
 }
 
-/*! @brief Pour une liste de "faces" du domaine globale, compter le nombre de faces incluses dans la partie "part" et les copier dans la structure
+/*! @brief For a list of "faces" of the global domain, count the number of faces included in part "part" and copy them into the structure
  *
- *  faces_partie en remplacant les numeros de sommets par les numeros locaux
- *  dans le sous-domaine.
- *  L'ordre des faces est conserve (si une face apparait avant une autre dans
- *  la liste du domaine complet et si elles sont toutes les deux dans la sous-partie,
- *  alors leur ordre est conserve). C'est important pour le periodique
- *  (hypothese qu'il y a correspondance entre la face i et la face i+n/2 du bord
- *  periodique).
- *  Attention: la condition pour qu'une face soit incluse est "la face appartient
- *   a un element de la partie voisine". La condition "les sommets des faces sont
- *   des sommets de joint" n'est PAS suffisante.
+ *  faces_partie by replacing vertex numbers with local numbers
+ *  in the sub-domain.
+ *  The order of faces is preserved (if a face appears before another in
+ *  the list of the complete domain and both are in the sub-part,
+ *  their order is preserved). This is important for periodicity
+ *  (assumption that there is a correspondence between face i and face i+n/2 of the
+ *  periodic boundary).
+ *  Note: the condition for a face to be included is "the face belongs
+ *   to an element of the neighboring part". The condition "the vertices of the faces are
+ *   joint vertices" is NOT sufficient.
  */
 template<typename _SIZE_>
 void construire_liste_faces_sous_domaine(const ArrOfInt_T<_SIZE_>& elements_voisins,
@@ -240,10 +240,10 @@ void construire_liste_faces_sous_domaine(const ArrOfInt_T<_SIZE_>& elements_vois
   const int nb_sommets_par_face = faces_sommets.dimension_int(1);
 
   assert(elements_voisins.size_array() == nb_faces);
-  // La liste des faces du tableau faces_sommets a inclure dans le sous-domaine
+  // List of faces from the faces_sommets array to include in the sub-domain
   ArrOfInt_T<_SIZE_> liste_faces;
 
-  // Premier passage : on cherche les faces a inclure
+  // First pass: look for faces to include
   {
     for (int_t i = 0; i < nb_faces; i++)
       {
@@ -257,8 +257,8 @@ void construire_liste_faces_sous_domaine(const ArrOfInt_T<_SIZE_>& elements_vois
   const int nb_faces_part = Process::check_int_overflow(liste_faces.size_array());
   faces_sommets_partie.resize(nb_faces_part, nb_sommets_par_face);
 
-  // Deuxieme passage : stockage des faces et conversion des numeros
-  //  de sommets des faces en numeros locaux dans le sous-domaine.
+  // Second pass: store the faces and convert vertex numbers
+  //  to local numbers in the sub-domain.
   for (int i = 0; i < nb_faces_part; i++)
     {
       const int_t i_face = liste_faces[i];
@@ -279,8 +279,8 @@ void construire_liste_faces_sous_domaine(const ArrOfInt_T<_SIZE_>& elements_vois
 
 } // end anonymous NS
 
-/*! @brief Pour chaque PE mentionne dans le tableau "voisins", si un joint avec ce pe n'existe par encore dans le domaine,
- * ajoute un joint et initialise ce joint avec "epaisseur".
+/*! @brief For each PE listed in the "voisins" array, if a joint with that pe does not yet exist in the domain,
+ * add a joint and initialize it with "epaisseur".
  */
 template <typename _SIZE_>
 void DomaineCutter_32_64<_SIZE_>::ajouter_joints(Domaine32& domaine, const ArrOfInt& voisins) const
@@ -304,24 +304,24 @@ void DomaineCutter_32_64<_SIZE_>::ajouter_joints(Domaine32& domaine, const ArrOf
           joint.associer_domaine(domaine);
           joint.affecte_epaisseur(epaisseur_joint_);
           joint.affecte_PEvoisin(pe);
-          // Ces joints n'auront pas de sommets communs. Met le flag d'initialisation a 1.
+          // These joints will have no common vertices. Set the initialization flag to 1.
           joint.set_joint_item(JOINT_ITEM::SOMMET).set_items_communs();
         }
     }
 }
 
 
-/*! @brief A partir d'une liste de sommets de depart (liste_sommets_depart), on parcourt les elements voisins de ces sommets (si epaisseur <= 1),
+/*! @brief Starting from a list of vertices (liste_sommets_depart), iterate over neighboring elements of these vertices (if epaisseur <= 1),
  *
- *   puis les voisins de ces elements (voisins par un sommet de l'element) si epaisseur <= 2,
- *   puis les voisins des voisins si epaisseur <= 3, etc
- *   Les elements appartenant a la "partie_a_ignorer" ne sont pas parcourus.
- *   Les indices des elements parcourus sont ranges dans liste_elements_trouves.
- *   Cette methode a ete codee pour construire_elements_distants_ssdom()
+ *   then the neighbors of these elements (sharing a vertex with the element) if epaisseur <= 2,
+ *   then the neighbors of the neighbors if epaisseur <= 3, etc.
+ *   Elements belonging to "partie_a_ignorer" are not visited.
+ *   The indices of the visited elements are stored in liste_elements_trouves.
+ *   This method was written for construire_elements_distants_ssdom()
  */
 template <typename _SIZE_>
-void DomaineCutter_32_64<_SIZE_>::parcourir_epaisseurs_elements(SmallArrOfTID_t liste_sommets_depart, /* par valeur car on va la modifier */
-                                                                const int partie_a_ignorer, /* ne pas parcourir les elems de cette partie */
+void DomaineCutter_32_64<_SIZE_>::parcourir_epaisseurs_elements(SmallArrOfTID_t liste_sommets_depart, /* by value since we will modify it */
+                                                                const int partie_a_ignorer, /* do not traverse elements of this partition */
                                                                 SmallArrOfTID_t& liste_elements_trouves) const
 {
   const Domaine_t& domaine          = ref_domaine_.valeur();
@@ -341,7 +341,7 @@ void DomaineCutter_32_64<_SIZE_>::parcourir_epaisseurs_elements(SmallArrOfTID_t 
   elements_parcourus = 0;
 
   {
-    // Marquage des sommets de depart et construction d'une liste de sommets uniques
+    // Mark the starting vertices and build a list of unique vertices
     const int sz_liste = liste_sommets_depart.size_array();
     for (int i = 0; i < sz_liste; i++)
       {
@@ -352,7 +352,7 @@ void DomaineCutter_32_64<_SIZE_>::parcourir_epaisseurs_elements(SmallArrOfTID_t 
       }
   }
 
-  // Boucle sur les epaisseurs successives d'elements autour des sommets de joint.
+  // Loop over successive layers of elements around the joint vertices.
   for (int ep = 1; ep <= epaisseur_joint_; ep++)
     {
       liste_sommets_depart = new_liste;
@@ -361,22 +361,22 @@ void DomaineCutter_32_64<_SIZE_>::parcourir_epaisseurs_elements(SmallArrOfTID_t 
       for (int i_sommet = 0; i_sommet < sz_liste; i_sommet++)
         {
           const int_t sommet = liste_sommets_depart[i_sommet];
-          // Parcours des elements voisins de ce sommet :
+          // Iterate over elements neighboring this vertex:
           const int nb_elems_voisins = Process::check_int_overflow(som_elem_.get_list_size(sommet));
           for (int i_elem = 0; i_elem < nb_elems_voisins; i_elem++)
             {
               const int_t elem = som_elem_(sommet, i_elem);
               if (elements_parcourus[elem])
-                continue; // Cet element a deja ete visite
-              // Numero de domaine de l'element voisin:
+                continue; // This element has already been visited
+              // Domain number of the neighboring element:
               const int part = elem_part[elem];
               if (part == partie_a_ignorer)
-                continue; // Ne traiter que les elements des autres parties
+                continue; // Only process elements from other parts
 
               liste_elements_trouves.append_array(elem);
               elements_parcourus.setbit(elem);
 
-              // Ajout a la prochaine liste de sommets a traiter les sommets de cet element:
+              // Add to the next list of vertices to process the vertices of this element:
               for (int i = 0; i < nb_som_elem; i++)
                 {
                   const int_t sommet2 = elements(elem, i);
@@ -392,8 +392,8 @@ void DomaineCutter_32_64<_SIZE_>::parcourir_epaisseurs_elements(SmallArrOfTID_t 
 }
 
 
-/*! Pour les trois fonctions suivantes :
- * Remplissage des frontieres de la partie associee a un processeur.
+/*! For the following three functions:
+ * Fill the boundaries of the part associated with a processor.
  */
 template<typename _SIZE_>
 void DomaineCutter_32_64<_SIZE_>::construire_faces_bords_ssdom(const BigArrOfInt_T<_SIZE_>& liste_inverse_sommets,
@@ -421,9 +421,9 @@ void DomaineCutter_32_64<_SIZE_>::construire_faces_bords_ssdom(const BigArrOfInt
     }
 }
 
-/*! @brief Constructions des raccords de la sous_partie a partir des raccords du domaine global.
+/*! @brief Builds the connections of the sub-partition from the connections of the global domain.
  *
- *   Les Raccord_local_homogene sont transformes en Raccord_distant_homogene.
+ *   Raccord_local_homogene objects are transformed into Raccord_distant_homogene objects.
  */
 template<typename _SIZE_>
 void DomaineCutter_32_64<_SIZE_>::construire_faces_raccords_ssdom(const BigArrOfInt_t& liste_inverse_sommets,
@@ -463,8 +463,8 @@ void DomaineCutter_32_64<_SIZE_>::construire_frontieres_internes_ssdom(const Big
                                                                        const int partie,
                                                                        Domaine32& domaine_partie) const
 {
-  // Rappel : les bords internes sont des "frontieres" a l'interieur du domaine
-  // (par exemple une plaque d'epaisseur nulle dans l'ecoulement)
+  // Reminder: internal boundaries are "frontiers" inside the domain
+  // (for example a zero-thickness plate in the flow)
   const Domaine_t& domaine = ref_domaine_.valeur();
   int i_fr = domaine.nb_bords()+domaine.nb_raccords();
   ArrOfInt_t elements_voisins;
@@ -516,7 +516,7 @@ void DomaineCutter_32_64<_SIZE_>::construire_groupe_faces_ssdom(const BigArrOfIn
       IntTab& faces_sommets_partie = groupe_partie.faces().les_sommets();
 
       ArrOfInt_t liste_faces;
-      // Premier passage : on cherche les faces a inclure
+      // First pass: look for faces to include
       const IntTab_t& faces = groupe_faces.les_sommets_des_faces();
       const int_t n = nb_faces[grp];
       for (int_t j = 0; j < n; j++)
@@ -535,8 +535,8 @@ void DomaineCutter_32_64<_SIZE_>::construire_groupe_faces_ssdom(const BigArrOfIn
       const int nb_faces_part = Process::check_int_overflow(liste_faces.size_array());
       faces_sommets_partie.resize(nb_faces_part, nb_som_face);
 
-      // Deuxieme passage : stockage des faces et conversion des numeros
-      //  de sommets des faces en numeros locaux dans le sous-domaine.
+      // Second pass: store the faces and convert vertex numbers
+      //  to local numbers in the sub-domain.
       for (int i = 0; i < nb_faces_part; i++)
         {
           const int_t i_face = liste_faces[i];
@@ -557,17 +557,17 @@ void DomaineCutter_32_64<_SIZE_>::construire_groupe_faces_ssdom(const BigArrOfIn
 }
 
 
-/*! @brief calcul et remplissage de domaine_partie.
+/*! @brief Compute and fill domaine_partie.
  *
  * joint(i).set_joint_item(JOINT_ITEM::ELEMENT).set_items_distants()
- *    (liste des elements distants).
- *    Eventuellement, de nouveaux joints sont crees.
- *  Historique: methode codee en janvier 2006 par B.Mathieu. Je croyais que c'etait
- *   trop complique de determiner les elements distants au moment du scatter et j'ai
- *   fini par trouver comment faire. Du coup la methode ci-dessous n'est plus utilisee
- *   en temps normal. En cas de probleme, on peut la reactiver (option 'print_more_info' de Decouper):
- *   en theorie elle donne exactement le meme resultat que l'algorithme code dans Scatter::calculer_espace_distant_elements.
- *   Attention, elle ne fait rien de special pour le bords periodiques...
+ *    (list of distant elements).
+ *    New joints may be created.
+ *  History: method coded in January 2006 by B.Mathieu. The original belief was that
+ *   determining distant elements during scatter would be too complex. Eventually a way
+ *   was found. As a result this method is no longer used in normal operation. In case of
+ *   problems, it can be re-enabled (option 'print_more_info' in Decouper):
+ *   in theory it gives exactly the same result as the algorithm in Scatter::calculer_espace_distant_elements.
+ *   Note: it does nothing special for periodic boundaries...
  */
 template<typename _SIZE_>
 void DomaineCutter_32_64<_SIZE_>::construire_elements_distants_ssdom(const int     partie,
@@ -581,12 +581,12 @@ void DomaineCutter_32_64<_SIZE_>::construire_elements_distants_ssdom(const int  
   const int_t nb_elem = elements.dimension(0);
   const int_t nb_som_elem = elements.dimension(1);
 
-  // Premiere etape: chercher les elements virtuels de la sous-partie
-  // (elements des autres parties situes dans l'epaisseur de joint en partant
-  //  des sommets de joint).
+  // First step: look for virtual elements of the sub-part
+  // (elements of other parts located within the joint thickness starting
+  //  from the joint vertices).
   SmallArrOfTID_t elements_virtuels;
   {
-    // Construction d'un tableau contenant tous les sommets de tous les joints
+    // Build an array containing all the vertices of all the joints
     SmallArrOfTID_t sommets_joint;
 
     const int nb_joints = domaine_partie.nb_joints();
@@ -602,12 +602,12 @@ void DomaineCutter_32_64<_SIZE_>::construire_elements_distants_ssdom(const int  
           }
       }
 
-    parcourir_epaisseurs_elements(sommets_joint, // Sommets de depart
-                                  partie, /* ignorer les elements de la partie locale */
+    parcourir_epaisseurs_elements(sommets_joint, // Starting vertices
+                                  partie, /* ignore elements of the local partition */
                                   elements_virtuels);
   }
   const int nb_elements_virtuels = elements_virtuels.size_array();
-  // Construire la liste des numeros de domaines voisins et ajouter les joints manquants:
+  // Build the list of neighboring domain numbers and add missing joints:
   ArrOfInt parties_voisines;
   {
     for (int i = 0; i < nb_elements_virtuels; i++)
@@ -620,7 +620,7 @@ void DomaineCutter_32_64<_SIZE_>::construire_elements_distants_ssdom(const int  
     ajouter_joints(domaine_partie, parties_voisines);
   }
 
-  // Pour chaque partie voisine, chercher les elements distants:
+  // For each neighboring part, look for distant elements:
   const int nb_parties_voisines = parties_voisines.size_array();
   SmallArrOfTID_t sommets_depart;
 
@@ -628,7 +628,7 @@ void DomaineCutter_32_64<_SIZE_>::construire_elements_distants_ssdom(const int  
     {
       const int partie_voisine = parties_voisines[i_part];
       sommets_depart.resize_array(0);
-      // Liste des sommets des elements virtuels de la partie voisine:
+      // List of vertices of the virtual elements of the neighboring part:
       for (int i_elem = 0; i_elem < nb_elements_virtuels; i_elem++)
         {
           const int_t elem = elements_virtuels[i_elem];
@@ -642,13 +642,13 @@ void DomaineCutter_32_64<_SIZE_>::construire_elements_distants_ssdom(const int  
             }
         }
 
-      // Recherche des elements voisins de cette liste:
+      // Search for elements neighboring this list:
       SmallArrOfTID_t elements_distants;
       parcourir_epaisseurs_elements(sommets_depart,
-                                    partie_voisine, /* ignorer les elements de la partie voisine */
+                                    partie_voisine, /* ignore elements of the neighboring part */
                                     elements_distants);
 
-      // Retirer de la liste les elements qui ne sont pas dans la partie locale:
+      // Remove from the list the elements that are not in the local part:
       {
         int count = 0;
         const int n = elements_distants.size_array();
@@ -660,7 +660,7 @@ void DomaineCutter_32_64<_SIZE_>::construire_elements_distants_ssdom(const int  
           }
         elements_distants.resize_array(count);
       }
-      // Traduire les indices des elements en indices locaux sur le sous-domaine.
+      // Translate element indices to local indices on the sub-domain.
       const int n = elements_distants.size_array();
       ArrOfInt elem_dist_loc(n);
       {
@@ -671,25 +671,25 @@ void DomaineCutter_32_64<_SIZE_>::construire_elements_distants_ssdom(const int  
             elem_dist_loc[i] = renum;
           }
       }
-      // Trier les elements dans l'ordre croissant des indices
+      // Sort elements in ascending order of indices
       elements_distants.ordonne_array();
-      // Stocker la liste des elements distants dans le joint
+      // Store the list of distant elements in the joint
       Joint&     joint = domaine_partie.joint_of_pe(partie_voisine);
       joint.set_joint_item(JOINT_ITEM::ELEMENT).set_items_distants() = elem_dist_loc;
     }
 }
 
-/*! @brief Creation des joints et construction des listes et des tableaux de sommets joints pour tous les joints de
+/*! @brief Create joints and build vertex lists and arrays for all joints of
  *
- *   la partie part. Les sommets du joint avec le "PEvoisin" sont
- *   les sommets de la partie "part" qui sont aussi un sommet d'un
- *   element appartenant au PEvoisin.
- *   Les joints apparaissent dans la liste dans l'ordre croissant des PEs.
- *   Note:  Les faces que l'on va creer ensuite utilisent forcement
- *          des sommets que l'on va trouver ici.
- *   Propriete : Les sommets du joint sont classes dans l'ordre croissant
- *               de leur numero local, donc dans l'ordre croissant de
- *               leur numero global (voir Remplir_Numeros_Sommets)
+ *   part. The vertices of the joint with "PEvoisin" are
+ *   the vertices of part "part" that are also a vertex of an
+ *   element belonging to PEvoisin.
+ *   Joints appear in the list in ascending order of PEs.
+ *   Note:  The faces to be created next necessarily use
+ *          vertices found here.
+ *   Property: The vertices of the joint are sorted in ascending order
+ *               of their local number, hence in ascending order of
+ *               their global number (see Remplir_Numeros_Sommets)
  */
 template<typename _SIZE_>
 void DomaineCutter_32_64<_SIZE_>::construire_sommets_joints_ssdom(const SmallArrOfTID_t& liste_sommets,
@@ -703,34 +703,34 @@ void DomaineCutter_32_64<_SIZE_>::construire_sommets_joints_ssdom(const SmallArr
   const int parts = nb_parties_;
   const BigIntVect_t& elem_part = ref_elem_part_.valeur();
 
-  // Liste de sommets de joint (toutes parties confondues, un sommet peut
-  // apparaitre plusieurs fois dans le tableau, une fois par pe voisin au maximum)
-  // C'est le numero global du sommet
+  // List of joint vertices (across all parts; a vertex may appear
+  // multiple times in the array, at most once per neighboring pe).
+  // This is the global vertex number.
   ArrsOfInt_T<_SIZE_> joints_sommets(parts);
 
-  // Algorithme : boucle sur les sommets de la partie.
-  // Pour chaque sommet du sous-domaine "p", on cherche les PEs auxquels appartiennent
-  // les elements voisins du sommet, et, s'il y a un PE voisin different de "p",
-  // on ajoute ce sommet aux joints avec ces PEs.
+  // Algorithm: loop over the vertices of the part.
+  // For each vertex of sub-domain "p", look for the PEs to which
+  // the neighboring elements of the vertex belong, and, if there is a neighboring PE
+  // different from "p", add this vertex to the joints with those PEs.
 
   const int nb_sommets = liste_sommets.size_array();
 
-  // i = indice local du sommet dans le sous-domaine
+  // i = local index of the vertex in the sub-domain
   for (int i_sommet = 0; i_sommet < nb_sommets; i_sommet++)
     {
-      // Numero global du sommet
+      // Global vertex number
       int_t sommet = liste_sommets[i_sommet];
-      // Boucle sur les elements voisins du sommet i
+      // Loop over the elements neighboring vertex i
       int nb_elements_voisins = Process::check_int_overflow(som_elem_.get_list_size(sommet));
       for (int i = 0; i < nb_elements_voisins; i++)
         {
           int_t elem = som_elem_(sommet, i);
           int PEvoisin = elem_part[elem];
-          // Faut-il ajouter ce sommet aux sommets du joint avec le PEvoisin ?
+          // Should this vertex be added to the joint vertices with PEvoisin?
           if (PEvoisin != partie)
             joints_sommets[PEvoisin].append_array(sommet);
         }
-      //boucle sur les procs connectes au sommet par un raccord
+      //loop over procs connected to the vertex by a connection
       if (som_raccord)
         for (int_t i = 0; i < som_raccord->get_list_size(sommet); i++)
           {
@@ -740,19 +740,19 @@ void DomaineCutter_32_64<_SIZE_>::construire_sommets_joints_ssdom(const SmallArr
           }
     }
 
-  // Creation des joints : dans l'ordre croissant du PE voisin
+  // Create joints: in ascending order of the neighboring PE
   for (int PEvoisin = 0; PEvoisin < parts; PEvoisin++)
     {
       ArrOfInt_t& sommets = joints_sommets[PEvoisin];
       if (sommets.size_array() > 0)
         {
-          // Trier les sommets de joint par ordre croissant de l'indice global
-          // (donc toutes les listes sur les processeurs voisins seront ordonnees
-          //  de la meme facon) et retirer les doublons
+          // Sort joint vertices in ascending order of global index
+          // (so all lists on neighboring processors will be sorted
+          //  in the same way) and remove duplicates
           array_trier_retirer_doublons(sommets);
           const int nb_sommets2 = Process::check_int_overflow(sommets.size_array());
 
-          // On cree un nouveau joint
+          // Create a new joint
           Joint& joint = les_joints.add(Joint());
           Nom nom_joint("Joint_");
           Nom nom_numero(PEvoisin);
@@ -763,7 +763,7 @@ void DomaineCutter_32_64<_SIZE_>::construire_sommets_joints_ssdom(const SmallArr
           joint.affecte_PEvoisin(PEvoisin);
           ArrOfInt& sommets_locaux = joint.set_joint_item(JOINT_ITEM::SOMMET).set_items_communs();
           sommets_locaux.resize_array(nb_sommets2);
-          // Remplissage du tableau (transformation en indice local de sommet)
+          // Fill the array (convert to local vertex index)
           for (int i = 0; i < nb_sommets2; i++)
             {
               const int_t indice_global = sommets[i];
@@ -775,9 +775,9 @@ void DomaineCutter_32_64<_SIZE_>::construire_sommets_joints_ssdom(const SmallArr
     }
 }
 
-/*! Recherche des faces de joints (faces adjacentes a deux elements appartenant
- * a deux processeurs differents).
- * On suppose que les sommets des joints ont ete construits.
+/*! Search for joint faces (faces adjacent to two elements belonging
+ * to two different processors).
+ * It is assumed that the joint vertices have already been built.
  */
 template<typename _SIZE_>
 void DomaineCutter_32_64<_SIZE_>::construire_faces_joints_ssdom(const int partie,
@@ -789,19 +789,19 @@ void DomaineCutter_32_64<_SIZE_>::construire_faces_joints_ssdom(const int partie
   const SmallArrOfTID_t& liste_sommets = correspondance.liste_sommets_;
   const BigArrOfInt_t& liste_inverse_elements = correspondance.liste_inverse_elements_;
 
-  // Premiere etape: reperage des "elements de joint" (elements de la "partie"
-  //  possedant un sommet de joint), et marquage des sommets de joint
+  // First step: identify "joint elements" (elements of "partie"
+  //  having a joint vertex), and mark the joint vertices
   SmallArrOfTID_t liste_elements_joint;
   ArrOfBit drapeaux_sommets_joints(nb_sommets_ssdom);
   {
-    // Pour l'instant, on utilise les joints en const...
+    // For now, use joints as const...
     const Joints& joints_partie = domaine_partie.faces_joint();
     drapeaux_sommets_joints = 0;
 
-    // Marqueurs: pour chaque element du sous-domaine, est-il deja dans la liste ?
+    // Markers: for each element of the sub-domain, is it already in the list?
     ArrOfBit drapeaux_elements(nb_elem_ssdom);
     drapeaux_elements = 0;
-    // Boucle sur tous les sommets de joint
+    // Loop over all joint vertices
     const int nb_joints = joints_partie.size();
     for (int i_joint = 0; i_joint < nb_joints; i_joint++)
       {
@@ -813,14 +813,14 @@ void DomaineCutter_32_64<_SIZE_>::construire_faces_joints_ssdom(const int partie
             const int i_sommet_local = sommets_du_joint[i];
             const int_t i_sommet_global = liste_sommets[i_sommet_local];
             const int nb_elem_voisins = Process::check_int_overflow(som_elem_.get_list_size(i_sommet_global));
-            // Marquage du sommet de joint dans le sous-domaine
+            // Mark the joint vertex in the sub-domain
             drapeaux_sommets_joints.setbit(i_sommet_local);
             for (int j = 0; j < nb_elem_voisins; j++)
               {
                 const int_t i_elem_global = som_elem_(i_sommet_global, j);
                 const int i_elem_local = liste_inverse_elements[i_elem_global];
-                // On ajoute l'element a la liste d'elements joint s'il est dans ma partie
-                // et s'il n'est pas encore dans la liste.
+                // Add the element to the joint element list if it is in my part
+                // and if it is not yet in the list.
                 if (i_elem_local >= 0)
                   if (! drapeaux_elements.testsetbit(i_elem_local))
                     liste_elements_joint.append_array(i_elem_global);
@@ -829,20 +829,20 @@ void DomaineCutter_32_64<_SIZE_>::construire_faces_joints_ssdom(const int partie
       }
   }
 
-  // Deuxieme etape: pour chaque element de joint, construction de ses
-  // faces et on regarde si la face a un element voisin dans une autre partie.
-  // Si oui, c'est une face de joint
+  // Second step: for each joint element, build its faces and check
+  // if the face has a neighboring element in another part.
+  // If so, it is a joint face.
 
-  // Tableau des indices des sommets de toutes les faces de joint
-  //  (tous joints confondus, indices de sommets dans le sous-domaine)
+  // Array of vertex indices of all joint faces
+  //  (across all joints, vertex indices in the sub-domain)
   IntTab faces_joints;
-  // Pour chaque face de joint, numero du sous-domaine voisin par cette face
+  // For each joint face, the number of the neighboring sub-domain through this face
   ArrOfInt faces_pe_voisins;
-  // Pour chaque processeur, nombre de faces de joint avec ce proc.
-  // (on initialise a zero)
+  // For each processor, number of joint faces with that proc.
+  // (initialized to zero)
   ArrOfInt nb_faces_joints(nb_parties_);
   {
-    // Indices des sommets des faces sur l'element de reference
+    // Indices of face vertices on the reference element
     IntTab faces_element_reference;
     const Elem_geom_base& type_elem = domaine_partie.type_elem().valeur();
     int is_regular = type_elem.get_tab_faces_sommets_locaux(faces_element_reference);
@@ -855,19 +855,19 @@ void DomaineCutter_32_64<_SIZE_>::construire_faces_joints_ssdom(const int partie
     faces_joints.resize(0, nb_sommets_par_face); // Voir *suite*
     const BigArrOfInt_t& liste_inverse_sommets = correspondance.liste_inverse_sommets_;
     const BigIntVect_t& elem_part = ref_elem_part_.valeur();
-    // Sommets des elements du maillage global
+    // Vertices of the elements of the global mesh
     const Domaine_t& domaine = ref_domaine_.valeur();
     const IntTab_t& elem_som = domaine.les_elems();
     SmallArrOfTID_t une_face(nb_sommets_par_face);
     SmallArrOfTID_t elements_voisins;
 
-    // Boucle sur les elements de joint
+    // Loop over joint elements
     const int nb_elem_joints = liste_elements_joint.size_array();
     for (int i_elem_joint = 0; i_elem_joint < nb_elem_joints; i_elem_joint++)
       {
-        // Indice de l'element dans le domaine global
+        // Index of the element in the global domain
         const int_t i_elem_global = liste_elements_joint[i_elem_joint];
-        // Boucle sur les faces de l'element
+        // Loop over the faces of the element
         if (!is_regular)
           {
             int loc_idx = liste_inverse_elements[i_elem_global];
@@ -878,7 +878,7 @@ void DomaineCutter_32_64<_SIZE_>::construire_faces_joints_ssdom(const int partie
           }
         for (int i_face = 0; i_face < nb_faces_elem; i_face++)
           {
-            // Construction de la face
+            // Build the face
             int face_ok = 1;
             for (int i = 0; i < nb_sommets_par_face; i++)
               {
@@ -889,27 +889,27 @@ void DomaineCutter_32_64<_SIZE_>::construire_faces_joints_ssdom(const int partie
                   {
                     const int_t i_som = elem_som(i_elem_global, i_ref);
                     une_face[i] = i_som;
-                    // Indice du sommet dans le sous-domaine
+                    // Index of the vertex in the sub-domain
 
                     if (i_som>-1)
                       {
                         const int i_som_local = liste_inverse_sommets[i_som];
                         if(i_som_local>0)
                           {
-                            // Le sommet est-il sur un joint ?
+                            // Is the vertex on a joint?
                             if (drapeaux_sommets_joints[i_som_local] == 0)
-                              face_ok = 0; // Non => cette face n'est pas sur un joint
+                              face_ok = 0; // No => this face is not on a joint
                           }
                       }
                   }
               }
-            // Premier test pour eliminer tout de suite la face
-            // si tous ses sommets ne sont pas des sommets de joint.
+            // First test to quickly reject the face
+            // if not all its vertices are joint vertices.
             if (face_ok)
               {
-                // Recherche des elements voisins de cette face
+                // Search for neighboring elements of this face
                 find_adjacent_elements(som_elem_, une_face, elements_voisins);
-                // Recherche d'un element voisin qui n'est pas dans ma partie
+                // Search for a neighboring element that is not in my part
                 const int nb_elem_voisins = elements_voisins.size_array();
                 int PEvoisin = -1, i=0;
                 for (; i < nb_elem_voisins; i++)
@@ -921,7 +921,7 @@ void DomaineCutter_32_64<_SIZE_>::construire_faces_joints_ssdom(const int partie
                   }
                 if (i < nb_elem_voisins)
                   {
-                    // J'ai une face de joint, je l'ajoute au tableau
+                    // I have a joint face, add it to the array
                     faces_pe_voisins.append_array(PEvoisin);
                     const int n = faces_joints.dimension(0);
                     faces_joints.resize(n+1, nb_sommets_par_face);
@@ -943,28 +943,28 @@ void DomaineCutter_32_64<_SIZE_>::construire_faces_joints_ssdom(const int partie
       }
   }
 
-  // Troisieme etape: ajout des faces dans les joints
+  // Third step: add the faces to the joints
   {
-    // Le type des faces de joint
+    // The type of joint faces
     const Domaine_t& domaine_globale = ref_domaine_.valeur();
     const Type_Face& type_face_joint = domaine_globale.type_elem()->type_face();
-    // On va modifier les joints:
+    // Modify the joints:
     Joints& joints_partie = domaine_partie.faces_joint();
     const int nb_joints = joints_partie.size();
     const int nb_faces_joints_tot = faces_joints.dimension(0);
-    // *suite* : tableau de dimension 2 meme s'il n'y a pas de faces
+    // *continued*: 2D array even if there are no faces
     const int nb_sommets_par_face = faces_joints.dimension(1);
 
     for (int i_joint = 0; i_joint < nb_joints; i_joint++)
       {
-        // Typage des faces et allocation memoire
+        // Face type and memory allocation
         Joint& joint = joints_partie[i_joint];
         joint.typer_faces(type_face_joint);
         joint.faces().les_sommets().resize(0, nb_sommets_par_face);
         const int PE_voisin = joint.PEvoisin();
         const int nb_faces = nb_faces_joints[PE_voisin];
         joint.dimensionner(nb_faces);
-        // Remplissage du tableau de faces
+        // Fill the face array
         IntTab& faces = joint.faces().les_sommets();
         int k = 0;
         for (int i = 0; i < nb_faces_joints_tot; i++)
@@ -981,7 +981,7 @@ void DomaineCutter_32_64<_SIZE_>::construire_faces_joints_ssdom(const int partie
   }
 }
 
-/*! @brief annule toutes les references et vide les tableaux
+/*! @brief cancels all references and empties the arrays
  */
 template<typename _SIZE_>
 void DomaineCutter_32_64<_SIZE_>::reset()
@@ -1005,14 +1005,14 @@ void calculer_listes_elements_sous_domaines(const BigIntVect_T<_SIZE_>& elem_par
   using int_t = _SIZE_;
 
   ArrOfInt_T<_SIZE_> sizes(nb_parts);
-  // Premier passage : comptage
+  // First pass: counting
   for (int_t i = 0; i < nbelem; i++)
     {
       const int part = elem_part[i];
       sizes[part]++;
     }
   liste_elems_sous_domaines.set_list_sizes(sizes);
-  // Deuxieme passage : remplissage
+  // Second pass: filling
   sizes = 0;
   for (int_t i = 0; i < nbelem; i++)
     {
@@ -1129,11 +1129,11 @@ void construire_nom_fichier_sous_domaine(const Nom& basename,
 }// end anonymous NS
 
 
-/*! @brief Prepare les structures de donnees pour la construction des sous-domaines en fonction d'un decoupage fourni dans elem_part.
+/*! @brief Prepares the data structures for building sub-domains based on a partitioning provided in elem_part.
  *
- * @param (domaine_global) le domaine a decouper (doit avoir un domaine). On prend une ref a ce domaine (il doit donc rester valide).
- * @param (elem_part) pour chaque element, numero du sous-domaine auquel il appartient, avec 0 <= elem_part[i] < nb_parts. Attention, on prend une ref a ce tableau, on ne fait pas une copie local. Le tableau doit continuer a exister jusqu'a ce qu'on a fini d'utiliser DomaineCutter.
- * @param (nb_parts) nombre total de sous-domaines
+ * @param (domaine_global) the domain to partition (must have a domain). A reference to this domain is stored (it must remain valid).
+ * @param (elem_part) for each element, the number of the sub-domain to which it belongs, with 0 <= elem_part[i] < nb_parts. Note: a reference to this array is stored, not a local copy. The array must continue to exist until DomaineCutter is no longer used.
+ * @param (nb_parts) total number of sub-domains
  * @param (les_faces)
  * @param (epaisseur_joint)
  */
@@ -1165,7 +1165,7 @@ void DomaineCutter_32_64<_SIZE_>::initialiser(const Domaine_t&   domaine_global,
   const IntTab_t& elems = domaine_global.les_elems();
   const int_t nb_som = domaine_global.nb_som_tot();
   construire_connectivite_som_elem(nb_som, elems, som_elem_,
-                                   1 /* inclure les elems virtuels */);
+                                   1 /* include virtual elements */);
 
   Cerr << "Search of neighboring elements of boundary faces" << finl;
   calculer_elements_voisins_bords(domaine_global, som_elem_, voisins_bords_,elem_part,permissif,bords_a_pb_);
@@ -1174,13 +1174,13 @@ void DomaineCutter_32_64<_SIZE_>::initialiser(const Domaine_t&   domaine_global,
   //calculer_listes_elements_sous_domaines(elem_part, nb_parts, liste_elems_sous_domaines_);
 }
 
-/*! @brief Remplit la structure "correspondance" et le "sous_domaine" pour la partie "part".
+/*! @brief Fills the "correspondance" structure and the "sous_domaine" for part "part".
  *
- * On cherche les sommets qui appartiennent a la sous-partie,
- *   on calcule les tableaux de renumerotation des sommets et des elements entre numero
- *   global et numero local (structure correspondance), on remplit les structures de
- *   sous_domaine (sommets, elements, frontieres, joints, etc).
- *   Attention: sous_domaine doit etre un objet vierge (ne pas contenir de domaine)
+ * Look for the vertices belonging to the sub-part,
+ *   compute the renumbering arrays for vertices and elements between global
+ *   and local numbers (correspondance structure), fill the sub_domaine structures
+ *   (vertices, elements, boundaries, joints, etc).
+ *   Note: sous_domaine must be an empty object (not containing a domain)
  */
 template<typename _SIZE_>
 void DomaineCutter_32_64<_SIZE_>::construire_sous_domaine(const int part, DomaineCutter_Correspondance_t& correspondance,
@@ -1188,11 +1188,11 @@ void DomaineCutter_32_64<_SIZE_>::construire_sous_domaine(const int part, Domain
 {
   using Poly_geom_base_t = Poly_geom_base_32_64<_SIZE_>;
 
-  // L'objet doit etre initialise:
+  // The object must be initialized:
   assert(nb_parties_ >= 0);
-  // sous_domaine vide
+  // sous_domaine empty
   assert(sous_domain.nb_elem() == 0);
-  // Numero de partie valide
+  // Valid part number
   assert(part >= 0 && part < nb_parties_);
 
   correspondance.partie_ = part;
@@ -1202,8 +1202,8 @@ void DomaineCutter_32_64<_SIZE_>::construire_sous_domaine(const int part, Domain
   ArrOfInt_t elements_sous_partie;
   liste_elems_sous_domaines_.copy_list_to_array(part, elements_sous_partie);
 
-  // Preparation du sous_domaine
-  // sous_domaine.reset(); /* reset n'existe pas encore... */
+  // Preparation of sous_domaine
+  // sous_domaine.reset(); /* reset does not exist yet... */
   sous_domain.nommer(domain.le_nom());
   if (sub_type(Poly_geom_base_t, domain.type_elem().valeur()))
     {
@@ -1244,14 +1244,14 @@ void DomaineCutter_32_64<_SIZE_>::construire_sous_domaine(const int part, Domain
   int compute_items_distants = Decouper_t::print_more_infos_ && !som_raccord; // To print NbElemDist informations
   if (compute_items_distants)
     {
-      // Cet algorithme sequentiel n'est pas utilise en temps normal, sauf si
-      // on veut tester l'algorithme parallele dans Scatter.cpp
-      // voir  CHECK_ALGO_ESPACE_VIRTUEL dans Scatter.cpp (Benoit Mathieu) et/ou option 'print_more_info' dans Decouper
+      // This sequential algorithm is not used in normal operation, unless
+      // testing the parallel algorithm in Scatter.cpp.
+      // see CHECK_ALGO_ESPACE_VIRTUEL in Scatter.cpp (Benoit Mathieu) and/or option 'print_more_info' in Decouper
       construire_elements_distants_ssdom(part, correspondance.liste_sommets_, correspondance.liste_inverse_elements_, sous_domain);
     }
   else
     {
-      // Initialiser des joints vides (sinon assert en debug car les joints ne sont pas initialises)
+      // Initialize empty joints (otherwise assert in debug mode since joints are not initialized)
       for (int ij = 0; ij < sous_domain.nb_joints(); ij++)
         {
           Joint& joint = sous_domain.joint(ij);
@@ -1268,11 +1268,11 @@ void DomaineCutter_32_64<_SIZE_>::writeData(const Domaine& sous_domaine, Sortie&
   os << sous_domaine;
 }
 
-/*! @brief Generation de tous les sous-domaines du calcul et ecriture sur disque des fichiers basename_000n.
+/*! @brief Generation of all sub-domains of the computation and writing to disk of the files basename_000n.
  *
- * Domaines pour 0 <= n < nb_parties_.
- *   Si des "sous-domaines" sont definies (dans le champ domaine.ss_domaines()),
- *   on genere aussi un fichier par sous-domaine.
+ * Domains for 0 <= n < nb_parties_.
+ *   If "sous-domaines" are defined (in the domain.ss_domaines() field),
+ *   a file is also generated per sub-domain.
  *
  *   WARNING: this method might change elem_part!!! (if 'reorder' option was specified)
  */
@@ -1462,7 +1462,7 @@ void DomaineCutter_32_64<_SIZE_>::ecrire_domaines(const Nom& basename, const Dom
 
           Domaine32 sous_domaine;
           construire_sous_domaine(i_part, dc_correspondance, sous_domaine, som_raccord);
-          // On affiche quelques informations...
+          // Print some information...
           {
             const Joints& joints = sous_domaine.faces_joint();
             const int nb_joints = joints.size();
@@ -1502,7 +1502,7 @@ void DomaineCutter_32_64<_SIZE_>::ecrire_domaines(const Nom& basename, const Dom
               const int nb_joints = joints.size();
               // Resize ja:
               ja.resize_array(nnz+nb_joints+1);
-              // Fortran numerotation:
+              // Fortran numbering:
               ja[nnz]=i_part+1;
               nnz++;
               ia[i_part+1]=ia[i_part]+1;
@@ -1560,26 +1560,26 @@ void DomaineCutter_32_64<_SIZE_>::ecrire_domaines(const Nom& basename, const Dom
                 }
             }
 
-          // Ecritures des fichiers sous-domaines .ssz
+          // Write sub-domain .ssz files
           const LIST(OBS_PTR(Sous_Domaine_t)) & liste_sous_domaines = domaine.ss_domaines();
           const int nb_sous_domaines = liste_sous_domaines.size();
           if (nb_sous_domaines>0)
             {
               Cerr << " Writing of files .ssz ..." << finl;
-              // Un fichier par sous-domaine, dans chaque fichier on trouve toutes les parties...
-              // Si on est en train d'ecrire la premiere partie, on efface le fichier
+              // One file per sub-domain, each file contains all parts...
+              // If writing the first part, erase the file
               IOS_OPEN_MODE mode;
               if (i_part == 0)
-                mode = ios::out; // Premiere partie, on ecrase le fichier
+                mode = ios::out; // First part, overwrite the file
               else
-                mode = (ios::out | ios::app); // Mode append
+                mode = (ios::out | ios::app); // Append mode
 
-              // Boucle sur les sous-domaines
+              // Loop over sub-domains
               const BigArrOfInt_t& liste_inverse_elements = dc_correspondance.liste_inverse_elements_;
 
               for (int i_sous_domaine = 0; i_sous_domaine < nb_sous_domaines; i_sous_domaine++)
                 {
-                  // Indices des elements du sous-domaine qui sont dans le sous-domaine:
+                  // Indices of the sub-domain elements that are in the sub-domain:
                   const Sous_Domaine_t& sous_dom = liste_sous_domaines[i_sous_domaine];
                   ArrOfInt elements;
                   {
@@ -1596,7 +1596,7 @@ void DomaineCutter_32_64<_SIZE_>::ecrire_domaines(const Nom& basename, const Dom
                        << "  file_name " << nom_fichier
                        << "  nb_elements in this part " << elements.size_array()
                        << finl;
-                  // Le fichier sous-domaines est toujours en ascii
+                  // The sub-domain file is always in ascii
                   SFichier os;
                   const int ok = os.ouvrir(nom_fichier, mode);
                   if (!ok)
@@ -1612,7 +1612,7 @@ void DomaineCutter_32_64<_SIZE_>::ecrire_domaines(const Nom& basename, const Dom
       if (reorder && loop==0)
         {
           // Reduce the bandwith of a the matrix connectivity between parts:
-          // ToDo forcer a ne pas changer la partition 0 !
+          // ToDo force not to change partition 0!
           ArrOfInt riord(nb_parties_+1);
           ArrOfInt levels(nb_parties_+1);
           ArrOfInt mask(nb_parties_+1);

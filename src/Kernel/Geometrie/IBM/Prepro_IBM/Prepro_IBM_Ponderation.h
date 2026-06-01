@@ -30,7 +30,7 @@ private:
   void projectSolidPoints();
   void projectFluidPoints();
   void set_param(Param&) const override;
-  int pond_= 2 ; // choix de la methode de ponderation par defaut
+  int pond_= 2 ; // choice of the weighting method by default
 };
 
 #endif /* Prepro_IBM_Ponderation_included */

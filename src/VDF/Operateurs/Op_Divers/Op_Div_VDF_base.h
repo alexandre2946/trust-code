@@ -32,8 +32,8 @@ public:
   void completer() override;
   int impr(Sortie& os) const override;
 
-  inline DoubleTab& ajouter(const DoubleTab& inco, DoubleTab& resu) const override { return iter_->ajouter(inco,resu); } // ajoute la contribution de la divergence a resu
-  inline DoubleTab& calculer(const DoubleTab& inco, DoubleTab& resu ) const override { return iter_->calculer(inco,resu); } // calcule la contribution de la divergence
+  inline DoubleTab& ajouter(const DoubleTab& inco, DoubleTab& resu) const override { return iter_->ajouter(inco,resu); } // adds the divergence contribution to resu
+  inline DoubleTab& calculer(const DoubleTab& inco, DoubleTab& resu ) const override { return iter_->calculer(inco,resu); } // computes the divergence contribution
 
 protected:
   OWN_PTR(Iterateur_VDF_base) iter_;

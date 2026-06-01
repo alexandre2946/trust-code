@@ -19,12 +19,12 @@
 #include <Equation_base.h>
 
 
-/*! @brief classe Transport_Interfaces_base Cette classe constitue la classe de base des equations de transport d interfaces
+/*! @brief Transport_Interfaces_base This class is the base class for interface transport equations.
  *
- *      Actuellement une seule classe instanciable derivant : Transport_Interfaces_FT_Disc
+ *      Currently only one instantiable derived class: Transport_Interfaces_FT_Disc
  *
  *
- * @sa Transport_Interfaces_FT_Disc, Methodes abstraites:, void modifier_vpoint_pour_imposer_vit(...), void integrer_ensemble_lagrange(...)
+ * @sa Transport_Interfaces_FT_Disc, Abstract methods:, void modifier_vpoint_pour_imposer_vit(...), void integrer_ensemble_lagrange(...)
  */
 
 class Transport_Interfaces_base : public Equation_base
@@ -33,37 +33,36 @@ class Transport_Interfaces_base : public Equation_base
 
 public:
 
-  //La presence d'une interface solide dans un ecoulement s accompagne d un terme source
-  //dans l equation de quantite de mouvement qui ne peut etre considere comme un terme
-  //source classique mais plutot comme une modification de vpoint pour imposer au fluide
-  //la vitesse de l interface
+  // The presence of a solid interface in a flow is accompanied by a source term
+  // in the momentum equation that cannot be considered as a classical source term
+  // but rather as a modification of vpoint to impose the interface velocity on the fluid.
 
-  //Effectue la modification de vpoint (equation de quantite de mouvement)
-  //pour imposer au fluide la vitesse de l interface
+  // Applies the modification of vpoint (momentum equation)
+  // to impose the interface velocity on the fluid.
   virtual void modifier_vpoint_pour_imposer_vit(const DoubleTab& inco_val,DoubleTab& vpoint0,DoubleTab& vpoint,
                                                 const DoubleTab& rho_faces,DoubleTab& source_val,
                                                 const double temps, const double dt,
                                                 const int is_explicite = 1, const double eta = 1.) = 0;
-  // Recupere le tag du maillage de l'interface
+  // Returns the tag of the interface mesh.
   virtual int get_mesh_tag() const = 0;
-  // Recupere le champ de l'indicatrice
+  // Returns the indicator field.
   // TODO : Why virtual here? Why not getting the daughter version from Transport_Interfaces_FT_Disc directly here?
   virtual const Champ_base& get_indicatrice() =0;
   virtual void update_indicatrice() =0;
   virtual void check_indicatrice_is_up_to_date() =0;
 
 
-  //Effectue l integration de trajectoire de particules ponctuelles
-  //destinees a marquer le fluide
-  //xn+1 = xn + v_interpolee*dt
+  // Performs trajectory integration of point particles
+  // intended to mark the fluid.
+  // xn+1 = xn + v_interpolated*dt
   virtual void integrer_ensemble_lagrange(const double temps) = 0;
 
 protected:
 
-  // A terme d autres elements de Transport_Interfaces_FT_Disc sont susceptibles d etre factorises
-  // ex : OBS_PTR(Probleme_base) probleme_base_;
-  // Cette factorisation pourra etre realisee quand les developpements recents
-  // lies purement au Front-Tracking seront integres
+  // In the future, other elements of Transport_Interfaces_FT_Disc may be factored out here.
+  // e.g.: OBS_PTR(Probleme_base) probleme_base_;
+  // This refactoring can be done once the recent developments
+  // purely related to Front-Tracking are integrated.
 
 private:
 

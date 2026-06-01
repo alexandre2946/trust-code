@@ -12,12 +12,12 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//   fichier a inclure dans Ch_front_ana.cpp
-//   il contient pour chaque region $$$ de {in1,up1,ou1,in2,ou2}:
-//      - les tableaux des points de la grille d'entree Y$$$, Z$$$
-//      - les tableaux des profils de vitesse U$$$, V$$$, W$$$ et
-//   pour le cas test du conduit coude a section recatangulaire.
-//   La face d'entree est divisee en 5 regions, comme montre dans le schema :
+//   file to include in Ch_front_ana.cpp
+//   it contains for each region $$$ of {in1,up1,ou1,in2,ou2}:
+//      - the arrays of input grid points Y$$$, Z$$$
+//      - the velocity profile arrays U$$$, V$$$, W$$$ and
+//   for the test case of the curved duct with rectangular cross-section.
+//   The inlet face is divided into 5 regions, as shown in the diagram:
 //
 //              ^z
 //              |                |
@@ -59,12 +59,12 @@ static float _U0 = 16;
 //region in1
 //Mean velocity components in the domain IN1 of Station U1
 //file name : mu1in1.dat
-//coordonnees des points a vitesse connue
+//coordinates of points with known velocity
 static int Nzin1 = 8;
 static float Zin1[] = {        0.62500E-01,        0.12500E+00,        0.18750E+00,        0.25000E+00,        0.37500E+00,        0.50000E+00,        0.75000E+00,        0.10000E+01};
 static int Nyin1 = 13;
 static float Yin1[] = {        0.12500E-01,        0.18750E-01,        0.25000E-01,        0.31250E-01,        0.37500E-01,        0.43750E-01,        0.50000E-01,        0.56250E-01,        0.62500E-01,        0.75000E-01,        0.87500E-01,        0.10000E+00,        0.12500E+00};
-//vitesse aux points donnes
+//velocity at the given points
 static float Uin1[] =
 {
   0.66100E+00,        0.69100E+00,        0.72600E+00,        0.75800E+00,        0.77900E+00,        0.79400E+00,        0.81000E+00,        0.82200E+00,        0.83600E+00,        0.85400E+00,        0.86200E+00,        0.87000E+00,        0.89300E+00,        /*Z=0.62500E-01*/
@@ -102,12 +102,12 @@ static float Win1[] =
 //region up1
 //Mean velocity components in the domain UP1 of Station U1
 //file name : mu1up1.dat
-//coordonnees des points a vitesse connue
+//coordinates of points with known velocity
 static int Nzup1 = 18;
 static float Zup1[] = {        0.15625E-01,        0.21875E-01,        0.28125E-01,        0.37500E-01,        0.50000E-01,        0.62500E-01,        0.75000E-01,        0.10000E+00,        0.12500E+00,        0.16250E+00,        0.20000E+00,        0.25000E+00,        0.31250E+00,        0.37500E+00,        0.50000E+00,        0.62500E+00,        0.75000E+00,        0.10000E+01};
 static int Nyup1 = 17;
 static float Yup1[] = {        0.12500E+00,        0.18750E+00,        0.25000E+00,        0.31250E+00,        0.37500E+00,        0.40625E+00,        0.43750E+00,        0.46875E+00,        0.50000E+00,        0.53125E+00,        0.56250E+00,        0.59375E+00,        0.62500E+00,        0.68750E+00,        0.75000E+00,        0.81250E+00,        0.87500E+00};
-//vitesse aux points donnes
+//velocity at the given points
 static float Uup1[] =
 {
   0.73400E+00,        0.78700E+00,        0.79500E+00,        0.78200E+00,        0.71900E+00,        0.67300E+00,        0.71100E+00,        0.83500E+00,        0.86400E+00,        0.83300E+00,        0.70200E+00,        0.69100E+00,        0.74000E+00,        0.81600E+00,        0.84100E+00,        0.83900E+00,        0.79000E+00,        /*Z=0.15625E-01*/
@@ -175,12 +175,12 @@ static float Wup1[] =
 //region ou1
 //Mean velocity components in the domain OU1 of Station U1
 //file name : mu1ou1.dat
-//coordonnees des points a vitesse connue
+//coordinates of points with known velocity
 static int Nzou1 = 8;
 static float Zou1[] = {        0.62500E-01,        0.12500E+00,        0.18750E+00,        0.25000E+00,        0.37500E+00,        0.50000E+00,        0.75000E+00,        0.10000E+01};
 static int Nyou1 = 13;
 static float You1[] = {        0.87500E+00,        0.90000E+00,        0.91250E+00,        0.92500E+00,        0.93750E+00,        0.94375E+00,        0.95000E+00,        0.95625E+00,        0.96250E+00,        0.96875E+00,        0.97500E+00,        0.98125E+00,        0.98750E+00};
-//vitesse aux points donnes
+//velocity at the given points
 static float Uou1[] =
 {
   0.96000E+00,        0.95200E+00,        0.94400E+00,        0.92200E+00,        0.89900E+00,        0.88900E+00,        0.87900E+00,        0.83400E+00,        0.81600E+00,        0.79300E+00,        0.75900E+00,        0.72600E+00,        0.67300E+00,        /*Z=0.62500E-01*/
@@ -218,12 +218,12 @@ static float Wou1[] =
 //region in2
 //Mean velocity components in the domain IN2 of Station U1
 //file name : mu1in2.dat
-//coordonnees des points a vitesse connue
+//coordinates of points with known velocity
 static int Nzin2 = 5;
 static float Zin2[] = {        0.10000E+01,        0.15000E+01,        0.20000E+01,        0.25000E+01,        0.30000E+01};
 static int Nyin2 = 17;
 static float Yin2[] = {        0.12500E-01,        0.18750E-01,        0.25000E-01,        0.31250E-01,        0.37500E-01,        0.43750E-01,        0.50000E-01,        0.56250E-01,        0.62500E-01,        0.75000E-01,        0.87500E-01,        0.10000E+00,        0.12500E+00,        0.18750E+00,        0.25000E+00,        0.37500E+00,        0.50000E+00};
-//vitesse aux points donnes
+//velocity at the given points
 static float Uin2[] =
 {
   0.75000E+00,        0.80300E+00,        0.84200E+00,        0.88100E+00,        0.90500E+00,        0.93600E+00,        0.95600E+00,        0.97300E+00,        0.98100E+00,        0.99200E+00,        0.99100E+00,        0.99300E+00,        0.99200E+00,        0.99300E+00,        0.99500E+00,        0.99600E+00,        0.99100E+00,        /*Z=0.10000E+01*/
@@ -252,12 +252,12 @@ static float Win2[] =
 //region ou2
 //Mean velocity components in the domain OU2 of Station U1
 //file name : mu1ou2.dat
-//coordonnees des points a vitesse connue
+//coordinates of points with known velocity
 static int Nzou2 = 5;
 static float Zou2[] = {        0.10000E+01,        0.15000E+01,        0.20000E+01,        0.25000E+01,        0.30000E+01};
 static int Nyou2 = 17;
 static float You2[] = {        0.50000E+00,        0.62500E+00,        0.75000E+00,        0.81250E+00,        0.87500E+00,        0.90000E+00,        0.91250E+00,        0.92500E+00,        0.93750E+00,        0.94375E+00,        0.95000E+00,        0.95625E+00,        0.96250E+00,        0.96875E+00,        0.97500E+00,        0.98125E+00,        0.98750E+00};
-//vitesse aux points donnes
+//velocity at the given points
 static float Uou2[] =
 {
   0.99800E+00,        0.99700E+00,        0.99600E+00,        0.99600E+00,        0.99800E+00,        0.99700E+00,        0.99600E+00,        0.98800E+00,        0.97000E+00,        0.95600E+00,        0.94300E+00,        0.92200E+00,        0.89700E+00,        0.86800E+00,        0.83600E+00,        0.81300E+00,        0.77800E+00,        /*Z=0.10000E+01*/

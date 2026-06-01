@@ -17,10 +17,10 @@
 
 Implemente_instanciable_sans_constructeur(Matrice_Morse_Diag,"Matrice_Morse_Diag",Matrice_Morse_Sym);
 
-/*! @brief Ecrit les trois tableaux de la structure de stockage Morse sur un flot de sortie.
+/*! @brief Writes the three arrays of the Morse storage structure to an output stream.
  *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie& s) le flot de sortie modifie
+ * @param (Sortie& s) an output stream
+ * @return (Sortie& s) the modified output stream
  */
 Sortie& Matrice_Morse_Diag::printOn(Sortie& s) const
 {
@@ -28,18 +28,18 @@ Sortie& Matrice_Morse_Diag::printOn(Sortie& s) const
 }
 
 
-/*! @brief NON CODE
+/*! @brief NOT IMPLEMENTED
  *
- * @param (Entree& s) un flot d'entree
- * @return (Entree& s) le flot d'entree
- * @throws NON CODE
+ * @param (Entree& s) an input stream
+ * @return (Entree& s) the input stream
+ * @throws NOT IMPLEMENTED
  */
 Entree& Matrice_Morse_Diag::readOn(Entree& s)
 {
   return  Matrice_Morse::readOn(s) ;
 }
 
-/*! @brief provoquue une erreur le but de cette matrice est juste de calculer la diagonale
+/*! @brief The purpose of this matrix is only to compute the diagonal.
  *
  */
 DoubleVect& Matrice_Morse_Diag::ajouter_multvect_(const DoubleVect& x, DoubleVect& y) const
@@ -47,7 +47,7 @@ DoubleVect& Matrice_Morse_Diag::ajouter_multvect_(const DoubleVect& x, DoubleVec
   return Matrice_Morse::ajouter_multvect_(x,y);
 }
 
-/*! @brief provoquue une erreur le but de cette matrice est juste de calculer la diagonale
+/*! @brief The purpose of this matrix is only to compute the diagonal.
  *
  */
 DoubleVect& Matrice_Morse_Diag::ajouter_multvectT_(const DoubleVect& x, DoubleVect& y) const
@@ -56,7 +56,7 @@ DoubleVect& Matrice_Morse_Diag::ajouter_multvectT_(const DoubleVect& x, DoubleVe
   exit();
   return y;
 }
-/*! @brief provoquue une erreur le but de cette matrice est juste de calculer la diagonale
+/*! @brief The purpose of this matrix is only to compute the diagonal.
  *
  */
 DoubleTab& Matrice_Morse_Diag::ajouter_multTab_(const DoubleTab& x, DoubleTab& y) const

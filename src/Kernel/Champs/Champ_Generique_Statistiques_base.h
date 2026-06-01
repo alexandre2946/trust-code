@@ -25,10 +25,10 @@ class Domaine_dis_base;
 class Nom;
 class Operateur_Statistique_tps_base;
 
-/*! @brief Classe Champ_Generique_Statistiques_base Classe de base des classes de champs generiques dedies aux statistiques
+/*! @brief Classe Champ_Generique_Statistiques_base Base class for generic field classes dedicated to statistics
  *
- *    Une classe heritant de Champ_Generique_Statistiques_base porte un operateur statistique
- *    Les operateurs consideres sont moyenne, ecart_Type et correlation
+ *    A class inheriting from Champ_Generique_Statistiques_base carries a statistical operator
+ *    The operators considered are moyenne, ecart_Type and correlation
  *
  *
  */
@@ -75,7 +75,7 @@ public:
 protected:
 
   bool use_source_name_only_ = false; // for PDI: does the name has to be prefixed with the name of my parent field, or am I just using my name?
-  double tstat_deb_, tstat_fin_; //temps de debut et de fin des statistiques pour ce champ
+  double tstat_deb_, tstat_fin_; //start and end times of the statistics for this field
 };
 
 #endif

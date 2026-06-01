@@ -89,7 +89,7 @@ void Op_Dift_standard_VEF_Face::ajouter_cas_vectoriel(const DoubleTab& vitesse, 
   const Domaine_VEF& domaine_VEF = domaine_vef();
   const int nbr_comp = resu.line_size();
 
-  // on cast grad et grad_transp pour pouvoir les modifier : on utilise plus les static car pb avec plusieurs pbs
+  // cast grad and grad_transp to be able to modify them: no longer using statics due to issues with multiple problems
   DoubleTab& grad = ref_cast_non_const(DoubleTab, grad_);
   Debog::verifier("Op_Dift_standard_VEF_Face::ajouter_cas_vectoriel : resu 0 ", resu);
 
@@ -98,18 +98,18 @@ void Op_Dift_standard_VEF_Face::ajouter_cas_vectoriel(const DoubleTab& vitesse, 
 
   assert(nbr_comp > 1);
 
-  // On dimensionne et initialise le tableau des bilans de flux:
+  // Size and initialize the flux balance array:
   flux_bords_.resize(domaine_VEF.nb_faces_bord(), nbr_comp);
   flux_bords_ = 0.;
 
-  // Construction du tableau grad_
+  // Build the grad_ array
   if (!grad.get_md_vector())
     {
       grad.resize(0, Objet_U::dimension, Objet_U::dimension);
       domaine_VEF.domaine().creer_tableau_elements(grad);
     }
 
-  // *** CALCUL DU GRADIENT ***
+  // *** GRADIENT COMPUTATION ***
   DoubleTab ubar(vitesse);
 
   if (grad_Ubar) ref_cast(Champ_P1NC,inconnue_.valeur()).filtrer_L2(ubar);
@@ -121,7 +121,7 @@ void Op_Dift_standard_VEF_Face::ajouter_cas_vectoriel(const DoubleTab& vitesse, 
 
   grad.echange_espace_virtuel();
 
-  // *** CALCUL DE LA DIFFUSION ***
+  // *** DIFFUSION COMPUTATION ***
   Debog::verifier("Op_Dift_standard_VEF_Face::ajouter_cas_vectoriel : grad 1 ", grad);
   calcul_divergence(resu, grad, grad, nu, nu_turb);
 
@@ -145,7 +145,7 @@ void Op_Dift_standard_VEF_Face::calcul_divergence(DoubleTab& dif, const DoubleTa
   if (nu_transp_lu) c3 = 1.;
   if (nut_transp_lu) c4 = 1.;
 
-  // Traitement des bords
+  // Boundary treatment
   Debog::verifier("Op_Dift_standard_VEF_Face::calcul_divergence dif 0 ", dif);
 
   const Conds_lim& les_cl = domaine_Cl_VEF.les_conditions_limites();
@@ -200,13 +200,13 @@ void Op_Dift_standard_VEF_Face::calcul_divergence(DoubleTab& dif, const DoubleTa
                       for (int j = 0; j < nbr_comp; j++)
                         flux += face_normale(num_face0, j) * (nu1 * grad(elem1, i, j) + nu1t * gradt(elem1, j, i));
 
-                      dif(num_face0, i) = 0.; // PQ : valable en regime turbulent d'apres profil lineaire de la vitesse dans la sous couche visqueuse
+                      dif(num_face0, i) = 0.; // PQ: valid in turbulent regime based on linear velocity profile in the viscous sublayer
                       flux_bords_(num_face0, i) -= flux;
                     }
                 }
             }
         }
-      else // Pour les autres conditions aux limites
+      else // For other boundary conditions
         {
           for (int num_face = num1; num_face < num2; num_face++)
             {
@@ -220,7 +220,7 @@ void Op_Dift_standard_VEF_Face::calcul_divergence(DoubleTab& dif, const DoubleTa
                   for (int j = 0; j < nbr_comp; j++)
                     flux += face_normale(num_face, j) * (nu1 * grad(elem1, i, j) + nu1t * gradt(elem1, j, i));
 
-                  dif(num_face, i) = 0.; // PQ : en attendant de faire mieux
+                  dif(num_face, i) = 0.; // PQ: pending a better implementation
                   flux_bords_(num_face, i) -= flux;
                 }
 

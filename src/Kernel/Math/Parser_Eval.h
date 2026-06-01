@@ -20,9 +20,9 @@
 #include <TRUSTTabs.h>
 #include <Parser_U.h>
 
-/*! @brief Classe Parser_Eval Cette classe a pour fonction d evaleur les valeurs prises par une fonction analytique.
+/*! @brief Parser_Eval class - Evaluates the values taken by an analytic function.
  *
- *     La fonction peut dependre de l espace (x, y, z), du temps (t) et d'un champ parametre (val).
+ *     The function may depend on space (x, y, z), time (t) and a parameter field (val).
  *
  */
 class Parser_Eval
@@ -47,7 +47,7 @@ public :
   // single point evaluation - x, y, z, t
   void eval_fct(const DoubleVect& position, const double t, DoubleVect& val) const { eval_fct_single_position(position, &t, nullptr, val); }
 
-  // Fonction generale qui depend de plusieurs champs inconnus
+  // General function depending on multiple unknown fields
   void eval_fct(const DoubleTabs& variables, DoubleTab& val) const;
 
 protected:

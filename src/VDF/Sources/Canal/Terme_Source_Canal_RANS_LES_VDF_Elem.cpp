@@ -29,8 +29,8 @@ Implemente_instanciable_sans_destructeur(Terme_Source_Canal_RANS_LES_VDF_Elem,"C
 
 Terme_Source_Canal_RANS_LES_VDF_Elem::~Terme_Source_Canal_RANS_LES_VDF_Elem()
 {
-  //Le destructeur est appele a l'initialisation alors
-  //la sauvegarde du champ se fait hors initialisation
+  //The destructor is called at initialization so
+  //the field saving is done outside initialization
 
   if(umoy.size()!=0)
     {
@@ -226,7 +226,7 @@ void Terme_Source_Canal_RANS_LES_VDF_Elem::mettre_a_jour(double temps)
 
   const Domaine_VDF& domaine_VDF = le_dom_VDF.valeur();
 
-  //vitesse=temperature
+  //velocity=temperature
 
   const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
   const double dt = mon_equation->schema_temps().pas_de_temps();
@@ -237,7 +237,7 @@ void Terme_Source_Canal_RANS_LES_VDF_Elem::mettre_a_jour(double temps)
   int cptbis=0;
 
   //****************************************************
-  //******* MaJ de la vitesse cible (RANS) ***********
+  //******* Update of the target velocity (RANS) ***********
   //**************************************************
   if(nom_pb_rans != "non_couple")
     {
@@ -257,10 +257,10 @@ void Terme_Source_Canal_RANS_LES_VDF_Elem::mettre_a_jour(double temps)
   if(moyenne==2)
     {
       //******************************************************
-      //*************** MOYENNE TEMPORELLE *******************
+      //*************** TEMPORAL AVERAGE *******************
       //******************************************************
 
-      //Calcul d'une premiere moyenne temporelle significative
+      //Compute a first meaningful temporal average
 
       if((tps>(f_start-t_av))&&(tps<f_start))
         {
@@ -297,7 +297,7 @@ void Terme_Source_Canal_RANS_LES_VDF_Elem::mettre_a_jour(double temps)
 
 
       //***********************************************************
-      //*************** FIN MOYENNE TEMPORELLE  ***************
+      //*************** END TEMPORAL AVERAGE  ***************
       //*******************************************************
     }
 
@@ -344,7 +344,7 @@ void Terme_Source_Canal_RANS_LES_VDF_Elem::ajouter_blocs(matrices_t matrices, Do
   const double dt = mon_equation->schema_temps().pas_de_temps();
   const double dt_min = mon_equation->schema_temps().pas_temps_min();
 
-  //vitesse=temperature
+  //velocity=temperature
   const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
 
   double vol=0.;
@@ -356,7 +356,7 @@ void Terme_Source_Canal_RANS_LES_VDF_Elem::ajouter_blocs(matrices_t matrices, Do
 
   static int cpt2=0;
 
-  // Calcul de la norme des vitesses au centre des elements
+  // Compute the norm of velocities at element centers
 
   if(((tps>f_start)&&(compteur_reprise > 1))||((moyenne==3)&&(tps>dt_min)))
     {

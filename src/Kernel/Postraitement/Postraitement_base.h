@@ -27,7 +27,7 @@ class Sortie;
 class Motcle;
 class Param;
 
-/*! @brief Classe de base pour l'ensemble des postraitements.
+/*! @brief Base class for all post-processing objects.
  *
  * @sa Postraitements
  */

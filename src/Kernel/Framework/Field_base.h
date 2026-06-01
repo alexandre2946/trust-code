@@ -53,7 +53,7 @@ public:
   inline virtual void add_synonymous(const Nom& nom) { noms_synonymes_.add(nom); }
 
   // Component management
-  virtual int nb_comp() const { return nb_compo_ ; } // Renvoie le nombre de composantes du champ.
+  virtual int nb_comp() const { return nb_compo_ ; } // Returns the number of components of the field.
   virtual void fixer_nb_comp(int i);
   virtual int nb_vect_comp() const;
 
@@ -74,7 +74,7 @@ public:
   virtual const Nom& fixer_unite(int i, const Nom&);
 
   // Field nature management
-  virtual Nature_du_champ nature_du_champ() const { return nature_; } // Renvoie la nature d'un champ (scalaire, multiscalaire, vectoriel).
+  virtual Nature_du_champ nature_du_champ() const { return nature_; } // Returns the nature of a field (scalar, multiscalar, vectorial).
   virtual Nature_du_champ fixer_nature_du_champ(Nature_du_champ nat);
 
   bool is_basis_function() const  { return nature_ >= basis_function_order_1_scalar; }

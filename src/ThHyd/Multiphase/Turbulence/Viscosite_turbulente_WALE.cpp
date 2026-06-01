@@ -27,7 +27,7 @@ Sortie& Viscosite_turbulente_WALE::printOn(Sortie& os) const { return os; }
 
 Entree& Viscosite_turbulente_WALE::readOn(Entree& is)
 {
-  mod_const_ = 0.5; // par default
+  mod_const_ = 0.5; // by default
   Param param(que_suis_je());
   param.ajouter("cw", &mod_const_); // XD_ADD_P floattant
   // XD_CONT WALE's model constant. By default it is se to 0.5.
@@ -59,7 +59,7 @@ void Viscosite_turbulente_WALE::eddy_viscosity(DoubleTab& nu_t) const
       const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, pb_->domaine_dis());
       const Champ_Face_base& vit = ref_cast(Champ_Face_base, pb_->equation(0).inconnue());
 
-      // Nota bene : en PolyMAC_MPFA, grad_u__ contient (nf.grad)u_i aux faces, puis (d_j u_i) aux elements
+      // Note: in PolyMAC_MPFA, grad_u__ contains (nf.grad)u_i at faces, then (d_j u_i) at elements
       const DoubleTab& grad_u__ = pb_->get_champ("gradient_vitesse").valeurs();
 
       const IntTab& face_voisins = domaine_VF.face_voisins(), &elem_faces = domaine_VF.elem_faces();
@@ -74,11 +74,11 @@ void Viscosite_turbulente_WALE::eddy_viscosity(DoubleTab& nu_t) const
       DoubleTrav grad_u(nb_elem_tot, dim, dim, N), gij_bar2(dim, dim, N), Sij_d(dim, dim, N);
       grad_u = 0., gij_bar2 = 0., Sij_d = 0.;
 
-      // remplir grad_u en 4 dimension
-      // XXX : attention faut remplir grad_u ici pas plus tard !!!
+      // fill grad_u in 4 dimensions
+      // XXX: grad_u must be filled here, not later !!!
       for (int elem = 0; elem < nb_elem_tot; elem++)
         for (int i = 0; i < dim; i++) // variable : du, dv, dw
-          for (int j = 0; j < dim; j++) // par rappor a : dx, dy, dz
+          for (int j = 0; j < dim; j++) // with respect to: dx, dy, dz
             for (int n = 0; n < N; n++) // phase
               grad_u(elem, i, j, n) = is_poly ? grad_u__(nb_faces_tot + elem * dim + j, n * dim + i) : grad_u__(nb_faces_tot + elem, N * (dim * i + j) + n);
 
@@ -87,7 +87,7 @@ void Viscosite_turbulente_WALE::eddy_viscosity(DoubleTab& nu_t) const
 
       for (int elem = 0; elem < nb_elem_tot; elem++)
         {
-          //Calcul du terme Sij_d
+          //Compute the Sij_d term
           for (int i = 0; i < dim; i++)
             for (int j = 0; j < dim; j++)
               for (int n = 0; n < N; n++)
@@ -108,10 +108,10 @@ void Viscosite_turbulente_WALE::eddy_viscosity(DoubleTab& nu_t) const
                 {
                   Sij_d(i, j, n) = 0.5 * (gij_bar2(i, j, n) + gij_bar2(j, i, n));
                   if (i == j)
-                    Sij_d(i, j, n) -= gkk_bar2(n) / 3.; // Terme derriere le tenseur de Kronecker
+                    Sij_d(i, j, n) -= gkk_bar2(n) / 3.; // Kronecker tensor term
                 }
 
-          // Calcul de Sij_d2 et Sij_bar2
+          // Compute Sij_d2 and Sij_bar2
           Sij_d2 = 0., Sij_bar = 0., Sij_bar2 = 0.;
 
           for (int i = 0; i < dim; i++)
@@ -120,7 +120,7 @@ void Viscosite_turbulente_WALE::eddy_viscosity(DoubleTab& nu_t) const
                 {
                   Sij_d2(n) += Sij_d(i, j, n) * Sij_d(i, j, n);
 
-                  // Sij_bar et Sij_bar2
+                  // Sij_bar and Sij_bar2
                   Sij_bar(n) = 0.5 * (grad_u(elem, i, j, n) + grad_u(elem, j, i, n));
                   if (i == j)
                     {

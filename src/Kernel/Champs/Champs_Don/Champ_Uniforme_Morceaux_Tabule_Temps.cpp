@@ -26,13 +26,13 @@ Implemente_instanciable(Champ_Uniforme_Morceaux_Tabule_Temps, "Champ_Uniforme_Mo
 
 Sortie& Champ_Uniforme_Morceaux_Tabule_Temps::printOn(Sortie& os) const { return os; }
 
-/*! @brief Lit un champ uniforme par morceaux tabule dans le temps a partir d'un flot d'entree.
+/*! @brief Reads a piecewise uniform field tabulated in time from an input stream.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entre modifie
- * @throws accolade ouvrante attendue
- * @throws mot clef "defaut" attendu
- * @throws accolade fermante attendue
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
+ * @throws opening brace expected
+ * @throws keyword "defaut" expected
+ * @throws closing brace expected
  */
 Entree& Champ_Uniforme_Morceaux_Tabule_Temps::readOn(Entree& is)
 {
@@ -107,9 +107,9 @@ Entree& Champ_Uniforme_Morceaux_Tabule_Temps::readOn(Entree& is)
   return is;
 }
 
-/*! @brief Mise a jour en temps du champ (tabule en temps)
+/*! @brief Updates the field in time (tabulated in time).
  *
- * @param (double tps) le temps de mise a jour
+ * @param (double tps) the update time
  */
 void Champ_Uniforme_Morceaux_Tabule_Temps::me_calculer(double tps)
 {

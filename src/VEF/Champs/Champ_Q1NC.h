@@ -33,7 +33,7 @@ public:
   void cal_rot_ordre1(DoubleTab&);
   void gradient(DoubleTab&);
 
-  // Methodes inlines
+  // Inline methods
   inline const Domaine_VEF& domaine_vef() const override { return ref_cast(Domaine_VEF, le_dom_VF.valeur()); }
 
   inline DoubleVect& valeur_a_elem(const DoubleVect& position, DoubleVect& val, int le_poly) const override

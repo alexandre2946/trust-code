@@ -57,8 +57,8 @@ void Interface_base::mettre_a_jour(double temps)
                    &temp = pbm.equation_energie().inconnue().valeurs();
 
   // XXX Elie Saikali : Cas sans saturation !
-  // pour le moment on simplifie le calcul et on prend la moyenne de T
-  // FIXME : faut faire un truc pour calculer T a l'interface comme le code dans Source_Flux_interfacial_base::ajouter_blocs
+  // for now we simplify the computation and take the average of T
+  // FIXME: need to compute T at the interface as done in Source_Flux_interfacial_base::ajouter_blocs
   // T_interf = ( Tl / hl + Tg / hg ) / (1 / hl + 1 / hg )
 
   const int N = temp.line_size();
@@ -76,7 +76,7 @@ void Interface_base::mettre_a_jour(double temps)
   sigma_tab.echange_espace_virtuel();
 }
 
-// lois en T
+// laws in T
 void Interface_base::sigma(const SpanD T, const SpanD P, SpanD res, int ncomp, int ind) const
 {
   if (sigma__ >= 0)
@@ -93,7 +93,7 @@ double Interface_base::sigma(const double T, const double P) const
   return res_[0];
 }
 
-// lois en h
+// laws in h
 void Interface_base::sigma_h(const SpanD H, const SpanD P, SpanD res, int ncomp, int ind) const
 {
   if (sigma__ >= 0)

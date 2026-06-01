@@ -25,15 +25,15 @@ class Discretisation_base;
 class Operateur_base;
 class Champ_Inc_base;
 
-/*! @brief classe Operateur Classe generique de la hierarchie des operateurs.
+/*! @brief class Operateur Generic class of the operator hierarchy.
  *
- *      Cette classe generique est particuliere car elle n'HERITE PAS
- *      de OWN_PTR(Operateur_base) mais de MorEqn.
- *      Une reference sur un Operateur_base est renvoye par la methode
- *      Operateur::l_op_base() qui est virtuelle pure et doit etre surchargee
- *      dans ses derivees.
+ *      This generic class is special because it does NOT INHERIT
+ *      from OWN_PTR(Operateur_base) but from MorEqn.
+ *      A reference to an Operateur_base is returned by the method
+ *      Operateur::l_op_base() which is pure virtual and must be overridden
+ *      in derived classes.
  *
- * @sa MorEqn Operateur_base, Classe abstraite, Methodes abstraites:, Operateur_base& l_op_base(), const Operateur_base& l_op_base() const, DoubleTab& calculer(const DoubleTab&,DoubleTab& ) const, DoubleTab& calculer(const DoubleTab&,DoubleTab& ) const
+ * @sa MorEqn Operateur_base, Abstract class, Abstract methods:, Operateur_base& l_op_base(), const Operateur_base& l_op_base() const, DoubleTab& calculer(const DoubleTab&,DoubleTab& ) const, DoubleTab& calculer(const DoubleTab&,DoubleTab& ) const
  */
 class Operateur : public MorEqn
 {
@@ -66,8 +66,8 @@ public :
 
   void set_fichier(const Nom& nom);
   void set_description(const Nom& nom);
-  //Methode non_nul declaree car Operateur n est pas un OWN_PTR de Operateur_base
-  //et n accede pas a la methode non_nul
+  // Method op_non_nul declared because Operateur does not derive from OWN_PTR(Operateur_base)
+  // and therefore does not have access to the non_nul method
   virtual int op_non_nul() const =0;
 
 protected :

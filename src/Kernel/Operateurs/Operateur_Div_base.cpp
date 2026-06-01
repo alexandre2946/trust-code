@@ -19,10 +19,10 @@
 Implemente_base(Operateur_Div_base,"Operateur_Div_base",Operateur_base);
 
 
-/*! @brief NE FAIT RIEN A surcharger dans les classes derivees
+/*! @brief DOES NOTHING To be overridden in derived classes
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the output stream
  */
 Sortie& Operateur_Div_base::printOn(Sortie& os) const
 {
@@ -30,10 +30,10 @@ Sortie& Operateur_Div_base::printOn(Sortie& os) const
 }
 
 
-/*! @brief NE FAIT RIEN A surcharger dans les classes derivees
+/*! @brief DOES NOTHING To be overridden in derived classes
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the input stream
  */
 Entree& Operateur_Div_base::readOn(Entree& is)
 {

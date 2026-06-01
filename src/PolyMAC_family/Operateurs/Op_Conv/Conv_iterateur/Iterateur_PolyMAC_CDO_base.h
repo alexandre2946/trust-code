@@ -40,11 +40,11 @@ class Matrice_Morse;
 enum Type_Cl_PolyMAC_CDO
 {
   symetrie                         //        Symetrie
-  , sortie_libre                 //        Neumann_sortie_libre ou derivees
+  , sortie_libre                 //        Neumann_sortie_libre or derived
   , entree_fluide                //        Dirichlet_entree_fluide
   , paroi_fixe                        //        Dirichlet_paroi_fixe
   , paroi_defilante                //        Dirichlet_paroi_defilante
-  , paroi_adiabatique                //        Neumann_paroi_adiabatique ou derivees
+  , paroi_adiabatique                //        Neumann_paroi_adiabatique or derived
   , paroi                        //      Neumann_paroi
   , echange_externe_impose        //        Echange_externe_impose
   , echange_global_impose        //        Echange_global_impose

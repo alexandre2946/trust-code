@@ -57,7 +57,7 @@ Entree& Champ_MUSIG::readOn( Entree& is )
       dim_ += nbSubPhases;
     }
 
-  // XXX : On verifie qu'on a lu les memes types de champs ...
+  // XXX : Check that the same field types were read ...
   for (int i = 1; i < dim_ ; i++)
     if (z_fld_[i]->que_suis_je() != z_fld_[0]->que_suis_je())
       {
@@ -65,7 +65,7 @@ Entree& Champ_MUSIG::readOn( Entree& is )
         Process::exit();
       }
 
-  // pour la methode valeurs()
+  // for the valeurs() method
   const int ncompo = z_fld_[0]->nb_comp() * dim_, nnodes = z_fld_[0]->valeurs().dimension_tot(0);
   fixer_nb_comp(ncompo);
   fixer_nb_valeurs_nodales(nnodes);

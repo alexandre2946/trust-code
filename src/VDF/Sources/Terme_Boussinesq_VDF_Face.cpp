@@ -67,13 +67,13 @@ void Terme_Boussinesq_VDF_Face::ajouter_blocs(matrices_t matrices, DoubleTab& se
 
   int nb_dim = param.line_size();
 
-  // Verifie la validite de T0:
+  // Verify the validity of T0:
   check();
 
-  // Boucle sur les conditions limites pour traiter les faces de bord
+  // Loop over boundary conditions to process boundary faces
   for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
-      // pour chaque Condition Limite on regarde son type
+      // for each boundary condition, check its type
       const Cond_lim& la_cl = domaine_Cl_VDF_hyd.les_conditions_limites(n_bord);
       const Cond_lim& la_cl_scal = domaine_Cl_VDF_scal.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
@@ -175,7 +175,7 @@ void Terme_Boussinesq_VDF_Face::ajouter_blocs(matrices_t matrices, DoubleTab& se
         }
     }
 
-  // Boucle sur les faces internes
+  // Loop over internal faces
   int ndeb = domaine_VDF.premiere_face_int();
   int nb_faces = domaine_VDF.nb_faces();
   for (int num_face=ndeb; num_face<nb_faces; num_face++)

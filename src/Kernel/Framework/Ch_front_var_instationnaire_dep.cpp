@@ -42,9 +42,9 @@ int Ch_front_var_instationnaire_dep::initialiser(double temps, const Champ_Inc_b
   if (!Champ_front_var_instationnaire::initialiser(temps,inco))
     return 0;
 
-  // Initialisation par defaut a la valeur de l'inconnue au bord
-  // Ca veut dire prendre la trace de son propre bord
-  // Attention, ne pas passer par les raccords !
+  // Default initialization to the value of the unknown at the boundary
+  // This means taking the trace of its own boundary
+  // Warning: do not go through the connectors!
   DoubleTab& tab=les_valeurs->valeurs();
   assert(temps==inco.temps());
   if(nb_comp()!=inco.nb_comp())

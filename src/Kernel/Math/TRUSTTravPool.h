@@ -21,7 +21,7 @@
 
 #include <TVAlloc.h>
 
-/*! Pool of memory blocks used when requesting temporary storage (Trav arrays)
+/*! @brief Pool of memory blocks used when requesting temporary storage (Trav arrays)
  *
  * Purely static methods. One pool per base type (int, double, etc...).
  *

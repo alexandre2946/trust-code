@@ -106,9 +106,9 @@ int Fluide_Quasi_Compressible::lire_motcle_non_standard(const Motcle& mot, Entre
     return Fluide_Dilatable_base::lire_motcle_non_standard(mot, is);
 }
 
-/*! @brief Complete le fluide avec les champs inconnus associes au probleme
+/*! @brief Completes the fluid with the unknown fields associated with the problem.
  *
- * @param (Pb_Thermohydraulique& pb) le probleme a resoudre
+ * @param pb The problem to solve.
  */
 void Fluide_Quasi_Compressible::completer(const Probleme_base& pb)
 {

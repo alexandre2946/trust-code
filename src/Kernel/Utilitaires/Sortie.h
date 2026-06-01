@@ -37,13 +37,13 @@ class TRUST_Ref_Objet_U;
 class Separateur;
 class Objet_U;
 
-/*! @brief Classe de base des flux de sortie.
+/*! @brief Base class for output streams.
  *
- * Elle sait ecrire des types simples (entiers, flottants) et des Objet_U (via printOn de l'objet_U)
- *    Attention, certains classes derivees sont paralleles: dans ce cas, il faut appeler
- *    syncfile() periodiquement sur tous les processeurs. Voir class EcrFicPartage
- *    Attention: pour ecrire correctement un flux a la fois en ASCII et BINAIRE,
- *     il faut utiliser un Separateur (finl ou space) pour separer les objets ecrits.
+ * Knows how to write simple types (integers, floats) and Objet_U objects (via printOn of the Objet_U).
+ *    Note: some derived classes are parallel; in that case, syncfile() must be called periodically
+ *    on all processors. See class EcrFicPartage.
+ *    Note: to write correctly to a stream in both ASCII and BINARY mode,
+ *    a Separateur (finl or space) must be used to separate written objects.
  *
  * @sa Entree
  */

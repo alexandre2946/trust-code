@@ -20,7 +20,7 @@
 
 /*! @brief class Champ_front_fonc_gradient_VEF
  *
- *  Classe derivee de Champ_front_base
+ *  @brief Derived class from Champ_front_base.
  *
  * @sa Champ_front_base
  */

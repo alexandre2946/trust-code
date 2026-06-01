@@ -36,7 +36,7 @@ void Flux_interfacial_Zeitoun::completer()
   Pb_Multiphase *pbm = sub_type(Pb_Multiphase, pb_.valeur()) ? &ref_cast(Pb_Multiphase, pb_.valeur()) : nullptr;
 
   if (!pbm || pbm->nb_phases() == 1) Process::exit(que_suis_je() + " : not needed for single-phase flow!");
-  for (int n = 0; n < pbm->nb_phases(); n++) //recherche de n_l, n_g : phase {liquide,gaz}_continu en priorite
+  for (int n = 0; n < pbm->nb_phases(); n++) //search for n_l, n_g: continuous {liquid,gas} phase with priority
     if (pbm->nom_phase(n).debute_par("liquide") && (n_l < 0 || pbm->nom_phase(n).finit_par("continu")))  n_l = n;
 
   if (n_l < 0) Process::exit(que_suis_je() + " : liquid phase not found!");
@@ -80,7 +80,7 @@ void Flux_interfacial_Zeitoun::coeffs(const input_t& in, output_t& out) const
             double dTk_Nu = 2.04* std::pow(Re_b, .61)*            std::pow(std::max(in.alpha[k], a_min_coeff), 0.328)*              -.308*dTk_Ja *std::pow(Ja, -1.308);
             double dTl_Nu = 2.04* std::pow(Re_b, .61)*            std::pow(std::max(in.alpha[k], a_min_coeff), 0.328)*              -.308*dTl_Ja *std::pow(Ja, -1.308);
 
-            out.hi(n_l, k)       =  Nu    * in.lambda[n_l] * 6. / (in.d_bulles[k]*in.d_bulles[k]) * std::max(in.alpha[k], a_min); // std::max() pour que le flux interfacial sont non nul
+            out.hi(n_l, k)       =  Nu    * in.lambda[n_l] * 6. / (in.d_bulles[k]*in.d_bulles[k]) * std::max(in.alpha[k], a_min); // std::max() to ensure non-zero interfacial flux
             out.da_hi(n_l, k, k) = (in.alpha[k] > a_min ?
                                     Nu    * in.lambda[n_l] * 6. / (in.d_bulles[k]*in.d_bulles[k]) :
                                     0.)

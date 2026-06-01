@@ -17,11 +17,11 @@
 
 Implemente_instanciable(DescStructure,"DescStructure",Objet_U);
 
-/*! @brief Lecture d'un descripteur de structure Un descripteur de structure est constitue d'un
+/*! @brief Reads a structure descriptor. A structure descriptor consists of
  *
- *     identificateur, d'un vecteur d'espaces virtuels,
- *     d'un vecteur d'espaces distants et d'un descripteur de
- *     structure interne
+ *     an identifier, a vector of virtual spaces,
+ *     a vector of distant spaces, and an internal
+ *     structure descriptor.
  *
  */
 Entree& DescStructure::readOn(Entree& is)
@@ -41,7 +41,7 @@ Entree& DescStructure::readOn(Entree& is)
   return is;
 }
 
-/*! @brief Pas utilise
+/*! @brief Not used
  *
  */
 Sortie& DescStructure::printOn(Sortie& os) const

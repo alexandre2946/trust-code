@@ -23,7 +23,7 @@ class Sortie;
 class Noms;
 class Nom;
 
-// Le pragma est pour desactiver le -Wunused-variable avec nvc++:
+// The pragma is to disable -Wunused-variable with nvc++:
 // Macro to declare A and B synonyms:
 #ifdef __NVCOMPILER
 #define Add_synonym(A,B) _Pragma("diag_suppress 177") \
@@ -32,7 +32,7 @@ const Synonyme_info name2(name2(synonym_,A),__LINE__)(B,A::info_obj.name())
 #define Add_synonym(A,B) const Synonyme_info name2(name2(synonym_,A),__LINE__)(B,A::info_obj.name())
 #endif
 
-/*! @brief modelise une information de synonyme pour les Objet_U
+/*! @brief Models synonym information for Objet_U objects.
  *
  * @sa Objet_U Nom
  */
@@ -46,7 +46,7 @@ public:
   inline const char* org_name_() const { return org; }
   inline const char* nom() const { return n; }
 
-  // Methodes statiques :
+  // Static methods:
   static Sortie&           hierarchie(Sortie&) ;
   static int            est_un_synonyme(const char*) ;
 
@@ -56,25 +56,25 @@ public:
 protected:
 
 private:
-  Synonyme_info(Synonyme_info&) {}; // Constructeur par copie invalide
-  Synonyme_info& operator=(Synonyme_info&); // Operateur= invalide
+  Synonyme_info(Synonyme_info&) {}; // Copy constructor invalid
+  Synonyme_info& operator=(Synonyme_info&); // operator= invalid
 
 
   static void retirer_synonyme(const char *nom );
   static int search_synonyme_info_name(const char *nom, int& index);
 
-  // Le nom de la classe.
+  // The class name.
   const char* n = "rien";
   const char* org = "rien";
 
-  // Liste des Synonyme_info des classes declarees par declare_base/declare_instanciable
-  // La liste est triee par ordre alphabetique (minuscules/majuscules indifferentes)
+  // List of Synonyme_info for classes declared by declare_base/declare_instanciable
+  // The list is sorted alphabetically (case-insensitive)
   static const Synonyme_info** les_synonymes;
 
-  // Nombre de classes enregistrees dans "les_synonymes" et "synonymes_homonymes"
+  // Number of classes registered in "les_synonymes" and "synonymes_homonymes"
   static int nb_classes;
-  // Taille memoire du tableau "les_synonymes" et "synonymes_homonymes"
-  // (tableau redimensionne par blocs)
+  // Memory size of the array "les_synonymes" and "synonymes_homonymes"
+  // (array resized in blocks)
   static int les_synonymes_memsize;
 };
 

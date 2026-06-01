@@ -50,7 +50,7 @@ void Op_Grad_P0_to_Face::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, c
 
   int N = inco.line_size();
 
-  // Boucle sur les bords pour traiter les conditions aux limites
+  // Loop over boundaries to process boundary conditions
   for (int n_bord = 0; n_bord < zvdf.nb_front_Cl(); n_bord++)
     for (int k = 0; k < N; k++)
       {
@@ -68,7 +68,7 @@ void Op_Grad_P0_to_Face::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, c
         else if (sub_type(Dirichlet, la_cl.valeur())) // Cas CL Dirichlet
           {
             const Dirichlet& cl = ref_cast(Dirichlet, la_cl.valeur());
-            // XXX Elie Saikali : on calcule pas si champ_front_var n'est pas initialise
+            // XXX Elie Saikali : skip computation if champ_front_var is not initialized
             if (cl.champ_front().has_valeurs_au_temps(cl.champ_front().get_temps_defaut()))
               for (int num_face = ndeb, num_face_cl = 0; num_face < nfin; num_face++, num_face_cl++)
                 {
@@ -79,7 +79,7 @@ void Op_Grad_P0_to_Face::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, c
                   secmem(num_face, k) -= (inco(n0, k) - cl.val_imp(num_face_cl, k)) / (xp(n0, ori) - xv(num_face, ori));
                 }
           }
-        else if (sub_type(Dirichlet_homogene, la_cl.valeur())) // Cas Dirichlet homogene, i.e. valeur nulle a la paroi
+        else if (sub_type(Dirichlet_homogene, la_cl.valeur())) // Homogeneous Dirichlet case, i.e. zero value at the wall
           for (int num_face = ndeb; num_face < nfin; num_face++)
             {
               int n0 = face_voisins(num_face, 0);
@@ -98,26 +98,26 @@ void Op_Grad_P0_to_Face::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, c
                   if (n0 < 0)
                     n0 = face_voisins(num_face, 1);
                   if (face_voisins(num_face, 0) >= 0)
-                    secmem(num_face, k) -= (inco(n0, k) - cl.T_ext(num_face_cl, k)) * cl.h_imp_grad(num_face_cl, k); // Si bien oriente
+                    secmem(num_face, k) -= (inco(n0, k) - cl.T_ext(num_face_cl, k)) * cl.h_imp_grad(num_face_cl, k); // If correctly oriented
                   else
-                    secmem(num_face, k) += (inco(n0, k) - cl.T_ext(num_face_cl, k)) * cl.h_imp_grad(num_face_cl, k); // Si oriente a envers
+                    secmem(num_face, k) += (inco(n0, k) - cl.T_ext(num_face_cl, k)) * cl.h_imp_grad(num_face_cl, k); // If oriented in reverse
                 }
             else { /* Do nothing */ }
           }
-        else if (sub_type(Neumann_paroi, la_cl.valeur())) // Cas Neumann_paroi
+        else if (sub_type(Neumann_paroi, la_cl.valeur())) // Neumann_paroi case
           {
             const Neumann_paroi& cl = ref_cast(Neumann_paroi, la_cl.valeur());
-            // XXX Elie Saikali : on calcule pas si champ_front_var n'est pas initialise
+            // XXX Elie Saikali : skip computation if champ_front_var is not initialized
             if (cl.champ_front().has_valeurs_au_temps(cl.champ_front().get_temps_defaut()))
               for (int num_face = ndeb, num_face_cl = 0; num_face < nfin; num_face++, num_face_cl++)
                 {
                   if (face_voisins(num_face, 0) >= 0)
-                    secmem(num_face, k) -= cl.flux_impose(num_face_cl, k); // Si bien oriente
+                    secmem(num_face, k) -= cl.flux_impose(num_face_cl, k); // If correctly oriented
                   else
-                    secmem(num_face, k) += cl.flux_impose(num_face_cl, k); // Si oriente a envers
+                    secmem(num_face, k) += cl.flux_impose(num_face_cl, k); // If oriented in reverse
                 }
           }
-        else if (!sub_type(Neumann_homogene, la_cl.valeur())) // En Neumann homogene, i.e. symetrie, la derivee a la face est nulle => on fait rien
+        else if (!sub_type(Neumann_homogene, la_cl.valeur())) // In homogeneous Neumann, i.e. symmetry, the face derivative is zero => do nothing
           for (int num_face = ndeb; num_face < nfin; num_face++)
             {
               int n0 = face_voisins(num_face, 0);
@@ -138,7 +138,7 @@ void Op_Grad_P0_to_Face::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, c
             }
       }
 
-  // Boucle sur les faces internes
+  // Loop over internal faces
   for (int num_face = zvdf.premiere_face_int(); num_face < zvdf.nb_faces(); num_face++)
     for (int k = 0; k < N; k++)
       {

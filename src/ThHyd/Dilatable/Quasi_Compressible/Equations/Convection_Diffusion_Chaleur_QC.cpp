@@ -93,7 +93,7 @@ int Convection_Diffusion_Chaleur_QC::lire_motcle_non_standard(const Motcle& mot,
     {
       Convection_Diffusion_Chaleur_Fluide_Dilatable_base::lire_motcle_non_standard(mot,is);
 
-      //l'equation de la chaleur en quasi compressible contient un terme source dP/dt
+      //the quasi-compressible heat equation contains a source term dP/dt
       Cerr << "Source term creation of the energy equation :"<< finl;
       Source t;
       Source& so=les_sources.add(t);

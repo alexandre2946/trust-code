@@ -38,23 +38,23 @@ public:
   virtual int limpr(double, double) const;
 
   /*
-   * Methode qu'on peut surcharger  dans les classes filles pour definir un Nusselt particulier
-   * Sinon on peut rentrer dans le jdd directement une fonction Nusselt de Reynolds local et Prandtl local.
-   * Elle se charge de renvoyer la valeur du coefficient d'echange sur la maille i.
+   * Method that can be overridden in derived classes to define a particular Nusselt number.
+   * Otherwise, a Nusselt function of local Reynolds and local Prandtl can be entered directly in the data file.
+   * It returns the value of the heat exchange coefficient on cell i.
    */
   virtual double calculer_coefficient_echange(int i);
 
   /*
-   * Methode qu'on peut surcharger  dans les classes filles pour definir une forme particuliere.
-   * Sinon on peut rentrer dans le jdd une fonction de la surface laterale S et du diametre hydraulique Dh.
-   * Elle calcule le volume d'une tranche de fluide de surface laterale s et de diametre hydraulique d.
-   * Cette fonction depend donc de la geometrie pour laquelle la correlation est ecrite
-   * (plaques paralleles, cylindres etc...)
+   * Method that can be overridden in derived classes to define a particular shape.
+   * Otherwise, a function of the lateral surface area S and the hydraulic diameter Dh can be entered in the data file.
+   * It computes the volume of a fluid slice with lateral surface area s and hydraulic diameter d.
+   * This function depends on the geometry for which the correlation is written
+   * (parallel plates, cylinders, etc.)
    */
   virtual double volume(double s, double d);
 
   /*
-   * Renvoie U et T et les proprietes physiques sur la maille 1D i
+   * Returns U and T and the physical properties on 1D cell i.
    */
   inline double getU(int i) const { return U(i); }
   inline double getT(int i) const { return T(i); }
@@ -85,9 +85,9 @@ protected:
 
   DoubleTab tab_ech;
 
-  double Tinf = -100., Tsup = -100.; // Temperature entree, sortie
-  double T_CL0 = -100., T_CL1 = -100.; // CL sur le domaine. En seq. = Tinf et Tsup ; En parallele = Tvoisin
-  int dir = -1; // Direction du cylindre
+  double Tinf = -100., Tsup = -100.; // Inlet and outlet temperatures
+  double T_CL0 = -100., T_CL1 = -100.; // BCs on the domain. Sequential: = Tinf and Tsup; Parallel: = Tvoisin
+  int dir = -1; // Direction of the cylinder
   Parser_U lambda_T;
   Parser_U mu_T;
   Parser_U rho_T;
@@ -97,15 +97,15 @@ protected:
   double Cp = -100.;
   double debit = -100.;
 
-  double diam = -100.; // diametre hydraulique
-  DoubleVect vol; // volumes des tranches Sdz du volume suivant la direction de l'ecoulement
-  DoubleVect coord; // coordonnees des points de discretisation 1D
+  double diam = -100.; // hydraulic diameter
+  DoubleVect vol; // slice volumes Sdz along the flow direction
+  DoubleVect coord; // coordinates of the 1D discretization points
 
-  int N = -1;   // nb de points du maillage 1D pour la vitesse et la temperature
-  DoubleVect U, T; // inconnues fluides vitesse et temperature
-  DoubleVect Qvol; // puissance volumique dans le fluide 1D
-  DoubleVect rho, mu, lambda; // tableau des proprietes physiques du fluide a un instant donne
-  DoubleVect h_correlation; // le coeff d'echange par correlation
+  int N = -1;   // number of 1D mesh points for velocity and temperature
+  DoubleVect U, T; // fluid unknowns: velocity and temperature
+  DoubleVect Qvol; // volumetric power in the 1D fluid
+  DoubleVect rho, mu, lambda; // array of fluid physical properties at a given instant
+  DoubleVect h_correlation; // heat transfer coefficient from correlation
 
 };
 

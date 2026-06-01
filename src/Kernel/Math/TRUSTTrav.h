@@ -74,8 +74,8 @@ public:
     TRUSTTab<_TYPE_,int>::resize(n1, n2, n3, n4);
   }
 
-  // Constructeur par copie depuis Vect
-  //  ATTENTION: construit un tableau de meme taill et de meme structure (espaces virtuels), mais initialise avec TYPE_ZERO !!!
+  // Copy constructor from Vect
+  //  WARNING: builds an array with the same size and structure (virtual spaces) but initialised with TYPE_ZERO !!!
   inline TRUSTTrav(const TRUSTVect<_TYPE_,int>& tab)
   {
     TRUSTTab<_TYPE_,int>::set_mem_storage(STORAGE::TEMP_STORAGE);
@@ -87,8 +87,8 @@ public:
     TRUSTTab<_TYPE_,int>::operator=(TYPE_ZERO);
   }
 
-  // Constructeur par copie depuis Tab
-  //  ATTENTION: construit un tableau de meme taill et de meme structure (espaces virtuels), mais initialise avec TYPE_ZERO !!!
+  // Copy constructor from Tab
+  //  WARNING: builds an array with the same size and structure (virtual spaces) but initialised with TYPE_ZERO !!!
   inline TRUSTTrav(const TRUSTTab<_TYPE_,int>& tab)
   {
     TRUSTTab<_TYPE_,int>::set_mem_storage(STORAGE::TEMP_STORAGE);
@@ -98,8 +98,8 @@ public:
     TRUSTTab<_TYPE_,int>::operator=(TYPE_ZERO);
   }
 
-  // Constructeur par copie depuis Trav
-  //  ATTENTION: construit un tableau de meme taill et de meme structure (espaces virtuels), mais initialise avec TYPE_ZERO !!!
+  // Copy constructor from Trav
+  //  WARNING: builds an array with the same size and structure (virtual spaces) but initialised with TYPE_ZERO !!!
   inline TRUSTTrav(const TRUSTTrav& tab) :
     // Force invocation of previous ctor on TRUSTTab<> since nothing new here (but this ctor must exist since 'operator=()' is coded)
     TRUSTTrav<_TYPE_>((const TRUSTTab<_TYPE_,int>&)tab)
@@ -107,32 +107,32 @@ public:
 
   // Operateurs copie
 
-  // Operateur copie (on ne veut pas l'operateur par defaut)
+  // Copy operator (we do not want the default operator)
   inline TRUSTTrav& operator=(const TRUSTTrav& tab)
   {
     TRUSTTab<_TYPE_,int>::operator=(tab);
     return *this;
   }
 
-  //  Operateur copie d'un tableau (copie structure ET contenu)
+  //  Copy operator for an array (copies both structure AND contents)
   inline TRUSTTrav& operator=(const TRUSTTab<_TYPE_,int>& tab)
   {
-    // ATTENTION: note aux programmeurs
-    //  La declaration de cet operateur est indispensable, sinon
+    // WARNING: note to developers
+    //  This operator declaration is essential; otherwise
     //   IntTab b;
     //   IntTrav a;
     //   a = b
-    //  est traduit en
-    //   IntTrav tmp(b); // copie la structure mais met les valeurs a TYPE_ZERO
+    //  is translated as
+    //   IntTrav tmp(b); // copies the structure but sets values to TYPE_ZERO
     //   a.operator=(tmp);
     TRUSTTab<_TYPE_,int>::operator=(tab);
     return *this;
   }
 
-  //  Operateur copie d'un tableau (copie structure ET contenu)
+  //  Copy operator for an array (copies both structure AND contents)
   inline TRUSTTrav& operator=(const TRUSTVect<_TYPE_,int>& tab)
   {
-    // ATTENTION: note aux programmeurs ...
+    // WARNING: note to developers ...
     TRUSTTab<_TYPE_,int>::operator=(tab);
     return *this;
   }

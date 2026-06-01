@@ -23,17 +23,20 @@ Sortie& Champ_Fonc_P0_VDF::printOn(Sortie& s) const { return s << que_suis_je() 
 
 Entree& Champ_Fonc_P0_VDF::readOn(Entree& s) { return s; }
 
-/*! @brief Ecrit le champ sous la forme IJK
+/*! @brief Writes the field in IJK format.
  *
+ * @param os Output stream.
+ * @param ncomp Component index to print.
+ * @return 1 on success.
  */
 int Champ_Fonc_P0_VDF::imprime(Sortie& os, int ncomp) const
 {
   // valeur_au_ijk(xi,yj,zk,valeurs,ncomp);
-  // principe  : creer un tableau points avec selon si champ_elem ou champ_faces
-  // une grille construite a partie de xi,yj,zk lu dans un fichier
-  // sub_type(Champ_P0, *this) : grille construite a partir de (xi+xi+1)/2,etc...
-  // Sinon : grille construite a partir de xi,xi+1,etc...
-  // Boucle sur ni,nj,nk
+  // principle: create a point array depending on whether the field is element-based or face-based
+  // with a grid built from xi,yj,zk read from a file
+  // sub_type(Champ_P0, *this): grid built from (xi+xi+1)/2, etc...
+  // Otherwise: grid built from xi, xi+1, etc...
+  // Loop over ni,nj,nk
   // K=
   //     I=1 I=2 I=3 I=4
   // J=10 Vij
@@ -45,7 +48,7 @@ int Champ_Fonc_P0_VDF::imprime(Sortie& os, int ncomp) const
   int cmax = 7;
   DoubleVect xi, yj, zk;
   DoubleTab Grille;
-  //Lecture de xi,yj,zk dans un fichier .xiyjzk
+  //Reading xi,yj,zk from a .xiyjzk file
   Nom nomfic(nom_du_cas());
   nomfic += ".xiyjzk";
   LecFicDiffuse ficijk(nomfic);
@@ -62,7 +65,7 @@ int Champ_Fonc_P0_VDF::imprime(Sortie& os, int ncomp) const
     {
       if (dimension == 3)
         {
-          // Grille ordonnee sur les centres des elements
+          // Grid ordered at element centers
           np = (ni - 1) * (nj - 1) * (nk - 1);
           Grille.resize(np, dimension);
           for (k = 0; k < nk - 1; k++)

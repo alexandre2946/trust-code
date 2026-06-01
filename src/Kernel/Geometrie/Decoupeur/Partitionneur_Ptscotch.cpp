@@ -64,9 +64,7 @@ void Partitionneur_Ptscotch::associer_domaine(const Domaine& domaine)
   ref_domaine_ = domaine;
 }
 
-/*! @brief Calcule le graphe de connectivite, appelle le partitionneur et remplit elem_part (pour chaque element, numero de la partie qui lui
- *
- *   est attribuee).
+/*! @brief @brief Computes the connectivity graph, calls the partitioner and fills elem_part (for each element, the number of the part assigned to it).
  *
  */
 void Partitionneur_Ptscotch::construire_partition(IntVect& elem_part, int& nb_parts_tot) const
@@ -88,7 +86,7 @@ void Partitionneur_Ptscotch::construire_partition(IntVect& elem_part, int& nb_pa
       exit();
     }
 
-  // Cas particulier: si nb_parts == 1, METIS ne veut rien faire...
+  // Special case: if nb_parts == 1, METIS does nothing...
   //ToDo: I don't know is that's the case with Ptscotch
   if (nb_parties_ == 1)
     {
@@ -119,7 +117,7 @@ void Partitionneur_Ptscotch::construire_partition(IntVect& elem_part, int& nb_pa
   SCOTCH_Dgraph scotch_graph;
   SCOTCH_dgraphInit(&scotch_graph, Comm_Group_MPI::get_trio_u_world());
   SCOTCH_dgraphBuild(&scotch_graph,
-                     0,             // baseval               , base first indice 0
+                     0,             // baseval               , base first index 0
                      n,   // vertlocnbr            , nb of local graph nodes
                      n,   // vertlocmax            , should be set to vertlocnbr for graphs without holes
                      graph.xadj.addr(),    // vertloctab[vertnbr+1] , index vertex table
@@ -145,7 +143,7 @@ void Partitionneur_Ptscotch::construire_partition(IntVect& elem_part, int& nb_pa
 
   delete [] partition;
 
-  // Correction de la partition pour la periodicite. (***)
+  // Correction of the partition for periodicity. (***)
   if (graph_elements_perio.get_nb_lists() > 0)
     {
       Cerr << "Correction of the partition for the periodicity" << finl;

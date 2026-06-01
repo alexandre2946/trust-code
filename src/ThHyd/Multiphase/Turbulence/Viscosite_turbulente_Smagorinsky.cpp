@@ -26,7 +26,7 @@ Sortie& Viscosite_turbulente_Smagorinsky::printOn(Sortie& os) const { return os;
 
 Entree& Viscosite_turbulente_Smagorinsky::readOn(Entree& is)
 {
-  mod_const_ = 0.18; // par default
+  mod_const_ = 0.18; // by default
   Param param(que_suis_je());
   param.ajouter("cs", &mod_const_); // XD_ADD_P floattant
   // XD_CONT Smagorinsky's model constant. By default it is se to 0.18.
@@ -35,7 +35,7 @@ Entree& Viscosite_turbulente_Smagorinsky::readOn(Entree& is)
   if (mod_const_ < 0.) Process::exit("The smagorinsky's constant must be positive !");
   else Cerr << "LES Smagorinsky model used with constant Cs = " << mod_const_ << finl;
 
-  pb_->creer_champ("taux_cisaillement"); // On en aura besoin pour le calcul de la viscosite turbulente
+  pb_->creer_champ("taux_cisaillement"); // needed for the computation of the turbulent viscosity
 
   return Viscosite_turbulente_LES_base::readOn(is);
 }
@@ -44,10 +44,10 @@ void Viscosite_turbulente_Smagorinsky::eddy_viscosity(DoubleTab& nu_t) const
 {
   const DoubleTab& tc = pb_->get_champ("taux_cisaillement").valeurs();
   assert(nu_t.dimension(0) == tc.dimension(0) && tc.dimension(1) <= nu_t.dimension(1));
-  //on met 0 pour les composantes au-dela de k.dimension(1) (ex. : vapeur dans Pb_Multiphase)
+  //set to 0 for components beyond k.dimension(1) (e.g. vapor in Pb_Multiphase)
   for (int i = 0; i < nu_t.dimension(0); i++)
     for (int n = 0; n < nu_t.dimension(1); n++)
-      nu_t(i, n) = n < tc.dimension(1) ? mod_const_ * mod_const_ * l_(i) * l_(i) * tc(i, n) : 0; // XXX attention l_ resize comme nb_elem pas tot ...
+      nu_t(i, n) = n < tc.dimension(1) ? mod_const_ * mod_const_ * l_(i) * l_(i) * tc(i, n) : 0; // XXX note: l_ is resized to nb_elem, not nb_elem_tot ...
 
   nu_t.echange_espace_virtuel();
 }

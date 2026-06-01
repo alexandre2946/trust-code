@@ -19,11 +19,11 @@
 #include <Navier_Stokes_IBM_Turbulent.h>
 #include <Pb_Fluide_base.h>
 
-/*! @brief classe Pb_Hydraulique_IBM_Turbulent Cette classe represente un probleme d'hydraulique turbulent dans
+/*! @brief Turbulent hydraulic IBM problem.
  *
- *      lequel on resout les equations de Navier Stokes en regime turbulent
- *      pour un fluide incompressible
- *      La formulation est de type vitesse pression
+ *      This class represents a turbulent hydraulic problem in which the
+ *      Navier-Stokes equations are solved in turbulent regime for an incompressible fluid.
+ *      The formulation is of velocity-pressure type.
  *
  * @sa Pb_Fluide_base Navier_Stokes_IBM_Turbulent Pb_Hydraulique
  */

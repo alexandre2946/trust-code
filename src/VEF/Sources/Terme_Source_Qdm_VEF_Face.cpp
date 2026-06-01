@@ -90,10 +90,10 @@ DoubleTab& Terme_Source_Qdm_VEF_Face::ajouter(DoubleTab& resu) const
   const DoubleTab& face_normales = domaine_VEF.face_normales();
   const IntTab&    face_voisins  = domaine_VEF.face_voisins();
 
-  // On remplit les Poids et les coord_bary :
+  // Fill Poids and coord_bary:
 
   ArrOfDouble Poids(nbpts);
-  DoubleTab coord_bary(nbpts,dimension+1); // lambda_i des points
+  DoubleTab coord_bary(nbpts,dimension+1); // lambda_i of the points
 
   double tiers=0.333333333333333;
   if(dimension==2)
@@ -125,7 +125,7 @@ DoubleTab& Terme_Source_Qdm_VEF_Face::ajouter(DoubleTab& resu) const
       Poids[5]=Poids[6]=Poids[7]=Poids[8]=0.011645249086029;
       Poids[9]=Poids[10]=Poids[11]=
                            Poids[12]=Poids[13]=Poids[14]=0.010949141561386;
-      // Pour que la somme soit 1.
+      // So that the sum equals 1.
       Poids*=6;
 
       coord_bary(0,0)=coord_bary(0,1)=coord_bary(0,2)
@@ -190,7 +190,7 @@ DoubleTab& Terme_Source_Qdm_VEF_Face::ajouter(DoubleTab& resu) const
       for (int i=0; i<nbpts; i++)
         les_polygones(i)=elem;
 
-      //On remplit la matrice de changement d'element  :
+      //Fill the element change matrix:
       const int som_glob = elem_sommets(elem,0);
       for (int dim=0; dim<dimension; dim++)
         a0[dim]=coord_sommets(som_glob,dim);
@@ -210,7 +210,7 @@ DoubleTab& Terme_Source_Qdm_VEF_Face::ajouter(DoubleTab& resu) const
             a0a3[dim]=coord_sommets(som_glob3,dim)-a0[dim];
         }
 
-      //On remplit les_positions :
+      //Fill les_positions:
       if(dimension == 2)
         {
           for (int pt=0; pt<nbpts; pt++)
@@ -235,7 +235,7 @@ DoubleTab& Terme_Source_Qdm_VEF_Face::ajouter(DoubleTab& resu) const
       else
         assert(0);
 
-      // Calcul du terme source aux points d'integration :
+      // Compute the source term at integration points:
       la_source->valeur_aux_elems(les_positions,les_polygones,
                                   valeurs_source);
       bool RT = sub_type(VEF_discretisation, equation().discretisation()) && (ref_cast(VEF_discretisation, equation().discretisation()).get_alphaRT() );
@@ -245,7 +245,7 @@ DoubleTab& Terme_Source_Qdm_VEF_Face::ajouter(DoubleTab& resu) const
             {
               int num_face=elem_faces(elem, face);
 
-              // Calcul des Psi aux points d'integration :
+              // Compute Psi at integration points:
 
               for (int pt=0; pt<nbpts; pt++)
                 {
@@ -286,7 +286,7 @@ DoubleTab& Terme_Source_Qdm_VEF_Face::ajouter(DoubleTab& resu) const
         }
       else
         {
-          // coordonnees des sommets locaux opposes
+          // coordinates of the opposite local vertices
           DoubleTab coord_sommets_loc(dimension+1,dimension);
           for (int sommet=0; sommet<=dimension; sommet++)
             {
@@ -310,7 +310,7 @@ DoubleTab& Terme_Source_Qdm_VEF_Face::ajouter(DoubleTab& resu) const
                 {
                   double contrib_resu=signe*face_normales(num_face,dim)*contrib;
                   resu(num_face, dim)+=contrib_resu;
-                  // Traitement CL de Dirichlet
+                  // Dirichlet boundary condition treatment
                   for (int fdiri=0; fdiri<nb_face_diri; fdiri++)
                     {
                       int indice=indice_diri[fdiri];
@@ -333,7 +333,7 @@ DoubleTab& Terme_Source_Qdm_VEF_Face::ajouter(DoubleTab& resu) const
         }
     }
   {
-    // modif pour periodic
+    // periodic correction
     for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
       {
         const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);

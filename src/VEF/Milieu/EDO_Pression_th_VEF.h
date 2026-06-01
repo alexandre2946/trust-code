@@ -18,10 +18,10 @@
 
 #include <EDO_Pression_th_base.h>
 
-/*! @brief classe EDO_Pression_th_VEF Cette classe represente l'EDO sur la pression associee au schema de
+/*! @brief class EDO_Pression_th_VEF This class represents the ODE on the pressure associated with the computation scheme for
  *
- *      de calcul pour les fluides faiblement compressibles, et relatif a
- *      discretisation de type VEF.
+ *      weakly compressible fluids, and relative to
+ *      VEF type discretization.
  *
  * @sa Fluide_Quasi_Compressible EDO_Pression_th_base
  */

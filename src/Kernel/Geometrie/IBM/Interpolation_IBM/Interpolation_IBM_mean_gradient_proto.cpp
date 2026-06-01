@@ -36,15 +36,15 @@ void Interpolation_IBM_mean_gradient_proto::computeSommetsVoisins(Domaine_dis_ba
 
   DoubleTab& is_dirichlet = my_is_dirichlet_->valeurs();
 
-  // On cree un indicateur nodal reperant si un noeud appartient a un ou des elements
-  // etant totalement fluide (sans noeuds CL Dirichelt immergee)
+  // Create a nodal indicator identifying whether a node belongs to one or more elements
+  // that are totally fluid (without immersed Dirichlet boundary nodes)
   DoubleTrav is_elem_fluide(nb_elem_tot);
   DoubleTrav is_node_voisin_elem_fluide(is_dirichlet);
   is_node_voisin_elem_fluide = 0.;
   for (int num_elem_tf = 0; num_elem_tf < nb_elem_tot; num_elem_tf++)
     {
       is_elem_fluide(num_elem_tf) = 1.;
-      // Est-ce vrai ?
+      // Is this correct?
       for (int j_tf = 0; j_tf < nb_som_elem; j_tf++)
         {
           int num_som_tf = elems(num_elem_tf,j_tf);
@@ -60,10 +60,10 @@ void Interpolation_IBM_mean_gradient_proto::computeSommetsVoisins(Domaine_dis_ba
         }
     }
 
-  // La numerotation des elements peut avoir changee entre l'etape pre_pro et
-  // l'etape calcul (cas du pre_pro Salome)
-  // On utilise un champ d'etiquette pour solid_elems_ (par exemple le no elem Salome)
-  // et un champ d'element reprenant ces etiquettes
+  // Element numbering may have changed between the pre_pro step and
+  // the calculation step (case of Salome pre_pro)
+  // Use a label field for solid_elems_ (e.g. the Salome element number)
+  // and an element field using these labels
   if (has_corres)
     {
       const DoubleTab& corresp_elemsref = corresp_elems.valeurs();
@@ -135,20 +135,20 @@ void Interpolation_IBM_mean_gradient_proto::computeSommetsVoisins(Domaine_dis_ba
                       double d1 = (xf1-xpf1)*(xf1-xpf1)+(xf2-xpf2)*(xf2-xpf2)+(xf3-xpf3)*(xf3-xpf3);
                       double d2 = (x1-xp1)*(x1-xp1)+(x2-xp2)*(x2-xp2)+(x3-xp3)*(x3-xp3);
 
-                      // On demande que :
-                      // *) le point voisin soit de type fluide (pas Dirichlet)
-                      // *) le projete du point fluide voisin soit du meme cote de la frontiere
-                      //    immergee que le point Dirichlet considere
-                      // *) le projete du point fluide soit dans un element traverse par la
-                      //    frontiere (on considere la vitesse de la frontiere immergee en ce point)
-                      // *) le projete du point fluide voisin soit a une distance carre d1 de la
-                      //    frontiere immergee plus grande que celle d2 du point Dirichlet
-                      //    considere (on interpole; on n'extrapole pas; critere de
-                      //    distance : d1 = 2.0^2 fois d2)
-                      // *) le point fluide voisin appartienne a au moins un element totalement fluide
+                      // Requirements:
+                      // *) the neighboring point must be of fluid type (not Dirichlet)
+                      // *) the projection of the neighboring fluid point must be on the same side of the
+                      //    immersed boundary as the considered Dirichlet point
+                      // *) the fluid point projection must be in an element traversed by the
+                      //    boundary (we use the immersed boundary velocity at this point)
+                      // *) the projection of the neighboring fluid point must be at a squared distance d1 from
+                      //    the immersed boundary greater than d2 of the considered Dirichlet point
+                      //    (we interpolate; we do not extrapolate; distance criterion:
+                      //    d1 = 2.0^2 times d2)
+                      // *) the neighboring fluid point must belong to at least one fully fluid element
                       if (is_dirichlet(num_som_2) < 0.0 && d > 0.0 && (3.0*d2) < d1 && is_node_voisin_elem_fluide(num_som_2) == 1.0)
                         {
-                          // Element contenant le projete du point fluide
+                          // Element containing the fluid point projection
                           int elems_xpf = (int)lrint(elems_solid_ref(num_som_2));
                           bool flag_xpf = true;
                           //bool flag_prt_nodes = false;
@@ -179,7 +179,7 @@ void Interpolation_IBM_mean_gradient_proto::computeSommetsVoisins(Domaine_dis_ba
                             }
                           if (!flag_xpf)
                             {
-                              // Traitement des erreurs
+                              // Error handling
                               Cerr << __FILE__ << (int)__LINE__ << "Interpolation_IBM_mean_gradient_proto::computeSommetsVoisins : ERROR : joint width too low?" << finl;
                               Cerr<<"Nb elem; Nb elem tot = "<<nb_elem<<" "<<nb_elem_tot<<finl;
                               Cerr<<"Nb som;  Nb som tot  = "<<nb_som<<" "<<nb_som_tot<<finl;
@@ -216,8 +216,8 @@ void Interpolation_IBM_mean_gradient_proto::computeSommetsVoisins(Domaine_dis_ba
                                 }*/
                               Process::exit();
                             }
-                          // On demande que le projete du point fluide soit dans un element
-                          // traverse par la frontiere ou borde d'elements traverses par la frontiere
+                          // Require that the fluid point projection be in an element
+                          // traversed by the boundary or bordered by elements traversed by the boundary
                           if (elems_xpf >= 0)
                             {
                               for (int kxpf = 0; kxpf < nb_som_elem; kxpf++)

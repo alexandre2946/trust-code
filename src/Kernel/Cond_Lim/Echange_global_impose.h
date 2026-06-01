@@ -18,19 +18,19 @@
 
 #include <Echange_impose_base.h>
 
-/*! @brief Classe Echange_global_impose Cette classe represente le cas particulier de la classe
+/*! @brief Classe Echange_global_impose This class represents the special case of the class
  *
- *     Echange_impose_base ou l'echange de chaleur total est calcule grace au
- *     coefficient d'echange de chaleur global fourni par l'utilisateur.
+ *     Echange_impose_base where the total heat exchange is computed using the
+ *     global heat exchange coefficient provided by the user.
  *
- *     ATTENTION, dans le cas des discretisations ou T est localisee au centre de l'element (VDF)
- *     cela correspond a la modelisation d'une paroi d'echange dont l'epaisseur s'etend jusqu'a la moitie
- *     de la premiere maille.
+ *     WARNING, in the case of discretizations where T is located at the element centre (VDF),
+ *     this corresponds to modelling an exchange wall whose thickness extends to half
+ *     of the first mesh cell.
  *
- *      h_t   : coefficient d'echange total
- *      h_imp_: coefficient d'echange global (donnee utilisateur)
- *     On a: h_t = h_imp
- *     Les champs h_imp et T_ext sont uniformes
+ *      h_t   : total exchange coefficient
+ *      h_imp_: global exchange coefficient (user input)
+ *     We have: h_t = h_imp
+ *     The fields h_imp and T_ext are uniform
  *
  *
  * @sa Echange_impose_base Echange_externe_impose

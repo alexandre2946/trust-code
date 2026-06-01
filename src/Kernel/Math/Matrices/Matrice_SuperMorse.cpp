@@ -14,13 +14,13 @@
 *****************************************************************************/
 #include <Matrice_SuperMorse.h>
 
-/*! @brief Calcul de "resu += MATRICE * x" et d'un produit scalaire (c'est une brique de base pour le gradient conjugue, voir class Solv_GCP)
+/*! @brief Computes "resu += MATRICE * x" and a dot product (this is a building block for the conjugate gradient, see class Solv_GCP)
  *
- *  Valeur de retour:
- *    partie locale a ce processeur de "(MATRICE * x) scalaire x"
- *    (attention: le produit scalaire compte toutes les lignes de la matrice
- *      les items communs ne sont pas supprimes !)
- *    (attention: c'est different de resu scalaire x !)
+ *  Return value:
+ *    local contribution of this processor to "(MATRICE * x) dot x"
+ *    (note: the dot product counts all rows of the matrix;
+ *      shared items are not removed!)
+ *    (note: this is different from resu dot x!)
  *
  */
 double Matrice_SuperMorse::ajouter_mult_vect_et_prodscal(const DoubleVect& x, DoubleVect& resu) const
@@ -29,26 +29,26 @@ double Matrice_SuperMorse::ajouter_mult_vect_et_prodscal(const DoubleVect& x, Do
 
   const int nb_lignes = lignes_non_vides_.size_array();
   const int *tab_lignes = lignes_non_vides_.addr();
-  // Le premier indice de tab1_ qui va nous interesser est le deuxieme du tableau
-  // (le premier du tableau est forcement 1)
+  // The first index of tab1_ we care about is the second element of the array
+  // (the first element is always 1)
   assert(tab1_[0] == 1);
   const auto *tab1_ptr = tab1_.addr() + 1;
   assert(tab1_.size_array() == nb_lignes + 1);
   const int *tab2_ptr = tab2_.addr();
   const double *coeff_ptr = coeff_.addr();
-  const double *x_ptr = x.addr() - 1; // decalage de 1 car on va indexer par des indices fortran
-  double *resu_ptr = resu.addr() - 1; // idem
-  int n = 1; // indice du coeff courant dans tab2 et coeff
+  const double *x_ptr = x.addr() - 1; // offset by 1 because we index with Fortran indices
+  double *resu_ptr = resu.addr() - 1; // same
+  int n = 1; // index of the current coefficient in tab2 and coeff
 
   double prod_scal_local = 0;
 
   for (int i = 0; i < nb_lignes; i++)
     {
-      // Numero de la ligne de la matrice:
+      // Row index in the matrix:
       const int i_ligne = *(tab_lignes++);
       assert(i_ligne >= 1 && i_ligne <= resu.size_array());
       double r = 0.;
-      // Indice de fin des coeffs de cette ligne dans tab2 et coeff
+      // End index of the coefficients for this row in tab2 and coeff
       const auto n_fin = *(tab1_ptr++);
       for (; n < n_fin; n++)
         {
@@ -59,8 +59,8 @@ double Matrice_SuperMorse::ajouter_mult_vect_et_prodscal(const DoubleVect& x, Do
           r += coef * xb;
         }
       resu_ptr[i_ligne] += r;
-      // attention: on ne veut calculer que le produit scalaire entre x et la partie ajoutee a resu
-      //  (pas avec les valeurs existantes de resu avant l'appel)
+      // note: we only want to compute the dot product between x and the part added to resu
+      //  (not with the existing values of resu before the call)
       prod_scal_local += r * x_ptr[i_ligne];
     }
   return prod_scal_local;

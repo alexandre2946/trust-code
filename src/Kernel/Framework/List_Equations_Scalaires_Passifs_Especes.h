@@ -23,11 +23,11 @@
 
 class Milieu_base;
 
-/*! @brief classe List_Equations_Scalaires_Passifs_Especes Represente une liste d'equations de scalaires passifs ou especes
+/*! @brief List_Equations_Scalaires_Passifs_Especes Represents a list of passive scalar or species equations
  *
- *      List_Equations_Scalaires_Passifs_Especes comprend une liste d'equations
- *      de scalaires passifs ou especes et est vue comme une equation
- *      elle porte une vraie liste d'equations
+ *      List_Equations_Scalaires_Passifs_Especes contains a list of equations
+ *      for passive scalars or species and is seen as a single equation
+ *      it holds a real list of equations
  *
  */
 

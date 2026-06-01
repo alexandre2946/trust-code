@@ -21,9 +21,9 @@
 
 class Matrice_Morse;
 
-/*! @brief class Op_Grad_VDF_Face Cette classe represente l'operateur de gradient
+/*! @brief class Op_Grad_VDF_Face This class represents the gradient operator
  *
- *   La discretisation est VDF. On calcule le gradient d'un champ_P0_VDF (la pression)
+ *   The discretization is VDF. The gradient of a Champ_P0_VDF field (the pressure) is computed
  *
  */
 class Op_Grad_VDF_Face : public Op_Grad_VDF_Face_base

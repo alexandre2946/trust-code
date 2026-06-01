@@ -26,7 +26,7 @@
 #include <TRUST_Vector.h>
 #include <Sous_Domaine.h>
 
-/*! @brief Un vecteur de Sous_Domaine (VECT(Sous_Domaine))
+/*! @brief A vector of Sous_Domaine (VECT(Sous_Domaine))
  *
  */
 class Sous_Domaines : public VECT(Sous_Domaine)

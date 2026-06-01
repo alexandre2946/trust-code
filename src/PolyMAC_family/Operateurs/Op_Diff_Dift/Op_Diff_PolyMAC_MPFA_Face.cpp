@@ -39,7 +39,7 @@ void Op_Diff_PolyMAC_MPFA_Face::completer()
   const Domaine_PolyMAC_MPFA& domaine = ref_cast(Domaine_PolyMAC_MPFA, le_dom_poly_.valeur());
   Champ_Face_PolyMAC_MPFA& ch = ref_cast(Champ_Face_PolyMAC_MPFA, le_champ_inco ? le_champ_inco.valeur() : equation().inconnue());
   if (le_champ_inco)
-    ch.init_auxiliary_variables(); // cas flica5 : ce n'est pas l'inconnue qui est utilisee, donc on cree les variables auxiliaires ici
+    ch.init_auxiliary_variables(); // flica5 case: the unknown is not used directly, so auxiliary variables are created here
 
   flux_bords_.resize(domaine.premiere_face_int(), dimension * ch.valeurs().line_size());
   if (domaine.domaine().nb_joints() && domaine.domaine().joint(0).epaisseur() < 1)
@@ -61,7 +61,7 @@ double Op_Diff_PolyMAC_MPFA_Face::calculer_dt_stab() const
                           &ref_cast(Pb_Multiphase, equation().probleme()).equation_masse().inconnue().passe() : nullptr,
                           *a_r = sub_type(Pb_Multiphase, equation().probleme())
                                  ? &ref_cast(Pb_Multiphase, equation().probleme()).equation_masse().champ_conserve().passe()
-                                 : (has_champ_masse_volumique() ? &get_champ_masse_volumique().valeurs() : nullptr); /* produit alpha * rho */
+                                 : (has_champ_masse_volumique() ? &get_champ_masse_volumique().valeurs() : nullptr); /* alpha * rho product */
 
   const DoubleVect& pe = equation().milieu().porosite_elem(), &pf = equation().milieu().porosite_face(),
                     &vf = domaine.volumes_entrelaces(), &ve = domaine.volumes();
@@ -93,7 +93,7 @@ double Op_Diff_PolyMAC_MPFA_Face::calculer_dt_stab() const
         }
 
       for (int n = 0; n < N; n++)
-        if ((!alp || (*alp)(e, n) > 0.25) && flux(n)) /* sous 0.5e-6, on suppose que l'evanescence fait le job */
+        if ((!alp || (*alp)(e, n) > 0.25) && flux(n)) /* below 0.5e-6, assume evanescence handles it */
           dt = std::min(dt, vol * (a_r ? (*a_r)(e, n) : 1) / flux(n));
     }
   return Process::mp_min(dt);
@@ -112,7 +112,7 @@ void Op_Diff_PolyMAC_MPFA_Face::dimensionner_blocs(matrices_t matrices, const ta
   const Champ_Face_PolyMAC_MPFA& ch = ref_cast(Champ_Face_PolyMAC_MPFA, equation().inconnue());
   const std::string& nom_inco = ch.le_nom().getString();
   if (!matrices.count(nom_inco) || semi_impl.count(nom_inco))
-    return; //semi-implicite ou pas de bloc diagonal -> rien a faire
+    return; //semi-implicit or no diagonal block -> nothing to do
 
   const Domaine_PolyMAC_MPFA& domaine = ref_cast(Domaine_PolyMAC_MPFA, le_dom_poly_.valeur());
   const IntTab& f_e = domaine.face_voisins(), &e_f = domaine.elem_faces(), &fcl = ch.fcl(), &equiv = domaine.equiv();
@@ -127,8 +127,8 @@ void Op_Diff_PolyMAC_MPFA_Face::dimensionner_blocs(matrices_t matrices, const ta
 
   domaine.creer_tableau_faces(tpfa);
 
-  /* stencils du flux : ceux (reduits) de update_nu si nu constant ou scalaire, ceux (complets) du domaine sinon */
-  update_phif(!nu_constant_ or equation().domaine_dis().domaine().deformable()); //si nu variable, stencil complet
+  /* flux stencils: reduced stencils from update_nu if nu is constant or scalar, full domain stencils otherwise */
+  update_phif(!nu_constant_ or equation().domaine_dis().domaine().deformable()); //if nu is variable, full stencil
 
   Cerr << "Op_Diff_PolyMAC_MPFA_Face::dimensionner() : ";
 
@@ -136,10 +136,10 @@ void Op_Diff_PolyMAC_MPFA_Face::dimensionner_blocs(matrices_t matrices, const ta
     if (fcl(f, 0) < 2)
       for (int i = 0; i < 2; i++)
         {
-          const int e = f_e(f, i); /* op. aux faces : contrib de l'elem e */
+          const int e = f_e(f, i); /* operator at faces: contribution from element e */
           if (e < 0) continue;
 
-          //recherche de i_f : indice de f dans l'element e
+          //find i_f: index of f in element e
           int i_f = -1;
           for (int j = 0; j < e_f.dimension(1); j++)
             {
@@ -150,7 +150,7 @@ void Op_Diff_PolyMAC_MPFA_Face::dimensionner_blocs(matrices_t matrices, const ta
                 i_f = j;
             }
 
-          //contribution de la diffusion a la face fb
+          //contribution of diffusion to face fb
           for (int j = 0; j < e_f.dimension(1); j++)
             {
               const int fb = e_f(e, j);
@@ -161,16 +161,16 @@ void Op_Diff_PolyMAC_MPFA_Face::dimensionner_blocs(matrices_t matrices, const ta
                 {
                   const int e_s = phif_e(k);
 
-                  if (e_s >= ne_tot) continue; //bord -> pas de terme de matrice
+                  if (e_s >= ne_tot) continue; //boundary -> no matrix term
 
                   const int fc = equiv(fb, c, i_f);
                   const int f_s = (e_s == e) ? f : fc;
 
-                  if (fc >= 0 && fcl(f_s, 0) < 2) /* amont/aval si equivalence : operateur entre faces */
+                  if (fc >= 0 && fcl(f_s, 0) < 2) /* upwind/downwind if equivalence: operator between faces */
                     for (int n = 0; n < N; n++)
                       stencil.append_line(N * f + n, N * f_s + n);
 
-                  /* sinon : elem -> face, avec un traitement particulier de e_s == e pour eviter les modes en echiquier dans la diffusion */
+                  /* otherwise: element -> face, with special handling when e_s == e to avoid checkerboard modes in diffusion */
                   for (int d = 0; d < D; d++)
                     if (std::fabs(nf(f, d)) > 1e-6 * fs(f))
                       for (int n = 0; n < N; n++)
@@ -185,7 +185,7 @@ void Op_Diff_PolyMAC_MPFA_Face::dimensionner_blocs(matrices_t matrices, const ta
         }
 
   for (int e = 0; e < ne_tot; e++)
-    for (int i = 0; i < e_f.dimension(1); i++) /* aux elements : on doit traiter aussi les elems virtuels */
+    for (int i = 0; i < e_f.dimension(1); i++) /* at elements: virtual elements must also be processed */
       {
         const int f = e_f(e, i);
         if (f < 0) continue;
@@ -193,7 +193,7 @@ void Op_Diff_PolyMAC_MPFA_Face::dimensionner_blocs(matrices_t matrices, const ta
         for (int j = phif_d(f); j < phif_d(f + 1); j++)
           {
             const int e_s = phif_e(j);
-            if (e_s < ne_tot) //contrib d'un element
+            if (e_s < ne_tot) //contribution from an element
               for (int d = 0; d < D; d++)
                 for (int n = 0; n < N; n++)
                   stencil.append_line(N * (nf_tot + D * e + d) + n, N * (nf_tot + D * e_s + d) + n);
@@ -269,7 +269,7 @@ void Op_Diff_PolyMAC_MPFA_Face::ajouter_blocs(matrices_t matrices, DoubleTab& se
               int e = f_e(f, i);
               if (e < 0) continue;
 
-              // Recherche de i_f : indice de la face f dans l'element e
+              // Find i_f: index of face f in element e
               int i_f = -1;
               for (int j = 0; i_f < 0 && j < e_f.dimension(1); j++)
                 {
@@ -280,7 +280,7 @@ void Op_Diff_PolyMAC_MPFA_Face::ajouter_blocs(matrices_t matrices, DoubleTab& se
                     i_f = j;
                 }
 
-              // Contribution de la diffusion a la face fb
+              // Contribution of diffusion to face fb
               for (int j = 0; j < e_f.dimension(1); j++)
                 {
                   int fb = e_f(e, j);
@@ -311,7 +311,7 @@ void Op_Diff_PolyMAC_MPFA_Face::ajouter_blocs(matrices_t matrices, DoubleTab& se
 
                       if (e_s >= ne_tot)
                         {
-                          // Contribution d'un bord
+                          // Contribution from a boundary
                           int f_s = e_s - ne_tot;
                           if (fcl(f_s, 0) == 3 && sub_type(Dirichlet, cls[fcl(f_s, 1)].valeur()))
                             {
@@ -322,7 +322,7 @@ void Op_Diff_PolyMAC_MPFA_Face::ajouter_blocs(matrices_t matrices, DoubleTab& se
                         }
                       else if (tpfa && fc >= 0)
                         {
-                          // Amont/aval si equivalence : operateur entre faces
+                          // Upwind/downwind if equivalence: operator between faces
                           int f_s = (e_s == e) ? f : fc;
                           int sgn = (domaine.dot(&nf(f_s, 0), &nf(f, 0)) > 0) ? 1 : -1;
                           for (int n = 0; n < N; n++)
@@ -334,7 +334,7 @@ void Op_Diff_PolyMAC_MPFA_Face::ajouter_blocs(matrices_t matrices, DoubleTab& se
                         }
                       else
                         {
-                          // Sinon : element -> face, avec traitement particulier
+                          // Otherwise: element -> face, with special handling
                           double f_eps = (e_s != e) ? 0 : tpfa && fcl(fb, 0) ? 1 : std::min(eps, 1000 * std::pow(vf(f) / fs(f), 2));
 
                           for (int d = 0; d < D; d++)
@@ -363,7 +363,7 @@ void Op_Diff_PolyMAC_MPFA_Face::ajouter_blocs(matrices_t matrices, DoubleTab& se
     }
 
   for (int e = 0; e < ne_tot; e++)
-    for (int i = 0; i < e_f.dimension(1); i++) /* aux elements : on doit traiter aussi les elems virtuels */
+    for (int i = 0; i < e_f.dimension(1); i++) /* at elements: virtual elements must also be processed */
       {
         const int f = e_f(e, i);
         if (f < 0) continue;
@@ -378,7 +378,7 @@ void Op_Diff_PolyMAC_MPFA_Face::ajouter_blocs(matrices_t matrices, DoubleTab& se
             const int e_s = phif_e(j);
             const int f_s = e_s - ne_tot;
 
-            if (e_s < ne_tot) //contrib d'un element
+            if (e_s < ne_tot) //contribution from an element
               {
                 for (int d = 0; d < D; d++)
                   for (int n = 0; n < N; n++)
@@ -389,7 +389,7 @@ void Op_Diff_PolyMAC_MPFA_Face::ajouter_blocs(matrices_t matrices, DoubleTab& se
                     for (int n = 0; n < N; n++)
                       (*mat)(N * (nf_tot + D * e + d) + n, N * (nf_tot + D * e_s + d) + n) += coeff(n);
               }
-            else if (fcl(f_s, 0) == 3 && sub_type(Dirichlet, cls[fcl(f_s, 1)].valeur())) //contrib d'un bord : seul Dirichlet contribue
+            else if (fcl(f_s, 0) == 3 && sub_type(Dirichlet, cls[fcl(f_s, 1)].valeur())) //contribution from a boundary: only Dirichlet contributes
               for (int d = 0; d < D; d++)
                 for (int n = 0; n < N; n++)
                   secmem(nf_tot + D * e + d, n) -= coeff(n) * ref_cast(Dirichlet, cls[fcl(f_s, 1)].valeur()).val_imp(fcl(f_s, 2), N * d + n);

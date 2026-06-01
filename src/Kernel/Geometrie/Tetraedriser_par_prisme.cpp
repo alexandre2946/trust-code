@@ -29,12 +29,12 @@ Sortie& Tetraedriser_par_prisme::printOn(Sortie& os) const { return Interprete::
 
 Entree& Tetraedriser_par_prisme::readOn(Entree& is) { return Interprete::readOn(is); }
 
-/*! @brief Fonction hors classe Decoupe toutes les faces d'un objet Faces
+/*! @brief Function outside class Cuts all faces of a Faces object
  *
- *     dont les faces ont 4 sommets
- *     en 2 faces a 3 sommets.
+ *     whose faces have 4 vertices
+ *     into 2 faces with 3 vertices.
  *
- * @param (Faces& faces) l'ensemble des faces a decouper
+ * @param (Faces& faces) the set of faces to cut
  */
 static void decoupe(Domaine& dom, Faces& faces)
 {
@@ -53,7 +53,7 @@ static void decoupe(Domaine& dom, Faces& faces)
       int i3 = sommets(i, 2);
       int i4 = sommets(i, 3);
 
-      // C'est une face a X constant
+      // This is a face with X constant
       if ((coord(i1, 0) == coord(i2, 0)) && (coord(i1, 0) == coord(i3, 0)))
         {
           nouveaux(i, 0) = i1;
@@ -64,7 +64,7 @@ static void decoupe(Domaine& dom, Faces& faces)
           nouveaux(nb_faces + i, 2) = i4;
         }
 
-      // C'est une face a Z constant
+      // This is a face with Z constant
       if ((coord(i1, 2) == coord(i2, 2)) && (coord(i1, 2) == coord(i3, 2)))
         {
           nouveaux(i, 0) = i1;
@@ -74,7 +74,7 @@ static void decoupe(Domaine& dom, Faces& faces)
           nouveaux(nb_faces + i, 1) = i3;
           nouveaux(nb_faces + i, 2) = i4;
         }
-      // C'est une face a Y constant
+      // This is a face with Y constant
       if ((coord(i1, 1) == coord(i2, 1)) && (coord(i1, 1) == coord(i3, 1)))
         {
           nouveaux(i, 0) = i1;
@@ -89,17 +89,16 @@ static void decoupe(Domaine& dom, Faces& faces)
   sommets.ref(nouveaux);
 }
 
-/*! @brief Tetraedrise tous les elements d'un domaine : transforme les elements goemetriques du domaine en tetraedres IDENTIQUES
+/*! @brief @brief Tetrahedralises all elements of a domain: transforms the geometric elements of the domain into IDENTICAL tetrahedra
  *
- *     par la methode des prismes.
- *     Pour l'instant on ne sait tetraedriser que des Hexaedre.
- *     (on les coupe en 2).
- *     Les elements sont tetraedrises et tous les bords
- *     sont types en Triangle_3D.
+ *     using the prism method.
+ *     Currently only Hexaedre elements can be tetrahedralised
+ *     (they are split into 2).
+ *     All elements are tetrahedralised and all boundaries
+ *     are typed as Triangle_3D.
  *
- * @param (Domaine& domaine) le domaine dont on veut tetraedriser les elements
- * @throws on ne sait pas Tetraedriser par prisme les elements
- * geometriques de ce type
+ * @param domaine The domain whose elements are to be tetrahedralised.
+ * @throws Cannot tetrahedralise by prism the geometric elements of this type.
  */
 void Tetraedriser_par_prisme::trianguler(Domaine& domaine) const
 {

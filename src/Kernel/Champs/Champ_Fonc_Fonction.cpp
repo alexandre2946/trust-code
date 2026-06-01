@@ -28,20 +28,20 @@ Implemente_instanciable(Champ_Fonc_Fonction,"Champ_Fonc_Fonction",Champ_Fonc_Tab
 
 Sortie& Champ_Fonc_Fonction::printOn(Sortie& os) const { return os; }
 
-/*! @brief Lecture du Champ a partir d'un flot d'entree, (On ne sait traiter que les champs scalaires.)
+/*! @brief Read the field from an input stream. (Only scalar fields are handled.)
  *
- *      exemple:
- *      Champ_Fonc_Fonction probleme ch
- *      1 (nombre de composantes)
+ *      example:
+ *      Champ_Fonc_Fonction problem ch
+ *      1 (number of components)
  *      {
  *      2
  *      0 500 0 250  (ch(0)=0 && ch(500)=250
  *      }
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws accolade fermante attendue
- * @throws accolade ouvrante attendue
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
+ * @throws closing brace expected
+ * @throws opening brace expected
  */
 Entree& Champ_Fonc_Fonction::readOn(Entree& is)
 {
@@ -129,8 +129,8 @@ Entree& Sutherland::readOn(Entree& is)
 
 void Sutherland::lire_expression()
 {
-  // On cree une chaine correspondant a Sutherland
-  // c.a.d Champ_Fonc_fonction 1 prob temperature A * (Tref+C)/(val+C) * pow(val/Tref,1.5);
+  // We create a string corresponding to Sutherland
+  // i.e. Champ_Fonc_fonction 1 prob temperature A * (Tref+C)/(val+C) * pow(val/Tref,1.5);
   Nom chaine = get_prob();
   chaine += " temperature 1 ";
   Nom nA(A_);

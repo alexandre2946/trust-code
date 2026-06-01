@@ -21,9 +21,9 @@
 #include <math.h>
 
 
-/*! @brief : Tableau a n entrees pour n<= 4.
+/*! @brief N-dimensional array for N <= 4.
  *
- * Repose sur un TRUSTVect avec calculs de l'indice corespondant
+ * Built on top of TRUSTVect with index computation for each dimension.
  *
  */
 template<typename _TYPE_, typename _SIZE_>
@@ -39,7 +39,7 @@ protected:
     return xxx->numero();
   }
 
-  /*! @brief ecriture d'un tableau sequentiel (idem que TRUSTVect::printOn() on ne sait pas quoi faire de pertinent pour un tableau distribue).
+  /*! @brief Writes a sequential array (same as TRUSTVect::printOn(); no meaningful action is defined for a distributed array).
    *
    */
   Sortie& printOn(Sortie& os) const override
@@ -62,13 +62,13 @@ protected:
     return os;
   }
 
-  /*! @brief lecture d'un tableau sequentiel
+  /*! @brief Reads a sequential array.
    *
    */
   Entree& readOn(Entree& is) override
   {
 #ifndef LATATOOLS
-    // Que veut-on faire si on lit dans un vecteur ayant deja une structure parallele ?
+    // What should we do if we read into a vector that already has a parallel structure?
     if (TRUSTVect<_TYPE_,_SIZE_>::get_md_vector())
       Process::exit("Error in TRUSTTab::readOn: vector has a parallel structure");
 
@@ -219,7 +219,7 @@ public:
   inline _TYPE_& operator()(_SIZE_ i1, int i2, int i3, int i4);
   inline const _TYPE_& operator()(_SIZE_ i1, int i2, int i3, int i4) const ;
 
-  // Juste pour TRUSTTab<double/float>
+  // Only for TRUSTTab<double/float>
   template <typename _T_> inline void ajoute_produit_tensoriel(_T_ alpha, const TRUSTTab<_T_,_SIZE_>&, const TRUSTTab<_T_,_SIZE_>&); // z+=alpha*x*y;
   template <typename _T_> inline void resoud_LU(_SIZE_, TRUSTArray<int,_SIZE_>&, const TRUSTArray<_T_,_SIZE_>&, TRUSTArray<_T_,_SIZE_>&);
   template <typename _T_> inline bool inverse_LU(const TRUSTArray<_T_,_SIZE_>&, TRUSTArray<_T_,_SIZE_>&);
@@ -232,7 +232,7 @@ public:
   int decomp_LU(int, TRUSTArray<int,_SIZE_>&, TRUSTTab<int,_SIZE_>&) = delete;
   int max_du_u(const TRUSTTab<int,_SIZE_>&) = delete;
 
-  // methodes virtuelles
+  // Virtual methods
   inline _SIZE_ dimension_tot(int) const override;
   inline virtual void ref(const TRUSTTab&);
   inline virtual void ref_tab(TRUSTTab&, _SIZE_ start_line=0, _SIZE_ nb_lines=-1);
@@ -303,13 +303,13 @@ public:
 #endif
 private:
   static constexpr int MAXDIM_TAB = 4;
-  /*! Dimensions "reelles" (dimensions_[0] * line_size() = size_reelle()) : line_size() est egal au produit des dimensions_[i] pour 1 <= i < this->nb_dim_
+  /*! Real dimensions (dimensions_[0] * line_size() = size_reelle()): line_size() equals the product of dimensions_[i] for 1 <= i < this->nb_dim_.
    *  Everything is stored as _SIZE_ but higher dims (>=1) should fit in an int. See line_size().
    */
   _SIZE_ dimensions_[MAXDIM_TAB];
 
-  // Dimension totale (nombre de lignes du tableau) = nb lignes reeles + nb lignes virtuelles
-  // Les dimensions dimension_tot(i>=1) sont implicitement egales a dimension(i)
+  // Total dimension (number of rows) = number of real rows + number of virtual rows
+  // Dimensions dimension_tot(i>=1) are implicitly equal to dimension(i)
   _SIZE_ dimension_tot_0_;
 
   inline void verifie_MAXDIM_TAB() const
@@ -347,15 +347,15 @@ using BigDoubleTab = BigTRUSTTab<double>;
 using BigIntTab = BigTRUSTTab<int>;
 using BigTIDTab = BigTRUSTTab<trustIdType>;
 
-/* ********************************* *
- * FONCTIONS NON MEMBRES DE TRUSTTab *
- * ********************************* */
+/* *************************************** *
+ * NON-MEMBER FUNCTIONS OF TRUSTTab        *
+ * *************************************** */
 
 #include <TRUSTTab_tools.tpp> // external templates function specializations ici ;)
 
-/* ***************************** *
- * FONCTIONS MEMBRES DE TRUSTTab *
- * ***************************** */
+/* *********************************** *
+ * MEMBER FUNCTIONS OF TRUSTTab        *
+ * *********************************** */
 
 #include <TRUSTTab.tpp> // The rest here!
 

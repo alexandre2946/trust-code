@@ -17,10 +17,10 @@
 #include <PE_Groups.h>
 #include <TRUST_Ref.h>
 
-// Les trois variables suivantes sauvegardent la pile des groupes
-// (voir Comm_Group::enter_group() Comm_Group::current_group() Comm_Group::exit_group() )
-// Le haut de la pile est toujours groupe_TRUST(), fourni a initialize()
-// groups[0] pointe sur groupe_trio.
+// The following three variables save the group stack
+// (see Comm_Group::enter_group(), Comm_Group::current_group(), Comm_Group::exit_group())
+// The top of the stack is always groupe_TRUST(), provided to initialize().
+// groups[0] points to groupe_trio.
 static OBS_PTR(Comm_Group) groups[100];
 static int ngroups = 0;
 static int max_ngroups = 100;
@@ -39,42 +39,44 @@ int PE_Groups::check_current_group()
   return 1;
 }
 
-/*! @brief Creation d'un nouveau groupe de processeurs (utilisation possible n'importe ou dans le code)
+/*! @brief Creates a new processor group (can be called anywhere in the code).
  *
- *   Il faut l'appeler simultanement sur tous les processeurs du groupe current_group()
- *   avec le meme tableau liste_pe. liste_pe est la liste des rangs dans le groupe
- *   courant des processeurs que l'on veut inclure dans le groupe. Le premier de la
- *   liste sera le maitre du groupe. La liste ne doit pas comporter de doublon et
- *   doit contenir au moins un processeur.
- *   La methode type et initialize l'objet group.
- *   Il faut ensuite appeler enter_group() et exit_group() (autant de fois qu'on veut)
+ *   Must be called simultaneously on all processors of current_group() with the same
+ *   liste_pe array. liste_pe is the list of ranks within the current group of processors
+ *   to include in the new group. The first in the list will be the group master. The list
+ *   must not contain duplicates and must include at least one processor.
+ *   This method types and initializes the group object.
+ *   enter_group() and exit_group() must then be called (as many times as desired).
  *
+ * @param liste_pe List of PE ranks within current_group().
+ * @param group The group object to initialize.
+ * @param force_Comm_Group_NoParallel If non-zero, force a non-parallel group when possible.
  */
 void PE_Groups::create_group(const ArrOfInt& liste_pe, OWN_PTR(Comm_Group) & group, int force_Comm_Group_NoParallel)
 {
   if (liste_pe.size_array()==1 && force_Comm_Group_NoParallel)
     {
-      // On cree un groupe non parallele si c'est possible et si c'est impose
+      // Create a non-parallel group if possible and if required
       group.typer("Comm_Group_NoParallel");
     }
   else
     {
-      // On cree un groupe du meme type que le groupe_TRUST
+      // Create a group of the same type as groupe_TRUST
       group.typer(groups[0]->que_suis_je());
     }
   group->init_group(liste_pe);
 }
 
-/*! @brief Initialisation d'un nouveau groupe de processeurs deja instantie (utilisation possible n'importe ou dans le code)
+/*! @brief Initializes a new processor group that is already instantiated (can be called anywhere in the code).
  *
- *   Il faut l'appeler simultanement sur tous les processeurs du groupe current_group()
- *   avec le meme tableau liste_pe. liste_pe est la liste des rangs dans le groupe
- *   courant des processeurs que l'on veut inclure dans le groupe. Le premier de la
- *   liste sera le maitre du groupe. La liste ne doit pas comporter de doublon et
- *   doit contenir au moins un processeur.
- *   La methode type et initialize l'objet group.
- *   Il faut ensuite appeler enter_group() et exit_group() (autant de fois qu'on veut)
+ *   Must be called simultaneously on all processors of current_group() with the same
+ *   liste_pe array. liste_pe is the list of ranks within the current group of processors
+ *   to include in the new group. The first in the list will be the group master. The list
+ *   must not contain duplicates and must include at least one processor.
+ *   enter_group() and exit_group() must then be called (as many times as desired).
  *
+ * @param liste_pe List of PE ranks within current_group().
+ * @param group The already-instantiated group object to initialize.
  */
 void PE_Groups::init_group(const ArrOfInt& liste_pe, OWN_PTR(Comm_Group) & group)
 {
@@ -82,16 +84,14 @@ void PE_Groups::init_group(const ArrOfInt& liste_pe, OWN_PTR(Comm_Group) & group
   group->init_group(liste_pe);
 }
 
-/*! @brief Si le processeur local appartient au groupe, le groupe courant pour ce processeur devient "group" et on renvoie 1, sinon on renvoie 0.
+/*! @brief If the local processor belongs to the group, the current group for this processor becomes "group" and returns 1; otherwise returns 0.
  *
- *   Une reference au groupe actuel est sauvegardee et sera restauree quand on
- *   appellera exit_group().
- *   Cette methode doit etre appelee simultanement sur tous les processeurs
- *   du groupe "group".
- *   Attention: a chaque enter_group() doit correspondre un exit_group().
- *   Cependant, il n'est pas interdit d'entrer plusieurs fois de suite dans le
- *   meme groupe, ni d'entrer dans un groupe plus grand que le groupe actuel.
- *   Exemple : group1 et group2 forment une partition du groupe_TRUST()
+ *   A reference to the current group is saved and will be restored when exit_group() is called.
+ *   This method must be called simultaneously on all processors of "group".
+ *   Each enter_group() must be matched by a corresponding exit_group().
+ *   However, it is allowed to enter the same group multiple times in a row, or to enter a
+ *   larger group than the current one.
+ *   Example: group1 and group2 form a partition of groupe_TRUST().
  *
  *    int sync_point(int x)
  *    {
@@ -101,19 +101,21 @@ void PE_Groups::init_group(const ArrOfInt& liste_pe, OWN_PTR(Comm_Group) & group
  *      return i;
  *    }
  *    if (PE_Groups::enter_group(group1)) {
- *      s1 = mp_sum(x); // Somme sur le groupe 2
- *      // Point de synchro avec l'autre groupe:
+ *      s1 = mp_sum(x); // Sum over group 1
+ *      // Sync point with the other group:
  *      s_all = sync_point(x);
  *    } else if (PE_Groups::enter_group(group2)) {
  *      s2 = mp_sum(x);
- *      // Point de synchro avec l'autre groupe:
+ *      // Sync point with the other group:
  *      s_all = sync_point(x);
  *    } else {
  *      Cerr << "Error: processor " << me() << " is not within a subgroup.";
  *      exit();
  *    }
- *    PE_Groups::exit_group(); // Sort du sous-groupe
+ *    PE_Groups::exit_group(); // Exit the subgroup
  *
+ * @param group The group to enter.
+ * @return 1 if the local processor is in the group, 0 otherwise.
  */
 int PE_Groups::enter_group(const Comm_Group& group)
 {
@@ -126,14 +128,13 @@ int PE_Groups::enter_group(const Comm_Group& group)
   int my_rank_in_group = rank_translate(current_group().rank(), current_group(), group);
   if (my_rank_in_group >= 0)
     {
-      // Sauvegarde du pointeur sur le groupe actuel et changement du
-      // current_group() :
+      // Save the pointer to the current group and switch current_group():
       groups[ngroups] = group;
       current_group_ = &group;
       ngroups++;
-      // Attention, on a change de current_group() !
+      // Note: current_group() has changed!
 
-      // On verifie que tous les processeurs du nouveau groupe sont la:
+      // Verify that all processors of the new group are present:
       if (Comm_Group::check_enabled())
         current_group().barrier(0);
 
@@ -145,10 +146,9 @@ int PE_Groups::enter_group(const Comm_Group& group)
     }
 }
 
-/*! @brief Retourne dans le groupe ou l'on etait avant le dernier enter_group() reussi (dont le resultat a ete 1).
+/*! @brief Returns to the group that was active before the last successful enter_group() call (which returned 1).
  *
- *   Cette methode doit etre appelee simultanement sur tous les processeurs
- *   du current_group() actif juste avant exit_group()).
+ *   This method must be called simultaneously on all processors of the current current_group() just before exit_group().
  *
  */
 void PE_Groups::exit_group()
@@ -165,11 +165,15 @@ void PE_Groups::exit_group()
   current_group_ = &(groups[ngroups-1].valeur());
 }
 
-/*! @brief Calcule le rank dans le groupe courant du processeur de rang "rank" dans le "group".
+/*! @brief Computes the rank in the current group of the processor with rank "rank" in "group".
  *
- * Il faut que 0 <= rank < group.nproc()
- *   Si le processeur en question n'appartient pas au groupe courant, renvoie -1.
+ * Requires 0 <= rank < group.nproc().
+ *   Returns -1 if the processor is not in the current group.
  *
+ * @param rank Rank in the source group.
+ * @param group The source group.
+ * @param dest_group The destination group.
+ * @return Rank in the destination group, or -1 if not present.
  */
 int PE_Groups::rank_translate(int rank, const Comm_Group& group,
                               const Comm_Group& dest_group)
@@ -179,8 +183,9 @@ int PE_Groups::rank_translate(int rank, const Comm_Group& group,
   return local_rank;
 }
 
-/*! @brief Renvoie une reference au groupe de tous les processeurs TRUST
+/*! @brief Returns a reference to the group containing all TRUST processors.
  *
+ * @return Reference to the global TRUST Comm_Group.
  */
 const Comm_Group& PE_Groups::groupe_TRUST()
 {
@@ -188,8 +193,9 @@ const Comm_Group& PE_Groups::groupe_TRUST()
   return groups[0].valeur();
 }
 
-/*! @brief Renvoie une reference au groupe sur les noeuds
+/*! @brief Returns a reference to the node-level communicator group.
  *
+ * @return Reference to the node Comm_Group.
  */
 const Comm_Group& PE_Groups::get_node_group()
 {
@@ -197,8 +203,9 @@ const Comm_Group& PE_Groups::get_node_group()
   return node_group.valeur();
 }
 
-/*! @brief Renvoie le groupe contenant le maitre de mon noeud
+/*! @brief Returns the group containing the master of my node.
  *
+ * @return Reference to the node-master Comm_Group.
  */
 const Comm_Group& PE_Groups::get_node_master()
 {
@@ -206,8 +213,9 @@ const Comm_Group& PE_Groups::get_node_master()
   return node_master.valeur();
 }
 
-/*! @brief Renvoie une reference au groupe sur defini par l'utilisateur
+/*! @brief Returns a reference to the user-defined group.
  *
+ * @return Reference to the user-defined Comm_Group.
  */
 const Comm_Group& PE_Groups::get_user_defined_group()
 {
@@ -215,10 +223,9 @@ const Comm_Group& PE_Groups::get_user_defined_group()
   return user_defined_group.valeur();
 }
 
-/*! @brief Methode a appeler au debut de l'execution (MAIN.
+/*! @brief Method to call at the beginning of execution (MAIN.cpp). Initializes current_group() with groupe_trio_u.
  *
- * cpp) Elle initialise current_group() avec groupe_trio_u
- *
+ * @param groupe_trio_u The main TRUST communicator group to initialize with.
  */
 void PE_Groups::initialize(const Comm_Group& groupe_trio_u)
 {
@@ -228,7 +235,9 @@ void PE_Groups::initialize(const Comm_Group& groupe_trio_u)
   current_group_ = &groupe_trio_u;
 }
 
-/*! @brief Methode a appeler apres l'initialisation de trio_u_world et l'initialisation des compteurs statistiques de TRUST
+/*! @brief Method to call after the initialization of trio_u_world and TRUST's statistical counters.
+ *
+ * @param ngrp The node-level communicator group.
  */
 void PE_Groups::initialize_node(const Comm_Group& ngrp)
 {
@@ -247,7 +256,9 @@ bool PE_Groups::has_user_defined_group()
   return bool(user_defined_group);
 }
 
-/*! @brief Methode a appeler apres l'initialisation de trio_u_world et de node_group et l'initialisation des compteurs statistiques de TRUST
+/*! @brief Method to call after the initialization of trio_u_world, node_group, and TRUST's statistical counters.
+ *
+ * @param ngrp The node-master communicator group.
  */
 void PE_Groups::initialize_node_master(const Comm_Group& ngrp)
 {
@@ -255,9 +266,7 @@ void PE_Groups::initialize_node_master(const Comm_Group& ngrp)
   node_master = ngrp;
 }
 
-/*! @brief Methode a appeler en fin d'execution, une fois qu'on est revenu dans le groupe_TRUST() et juste avant de detruire de Comm_Group
- *
- *   principal.
+/*! @brief Method to call at the end of execution, once back in groupe_TRUST() and just before destroying the main Comm_Group.
  *
  */
 void PE_Groups::finalize()

@@ -55,11 +55,11 @@ int Champ_front_contact_rayo_semi_transp_VEF::initialiser(double temps, const Ch
 void Champ_front_contact_rayo_semi_transp_VEF::mettre_a_jour_flux_radiatif()
 {
 
-  if (is_conduction)   // Le pb_rayo est connu par l'autre probleme
+  if (is_conduction)   // The pb_rayo is known by the other problem
     {
       const Champ_front_contact_rayo_semi_transp_VEF& ch_fr_rayo = ref_cast(Champ_front_contact_rayo_semi_transp_VEF, ch_fr_autre_pb.valeur());
       const DoubleTab& tab_fl_rad = ch_fr_rayo.pb_rayo_semi_transp().flux_radiatif(frontiere_dis().le_nom()).valeurs();
-      // Le rapatrier
+      // Fetch it from the other problem
       trace_face_raccord(fr_vf_autre_pb.valeur(), tab_fl_rad, flux_radiatif_);
     }
   else
@@ -75,7 +75,7 @@ void Champ_front_contact_rayo_semi_transp_VEF::calcul_grads_locaux(double temps)
 {
   Champ_front_contact_VEF::calcul_grads_locaux(temps);
 
-  // Calcul des coefficitents d'amortissement
+  // Computation of the damping coefficients
   calcul_coeff_amort();
 }
 
@@ -84,7 +84,7 @@ void Champ_front_contact_rayo_semi_transp_VEF::calculer_temperature_bord(double 
   const Frontiere& la_front = la_frontiere_dis->frontiere();
   int nb_faces = la_front.nb_faces();
 
-  // On recupere les coefficients gradient_num_transf et gradient_fro_transf de l'autre probleme
+  // Retrieve the coefficients gradient_num_transf and gradient_fro_transf from the other problem
   DoubleVect gradient_num_transf_autre_pb(nb_faces);
   DoubleVect gradient_fro_transf_autre_pb(nb_faces);
   trace_face_raccord(fr_vf_autre_pb.valeur(), ch_fr_autre_pb->get_gradient_num_transf(), gradient_num_transf_autre_pb);
@@ -93,27 +93,27 @@ void Champ_front_contact_rayo_semi_transp_VEF::calculer_temperature_bord(double 
   gradient_num_transf_autre_pb *= signe;
   gradient_fro_transf_autre_pb *= signe;
 
-  // On modifiee les gradients pour prendre en compte le flux radiatif
+  // Modify the gradients to account for the radiative flux
   modifie_gradients_pour_rayonnement(gradient_num_transf, gradient_num_transf_autre_pb);
 
-  // On recupere les tableaux permettant de calculer omega, le facteur d'amortissement
+  // Retrieve the arrays needed to compute omega, the damping factor
   DoubleVect coeff_amort_num_autre_pb(nb_faces);
   DoubleVect coeff_amort_denum_autre_pb(nb_faces);
   trace_face_raccord(fr_vf_autre_pb.valeur(), ch_fr_autre_pb->get_coeff_amort_num(), coeff_amort_num_autre_pb);
   trace_face_raccord(fr_vf_autre_pb.valeur(), ch_fr_autre_pb->get_coeff_amort_denum(), coeff_amort_denum_autre_pb);
 
-  // Calcul de la temperature de paroi
+  // Computation of the wall temperature
   DoubleTab& tab = valeurs_au_temps(temps);
   for (int fac_front = 0; fac_front < nb_faces; fac_front++)
     {
-      // CALCUL DU TERME D'AMORTISSEMENT
+      // COMPUTATION OF THE DAMPING TERM
       Schema_Temps_base& sch = l_inconnue->equation().probleme().schema_temps();
       double dt = sch.pas_de_temps();
       double e = std::max(coeff_amort_num_autre_pb(fac_front), coeff_amort_num(fac_front));
       //      double e = coeff_amort_num_autre_pb(fac_front) + coeff_amort_num(fac_front);
       double omega = dt / (dt + e / (coeff_amort_denum_autre_pb(fac_front) + coeff_amort_denum(fac_front)));
       omega = 1.;
-      // FIN DU CALCUL DU TERME D'AMORTISSEMENT
+      // END OF DAMPING TERM COMPUTATION
       /*
        Cerr<<"omega = "<<omega<<finl;
        Cerr<<"gradient_num_local(fac_front) = "<<gradient_num_local(fac_front)<<finl;

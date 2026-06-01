@@ -101,13 +101,13 @@ void Source_PDF_base::associer_pb(const Probleme_base& pb)
     {
       prepro_lu_->associer_pb(pb);
 
-      // Verification eventuelle
+      // Optional verification
       if( prepro_lu_->verify_results_prepro() == 1) verify_results_prepro();
     }
 
   const Domaine_dis_base& le_dom_dis = pb.domaine_dis();
 
-  // Matrice Rotation
+  // Rotation Matrix
   int dim_esp = Objet_U::dimension;
   assert(dim_esp==3);
   int nb_comp=dim_esp*dim_esp;
@@ -131,7 +131,7 @@ void Source_PDF_base::associer_pb(const Probleme_base& pb)
         }
     }
 
-  // Barycentre
+  // Barycenter
   int nb_comp0=dim_esp;
   Noms nom_c0(nb_comp0);
   Noms unites0(nb_comp0);
@@ -147,20 +147,20 @@ void Source_PDF_base::associer_pb(const Probleme_base& pb)
           champ_barycentre_->affecter(champ_barycentre_lu_);
         }
       // else
-      // barycentres non requis sans prepro_ibm
+      // barycenters not required without prepro_ibm
       //   {
       //     Cerr<<"Source_PDF_base::associer_pb: barycenter term is missing "<<finl;
       //     exit();
       //   }
     }
 
-  // Champ pour terme source PDF
+  // Field for PDF source term
   if (equation().discretisation().is_ef())
     pb.discretisation().discretiser_champ("champ_sommets",le_dom_dis,"","",1,0., champ_nodal_);
   else
     pb.discretisation().discretiser_champ("champ_face",le_dom_dis,"","",1,0., champ_nodal_);
 
-  // Aire
+  // Area
   pb.discretisation().discretiser_champ("champ_elem",le_dom_dis ,"aire","m-1",1,0., champ_aire_);
   if (prepro_lu_ && aire_from_prepro_)
     {
@@ -179,7 +179,7 @@ void Source_PDF_base::associer_pb(const Probleme_base& pb)
         }
     }
 
-  // Vitesse Imposee Shape IB
+  // Imposed Shape IB Velocity
   if (get_modele().get_PDF_mobile())
     {
       nb_comp=dim_esp;
@@ -188,7 +188,7 @@ void Source_PDF_base::associer_pb(const Probleme_base& pb)
       pb.discretisation().discretiser_champ("champ_elem",le_dom_dis,vectoriel,nom_c11,unites11,nb_comp,0.,modele_lu_.vitesse_shape_IBM_);
     }
 
-  // Variable Imposee sur IB
+  // Variable Imposed on IB
   const DoubleTab& variable=equation().inconnue().valeurs();
   Motcle directive("temperature");
   if (equation().inconnue().is_vectorial()) directive="vitesse";
@@ -226,7 +226,7 @@ void Source_PDF_base::set_variable_imposee()
   const Probleme_base& pb = equation().probleme();
   const Domaine_dis_base& le_dom_dis = pb.domaine_dis();
 
-  // Transposition Matrice Rotation
+  // Transpose Rotation Matrix
   if (transpose_rotation_)
     {
       DoubleTab& val=champ_rotation_->valeurs();
@@ -242,7 +242,7 @@ void Source_PDF_base::set_variable_imposee()
             }
     }
 
-  // Variable Imposee sur IB
+  // Variable Imposed on IB
   const DoubleTab& variable=equation().inconnue().valeurs();
   int nb_comp=variable.dimension(1);
 
@@ -266,7 +266,7 @@ void Source_PDF_base::set_variable_imposee()
           modele_lu_.variable_imposee_->affecter(modele_lu_.variable_imposee_lu_);
         }
     }
-  else // pas d'interpolation
+  else // no interpolation
     {
       if (type_variable_imposee_ != 1) // data
         {
@@ -321,11 +321,11 @@ void Source_PDF_base::compute_NeighNode_IBM_elem(DoubleTab& aireArray, IntLists&
   const IntTab& elems = le_dom.les_elems() ;
   const IntTab& elem_face = the_dom_VF.elem_faces();
 
-  // On vide la Lists
+  // Clear the Lists
   assert (elem_voisins.size() == nb_elem_tot);
   for (int num_elem = 0; num_elem < nb_elem_tot; num_elem++) elem_voisins[num_elem].vide();
 
-  for (int num_elem = 0; num_elem < nb_elem_tot; num_elem++) // inclus les elem ghost
+  for (int num_elem = 0; num_elem < nb_elem_tot; num_elem++) // includes ghost elements
     {
       if (aireArray(num_elem) > 0.)
         {
@@ -347,18 +347,18 @@ void Source_PDF_base::compute_NeighNode_IBM_elem(DoubleTab& aireArray, IntLists&
             {
               int num_fac = elem_face(num_elem, fac);
               // Cerr << "face "<<fac<<" : num_face = "<<num_fac<<finl;
-              for (int voisin=0; voisin<2; voisin++) // Deux voisins seulement
+              for (int voisin=0; voisin<2; voisin++) // Two neighbors only
                 {
                   int num_elem_v = face_voisins(num_fac,voisin);
                   if ( (num_elem_v!=-1) && (num_elem_v!=num_elem) )
                     {
-                      if (aireArray(num_elem_v) > 0. || all_elem_vois) elem_voisins[num_elem].add_if_not(num_elem_v); // voisin de num_elem par une face
+                      if (aireArray(num_elem_v) > 0. || all_elem_vois) elem_voisins[num_elem].add_if_not(num_elem_v); // neighbor of num_elem via a face
                       // Cerr << "voisin "<<voisin<<" : num_elem_v = "<<num_elem_v<<finl;
                       // Cerr<<"list elem_voisins => ";
                       // for (int v=0; v<elem_voisins[num_elem].size(); v++) Cerr<<(elem_voisins[num_elem])[v]<< " ";
                       // Cerr<<finl;
 
-                      // element num_elem_v_v, voisin de num_elem_v par une face
+                      // element num_elem_v_v, neighbor of num_elem_v through a face
                       for (int fac_v=0; fac_v<nb_faces_elem; fac_v++)
                         {
                           int num_fac_v = elem_face(num_elem_v, fac_v);
@@ -376,7 +376,7 @@ void Source_PDF_base::compute_NeighNode_IBM_elem(DoubleTab& aireArray, IntLists&
                                           if (node_of_elem.contient(num_nod_v_v)) iok = 1;
                                         }
                                       // Cerr << "num_elem_v_v = "<<num_elem_v_v<<" iok = "<<iok<<finl;
-                                      if (iok == 1) elem_voisins[num_elem].add_if_not(num_elem_v_v); // voisin de num_elem par un noeud
+                                      if (iok == 1) elem_voisins[num_elem].add_if_not(num_elem_v_v); // neighbor of num_elem via a node
                                     }
                                 }
                             }
@@ -431,7 +431,7 @@ double Source_PDF_base::aire_geometrique_IBM(DoubleTab& rotation, int elem)
 
 void Source_PDF_base::update_pseudo_level_set_IBM(DoubleTab& vecteur_deplacement, double alpha)
 {
-  // Update a partir de la pseudo level set et vecteur deplacement vertex
+  // Update from the pseudo level set and vertex displacement vector
 
   if (!(getInterpolationBool() == true))
     {
@@ -469,7 +469,7 @@ void Source_PDF_base::update_pseudo_level_set_IBM(DoubleTab& vecteur_deplacement
   int nb_som_elem=dom.nb_som_elem();
   const DoubleTab coordsDom3D=dom.les_sommets();
 
-  // Preparation de la level-set
+  // Initialization of the level-set
   double nor_nor = 0.;
   for (int e=0; e<nb_elem; e++)
     {
@@ -477,39 +477,39 @@ void Source_PDF_base::update_pseudo_level_set_IBM(DoubleTab& vecteur_deplacement
       for (int il=0; il<nb_som_elem; il++)
         {
           int i = elems(e,il);
-          if (level_set(i) == -99999.) // level_set non initialise
+          if (level_set(i) == -99999.) // level_set not initialized
             {
               nb_nor_nul += 1;
               continue;
             }
           nor_nor = 0.;
           for (int k=0; k<dim_esp; k++) nor_nor += nor(i, k)*nor(i, k);
-          if (nor_nor <= 1.e-10) nb_nor_nul += 1; // vertex non calcule PDF
+          if (nor_nor <= 1.e-10) nb_nor_nul += 1; // vertex not computed by PDF
         }
       if ( nb_nor_nul == nb_som_elem )
         for (int il=0; il<nb_som_elem; il++) level_set(elems(e,il)) = -99999.;
     }
 
-  // Gradient de phi par element (schema explicite) + sommet (robustesse)
+  // Gradient of phi per element (explicit scheme) + vertex (robustness)
   DoubleTrav grad_phi_e_0(nb_elem,dim_esp) ;
   DoubleTrav grad_phi_i_0(nb_som,dim_esp) ;
   IntTrav contrib_i(nb_som);
-  int etarg = -1; // pour debug
-  // grad_phi par element (normee)
+  int etarg = -1; // for debug
+  // grad_phi per element (normalized)
   for (int e=0; e<nb_elem; e++)
     {
       int initialised_vertex_in_e = 1;
       if (e == etarg) Cerr<<">>> elem = "<<e<<" : grad phi"<<finl;
-      // Ajout contributions dans l element
+      // Add contributions within the element
       for (int il=0; il<nb_som_elem; il++)
         {
           int i = elems(e,il);
-          if (level_set(i) == -99999.) // level_set non initialisee => pas de contrib.
+          if (level_set(i) == -99999.) // level_set not initialized => no contribution
             {
               initialised_vertex_in_e = 0;
               continue;
             }
-          int dir_grad_phi_0 = (level_set(i)<0.?-1:(level_set(i)==0.?0.:1)); // grad_phi suivant phi croissant (dir_grad_phi * nor)
+          int dir_grad_phi_0 = (level_set(i)<0.?-1:(level_set(i)==0.?0.:1)); // grad_phi along increasing phi direction (dir_grad_phi * nor)
           nor_nor = 0.;
           for (int k=0; k<dim_esp; k++) nor_nor += nor(i, k)*nor(i, k);
           if (e == etarg) Cerr<<"i = "<<i<<" norme carree  normal = "<<nor_nor<<" dir_grad_phi_0 = "<<dir_grad_phi_0<<finl;
@@ -518,20 +518,20 @@ void Source_PDF_base::update_pseudo_level_set_IBM(DoubleTab& vecteur_deplacement
               for (int k=0; k<dim_esp; k++) grad_phi_e_0(e,k) += dir_grad_phi_0*nor(i, k);
             }
         }
-      // normalisation grad_phi_e_0 par element si non null
-      // rem. : si level_set non initialisee pour tout noeud de l element => grad_phi_e_0 null
-      // Traitement initialised_vertex_in_e = 0 et Assemblage sommet
+      // normalization of grad_phi_e_0 per element if non-null
+      // note: if level_set not initialized for all nodes of the element => grad_phi_e_0 is null
+      // Treatment of initialised_vertex_in_e = 0 and vertex assembly
       nor_nor = 0.;
       for (int k=0; k<dim_esp; k++) nor_nor += grad_phi_e_0(e,k)*grad_phi_e_0(e,k);
       if (nor_nor > 1.e-10)
         {
           for (int k=0; k<dim_esp; k++) grad_phi_e_0(e,k) /= sqrt(nor_nor);
 
-          // Si initialised_vertex_in_e = 0
-          //   => initialisation de ces vertex a partir de grad_phi_e_0 et des autres vertex
+          // If initialised_vertex_in_e = 0
+          //   => initialize these vertices from grad_phi_e_0 and the other vertices
           if ( initialised_vertex_in_e == 0)
             {
-              // boucle recherche vertex de reference
+              // loop to find reference vertex
               double level_set_ref = -99999.;
               DoubleTrav XYZ_ref(dim_esp);
               for (int il=0; il<nb_som_elem; il++)
@@ -560,7 +560,7 @@ void Source_PDF_base::update_pseudo_level_set_IBM(DoubleTab& vecteur_deplacement
                 }
             }
 
-          // Assemblage sommet
+          // Vertex assembly
           for (int il=0; il<nb_som_elem; il++)
             {
               int i = elems(e,il);
@@ -586,7 +586,7 @@ void Source_PDF_base::update_pseudo_level_set_IBM(DoubleTab& vecteur_deplacement
         }
     }
 
-  // grad_phi par sommet (norme)
+  // grad_phi per vertex (normalized)
   for (int i=0; i<nb_som; i++)
     {
       if (contrib_i(i) != 0)
@@ -601,24 +601,24 @@ void Source_PDF_base::update_pseudo_level_set_IBM(DoubleTab& vecteur_deplacement
         }
     }
 
-  // Advecte phi par sommet pour tous les sommets + new_bary pour element traverse par level set zero (moyenne arith)
-  // normale egale a grad_phi_e_0 pour ces elements
+  // Advect phi per vertex for all vertices + new_bary for elements crossed by level set zero (arithmetic mean)
+  // normal equals grad_phi_e_0 for these elements
   IntTrav advect_faite(nb_som) ;
-  aire = 0.; // Mise a zero champ aire IB
-  bary = 0.; // Mise a zero champ barycentre IB
+  aire = 0.; // Zero out the IB area field
+  bary = 0.; // Zero out the IB barycenter field
   DoubleTrav new_normal_e(bary);
   for (int e=0; e<nb_elem; e++)
     {
       if (e == etarg) Cerr<<">>> elem = "<<e<<" : Advecte phi"<<finl;
       double nor_nor_e_0 = 0.;
       for (int k=0; k<dim_esp; k++) nor_nor_e_0 += grad_phi_e_0(e,k)*grad_phi_e_0(e,k);
-      if (nor_nor_e_0 <= 1.0e-10) continue; // element avec grad phi element non defini
+      if (nor_nor_e_0 <= 1.0e-10) continue; // element with undefined element grad phi
 
       double contrib_e = 0.;
       for (int il=0; il<nb_som_elem; il++)
         {
           int i = elems(e,il);
-          // Advection phi pour le sommet i de l element (si pas deja fait)
+          // Advect phi for vertex i of the element (if not already done)
           if (advect_faite(i) == 0)
             {
               if (e == etarg)
@@ -650,7 +650,7 @@ void Source_PDF_base::update_pseudo_level_set_IBM(DoubleTab& vecteur_deplacement
                 }
             }
 
-          // calcul de la projection solide nodale et du barycentre (moyenne arith.)
+          // compute nodal solid projection and barycenter (arithmetic mean)
           for (int k=0; k<dim_esp; k++)
             bary(e,k) += coordsDom3D(i,k)-(level_set(i)*grad_phi_i_0(i,k)); // OP^1 = OX - phi^1 grad_phi^0
           contrib_e += 1.;
@@ -669,16 +669,16 @@ void Source_PDF_base::update_pseudo_level_set_IBM(DoubleTab& vecteur_deplacement
       if (contrib_e != 0.)
         for (int k=0; k<dim_esp; k++) bary(e,k) /= contrib_e;
 
-      // Si element traverse par level set zero + grad_phi_e element OK => contribution au champ aire
+      // If element crossed by level set zero + element grad_phi_e OK => contribution to area field
       int iok = 0;
-      // element avec level set differents signe ?
+      // element with level set of different sign?
       double level_ref = 0.;
       for (int il=0; il<nb_som_elem; il++)
         {
           int i = elems(e,il);
           if (level_set(i) != 0. && level_set(i) != -99999.)
             {
-              level_ref = level_set(i); // reference 1er vertex avec phi<>0 et initialisee
+              level_ref = level_set(i); // reference: first vertex with phi<>0 and initialized
               break;
             }
         }
@@ -698,9 +698,9 @@ void Source_PDF_base::update_pseudo_level_set_IBM(DoubleTab& vecteur_deplacement
       if (nor_nor_e_0 > 1.0e-10) iok += 1;
       if (iok == 2)
         {
-          // Definition de l aire a faire une fois les rotations mises a jour
+          // Area definition to be done once the rotations have been updated
           aire(e) = 9999.;
-          // Definition de la normale element
+          // Definition of the element normal
           for (int k=0; k<dim_esp; k++) new_normal_e(e, k) = grad_phi_e_0(e,k);
           if (e == etarg)
             {
@@ -719,8 +719,8 @@ void Source_PDF_base::update_pseudo_level_set_IBM(DoubleTab& vecteur_deplacement
     }
   level_set.echange_espace_virtuel();
 
-  // Modification champ rotation par element
-  rotation = 0.; // Mise a zero des rotations
+  // Update rotation field per element
+  rotation = 0.; // Zero out the rotations
   rotation.echange_espace_virtuel();
   DoubleTrav t1EulerArr(bary);
   DoubleTrav t2EulerArr(bary);
@@ -734,7 +734,7 @@ void Source_PDF_base::update_pseudo_level_set_IBM(DoubleTab& vecteur_deplacement
     }
   rotation = prepro_lu_->get_champ_rotation();
 
-  // Rotations à jour => modification possible du champ aire
+  // Rotations up to date => possible modification of the area field
   for (int e=0; e<nb_elem; e++)
     {
       if(aire(e) == 9999.)
@@ -748,7 +748,7 @@ void Source_PDF_base::update_pseudo_level_set_IBM(DoubleTab& vecteur_deplacement
   bary.echange_espace_virtuel();
   rotation.echange_espace_virtuel();
 
-  // finalisation : mise a jour de l IB
+  // finalization: update of the IB
   set_fields_to_prepro(prepro_lu_);
   prepro_lu_->compute_solid_fluid(1);
 
@@ -764,7 +764,7 @@ void Source_PDF_base::update_pseudo_level_set_IBM(DoubleTab& vecteur_deplacement
 
 void Source_PDF_base::update_elem_IBM(DoubleTab& vecteur_deplacement, double alpha, double raid)
 {
-  // Update a partir des barycentres elementaires de Source_PDF_base
+  // Update from the elemental barycenters of Source_PDF_base
 
   int dim_esp = Objet_U::dimension;
   assert (dim_esp == 3);
@@ -784,11 +784,11 @@ void Source_PDF_base::update_elem_IBM(DoubleTab& vecteur_deplacement, double alp
   IntTab indic_dead_cell(nb_elem);
   indic_dead_cell = 0;
 
-  // calcul voisins de chaque element traverse
+  // compute neighbors of each crossed element
   IntLists elem_voisins(nb_elem_tot);
   compute_NeighNode_IBM_elem(aire, elem_voisins);
 
-  // update du champ barycentre
+  // update the barycenter field
   IntTrav toward_new_elem(nb_elem);
 
   // stpe1 : prediction
@@ -813,14 +813,14 @@ void Source_PDF_base::update_elem_IBM(DoubleTab& vecteur_deplacement, double alp
           toward_new_elem(e) = dom.chercher_elements(bary(e,0),bary(e,1),bary(e,2));
           if (aire(toward_new_elem(e)) <= 0. ) indic_dead_cell(toward_new_elem(e)) = 1;
         }
-      else //pour eviter que null soit considere comme element numero o
+      else //to avoid null being considered as element number 0
         {
           toward_new_elem(e) =-2; // rien a deplacer
         }
     }
   indicateur_dead_cell_ = indic_dead_cell;
 
-  // stpe2 : deplacement des champs vers des elements nouveaux
+  // step2 : displacement of fields towards new elements
   DoubleTrav new_aire(aire);
   DoubleTrav new_bary(bary);
   DoubleTrav new_rotation(rotation);
@@ -833,10 +833,10 @@ void Source_PDF_base::update_elem_IBM(DoubleTab& vecteur_deplacement, double alp
           Cerr<<"Source_PDF_base::update_elem_IBM: element displacement is not valid."<<finl;
           exit();
         }
-      else if (toward_new_elem(e) == -2 ) // element non coupe par gamma
+      else if (toward_new_elem(e) == -2 ) // element not crossed by gamma
         {
         }
-      else //deplacement des donnees (barycentres et matrices rotation)
+      else //displacement of data (barycenters and rotation matrices)
         {
           for (int k=0; k<dim_esp; k++) new_bary(toward_new_elem(e),k) += bary(e,k);
           for (int k=0; k<rotation.dimension(1); k++) new_rotation(toward_new_elem(e),k) += rotation(e,k);
@@ -845,7 +845,7 @@ void Source_PDF_base::update_elem_IBM(DoubleTab& vecteur_deplacement, double alp
         }
     }
 
-  // Moyenne arithmetique pour barycentres et matrices rotation; moyenne arithmetique ou definition geometrique pour aire
+  // Arithmetic mean for barycenters and rotation matrices; arithmetic mean or geometric definition for area
 
   int aire_geometriq_ok = 1;
 
@@ -871,37 +871,37 @@ void Source_PDF_base::update_elem_IBM(DoubleTab& vecteur_deplacement, double alp
       for (int k=0; k<rotation.dimension(1); k++) rotation(e,k) = new_rotation(e,k);
     }
 
-  // Verification de la conservation de la topologie
-  // Traitement des elements elem ayant 0 ou 1 voisin
-  // les voisins de l'antecedent de elem doivent etre voisins de elem
+  // Verification of topology conservation
+  // Treatment of elements having 0 or 1 neighbor
+  // the neighbors of the predecessor of elem must be neighbors of elem
 
-  // calcul voisins de chaque nouveau element traverse
+  // compute neighbors of each new crossed element
   IntLists elem_voisins_new(nb_elem_tot);
   compute_NeighNode_IBM_elem(aire, elem_voisins_new);
 
-  // recherche des elements deplaces ayant moins de 2 voisins
+  // find displaced elements with fewer than 2 neighbors
   for (int e=0; e<nb_elem_tot; e++)
     {
       if ( elem_voisins_new[e].size() < 2)
         {
           IntList antecedents;
           antecedents.vide();
-          // list des elements (antecedents) s'etant deplace vers e
+          // list of elements (antecedents) that have moved towards e
           for (int e_old=0; e_old<nb_elem_tot; e_old++)
             if (toward_new_elem(e_old) == e) antecedents.add_if_not(e_old);
 //          if (antecedents.size() != 0) Cerr<<"element "<<e<<" => "<<finl;
           IntList to_link;
           to_link.vide();
-          // boucle sur les antecedents de e
+          // loop over predecessors of e
           for (int ant=0; ant<antecedents.size(); ant++)
             {
               // Cerr<<" voisins de antecedent = "<<antecedents[ant] <<" ";
-              // boucle sur les anciens voisins de chaque antecedent de e
+              // loop over old neighbors of each predecessor of e
               int nb_vois_ant = elem_voisins[antecedents[ant]].size();
               for (int vois_ant=0; vois_ant<nb_vois_ant; vois_ant++)
                 {
                   int old_vois = (elem_voisins[antecedents[ant]])[vois_ant];
-                  // l'ancien voisin est il toujours voisin de e ?
+                  // is the old neighbor still a neighbor of e?
                   int i_present = 0;
                   for (int vois_e=0; vois_e<elem_voisins_new[e].size(); vois_e++)
                     if ( (elem_voisins_new[e])[vois_e] == toward_new_elem(old_vois) ) i_present = 1;
@@ -977,8 +977,8 @@ void Source_PDF_base::verify_results_prepro()
 
   int dim_esp = Objet_U::dimension;
 
-  ///////////////////////////////// Champs de base /////////////////////////////////
-  // Aire
+  ///////////////////////////////// Base fields /////////////////////////////////
+  // Area
   if (champ_aire_lu_)
     {
       const DoubleTab& aireArray_src_pdf = champ_aire_lu_->valeurs();
@@ -1244,8 +1244,8 @@ void Source_PDF_base::associer_domaines(const Domaine_dis_base& domaine_dis,
 
 void Source_PDF_base::compute_indicateur_nodal_champ_aire()
 {
-  // indicateur_nodal_champ_aire_ = 1 si sommet appartient a un element dont l'aire <> 0
-  // 0 sinon
+  // indicateur_nodal_champ_aire_ = 1 if vertex belongs to an element with non-zero area
+  // 0 otherwise
   const DoubleTab& aire=champ_aire_->valeurs();
   const Domaine_dis_base& Domaine_dis = equation().probleme().domaine_dis();
   int nb_elems=Domaine_dis.domaine().nb_elem_tot();
@@ -1297,8 +1297,8 @@ double Source_PDF_base::fonct_regul_PDF(const int elem, const double dist)
 
 double Source_PDF_base::fonct_coeff(const double rho_m, const double aire, const double dt) const
 {
-  // return = 0 si aire dans element <= 0
-  // return = rho/dt * coeff_relax sinon
+  // return = 0 if area in element <= 0
+  // return = rho/dt * coeff_relax otherwise
   double val_coeff = 0.;
   if (aire<=0.)
     {
@@ -1363,8 +1363,8 @@ DoubleVect Source_PDF_base::diag_coeff_elem(ArrOfDouble& variable_elem, const Do
 
 DoubleTab Source_PDF_base::compute_coeff_elem() const
 {
-  // coeff = 1 si aire dans element <= 0
-  // coeff = 1 + (Ksi/eta) * coeff_relax sinon
+  // coeff = 1 if area in element <= 0
+  // coeff = 1 + (Ksi/eta) * coeff_relax otherwise
   const Domaine_dis_base& domaine_dis = equation().probleme().domaine_dis();
   const IntTab& elems= domaine_dis.domaine().les_elems() ;
   int nb_som_elem=domaine_dis.domaine().nb_som_elem();
@@ -1430,9 +1430,9 @@ DoubleTab Source_PDF_base::compute_coeff_elem() const
 
 DoubleTab Source_PDF_base::compute_coeff_matrice() const
 {
-  // coeff sommet = Sigma_elem coeff_elem / Nb contributions;  avec :
-  // coeff_elem = Ksi/eta * coeff_relax si element dont l'aire <>= 0
-  // coeff_elem = 0 sinon
+  // coeff vertex = Sigma_elem coeff_elem / Nb contributions;  with:
+  // coeff_elem = Ksi/eta * coeff_relax if element with area <>= 0
+  // coeff_elem = 0 otherwise
   const Domaine_dis_base& Domaine_dis = equation().probleme().domaine_dis();
   int nb_elems=Domaine_dis.domaine().nb_elem_tot();
 
@@ -1545,8 +1545,8 @@ void Source_PDF_base::multiply_coeff_volume(DoubleTab& coeff) const
 
 DoubleTab Source_PDF_base::compute_pond(const DoubleTab& rho_m, const DoubleTab& aire, const DoubleVect& volume, int& coef1, int& nb_elems) const
 {
-// return = 0 si aire dans element <= 0
-// return = rho/dt * coeff_relax * volume / (coef1*coef1)  sinon
+// return = 0 if area in element <= 0
+// return = rho/dt * coeff_relax * volume / (coef1*coef1)  otherwise
   DoubleTab pond = rho_m;
   double inv_coef1 = 1. / coef1;
 
@@ -1621,7 +1621,7 @@ DoubleVect& Source_PDF_base::compute_source_term_PDF(int i_traitement_special, D
 
   DoubleTrav resu(variable);
   calculer(resu, i_traitement_special);
-  // On s'assure d'avoir le meme dt que pour sec_mem_pdf (calculer_pdf)
+  // Make sure we have the same dt as for sec_mem_pdf (calculer_pdf)
   double dt_courant = calcul_dt_pdf();
   resu *= dt_courant/dt_computation_pdf_;
   DoubleTrav flag_cl(resu);
@@ -1784,7 +1784,7 @@ int Source_PDF_base::impr(Sortie& os) const
 
 void Source_PDF_base::ouvrir_fichier(SFichier& os, const Nom& type, const int flag=1) const
 {
-  // flag nul on n'ouvre pas le fichier
+  // null flag: do not open the file
   if (flag==0)
     return ;
 
@@ -1795,7 +1795,7 @@ void Source_PDF_base::ouvrir_fichier(SFichier& os, const Nom& type, const int fl
   if (type!="") nomfichier+=(Nom)"_"+type;
   nomfichier+=".out";
 
-  // On cree le fichier a la premiere impression avec l'en tete
+  // Create the file at the first output with the header
   if (sch.nb_impr()==1 && !pb.reprise_effectuee())
     {
       os.ouvrir(nomfichier);
@@ -1980,7 +1980,7 @@ bool Source_PDF_base::has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_cham
       return true;
     }
   else
-    return false; /* rien trouve */
+    return false; /* nothing found */
 }
 
 bool Source_PDF_base::has_champ(const Motcle& nom) const
@@ -1998,7 +1998,7 @@ bool Source_PDF_base::has_champ(const Motcle& nom) const
   else if (nom == "pseudo_level_set_IBM" && champ_pseudo_level_set_IBM_)
     return true;
   else
-    return false; /* rien trouve */
+    return false; /* nothing found */
 }
 
 const Champ_base& Source_PDF_base::get_champ(const Motcle& nom) const
@@ -2010,7 +2010,7 @@ const Champ_base& Source_PDF_base::get_champ(const Motcle& nom) const
       if (!champ_source_term_PDF_)
         throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 
-      // Initialisation a 0 du champ_source_term_PDF_
+      // Initialization to 0 of champ_source_term_PDF_
       DoubleTab& valeurs = champ_source_term_PDF_->valeurs();
       valeurs=0.;
       if (source_term_PDF.size_array()>0)
@@ -2030,7 +2030,7 @@ const Champ_base& Source_PDF_base::get_champ(const Motcle& nom) const
       if (!champ_barycentre_IBM_)
         throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 
-      // Initialisation a 0 du champ_barycentre_IBM_
+      // Initialization to 0 of champ_barycentre_IBM_
       DoubleTab& valeurs = champ_barycentre_IBM_->valeurs();
       valeurs=0.;
       if (champ_barycentre_)
@@ -2051,7 +2051,7 @@ const Champ_base& Source_PDF_base::get_champ(const Motcle& nom) const
       if (!champ_normal_IBM_)
         throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 
-      // Initialisation a 0 du champ_normal_IBM_
+      // Initialization to 0 of champ_normal_IBM_
       DoubleTab& valeurs = champ_normal_IBM_->valeurs();
       valeurs=0.;
       if (champ_rotation_)
@@ -2071,7 +2071,7 @@ const Champ_base& Source_PDF_base::get_champ(const Motcle& nom) const
       if (!champ_aire_IBM_)
         throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 
-      // Initialisation a 0 du champ_aire_IBM_
+      // Initialization to 0 of champ_aire_IBM_
       DoubleTab& valeurs = champ_aire_IBM_->valeurs();
       valeurs=0.;
       if (champ_aire_)
@@ -2092,7 +2092,7 @@ const Champ_base& Source_PDF_base::get_champ(const Motcle& nom) const
       if (!champ_vitesse_shape_IBM_)
         throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 
-      // Initialisation a 0 du champ_vitesse_shape_IBM_
+      // Initialization to 0 of champ_vitesse_shape_IBM_
       DoubleTab& valeurs = champ_vitesse_shape_IBM_->valeurs();
       valeurs=0.;
       if (modele_lu_.vitesse_shape_IBM_)
@@ -2113,7 +2113,7 @@ const Champ_base& Source_PDF_base::get_champ(const Motcle& nom) const
       if (!champ_pseudo_level_set_IBM_)
         throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 
-      // Initialisation a 0 du champ_pseudo_level_set_IBM_
+      // Initialization to 0 of champ_pseudo_level_set_IBM_
       DoubleTab& valeurs = champ_pseudo_level_set_IBM_->valeurs();
       valeurs=0.;
       if (interpolation_bool_)

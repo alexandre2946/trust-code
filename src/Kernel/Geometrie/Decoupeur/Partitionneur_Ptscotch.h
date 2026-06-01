@@ -21,9 +21,9 @@
 
 #include <Domaine_forward.h>
 
-/*! @brief Partition d'un domaine en nb_parties parties equilibrees en utilisant la librairie Ptscotch.
+/*! @brief Partition of a domain into nb_parties balanced parts using the Ptscotch library.
  *
- * Voir construire_partition
+ * See construire_partition.
  *
  */
 
@@ -39,11 +39,11 @@ public:
   void construire_partition(IntVect& elem_part, int& nb_parts_tot) const override;
 
 private:
-  // Parametres du partitionneur
+  // Partitioner parameters
   OBS_PTR(Domaine) ref_domaine_;
   int nb_parties_ = -1;
 
-  // Drapeau: utiliser ou pas la ponderation des edges dans metis.
+  // Flag: whether to use edge weighting in metis.
   bool use_weights_ = false;
 };
 

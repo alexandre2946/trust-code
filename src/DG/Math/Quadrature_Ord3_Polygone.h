@@ -26,11 +26,11 @@ public:
     compute_integ_points_on_facet();
     nb_f_elem_max = dom_->elem_faces().dimension(1);
   }
-  /*! Compute for the whole domain the exact location of integration points per element
+  /*! @brief Compute for the whole domain the exact location of integration points per element
    */
   void compute_integ_points() override;
 
-  /*! Compute for the whole domain the exact location of integration points per facet
+  /*! @brief Compute for the whole domain the exact location of integration points per facet
    */
   void compute_integ_points_on_facet() override;
 

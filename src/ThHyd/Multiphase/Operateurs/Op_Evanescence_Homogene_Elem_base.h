@@ -18,9 +18,7 @@
 
 #include <Operateur_Evanescence_base.h>
 
-/*! @brief Classe Op_Evanescence_Homogene_Elem_base
- *
- *   gestion de l'evanescence dans une equation aux elements (masse, energie ...)
+/*! @brief Manages evanescence in an element-based equation (mass, energy, etc.).
  *
  * @sa Operateur_Evanescence_base Operateur_base
  */
@@ -34,7 +32,7 @@ public :
   double alpha_res() const override { return alpha_res_; }
 
 private:
-  double alpha_res_ = 0., alpha_res_min_ = 0.; //seuil de declenchement du traitement de l'evanescence
+  double alpha_res_ = 0., alpha_res_min_ = 0.; // threshold for triggering evanescence treatment
 };
 
 #endif /* Op_Evanescence_Homogene_Elem_base_included*/

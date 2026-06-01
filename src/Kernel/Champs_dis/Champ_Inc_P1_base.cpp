@@ -34,7 +34,7 @@ int Champ_Inc_P1_base::fixer_nb_valeurs_nodales(int nb_noeuds)
   return 1;
 }
 
-/*! @brief Trace du champ P0 sur la frontiere
+/*! @brief Trace of the P0 field on the boundary
  *
  */
 DoubleTab& Champ_Inc_P1_base::trace(const Frontiere_dis_base& fr, DoubleTab& x, double tps, int distant) const

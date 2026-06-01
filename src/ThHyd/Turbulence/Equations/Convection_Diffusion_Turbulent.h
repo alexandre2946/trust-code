@@ -22,23 +22,23 @@
 
 class Operateur_Diff;
 
-/*! @brief classe Convection_Diffusion_Turbulent Cette classe represente la convection-diffusion d'une ou plusieurs
+/*! @brief Mixin class for turbulent convection-diffusion of one or more scalar quantities.
  *
- *      grandeurs scalaires (la temperature, une concentration ou plusieurs
- *      concentrations) par un fluide verifiant la condition
- *      d'incompressibilite div U = 0, avec modelisation de la turbulence.
- *      Ce n'est pas (a elle seule) une classe de la hierarchie des equations
- *      de TrioU, mais elle porte un modele de turbulence.
+ *      Handles temperature, a single concentration, or multiple concentrations in a fluid
+ *      satisfying the incompressibility condition div U = 0, with turbulence modelling.
+ *      This class is not, on its own, part of the equation hierarchy (Objet_U/Equation_base);
+ *      it is meant to be combined via multiple inheritance to produce turbulent equation classes
+ *      (see e.g. Convection_Diffusion_Temperature_Turbulent).
  *
- * @sa Convection_Diffusion_std  Mod_turb_scal, Convection_Diffusion_Temperature_Turbulent, Convection_Diffusion_Concentration_Turbulent, Cette est definie hors hierarchie Objet_U et Equation_base, ceci permet la definition des equations de convection-diffusion, turbulentes par heritage multiple, voir par exemple, Convection_Diffusion_Temperature_Turbulent.
+ * @sa Convection_Diffusion_std  Mod_turb_scal, Convection_Diffusion_Temperature_Turbulent, Convection_Diffusion_Concentration_Turbulent
  */
 class Convection_Diffusion_Turbulent
 {
 public :
   Entree& lire_modele(Entree&, const Equation_base& );
 
-  //On passe desormais par equation().get_modele(TURBULENCE) pour recuperer
-  //le modele de turbulence puis le tableau des valeurs de la diffusion turbulente
+  // Now accessed via equation().get_modele(TURBULENCE) to retrieve
+  // the turbulence model and then the turbulent diffusion values array
   void completer();
   virtual bool initTimeStep(double dt);
   int preparer_calcul();

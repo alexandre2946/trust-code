@@ -43,7 +43,7 @@ Entree& Momentum_Euler::readOn(Entree& is)
       Process::exit();
     }
 
-  // si monophasique et termes_non_conservatifs non-lu ... on type sans error !
+  // if single-phase and termes_non_conservatifs not read ... type without error!
   const bool is_single_phase = (ref_cast(Pb_Euler, probleme()).nb_phases() == 1);
   if (is_single_phase && !terme_nconserv_)
     {
@@ -100,7 +100,7 @@ const Operateur& Momentum_Euler::operateur(int i) const
       Cerr << "and you are trying to access the " << i <<" th one."<< finl;
       exit();
     }
-  // Pour les compilos!!
+  // For the compilers!!
   return terme_convectif;
 }
 
@@ -118,14 +118,14 @@ Operateur& Momentum_Euler::operateur(int i)
       Cerr << "and you are trying to access the " << i <<" th one."<< finl;
       exit();
     }
-  // Pour les compilos!!
+  // For the compilers!!
   return terme_convectif;
 }
 
 bool Momentum_Euler::initTimeStep(double dt)
 {
   Schema_Temps_base& sch = schema_temps();
-  // Mise a jour du temps dans la pression
+  // Update the time in the pressure field
   for (int i = 1; i <= sch.nb_valeurs_futures(); i++)
     {
       la_pression->changer_temps_futur(sch.temps_futur(i), i);
@@ -163,7 +163,7 @@ void Momentum_Euler::completer()
   const Domaine_VF& dom = ref_cast(Domaine_VF, domaine_dis());
   const Pb_Euler& pb = ref_cast(Pb_Euler, probleme());
 
-  vitesse_normale_.resize(dom.nb_faces(), 2 * pb.nb_phases()); // dimension du tab à changer pour 3 pahses
+  vitesse_normale_.resize(dom.nb_faces(), 2 * pb.nb_phases()); // array dimension to be updated for 3 phases
   dom.creer_tableau_faces(vitesse_normale_);
   assert(vitesse_normale_.dimension(0) == dom.nb_faces());
   assert(vitesse_normale_.dimension_tot(0) == dom.nb_faces_tot());
@@ -277,7 +277,7 @@ Entree& Momentum_Euler::lire_cond_init(Entree& is)
 
 int Momentum_Euler::preparer_calcul()
 {
-  Equation_base::preparer_calcul(); //pour eviter Navier_Stokes_std::preparer_calcul() !
+  Equation_base::preparer_calcul(); //to avoid calling Navier_Stokes_std::preparer_calcul() !
 
   // XXX Elie Saikali : utile pour cas reprise !
   const double temps = schema_temps().temps_courant();
@@ -309,7 +309,7 @@ void Momentum_Euler::discretiser()
   la_vitesse->add_synonymous(Nom("velocity"));
   champs_compris_.ajoute_champ(la_vitesse);
 
-  /* vitesse par phase */
+  /* velocity per phase */
   noms_vit_phases_.dimensionner(N);
   vit_phases_.resize(N);
 
@@ -328,13 +328,13 @@ void Momentum_Euler::discretiser()
   la_pression->fixer_nature_du_champ(N == 1 ? scalaire : multi_scalaire);
   la_pression->associer_eqn(*this);
 
-  /* nom pression par phase */
+  /* pressure field name per phase */
   for (int i = 0; i < pb.nb_phases(); i++)
     la_pression->fixer_nom_compo(i, Nom("pression_") + pb.nom_phase(i));
 
   champs_compris_.ajoute_champ(la_pression);
 
-  // on copie la structure //
+  // copy the structure //
   vitesse_son_ = la_pression->valeurs(); // nb_elem_tot * nb_phase
 
   Cerr << "Unknown alpha_rho_u discretization" << finl;
@@ -471,8 +471,8 @@ void Momentum_Euler::calculer_vitesse_normale()
   for (int n = 0; n < Nb_phase; n++)
     for (int f = 0; f < dom.nb_faces(); f++)
       {
-        // attention :  u_n( faces ,  0 ) est la vitesse normale left (au sens de la normale sortante) et u_n( faces ,  0 ) est vit norma right
-        // CE N EST PAS	 la dimesion de l espae
+        // note:  u_n( faces ,  0 ) is the left normal velocity (in the sense of the outward normal) and u_n( faces ,  0 ) is the right normal velocity
+        // THIS IS NOT the space dimension
         int el = f_e(f, 0), er = f_e(f, 1);
         double nx = dom.face_normales(f, 0) / dom.face_surfaces(f);
         double ny = dom.face_normales(f, 1) / dom.face_surfaces(f);

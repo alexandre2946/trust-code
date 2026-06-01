@@ -20,7 +20,7 @@
 #include <Traitement_particulier_NS_Profils.h>
 #include <TRUSTTabs_forward.h>
 
-/*! @brief class Trait_part_NS_Profils_VDF This classe enables a particular treatment
+/*! @brief class Trait_part_NS_Profils_VDF This class enables a particular treatment
  *
  *      for computations which have a periodic BC (ie homogeneous direction)
  *      and on which we want profiles in a specific direction and position :
@@ -53,15 +53,15 @@ protected :
 
 
 protected:
-  DoubleTab Yu_m,Yv_m,Yw_m,Yuv_m;                             // Coordonnees des points ou est definie la vitesse.
+  DoubleTab Yu_m,Yv_m,Yw_m,Yuv_m;                             // Coordinates of points where the velocity is defined.
   DoubleTab Yu_p,Yv_p,Yw_p,Yuv_p;
-  IntTab compt_x_m,compt_y_m,compt_z_m,compt_uv_m;            // Nombre de points a "meme Y" pour chaque grandeur.
+  IntTab compt_x_m,compt_y_m,compt_z_m,compt_uv_m;            // Number of points at the "same Y" for each quantity.
   IntTab compt_x_p,compt_y_p,compt_z_p,compt_uv_p;
-  IntTab corresp_u_m, corresp_v_m, corresp_w_m, corresp_uv_m; // Correspondance numerotation globale -> numerotation locale dans Yxx
+  IntTab corresp_u_m, corresp_v_m, corresp_w_m, corresp_uv_m; // Mapping from global numbering to local numbering in Yxx
   IntTab corresp_u_p, corresp_v_p, corresp_w_p, corresp_uv_p;
 
-  DoubleTab xUm,xUp,xWm,xWp,xVm,xVp,xUVm,xUVp;               // Positions des points juste avant et apres.
-  DoubleVect delta_Um,delta_Up,delta_Wm,delta_Wp,delta_Vm,delta_Vp,delta_UVm,delta_UVp;  // Distance (tjrs positive) entre le point avant ou apres et le point du profil, pour faire les interpolations lineaires et trouver les points en question.
+  DoubleTab xUm,xUp,xWm,xWp,xVm,xVp,xUVm,xUVp;               // Positions of the points just before and after.
+  DoubleVect delta_Um,delta_Up,delta_Wm,delta_Wp,delta_Vm,delta_Vp,delta_UVm,delta_UVp;  // Distance (always positive) between the point before or after and the profile point, used for linear interpolation.
 
 };
 #endif

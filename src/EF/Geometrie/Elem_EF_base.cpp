@@ -18,7 +18,7 @@
 
 Implemente_base(Elem_EF_base,"Elem_EF_base",Objet_U);
 
-// printOn et readOn
+// printOn and readOn
 
 Sortie& Elem_EF_base::printOn(Sortie& s ) const
 {

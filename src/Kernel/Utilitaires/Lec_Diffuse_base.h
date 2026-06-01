@@ -20,16 +20,16 @@
 #include <communications.h>
 #include <EFichier.h>
 
-/*! @brief Classe de base des entrees diffusees: le processeur maitre lit les donnees dans la classe get_entree_master() et les diffuse
+/*! @brief Base class for diffused inputs: the master processor reads data from get_entree_master() and broadcasts it
  *
- *    sur tous les processeurs.
- *    Attention, les methodes operator>>(), get(), eof(), good() et bad()
- *    doivent etre appelees simultanement sur tous les processeurs.
- *    Les classes derivees doivent reimplementer get_entree_master().
- *    La methode get_entree_master() doit renvoyer une reference a l'entree
- *    qui sert de source sur le processeur maitre, elle n'est jamais appellee
- *    sur les autres processeurs.
- *    Attention: l'entree source doit avoir set_error_action(ERROR_CONTINUE)
+ *    to all processors.
+ *    Warning: the methods operator>>(), get(), eof(), good() and bad()
+ *    must be called simultaneously on all processors.
+ *    Derived classes must reimplement get_entree_master().
+ *    The get_entree_master() method must return a reference to the input
+ *    that serves as source on the master processor; it is never called
+ *    on other processors.
+ *    Warning: the source input must have set_error_action(ERROR_CONTINUE).
  *
  */
 

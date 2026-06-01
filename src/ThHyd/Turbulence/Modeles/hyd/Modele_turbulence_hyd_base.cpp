@@ -37,19 +37,19 @@ Implemente_base(Modele_turbulence_hyd_base, "Modele_turbulence_hyd_base", Objet_
 
 Sortie& Modele_turbulence_hyd_base::printOn(Sortie& s) const { return s << que_suis_je() << " " << le_nom(); }
 
-/*! @brief Lit les specifications d'un modele de turbulence a partir d'un flot d'entree.
+/*! @brief Reads the specifications of a turbulence model from an input stream.
  *
  *     Format:
  *     Modele_turbulence type_modele
  *     {
  *       [Turbulence_paroi la_loi_de_paroi]
- *       bloc de lecture specifique du type de turbulence
+ *       reading block specific to the turbulence type
  *     }
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws accolade ouvrante attendue
- * @throws loi de paroi incompatible avec le probleme
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
+ * @throws opening brace expected
+ * @throws wall law incompatible with the problem
  */
 Entree& Modele_turbulence_hyd_base::readOn(Entree& is)
 {
@@ -57,14 +57,14 @@ Entree& Modele_turbulence_hyd_base::readOn(Entree& is)
   Param param(que_suis_je());
   set_param(param);
   param.lire_avec_accolades_depuis(is);
-  // Verifications
-  // Cas ou Correction_visco_turb_pour_controle_pas_de_temps_parametre est lu sans Correction_visco_turb_pour_controle_pas_de_temps
+  // Checks
+  // Case where Correction_visco_turb_pour_controle_pas_de_temps_parametre is read without Correction_visco_turb_pour_controle_pas_de_temps
   if (dt_diff_sur_dt_conv_ != -1)
     calcul_borne_locale_visco_turb_ = true;
-  // Cas ou Correction_visco_turb_pour_controle_pas_de_temps sans Correction_visco_turb_pour_controle_pas_de_temps_parametre
+  // Case where Correction_visco_turb_pour_controle_pas_de_temps is set without Correction_visco_turb_pour_controle_pas_de_temps_parametre
   else if (calcul_borne_locale_visco_turb_)
     dt_diff_sur_dt_conv_ = 1;
-  // Cas ou Correction_visco_turb_pour_controle_pas_de_temps_parametre est incorrectement fixe
+  // Case where Correction_visco_turb_pour_controle_pas_de_temps_parametre is incorrectly set
   if (dt_diff_sur_dt_conv_ <= 0 && calcul_borne_locale_visco_turb_)
     {
       Cerr << "Parameter value Correction_visco_turb_pour_controle_pas_de_temps_parametre must be strictly positive." << finl;
@@ -111,7 +111,7 @@ int Modele_turbulence_hyd_base::lire_motcle_non_standard(const Motcle& mot, Entr
       Nom accolade_fermee = "}";
       nom_fichier_ = Objet_U::nom_du_cas() + "_" + equation().probleme().le_nom() + "_ustar_mean_only";
       Domaine& dom = equation().probleme().domaine();
-      LIST(Nom) nlistbord_dom;                      //!< liste stockant tous les noms de frontiere du domaine
+      LIST(Nom) nlistbord_dom;                      //!< list storing all boundary names of the domain
       int nbfr = dom.nb_front_Cl();
       for (int b = 0; b < nbfr; b++)
         {
@@ -133,7 +133,7 @@ int Modele_turbulence_hyd_base::lire_motcle_non_standard(const Motcle& mot, Entr
         }
       is >> dt_impr_ustar_mean_only_;
 
-      is >> motlu; // boundaries ou accolade_fermee ou pasbon
+      is >> motlu; // boundaries, closing brace, or unknown token
       if (motlu != accolade_fermee)
         {
           if (motlu == "boundaries")
@@ -151,7 +151,7 @@ int Modele_turbulence_hyd_base::lire_motcle_non_standard(const Motcle& mot, Entr
                     {
                       is >> nom_bord_lu;
                       boundaries_list_.add(Nom(nom_bord_lu));
-                      //  verif nom bords
+                      //  check boundary name
                       if (!nlistbord_dom.contient(boundaries_list_[i]))
                         {
                           Cerr << "Problem in the dt_impr_ustar_mean_only instruction:" << finl;
@@ -160,7 +160,7 @@ int Modele_turbulence_hyd_base::lire_motcle_non_standard(const Motcle& mot, Entr
                         }
                     }
                 }
-              // lecture accolade fermee
+              // read closing brace
               is >> motlu;
               if (motlu != accolade_fermee)
                 {
@@ -176,30 +176,28 @@ int Modele_turbulence_hyd_base::lire_motcle_non_standard(const Motcle& mot, Entr
               exit();
             }
         }
-    } // fin dt_impr_ustar_mean_only
+    } // end dt_impr_ustar_mean_only
   else
     retval = -1;
 
   return retval;
 }
 
-/*! @brief Associe l'equation passe en parametre au modele de turbulence.
+/*! @brief Associates the equation passed as parameter to the turbulence model.
  *
- * @param (Equation_base& eqn) l'equation a laquelle l'objet s'associe
+ * @param eqn The equation to associate with this object.
  */
 void Modele_turbulence_hyd_base::associer_eqn(const Equation_base& eqn)
 {
   mon_equation_ = eqn;
 }
 
-/*! @brief Lit le fichier dom_Wall_length.
- *
- * xyz pour remplir le champs wall_length en vue d'un post-traitement de distance_paroi
+/*! @brief Reads the domain Wall_length.xyz file to populate the wall_length field for distance_paroi post-processing.
  *
  */
 void Modele_turbulence_hyd_base::lire_distance_paroi()
 {
-  // PQ : 25/02/04 recuperation de la distance a la paroi dans Wall_length.xyz
+  // PQ : 25/02/04 retrieval of the wall distance from Wall_length.xyz
   DoubleTab& wall_length = wall_length_->valeurs();
   wall_length = -1.;
 
@@ -220,7 +218,7 @@ void Modele_turbulence_hyd_base::lire_distance_paroi()
 
 }
 
-/*! @brief Discretise le modele de turbulence.
+/*! @brief Discretizes the turbulence model.
  *
  */
 void Modele_turbulence_hyd_base::discretiser()
@@ -263,12 +261,12 @@ void Modele_turbulence_hyd_base::discretiser_K(const Schema_Temps_base& sch, Dom
   dis.discretiser_champ("champ_elem", z, "K", "m2/s2", 1, sch.temps_courant(), ch);
 }
 
-/*! @brief Prepare le calcul.
+/*! @brief Prepares the computation.
  *
- * Initialise la loi de paroi.
- *     Remplit le champ wall_length en cas de post traitemetn de la distance_paroi
+ * Initializes the wall law.
+ *     Fills the wall_length field for distance_paroi post-processing.
  *
- * @return (int) code de retour de Turbulence_paroi::init_lois_paroi()
+ * @return Return code from Turbulence_paroi::init_lois_paroi().
  */
 int Modele_turbulence_hyd_base::preparer_calcul()
 {
@@ -322,7 +320,7 @@ bool Modele_turbulence_hyd_base::has_champ(const Motcle& nom, OBS_PTR(Champ_base
     if (loipar_->has_champ(nom, ref_champ))
       return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 bool Modele_turbulence_hyd_base::has_champ(const Motcle& nom) const
@@ -334,7 +332,7 @@ bool Modele_turbulence_hyd_base::has_champ(const Motcle& nom) const
     if (loipar_->has_champ(nom))
       return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 const Champ_base& Modele_turbulence_hyd_base::get_champ(const Motcle& nom) const
@@ -362,9 +360,9 @@ void Modele_turbulence_hyd_base::get_noms_champs_postraitables(Noms& nom, Option
     loipar_->get_noms_champs_postraitables(nom, opt);
 }
 
-/*! @brief Effectue l'impression si cela est necessaire.
+/*! @brief Performs printing if necessary.
  *
- * @return renvoie toujours 1
+ * @param os Output stream.
  */
 void Modele_turbulence_hyd_base::imprimer(Sortie& os) const
 {
@@ -388,7 +386,7 @@ int Modele_turbulence_hyd_base::limpr_ustar(double temps_courant, double temps_p
     return 1;
   else
     {
-      // Voir Schema_Temps_base::limpr pour information sur epsilon et modf
+      // See Schema_Temps_base::limpr for information on epsilon and modf
       double i, j, epsilon = 1.e-8;
       modf(temps_courant / dt_ustar + epsilon, &i);
       modf(temps_prec / dt_ustar + epsilon, &j);
@@ -410,12 +408,12 @@ std::vector<YAML_data> Modele_turbulence_hyd_base::data_a_sauvegarder() const
   return data;
 }
 
-/*! @brief Sauvegarde le modele de turbulence sur un flot de sortie.
+/*! @brief Saves the turbulence model to an output stream.
  *
- * Sauvegarde le type de l'objet.
+ * Saves the object type.
  *
- * @param (Sortie& os) un flot de sortie
- * @return (int) renvoie toujours 1
+ * @param (Sortie& os) an output stream
+ * @return (int) always returns 1
  */
 int Modele_turbulence_hyd_base::sauvegarder(Sortie& os) const
 {
@@ -424,7 +422,7 @@ int Modele_turbulence_hyd_base::sauvegarder(Sortie& os) const
     {
       loipar_->sauvegarder(os);
     }
-  else if(!TRUST_2_PDI::is_PDI_checkpoint())  // OC: pour le bas Re, on ecrit negligeable => pas de pb a faire ceci ?
+  else if(!TRUST_2_PDI::is_PDI_checkpoint())  // OC: for low Re, we write negligeable — no issue doing this here
     {
       const Discretisation_base& discr = mon_equation_->discretisation();
       Nom nom_discr = discr.que_suis_je();
@@ -432,14 +430,14 @@ int Modele_turbulence_hyd_base::sauvegarder(Sortie& os) const
       type += nom_discr.substr_old(1, 3);
       os << type << finl;
     }
-  // Verification que l'appel a bien ete fait a Modele_turbulence_hyd_base::limiter_viscosite_turbulente()
+  // Verify that Modele_turbulence_hyd_base::limiter_viscosite_turbulente() was indeed called
   assert(mp_sum(borne_visco_turb_.size()) != 0);
   return 0;
 }
-/*! @brief Reprend la loi de paroi
+/*! @brief Restores the wall law from a checkpoint.
  *
- * @param (Entree&) un flot d'entree
- * @return (int) renvoie toujours 0
+ * @param (Entree&) an input stream
+ * @return (int) always returns 0
  */
 int Modele_turbulence_hyd_base::reprendre(Entree& is)
 {
@@ -448,7 +446,7 @@ int Modele_turbulence_hyd_base::reprendre(Entree& is)
   return 0;
 }
 
-/*! @brief Effectue l'ecriture d'une identite si cela est necessaire.
+/*! @brief Writes an identity record to the output stream if required.
  *
  */
 void Modele_turbulence_hyd_base::a_faire(Sortie& os) const
@@ -470,19 +468,19 @@ void Modele_turbulence_hyd_base::a_faire(Sortie& os) const
 
 void Modele_turbulence_hyd_base::limiter_viscosite_turbulente()
 {
-  // On initial
+  // Initialise
   int size = viscosite_turbulente().valeurs().size();
   if (borne_visco_turb_.size() == 0)
     borne_visco_turb_ = la_viscosite_turbulente_->valeurs();
   borne_visco_turb_ = XNUTM_;
   if (calcul_borne_locale_visco_turb_ && (equation().schema_temps().nb_pas_dt() != 0 || equation().probleme().reprise_effectuee()))
     {
-      // On recalcule les bornes de la viscosite turbulente apres le premier pas de temps
+      // Recompute the turbulent viscosity bounds after the first time step
       const Operateur_Diff_base& op_diff = ref_cast(Operateur_Diff_base, equation().operateur(0).l_op_base());
       const Operateur_Conv_base& op_conv = ref_cast(Operateur_Conv_base, equation().operateur(1).l_op_base());
       op_diff.calculer_borne_locale(borne_visco_turb_, op_conv.dt_stab_conv(), dt_diff_sur_dt_conv_);
     }
-  // On borne la viscosite turbulente
+  // Apply the turbulent viscosity bound
   int nb_elem = equation().domaine_dis().domaine().nb_elem();
   assert(nb_elem == size);
   int compt = 0;
@@ -491,7 +489,7 @@ void Modele_turbulence_hyd_base::limiter_viscosite_turbulente()
   CDoubleArrView borne_visco_turb = borne_visco_turb_.view_ro();
   DoubleArrView corr_visco_turb = static_cast<DoubleVect&>(corr_visco_turb_->valeurs()).view_wo();
   DoubleArrView visco_turb = static_cast<DoubleVect&>(la_viscosite_turbulente_->valeurs()).view_rw();
-  // Remplissage des tableaux de travail:
+  // Fill the work arrays:
   Kokkos::parallel_reduce(start_gpu_timer(__KERNEL_NAME__),
                           Kokkos::RangePolicy<>(0, nb_elem), KOKKOS_LAMBDA(
                             const int elem, int& compt_)
@@ -510,7 +508,7 @@ void Modele_turbulence_hyd_base::limiter_viscosite_turbulente()
   la_viscosite_turbulente_->valeurs().echange_espace_virtuel();
   Debog::verifier("Modele_turbulence_hyd_base::limiter_viscosite_turbulente la_viscosite_turbulente after", la_viscosite_turbulente_->valeurs());
 
-  // On imprime
+  // Print if required
   int imprimer_compt = 0;
   if (mon_equation_->schema_temps().temps_impr() <= mon_equation_->schema_temps().pas_de_temps())
     imprimer_compt = 1;
@@ -520,7 +518,7 @@ void Modele_turbulence_hyd_base::limiter_viscosite_turbulente()
         imprimer_compt = 0;
       else
         {
-          // Voir Schema_Temps_base::limpr pour information sur epsilon et modf
+          // See Schema_Temps_base::limpr for information on epsilon and modf
           double i, j, epsilon = 1.e-8;
           modf(mon_equation_->schema_temps().temps_courant() / mon_equation_->schema_temps().temps_impr() + epsilon, &i);
           modf((mon_equation_->schema_temps().temps_courant() - mon_equation_->schema_temps().pas_de_temps()) / mon_equation_->schema_temps().temps_impr() + epsilon, &j);

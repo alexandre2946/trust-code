@@ -31,14 +31,14 @@ Sortie& Pb_Hydraulique_Concentration_Turbulent::printOn(Sortie& os) const { retu
 
 Entree& Pb_Hydraulique_Concentration_Turbulent::readOn(Entree& is) { return Pb_Fluide_base::readOn(is); }
 
-/*! @brief Renvoie le nombre d'equation, Renvoie 2 car il y a 2 equations a un probleme
+/*! @brief Returns the number of equations.
  *
- *     hydraulique turbulent avec transport:
- *       - l'equation de Navier Stokes Turbulent
- *       - une equation de convection-diffusion (eventuellement vectorielle)
- *         avec turbulence
+ *     Returns 2 because there are 2 equations in a turbulent hydraulic
+ *     problem with transport:
+ *       - the turbulent Navier-Stokes equation
+ *       - a convection-diffusion equation (possibly vectorial) with turbulence
  *
- * @return (int) le nombre d'equation
+ * @return Number of equations (2).
  */
 int Pb_Hydraulique_Concentration_Turbulent::nombre_d_equations() const
 {
@@ -58,13 +58,13 @@ const Equation_base& Pb_Hydraulique_Concentration_Turbulent::equation(int i) con
     return eq_concentration;
 }
 
-/*! @brief Renvoie l'equation d'hydraulique de type Navier_Stokes_Turbulent si i=0 Renvoie l'equation de convection-diffusion de type
+/*! @brief Returns the hydraulic equation of type Navier_Stokes_Turbulent if i=0, returns the convection-diffusion equation of type
  *
- *     Convection_Diffusion_Concentration_Turbulent si i=1
- *     (l'equation de convection diffusion peut-etre vectorielle)
+ *     Convection_Diffusion_Concentration_Turbulent if i=1
+ *     (the convection-diffusion equation may be vectorial).
  *
- * @param (int i) l'index de l'equation a renvoyer
- * @return (Equation_base&) l'equation correspondante a l'index
+ * @param i Index of the equation to return.
+ * @return The equation corresponding to the given index.
  */
 Equation_base& Pb_Hydraulique_Concentration_Turbulent::equation(int i)
 {
@@ -79,14 +79,15 @@ Equation_base& Pb_Hydraulique_Concentration_Turbulent::equation(int i)
     return eq_concentration;
 }
 
-/*! @brief Associe un milieu au probleme, Si le milieu est de type
+/*! @brief Associates a medium to the problem.
  *
- *       - Fluide_Incompressible, il sera associe a l'equation de l'hydraulique
- *       - Constituant, il sera associe a l'equation de convection-diffusion
- *     Un autre type de milieu provoque une erreur
+ * Depending on the medium type:
+ *       - Fluide_Incompressible: associated to the hydraulic equation
+ *       - Constituant: associated to the convection-diffusion equation
+ *     Any other medium type causes an error.
  *
- * @param (Milieu_base& mil) le milieu physique a associer au probleme
- * @throws mauvais type de milieu physique
+ * @param mil Physical medium to associate with the problem.
+ * @throws If the medium is not of the correct physical type.
  */
 void Pb_Hydraulique_Concentration_Turbulent::associer_milieu_base(const Milieu_base& mil)
 {

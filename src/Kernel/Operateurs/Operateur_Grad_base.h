@@ -21,9 +21,9 @@
 
 
 
-/*! @brief Classe Operateur_Grad_base Cette classe est la base de la hierarchie des operateurs representant
+/*! @brief Classe Operateur_Grad_base This class is the base of the hierarchy of operators representing
  *
- *     le calcul du gradient d'un champ dans une equation.
+ *     the computation of the gradient of a field in an equation.
  *
  * @sa Operateur_base
  */
@@ -32,13 +32,13 @@ class Operateur_Grad_base  : public Operateur_base
   Declare_base(Operateur_Grad_base);
 public :
 
-  /* pour Operateur_Grad, ces methodes agissent sur la matrice pression -> vitesse */
+  /* for Operateur_Grad, these methods act on the pressure -> velocity matrix */
   void dimensionner(Matrice_Morse& ) const override;
   void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override;
 
   /*
-    l'interface ajouter_blocs tient compte du signe du gradient (- grad p), tandis que ajouter() calcule (grad p)
-    -> on doit modifier l'implementation par defaut de ajouter() pour en tenir compte
+    the ajouter_blocs interface accounts for the sign of the gradient (- grad p), while ajouter() computes (grad p)
+    -> the default implementation of ajouter() must be modified to account for this
   */
   DoubleTab& ajouter(const DoubleTab& inco, DoubleTab& secmem) const override;
 

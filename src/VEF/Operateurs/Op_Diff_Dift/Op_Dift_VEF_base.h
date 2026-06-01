@@ -57,7 +57,7 @@ public:
   const Modele_turbulence_hyd_base& get_modele_turbulence() const { return le_modele_turbulence.valeur(); }
 
 protected:
-  OBS_PTR(Modele_turbulence_hyd_base) le_modele_turbulence; // A deplacer dans Op_Diff_turb ?
+  OBS_PTR(Modele_turbulence_hyd_base) le_modele_turbulence; // To be moved into Op_Diff_turb ?
   OBS_PTR(Champ_base) diffusivite_;
   DoubleTab tau_tan_;
 

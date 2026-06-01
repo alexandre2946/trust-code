@@ -24,19 +24,19 @@
 
 using ICoCo::WrongArgument;
 
-/*! @brief Lecture d'un champ input dans un flot d'entree Factorisation des readOn des differents Champ_input
+/*! @brief Reading an input field from an input stream Factorization of the readOn methods of the different Champ_input
  *
  *     Format:
- *      { nb_comp nombre_de_composantes_du_champ
- *        nom nom_du_champ
- *        probleme nom_du_probleme_base_associe
- *        [sous_domaine nom_du_sous_domaine_associe] }
+ *      { nb_comp number_of_field_components
+ *        nom field_name
+ *        probleme name_of_associated_problem_base
+ *        [sous_domaine name_of_associated_sous_domaine] }
  *
- * @param (Entree& is) flot d'entree
- * @return le flot d'entre modifie
- * @throws pas d'accolade ouvrante en debut de format
- * Exception : un des 3 motcles absent, autre motcle non compris
- * @throws pas d'accolade fermante en fin de jeu de donnee
+ * @param (Entree& is) input stream
+ * @return the modified input stream
+ * @throws no opening brace at the start of the format
+ * Exception: one of the 3 keywords missing, or another unrecognized keyword
+ * @throws no closing brace at the end of the data set
  */
 void Champ_Input_Proto::read(Entree& is)
 {
@@ -45,7 +45,7 @@ void Champ_Input_Proto::read(Entree& is)
   Nom nom_sous_domaine;
   int nbc=-1;
 
-  // Lire nom_champ et nom_pb
+  // Read nom_champ and nom_pb
   Motcle accolade_ouverte("{");
   Motcle accolade_fermee("}");
   Motcle motlu;
@@ -95,10 +95,10 @@ void Champ_Input_Proto::read(Entree& is)
       Cerr << "It must be define the name, problem and number of components" << motlu << finl;
       Process::exit();
     }
-  // Nommer le champ
+  // Name the field
   set_name(nom_champ);
 
-  // Retrouver le probleme et s'inscrire dans sa liste
+  // Find the problem and register in its list
   mon_pb=ref_cast(Probleme_base,Interprete::objet(nom_pb));
 
   mon_sous_domaine.reset();

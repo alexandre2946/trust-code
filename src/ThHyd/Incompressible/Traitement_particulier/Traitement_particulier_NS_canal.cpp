@@ -65,10 +65,10 @@ Traitement_particulier_NS_canal::Traitement_particulier_NS_canal()
 }
 
 
-/*! @brief
+/*! @brief Prints the object to an output stream.
  *
- * @param (Sortie& is) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param is an output stream
+ * @return the modified output stream
  */
 Sortie& Traitement_particulier_NS_canal::printOn(Sortie& is) const
 {
@@ -76,10 +76,10 @@ Sortie& Traitement_particulier_NS_canal::printOn(Sortie& is) const
 }
 
 
-/*! @brief
+/*! @brief Reads the object from an input stream.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param is an input stream
+ * @return the modified input stream
  */
 Entree& Traitement_particulier_NS_canal::readOn(Entree& is)
 {
@@ -116,46 +116,46 @@ Entree& Traitement_particulier_NS_canal::lire(Entree& is)
             {
             case 0 :
               {
-                is >> dt_impr_moy_spat;      // intervalle de temps de sorties des moyennes spatiales
+                is >> dt_impr_moy_spat;      // time interval for printing spatial averages
                 Cerr << "Spatial averages are printed for : dt_impr_moy_spat = " << dt_impr_moy_spat << finl;
                 break;
               }
             case 1 :
               {
-                is >> dt_impr_moy_temp;      // intervalle de temps de sorties des moyennes temporelles
+                is >> dt_impr_moy_temp;      // time interval for printing temporal averages
                 Cerr << "Temporal averages are printed for : dt_impr_moy_temp = " << dt_impr_moy_temp << finl;
                 break;
               }
             case 2 :
               {
-                is >> temps_deb;             // temps de debut des moyennes temporelles
+                is >> temps_deb;             // start time for temporal averages
                 Cerr << "Temporal averages start at : temps_deb = " << temps_deb << finl;
                 break;
               }
             case 3 :
               {
-                is >> temps_fin;             // temps de debut des moyennes temporelles
+                is >> temps_fin;             // end time for temporal averages
                 Cerr << "Temporal averages finish at : temps_fin = " << temps_fin << finl;
                 break;
               }
             case 4 :
               {
                 oui_repr = 1;
-                is  >> fich_repr ;             // indication du nom du fichier de reprise des stats
+                is  >> fich_repr ;             // name of the stats restart file
                 Cerr << "The time statistics file is : " << fich_repr << finl;
                 break;
               }
             case 5 :
               {
                 oui_pulse = 1;
-                is  >> w ;                     // pulsation
-                freq = w/(2.*3.141592653); // frequence associee
+                is  >> w ;                     // angular frequency
+                freq = w/(2.*3.141592653); // associated frequency
                 break;
               }
             case 6 :
               {
                 oui_pulse = 1;
-                is  >> Nphase ;            // nombre de points pour decrire une phase
+                is  >> Nphase ;            // number of points to describe a phase
                 break;
               }
             default :
@@ -210,7 +210,7 @@ void Traitement_particulier_NS_canal::preparer_calcul_particulier()
         Nval=18;
       }
 
-  remplir_Y(Y,compt,Ny); // renvoie vers Traitement_particulier_NS_canal_VDF ou Traitement_particulier_NS_canal_VEF
+  remplir_Y(Y,compt,Ny); // dispatched to Traitement_particulier_NS_canal_VDF or Traitement_particulier_NS_canal_VEF
   remplir_Tab_recap(Tab_recap);
   remplir_reordonne_Y_tot(Y,Y_tot);
 
@@ -250,7 +250,7 @@ void Traitement_particulier_NS_canal::remplir_reordonne_Y_tot(const DoubleVect& 
           recevoir(Y_p,p,0,p);
           for (int k=0; k<Y_p.size(); k++)
             {
-              if(!est_egal(Y_p(k),-100.)) // on recherche si Y_p(k) est deja contenu dans Y_tot
+              if(!est_egal(Y_p(k),-100.)) // check whether Y_p(k) is already present in Y_tot
                 {
                   int ok_new=1;
 
@@ -404,7 +404,7 @@ void Traitement_particulier_NS_canal::sauver_stat_canal(const DoubleTab& val, co
 void Traitement_particulier_NS_canal::post_traitement_particulier()
 {
 
-  // Calcul des Moyennes spatiales
+  // Spatial averaging
   //////////////////////////////////////////////////////////
 
   DoubleTrav val_moy(Ny,Nval);
@@ -420,7 +420,7 @@ void Traitement_particulier_NS_canal::post_traitement_particulier()
     calculer_moyenne_spatiale_Temp(val_moy);
 
 
-  // Echange des donnees entre processeurs
+  // Data exchange between processors
   //////////////////////////////////////////////////////////
 
   DoubleVect Y_p(Y);
@@ -463,12 +463,12 @@ void Traitement_particulier_NS_canal::post_traitement_particulier()
     }
 
 
-  // Calcul et ecriture des grandeurs parietales
+  // Computation and output of wall quantities
   ///////////////////////////////////////////////////////////////////
 
   calcul_reynolds_tau();
 
-  // Calcul des Moyennes temporelles
+  // Temporal averaging
   //////////////////////////////////////////////////////////////////
 
   double tps = mon_equation->inconnue().temps();
@@ -482,7 +482,7 @@ void Traitement_particulier_NS_canal::post_traitement_particulier()
           double dt_v = mon_equation->schema_temps().pas_de_temps();
           int NN2 = Y_tot.size();
 
-          if(init_stat_temps==0 && oui_repr!=1) // sinon, les valeurs de val_moy_temp ont ete lues a partir de reprendre_stat()
+          if(init_stat_temps==0 && oui_repr!=1) // otherwise, val_moy_temp values were read from reprendre_stat()
             {
               temps_deb = tps-dt_v;
 
@@ -527,7 +527,7 @@ void Traitement_particulier_NS_canal::post_traitement_particulier()
         }
     }
 
-  // Calcul des Moyennes de phases
+  // Phase averaging
   //////////////////////////////////////////////////////////////////
 
   if(je_suis_maitre() && oui_pulse==1)
@@ -536,7 +536,7 @@ void Traitement_particulier_NS_canal::post_traitement_particulier()
         {
           double dt_v = mon_equation->schema_temps().pas_de_temps();
 
-          if ( (cos(w*tps) > cos(w*(tps+dt_v))) && (cos(w*tps) > cos(w*(tps-dt_v))) ) // debut d'une periode
+          if ( (cos(w*tps) > cos(w*(tps+dt_v))) && (cos(w*tps) > cos(w*(tps-dt_v))) ) // beginning of a period
             {
               debut_phase=tps;
               ind_phase=1;
@@ -548,7 +548,7 @@ void Traitement_particulier_NS_canal::post_traitement_particulier()
                 {
                   double tps_k=debut_phase+k/(Nphase*freq);
 
-                  if( (tps > tps_k-0.5*dt_v)  && (tps < tps_k+0.5*dt_v) ) // recherche de la k-phase correspondant
+                  if( (tps > tps_k-0.5*dt_v)  && (tps < tps_k+0.5*dt_v) ) // find the corresponding k-phase
                     {
                       for (int j=0; j<Nval; j++)
                         for (int i=0; i<NN; i++)
@@ -556,14 +556,14 @@ void Traitement_particulier_NS_canal::post_traitement_particulier()
 
                       Nb_ech_phase(k)++;
 
-                      if(k==Nphase-1)  ind_phase=2; // marqueur pour ecriture de moyennes de phase (voir plus bas)
+                      if(k==Nphase-1)  ind_phase=2; // marker for writing phase averages (see below)
                     }
                 }
             }
         }
     }
 
-  // Ecriture des Moyennes spatiales et temporelles
+  // Output of spatial and temporal averages
   ///////////////////////////////////////////////////////////////
 
   if(je_suis_maitre())
@@ -578,7 +578,7 @@ void Traitement_particulier_NS_canal::post_traitement_particulier()
         impr_inst=1;
       else
         {
-          // Voir Schema_Temps_base::limpr pour information sur epsilon et modf
+          // See Schema_Temps_base::limpr for information on epsilon and modf
           double i, j, epsilon = 1.e-8;
           modf(tps/dt_impr_moy_spat + epsilon, &i);
           modf(tps_passe/dt_impr_moy_spat + epsilon, &j);
@@ -589,14 +589,14 @@ void Traitement_particulier_NS_canal::post_traitement_particulier()
         impr_stat=1;
       else
         {
-          // Voir Schema_Temps_base::limpr pour information sur epsilon et modf
+          // See Schema_Temps_base::limpr for information on epsilon and modf
           double i, j, epsilon = 1.e-8;
           modf(tps/dt_impr_moy_temp + epsilon, &i);
           modf(tps_passe/dt_impr_moy_temp + epsilon, &j);
           impr_stat=(i>j);
         }
 
-      // sauvegarde periodique des moyennes spatiales
+      // periodic saving of spatial averages
 
       if ((nb_pas_dt+1<=1) || impr_inst || (temps_max <= tps) || (nb_pas_dt_max <= nb_pas_dt+1) || stationnaire_atteint)
         {
@@ -622,7 +622,7 @@ void Traitement_particulier_NS_canal::post_traitement_particulier()
           if (oui_profil_Temp == 1)   ecriture_fichiers_moy_Temp_old(val_moy_tot,fichier3,dt,0);
         }
 
-      // sauvegarde periodique des moyennes temporelles
+      // periodic saving of temporal averages
 
       if ((tps>temps_deb) && ((nb_pas_dt+1<=1) || impr_stat || (temps_max <= tps) || (nb_pas_dt_max <= nb_pas_dt+1) || stationnaire_atteint))
         {
@@ -642,7 +642,7 @@ void Traitement_particulier_NS_canal::post_traitement_particulier()
           if (oui_profil_Temp == 1)   ecriture_fichiers_moy_Temp(val_moy_temp,fichier3,dt,0);
         }
 
-      // sauvegarde en continue des moyennes temporelles
+      // continuous saving of temporal averages
 
       if (tps>temps_deb)
         {
@@ -657,7 +657,7 @@ void Traitement_particulier_NS_canal::post_traitement_particulier()
           if (oui_profil_Temp == 1)   ecriture_fichiers_moy_Temp(val_moy_temp,fichier3,dt,0);
         }
 
-      // sauvegarde en continue des moyennes de phase (en fin de cycle)
+      // continuous saving of phase averages (at end of cycle)
 
       if ( (ind_phase==2) && (tps>temps_deb) )
         {
@@ -688,17 +688,17 @@ void Traitement_particulier_NS_canal::post_traitement_particulier()
 
 void Traitement_particulier_NS_canal::calcul_reynolds_tau()
 {
-  // Aspects geometriques du maillage
+  // Mesh geometry
   /////////////////////////////////////////////////////////
-  // !!!!!  Hypotheses : maillage symetrique suivant la demi-hauteur et s'etendant de Y=0 a Y=H
+  // !!!!!  Assumptions: mesh symmetric about the half-height, extending from Y=0 to Y=H
 
   Nom nom_discr=mon_equation->discretisation().que_suis_je();
-  // indice du premier point hors paroi
+  // index of the first off-wall point
   int kmin=(nom_discr=="VEFPreP1B" || nom_discr=="VEF") ? 1 : 0;
-  int kmax=Y_tot.size()-1-kmin;                         // indice du dernier point hors paroi
-  double ymin=Y_tot(kmin);                              // position du premier point
-  double ymax=Y_tot(kmax);                              // position du dernier point
-  double hs2=0.5*(ymin+ymax);                           // demi-hauteur
+  int kmax=Y_tot.size()-1-kmin;                         // index of the last off-wall point
+  double ymin=Y_tot(kmin);                              // position of the first point
+  double ymax=Y_tot(kmax);                              // position of the last point
+  double hs2=0.5*(ymin+ymax);                           // half-height
 
   // check that the canal is in the good bounds
   if ( ymin < 0. || ymax < 0.)
@@ -709,15 +709,15 @@ void Traitement_particulier_NS_canal::calcul_reynolds_tau()
       exit() ;
     }
 
-  // viscosite dynamique
+  // dynamic viscosity
   double mu_bas  = val_moy_tot(kmin,11,0);
   double mu_haut = val_moy_tot(kmax,11,0);
 
-  // masse volumique
+  // mass density
   double rho_bas  = val_moy_tot(kmin,10,0);
   double rho_haut = val_moy_tot(kmax,10,0);
 
-  // cisaillement a la paroi
+  // wall shear stress
   double tauwb, tauwh, tauwm;
 //  int nbfaces_tot=0;
 
@@ -758,10 +758,10 @@ void Traitement_particulier_NS_canal::calcul_reynolds_tau()
 
   if (modele_turbulence && !ref_cast(Modele_turbulence_hyd_base,modele_turbulence.valeur()).loi_paroi().que_suis_je().debute_par("negligeable"))
     {
-      // PQ : 13/07/05 : prise en compte des lois de paroi pour le calcul de u_tau
-      // Hypotheses :    1ere condition de Dirichlet = paroi basse
-      //                 2eme condition de Dirichlet = paroi haute
-      //                 maillage regulier suivant x
+      // PQ : 13/07/05 : wall laws accounted for when computing u_tau
+      // Assumptions :   1st Dirichlet condition = lower wall
+      //                 2nd Dirichlet condition = upper wall
+      //                 regular mesh in x
       const Fluide_base& fluide = ref_cast(Fluide_base,mon_equation->probleme().equation(0).milieu());
       const Turbulence_paroi_base& loipar = ref_cast(Modele_turbulence_hyd_base,modele_turbulence.valeur()).loi_paroi();
       DoubleTab tau_tan;
@@ -1085,7 +1085,7 @@ void Traitement_particulier_NS_canal::calcul_reynolds_tau()
 //        }
 //      if (je_suis_maitre())
 //        {
-//          // calcul et ecritures des differentes grandeurs parietales
+//          // compute and write the various wall quantities
 //          //////////////////////////////////////////////////////
 //          // vitesse de frottement
 //          double utaub=sqrt(tauwb/rho_bas);
@@ -1093,7 +1093,7 @@ void Traitement_particulier_NS_canal::calcul_reynolds_tau()
 //          double utauh=sqrt(tauwh/rho_haut);
 //          if(val_moy_tot(kmax,0,0)<=0) utauh*=-1.;
 //          double utaum=0.5*(utauh+utaub);
-//          // Reynolds de frottement
+//          // friction Reynolds number
 //          double retaub=rho_bas*utaub*hs2/mu_bas;
 //          double retauh=rho_haut*utauh*hs2/mu_haut;
 //          double retaum=0.5*(retauh+retaub);
@@ -1113,27 +1113,27 @@ void Traitement_particulier_NS_canal::calcul_reynolds_tau()
     } // end if turbul
   else
     {
-      // norme de la vitesse tangente a la paroi
+      // norm of the wall-tangential velocity
       double utang_bas  = val_moy_tot(kmin,9,0);
       double utang_haut = val_moy_tot(kmax,9,0);
-      // calcul du cisaillement a la paroi suivant la vitesse tangentielle
+      // computation of wall shear stress from the tangential velocity
       //////////////////////////////////////////////////////
-      // approximation lineaire : Tau_w = mu * ||u_t||(y1) / dy1
+      // linear approximation: Tau_w = mu * ||u_t||(y1) / dy1
       tauwb= mu_bas * utang_bas  / ymin;
       tauwh= mu_haut* utang_haut / ymin;
 
       if (je_suis_maitre())
         {
-          // calcul et ecritures des differentes grandeurs parietales
+          // computation and output of the various wall quantities
           //////////////////////////////////////////////////////
-          // vitesse de frottement
+          // friction velocity
           double utaub=sqrt(tauwb/rho_bas);
           if(val_moy_tot(kmin,0,0)<=0) utaub*=-1.;
           double utauh=sqrt(tauwh/rho_haut);
           if(val_moy_tot(kmax,0,0)<=0) utauh*=-1.;
           double utaum=0.5*(utauh+utaub);
 
-          // Reynolds de frottement
+          // friction Reynolds number
           double retaub=rho_bas*utaub*hs2/mu_bas;
           double retauh=rho_haut*utauh*hs2/mu_haut;
           double retaum=0.5*(retauh+retaub);
@@ -1200,7 +1200,7 @@ void Traitement_particulier_NS_canal::ecriture_fichiers_moy_vitesse_rho_mu(const
 
       fic << Y_tot(i) << "    "  ;
       fic << u << "    " << v << "    " << wl << "    " ;
-      // Pour eviter NAN, on prend le std::max(,0):
+      // To avoid NaN, take std::max(,0):
       fic << sqrt(std::max(0.,u2)) << "    " << sqrt(std::max(v2,0.)) << "    " << sqrt(std::max(w2,0.)) << "    "  ;
       fic << -uv << "    " << -uw << "    " << -vw  << "    " ;
       fic << rho << "    " << mu << "    " ;
@@ -1267,7 +1267,7 @@ void Traitement_particulier_NS_canal::ecriture_fichiers_moy_Temp(const DoubleTab
 
 
       fic << Y_tot(i) << "    "  ;
-      // Pour eviter NAN, on prend le std::max(,0):
+      // To avoid NaN, take std::max(,0):
       fic << T << "    "  <<sqrt(std::max(T2,0.))<<" ";
       fic << -uT << "    " << -vT  << "    " << -wT  << "    ";
       fic << finl;
@@ -1276,8 +1276,8 @@ void Traitement_particulier_NS_canal::ecriture_fichiers_moy_Temp(const DoubleTab
   fic.close();
 }
 
-//Apres correction de l expression de la moyenne temporelle et des methodes d ecriture des moyennes temporelles
-//On conserve ces deux methodes d ecriture en version old pour l ecriture des moyennes de phase
+//After correcting the expression of the temporal average and the writing methods for temporal averages
+//these two writing methods are kept in the "old" version for writing phase averages
 
 void Traitement_particulier_NS_canal::ecriture_fichiers_moy_vitesse_rho_mu_old(const DoubleTab& val_moy, const Nom& fichier, const double dt, const int k) const
 {
@@ -1323,7 +1323,7 @@ void Traitement_particulier_NS_canal::ecriture_fichiers_moy_vitesse_rho_mu_old(c
 
       fic << Y_tot(i) << "    "  ;
       fic << u << "    " << v << "    " << wl << "    " ;
-      // Pour eviter NAN, on prend le std::max(,0):
+      // To avoid NaN, take std::max(,0):
       fic << sqrt(std::max(0.,u2-u*u)) << "    " << sqrt(std::max(v2-v*v,0.)) << "    " << sqrt(std::max(w2-wl*wl,0.)) << "    "  ;
       fic << u*v-uv << "    " << u*wl-uw << "    " << v*wl-vw  << "    " ;
 
@@ -1371,7 +1371,7 @@ void Traitement_particulier_NS_canal::ecriture_fichiers_moy_Temp_old(const Doubl
 
 
       fic << Y_tot(i) << "    "  ;
-      // Pour eviter NAN, on prend le std::max(,0):
+      // To avoid NaN, take std::max(,0):
       fic << T << "    " << sqrt(std::max(T2-T*T,0.)) << "    "  ;
       fic << u*T-uT << "    " << v*T-vT << "    " << wl*T-wT << "    ";
 

@@ -19,7 +19,7 @@
 #define Char_ptr_included
 
 
-/*! @brief class Char_ptr Une chaine de caractere pour nommer les objets de TRUST
+/*! @brief class Char_ptr A character string to name TRUST objects.
  *
  * @sa Motcle, .CONTRAINTES, .INVARIANTS, .HTML, .EPS
  */
@@ -27,7 +27,7 @@
 class Char_ptr
 {
 public:
-  Char_ptr();                                         // construit "??"
+  Char_ptr();                                         // builds "??"
   Char_ptr(const char* nom);
   Char_ptr(const Char_ptr&);
   virtual ~Char_ptr();

@@ -18,7 +18,7 @@
 
 #include <Champ_Fonc_P0_base.h>
 
-/*! @brief classe Champ_Fonc_P0_MED permet de faire un champ P0 pour le post med
+/*! @brief class Champ_Fonc_P0_MED Provides a P0 field for MED post-processing.
  *
  */
 class Champ_Fonc_P0_MED: public Champ_Fonc_P0_base

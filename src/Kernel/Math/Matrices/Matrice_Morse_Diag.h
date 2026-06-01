@@ -22,12 +22,12 @@
 class Matrice_Diagonale;
 
 
-/*! @brief Classe Matrice_Morse_Diag Represente une matrice M (creuse) symetrique stockee au format Morse
+/*! @brief Matrice_Morse_Diag class - Represents a sparse symmetric matrix M stored in Morse format.
  *
- *     Diagetrique: on ne stocke que la partie triangulaire superieure de la
- *     matrice. Important: Tous les coefficients diagonaux doivent etre stockes
- *     meme s'ils sont nuls (hypothese TRUST pour plusieurs methodes dont multvect).
- *     Cette classe derive de Matrice_Morse_Sym
+ *     Diagonal: only the upper triangular part of the matrix is stored.
+ *     Important: All diagonal coefficients must be stored even if they are zero
+ *     (TRUST assumption for several methods including multvect).
+ *     This class derives from Matrice_Morse_Sym.
  *
  * @sa Matrice_Morse Matrice_Diag
  */

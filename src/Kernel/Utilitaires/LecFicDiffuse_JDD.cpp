@@ -36,10 +36,9 @@ LecFicDiffuse_JDD::LecFicDiffuse_JDD()
 {
 }
 
-/*! @brief ouverture du fichier name.
+/*! @brief Opens file name.
  *
- * Cette methode doit etre appelee sur tous les processeurs. En cas
- *   d'echec : exit()
+ * This method must be called on all processors. On failure: exit().
  *
  */
 LecFicDiffuse_JDD::LecFicDiffuse_JDD(const char* name,
@@ -54,10 +53,10 @@ LecFicDiffuse_JDD::LecFicDiffuse_JDD(const char* name,
 }
 
 
-/*! @brief Ouverture du fichier.
+/*! @brief Opens the file.
  *
- * Cette methode doit etre appelee par tous les processeurs du groupe.
- *  Valeur de retour: 1 si ok, 0 sinon
+ * This method must be called by all processors in the group.
+ *  Return value: 1 if ok, 0 otherwise.
  *
  */
 int LecFicDiffuse_JDD::ouvrir(const char* name,
@@ -168,8 +167,8 @@ int LecFicDiffuse_JDD::ouvrir(const char* name,
                   Process::exit(msg);
                 }
 
-              /* GF ne pas reactiver ce morceau de code car cela
-                 est complique pour la traduction des jdd en python
+              /* GF do not re-enable this code block as it complicates
+                 the translation of data sets to Python
                  else if (motlu=="##")
                  {
 

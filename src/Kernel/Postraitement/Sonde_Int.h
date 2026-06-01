@@ -23,12 +23,13 @@
 class Postraitement;
 #include <Domaine_forward.h>
 
-/*! @brief classe Sonde_Int Cette classe permet d'effectuer l'evolution d'un champ au cours du temps.
+/*! @brief class Sonde_Int
+ * @brief Allows tracking the evolution of an integer array over time.
  *
- *      On choisit l'ensemble des points sur lesquels on veut sonder un champ et
- *      la periodicite des observations. Les objets Postraitement porte des
- *      des sondes sur les champs a observer, une sonde porte d'ailleurs une
- *      reference sur un postraitement.
+ *      A set of points at which the array is to be probed is chosen,
+ *      along with the observation period. Postraitement objects hold probes
+ *      for the fields to monitor; each probe in turn holds a reference to
+ *      its post-processing object.
  *
  * @sa Postraitement Sonde_Ints
  */
@@ -59,22 +60,22 @@ public :
 private :
 
   OBS_PTR(Postraitement) mon_post;
-  Nom nom_;                                // le nom de la sonde
-  int dim = -1;                                // la dimension de la sone (point:0,segment:1,plan:2,volume:3)
-  int nbre_points1= -1,nbre_points2= -1,nbre_points3= -1;        // faire des sonde_segment,sonde_plan,etc...
-  OBS_PTR(IntVect) mon_tableau;                // Le tableau sonde
-  DoubleTab les_positions_;                // les coordonnees des sondes ponctuelles
-  IntVect elem_;                        // les elements contenant les sondes ponctuelles
-  IntTab valeurs;                      // les valeurs de mon_tableau pour les indices donnes par elem_
-  double periode= 1.e10;                        // periode d'echantillonnage
+  Nom nom_;                                // probe name
+  int dim = -1;                                // dimension of the probe (point:0, segment:1, plan:2, volume:3)
+  int nbre_points1= -1,nbre_points2= -1,nbre_points3= -1;        // for segment, plan, etc. probes
+  OBS_PTR(IntVect) mon_tableau;                // the probed array
+  DoubleTab les_positions_;                // coordinates of point probes
+  IntVect elem_;                        // elements containing the point probes
+  IntTab valeurs;                      // values of mon_tableau at indices given by elem_
+  double periode= 1.e10;                        // sampling period
   double nb_bip= 0.;
   SFichier* le_fichier;
 };
 
 
-/*! @brief Constructeur d'une sonde a partir de son nom.
+/*! @brief Constructor for a probe given its name.
  *
- * @param (Nom& nom) le nom de la sonde a construire
+ * @param nom the name of the probe to construct
  */
 inline Sonde_Int::Sonde_Int(const Nom& nom)
   : nom_(nom), le_fichier(0)
@@ -82,9 +83,9 @@ inline Sonde_Int::Sonde_Int(const Nom& nom)
 
 
 
-/*! @brief Le temps ecoule.
+/*! @brief Returns the elapsed time.
  *
- * @return (double) le temps ecoule
+ * @return the elapsed time
  */
 inline double Sonde_Int::temps() const
 {
@@ -93,7 +94,7 @@ inline double Sonde_Int::temps() const
 
 
 
-/*! @brief Ferme le fichier sur laquelle la sonde ecrit.
+/*! @brief Closes the file to which the probe writes.
  *
  */
 inline void Sonde_Int::fermer_fichier()
@@ -105,9 +106,9 @@ inline void Sonde_Int::fermer_fichier()
 }
 
 
-/*! @brief Fixe la periode avec laquelle on sonde le champ.
+/*! @brief Sets the sampling period for probing the field.
  *
- * @param (double pe) la periode de sondage du champ
+ * @param pe the sampling period
  */
 inline void Sonde_Int::fixer_periode(double pe)
 {
@@ -115,9 +116,9 @@ inline void Sonde_Int::fixer_periode(double pe)
 }
 
 
-/*! @brief Renvoie le champ associe.
+/*! @brief Returns the associated array.
  *
- * @return (Champ_base&) le champ associe
+ * @return the associated integer array
  */
 inline const IntVect& Sonde_Int::le_tableau() const
 {
@@ -125,9 +126,9 @@ inline const IntVect& Sonde_Int::le_tableau() const
 }
 
 
-/*! @brief Renvoie le tableau des positions du champ qui sont sondees.
+/*! @brief Returns the array of probed positions.
  *
- * @return (DoubleTab&) les positions sondees
+ * @return the probed positions
  */
 inline const DoubleTab& Sonde_Int::les_positions() const
 {
@@ -135,9 +136,9 @@ inline const DoubleTab& Sonde_Int::les_positions() const
 }
 
 
-/*! @brief Renvoie le tableau des elements qui sont sondes.
+/*! @brief Returns the array of elements being probed.
  *
- * @return (IntVect&) les ments qui sont sondes
+ * @return the elements being probed
  */
 inline const IntVect& Sonde_Int::les_poly() const
 {
@@ -145,18 +146,18 @@ inline const IntVect& Sonde_Int::les_poly() const
 }
 
 
-/*! @brief Renvoie un flot de sortie Fichier, pointant sur le fichier de sortie utilise par la sonde.
+/*! @brief Returns the output file stream used by the probe.
  *
- * @return (SFichier&) le fichier de sortie utilise par la sonde
+ * @return the output file stream used by the probe
  */
 inline SFichier& Sonde_Int::fichier()
 {
   return *le_fichier;
 }
 
-/*! @brief Destructeur.
+/*! @brief Destructor.
  *
- * Ferme le fichier avant de detruire l'objet.
+ * Closes the file before destroying the object.
  *
  */
 inline Sonde_Int::~Sonde_Int()

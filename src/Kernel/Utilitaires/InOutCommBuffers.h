@@ -19,8 +19,8 @@
 
 class InOutCommBuffers
 {
-  // Ces deux membres sont des pointeurs pour pouvoir cacher l'implementation.
-  // Ne pas utiliser directement les pointeurs, mais passer par o/ebuffer(int pe)
+  // These two members are pointers to allow hiding the implementation.
+  // Do not use the pointers directly; use o/ebuffer(int pe) instead.
 public:
   InputCommBuffer  * ebuffers_;
   OutputCommBuffer * obuffers_;

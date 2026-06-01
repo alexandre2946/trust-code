@@ -18,10 +18,10 @@
 
 #include <Op_Diff_VEF_Face.h>
 
-/*! @brief class Op_Diff_VEF_Face_Stab Cette classe represente l'operateur de diffusion
+/*! @brief class Op_Diff_VEF_Face_Stab
  *
- *   La discretisation est VEF
- *   Le champ diffuse est scalaire
+ *  @brief This class represents the diffusion operator with VEF discretization.
+ *         The diffused field is scalar.
  *
  */
 

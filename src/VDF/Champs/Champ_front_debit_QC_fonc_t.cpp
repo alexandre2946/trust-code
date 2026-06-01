@@ -33,12 +33,12 @@ Implemente_instanciable(Champ_front_debit_QC_fonc_t,"Champ_front_debit_QC_VDF_fo
 
 
 
-/*! @brief Impression sur un flot de sortie au format: taille
+/*! @brief Prints to an output stream in the format: size
  *
- *     valeur(0) ... valeur(i)  ... valeur(taille-1)
+ *     value(0) ... value(i)  ... value(size-1)
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param os output stream
+ * @return modified output stream
  */
 Sortie& Champ_front_debit_QC_fonc_t::printOn(Sortie& os) const
 {
@@ -49,16 +49,16 @@ Sortie& Champ_front_debit_QC_fonc_t::printOn(Sortie& os) const
   return os;
 }
 
-/*! @brief Lecture a partir d'un flot d'entree au format: nombre_de_composantes
+/*! @brief Reads from an input stream in the format: number_of_components
  *
- *     moyenne moyenne(0) ... moyenne(nombre_de_composantes-1)
- *     moyenne amplitude(0) ... amplitude(nombre_de_composantes-1)
+ *     mean mean(0) ... mean(number_of_components-1)
+ *     mean amplitude(0) ... amplitude(number_of_components-1)
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws accolade ouvrante attendue
- * @throws mot clef inconnu a cet endroit
- * @throws accolade fermante attendue
+ * @param is input stream
+ * @return modified input stream
+ * @throws opening brace expected
+ * @throws unknown keyword at this location
+ * @throws closing brace expected
  */
 Entree& Champ_front_debit_QC_fonc_t::readOn(Entree& is)
 {
@@ -113,19 +113,19 @@ Entree& Champ_front_debit_QC_fonc_t::readOn(Entree& is)
 }
 
 
-/*! @brief Pas code !!
+/*! @brief Not implemented!!
  *
- * @param (Champ_front_base& ch)
- * @return (Champ_front_base&)
+ * @param ch source boundary field
+ * @return reference to this boundary field
  */
 Champ_front_base& Champ_front_debit_QC_fonc_t::affecter_(const Champ_front_base& ch)
 {
   return *this;
 }
 
-/*! @brief Mise a jour du temps et retirage aleatoire des valeurs du bruit.
+/*! @brief Updates the time and re-draws random noise values.
  *
- * @param (double tps) le temps de mise a jour
+ * @param tps current time for the update
  */
 void Champ_front_debit_QC_fonc_t::mettre_a_jour(double tps)
 {

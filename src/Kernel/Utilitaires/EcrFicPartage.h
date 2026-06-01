@@ -20,19 +20,19 @@
 #include <OBuffer.h>
 #include <Nom.h>
 
-/*! @brief Ecriture dans un fichier partage Cette classe implemente les operateurs et les methodes virtuelles de la clase SFichier de la facon suivante :
+/*! @brief Writing to a shared file. This class implements the operators and virtual methods of the SFichier class as follows:
  *
- *     un fichier physiquement localise sur le disque de la machine heberge la tache maitre de
- *     l'application Trio-U (le processus de rang 0 dans le groupe "tous").
- *     Chacun des processus ecrit ses donnees l'un apres l'autre, par ordre croissant de rang dans le groupe "tous"
- *     La synchronisation est realisee par un systeme de semaphore.
- *     Ce type de fichier est notamment utilise pour la creation d'un fichier de post-traitement unique.
+ *     A file physically located on the disk of the machine hosting the master task of
+ *     the Trio-U application (the process with rank 0 in the "all" group).
+ *     Each process writes its data one after the other, in ascending order of rank in the "all" group.
+ *     Synchronization is achieved through a semaphore system.
+ *     This type of file is notably used for the creation of a single post-processing file.
  *
  */
 
 class OBuffer;
 
-// Chaque PE ecrit dans le meme() fichier
+// Each PE writes to the same() file
 class EcrFicPartage : public SFichier
 {
   Declare_instanciable_sans_constructeur_ni_destructeur(EcrFicPartage);
@@ -77,7 +77,7 @@ protected:
 
 private:
   OBuffer& get_obuffer();
-  OBuffer * obuffer_ptr_ = nullptr; // Pointeur : permet de ne pas inclure OBuffer.h
+  OBuffer * obuffer_ptr_ = nullptr; // Pointer: avoids including OBuffer.h
 
   template <typename _TYPE_>
   int put_template(const _TYPE_* ob, std::streamsize n, std::streamsize pas)

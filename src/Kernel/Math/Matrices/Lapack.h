@@ -17,7 +17,7 @@
 #define Lapack_inclus
 
 #include <arch.h>
-/*! @brief Encapsulation de Lapack:
+/*! @brief Lapack wrapper:
  *
  */
 
@@ -50,7 +50,7 @@ extern "C"
 
   void F77DECLARE(DPBCON)(const char* const, const int* const, const int* const, const double* const, const int* const, const double* const, const double* const, const double* const, const int* const, const int* const);
 
-  // MODIF ELI LAUCOIN (26/11/2007) : j'ajoute les routines d'interpolation SVD
+  // MODIF ELI LAUCOIN (26/11/2007): adding SVD interpolation routines
   void F77DECLARE(DGESVD)(const char*   const, // JOBU
                           const char*   const, // JOBVT
                           const int*    const, // M
@@ -110,7 +110,7 @@ extern "C"
                          const int*     const  // LDC
                         );
 
-  // MODIF ELI LAUCOIN (19/03/2008) : j'ajoute les routines suivantes pour la resolution LU
+  // MODIF ELI LAUCOIN (19/03/2008): adding the following routines for LU factorization
   void F77DECLARE(DGETRF)(const int*    const, // M
                           const int*    const, // N
                           const double* const, // A
@@ -311,7 +311,7 @@ extern "C"
 
   void F77DECLARE(dgbtf2)(const int* const, const int* const,const int* const,const int* const, double* , const int* const, int* , int*);
 
-  // MODIF ELI LAUCOIN (26/11/2007) :  j'ajoute les routines d'interpolation SVD
+  // MODIF ELI LAUCOIN (26/11/2007): adding SVD interpolation routines
 
   void F77DECLARE(dgesdd)(const char*   const,
                           const int*    const,
@@ -371,7 +371,7 @@ extern "C"
                          const int*     const  // LDC
                         );
 
-  // MODIF ELI LAUCOIN (19/03/2008) : j'ajoute les routines suivantes pour la resolution LU
+  // MODIF ELI LAUCOIN (19/03/2008): adding the following routines for LU factorization
   void F77DECLARE(dgetrf)(const int*    const, // M
                           const int*    const, // N
                           const double* const, // A
@@ -607,7 +607,7 @@ inline void F77NAME(DGBTF2)(const int* const a, const int* const b,const int* co
   F77NAME(dgbtf2)(a,b,c,d,e,f,g,h);
 }
 
-// MODIF ELI LAUCOIN (26/11/2007) : j'ajoute les routines d'interpolation SVD
+// MODIF ELI LAUCOIN (26/11/2007): adding SVD interpolation routines
 
 inline void F77NAME(DGESDD)(const char*   const JOBZ,
                             const int*    const M,
@@ -666,7 +666,7 @@ inline void F77NAME(DGEMM)(const char*    const TRANSA,
   F77NAME(dgemm)(TRANSA,TRANSB,M,N,K,ALPHA,A,LDA,B,LDB,BETA,C,LDC);
 }
 
-// MODIF ELI LAUCOIN (19/03/2008) : j'ajoute les routines suivantes pour la resolution LU
+// MODIF ELI LAUCOIN (19/03/2008): adding the following routines for LU factorization
 inline void F77NAME(DGETRF)(const int*    const M,
                             const int*    const N,
                             const double* const A,

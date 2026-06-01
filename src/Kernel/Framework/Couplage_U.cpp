@@ -21,7 +21,7 @@ Implemente_instanciable(Couplage_U,"Couplage_U",Probleme_U);
 
 //////////////////////////////////////////////////
 //                                              //
-// Implementation de l'interface de Probleme_U  //
+// Implementation of the Probleme_U interface  //
 //                                              //
 //////////////////////////////////////////////////
 
@@ -205,7 +205,7 @@ OBS_PTR(Champ_Generique_base) Couplage_U::findOutputField(const Nom& name) const
 
 ///////////////////////////////////////////////////////////
 //                                                       //
-// Fin de l'implementation de l'interface de Probleme_U  //
+// End of the Probleme_U interface implementation        //
 //                                                       //
 ///////////////////////////////////////////////////////////
 

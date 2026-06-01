@@ -49,10 +49,10 @@ Implemente_instanciable_32_64(Bord_32_64,"Bord",Frontiere_32_64<_T_>);
 // XD attr nom chaine nom REQ Name of block side.
 // XD attr defbord defbord defbord REQ Definition of block side.
 
-/*! @brief Simple appel a: Frontiere::printOn(Sortie&)
+/*! @brief Simple call to: Frontiere::printOn(Sortie&)
  *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& s) an output stream
+ * @return (Sortie&) the modified output stream
  */
 template <typename _SIZE_>
 Sortie& Bord_32_64<_SIZE_>::printOn(Sortie& s ) const
@@ -60,10 +60,10 @@ Sortie& Bord_32_64<_SIZE_>::printOn(Sortie& s ) const
   return Frontiere_32_64<_SIZE_>::printOn(s) ;
 }
 
-/*! @brief Simple appel a: Frontiere::readOn(Entree&)
+/*! @brief Simple call to: Frontiere::readOn(Entree&)
  *
- * @param (Entree& s) un flot d'entree
- * @return (Entree&) le flot d'entre modifie
+ * @param (Entree& s) an input stream
+ * @return (Entree&) the modified input stream
  */
 template <typename _SIZE_>
 Entree& Bord_32_64<_SIZE_>::readOn(Entree& s)

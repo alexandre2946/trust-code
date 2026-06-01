@@ -18,10 +18,10 @@
 
 #include <TRUSTChamp_Don_generique.h>
 
-/*! @brief : class Champ_Don_lu Cette classe represente un champ de donnees que l'on lit dans un fichier avec les conventions suivantes:
+/*! @brief : class Champ_Don_lu This class represents a data field read from a file with the following conventions:
  *
- *       - n valeurs du champ sont donnees dans le fichier (n doit etre egal au nombre d'elements du maillage)
- *       - le format du fichier est le suivant:
+ *       - n values of the field are given in the file (n must be equal to the number of mesh elements)
+ *       - the file format is as follows:
  *          n
  *          xi yi (zi) ui (vi) (wi)
  *

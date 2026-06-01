@@ -35,7 +35,7 @@ public:
   void calculer_borne_locale(DoubleVect& ,double ,double ) const override;
 
 protected:
-  OBS_PTR(Modele_turbulence_hyd_base) le_modele_turbulence; // A deplacer dans Op_Diff_turb ?
+  OBS_PTR(Modele_turbulence_hyd_base) le_modele_turbulence; // To be moved into Op_Diff_turb?
   DoubleTab tau_tan_;
 };
 

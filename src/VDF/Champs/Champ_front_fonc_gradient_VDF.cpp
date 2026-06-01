@@ -33,8 +33,9 @@ Entree& Champ_front_fonc_gradient_VDF::readOn(Entree& s)
   return s;
 }
 
-/*! @brief Mise a jour du temps
+/*! @brief Updates the field at the given time.
  *
+ * @param temps Current time.
  */
 
 void Champ_front_fonc_gradient_VDF::mettre_a_jour(double temps)
@@ -48,7 +49,7 @@ void Champ_front_fonc_gradient_VDF::mettre_a_jour(double temps)
 
   const Domaine_VDF& le_dom_VDF = ref_cast(Domaine_VDF,domaine_dis());
   const IntVect& orientation = le_dom_VDF.orientation();
-  // On recupere la CL et les champs associes
+  // Retrieve the BC and associated fields
   const Paroi_Knudsen_non_negligeable& la_condition_limite=ref_cast(Paroi_Knudsen_non_negligeable,condition_limite(la_front.le_nom()));
   const DoubleTab& la_inconnue_paroi_=la_condition_limite.vitesse_paroi();
   const DoubleTab& k_=la_condition_limite.k();
@@ -84,8 +85,8 @@ void Champ_front_fonc_gradient_VDF::mettre_a_jour(double temps)
       elem = le_dom_VDF.face_voisins(num_face,0);
       if ( elem == -1 )
         elem = le_dom_VDF.face_voisins(num_face,1);
-      // Calcul de la inconnue a la paroi en fonction
-      // de l'orientation
+      // Compute the unknown at the wall as a function
+      // of the orientation
       ori = orientation(num_face);
       tab(i,ori) = la_inconnue_paroi(i,ori);
       if (dimension==2)

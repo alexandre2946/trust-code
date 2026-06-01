@@ -46,63 +46,62 @@ Sortie& Postraitements::printOn(Sortie& s) const
 {
   for (const auto& itr : *this)
     {
-      const Postraitement_base& post = itr.valeur(); // valeur() car OWN_PTR
+      const Postraitement_base& post = itr.valeur(); // valeur() because OWN_PTR
       s << post;
     }
   return s;
 }
 
-// Lecture des postraitements dans le jeu de donnees TRUST
-// Au sein du probleme, la syntaxe est la suivante:
+// Reading of post-processing objects from the TRUST data set.
+// Within the problem, the syntax is as follows:
 //
-// ------------- Syntaxe 1 : Un postraitement standard
-//                           (syntaxe historique)
+// ------------- Syntax 1: A single standard post-processing object
+//                         (historical syntax)
 // Lire pb {
-//   ... (les equations)
+//   ... (the equations)
 //   ...
 //   Postraitement {
-//     ...            (lecture au format readOn de Postraitement_std)
+//     ...            (read via readOn of Postraitement_std)
 //   }
 //
-// ------------- Syntaxe 2 : Plusieurs postraitements standard
-//                           (syntaxe historique)
+// ------------- Syntax 2: Several standard post-processing objects
+//                         (historical syntax)
 // Lire pb {
-//   ... (les equations)
+//   ... (the equations)
 //   ...
 //   Postraitements {
-//     nom_postraitement_1 {                   note: nom arbitraire
-//       ...            (lecture au format readOn de Postraitement_std)
+//     nom_postraitement_1 {                   note: arbitrary name
+//       ...            (read via readOn of Postraitement_std)
 //     }
 //     nom_postraitement_2 {
-//       ...            (lecture au format readOn de Postraitement_std)
+//       ...            (read via readOn of Postraitement_std)
 //     }
 //     ...
 //   }
-// ------------- Syntaxe 3 : Postraitements standard ou non standard
-//               (pour utiliser le postraitement standard, utiliser
+// ------------- Syntax 3: Standard or non-standard post-processing objects
+//               (to use the standard post-processing, set
 //                type_postraitement = "Postraitement_std")
 //
 // Lire pb {
-//   ... (les equations)
+//   ... (the equations)
 //   ...
 //   Liste_Postraitements {
 //     type_postraitement nom_postraitement {
-//                      (type_postraitement est un le nom d'un type derive
-//                       de Postraitement_base, par ex Postraitement)
-//       ...            (lecture au format readOn du type demande)
+//                      (type_postraitement is the name of a type derived
+//                       from Postraitement_base, e.g. Postraitement)
+//       ...            (read via readOn of the requested type)
 //     }
 //     type_postraitement nom_postraitement {
-//       ...            (lecture au format readOn du type demande)
+//       ...            (read via readOn of the requested type)
 //     }
 //     ...
 //   }
 //
-// La lecture commence par celle du mot cle Postraitement,
-// Postraitements ou Liste_postraitement, et on lit jusqu'a la
-// derniere accolade incluse.
+// Reading starts with the keyword Postraitement, Postraitements,
+// or Liste_postraitement, and continues until the last closing brace (inclusive).
 
-// Renvoie 1 si le motlu est compris (lecture d'un bloc de postraitement),
-//         0 sinon.
+// Returns 1 if motlu is recognised (a post-processing block was read),
+//         0 otherwise.
 
 int Postraitements::lire_postraitements(Entree& is, const Motcle& motlu, const Probleme_base& mon_pb)
 {
@@ -122,7 +121,7 @@ int Postraitements::lire_postraitements(Entree& is, const Motcle& motlu, const P
 
   if (lerang == 0)
     {
-      // Creation et lecture d'un postraitement unique standard
+      // Create and read a single standard post-processing object
       OWN_PTR(Postraitement_base) & post = add( OWN_PTR(Postraitement_base)() );
       if (mon_pb.que_suis_je() == "Pb_STT")
         post.typer("Postraitement_STT");
@@ -141,8 +140,8 @@ int Postraitements::lire_postraitements(Entree& is, const Motcle& motlu, const P
     }
   else if (lerang == 1 || lerang == 2 || lerang == 3 )
     {
-      // Lecture d'une liste
-      // Lire l'accolade
+      // Read a list
+      // Read the opening brace
       //Nom post_which_contains_statistic("");
       Motcle motlu2;
       is >> motlu2;
@@ -167,7 +166,7 @@ int Postraitements::lire_postraitements(Entree& is, const Motcle& motlu, const P
             case 2:
               {
                 Cerr<<" Warning liste_postraitements obsolete option" <<finl;
-                // Le premier mot est le type, le deuxieme est le nom
+                // The first word is the type, the second is the name
                 type = motlu2;
                 is >> nom_du_post;
                 break;
@@ -219,8 +218,8 @@ int Postraitements::lire_postraitements(Entree& is, const Motcle& motlu, const P
           compteur++;
         }
 
-      // test de verification pour eviter ecrasement de donnnes au fur et a mesure de leur enregistrement
-      // a cause du cas Liste_Postraitements => obligation de creer la liste de nom de fichier associes au post
+      // Verification check to avoid data being overwritten during incremental saves.
+      // Because of the Liste_Postraitements case, a list of file names associated with each post-processing object must be built.
       if (list_nom_post.size()!=compteur)
         {
           Cerr << "You can use the same name for the storing data file in two different blocks of post-processing" << finl;
@@ -245,13 +244,13 @@ int Postraitements::lire_postraitements(Entree& is, const Motcle& motlu, const P
 void Postraitements::postraiter()
 {
   for (auto& itr : *this)
-    itr->postraiter(1); // On force le postraitement
+    itr->postraiter(1); // Force post-processing
 }
 
 void Postraitements::traiter_postraitement()
 {
   for (auto& itr : *this)
-    itr->postraiter(0); // Postraitement si intervalle de temps ecoule
+    itr->postraiter(0); // Post-process if the time interval has elapsed
 }
 
 void Postraitements::mettre_a_jour(double temps)

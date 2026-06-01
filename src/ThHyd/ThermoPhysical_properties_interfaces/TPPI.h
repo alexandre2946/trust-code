@@ -18,10 +18,9 @@
 
 #include <TPPI_tools.h>
 
-/*! @brief classe EOS_to_TRUST
+/*! @brief Common interface for TRUST and its baltiks to call EOS/CoolProp library methods.
  *
- *  Interface commune pour TRUST et ses baltiks qui permet appeler les methodes de la lib EOS/CoolProp
- *  Methods disponibles en temperature et enthalpie, egalement pour la saturation
+ *  Methods are available as functions of temperature or enthalpy, and also for saturation.
  *
  */
 class TPPI
@@ -66,7 +65,7 @@ public:
 
   /*
    * ******************* *
-   * Lois en temperature
+   * Laws in temperature
    * ******************* *
    */
   virtual int tppi_get_rho_pT(const SpanD P, const SpanD T, SpanD R, int ncomp = 1, int ind = 0) const
@@ -159,7 +158,7 @@ public:
     return tppi_get_single_property_T_(Loi_en_T::SIGMA_DT, P, T, R, ncomp, ind);
   }
 
-  // appel simple si besoin : cas incompressible
+  // simple call when needed: incompressible case
   virtual int tppi_get_beta_pT(const SpanD P, const SpanD T, SpanD R, int ncomp = 1, int ind = 0) const
   {
     return tppi_get_single_property_T_(Loi_en_T::BETA, P, T, R, ncomp, ind);
@@ -167,7 +166,7 @@ public:
 
   /*
    * ***************** *
-   * Lois en enthalpie
+   * Laws in enthalpy
    * ***************** *
    */
   virtual int tppi_get_rho_ph(const SpanD P, const SpanD H, SpanD R, int ncomp = 1, int ind = 0) const
@@ -260,7 +259,7 @@ public:
     return tppi_get_single_property_h_(Loi_en_h::SIGMA_DH, P, H, R, ncomp, ind);
   }
 
-  // appel simple si besoin : cas incompressible
+  // simple call when needed: incompressible case
   virtual int tppi_get_beta_ph(const SpanD P, const SpanD H, SpanD R, int ncomp, int ind) const
   {
     return tppi_get_single_property_h_(Loi_en_h::BETA, P, H, R, ncomp, ind);
@@ -268,7 +267,7 @@ public:
 
   /*
    * ****************** *
-   * Pour la saturation
+   * Saturation laws
    * ****************** *
    */
   virtual int tppi_get_T_sat_p(const SpanD P, SpanD res, int ncomp = 1, int ind = 0) const
@@ -379,7 +378,7 @@ protected:
   virtual int tppi_get_single_sat_p_(SAT , const SpanD , SpanD , int , int , bool is_liq = true) const { return not_implemented<int>(__func__); }
 
 public:
-  // methodes particulieres par application pour gagner en performance : utilisees dans Pb_Multiphase
+  // application-specific methods to improve performance: used in Pb_Multiphase
   virtual inline int tppi_get_CPMLB_pb_multiphase_pT(const MSpanD input, MLoiSpanD prop, int ncomp = 1, int id = 0) const { return not_implemented<int>(__func__); }
   virtual inline int tppi_get_all_pb_multiphase_pT(const MSpanD input, MLoiSpanD inter, MLoiSpanD bord, int ncomp = 1, int id = 0) const { return not_implemented<int>(__func__); }
 
@@ -388,7 +387,7 @@ public:
 
   virtual inline int tppi_get_all_flux_interfacial_pb_multiphase(const SpanD P, MSatSpanD, int ncomp = 1, int id = 0) const { return not_implemented<int>(__func__); }
 
-  // methodes particulieres par application pour gagner en performance : utilisees dans F5
+  // application-specific methods to improve performance: used in F5
   virtual inline int tppi_get_all_prop_loi_F5(const MSpanD , MLoiSpanD_h  , int ncomp = 1, int id = 0, bool is_liq = true) const { return not_implemented<int>(__func__); }
   virtual inline int tppi_get_all_sat_loi_F5(const MSpanD input, MSatSpanD sats, int ncomp = 1, int id = 0) const { return not_implemented<int>(__func__); }
 

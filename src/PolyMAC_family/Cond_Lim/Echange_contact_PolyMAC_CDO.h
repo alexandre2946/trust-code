@@ -24,9 +24,9 @@ class Domaine_PolyMAC_CDO;
 class Front_VF;
 #include <Domaine_forward.h>
 
-//  Outre le champ_front representant la temperature de paroi,
-//  cette classe possede un autre champ_front avec autant de valeurs
-//  temporelles qui represente la temperature dans l'autre probleme.
+//  In addition to the champ_front representing the wall temperature,
+//  this class holds another champ_front with as many time values
+//  that represents the temperature in the other problem.
 class Echange_contact_PolyMAC_CDO  : public Echange_externe_impose
 {
   Declare_instanciable(Echange_contact_PolyMAC_CDO);
@@ -41,16 +41,16 @@ public :
   inline const Champ_front_base& T_autre_pb() const { return T_autre_pb_; }
   inline const Nom& nom_autre_pb() const { return nom_autre_pb_; }
 
-  //item(i, j) : indice du j-ieme item dont on a besoin pour la face i de la frontiere
+  //item(i, j): index of the j-th item needed for face i of the boundary
   mutable IntTab item;
 
-  //coeff(i, j) : coefficient de la face, puis coefficient de item(i, j - 1) (element, puis autres faces) dans la formule du flux a la face
-  //delta(i, j, 0/1) -> idem pour la correction non-lineaire de Le Potier
+  //coeff(i, j): coefficient of the face, then coefficient of item(i, j - 1) (element, then other faces) in the flux formula at the face
+  //delta(i, j, 0/1) -> same for the nonlinear correction of Le Potier
   mutable DoubleTab coeff, delta_int, delta;
-  int monolithic = 0; //1 si on resout la thermique en monolithique
+  int monolithic = 0; //1 if solving thermal problem monolithically
 protected :
-  int stab_ = 0; //1 si on utilise la stabilisation de Le Potier
-  mutable int coeffs_a_jour_ = 0, delta_a_jour_ = 0; //dernier temps auquel on a mis a jour les coeffs
+  int stab_ = 0; //1 if using the Le Potier stabilization
+  mutable int coeffs_a_jour_ = 0, delta_a_jour_ = 0; //flag: whether coefficients have been updated
   double h_paroi = -123.;
   OWN_PTR(Champ_front_base) T_autre_pb_;
   Nom nom_autre_pb_;

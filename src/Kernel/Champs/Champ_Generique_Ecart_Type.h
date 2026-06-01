@@ -23,18 +23,18 @@
 
 class Postraitement_base;
 
-/*! @brief class Champ_Generique_Ecart_Type OWN_PTR(Champ_base) destine a post-traiter un Ecart_Type d un champ generique
+/*! @brief class Champ_Generique_Ecart_Type OWN_PTR(Champ_base) intended to post-process a standard deviation (Ecart_Type) of a generic field
  *
- *  La classe porte un operateur statistique "Op_Ecart_Type"
+ *  The class carries a statistical operator "Op_Ecart_Type"
  *
- *  Syntaxe a respecter pour jdd
+ *  Syntax to follow in the data file
  *
- *  "nom_champ" Ecart_Type { t_deb "val_tdeb" t_fin "val_tfin"
- *                 source "type_champ_gen" { ...source ref_Champ { Pb_champ "nom_pb" "nom_champ_discret" } }
+ *  "field_name" Ecart_Type { t_deb "val_tdeb" t_fin "val_tfin"
+ *                 source "generic_field_type" { ...source ref_Champ { Pb_champ "pb_name" "discrete_field_name" } }
  *                }
- *  "nom_champ" fixe par utilisateur sera le nom du champ generique
- *  "val_tdeb" et "val_tfin" valeur de debut et fin des statistiques pour ce champ
- *  "type_champ_gen" type d'un champ generique
+ *  "field_name" set by the user will be the name of the generic field
+ *  "val_tdeb" and "val_tfin" start and end values of the statistics for this field
+ *  "generic_field_type" type of a generic field
  *
  */
 

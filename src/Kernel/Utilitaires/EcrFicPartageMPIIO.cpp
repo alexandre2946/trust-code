@@ -49,7 +49,7 @@ Sortie& EcrFicPartageMPIIO::printOn(Sortie& s) const
 
 EcrFicPartageMPIIO::EcrFicPartageMPIIO() : SFichier()
 {
-  bin_ = 1; // Binaire par defaut
+  bin_ = 1; // Binary by default
 #ifdef MPI_
   mpi_file_=nullptr;
 #endif
@@ -79,7 +79,7 @@ int EcrFicPartageMPIIO::ouvrir(const char* name,IOS_OPEN_MODE mode)
   MPI_File_set_errhandler(mpi_file_,MPI_ERRORS_ARE_FATAL);
   // Set initial displacement:
   disp_=0;
-  // Ecriture d'un entete specifique pour le build int64 ?
+  // Write a specific header for int64 builds?
   if (mode==ios::out)
     {
       if (je_suis_maitre())
@@ -167,7 +167,7 @@ Sortie& EcrFicPartageMPIIO::operator <<(const Separateur& ob)
 {
   if (bin_)
     {
-      // On n'ecrit pas les separateurs. Voir Sortie::operator<<(const Separateur& ob)
+      // Separators are not written. See Sortie::operator<<(const Separateur& ob)
       check();
     }
   else
@@ -257,7 +257,7 @@ Sortie& EcrFicPartageMPIIO::operator <<(const double ob)
   if (bin_)
     write(MPI_DOUBLE, &ob);
   else
-    (*this)<<std::to_string(ob).c_str(); // ToDo utiliser snprintf
+    (*this)<<std::to_string(ob).c_str(); // ToDo use snprintf
   return *this;
 }
 Sortie& EcrFicPartageMPIIO::operator <<(const Objet_U& ob)
@@ -317,7 +317,7 @@ int EcrFicPartageMPIIO::put(const double* ob, std::streamsize n, std::streamsize
 // MPI_File_get_byte_offset converts a view relative offset (etype units) into an absolute byte position
 // MPI_File_set_view(file,disp,etype,...) disp should be specified in absolute bytes from the start of the file
 // sizeof(MPI_DOUBLE)=4 !!! Should use:MPI_Type_size( MPI_DOUBLE, &size ) to return 8 !!!
-// Ecriture d'une zone memoire pointee par ob contenant n MPI_TYPE :
+// Write a memory area pointed by ob containing n MPI_TYPE elements:
 int EcrFicPartageMPIIO::put(MPI_Datatype MPI_TYPE, const void* ob, int n)
 {
   MPI_Datatype etype;
@@ -352,10 +352,10 @@ int EcrFicPartageMPIIO::put(MPI_Datatype MPI_TYPE, const void* ob, int n)
   /*
   MPI_Info_set(mpi_info, "romio_cb_read", "enable");
   MPI_Info_set(mpi_info, "romio_cb_write", "enable");
-  // Un processus par node s'occupe du buffering:
+  // One process per node handles the buffering:
   MPI_Info_set(mpi_info, "cb_config_list", "*:1");
 
-  // Striping count (max 160 sur LUSTRE):
+  // Striping count (max 160 on LUSTRE):
   Nom striping_factor=(Nom)min(Process::nproc(),160);
   MPI_Info_set(mpi_info, "striping_factor", (char*)striping_factor.getChar());
 

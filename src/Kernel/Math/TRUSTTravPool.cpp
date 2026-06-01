@@ -24,7 +24,7 @@
 #include <Device.h>
 #include <DeviceMemory.h>
 
-/*! The shared pools of memory - visibility: here only.
+/*! @brief The shared pools of memory - visibility: here only.
  *
  * Implementation is done as a map of lists. Key is the array size, and the list simply contains pointers to
  * available free blocks. So a block is only registered in the list when it is released.
@@ -37,7 +37,7 @@ struct PoolImpl_
   using list_t = std::list<ptr_t>;
   using pool_t = std::unordered_map<size_t, list_t>;
 
-  /*! A pool is a map of lists:
+  /*! @brief A pool is a map of lists:
   *   - key is the size of the block,
   *   - value is a list giving all free blocks (the last one is picked when requesting a free block)
   */
@@ -85,8 +85,10 @@ template<> int PoolImpl_<trustIdType>::num_items_ = 0;
 
 #endif
 
-/*! Handy method to get the proper list corresponding to a given size.
+/*! @brief Handy method to get the proper list corresponding to a given size.
  * The list is created if this is the first time the corresponding key (=size) is encountered
+ * @param sz the requested block size
+ * @return reference to the list of free blocks for that size
  */
 template<typename _TYPE_>
 typename PoolImpl_<_TYPE_>::list_t& GetOrCreateList(size_t sz)
@@ -106,10 +108,12 @@ typename PoolImpl_<_TYPE_>::list_t& GetOrCreateList(size_t sz)
 }
 
 
-/*! Retrieve a free block of size sz.
+/*! @brief Retrieve a free block of size sz.
  *
  * This takes the last available block from the list of the corresponding size, or returns a newly allocated block if none is available in the
  * block.
+ * @param sz the number of elements in the requested block
+ * @return a shared pointer to a free memory block of the requested size
  */
 template<typename _TYPE_>
 typename TRUSTTravPool<_TYPE_>::block_ptr_t TRUSTTravPool<_TYPE_>::GetFreeBlock(int sz)
@@ -143,7 +147,7 @@ typename TRUSTTravPool<_TYPE_>::block_ptr_t TRUSTTravPool<_TYPE_>::GetFreeBlock(
     }
 }
 
-/*! "Resize" a temporary Trav block - two possible strategies:
+/*! @brief "Resize" a temporary Trav block - two possible strategies:
  *  Strategy 1
  *    - get a new free block of the new size
  *    - copy the former data into it
@@ -158,7 +162,9 @@ typename TRUSTTravPool<_TYPE_>::block_ptr_t TRUSTTravPool<_TYPE_>::GetFreeBlock(
  *      }
  *      many times -> the array of size 10 is registered at each destruction (because it was always arrays of size 1 that were
  *      requested ...) -> same mitigation as above.
- *
+ * @param p shared pointer to the current block to resize
+ * @param new_sz the new number of elements
+ * @return a shared pointer to a block of the new size containing a copy of the original data
  */
 template<typename _TYPE_>
 typename TRUSTTravPool<_TYPE_>::block_ptr_t TRUSTTravPool<_TYPE_>::ResizeBlock(typename TRUSTTravPool<_TYPE_>::block_ptr_t p, int new_sz)
@@ -190,11 +196,12 @@ typename TRUSTTravPool<_TYPE_>::block_ptr_t TRUSTTravPool<_TYPE_>::ResizeBlock(t
     }
 }
 
-/*! Release a block.
+/*! @brief Release a block.
  *
  * This is invoked from the dtor of TRUSTArray and makes the memory block available again by registering it in the pool of
  * free blocks.
  * We don't register blocks of size 0.
+ * @param p the shared pointer to the block to release back to the pool
  */
 template<typename _TYPE_>
 void TRUSTTravPool<_TYPE_>::ReleaseBlock(typename TRUSTTravPool<_TYPE_>::block_ptr_t p)
@@ -229,7 +236,7 @@ void TRUSTTravPool<_TYPE_>::ReleaseBlock(typename TRUSTTravPool<_TYPE_>::block_p
 }
 
 /*!
- * Empty the TRUSTTrav pool explicitely.
+ * @brief Empty the TRUSTTrav pool explicitely.
  */
 template<typename _TYPE_>
 void TRUSTTravPool<_TYPE_>::ClearPool()
@@ -255,7 +262,7 @@ void TRUSTTravPool<_TYPE_>::ClearPool()
 }
 
 /*!
- * Debug method printing useful stats.
+ * @brief Debug method printing useful stats.
  */
 template<typename _TYPE_>
 void TRUSTTravPool<_TYPE_>::PrintStats()

@@ -23,7 +23,8 @@
 #include <Sonde.h>
 #include <Noms.h>
 
-/*! @brief classe Sondes Cette classe represente une liste de sondes.
+/*! @brief class Sondes
+ * @brief Represents a list of probes.
  *
  * @sa Sonde Postraitement
  */
@@ -48,7 +49,7 @@ public:
   void resetTime(double time) { for (auto &itr : *this) itr->resetTime(time); };
 
 private:
-  // Mecanisme de cache pour les sondes:
+  // Cache mechanism for probes:
   LIST(OBS_PTR(Champ_base)) sourceList;
   LIST(OWN_PTR(Champ_base)) espaceStockageList;
   Noms sourceNoms;
@@ -61,7 +62,7 @@ inline void Sondes::init_bords()
   for (auto& itr : *this) itr->init_bords();
 }
 
-/*! @brief Ouvre tous les fichiers associes a chacune des sondes de la liste.
+/*! @brief Opens all files associated with each probe in the list.
  *
  */
 inline void Sondes::ouvrir_fichiers()
@@ -69,7 +70,7 @@ inline void Sondes::ouvrir_fichiers()
   for (auto &itr : *this) itr->ouvrir_fichier();
 }
 
-/*! @brief Ferme tous les fichiers des sondes de la liste.
+/*! @brief Closes all files associated with the probes in the list.
  *
  */
 inline void Sondes::fermer_fichiers()

@@ -19,11 +19,11 @@
 #include <Champ_Fonc_Fonction.h>
 
 
-/*! @brief classe Champ_Fonc_Fonction_txyz classe derivee de Champ_Fonc_Fonction
+/*! @brief class Champ_Fonc_Fonction_txyz derived class of Champ_Fonc_Fonction
  *
- *      Cette classe represente un champ de donnees fonction d une variable scalaire
- *      et de variables d'espaces x,y,z et du temps t. La(les) fonction(s) est(sont) fournie(s)
- *      directement dans le jeu de donnees sous la forme d'expression(s) mathematique
+ *      This class represents a data field that is a function of a scalar variable
+ *      and of spatial variables x,y,z and time t. The function(s) is(are) provided
+ *      directly in the data set as mathematical expression(s).
  *          .......................
  *
  * @sa Champ_Fonc_Fonction

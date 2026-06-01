@@ -154,9 +154,9 @@ void Polyedre_32_64<_SIZE_>::calculer_un_centre_gravite(const int_t num_elem,Dou
   WARN;
 }
 
-/*! @brief Renvoie le nom LML d'un polyedre = "POLYEDRE_"+nb_som_max.
+/*! @brief Returns the LML name of a polyhedron = "POLYEDRE_" + nb_som_max.
  *
- * @return (Nom&) toujours egal a "PRISM6"
+ * @return LML name string for this polyhedron type.
  */
 template <typename _SIZE_>
 const Nom& Polyedre_32_64<_SIZE_>::nom_lml() const
@@ -169,21 +169,16 @@ const Nom& Polyedre_32_64<_SIZE_>::nom_lml() const
 }
 
 
-/*! @brief NE FAIT RIEN: A CODER, renvoie toujours 0.
+/*! @brief Returns 1 if element "num_poly" of the associated domain contains the point with coordinates given by "pos". Returns 0 otherwise.
  *
- * Renvoie 1 si l'element "element" du domaine associe a
- *               l'element geometrique contient le point
- *               de coordonnees specifiees par le parametre "pos".
- *     Renvoie 0 sinon.
- *
- * @param (DoubleVect& pos) coordonnees du point que l'on cherche a localiser
- * @param (int element) le numero de l'element du domaine dans lequel on cherche le point.
- * @return (int) 1 si le point de coordonnees specifiees appartient a l'element "element" 0 sinon
+ * @param pos Coordinates of the point to locate.
+ * @param num_poly Index of the domain element in which to search for the point.
+ * @return 1 if the point belongs to element "num_poly", 0 otherwise.
  */
 template <typename _SIZE_>
 int Polyedre_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t num_poly ) const
 {
-  // on regarde si le point P est du meme cote que xg pour chaque face .
+  // check if point P is on the same side as xg for each face.
   const Domaine_t& domaine = mon_dom.valeur();
   const IntTab_t& elem=domaine.les_elems();
   const DoubleTab_t& coord=domaine.coord_sommets();
@@ -237,14 +232,11 @@ int Polyedre_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t num_poly ) co
 }
 
 
-/*! @brief NE FAIT RIEN: A CODER, renvoie toujours 0 Renvoie 1 si les sommets specifies par le parametre "pos"
+/*! @brief Not yet implemented — always returns 0. Returns 1 if the vertices specified by "pos" are those of element "num_poly" in the associated domain.
  *
- *     sont les sommets de l'element "element" du domaine associe a
- *     l'element geometrique.
- *
- * @param (IntVect& pos) les numeros des sommets a comparer avec ceux de l'elements "element"
- * @param (int element) le numero de l'element du domaine dont on veut comparer les sommets
- * @return (int) 1 si les sommets passes en parametre sont ceux de l'element specifie, 0 sinon
+ * @param pos Vertex indices to compare.
+ * @param num_poly Index of the domain element whose vertices are to be compared.
+ * @return 1 if the vertices match, 0 otherwise.
  */
 template <typename _SIZE_>
 int Polyedre_32_64<_SIZE_>::contient(const SmallArrOfTID_t& pos, int_t num_poly ) const
@@ -254,9 +246,9 @@ int Polyedre_32_64<_SIZE_>::contient(const SmallArrOfTID_t& pos, int_t num_poly 
 }
 
 
-/*! @brief NE FAIT RIEN: A CODER Calcule les volumes des elements du domaine associe.
+/*! @brief Computes the volumes of the elements of the associated domain.
  *
- * @param (DoubleVect& volumes) le vecteur contenant les valeurs  des des volumes des elements du domaine
+ * @param volumes Vector to fill with the volumes of domain elements.
  */
 template <typename _SIZE_>
 void Polyedre_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const
@@ -310,18 +302,15 @@ void Polyedre_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const
     }
 }
 
-/*! @brief remplit le tableau faces_som_local(i,j)
+/*! @brief Fills the table faces_som_local(i,j), which gives for 0 <= i < nb_faces() and 0 <= j < nb_som_face(i) the local vertex index on the element.
  *
- *  Celui-ci donne pour 0 <= i < nb_faces()  et  0 <= j < nb_som_face(i) le numero local du sommet
- *  sur l'element.
+ * We have 0 <= faces_sommets_locaux(i,j) < nb_som().
+ * If faces do not all have the same number of vertices, the number of columns is
+ * the maximum, and unused entries are set to -1.
+ * Returns 1 if all faces have the same number of vertices, 0 otherwise.
  *
- *  On a  0 <= faces_sommets_locaux(i,j) < nb_som()
- *
- *  Si toutes les faces de l'element n'ont pas le meme nombre de sommets, le nombre
- *  de colonnes du tableau est le plus grand nombre de sommets, et les cases inutilisees
- *  du tableau sont mises a -1
- *  On renvoie 1 si toutes les faces ont le meme nombre d'elements, 0 sinon.
- *
+ * @param faces_som_local Table to fill with local face-vertex indices.
+ * @return 1 if all faces have the same vertex count, 0 otherwise.
  */
 template <typename _SIZE_>
 int Polyedre_32_64<_SIZE_>::get_tab_faces_sommets_locaux(IntTab& faces_som_local) const
@@ -335,9 +324,9 @@ int Polyedre_32_64<_SIZE_>::get_tab_faces_sommets_locaux(IntTab& faces_som_local
   faces_som_local.resize(nb_face_elem_max_,nb_som_face_max_);
   faces_som_local=-1;
   if (ele == 0 && PolyhedronIndex_.size_array() == 1)
-    return 1; //pas d'elements!
+    return 1; //no elements!
 
-  // on cherche les faces de l'elt
+  // look for the faces of the element
   int fl=0;
   for (int_t f=PolyhedronIndex_[ele]; f<PolyhedronIndex_[ele+1]; f++) // for all faces of the element 'ele'
     {
@@ -354,14 +343,14 @@ int Polyedre_32_64<_SIZE_>::get_tab_faces_sommets_locaux(IntTab& faces_som_local
   return 1;
 }
 
-// Desctiption : a partir des tableaux d'indirection FacesIndex PolyhedronIndex et Nodes
-// on calcul les elems, nb_som_face_max_, nb_face_elem_max_ nb_som_elem_max_
-// ainsi que Nodes local...
+// From the indirection arrays FacesIndex, PolyhedronIndex and Nodes,
+// compute les_elems, nb_som_face_max_, nb_face_elem_max_, nb_som_elem_max_,
+// and local Nodes...
 template <typename _SIZE_>
 void Polyedre_32_64<_SIZE_>::affecte_connectivite_numero_global(const ArrOfInt_t& Nodes, const ArrOfInt_t& FacesIndex,const ArrOfInt_t& PolyhedronIndex,IntTab_t& les_elems)
 {
   nb_som_elem_max_=0;
-  // detremination de nbsom_max
+  // determine the maximum number of vertices per element
   TRUSTList<_SIZE_> prov;
   nb_face_elem_max_=0;
   nb_som_face_max_=0;
@@ -388,7 +377,7 @@ void Polyedre_32_64<_SIZE_>::affecte_connectivite_numero_global(const ArrOfInt_t
   Cerr<<" Polyhedron information nb_som_elem_max "<< nb_som_elem_max_<<" nb_som_face_max "<<nb_som_face_max_<<" nb_face_elem_max "<<nb_face_elem_max_<<finl;
   les_elems.resize(nelem,nb_som_elem_max_);
   les_elems=-1;
-  // on refait un tour pour determiiner les elems
+  // second pass to determine les_elems
   for (int_t ele=0; ele<nelem; ele++)
     {
       prov.vide();
@@ -396,8 +385,8 @@ void Polyedre_32_64<_SIZE_>::affecte_connectivite_numero_global(const ArrOfInt_t
         for (int_t s=FacesIndex[f]; s<FacesIndex[f+1]; s++)
           prov.add_if_not(Nodes[s]);
       int nbsom=prov.size();
-      // on trie prov dans l'ordre croissant
-      // pas strictement necessaire mais permet de garder le meme tableau elem meme si on a effectue des permutation pour les faces
+      // sort prov in ascending order
+      // not strictly necessary but ensures a consistent elem table even after face permutations
       bool perm=1;
       while (perm)
         {
@@ -417,7 +406,7 @@ void Polyedre_32_64<_SIZE_>::affecte_connectivite_numero_global(const ArrOfInt_t
   FacesIndex_=FacesIndex;
   PolyhedronIndex_=PolyhedronIndex;
 
-  // Determination de Nodes_...
+  // Determine Nodes_...
   Nodes_.resize_array(Nodes.size_array());
   Nodes_=-2;
   for (int_t ele=0; ele<nelem; ele++)
@@ -449,13 +438,16 @@ void Polyedre_32_64<_SIZE_>::remplir_Nodes_glob(ArrOfInt_t& Nodes_glob,const Int
         }
 }
 
-/*! @brief on va ajouter les elements de type new_elem aux elements deja presents dans les_elems et dans new_elems
+/*! @brief Appends elements of type new_elem to those already present in les_elems and new_elems.
  *
+ * @param type_elem Geometric element type for the new elements.
+ * @param new_elems Connectivity table of the new elements to append.
+ * @param les_elems Connectivity table to update in place.
  */
 template <typename _SIZE_>
 void Polyedre_32_64<_SIZE_>::ajouter_elements(const Elem_geom_base_32_64<_SIZE_>& type_elem, const IntTab_t& new_elems, IntTab_t& les_elems)
 {
-  // On a joute les new_elems a les_elems
+  // Append new_elems to les_elems
   int_t nb_old_elem=les_elems.dimension(0);
   int_t nb_new_elem=new_elems.dimension(0);
   int nb_som_old_elem=les_elems.dimension_int(1);
@@ -471,7 +463,7 @@ void Polyedre_32_64<_SIZE_>::ajouter_elements(const Elem_geom_base_32_64<_SIZE_>
       for (int s=nb_som_new_elem; s<nb_som_old_elem; s++)
         les_elems(nb_old_elem+el,s)=-1;
     }
-  // on ajoute les faces pour cela on recupere le tableau de creation des faces
+  // Add the faces: retrieve the face creation array
   IntTab faces_som_local;
   type_elem.get_tab_faces_sommets_locaux(faces_som_local);
   int nb_face_new_elem=faces_som_local.dimension(0);
@@ -502,7 +494,7 @@ void Polyedre_32_64<_SIZE_>::ajouter_elements(const Elem_geom_base_32_64<_SIZE_>
               }
           if (nb_som_face_this_elem==4)
             {
-              // on inverse 3 et 4 en cas de quadrangle
+              // swap 3 and 4 in case of quadrangle
               int_t last=old_nodes_index+new_s-1;
               swap(Nodes_[last],Nodes_[last-1]);
             }
@@ -546,7 +538,7 @@ void Polyedre_32_64<_SIZE_>::compute_virtual_index()
 {
   using BigIntTab_t = TRUSTTab<int, _SIZE_>;   // A big tab but only containing ints.
 
-  // Methode brutale mais il faut bien commencer ....
+  // Brute-force approach to begin with...
   BigIntTab_t faces_som(0,nb_face_elem_max_,nb_som_face_max_);
   mon_dom->creer_tableau_elements(faces_som);
 

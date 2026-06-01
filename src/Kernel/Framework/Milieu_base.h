@@ -33,18 +33,18 @@ class Probleme_base;
 class Motcle;
 class Param;
 
-/*! @brief classe Milieu_base Cette classe est la base de la hierarchie des milieux (physiques)
+/*! @brief Milieu_base This class is the base of the (physical) medium hierarchy.
  *
- *      Elle regroupe les fonctionnalites (communes) et les proprietes physiques
- *      d'un milieu. Cette classe contient les principaux champs donnees
- *      caracterisant le milieu:
- *         - masse volumique       (rho)
- *         - diffusivite           (alpha)
- *         - conductivite          (lambda)
- *         - capacite calorifique  (Cp)
- *         - dilatabilite          (beta_th)
+ *      It groups the (common) functionalities and physical properties
+ *      of a medium. This class contains the main data fields
+ *      characterizing the medium:
+ *         - density               (rho)
+ *         - diffusivity           (alpha)
+ *         - conductivity          (lambda)
+ *         - heat capacity         (Cp)
+ *         - thermal expansion     (beta_th)
  *
- * @sa Milieu Solide Fluide_Incompressible Constituant, Classe abstraite dont tous les milieux physiques doivent deriver., Methodes abstraites:, void tester_champs_lus(), void mettre_a_jour(double temps), void initialiser()
+ * @sa Milieu Solide Fluide_Incompressible Constituant, Abstract class from which all physical media must derive., Abstract methods:, void tester_champs_lus(), void mettre_a_jour(double temps), void initialiser()
  */
 class Milieu_base : public Champs_compris_interface, public Objet_U
 {
@@ -66,7 +66,7 @@ public:
   inline const DoubleVect& section_passage_face() const { return section_passage_face_; }
   inline double section_passage_face(int i) const { return section_passage_face_[i]; }
 
-  // TODO : FIXME : DoubleVect peut etre ??
+  // TODO : FIXME : DoubleVect maybe ??
   inline DoubleTab& diametre_hydraulique_elem() { return ch_diametre_hyd_->valeurs(); }
   inline const DoubleTab& diametre_hydraulique_elem() const { return ch_diametre_hyd_->valeurs(); }
   inline DoubleVect& diametre_hydraulique_face() { return diametre_hydraulique_face_; }
@@ -109,14 +109,14 @@ public:
   virtual int a_gravite() const;
   virtual void update_rho_cp(double temps);
 
-  // equations associees au milieu
+  // equations associated with the medium
   virtual void associer_equation(const Equation_base* eqn) const;
   virtual const Equation_base& equation(const std::string& nom_inc) const;
 
-  // controle du domaine de validite des inconnues des equations associees au milieu par defaut renvoie 1 (OK)
+  // check validity domain of unknowns of equations associated with the medium, by default returns 1 (OK)
   virtual int check_unknown_range() const { return 1; }
 
-  //Methodes de l interface des champs postraitables
+  // Methods of the post-processable fields interface
   void creer_champ(const Motcle& motlu) override { }
   const Champ_base& get_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
@@ -127,18 +127,18 @@ public:
   void set_id_composite(const int i);
   int id_composite_ = -1;
 
-  // Liste des champs des milieux:
+  // List of medium fields:
   const LIST(OBS_PTR(Champ_Don_base))& champs_don() const { return champs_don_; }
 
   virtual bool is_dilatable() const { return false; }
 
 protected:
   OBS_PTR(Domaine_dis_base) zdb_;
-  OWN_PTR(Champ_base) ch_rho_; //peut etre un OWN_PTR(Champ_Don_base) ou un Champ_Inc
+  OWN_PTR(Champ_base) ch_rho_; //can be an OWN_PTR(Champ_Don_base) or a Champ_Inc
   OWN_PTR(Champ_Don_base) ch_g_, ch_alpha_, ch_lambda_, ch_alpha_fois_rho_, ch_Cp_, ch_beta_th_, ch_porosites_, ch_diametre_hyd_;
   OWN_PTR(Champ_Fonc_base)  ch_rho_Cp_elem_, ch_rho_Cp_comme_T_;
   Champs_compris champs_compris_;
-  DoubleVect porosite_face_, section_passage_face_ /* pour F5 */, diametre_hydraulique_face_;
+  DoubleVect porosite_face_, section_passage_face_ /* for F5 */, diametre_hydraulique_face_;
   Nom nom_;
   LIST(OBS_PTR(Champ_Don_base)) champs_don_;
 
@@ -148,7 +148,7 @@ protected:
   void creer_alpha();
   //void creer_derivee_rho();
 
-  // Utile pour F5
+  // Useful for F5
   void discretiser_porosite(const Probleme_base& pb, const Discretisation_base& dis);
   void discretiser_diametre_hydro(const Probleme_base& pb, const Discretisation_base& dis);
   virtual void set_additional_params(Param& param) const;
@@ -160,7 +160,7 @@ protected:
   void check_gravity_vector() const;
 
 private:
-  // attribue utile pour porosites (pas porosites_champ) ... a voir si utile sinon a virer ...
+  // attribute useful for porosites (not porosites_champ) ... to check if useful otherwise to remove ...
   Porosites porosites_;
   bool is_user_porosites_ = false, is_field_porosites_ = false, has_hydr_diam_ = false;
   void verifie_champ_porosites();

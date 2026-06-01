@@ -28,11 +28,12 @@ Sortie& Pb_Hydraulique_Turbulent::printOn(Sortie& os) const { return Pb_Fluide_b
 
 Entree& Pb_Hydraulique_Turbulent::readOn(Entree& is) { return Pb_Fluide_base::readOn(is); }
 
-/*! @brief Renvoie le nombre d'equation, Renvoie 1 car il y a seulement 1 equation a un probleme
+/*! @brief Returns the number of equations.
  *
- *     hydraulique turbulent: l'equation de Navier Stokes avec Turbulence
+ *     Returns 1 because there is only 1 equation in a turbulent
+ *     hydraulic problem: the Navier-Stokes equation with turbulence.
  *
- * @return (int) le nombre d'equation
+ * @return Number of equations (1).
  */
 int Pb_Hydraulique_Turbulent::nombre_d_equations() const
 {
@@ -49,10 +50,10 @@ const Equation_base& Pb_Hydraulique_Turbulent::equation(int i) const
   return eq_hydraulique;
 }
 
-/*! @brief Renvoie l' equation d'hydraulique de type Navier_Stokes_Turbulent si i=0 sort (exit) sinon.
+/*! @brief Returns the hydraulic equation of type Navier_Stokes_Turbulent if i=0, exits otherwise.
  *
- * @param (int i) l'index de l'equation a renvoyer
- * @return (Equation_base&) l'equation d'hydraulique de type Navier_Stokes_Turbulent
+ * @param i Index of the equation to return.
+ * @return The hydraulic equation of type Navier_Stokes_Turbulent.
  */
 Equation_base& Pb_Hydraulique_Turbulent::equation(int i)
 {
@@ -64,12 +65,12 @@ Equation_base& Pb_Hydraulique_Turbulent::equation(int i)
   return eq_hydraulique;
 }
 
-/*! @brief Associe le milieu au probleme.
+/*! @brief Associates the medium to the problem.
  *
- * Le milieu doit etre de type fluide incompressible.
+ * The medium must be of type incompressible fluid.
  *
- * @param (Milieu_base& mil) le milieu physique a associer au probleme
- * @throws le milieu n'est pas du type Fluide_Incompressible
+ * @param mil Physical medium to associate with the problem.
+ * @throws If the medium is not of type Fluide_Incompressible.
  */
 void Pb_Hydraulique_Turbulent::associer_milieu_base(const Milieu_base& mil)
 {

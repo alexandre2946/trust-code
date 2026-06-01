@@ -88,13 +88,13 @@ bool Schema_Implicite_Multi_TimeStep_base::initTimeStep(double dt)
 }
 ////////////////////////////////
 //                            //
-// Caracteristiques du schema //
+// Schema characteristics     //
 //                            //
 ////////////////////////////////
 
-/*! @brief Renvoie le nombre de valeurs temporelles futures.
+/*! @brief Returns the number of future temporal values.
  *
- * Ici : n+1, donc 1.
+ * Here: n+1, so 1.
  *
  */
 int Schema_Implicite_Multi_TimeStep_base::nb_valeurs_futures() const
@@ -102,9 +102,9 @@ int Schema_Implicite_Multi_TimeStep_base::nb_valeurs_futures() const
   return 1 ;
 }
 
-/*! @brief Renvoie le le temps a la i-eme valeur future.
+/*! @brief Returns the time at the i-th future value.
  *
- * Ici : t(n+1)
+ * Here: t(n+1)
  *
  */
 double Schema_Implicite_Multi_TimeStep_base::temps_futur(int i) const
@@ -113,9 +113,9 @@ double Schema_Implicite_Multi_TimeStep_base::temps_futur(int i) const
   return temps_courant()+pas_de_temps();
 }
 
-/*! @brief Renvoie le le temps le temps que doivent rendre les champs a l'appel de valeurs()
+/*! @brief Returns the time that fields must return when valeurs() is called.
  *
- *     Ici : t(n+1)
+ *     Here: t(n+1)
  *
  */
 double Schema_Implicite_Multi_TimeStep_base::temps_defaut() const
@@ -125,7 +125,7 @@ double Schema_Implicite_Multi_TimeStep_base::temps_defaut() const
 
 /////////////////////////////////////////
 //                                     //
-// Fin des caracteristiques du schema  //
+// End of schema characteristics       //
 //                                     //
 /////////////////////////////////////////
 
@@ -179,7 +179,7 @@ int Schema_Implicite_Multi_TimeStep_base::Iterer_Pb(Probleme_base& pb,int ite)
 
       authorized_equation(eqn);
 
-      // imposer_cond_lim   sert pour la pression et pour les echanges entre pbs
+      // imposer_cond_lim is used for the pressure and for inter-problem exchanges
       eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
       Cout<<"Solving equation "<<eqn.que_suis_je()<<finl;
       const DoubleTab& inut=futur;
@@ -193,9 +193,9 @@ int Schema_Implicite_Multi_TimeStep_base::Iterer_Pb(Probleme_base& pb,int ite)
       eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
       present         = futur;
 
-      // La ligne suivante realise:
-      // MAJ NS (donc MAJ inc)
-      // MAJ modele de turbulence donc k-eps
+      // The following line performs:
+      // Update NS (hence update unknowns)
+      // Update turbulence model (k-eps)
       //   eqn.inconnue().mettre_a_jour(temps);
       //   eqn.inconnue().reculer();
       changer_temps(eqn,temps);
@@ -279,7 +279,7 @@ bool Schema_Implicite_Multi_TimeStep_base::iterateTimeStep(bool& converged)
           prob.abortTimeStep();
           prob.initTimeStep(dt_);
 
-          // PL pour corriger plantage danbs U_in_var_impl
+          // PL fix for crash in U_in_var_impl
           const int nb_eqn=prob.nombre_d_equations();
           for(int ii=0; ii<nb_eqn; ii++)
             {
@@ -297,9 +297,9 @@ bool Schema_Implicite_Multi_TimeStep_base::iterateTimeStep(bool& converged)
         }
 
     }
-  //modification : prise en compte de la possibilite de modification du dt dans Itere_Pb
-  //cas du solveur pour compressible : division du pas de temps par 2
-  // si la convergence n'est pas atteinte en un nombre de pas de temps donne
+  // modification: account for the possibility of modifying dt in Itere_Pb
+  // for the compressible solver: divide the time step by 2
+  // if convergence is not reached within a given number of time steps
   //  double temps = dt_ + temps_courant_;
   test_stationnaire(prob);
 
@@ -310,9 +310,9 @@ bool Schema_Implicite_Multi_TimeStep_base::iterateTimeStep(bool& converged)
 
 int Schema_Implicite_Multi_TimeStep_base::faire_un_pas_de_temps_pb_couple(Probleme_Couple& pbc, int& ok)
 {
-  // Modif B.M. : Si on fait la sauvegarde entre derivee en temps inco et mettre a jour,
-  //  un calcul avec reprise n'est pas equivalent au calcul ininterrompu
-  //  (front-tracking notamment). Donc je mets la sauvegarde au debut du pas de temps.
+  // Modif B.M.: If the save is done between derivee_en_temps_inco and mettre_a_jour,
+  //  a restarted calculation is not equivalent to an uninterrupted one
+  //  (especially for front-tracking). So the save is placed at the beginning of the time step.
   //if (lsauv())
   //  for (int i=0;i<pbc.nb_problemes();i++)
   //    ref_cast(Probleme_base,pbc.probleme(i)).sauver();
@@ -439,7 +439,7 @@ int Schema_Implicite_Multi_TimeStep_base::faire_un_pas_de_temps_eqn_base(Equatio
         }
     }
 
-  // sert pour la pression et les couplages
+  // used for the pressure and inter-problem couplings
   eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
 
   Cout << finl;
@@ -495,12 +495,12 @@ int Schema_Implicite_Multi_TimeStep_base::reprendre(Entree& s)
       return 1;
     }
 
-  // Reprise du facsec et du residu dans le fichier .dt_ev s'il existe
+  // Reading facsec and residual from the .dt_ev file if it exists
   double facsec_lu=1.;
   double residu_lu=0;
   double facsec_lu_old;
 
-  // Test ouverture du fichier
+  // Test file opening
   if (je_suis_maitre())
     {
       EFichier fichier;
@@ -509,18 +509,18 @@ int Schema_Implicite_Multi_TimeStep_base::reprendre(Entree& s)
       double temps=0;
       double dt;
       std::string ligne;
-      // Si en tete on lit
+      // Read the header if present
       fichier >> chaine;
       if (chaine=="#")
         {
-          // On lit la ligne complete
+          // Read the full line
           std::getline(fichier.get_ifstream(), ligne);
-        } // Sinon on reouvre
+        } // Otherwise reopen
       else
         {
           fichier.ouvrir(nom_fichier);
         }
-      // Recherche du pas de temps precedant tinit_
+      // Search for the time step preceding tinit_
       fichier >> temps;
       while (!fichier.eof() && temps<tinit_)
         {
@@ -528,7 +528,7 @@ int Schema_Implicite_Multi_TimeStep_base::reprendre(Entree& s)
           fichier >> dt;
           fichier >> facsec_lu;
           fichier >> residu_lu;
-          // On lit le reste de la ligne
+          // Read the rest of the line
           std::getline(fichier.get_ifstream(), ligne);
           fichier >> temps;
           if (facsec_lu_old != facsec_lu)
@@ -544,9 +544,9 @@ int Schema_Implicite_Multi_TimeStep_base::reprendre(Entree& s)
   envoyer_broadcast(nb_ite_sans_accel_, 0 /* pe source */);
   envoyer_broadcast(residu_old_, 0 /* pe source */);
 
-  // On prend le facsec lu uniquement s'il est entre les
-  // bornes specifiees dans le jeu de donnees
-  // En effet, on peut faire un calcul explicite puis une reprise en implicite
+  // The read facsec is used only if it is within the bounds
+  // specified in the data set.
+  // Indeed, one may run an explicit calculation and then restart with an implicit scheme.
   residu_ = residu_lu;
   if (facsec_lu>=facsec_)
     {

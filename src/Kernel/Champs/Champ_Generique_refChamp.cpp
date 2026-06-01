@@ -42,9 +42,9 @@ Entree& Champ_Generique_refChamp::readOn(Entree& is)
   return Champ_Generique_base::readOn(is);
 }
 
-/*! @brief pb_champ :   declenche la lecture du nom du probleme (nom_pb_) auquel appartient le champ discret et le nom de ce champ discret (nom_champ_)
+/*! @brief pb_champ :   triggers the reading of the problem name (nom_pb_) to which the discrete field belongs and the name of that discrete field (nom_champ_)
  *
- *   nom_source : option pour nommer le champ en tant que source (sinon nommer par defaut)
+ *   nom_source : option to name the field as a source (otherwise named by default)
  *
  */
 void Champ_Generique_refChamp::set_param(Param& param) const
@@ -58,9 +58,9 @@ int Champ_Generique_refChamp::lire_motcle_non_standard(const Motcle& mot, Entree
 {
   if (mot=="Pb_champ")
     {
-      // Lecture du nom du probleme et du nom du champ
+      // Read the problem name and the field name
       is >> nom_pb_ >> nom_champ_;
-      // Recherche du probleme parmi les objets connus de l'interprete
+      // Search for the problem among the objects known to the interpreter
       const Objet_U& ob = interprete().objet(nom_pb_);
       if (!sub_type(Probleme_base, ob))
         {
@@ -70,7 +70,7 @@ int Champ_Generique_refChamp::lire_motcle_non_standard(const Motcle& mot, Entree
         }
       Probleme_base& pb = ref_cast_non_const(Probleme_base, ob);
       ref_pb_ = pb;
-      // Recherche du champ "nom_champ" dans le probleme:
+      // Search for the field "nom_champ" in the problem:
       OBS_PTR(Champ_base) ref_champ;
       Noms liste_noms;
       pb.get_noms_champs_postraitables(liste_noms);
@@ -91,9 +91,9 @@ int Champ_Generique_refChamp::lire_motcle_non_standard(const Motcle& mot, Entree
     return Champ_Generique_base::lire_motcle_non_standard(mot,is);
 }
 
-/*! @brief On initialise la classe avec le champ en parametre.
+/*! @brief Initialize the class with the given field.
  *
- * On prend une ref a ce champ (il doit rester valable ensuite).
+ * We take a reference to this field (it must remain valid afterwards).
  *
  */
 void Champ_Generique_refChamp::initialize(const Champ_base& champ)
@@ -101,15 +101,15 @@ void Champ_Generique_refChamp::initialize(const Champ_base& champ)
   ref_champ_ = champ;
 }
 
-/*! @brief Renvoie le nombre de coordonnees de chaque sommet du domaine.
+/*! @brief Returns the number of coordinates of each vertex of the domain.
  *
- * Voir GenericField_base::get_dimension()
+ * See GenericField_base::get_dimension()
  *
  */
 int Champ_Generique_refChamp::get_dimension() const
 {
-  // Je n'utilise pas Objet_U::dimension expres car j'espere supprimer
-  // cette variable statique bientot.
+  // We do not use Objet_U::dimension intentionally as we hope to remove
+  // this static variable soon.
   const DoubleTab coords = get_ref_coordinates();
   const int dim = coords.dimension(1);
   return dim;
@@ -200,28 +200,28 @@ const Noms Champ_Generique_refChamp::get_property(const Motcle& query) const
         exit();
       }
     }
-  //Pour compilation
-  // On n'arrive jamais ici
+  //For compilation
+  // We never reach here
   return get_property(query);
 
 }
 
-/*! @brief Si le champ n'est pas un champ discret : exception Champ_Generique_erreur("INVALID") Sinon, renvoie la localisation du champ pour le support "index".
+/*! @brief If the field is not a discrete field: exception Champ_Generique_erreur("INVALID") Otherwise, returns the localisation of the field for support "index".
  *
- *   Si index == -1 (valeur par defaut), leve une exception si le champ est multisupport.
- *   Sinon, leve une exception si l'index est superieur au nombre de localisations du champ.
+ *   If index == -1 (default value), raises an exception if the field has multiple supports.
+ *   Otherwise, raises an exception if the index exceeds the number of field localisations.
  *
  */
 Entity Champ_Generique_refChamp::get_localisation(const int index) const
 {
   Entity loc;
-  //Pour initialisation
+  //For initialization
   loc =Entity::NODE;
 
   const Champ_base& ch = get_ref_champ_base();
   const Domaine_dis_base& z_dis_base = get_ref_domaine_dis_base();
 
-  // Champs discrets a une seule localisation :
+  // Discrete fields with a single localisation:
   if ((sub_type(Champ_Inc_P0_base, ch) || sub_type(Champ_Fonc_P0_base, ch)) && index <= 0)
     {
       loc = Entity::ELEMENT;
@@ -238,7 +238,7 @@ Entity Champ_Generique_refChamp::get_localisation(const int index) const
     }
   else
     {
-      // Champs discrets a plusieurs localisations
+      // Discrete fields with multiple localisations
       Nom message="Invalid localization used for postprocessing the field ";
       message+=ch.le_nom()+". Change your data file.";
       throw Champ_Generique_erreur(message);
@@ -246,32 +246,32 @@ Entity Champ_Generique_refChamp::get_localisation(const int index) const
   return loc;
 }
 
-/*! @brief Verifie que le champ est bien un champ discret et renvoie le tableau de valeurs.
+/*! @brief Verifies that the field is indeed a discrete field and returns the value array.
  *
- * Sinon, leve l'exception Champ_Generique_erreur("NO_REF")
+ * Otherwise, raises the exception Champ_Generique_erreur("NO_REF")
  *
  */
 const DoubleTab& Champ_Generique_refChamp::get_ref_values() const
 {
-  // Appel a get_localisation pour verifier que le champ est bien un champ discret
-  // (multi-support ou non)
+  // Call to get_localisation to verify that the field is indeed a discrete field
+  // (multi-support or not)
   get_localisation(0);
-  // Renvoie les valeurs du champ
+  // Returns the field values
   const DoubleTab& val = get_ref_champ_base().valeurs();
   return val;
 }
 
-/*! @brief Cree une copie du tableau de valeurs Voir GenericField_base::get_copy_values()
+/*! @brief Creates a copy of the value array. See GenericField_base::get_copy_values()
  *
  */
 void Champ_Generique_refChamp::get_copy_values(DoubleTab& values) const
 {
   const DoubleTab& val = get_ref_values();
-  // Cree une copie du tableau
+  // Creates a copy of the array
   values = val;
 }
 
-/*! @brief appel a Champ_base::valeur_aux()
+/*! @brief call to Champ_base::valeur_aux()
  *
  */
 void Champ_Generique_refChamp::get_xyz_values(const DoubleTab& coords, DoubleTab& values, ArrOfBit& validity_flag) const
@@ -290,7 +290,7 @@ const Domaine_Cl_dis_base& Champ_Generique_refChamp::get_ref_zcl_dis_base() cons
       exit();
     }
 
-  //Pour compilation
+  //For compilation
   return get_ref_zcl_dis_base();
 }
 
@@ -361,16 +361,16 @@ void Champ_Generique_refChamp::get_copy_connectivity(Entity index1, Entity index
   tab = connectivity;
 }
 
-// Renvoie le probleme qui porte le champ cible
+// Returns the problem that carries the target field
 const Probleme_base& Champ_Generique_refChamp::get_ref_pb_base() const
 {
   return ref_pb_.valeur();
 }
 
-/*! @brief Renvoie le champ_base sous-jacent.
+/*! @brief Returns the underlying champ_base.
  *
- * Teste si le champ a bien ete associe. A terme, cette methode disparaitra de la classe GenericField_base mais reste
- *   dans celle-ci (on y teste si le champ a ete associe).
+ * Tests that the field has been properly associated. Eventually, this method will be removed from GenericField_base but remains
+ *   here (to test if the field has been associated).
  *  Exceptions:
  *   Champ_Generique_erreur("NOT_INITIALIZED")
  *
@@ -393,10 +393,10 @@ void Champ_Generique_refChamp::completer(const Postraitement_base& post)
   nommer_source(post);
 }
 
-/*! @brief Voir Champ_Generique_base::mettre_a_jour Si le champ est champ_inc dans l'equation, il doit deja avoir
+/*! @brief See Champ_Generique_base::mettre_a_jour If the field is a champ_inc in the equation, it must already have
  *
- *   ete mis a jour par l'equation.
- *  Si c est un clacule, l actualisation est faite dans get_champ
+ *   been updated by the equation.
+ *  If it is a calculated field, the update is done in get_champ
  *
  */
 void Champ_Generique_refChamp::mettre_a_jour(double temps)
@@ -404,9 +404,9 @@ void Champ_Generique_refChamp::mettre_a_jour(double temps)
 
 }
 
-/*! @brief Voir Champ_Generique_base::get_champ.
+/*! @brief See Champ_Generique_base::get_champ.
  *
- * Ici, l'espace_stockage n'est pas utilise, le champ existe deja
+ * Here, the storage space is not used, the field already exists
  *
  */
 const Champ_base& Champ_Generique_refChamp::get_champ(OWN_PTR(Champ_base)& espace_stockage) const
@@ -421,7 +421,7 @@ const Champ_base& Champ_Generique_refChamp::get_champ_without_evaluation(OWN_PTR
   return get_champ(espace_stockage);
 }
 
-/*! @brief Associe le champ et determine sa localisation.
+/*! @brief Associates the field and determines its localisation.
  *
  */
 void Champ_Generique_refChamp::set_ref_champ(const Champ_base& champ)
@@ -429,10 +429,10 @@ void Champ_Generique_refChamp::set_ref_champ(const Champ_base& champ)
   assert(!ref_champ_);
   ref_champ_ = champ;
 
-  // Determination de la localisation du champ
-  // On code quelques champs de types connus...
-  // Pour les autres, il faut les interpoler quelque part.
-  // L'ideal serait la localisation soit une propriete du champ discret lui-meme.
+  // Determination of the field localisation
+  // We handle a few fields of known types...
+  // For the others, they must be interpolated somewhere.
+  // The ideal would be for the localisation to be a property of the discrete field itself.
 
   Nom type = champ.que_suis_je();
   type.majuscule();
@@ -459,7 +459,7 @@ void Champ_Generique_refChamp::set_ref_champ(const Champ_base& champ)
     }
 }
 
-//Renvoie le temps du champ cible
+//Returns the time of the target field
 double Champ_Generique_refChamp::get_time() const
 {
   double temps;
@@ -467,15 +467,15 @@ double Champ_Generique_refChamp::get_time() const
   return temps;
 }
 
-//Renvoie la directive (champ_elem, champ_sommets, champ_face ou pression)
-//pour lancer la discretisation de l espace de stockage rendu par
-//la methode get_champ() du Champ_Generique_base qui a lance l appel de cette methode
+//Returns the directive (champ_elem, champ_sommets, champ_face or pression)
+//to launch the discretisation of the storage space returned by
+//the get_champ() method of the Champ_Generique_base that triggered the call
 const Motcle Champ_Generique_refChamp::get_directive_pour_discr() const
 {
   Motcle directive;
   const Champ_base& ch = get_ref_champ_base();
 
-  // Champs discrets a une seule localisation :
+  // Discrete fields with a single localisation:
   if (sub_type(Champ_Inc_P0_base,ch) || sub_type(Champ_Fonc_P0_base,ch))
     directive = ch.is_basis_function() ? "champ_elem_DG" : (ch.is_quadrature() ? "champ_fonc_quad_DG" : "champ_elem");
   else if (sub_type(Champ_Inc_P1_base,ch) || sub_type(Champ_Fonc_P1_base,ch)
@@ -524,7 +524,7 @@ void Champ_Generique_refChamp::set_nom_champ(const Motcle& nom)
   nom_champ_=nom;
 }
 
-//Nomme le champ en tant que source par defaut
+//Name the field as a source by default
 //nom_champ_base + "_natif_" + nom_dom_natif
 void Champ_Generique_refChamp::nommer_source(const Postraitement_base& post)
 {

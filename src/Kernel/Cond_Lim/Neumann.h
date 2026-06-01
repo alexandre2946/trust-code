@@ -18,12 +18,12 @@
 
 #include <Cond_lim_base.h>
 
-/*! @brief Classe Neumann Cette classe est la classe de base de la hierarchie des conditions aux limites de type Neumann.
+/*! @brief Classe Neumann This class is the base class of the hierarchy of Neumann-type boundary conditions.
  *
- *     Une condition aux limites de type Neumann impose la valeur de la derivee d'un champ inconnue sur une frontiere, ce qui correspond a:
+ *     A Neumann boundary condition imposes the value of the derivative of an unknown field at a boundary, which corresponds to:
  *
- *       - flux impose pour l'equation de transport d'un scalaire
- *       - contrainte imposee pour l'equation de quantite de mouvement
+ *       - imposed flux for the scalar transport equation
+ *       - imposed stress for the momentum equation
  *
  * @sa Cond_lim_base Neumann_homogene
  */
@@ -36,7 +36,7 @@ public:
   const DoubleTab& flux_impose(bool nb_faces_tot=false) const;
 
 protected:
-  mutable DoubleTab flux_impose_; // Stocke toutes les valeurs du flux sur toutes les faces de la frontiere (pas d'hypothese sur un champ uniforme). Utile pour le GPU.
+  mutable DoubleTab flux_impose_; // Stores all flux values on all faces of the boundary (no assumption of a uniform field). Useful for GPU.
 };
 
 #endif

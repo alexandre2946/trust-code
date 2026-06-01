@@ -31,8 +31,8 @@ public:
   void assembler_continuite(matrices_t matrices, DoubleTab& secmem, int aux_only = 0) const override;
   DoubleTab norme_continuite() const override;
 
-  /* prise en compte des variations de pression aux CLs lors du calcul d'increments de pression.
-   fac est le coefficient tel que p_final - press = fac * sol */
+  /* account for pressure variations at BCs during the computation of pressure increments.
+   fac is the coefficient such that p_final - press = fac * sol */
   void modifier_secmem_pour_incr_p(const DoubleTab& press, const double fac, DoubleTab& incr) const override;
 
   void corriger_vitesses(const DoubleTab& dP, DoubleTab& dv) const override

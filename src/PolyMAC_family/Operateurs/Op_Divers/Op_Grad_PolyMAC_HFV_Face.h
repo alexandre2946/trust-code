@@ -20,8 +20,8 @@
 
 /*! @brief class Op_Grad_PolyMAC_HFV_Face
  *
- *   Cette classe represente l'operateur de gradient La discretisation est PolyMAC_HFV
- *   On calcule le gradient d'un champ_Elem_PolyMAC_HFV (la pression)
+ *   Gradient operator for the PolyMAC_HFV discretization.
+ *   Computes the gradient of a Champ_Elem_PolyMAC_HFV field (pressure).
  *
  * @sa Operateur_Grad_base
  */

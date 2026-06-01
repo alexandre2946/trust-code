@@ -30,7 +30,7 @@ Entree& Milieu_composite_Euler::readOn(Entree& is)
 {
   Milieu_composite::readOn(is);
 
-  // XXX pour le moment on force ca .. a retirer apres
+  // XXX for now this is forced .. to be removed later
   if (has_saturation_)
     Process::exit("We dont accept at present a saturation object in Milieu_composite_Euler ... But we will soon !\n");
 
@@ -51,7 +51,7 @@ Entree& Milieu_composite_Euler::readOn(Entree& is)
 void Milieu_composite_Euler::discretiser(const Probleme_base& pb, const  Discretisation_base& dis)
 {
   Cerr << "Composite Euler medium discretization" << finl;
-  // on discretise seulement la porosite
+  // only discretize the porosity
   Milieu_base::discretiser_porosite(pb,dis);
 
   res_en_T_ = true;

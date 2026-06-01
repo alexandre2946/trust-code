@@ -80,18 +80,18 @@ static void creer_tableau_distribue_(const MD_Vector& md, VECT& v, RESIZE_OPTION
 {
   if (v.get_md_vector())
     {
-      // Si ce message apparait et qu'on est sur de ce qu'on fait,
-      // faire ceci avant d'appeler creer_tableau_distribue:
-      //  vect.set_md_vector(MD_Vector()); // Annule le descripteur et garde le vecteur.
-      // ou
-      //  vect.reset(); // Detruit completement le contenu du vecteur
+      // If this message appears and you know what you are doing,
+      // do this before calling creer_tableau_distribue:
+      //  vect.set_md_vector(MD_Vector()); // Cancels the descriptor and keeps the vector.
+      // or
+      //  vect.reset(); // Completely destroys the vector contents
       Cerr << "Internal error in MD_Vector_tools::creer_tableau_distribue:\n"
            << " Vector already has a parallel vector structure" << finl;
       Process::exit();
     }
   int sz = md->get_nb_items_tot();
-  // Attention, sz_r peut valoir -1 dans certains cas. Alors le test n==sz_r sera toujours faux,
-  //  mais c'est bien ce qu'on veut...
+  // Note: sz_r may be -1 in some cases. Then the test n==sz_r will always be false,
+  //  but that is the intended behaviour...
   int sz_r = md->get_nb_items_reels();
   bool err = ::resize_tab_or_vect(v, sz, sz_r, opt);
 
@@ -126,16 +126,16 @@ static void creer_tableau_seq_(const MD_Vector& md, TRUSTVect<_TYPE_,_SIZE_>& v,
 }
 
 
-/*! @brief transforme v en un tableau parallele ayant la structure md.
+/*! @brief Transforms v into a parallel array having the structure md.
  *
- * md doit est non nul !
- *   Les dimension(i>=1) du tableau v (si c'est un IntTab ou DoubleTab) sont conservees,
- *   les dimension(0) et dimension_tot(0) sont modifiees en fonction du nombre d'items
- *   specifies dans le MD_Vector.
- *   La dimension initiale du vecteur doit etre soit 0, soit md.get_nb_items_reels(),
- *    soit md.get_nb_items_tot(). Si besoin, la taille du tableau est modifiee et on
- *    initialise le tableau selon opt.
- *  ATTENTION, virtual_exchange() n'est PAS appele. Les cases virtuelles ne sont pas initialisees...
+ * md must be non-null!
+ *   The dimension(i>=1) of array v (if it is an IntTab or DoubleTab) are preserved,
+ *   dimension(0) and dimension_tot(0) are modified according to the number of items
+ *   specified in the MD_Vector.
+ *   The initial size of the vector must be either 0, md.get_nb_items_reels(),
+ *    or md.get_nb_items_tot(). If needed, the array size is modified and the
+ *    array is initialized according to opt.
+ *  WARNING, virtual_exchange() is NOT called. The virtual slots are not initialised...
  */
 void MD_Vector_tools::creer_tableau_distribue(const MD_Vector& md, Array_base& v, RESIZE_OPTIONS opt)
 {
@@ -296,14 +296,14 @@ void MD_Vector_tools::compute_sequential_items_index(const MD_Vector&, MD_Vector
   Process::exit();
 }
 
-/*! @brief cree un descripteur pour un sous-ensemble d'un vecteur.
+/*! @brief Creates a descriptor for a subset of a vector.
  *
- * renum fournit la structure et le descripteur du vecteur source (doit avoir line_size==1)
- *   renum doit contenir -1 pour les items du vecteur source a ne pas conserver et une
- *    valeur positive ou nulle pour les items a conserver.
- *   La valeur renum[i] donne l'indice de cet item dans le nouveau tableau.
- *   Attention, si un item du vecteur source est recu d'un autre processeur et doit etre conserve,
- *    ce meme item doit aussi etre conserve sur le processeur qui envoie cet item.
+ * renum provides the structure and the descriptor of the source vector (must have line_size==1).
+ *   renum must contain -1 for items of the source vector to discard and a
+ *    non-negative value for items to keep.
+ *   The value renum[i] gives the index of that item in the new array.
+ *   Note: if an item of the source vector is received from another processor and must be kept,
+ *    that same item must also be kept on the processor that sends it.
  *
  */
 void MD_Vector_tools::creer_md_vect_renum(const IntVect& renum, MD_Vector& md_vect)
@@ -322,14 +322,13 @@ void MD_Vector_tools::creer_md_vect_renum(const IntVect& renum, MD_Vector& md_ve
   src_md->fill_md_vect_renum(renum, md_vect);
 }
 
-/*! @brief Idem que creer_md_vect_renum() mais cree une numerotation par defaut.
+/*! @brief Same as creer_md_vect_renum() but creates a default numbering.
  *
- * Le tableau flags_renum doit contenir en entree une valeur POSITIVE OU NULLE pour les
- *   valeurs a conserver et une valeur negative pour les autres.
- *   En sortie, flags_renum contient l'indice de l'item dans le tableau reduit s'il est
- *    conserve, sinon la valeur d'origine non modifiee.
- *   Les items sont places dans l'ordre croissant de leur indice local sur dans le descripteur
- *    d'origine.
+ * The flags_renum array must contain on input a NON-NEGATIVE value for the
+ *   values to keep and a negative value for the others.
+ *   On output, flags_renum contains the index of the item in the reduced array if it is
+ *    kept, otherwise the original unmodified value.
+ *   Items are placed in ascending order of their local index in the original descriptor.
  *
  */
 void MD_Vector_tools::creer_md_vect_renum_auto(IntVect& flags_renum, MD_Vector& md_vect)
@@ -381,7 +380,7 @@ void MD_Vector_tools::restore_vector_with_md(DoubleVect& v, Entree& is)
   md_ptr.typer(md_type);
   is >> md_ptr.valeur();
 
-  // Creation du MD_Vector attache au tableau
+  // Create the MD_Vector attached to the array
   MD_Vector md;
   md.copy(md_ptr.valeur());
 
@@ -392,7 +391,7 @@ void MD_Vector_tools::restore_vector_with_md(DoubleVect& v, Entree& is)
   is.get(toto.addr(), size_tot);
   toto.set_md_vector(md);
 
-  // Attache v a toto et oublie toto...
+  // Attach v to toto and forget toto...
   v.reset();
   v.ref(toto);
 }

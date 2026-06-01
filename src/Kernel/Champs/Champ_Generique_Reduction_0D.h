@@ -23,22 +23,22 @@
  *
  */
 
-// Champ destine a post-traiter un champ reduit a une dimension 0D
-// On construit un champ prenant en tout point de l espace la valeur reduite
-// La classe porte le type de methode pour realiser la reduction
-//// Syntaxe a respecter pour jdd
+// Field intended to post-process a field reduced to 0D dimension
+// We construct a field taking the reduced value at every point in space
+// The class carries the type of method to perform the reduction
+//// Data file syntax to follow
 //
-// "nom_champ" Reduction_0D { methode "type_methode"
-//                source "type_champ_gen" { ...source ref_Champ { Pb_champ "nom_pb" "nom_champ_discret" } }
-//                [ nom_source "nom_source" ]
-//                [ source_reference "source_reference" ]
-//                [ sources_reference "list_nom_virgule" ]
-//                [ sources "listchamp_generique" ]
+// "field_name" Reduction_0D { method "method_type"
+//                source "generic_field_type" { ...source ref_Champ { Pb_champ "pb_name" "discrete_field_name" } }
+//                [ source_name "source_name" ]
+//                [ reference_source "reference_source" ]
+//                [ reference_sources "comma_separated_list" ]
+//                [ sources "list_generic_field" ]
 //               }
-// "nom_champ" fixe par utilisateur sera le nom du champ generique
-// "type_champ_gen" type d'un champ generique
-// "type_methode" indique le type de reduction demandee
-// Les options possibles sont disponibles dans $TRUST_ROOT/src/Kernel/Champs/Champ_Generique_Reduction_0D.cpp
+// "field_name" set by the user will be the name of the generic field
+// "generic_field_type" type of a generic field
+// "method_type" indicates the type of reduction requested
+// The possible options are available in $TRUST_ROOT/src/Kernel/Champs/Champ_Generique_Reduction_0D.cpp
 
 class Champ_Generique_Reduction_0D : public Champ_Gen_de_Champs_Gen
 {
@@ -58,10 +58,10 @@ public:
 
 protected:
 
-  Motcle methode_; //Type de reduction : min, max, moyenne ou somme
-  int numero_proc_ = -10; // numero du proc contenant la maille la plus a gauche
-  int numero_elem_ = -10; // numero local de la maille la plus a gauche sur numero_proc_
-  mutable DoubleVect volume_controle_; //Tableau de travail
+  Motcle methode_; //Type of reduction: min, max, moyenne ou somme
+  int numero_proc_ = -10; // number of the proc containing the leftmost cell
+  int numero_elem_ = -10; // local number of the leftmost cell on numero_proc_
+  mutable DoubleVect volume_controle_; //Work array
 
 private:
   mutable OWN_PTR(Champ_Fonc_base) espace_stockage_;

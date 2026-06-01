@@ -49,7 +49,7 @@ Entree& Champ_Don_lu::readOn(Entree& is)
   Nom chaine;
   fic >> chaine;
   int star_ccm = 0;
-  // Est ce un fichier .csv de STAR-CCM  avec en tete: "champ1 unite" "champ2 unite" ....  "X" "Y" "Z"
+  // Is this a STAR-CCM .csv file with header: "field1 unit" "field2 unit" ....  "X" "Y" "Z"
   if (chaine.debute_par("\""))
     {
       star_ccm=1;
@@ -57,7 +57,7 @@ Entree& Champ_Don_lu::readOn(Entree& is)
       Cerr << "Find component 1 of the field: " << chaine << finl;
       for (int i=0; i<dim; i++)
         {
-          fic >> chaine; // Unite du champ
+          fic >> chaine; // Field unit
           fic >> chaine;
           if (i<dim-1) Cerr << "Find component " << i+2 << " of the field: " << chaine << finl;
         }
@@ -68,7 +68,7 @@ Entree& Champ_Don_lu::readOn(Entree& is)
         }
       fic >> chaine; // "Y"
       fic >> chaine; // "Z"
-      // Determination du nombre de lignes du fichier STAR-CCM
+      // Determine the number of lines in the STAR-CCM file
       LecFicDiffuse tmp(nom);
       while (!tmp.eof())
         {
@@ -80,7 +80,7 @@ Entree& Champ_Don_lu::readOn(Entree& is)
     }
   else
     {
-      // Sinon nombre de lignes a lire
+      // Otherwise number of lines to read
       nb_val_lues=atoi(chaine);
       Cerr << "The format of this file containing values of a field should be:" << finl;
       Cerr << "N" << finl;
@@ -103,7 +103,7 @@ Entree& Champ_Don_lu::readOn(Entree& is)
         }
     }
   Cerr << finl << "Read number of values (N)=" << nb_val_lues << finl;
-  // Lecture des valeurs dans le fichier fic
+  // Read the values from file fic
   DoubleTab& mes_val = valeurs();
   IntTab compteur(nb_elems);
   compteur = 0;
@@ -121,7 +121,7 @@ Entree& Champ_Don_lu::readOn(Entree& is)
           Cerr<<"\rProcess "<<Process::me()<<" has read "<<pourcent*10<<"% of values"<<flush;
         }
 
-      // Lecture des coordonnees du centre de l'element et des valeurs du champs
+      // Read the element center coordinates and field values
       if (star_ccm)
         {
           for (int k=0; k<dim; k++) fic >> val_lu[k];
@@ -136,7 +136,7 @@ Entree& Champ_Don_lu::readOn(Entree& is)
       y=point[1];
       if (Objet_U::dimension==3) z=point[2];
 
-      // Recherche de l'element
+      // Find the element
       elem2=domaine.chercher_elements(x,y,z);
       if ((elem2!=-1) && (elem2<nb_elems))
         {
@@ -145,7 +145,7 @@ Entree& Champ_Don_lu::readOn(Entree& is)
         }
     }
   Cerr << finl;
-  // Verification que tous les elements ont ete trouves
+  // Check that all elements have been found
   for (int num_elem=0; num_elem<nb_elems; num_elem++)
     if (compteur[num_elem] == 0)
       {

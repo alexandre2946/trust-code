@@ -22,9 +22,9 @@
 
 /*! @brief class Source_Darcy_VEF_Face
  *
- *  Cette classe represente le terme de Darcy pour les ecoulement en milieux poreux.
- *  Ce terme doit normalement etre de type "operateur" : pour l'instant il est code
- *  comme un terme source et donc ne  doit etre utilise qu'avec un schema en temps de type explicite.
+ *  This class represents the Darcy term for flow in porous media.
+ *  This term should normally be of type "operator"; for now it is implemented
+ *  as a source term and should therefore only be used with an explicit time scheme.
  *
  */
 class Source_Darcy_VEF_Face: public Terme_Source_VEF_base

@@ -41,7 +41,7 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::fill_grad_Re(const DoubleTab& tab_inconnue
       const Domaine_Cl_VEF& domaine_Cl_VEF = z_class->domaine_cl_vef();
       const Domaine_VEF& domaine_VEF = z_class->domaine_vef();
 
-      // Construction du tableau grad_ si necessaire
+      // Build the array grad_ if necessary
       if (!grad_.get_md_vector().non_nul())
         {
           grad_.resize(0, Objet_U::dimension, Objet_U::dimension);
@@ -97,7 +97,7 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::fill_grad_Re(const DoubleTab& tab_inconnue
 
 /*
  * ***************************
- *  METHODES POUR L'EXPLICITE
+ *  METHODS FOR THE EXPLICIT SCHEME
  * ***************************
  */
 
@@ -113,7 +113,7 @@ Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_gen(const DoubleTab& tab_inconnue,
   const Domaine_VEF& domaine_VEF = z_class->domaine_vef();
   const int nbr_comp = tab_resu.line_size();
 
-  // boucle sur les CL
+  // loop over boundary conditions
   const Conds_lim& les_cl = domaine_Cl_VEF.les_conditions_limites();
   const int nb_cl = les_cl.size();
   CIntTabView face_voisins = domaine_VEF.face_voisins().view_ro();;
@@ -143,7 +143,7 @@ Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_gen(const DoubleTab& tab_inconnue,
                     ori * face_normale(num_face, j) * (nu(elem, 0) * grad(elem, i, j) + Re(elem, i, j));
             }
         });
-      else // CL pas periodique
+      else // non-periodic BC
         {
           bool Symetrie = sub_type(Symetrie, la_cl.valeur());
           Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__),
@@ -159,7 +159,7 @@ Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_gen(const DoubleTab& tab_inconnue,
                   flux_bords(num_face, i) -= flux;
                 }
 
-            // Correction tab_flux_bords si symetrie
+            // Correction of tab_flux_bords for symmetry
             if (Symetrie)
               flux_bords(num_face, 0) = 0.;
           });
@@ -361,7 +361,7 @@ template <typename DERIVED_T> template<Type_Champ _TYPE_, bool _IS_RANS_>
 std::enable_if_t<_TYPE_ == Type_Champ::SCALAIRE, void>
 Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_gen(const DoubleTab& inconnue, DoubleTab& resu, DoubleTab& tab_flux_bords, const DoubleTab& nu, const DoubleTab& nu_turb) const
 {
-  // On traite les faces bord
+  // Process boundary faces
   const auto *z_class = static_cast<const DERIVED_T*>(this); // CRTP --> I love you :*
 
   const Domaine_Cl_VEF& domaine_Cl_VEF = z_class->domaine_cl_vef();
@@ -372,14 +372,14 @@ Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_gen(const DoubleTab& inconnue, Dou
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       if (sub_type(Periodique, la_cl.valeur()))
-        ajouter_bord_perio_gen__<_TYPE_, Type_Schema::EXPLICITE, false, _IS_RANS_>(n_bord, inconnue, &resu, nullptr, nu, nu_turb, nu_turb /* poubelle */);
-      else // CL pas periodique
+        ajouter_bord_perio_gen__<_TYPE_, Type_Schema::EXPLICITE, false, _IS_RANS_>(n_bord, inconnue, &resu, nullptr, nu, nu_turb, nu_turb /* scratch */);
+      else // non-periodic BC
         {
-          if (sub_type(Scalaire_impose_paroi, la_cl.valeur()) || sub_type(Neumann_paroi, la_cl.valeur()) || sub_type(Neumann_homogene, la_cl.valeur())) // CL Temperature imposee
-            ajouter_bord_scalaire_impose_gen__<_TYPE_, Type_Schema::EXPLICITE, false>(n_bord, inconnue, &resu, nullptr, nu, nu_turb, nu_turb /* poubelle */, &tab_flux_bords);
+          if (sub_type(Scalaire_impose_paroi, la_cl.valeur()) || sub_type(Neumann_paroi, la_cl.valeur()) || sub_type(Neumann_homogene, la_cl.valeur())) // imposed temperature BC
+            ajouter_bord_scalaire_impose_gen__<_TYPE_, Type_Schema::EXPLICITE, false>(n_bord, inconnue, &resu, nullptr, nu, nu_turb, nu_turb /* scratch */, &tab_flux_bords);
 
-          // A pas oublier !
-          ajouter_bord_gen__<_TYPE_, Type_Schema::EXPLICITE, false, _IS_RANS_>(n_bord, inconnue, &resu, nullptr, nu, nu_turb, nu_turb /* poubelle */, &tab_flux_bords);
+          // Do not forget!
+          ajouter_bord_gen__<_TYPE_, Type_Schema::EXPLICITE, false, _IS_RANS_>(n_bord, inconnue, &resu, nullptr, nu, nu_turb, nu_turb /* scratch */, &tab_flux_bords);
         }
     }
   modifie_pour_cl_gen<false>(inconnue, resu, tab_flux_bords);
@@ -388,7 +388,7 @@ Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_gen(const DoubleTab& inconnue, Dou
 template <typename DERIVED_T> template <bool _IS_STAB_>
 void Op_Dift_VEF_Face_Gen<DERIVED_T>::modifie_pour_cl_gen(const DoubleTab& tab_inconnue, DoubleTab& tab_resu, DoubleTab& tab_flux_bords) const
 {
-  // On traite les faces bord
+  // Process boundary faces
   const auto *z_class = static_cast<const DERIVED_T*>(this); // CRTP --> I love you :*
   constexpr bool is_STAB = _IS_STAB_;
 
@@ -478,14 +478,14 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::modifie_pour_cl_gen(const DoubleTab& tab_i
 
 /*
  * ***************************
- *  METHODES POUR L'IMPLICITE
+ *  METHODS FOR THE IMPLICIT SCHEME
  * ***************************
  */
 template <typename DERIVED_T> template <Type_Champ _TYPE_, bool _IS_STAB_, bool _IS_RANS_>
 void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_contribution_bord_gen(const DoubleTab& transporte, Matrice_Morse& tab_matrice, const DoubleTab& nu,
                                                                     const DoubleTab& nu_turb, const DoubleVect& porosite_eventuelle) const
 {
-  // On traite les faces bord
+  // Process boundary faces
   const auto *z_class = static_cast<const DERIVED_T*>(this); // CRTP --> I love you :*
 
   const Domaine_Cl_VEF& domaine_Cl_VEF = z_class->domaine_cl_vef();
@@ -499,11 +499,11 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_contribution_bord_gen(const Double
 
       if (sub_type(Periodique, la_cl.valeur()))
         ajouter_bord_perio_gen__<_TYPE_, Type_Schema::IMPLICITE, _IS_STAB_, _IS_RANS_>(n_bord, transporte, nullptr, &tab_matrice, nu, nu_turb, porosite_eventuelle);
-      else // pas perio
+      else // non-periodic
         {
-          if (sub_type(Scalaire_impose_paroi, la_cl.valeur())) // CL Temperature imposee
+          if (sub_type(Scalaire_impose_paroi, la_cl.valeur())) // imposed temperature BC
             ajouter_bord_scalaire_impose_gen__<_TYPE_, Type_Schema::IMPLICITE, _IS_STAB_>(n_bord, transporte, nullptr, &tab_matrice, nu, nu_turb, porosite_eventuelle);
-          else if (sub_type(Echange_externe_impose, la_cl.valeur()) && nb_comp < 2) // XXX : plus tard pour multi inco aussi ...
+          else if (sub_type(Echange_externe_impose, la_cl.valeur()) && nb_comp < 2) // XXX: later for multi-unknown too ...
             {
               const Echange_externe_impose& la_cl_paroi = ref_cast(Echange_externe_impose, la_cl.valeur());
               const int ndeb = le_bord.num_premiere_face(), nfin = ndeb + le_bord.nb_faces();
@@ -518,7 +518,7 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_contribution_bord_gen(const Double
               end_gpu_timer(__KERNEL_NAME__);
             }
 
-          // A pas oublier !
+          // Do not forget!
           ajouter_bord_gen__<_TYPE_, Type_Schema::IMPLICITE, _IS_STAB_, _IS_RANS_>(n_bord, transporte, nullptr, &tab_matrice, nu, nu_turb, porosite_eventuelle);
         }
     }
@@ -526,7 +526,7 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_contribution_bord_gen(const Double
 
 // METHODES GENERIQUES
 template <typename DERIVED_T> template <Type_Champ _TYPE_, Type_Schema _SCHEMA_, bool _IS_STAB_, bool _IS_RANS_>
-void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_perio_gen__(const int n_bord, const DoubleTab& tab_inconnue, DoubleTab* tab_resu /* Si explicite */, Matrice_Morse* matrice_morse /* Si implicite */,
+void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_perio_gen__(const int n_bord, const DoubleTab& tab_inconnue, DoubleTab* tab_resu /* if explicit */, Matrice_Morse* matrice_morse /* if implicit */,
                                                                const DoubleTab& tab_nu, const DoubleTab& tab_nu_turb, const DoubleVect& tab_porosite_eventuelle, DoubleTab* tab_flux_bord) const
 {
   constexpr bool is_VECT = (_TYPE_ == Type_Champ::VECTORIEL), is_EXPLICIT = (_SCHEMA_ == Type_Schema::EXPLICITE), is_STAB = _IS_STAB_, is_RANS = _IS_RANS_;
@@ -541,8 +541,8 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_perio_gen__(const int n_bord,
   const int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem(), nb_faces = domaine_VEF.nb_faces(), nb_comp = tab_inconnue.line_size();
   int num1 = 0, num2 = le_bord.nb_faces_tot(), nb_faces_bord_reel = le_bord.nb_faces();
 
-  // on ne parcourt que la moitie des faces volontairement ... GF il ne faut pas s'occuper des faces virtuelles
-  num2 = is_EXPLICIT ? num2 : nb_faces_bord_reel / 2; // XXX : attention si ecarts car version multicompo, num2 /= 2 .... et aussi je garde l'explicite comme num2
+  // deliberately iterate over only half the faces ... GF: do not process virtual faces
+  num2 = is_EXPLICIT ? num2 : nb_faces_bord_reel / 2; // XXX: beware of discrepancies with multi-component version (num2 /= 2) ... also keeping explicit as num2
 
   CIntArrView le_bord_num_face = le_bord.num_face().view_ro();
   CIntArrView face_associee = la_cl_perio.face_associee().view_ro();
@@ -592,11 +592,11 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_perio_gen__(const int n_bord,
                       const double valA = z_class->viscA(num_face0, j, elem, d_nu, face_voisins, face_normale, inverse_volumes);
                       const double flux = valA * inconnue(j, nc) - valA * inconnue(num_face0, nc);
                       Kokkos::atomic_add(&resu(num_face0, nc), +flux);
-                      if (j < nb_faces) // face reelle
+                      if (j < nb_faces) // real face
                         Kokkos::atomic_add(&resu(j, nc), -0.5 * flux);
                     }
               }
-            else   // pour l'implicite
+            else   // implicit scheme
               {
                 if (j > num_face0)
                   {
@@ -612,7 +612,7 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_perio_gen__(const int n_bord,
                     if (fac_loc == nb_faces_elem)
                       ok = 0;
 
-                    if (j >= nb_faces) // C'est une face virtuelle
+                    if (j >= nb_faces) // virtual face
                       {
                         int el1 = face_voisins(j, 0), el2 = face_voisins(j, 1);
                         if ((el1 == -1) || (el2 == -1))
@@ -633,7 +633,7 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_perio_gen__(const int n_bord,
                           matrice.atomic_add(n0, n0, + valA * porosite_eventuelle(num_face0));
                           matrice.atomic_add(n0, j0, - valA * porosite_eventuelle(j));
 
-                          if (j < nb_faces) // On traite les faces reelles
+                          if (j < nb_faces) // Process real faces only
                             {
                               if (ok == 1)
                                 matrice.atomic_add(j0, n0, - valA * porosite_eventuelle(num_face0));
@@ -653,7 +653,7 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_perio_gen__(const int n_bord,
                                 matrice.atomic_add(n0, n1, + coeff_s * porosite_eventuelle(num_face0));
                                 matrice.atomic_add(n0, j1, - coeff_s * porosite_eventuelle(j));
 
-                                if (j < nb_faces) // On traite les faces reelles
+                                if (j < nb_faces) // Process real faces only
                                   {
                                     double coeff_s2 = orientation * nu_turb(elem,0) / volumes(elem) *
                                                       face_normale(num_face0, nc) * face_normale(j, nc2);
@@ -676,7 +676,7 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_perio_gen__(const int n_bord,
 }
 
 template <typename DERIVED_T> template <Type_Champ _TYPE_, Type_Schema _SCHEMA_, bool _IS_STAB_>
-void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_scalaire_impose_gen__(const int n_bord, const DoubleTab& tab_inconnue, DoubleTab* tab_resu /* Si explicite */, Matrice_Morse* matrice_morse /* Si implicite */,
+void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_scalaire_impose_gen__(const int n_bord, const DoubleTab& tab_inconnue, DoubleTab* tab_resu /* if explicit */, Matrice_Morse* matrice_morse /* if implicit */,
                                                                          const DoubleTab& tab_nu, const DoubleTab& tab_nu_turb, const DoubleVect& tab_porosite_eventuelle, DoubleTab* tab_flux_bords) const
 {
   constexpr bool is_EXPLICIT = (_SCHEMA_ == Type_Schema::EXPLICITE);
@@ -691,8 +691,8 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_scalaire_impose_gen__(const i
       const Turbulence_paroi_scal_base& loiparth = mod_turb_scal.loi_paroi();
       if (loiparth.use_equivalent_distance())
         {
-          // Les lois de parois ne s'appliquent qu'aux cas ou la CL est de type temperature imposee, car dans les autres cas
-          // (flux impose et adiabatique) le flux a la paroi est connu et fixe.
+          // Wall laws only apply in cases where the BC is of imposed temperature type, since in the other cases
+          // (imposed flux and adiabatic) the wall flux is known and fixed.
           const Cond_lim_base& cl_base = domaine_Cl_VEF.les_conditions_limites(n_bord).valeur();
           int ldp_appli = 0;
           if (sub_type(Scalaire_impose_paroi, cl_base))
@@ -708,9 +708,9 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_scalaire_impose_gen__(const i
               const int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem(), nb_comp = tab_inconnue.line_size(), size_flux_bords = domaine_VEF.nb_faces_bord();
               int num1 = 0, num2 = le_bord.nb_faces_tot();
               int dim = Objet_U::dimension;
-              // d_equiv contient la distance equivalente pour le bord
-              // Dans d_equiv, pour les faces qui ne sont pas paroi_fixe (eg periodique, symetrie, etc...)
-              // il y a la distance geometrique grace a l'initialisation du tableau dans la loi de paroi.
+              // d_equiv contains the equivalent distance for the boundary
+              // In d_equiv, for faces that are not paroi_fixe (eg periodic, symmetry, etc...)
+              // the geometric distance is used thanks to the initialization of the array in the wall law.
               CDoubleArrView d_equiv = loiparth.equivalent_distance(n_bord).view_ro();
               CIntArrView le_bord_num_face = le_bord.num_face().view_ro();
               CIntTabView face_voisins = domaine_VEF.face_voisins().view_ro();
@@ -744,9 +744,9 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_scalaire_impose_gen__(const i
                 for (int nc = 0; nc < nb_comp; nc++)
                   {
                     int num_face = le_bord_num_face(ind_face);
-                    // Tf est la temperature fluide moyenne dans le premier element sans tenir compte de la temperature de paroi.
+                    // Tf is the mean fluid temperature in the first element without considering the wall temperature.
                     double Tf = 0.;
-                    double bon_gradient = 0.; // c'est la norme du gradient de temperature normal a la paroi
+                    double bon_gradient = 0.; // this is the norm of the temperature gradient normal to the wall
 
                     for (int kk = 0; kk < dim; kk++)
                       le_mauvais_gradient[kk] = 0.;
@@ -754,9 +754,9 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_scalaire_impose_gen__(const i
                     int elem1 = face_voisins(num_face, 0);
                     if (elem1 == -1) elem1 = face_voisins(num_face, 1);
 
-                    // inconnue(num_face) est la temperature de paroi : Tw.
-                    // On se fiche du signe de bon gradient car c'est la norme du gradient de temperature dans l'element.
-                    // Ensuite ce sera multiplie par le vecteur normal a la face de paroi qui lui a les bons signes.
+                    // inconnue(num_face) is the wall temperature: Tw.
+                    // The sign of bon_gradient does not matter since it is the norm of the temperature gradient in the element.
+                    // It will then be multiplied by the normal vector to the wall face which has the correct signs.
 
                     if (!is_EXPLICIT)
                       bon_gradient = 1. / d_equiv(ind_face) * (-oriente_normale(num_face, elem1, face_voisins));
@@ -793,9 +793,9 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_scalaire_impose_gen__(const i
                         for (int kk = 0; kk < dim; kk++)
                           mauvais_gradient += le_mauvais_gradient[kk] * face_normale(num_face, kk) / surface_face;
 
-                        // inconnue(num_face) est la temperature de paroi : Tw.
-                        // On se fiche du signe de bon gradient car c'est la norme du gradient de temperature dans l'element.
-                        // Ensuite ce sera multiplie par le vecteur normal a la face de paroi qui lui a les bons signes.
+                        // inconnue(num_face) is the wall temperature: Tw.
+                        // The sign of bon_gradient does not matter since it is the norm of the temperature gradient in the element.
+                        // It will then be multiplied by the normal vector to the wall face which has the correct signs.
                         double signe_num_face = oriente_normale(num_face, elem1, face_voisins);
                         bon_gradient = (Tf - inconnue(num_face, nc)) / d_equiv(ind_face) * (-signe_num_face);
 
@@ -855,7 +855,7 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_scalaire_impose_gen__(const i
                                     resu1 += mauvais_gradient * coeff;
                                     resu2 += bon_gradient * coeff;
                                   }
-                                // bon gradient_reel = bongradient*(Tf-T_face) d'ou les derivees... & mauvais gradient_reel=mauvai_gradient_j*Tj
+                                // bon_gradient_reel = bon_gradient*(Tf-T_face) hence the derivatives... & mauvais_gradient_reel=mauvais_gradient_j*Tj
                                 if (jj == num_face)
                                   resu2 *= -1;
                                 else
@@ -875,7 +875,7 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_scalaire_impose_gen__(const i
 }
 
 template <typename DERIVED_T> template <Type_Champ _TYPE_, Type_Schema _SCHEMA_, bool _IS_STAB_, bool _IS_RANS_>
-void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_gen__(const int n_bord, const DoubleTab& tab_inconnue, DoubleTab* tab_resu /* Si explicite */, Matrice_Morse* matrice_morse /* Si implicite */,
+void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_gen__(const int n_bord, const DoubleTab& tab_inconnue, DoubleTab* tab_resu /* if explicit */, Matrice_Morse* matrice_morse /* if implicit */,
                                                          const DoubleTab& tab_nu, const DoubleTab& tab_nu_turb, const DoubleVect& tab_porosite_eventuelle, DoubleTab* tab_flux_bords) const
 {
   constexpr bool is_VECT = (_TYPE_ == Type_Champ::VECTORIEL), is_EXPLICIT = (_SCHEMA_ == Type_Schema::EXPLICITE), is_STAB = _IS_STAB_, is_RANS = _IS_RANS_;
@@ -943,7 +943,7 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_gen__(const int n_bord, const
                         Kokkos::atomic_add(&resu(num_face, nc), +flux);
                         Kokkos::atomic_add(&flux_bords(num_face, nc), -flux);
                       }
-                    if (j < nb_faces) // face reelle
+                    if (j < nb_faces) // real face
                       {
                         double flux = valA * (inconnue(num_face, nc) - inconnue(j, nc));
                         Kokkos::atomic_add(&resu(j, nc), +flux);
@@ -960,7 +960,7 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_gen__(const int n_bord, const
                         matrice.atomic_add(n0, j0, - valA * porosite_eventuelle(j));
                       }
 
-                    if (j < nb_faces) // face reelle
+                    if (j < nb_faces) // real face
                       {
                         matrice.atomic_add(j0, n0, - valA * porosite_eventuelle(num_face));
                         matrice.atomic_add(j0, j0, + valA * porosite_eventuelle(j));
@@ -978,7 +978,7 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_gen__(const int n_bord, const
                               matrice.atomic_add(n0, j1, - coeff_s * porosite_eventuelle(j));
                             }
 
-                          if (j < nb_faces) // face reelle
+                          if (j < nb_faces) // real face
                             {
                               double coeff_s = orientation * nu_turb(elem,0) / volumes(elem) * face_normale(num_face, nc) * face_normale(j, nc2);
                               matrice.atomic_add(j0, n1, - coeff_s * porosite_eventuelle(num_face));
@@ -994,7 +994,7 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_bord_gen__(const int n_bord, const
 }
 
 template <typename DERIVED_T> template <Type_Champ _TYPE_, Type_Schema _SCHEMA_, bool _IS_STAB_, bool _IS_RANS_>
-void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_interne_gen__(const DoubleTab& tab_inconnue, DoubleTab* tab_resu /* Si explicite */, Matrice_Morse* matrice_morse /* Si implicite */,
+void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_interne_gen__(const DoubleTab& tab_inconnue, DoubleTab* tab_resu /* if explicit */, Matrice_Morse* matrice_morse /* if implicit */,
                                                             const DoubleTab& tab_nu, const DoubleTab& tab_nu_turb, const DoubleVect& tab_porosite_eventuelle) const
 {
   constexpr bool is_VECT = (_TYPE_ == Type_Champ::VECTORIEL), is_EXPLICIT = (_SCHEMA_ == Type_Schema::EXPLICITE), is_STAB = _IS_STAB_, is_RANS = _IS_RANS_;
@@ -1034,7 +1034,7 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_interne_gen__(const DoubleTab& tab
         if (j > num_face)
           {
             int contrib = 1;
-            if (j >= nb_faces) // C'est une face virtuelle
+            if (j >= nb_faces) // virtual face
               {
                 const int el1 = face_voisins(j, 0), el2 = face_voisins(j, 1);
                 if ((el1 == -1) || (el2 == -1))
@@ -1064,7 +1064,7 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_interne_gen__(const DoubleTab& tab
                       {
                         const double flux = valA * inconnue(j, nc) - valA * inconnue(num_face, nc);
                         Kokkos::atomic_add(&resu(num_face, nc), flux);
-                        if (j < nb_faces) // On traite les faces reelles
+                        if (j < nb_faces) // Process real faces only
                           Kokkos::atomic_sub(&resu(j, nc), flux);
                       }
                     else     // METHODE IMPLICITE
@@ -1074,7 +1074,7 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_interne_gen__(const DoubleTab& tab
                         const int n0 = num_face * nb_comp + nc, j0 = j * nb_comp + nc;
                         matrice.atomic_add(n0, n0, contrib_num_face);
                         matrice.atomic_add(n0, j0, -contrib_j);
-                        if (j < nb_faces) // On traite les faces reelles
+                        if (j < nb_faces) // Process real faces only
                           {
                             matrice.atomic_add(j0, n0, -contrib_num_face);
                             matrice.atomic_add(j0, j0, contrib_j);
@@ -1095,7 +1095,7 @@ void Op_Dift_VEF_Face_Gen<DERIVED_T>::ajouter_interne_gen__(const DoubleTab& tab
 
                                 matrice.atomic_add(n0, n1, coeff_s * poro_num_face);
                                 matrice.atomic_add(n0, j1, -coeff_s * poro_j);
-                                if (j < nb_faces) // On traite les faces reelles
+                                if (j < nb_faces) // Process real faces only
                                   {
                                     double coeff_s2 = is_STAB ? 0. : tmp * face_normale_num_face * face_normale(j, nc2);
                                     matrice.atomic_add(j0, n1, -coeff_s2 * poro_num_face);

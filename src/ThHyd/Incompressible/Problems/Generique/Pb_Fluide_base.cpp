@@ -50,7 +50,7 @@ Entree& Pb_Fluide_base::lire_radiation_models(Entree& is, Motcle& mot)
       Process::exit();
     }
 
-  // si bon on type et on lit !
+  // if ok, type and read!
   mod_rayo_transp_.typer(mot.getChar());
   is >> mod_rayo_transp_.valeur();
   mod_rayo_transp_->associer_pb_fluide_rayo(*this);

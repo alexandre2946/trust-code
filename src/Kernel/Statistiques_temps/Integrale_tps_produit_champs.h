@@ -18,12 +18,12 @@
 
 #include <Integrale_tps_Champ.h>
 
-/*! @brief classe Integrale_tps_produit_champs Cette classe represente l'integrale en temps d'un produit de 2 champs
+/*! @brief class Integrale_tps_produit_champs
  *
- *     eleves a une puissance entiere et positive entre un temps initial et un
- *     temps courant
- *     Un objet Integrale_tps_produit_champs a donc 2 champs associes dont
- *     il represente l'integrale du produit.
+ * @brief Represents the time integral of a product of 2 fields raised to a positive integer power,
+ *     between an initial time and the current time.
+ *     An Integrale_tps_produit_champs object therefore has 2 associated fields whose
+ *     product integral it represents.
  *
  */
 class Integrale_tps_produit_champs: public Integrale_tps_Champ

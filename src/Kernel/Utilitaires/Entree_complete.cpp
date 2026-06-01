@@ -88,7 +88,7 @@ int Entree_complete::good()
   return is.good();
 }
 
-/*! @brief Il est interdit de changer de type d'entree.
+/*! @brief Changing the type of input is forbidden.
  *
  * exit()
  *
@@ -102,9 +102,9 @@ void Entree_complete::set_bin(bool bin)
     }
 }
 
-/*! @brief affecte le drapeau aux deux entrees sources Attention, le drapeau de entree2 est modifie !
+/*! @brief Sets the flag on both source inputs. Warning, the flag of entree2 is modified!
  *
- *   Voir Entree::set_check_types()
+ *   See Entree::set_check_types()
  *
  */
 void Entree_complete::set_check_types(bool flag)
@@ -114,9 +114,9 @@ void Entree_complete::set_check_types(bool flag)
   entree2_->set_check_types(flag);
 }
 
-/*! @brief affecte la valeur aux deux entrees sources Attention, la valeur de entree2 est modifiee !
+/*! @brief Sets the value on both source inputs. Warning, the value of entree2 is modified!
  *
- *   Voir Entree::set_error_action()
+ *   See Entree::set_error_action()
  *
  */
 void Entree_complete::set_error_action(Error_Action action)

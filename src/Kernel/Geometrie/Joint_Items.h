@@ -18,11 +18,11 @@
 
 #include <TRUSTTab.h>
 
-/*! @brief Joint_Items contient les informations de distribution parallele d'un item geometrique particulier avec un domaine
- *  voisin particulier (item = sommet, element, face, etc..)
+/*! @brief Joint_Items holds the parallel distribution information for a particular geometric item type
+ *  with a particular neighboring domain (item = vertex, element, face, etc.)
  *
- * Ces structures sont initialisees dans Scatter. Elles sont ensuite utilisees par exemple pour creer un
- * tableau distribue indexe par les indices des items geometriques.
+ * These structures are initialised in Scatter and are then used, for example, to create a
+ * distributed array indexed by geometric item indices.
  *
  * @sa class Joint
  */
@@ -38,15 +38,15 @@ public:
   Joint_Items_32_64();
   void reset();
 
-  // Pour utiliser ces accesseurs, il faut avoir initialise
-  // les structures au prealable avec set_xxx.
+  // To use these accessors, the structures must have been previously
+  // initialised with set_xxx.
   int nb_items_reels() const;
   const ArrOfInt_t& items_communs() const {  return items_communs_; }
   const ArrOfInt_t& items_distants() const;
   int nb_items_virtuels() const;
   const IntTab_t& renum_items_communs() const;
 
-  // Methodes d'initialisation des structures
+  // Initialisation methods for the structures
   void set_nb_items_reels(int n);
   ArrOfInt_t& set_items_communs();
   ArrOfInt_t& set_items_distants();
@@ -54,35 +54,35 @@ public:
   IntTab_t& set_renum_items_communs();
 
 private:
-  // Nombre d'items reels (permet de construire un tableau distribue)
-  // uniquement avec les infos du joint.
+  // Number of real items (allows building a distributed array)
+  // using only the joint information.
   int nb_items_reels_;
 
-  // Liste des items communs avec le domaine voisin (la liste est
-  // classee dans le meme ordre sur le domaine local et sur le domaine
-  // voisin => items_communs[i] sur joint_j de domaine_k represente la meme
-  // entite geometrique que items_communs[i] sur joint_k de domaine_j)
+  // List of items shared with the neighboring domain (the list is
+  // ordered in the same way on the local domain and on the neighboring
+  // domain => items_communs[i] on joint_j of domain_k represents the same
+  // geometric entity as items_communs[i] on joint_k of domain_j)
   ArrOfInt_t items_communs_;
 
-  // Liste des items distants a envoyer au domaine voisin
-  // (l'ordre des items dans cette liste determine l'ordre d'apparition
-  // de ces items dans l'espace virtuel du voisin)
+  // List of remote items to send to the neighboring domain
+  // (the order of items in this list determines the order of appearance
+  // of these items in the virtual space of the neighbor)
   ArrOfInt_t items_distants_;
 
-  // Nombre d'items virtuels recus du domaine voisin.
-  //  on a "nb_items_virtuels_ sur joint_j de domaine_k"
-  //     = "items_distants.size_array() sur joint_k de domaine_j"
+  // Number of virtual items received from the neighboring domain.
+  //  we have "nb_items_virtuels_ on joint_j of domain_k"
+  //     = "items_distants.size_array() on joint_k of domain_j"
   int nb_items_virtuels_;
 
-  // Correspondance entre l'indice local d'un item commun et l'indice
-  // du meme item sur le domaine voisin:
-  // colonne 0 = indice sur le domaine voisin,
-  // colonne 1 = indice sur le domaine local
-  // dimension(0) est egal a items_communs.size_array()
-  // L'ordre des items dans le tableau n'est pas specifie
+  // Correspondence between the local index of a shared item and the index
+  // of the same item on the neighboring domain:
+  // column 0 = index on the neighboring domain,
+  // column 1 = index on the local domain
+  // dimension(0) is equal to items_communs.size_array()
+  // The order of items in the array is not specified
   IntTab_t renum_items_communs_;
 
-  // Qu'est ce qui a ete initialise ?
+  // What has been initialised?
   int flags_init_;
 };
 

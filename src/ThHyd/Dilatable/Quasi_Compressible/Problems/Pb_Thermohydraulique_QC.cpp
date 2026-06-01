@@ -30,12 +30,12 @@ Sortie& Pb_Thermohydraulique_QC::printOn(Sortie& os) const { return Probleme_bas
 
 Entree& Pb_Thermohydraulique_QC::readOn(Entree& is) { return Probleme_base::readOn(is); }
 
-/*! @brief Renvoie 2 car il y a 2 equations : Navier_Stokes_QC et Convection_Diffusion_Chaleur_QC
+/*! @brief Returns 2 because there are 2 equations: Navier_Stokes_QC and Convection_Diffusion_Chaleur_QC.
  *
  */
 int Pb_Thermohydraulique_QC::nombre_d_equations() const { return 2; }
 
-/*! @brief Renvoie l'equation d'hydraulique de type Navier_Stokes_QC si i=0 Renvoie l'equation de la thermique de type Convection_Diffusion_Chaleur_QC si i=1
+/*! @brief Returns the hydraulic equation of type Navier_Stokes_QC if i=0. Returns the thermal equation of type Convection_Diffusion_Chaleur_QC if i=1.
  *
  */
 const Equation_base& Pb_Thermohydraulique_QC::equation(int i) const
@@ -48,7 +48,7 @@ Equation_base& Pb_Thermohydraulique_QC::equation(int i)
   return equation_impl(i,eq_hydraulique,eq_thermique);
 }
 
-/*! @brief Teste la compatibilite des equations de la thermique et de l'hydraulique.
+/*! @brief Tests the compatibility of the thermal and hydraulic equations.
  *
  */
 int Pb_Thermohydraulique_QC::verifier()

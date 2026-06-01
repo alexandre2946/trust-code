@@ -33,13 +33,13 @@ template<> int NettoieNoeuds_32_64<int>::NettoiePasNoeuds=0;
 template<> int NettoieNoeuds_32_64<trustIdType>::NettoiePasNoeuds=0;
 #endif
 
-/*! @brief Fonction principale de l'interprete NettoieNoeuds_32_64 Structure du jeu de donnee (en dimension 2) :
+/*! @brief Main function of the NettoieNoeuds_32_64 interpreter. Data set structure (in dimension 2):
  *
  *     NettoieNoeuds_32_64 dom alpha
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree
- * @throws l'objet a mailler n'est pas du type Domaine
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the input stream
+ * @throws the object to mesh is not of type Domaine
  */
 template <typename _SIZE_>
 Entree& NettoieNoeuds_32_64<_SIZE_>::interpreter_(Entree& is)
@@ -65,7 +65,7 @@ void NettoieNoeuds_32_64<_SIZE_>::nettoie(Domaine_t& dom)
   if (NettoiePasNoeuds==1)
     return;
 
-  // Autorise la modification de structure des tableaux sommets et elements:
+  // Allow modification of the structure of the vertex and element arrays:
   Scatter::uninit_sequential_domain(dom);
 
   DoubleTab_t& coord_sommets=dom.les_sommets();
@@ -85,14 +85,14 @@ void NettoieNoeuds_32_64<_SIZE_>::nettoie(Domaine_t& dom)
     for (int_t i=0; i<nb_elem ; i++)
       for (int j=0; j< nb_som_elem; j++)
         {
-          // GF dans le cas ou on a des polyedres
+          // GF in the case of polyhedra
           if (les_elems(i,j)==-1) break;
           int_t& tmp=renum_som_old2new[les_elems(i,j)];
           assert (tmp < compteur);
           if(tmp==-1)
             tmp=compteur++;
         }
-    // ajout GF sinon un sommet double sur un bord devient -1
+    // GF addition: otherwise a duplicate node on a boundary becomes -1
     int nb_bords=dom.nb_front_Cl();
     for (int ii=0; ii<nb_bords; ii++)
       {
@@ -104,7 +104,7 @@ void NettoieNoeuds_32_64<_SIZE_>::nettoie(Domaine_t& dom)
         for(int_t i=0; i<nb_faces; i++)
           for(int j=0; j<nb_som_face; j++)
             {
-              // dans le cas ou l'on a des polygones
+              // in the case of polygons
               if (faces_sommets(i,j)==-1) break;
               int_t& tmp=renum_som_old2new[faces_sommets(i,j)];
               assert (tmp < compteur);
@@ -147,7 +147,7 @@ void NettoieNoeuds_32_64<_SIZE_>::nettoie(Domaine_t& dom)
             }
       }
 
-      // On recupere les bords :
+      // Retrieve the boundaries:
       for (auto &itr : dom.faces_bord())
         {
           Frontiere_t& front = itr;
@@ -181,20 +181,20 @@ void NettoieNoeuds_32_64<_SIZE_>::nettoie(Domaine_t& dom)
             faces_sommets(i, j) = renum_som_old2new[old_faces_sommets(i, j)];
       };
 
-      // Les Bords Internes :
+      // Internal boundaries:
       for (auto &itr : dom.bords_int())
         renum_lamb(itr);
-      // Les Raccords
+      // Connectors
       for (auto &itr : dom.faces_raccord())
         renum_lamb(itr);
-      // Les Groupes de Faces_t :
+      // Face groups:
       for (auto &itr : dom.groupes_faces())
         renum_lamb(itr);
     }
   Scatter::init_sequential_domain(dom);
 }
 
-/*! @brief regarde si on n'a pas des noeuds doubles
+/*! @brief checks whether there are duplicate nodes
  *
  */
 template <typename _SIZE_>
@@ -206,9 +206,9 @@ void NettoieNoeuds_32_64<_SIZE_>::verifie_noeuds(const Domaine_t& dom)
   //  int nbsomelem=coord_sommets.dimension(1);
   //  const IntTab_t& les_elems= dom.les_elems();
   int err=0;
-  // la version avec chercher element plus rapide a priori
-  // n log(n) a des chances de rater des sommets doubles
-  // on revien ta un algo en n*n/2
+  // the version with element search is faster in principle
+  // n log(n) risks missing duplicate nodes
+  // we fall back to an n*n/2 algorithm
   /*  for (int sommet=0;sommet<ns;sommet++)
       {
 

@@ -30,12 +30,12 @@ Sortie& Lec_Diffuse_base::printOn(Sortie& s) const
   throw;
 }
 
-/*! @brief ne fait rien (constructeur protege car c'est une classe de base)
+/*! @brief Does nothing (protected constructor since this is a base class).
  *
  */
 Lec_Diffuse_base::Lec_Diffuse_base() { }
 
-/*! @brief erreur
+/*! @brief Error.
  *
  */
 Lec_Diffuse_base& Lec_Diffuse_base::operator=(const Lec_Diffuse_base& )
@@ -121,7 +121,7 @@ int Lec_Diffuse_base::fail()
   return flag;
 }
 
-/*! @brief appelle get_entree_master().
+/*! @brief Calls get_entree_master().
  *
  * set_bin(bin)
  *
@@ -137,7 +137,7 @@ void Lec_Diffuse_base::set_bin(bool bin)
   Entree::set_bin(bin);
 }
 
-/*! @brief appelle get_entree_master().
+/*! @brief Calls get_entree_master().
  *
  * set_check_types(flag)
  *

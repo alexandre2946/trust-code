@@ -25,11 +25,11 @@
 //class Domaine_Cl_dis_base;
 //class Front_dis_base;
 
-/*! @brief classe Champ_front_contact_fictif_VEF Classe derivee de Champ_front_contact_VEF elle-meme derivant de
+/*! @brief class Champ_front_contact_fictif_VEF Derived class from Champ_front_contact_VEF, which itself derives from
  *
- *         Champ_front_var qui represente les
- *      champs a la frontiere obtenus en prenant la trace
- *      d'un objet de type OWN_PTR(Champ_Inc_base) (champ inconnue d'une equation)
+ *         Champ_front_var and represents the
+ *      boundary fields obtained by taking the trace
+ *      of an object of type OWN_PTR(Champ_Inc_base) (unknown field of an equation)
  *
  * @sa Champ_front_var_instationnaire Champ_Inc
  */
@@ -45,8 +45,8 @@ public:
 
 protected :
 
-  double conduct_fictif = -100.; // conductivite du solide fictif
-  double ep_fictif= -100.; // epaisseur du solide fictif
+  double conduct_fictif = -100.; // thermal conductivity of the fictitious solid
+  double ep_fictif= -100.; // thickness of the fictitious solid
 
 };
 

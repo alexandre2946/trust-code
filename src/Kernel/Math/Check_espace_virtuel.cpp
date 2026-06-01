@@ -16,22 +16,22 @@
 #include <Check_espace_virtuel.h>
 #include <MD_Vector_base.h>
 
-/*! @brief Verifie si le vecteur v a son espace virtuel a jour.
+/*! @brief Checks if the virtual space of vector v is up to date.
  *
- * Cette fonction doit etre appelee simultanement par tous les processeurs qui partagent le vecteur. (pour cela, on cree une copie qu'on echange, puis on compare a l'original).
+ * This function must be called simultaneously by all processors sharing the vector. (to do so, a copy is made, exchanged, then compared to the original).
  *
  */
 int check_espace_virtuel_vect(const DoubleVect& v)
 {
-  if (Process::is_sequential()) return 1; // ToDo Provisoire on ne verifie pas en sequentiel
-  // On fait une copie:
+  if (Process::is_sequential()) return 1; // ToDo Provisional: not checked in sequential
+  // Make a copy:
   DoubleVect w(v);
-  // On echange
+  // Exchange virtual space
   w.echange_espace_virtuel();
-  // Norme de w :
+  // Norm of w:
   const double norme_w = norme_array(w);
-  // On compare : difference entre les deux vecteurs au sens
-  // ArrOfDouble (pas d'echange espace virtuel)
+  // Compare: difference between the two vectors in the sense of
+  // ArrOfDouble (no virtual space exchange)
   w.ArrOfDouble::operator-=(v);
   const double ecart = norme_array(w);
   if (ecart > (norme_w + 1e-30) * 1e-12)
@@ -40,16 +40,16 @@ int check_espace_virtuel_vect(const DoubleVect& v)
     return 1;
 }
 
-/*! @brief Idem que  check_espace_virtuel_vect(const DoubleVect & v)
+/*! @brief Same as check_espace_virtuel_vect(const DoubleVect & v)
  *
  */
 int check_espace_virtuel_vect(const IntVect& v)
 {
-  // On fait une copie:
+  // Make a copy:
   IntVect w(v);
-  // On echange
+  // Exchange virtual space
   w.echange_espace_virtuel();
-  // On compare:
+  // Compare:
   const int n = v.size_array();
   for (int i = 0; i < n; i++)
     if (v[i] != w[i])
@@ -57,10 +57,10 @@ int check_espace_virtuel_vect(const IntVect& v)
   return 1;
 }
 
-/*! @brief Appelle remplir_items_non_calcules() si on est en mode comm_check_enabled() ou en mode debug (NDEBUG non defini)
+/*! @brief Calls remplir_items_non_calcules() if in comm_check_enabled() mode or in debug mode (NDEBUG not defined).
  *
- *   La "valeur" par defaut est censee provoquer une erreur si on
- *   essaye de l'utiliser.
+ *   The default "value" is meant to trigger an error if one
+ *   tries to use it.
  *
  */
 void assert_invalide_items_non_calcules(DoubleVect& v, double valeur)
@@ -99,7 +99,7 @@ void remplir_items_non_calcules_kernel_(TRUSTVect<_TYPE_>& v, _TYPE_ valeur, con
 
       end_gpu_timer(__KERNEL_NAME__, is_default_exec_space<ExecSpace>);
 
-      // Sauter a la fin du bloc
+      // Skip to end of the block
       if (i<sz) j = blocs[i*2+1] * line_size;
     }
 }

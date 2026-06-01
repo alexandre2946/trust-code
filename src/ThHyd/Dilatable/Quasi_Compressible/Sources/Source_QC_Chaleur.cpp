@@ -45,7 +45,7 @@ DoubleTab& Source_QC_Chaleur::ajouter(DoubleTab& resu) const
 }
 
 
-/*! @brief Ajoute les termes sources
+/*! @brief Adds the source terms.
  *
  * @return (Entree&)
  */
@@ -53,7 +53,7 @@ DoubleTab& Source_QC_Chaleur::ajouter_(DoubleTab& resu) const
 {
   double dt_= mon_equation->schema_temps().temps_courant() - mon_equation->schema_temps().temps_precedent();
 
-  if (dt_<=0) return resu; // On calcul pas ce terme source si dt<=0
+  if (dt_<=0) return resu; // Do not compute this source term if dt<=0
 
   /*
    * The source term corresponds to :
@@ -68,7 +68,7 @@ DoubleTab& Source_QC_Chaleur::ajouter_(DoubleTab& resu) const
   int nsom = resu.dimension(0);
   CDoubleArrView volumes_v = volumes.view_ro();
   CDoubleArrView porosites_v = porosites.view_ro();
-  // ToDo_Kokkos :  DoubleArrView resu_v = resu.view_rw(); avec resu DoubleTab
+  // ToDo_Kokkos:  DoubleArrView resu_v = resu.view_rw(); with resu as DoubleTab
   DoubleTabView resu_v = resu.view_rw();
   Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nsom, KOKKOS_LAMBDA(
                          const int i)

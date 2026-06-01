@@ -28,7 +28,7 @@ int Champ_Fonc_Face_VDF::fixer_nb_valeurs_nodales(int nb_noeuds)
 {
   assert(nb_noeuds == domaine_vdf().nb_faces());
   const MD_Vector& md = domaine_vdf().md_vector_faces();
-  // HACK (le meme que dans Champ_Face_VDF.cpp)
+  // HACK (same as in Champ_Face_VDF.cpp)
   int old_nb_compo = nb_compo_;
   if(nb_compo_ >= dimension) nb_compo_ /= dimension;
   creer_tableau_distribue(md);

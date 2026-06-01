@@ -56,7 +56,7 @@ double Loi_Etat_GP_WC::inverser_Pth(double T, double rho)
   return -1.e10;
 }
 
-/*! @brief Calcule la masse volumique
+/*! @brief Computes the density.
  *
  */
 void Loi_Etat_GP_WC::calculer_masse_volumique()

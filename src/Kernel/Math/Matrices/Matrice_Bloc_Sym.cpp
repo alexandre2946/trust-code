@@ -35,7 +35,7 @@ Entree& Matrice_Bloc_Sym::readOn( Entree& is )
 
 /*--------------------------------------------------------------------------*/
 /*                                                                          */
-/*     Implementation des fonctions membres de la classe Matrice_Bloc_Sym       */
+/*     Implementation of the member functions of the Matrice_Bloc_Sym class    */
 /*                                                                          */
 /*--------------------------------------------------------------------------*/
 
@@ -69,13 +69,13 @@ Sortie& Matrice_Bloc_Sym::imprimer_formatte(Sortie& os) const
   return os;
 }
 
-//Produit matrice-vecteur
+//Matrix-vector product
 DoubleVect& Matrice_Bloc_Sym::ajouter_multvect_(const DoubleVect& x, DoubleVect& y) const
 {
   const double * const_x_addr = x.addr();
   double* x_addr = (double *) const_x_addr;
   double* y_addr = y.addr();
-  // Si on met static la methode ne fonctionne pas pour une Matrice_Bloc_Sym de Matrice_Bloc_Sym
+  // If set to static, the method does not work for a Matrice_Bloc_Sym of Matrice_Bloc_Sym
   // static DoubleVect xtmp;
   // static DoubleVect ytmp;
 
@@ -123,7 +123,7 @@ DoubleVect& Matrice_Bloc_Sym::ajouter_multvect_(const DoubleVect& x, DoubleVect&
   return y;
 }
 
-//Produit matrice transposee-vecteur
+//Transposed-matrix-vector product
 DoubleVect& Matrice_Bloc_Sym::ajouter_multvectT_(const DoubleVect& x, DoubleVect& y) const
 {
   Cerr <<"Matrice_Bloc_Sym::ajouter_multvectT_ is not coded"<<finl<<flush;
@@ -131,7 +131,7 @@ DoubleVect& Matrice_Bloc_Sym::ajouter_multvectT_(const DoubleVect& x, DoubleVect
   return y;
 }
 
-//Produit matrice representee par un tableau-matrice
+//Matrix-represented-by-array times matrix product
 DoubleTab& Matrice_Bloc_Sym::ajouter_multTab_(const DoubleTab& x, DoubleTab& y) const
 {
   Cerr <<"Matrice_Bloc_Sym::ajouter_multTab_ is not coded"<<finl<<flush;
@@ -151,12 +151,12 @@ void Matrice_Bloc_Sym::BlocSymToMatMorseSym(Matrice_Morse_Sym& mat) const
 
   // int n=nb_lignes();
 
-  // // Dimensionnement et initialisation d'une matrice Morse
+  // // Size and initialise a Morse matrix
   // Matrice_Morse mat_morse;
   // mat_morse.dimensionner(n,n,0);
   // mat_morse.tab1_=1;
 
-  // // Remplissage de cette matrice en sommant les contributions de chaque bloc
+  // // Fill this matrix by summing the contributions of each block
   // Matrice_Morse contribution;
   // int ideb=0;
 
@@ -172,7 +172,7 @@ void Matrice_Bloc_Sym::BlocSymToMatMorseSym(Matrice_Morse_Sym& mat) const
   //             Cerr << "constituted of Matrice_Bloc type matrixes." << finl;
   //             exit();
   //           }
-  //         // Pour calculer le nombre de colonnes du bloc(j,i), on prend le nombre de lignes du bloc transpose bloc(i,j)
+  //         // To compute the number of columns of block(j,i), we take the number of rows of the transposed block(i,j)
   //         const Matrice_Bloc& bloc = ref_cast(Matrice_Bloc,get_bloc(jbloc,ibloc).valeur());
   //         jdeb += bloc.nb_lignes();
   //       }
@@ -188,7 +188,7 @@ void Matrice_Bloc_Sym::BlocSymToMatMorseSym(Matrice_Morse_Sym& mat) const
   //         // Transforme la Matrice_Bloc bloc en Matrice_Morse bloc_en_morse
   //         Matrice_Morse bloc_en_morse;
   //         bloc.BlocToMatMorse(bloc_en_morse);
-  //         // Remplissage de la matrice contribution
+  //         // Fill the contribution matrix
   //         contribution.remplir(ideb, jdeb, n, n, bloc_en_morse);
   //         if (jbloc==ibloc) nb_lignes = bloc.nb_lignes();
   //         assert(nb_lignes==bloc_en_morse.nb_lignes());
@@ -198,9 +198,9 @@ void Matrice_Bloc_Sym::BlocSymToMatMorseSym(Matrice_Morse_Sym& mat) const
   //       }
   //     ideb+=nb_lignes;
   //   }
-  // // Remplissage de la Matrice_Morse_Symetrique
+  // // Fill the Matrice_Morse_Symetrique
   // mat=mat_morse;
-  // // La matrice est t'elle definie ? On regarde son bloc(0,0)
+  // // Is the matrix defined? Check its block(0,0)
   // //  const Matrice_Bloc& bloc=ref_cast(Matrice_Bloc,get_bloc(0,0).valeur());
   // //  const Matrice_Morse_Sym& sous_bloc=ref_cast(Matrice_Morse_Sym,bloc.get_bloc(0,0).valeur());
   // //  mat.set_est_definie(sous_bloc.get_est_definie());

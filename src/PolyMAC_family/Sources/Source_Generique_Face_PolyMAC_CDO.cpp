@@ -33,15 +33,15 @@ Sortie& Source_Generique_Face_PolyMAC_HFV::printOn(Sortie& os) const { return os
 
 Entree& Source_Generique_Face_PolyMAC_HFV::readOn(Entree& is) { return Source_Generique_base::readOn(is); }
 
-// Methode de calcul de la valeur sur une face encadree par elem1 et elem2 d'un champ uniforme ou non a plusieurs composantes
+// Method to compute the value on a face bounded by elem1 and elem2 from a uniform or multi-component field
 inline double valeur(const DoubleTab& valeurs_champ, int elem1, int elem2, const int compo)
 {
   if (valeurs_champ.dimension(0) == 1)
-    return valeurs_champ(0, compo); // Champ uniforme
+    return valeurs_champ(0, compo); // Uniform field
   else
     {
       if (elem2 < 0)
-        elem2 = elem1; // face frontiere
+        elem2 = elem1; // boundary face
       if (valeurs_champ.nb_dim() == 1)
         return 0.5 * (valeurs_champ(elem1) + valeurs_champ(elem2));
       else
@@ -69,7 +69,7 @@ DoubleTab& Source_Generique_Face_PolyMAC_CDO::ajouter(DoubleTab& resu) const
   const DoubleVect& pf = equation().milieu().porosite_face(), &fs = domaine.face_surfaces();
   const IntTab& f_e = domaine.face_voisins();
   const DoubleTab& xv = domaine.xv(), &xp = domaine.xp();
-  /* 1. faces de bord -> on ne contribue qu'aux faces de Neumann */
+  /* 1. boundary faces: contribute only to Neumann faces */
   for (int n_bord = 0; n_bord < domaine.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = Domaine_Cl_PolyMAC_family.les_conditions_limites(n_bord);
@@ -84,7 +84,7 @@ DoubleTab& Source_Generique_Face_PolyMAC_CDO::ajouter(DoubleTab& resu) const
             resu(f) += fac * la_source.valeurs()(f) * (xv(f, r) - xp(e, r));
         }
     }
-  /* 2. faces internes -> contributions amont/aval */
+  /* 2. internal faces -> upstream/downstream contributions */
   for (int f = domaine.premiere_face_int(); f < domaine.nb_faces(); f++)
     {
       double fac = pf(f) * fs(f);

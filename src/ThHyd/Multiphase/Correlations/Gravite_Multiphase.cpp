@@ -52,7 +52,7 @@ bool Gravite_Multiphase::has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_c
   if (nom == "gravite")
     return champs_compris_.has_champ(nom, ref_champ);
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 bool Gravite_Multiphase::has_champ(const Motcle& nom) const
@@ -60,7 +60,7 @@ bool Gravite_Multiphase::has_champ(const Motcle& nom) const
   if (nom == "gravite")
     return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 const Champ_base& Gravite_Multiphase::get_champ(const Motcle& nom) const

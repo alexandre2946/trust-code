@@ -21,11 +21,11 @@
 #include <TRUSTTabs_forward.h>
 class Entree;
 
-/*! @brief classe Traitement_particulier_Solide_canal_VDF Cette classe permet de faire les traitements particuliers
+/*! @brief Traitement_particulier_Solide_canal_VDF class This class performs special post-processing operations
  *
- *      pour le calcul d'un canal plan dans le cas d'un calcul Thermohydraulique
- *      avec couplage avec le Solide ou l'on cherche a faire des statistiques
- *      sur le champs de temperature solide (moyenne, ecart-types... )
+ *      for plane channel computations in the case of a thermohydraulic calculation
+ *      coupled with a Solid where statistical analysis is performed
+ *      on the solid temperature field (mean, standard deviations, ...)
  *
  *
  * @sa Conduction, Traitement_particulier_VDF

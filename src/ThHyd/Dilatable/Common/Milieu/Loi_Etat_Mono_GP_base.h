@@ -19,9 +19,9 @@
 #include <Loi_Etat_GP_base.h>
 
 
-/*! @brief classe Loi_Etat_Mono_GP_base Cette classe represente la loi d'etat base pour les gaz parfaits.
+/*! @brief Base state law class for mono-species ideal gases.
  *
- *      Elle definit un fluide dilatable dont la loi d'etat est :
+ *  @brief Defines a dilatable fluid whose state law is:
  *         Pth = rho*R*T
  *
  * @sa Fluide_Dilatable_base Loi_Etat_base Loi_Etat_GP_base

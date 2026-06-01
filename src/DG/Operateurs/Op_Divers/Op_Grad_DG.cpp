@@ -59,9 +59,9 @@ void Op_Grad_DG::associer(const Domaine_dis_base& domaine_dis, const Domaine_Cl_
  */
 void Op_Grad_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
-  if (!matrices.count("pression")) return; //rien a faire
+  if (!matrices.count("pression")) return; //nothing to do
   if (semi_impl.count("pression"))
-    return; // semi-implicite -> rien a dimensionner
+    return; // semi-implicit -> nothing to size
 
   Matrice_Morse *mat = matrices["pression"], mat2;
 

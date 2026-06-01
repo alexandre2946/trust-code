@@ -29,7 +29,7 @@ class Champ_Inc_base;
 
 /*! @brief class Op_Conv_VEF_base
  *
- *  Classe de base des operateurs de convection VEF
+ *  Base class for VEF convection operators
  *
  *
  */
@@ -58,11 +58,11 @@ protected:
   OBS_PTR(Domaine_Cl_VEF) la_zcl_vef;
   OBS_PTR(Champ_Inc_base) vitesse_;
 
-  mutable DoubleVect fluent_;           // tableau qui sert pour le calcul du pas
-  // Les jeton pour la permmutation des schemas de convection
+  mutable DoubleVect fluent_;           // array used for the time step computation
+  // Tokens for the permutation of convection schemes
   mutable int jeton = -1;
   mutable int roue = -1;
-  mutable ArrOfInt faces_entrelaces_Cl_; // tableau de travail
+  mutable ArrOfInt faces_entrelaces_Cl_; // work array
 };
 
 #endif

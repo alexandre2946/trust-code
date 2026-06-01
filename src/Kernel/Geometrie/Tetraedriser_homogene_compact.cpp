@@ -28,7 +28,7 @@ Sortie& Tetraedriser_homogene_compact::printOn(Sortie& os) const { return Interp
 
 Entree& Tetraedriser_homogene_compact::readOn(Entree& is) { return Interprete::readOn(is); }
 
-// Traitement des faces
+// Face processing
 void Tetraedriser_homogene_compact::decoupe(Domaine& domaine, Faces& faces, IntTab& new_soms_old_elems, IntTab& fait_sommet, int nface) const
 {
   IntTab& sommets = faces.les_sommets();
@@ -52,7 +52,7 @@ void Tetraedriser_homogene_compact::decoupe(Domaine& domaine, Faces& faces, IntT
       int i3 = indice(3);
       int i4 = -1;
 
-      // on remet un peu d'ordre dans les indices
+      // restore some order in the indices
 
       int permut, ind;
 
@@ -110,14 +110,14 @@ void Tetraedriser_homogene_compact::decoupe(Domaine& domaine, Faces& faces, IntT
 }
 
 //
-// ATTENTION: ne considere qu'un seul domaine pour l'instant...
+// WARNING: only considers a single domain for now...
 //
 int Tetraedriser_homogene_compact::creer_sommet(Domaine& domaine, DoubleTab& new_soms, IntTab& elem_traite, IntTab& new_soms_old_elems, int NbSom, IntTab& sommets, int& compteur, int oldnbsom,
                                                 int& nbnewsoms, IntTab& fait_sommet, int& nface) const
 {
 
   int _out = -1;
-  if (NbSom == 4) // On verifie que le sommet rattache a une face n'a pas ete cree ulterieurement
+  if (NbSom == 4) // Check that the vertex attached to a face has not been created subsequently
     {
       int permut, som;
 
@@ -186,7 +186,7 @@ void Tetraedriser_homogene_compact::trianguler(Domaine& domaine) const
       IntTab elem_traite(oldsz);
       int oldnbsom = domaine.nb_som();
       IntTab new_elems(24 * oldsz, 4);
-      // pour chaque cube, liste des nouveaux sommets qu'il contient :
+      // for each cube, list of new vertices it contains:
       IntTab new_soms_old_elems(oldsz, 7);
       IntTab sommets(8);
       int compteur = 0;
@@ -195,18 +195,18 @@ void Tetraedriser_homogene_compact::trianguler(Domaine& domaine) const
       int i;
 
       Cerr << " NB ELEM : " << oldsz << " NB NODE : " << nbs << finl;
-      IntTab fait_sommet(3 * nbs, 4); // PQ : 04-03 : dimensionnement de fait_sommet a 3*nbs (a revoir si insuffisant)
+      IntTab fait_sommet(3 * nbs, 4); // PQ : 04-03 : sizing fait_sommet to 3*nbs (to revisit if insufficient)
       fait_sommet = -1;
 
-      // Construction de l'Octree sur la grille "VDF" de base
+      // Build the Octree on the base "VDF" grid
 
       domaine.construit_octree();
 
-      //On dimensionne une premiere fois le tableau des sommets avec la dimension maximum
-      //puis on redimensionnera seulement a la fin par la dimension exacte
+      //First dimension the array of vertices with the maximum size
+      //then resize only at the end to the exact dimension
 
       DoubleTab& sommets_dom = domaine.les_sommets();
-      //8 pour les nouveaux sommets et 8 pour les anciens sommets =16
+      //8 for the new vertices and 8 for the old vertices =16
       int dim_som_max = 16 * oldsz;
       int dim_som_old = sommets_dom.dimension(0);
       sommets_dom.resize(dim_som_max, 3);
@@ -233,8 +233,8 @@ void Tetraedriser_homogene_compact::trianguler(Domaine& domaine) const
 
           compteur = 0;
 
-          // Definition des nouveaux sommets : creation des barycentres
-          //centre de l'hexaedre
+          // Definition of new vertices: creation of barycenters
+          //center of the hexahedron
 
           sommets(0) = i0;
           sommets(1) = i1;
@@ -246,49 +246,49 @@ void Tetraedriser_homogene_compact::trianguler(Domaine& domaine) const
           sommets(7) = i7;
           indice(0) = creer_sommet(domaine, new_soms, elem_traite, new_soms_old_elems, 8, sommets, compteur, oldnbsom, nbnewsoms, fait_sommet, nface);
 
-          //centres des faces bas (0-1-3-2)
+          //centers of bottom faces (0-1-3-2)
           sommets(0) = i0;
           sommets(1) = i1;
           sommets(2) = i3;
           sommets(3) = i2;
           indice(1) = creer_sommet(domaine, new_soms, elem_traite, new_soms_old_elems, 4, sommets, compteur, oldnbsom, nbnewsoms, fait_sommet, nface);
 
-          //centres des faces haut (4-5-7-6)
+          //centers of top faces (4-5-7-6)
           sommets(0) = i4;
           sommets(1) = i5;
           sommets(2) = i7;
           sommets(3) = i6;
           indice(4) = creer_sommet(domaine, new_soms, elem_traite, new_soms_old_elems, 4, sommets, compteur, oldnbsom, nbnewsoms, fait_sommet, nface);
 
-          //centres des faces avant (0-1-5-4)
+          //centers of front faces (0-1-5-4)
           sommets(0) = i0;
           sommets(1) = i1;
           sommets(2) = i5;
           sommets(3) = i4;
           indice(3) = creer_sommet(domaine, new_soms, elem_traite, new_soms_old_elems, 4, sommets, compteur, oldnbsom, nbnewsoms, fait_sommet, nface);
 
-          //centres des faces arriere (2-3-7-6)
+          //centers of rear faces (2-3-7-6)
           sommets(0) = i2;
           sommets(1) = i3;
           sommets(2) = i7;
           sommets(3) = i6;
           indice(6) = creer_sommet(domaine, new_soms, elem_traite, new_soms_old_elems, 4, sommets, compteur, oldnbsom, nbnewsoms, fait_sommet, nface);
 
-          //centres des faces gauche (0-2-6-4)
+          //centers of left faces (0-2-6-4)
           sommets(0) = i0;
           sommets(1) = i2;
           sommets(2) = i6;
           sommets(3) = i4;
           indice(2) = creer_sommet(domaine, new_soms, elem_traite, new_soms_old_elems, 4, sommets, compteur, oldnbsom, nbnewsoms, fait_sommet, nface);
 
-          //centres des faces droite (1-3-7-5)
+          //centers of right faces (1-3-7-5)
           sommets(0) = i1;
           sommets(1) = i3;
           sommets(2) = i7;
           sommets(3) = i5;
           indice(5) = creer_sommet(domaine, new_soms, elem_traite, new_soms_old_elems, 4, sommets, compteur, oldnbsom, nbnewsoms, fait_sommet, nface);
 
-          // Liste des nouveaux sommets pour cet ancien cube
+          // List of new vertices for this old cube
           for (int t = 0; t < 7; t++)
             {
               new_soms_old_elems(i, t) = indice(t);
@@ -310,10 +310,10 @@ void Tetraedriser_homogene_compact::trianguler(Domaine& domaine) const
               sommets_dom(dim_som_old + j, k) = new_soms(j, k);
           dim_som_old += compteur;
 
-          // L'element en cours a ete "traite" en entier
+          // The current element has been fully "processed"
           elem_traite(i) = 1;
 
-          // pyramide bas (base : 0-1-3-2)
+          // bottom pyramid (base: 0-1-3-2)
 
           new_elems(i, 0) = les_elems(i, 0);
           new_elems(i, 1) = les_elems(i, 1);
@@ -338,7 +338,7 @@ void Tetraedriser_homogene_compact::trianguler(Domaine& domaine) const
           new_elems(i + 3 * oldsz, 3) = indice(0);
           mettre_a_jour_sous_domaine(domaine, i, i + 3 * oldsz, 1);
 
-          // pyramide haut (base : 4-5-7-6)
+          // top pyramid (base: 4-5-7-6)
 
           new_elems(i + 4 * oldsz, 0) = les_elems(i, 4);
           new_elems(i + 4 * oldsz, 1) = les_elems(i, 5);
@@ -364,7 +364,7 @@ void Tetraedriser_homogene_compact::trianguler(Domaine& domaine) const
           new_elems(i + 7 * oldsz, 3) = indice(0);
           mettre_a_jour_sous_domaine(domaine, i, i + 7 * oldsz, 1);
 
-          // pyramide avant (base : 0-1-5-4)
+          // front pyramid (base: 0-1-5-4)
 
           new_elems(i + 8 * oldsz, 0) = les_elems(i, 0);
           new_elems(i + 8 * oldsz, 1) = les_elems(i, 1);
@@ -390,7 +390,7 @@ void Tetraedriser_homogene_compact::trianguler(Domaine& domaine) const
           new_elems(i + 11 * oldsz, 3) = indice(0);
           mettre_a_jour_sous_domaine(domaine, i, i + 11 * oldsz, 1);
 
-          // pyramide arriere (base : 2-3-7-6)
+          // rear pyramid (base: 2-3-7-6)
 
           new_elems(i + 12 * oldsz, 0) = les_elems(i, 2);
           new_elems(i + 12 * oldsz, 1) = les_elems(i, 3);
@@ -416,7 +416,7 @@ void Tetraedriser_homogene_compact::trianguler(Domaine& domaine) const
           new_elems(i + 15 * oldsz, 3) = indice(0);
           mettre_a_jour_sous_domaine(domaine, i, i + 15 * oldsz, 1);
 
-          // pyramide gauche (base : 0-2-6-4)
+          // left pyramid (base: 0-2-6-4)
 
           new_elems(i + 16 * oldsz, 0) = les_elems(i, 0);
           new_elems(i + 16 * oldsz, 1) = les_elems(i, 2);
@@ -442,7 +442,7 @@ void Tetraedriser_homogene_compact::trianguler(Domaine& domaine) const
           new_elems(i + 19 * oldsz, 3) = indice(0);
           mettre_a_jour_sous_domaine(domaine, i, i + 19 * oldsz, 1);
 
-          // pyramide droite (base : 1-3-7-5)
+          // right pyramid (base: 1-3-7-5)
 
           new_elems(i + 20 * oldsz, 0) = les_elems(i, 1);
           new_elems(i + 20 * oldsz, 1) = les_elems(i, 3);
@@ -472,7 +472,7 @@ void Tetraedriser_homogene_compact::trianguler(Domaine& domaine) const
       sommets_dom.resize(dim_som_old, 3);
       les_elems.ref(new_elems);
 
-      // Reconstruction de l'octree
+      // Rebuild the octree
       Cerr << "We have split the cubes..." << finl;
       domaine.invalide_octree();
       domaine.typer("Tetraedre");

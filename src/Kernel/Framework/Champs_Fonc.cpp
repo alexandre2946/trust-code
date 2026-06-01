@@ -21,9 +21,9 @@ Entree& Champs_Fonc::readOn(Entree& s) { return s; }
 
 Sortie& Champs_Fonc::printOn(Sortie& s) const { return s; }
 
-/*! @brief Effectue une mise a jour en temps de tous les Champ contenus dans la liste.
+/*! @brief Performs a time update of all fields contained in the list.
  *
- * @param (double tps) le temps de mise a jour
+ * @param (double tps) the update time
  */
 void Champs_Fonc::mettre_a_jour(double tps)
 {

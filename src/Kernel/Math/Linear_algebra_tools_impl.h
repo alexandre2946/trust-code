@@ -16,10 +16,10 @@
 #define Linear_algebra_tools_impl_H
 #include <Linear_algebra_tools.h>
 
-/*! @brief calcul de la norme Linfini de la matrice Propriete: on note |x| la norme Linfini de x (vecteur ou matrice)
+/*! @brief Computes the Linfini norm of the matrix. Property: denoting |x| as the Linfini norm of x (vector or matrix),
  *
- *   On a |m * x| <= |m| * |x|
- *  En pratique: c'est le max sur j de la somme sur i de std::fabs(m(i,j))
+ *   we have |m * x| <= |m| * |x|
+ *  In practice: it is the max over j of the sum over i of std::fabs(m(i,j))
  *
  */
 inline double Matrice33::norme_Linfini()
@@ -32,7 +32,7 @@ inline double Matrice33::norme_Linfini()
   return resu;
 }
 
-/*! @brief produit avec de la matrice avec le vecteur x.
+/*! @brief Matrix-vector product with vector x.
  *
  */
 inline void Matrice33::produit(const Matrice33& m, const Vecteur3& x, Vecteur3& y)
@@ -67,7 +67,7 @@ inline double Vecteur3::produit_scalaire(const Vecteur3& x, const Vecteur3& y)
   return r;
 }
 
-/*! @brief norme L_infini, c'est le max des abs(v[i])
+/*! @brief L_infini norm, i.e. the max of abs(v[i])
  *
  */
 inline double Vecteur3::norme_Linfini()
@@ -80,7 +80,7 @@ inline double Vecteur3::norme_Linfini()
   return resu;
 }
 
-/* ! @brief calcul de la transpose
+/* ! @brief Computes the transpose
  *
  */
 inline void Matrice33::transpose(const Matrice33& matrice, Matrice33& matrice_transpose)
@@ -90,11 +90,11 @@ inline void Matrice33::transpose(const Matrice33& matrice, Matrice33& matrice_tr
       matrice_transpose.m[i][j] = matrice.m[j][i];
 }
 
-/*! @brief calcul de l'inverse.
+/*! @brief Computes the inverse.
  *
- * Si le determinant de "matrice" est nul, exit() si exit_on_error (valeur par defaut)
- *    sinon on ne remplit pas matrice_inv et on renvoie 0.
- *  Valeur de retour: determinant de la "matrice" (pas de l'inverse !)
+ * If the determinant of "matrice" is zero, exit() is called if exit_on_error (default value),
+ *    otherwise matrice_inv is not filled and 0 is returned.
+ *  Return value: determinant of "matrice" (not of the inverse!)
  *
  */
 inline double Matrice33::inverse(const Matrice33& matrice, Matrice33& matrice_inv, int exit_on_error)
@@ -108,7 +108,7 @@ inline double Matrice33::inverse(const Matrice33& matrice, Matrice33& matrice_in
   const double a20 = matrice.m[2][0];
   const double a21 = matrice.m[2][1];
   const double a22 = matrice.m[2][2];
-  // calcul de valeurs temporaires pour optimisation
+  // compute temporary values for optimization
   const double t4 = a00*a11;
   const double t6 = a00*a12;
   const double t8 = a01*a10;
@@ -131,7 +131,7 @@ inline double Matrice33::inverse(const Matrice33& matrice, Matrice33& matrice_in
     }
   const double t17 = 1/(t);
 
-  //calcul de la matrice inverse
+  //compute the inverse matrix
   matrice_inv.m[0][0] = (a11*a22-a12*a21)*t17;
   matrice_inv.m[0][1] = -(a01*a22-a02*a21)*t17;
   matrice_inv.m[0][2] = -(-a01*a12+a02*a11)*t17;

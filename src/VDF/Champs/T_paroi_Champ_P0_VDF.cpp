@@ -59,19 +59,19 @@ void T_paroi_Champ_P0_VDF::me_calculer(double tps)
 
   const DoubleTab& temp = mon_champ_->valeurs();
   DoubleTab& val = valeurs(tps);
-  val = 0.; // interne ou cl pas traitees
+  val = 0.; // interior or unhandled boundary conditions
 
   /*
-   * Traitement bord/coin :-)
+   * Boundary/corner treatment :-)
    *
-   * On moyenne la contribution ... comment tu fais sinon ?
+   * The contribution is averaged ... what else can you do?
    */
 
   const int N = temp.line_size(), n_elem = temp.dimension(0);
   IntTrav indx_pond(n_elem, N);
 
   for (int n_bord = 0; n_bord < dvdf.nb_front_Cl(); n_bord++)
-    for (int k = 0; k < N; k++) // pour multiphase
+    for (int k = 0; k < N; k++) // for multiphase
       {
         const Cond_lim& la_cl = le_dom_Cl_VDF->les_conditions_limites(n_bord);
         const Front_VF& le_bord = ref_cast(Front_VF, la_cl->frontiere_dis());
@@ -83,7 +83,7 @@ void T_paroi_Champ_P0_VDF::me_calculer(double tps)
               {
                 const int elem1 = face_voisins(num_face, 0), elem2 = face_voisins(num_face, 1);
 
-                val(elem1, k) += (vol(elem1) * temp(elem1, k) + vol(elem2) * temp(elem2, k)) / (vol(elem1) + vol(elem2)); // moyenne volumique
+                val(elem1, k) += (vol(elem1) * temp(elem1, k) + vol(elem2) * temp(elem2, k)) / (vol(elem1) + vol(elem2)); // volume-weighted average
                 val(elem2, k) = val(elem1, k);
 
                 indx_pond(elem1, k)++;
@@ -115,7 +115,7 @@ void T_paroi_Champ_P0_VDF::me_calculer(double tps)
                 indx_pond(elem, k)++;
               }
           }
-        else if (sub_type(Neumann_homogene, la_cl.valeur()) || sub_type(Navier, la_cl.valeur())) // grad nulle
+        else if (sub_type(Neumann_homogene, la_cl.valeur()) || sub_type(Navier, la_cl.valeur())) // zero gradient
           {
             for (int num_face = ndeb; num_face < nfin; num_face++)
               {
@@ -133,7 +133,7 @@ void T_paroi_Champ_P0_VDF::me_calculer(double tps)
             for (int num_face = ndeb, num_face_cl = 0; num_face < nfin; num_face++, num_face_cl++)
               {
                 const int elem1 = face_voisins(num_face, 0), elem2 = face_voisins(num_face, 1);
-                int elem_opp = -1; // si Echange_interne_impose
+                int elem_opp = -1; // if Echange_interne_impose
 
                 if (sub_type(Echange_interne_impose, la_cl_ext))
                   {
@@ -188,9 +188,9 @@ void T_paroi_Champ_P0_VDF::me_calculer(double tps)
             }
       }
 
-  // On moyenne la contribution
+  // Average the contributions
   for (int elem = 0; elem < n_elem; elem++)
-    for (int k = 0; k < N; k++) // pour multiphase
+    for (int k = 0; k < N; k++) // for multiphase
       if (indx_pond(elem, k) > 0)
         val(elem, k) /= (double)indx_pond(elem, k);
 }

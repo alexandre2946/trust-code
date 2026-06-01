@@ -20,7 +20,7 @@
 #include <TRUST_Ref.h>
 #include <TRUSTVect.h>
 
-/*! @brief : classe Op_Diff_Turbulent_base Classe de base pour les operateurs de diffusion pour un ecoulement turbulent.
+/*! @brief Base class for diffusion operators in a turbulent flow.
  *
  * @sa Operateur_Diff_base
  */

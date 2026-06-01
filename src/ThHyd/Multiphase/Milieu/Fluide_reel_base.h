@@ -35,16 +35,15 @@ using ArrayD = std::array<double,1>;
 using SpanD = tcb::span<double>;
 
 
-/*! @brief Classe Fluide_reel_base Cette classe represente un fluide reel ainsi que
+/*! @brief Represents a real fluid and its physical properties:
  *
- *     ses proprietes:
- *         - viscosite cinematique, (mu)
- *         - viscosite dynamique,   (nu)
- *         - masse volumique,       (rho)
- *         - diffusivite,           (alpha)
- *         - conductivite,          (lambda)
- *         - capacite calorifique,  (Cp)
- *         - dilatabilite thermique du constituant (beta_co)
+ *         - kinematic viscosity, (mu)
+ *         - dynamic viscosity,   (nu)
+ *         - density,             (rho)
+ *         - diffusivity,         (alpha)
+ *         - thermal conductivity,(lambda)
+ *         - heat capacity,       (Cp)
+ *         - thermal expansion coefficient (beta_co)
  *
  * @sa Milieu_base
  */
@@ -60,7 +59,7 @@ public :
 
   bool initTimeStep(double dt) override;
   int initialiser(const double temps) override;
-  int check_unknown_range() const override; //verifie que chaque inconnue "inco" est entre val_min[inco] et val_max[inco]
+  int check_unknown_range() const override; // verifies that each unknown "inco" lies between val_min[inco] and val_max[inco]
   int is_incompressible() const override { return (P_ref_ >= 0 && T_ref_ >= 0) || (P_ref_ >= 0 && h_ref_ >= 0); }
   void abortTimeStep() override;
   void mettre_a_jour(double temps) override;
@@ -69,11 +68,11 @@ public :
   void discretiser(const Probleme_base& pb, const  Discretisation_base& dis) override;
   void creer_champs_non_lus() override { /* everything is done in discretiser */ }
 
-  //gamme range[inco] = { min, max} : par defaut, rien a controler
+  // range[inco] = { min, max}: by default, nothing to check
   virtual std::map<std::string, std::array<double, 2>> unknown_range() const { return {}; }
   virtual std::map<std::string, std::array<double, 2>> unknown_range_h() const { return {}; }
 
-  // Methodes utilisees uniquement dans Pb_Euler
+  // Methods used only in Pb_Euler
   inline virtual double calculer_vitesse_son(const double& rho, const double& p) const
   {
     Process::exit("Fluide_reel_base::calculer_vitesse_son is not implemented for your fluid !!! To call only for Pb_Euler also ... \n");
@@ -93,7 +92,7 @@ public :
 protected :
   double T_ref_ = -1., P_ref_ = -1., h_ref_ = -1., t_init_ = -1.;
   int first_maj_ = 1;
-  bool res_en_T_ = true; // par defaut resolution en T
+  bool res_en_T_ = true; // by default resolution in T
 
   void calculate_fluid_properties_incompressible();
   void calculate_fluid_properties();
@@ -102,29 +101,29 @@ protected :
   void calculate_fluid_properties_enthalpie();
 
   /*
-   * *****************
-   * Pour compressible
-   * *****************
+   * *******************
+   * For compressible
+   * *******************
    */
 
-  /* Lois en T */
-  // densite
+  /* Laws in T */
+  // density
   virtual void rho_(const SpanD T, const SpanD P, SpanD R, int ncomp = 1, int id = 0) const = 0;
   virtual void dP_rho_(const SpanD T, const SpanD P, SpanD dP_R, int ncomp = 1, int id = 0) const = 0;
   virtual void dT_rho_(const SpanD T, const SpanD P, SpanD dT_R, int ncomp = 1, int id = 0) const = 0;
 
-  // enthalpie
+  // enthalpy
   virtual void h_(const SpanD T, const SpanD P, SpanD H, int ncomp = 1, int id = 0) const = 0;
   virtual void dP_h_(const SpanD T, const SpanD P, SpanD dP_H, int ncomp = 1, int id = 0) const = 0;
   virtual void dT_h_(const SpanD T, const SpanD P, SpanD dT_H, int ncomp = 1, int id = 0) const = 0;
 
-  // lois champs "faibles" -> pas de derivees
+  // "weak" field laws -> no derivatives
   virtual void cp_(const SpanD T, const SpanD P, SpanD CP, int ncomp = 1, int id = 0) const = 0;
   virtual void beta_(const SpanD T, const SpanD P, SpanD B, int ncomp = 1, int id = 0) const = 0;
   virtual void mu_(const SpanD T, const SpanD P, SpanD M, int ncomp = 1, int id = 0) const = 0;
   virtual void lambda_(const SpanD T, const SpanD P, SpanD L, int ncomp = 1, int id = 0) const = 0;
 
-  // methodes particulieres par application pour gagner en performance : utilisees dans Pb_Multiphase (pour le moment !)
+  // application-specific methods to improve performance: used in Pb_Multiphase (for now!)
   virtual void compute_CPMLB_pb_multiphase_(const MSpanD , MLoiSpanD, int ncomp = 1, int id = 0) const;
   virtual void compute_all_pb_multiphase_(const MSpanD , MLoiSpanD, MLoiSpanD , int ncomp = 1, int id = 0) const;
 
@@ -142,24 +141,24 @@ protected :
   double _mu_(const double T, const double P) const { return double_to_span<&Fluide_reel_base::mu_>(T,P); }
   double _lambda_(const double T, const double P) const { return double_to_span<&Fluide_reel_base::lambda_>(T,P); }
 
-  /* Lois en h */
-  // densite
+  /* Laws in h */
+  // density
   virtual void rho_h_(const SpanD h, const SpanD P, SpanD R, int ncomp = 1, int id = 0) const = 0;
   virtual void dP_rho_h_(const SpanD h, const SpanD P, SpanD dP_R, int ncomp = 1, int id = 0) const = 0;
   virtual void dh_rho_h_(const SpanD h, const SpanD P, SpanD dT_R, int ncomp = 1, int id = 0) const = 0;
 
-  // temperature
+  // temperature (from h)
   virtual void T_(const SpanD h, const SpanD P, SpanD H, int ncomp = 1, int id = 0) const = 0;
   virtual void dP_T_(const SpanD h, const SpanD P, SpanD dP_H, int ncomp = 1, int id = 0) const = 0;
   virtual void dh_T_(const SpanD h, const SpanD P, SpanD dT_H, int ncomp = 1, int id = 0) const = 0;
 
-  // lois champs "faibles" -> pas de derivees
+  // "weak" field laws -> no derivatives
   virtual void cp_h_(const SpanD h, const SpanD P, SpanD CP, int ncomp = 1, int id = 0) const = 0;
   virtual void beta_h_(const SpanD h, const SpanD P, SpanD B, int ncomp = 1, int id = 0) const = 0;
   virtual void mu_h_(const SpanD h, const SpanD P, SpanD M, int ncomp = 1, int id = 0) const = 0;
   virtual void lambda_h_(const SpanD h, const SpanD P, SpanD L, int ncomp = 1, int id = 0) const = 0;
 
-  // methods particuliers par application pour gagner en performance : utilise dans Pb_Multiphase (pour le moment !)
+  // application-specific methods to improve performance: used in Pb_Multiphase (for now!)
   virtual void compute_CPMLB_pb_multiphase_h_(const MSpanD , MLoiSpanD_h, int ncomp = 1, int id = 0) const;
   virtual void compute_all_pb_multiphase_h_(const MSpanD , MLoiSpanD_h, MLoiSpanD_h , int ncomp = 1, int id = 0) const;
 
@@ -198,11 +197,11 @@ private:
 
   /*
    * *********************
-   * Pour l'incompressible
+   * For incompressible
    * *********************
    */
 
-  /* Lois en T */
+  /* Laws in T */
   void _rho_(const double T, const double P, SpanD res) const { double_to_span<&Fluide_reel_base::rho_>(T,P,res); }
   void _dP_rho_(const double T, const double P, SpanD res) const { double_to_span<&Fluide_reel_base::dP_rho_>(T,P,res); }
   void _dT_rho_(const double T, const double P, SpanD res) const { double_to_span<&Fluide_reel_base::dT_rho_>(T,P,res); }
@@ -221,21 +220,19 @@ private:
 
 public:
   /*
-   * Elie Saikali : struct interne pour convertir les derivees en h a T (pour Pb_Multiphase).
+   * Elie Saikali: internal struct to convert derivatives from h to T (for Pb_Multiphase).
    *
-   * XXX : VOIR AVEC LE CAHIER D'ANTOINE SI T'ES PAS D'ACCORD (ici, au contraire d'EOS, the doc is available :-) )
+   * We seek dX/dP|T and dX/dT|P
    *
-   * On cherche dX/dP|T et dX/dT|P
+   * We know that dX = dX/dP|T dP + dX/dT|P dT = dX/dP|h dP + dX/dh|P dh
    *
-   * On sait que dX = dX/dP|T dP + dX/dT|P dT = dX/dP|h dP + dX/dh|P dh
-   *
-   * Lets Go :
+   * Expanding:
    *
    *    dX/dP|h dP + dX/dh|P dh = dX/dP|h dP + dX/dh|P {  dh/dP|T dP + dh/dT|P dT }
    *                            = { dX/dP|h + dX/dh|P * dh/dP|T } dP + { dX/dh|P * dh/dT|P } dT
    *                            = dX/dP|T dP + dX/dT|P dT
    *
-   * Alors,
+   * Therefore,
    *
    *    dX/dP|T = dX/dP|h + dX/dh|P * dh/dP|T
    *    dX/dT|P = dX/dh|P * dh/dT|P
@@ -271,7 +268,7 @@ public:
   H_to_T converter_H_to_T_;
   T_to_H converter_T_to_H_;
 
-  /* Lois en h */
+  /* Laws in h */
   void _rho_h_(const double h, const double P, SpanD res) const { double_to_span<&Fluide_reel_base::rho_h_>(h,P,res); }
   void _dP_rho_h_(const double h, const double P, SpanD res) const { double_to_span<&Fluide_reel_base::dP_rho_h_>(h,P,res); }
   void _dh_rho_h_(const double h, const double P, SpanD res) const { double_to_span<&Fluide_reel_base::dh_rho_h_>(h,P,res); }

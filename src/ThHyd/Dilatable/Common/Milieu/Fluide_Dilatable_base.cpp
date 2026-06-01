@@ -46,12 +46,12 @@ void Fluide_Dilatable_base::discretiser(const Probleme_base& pb, const  Discreti
   const Domaine_dis_base& domaine_dis=pb.equation(0).domaine_dis();
   double temps=pb.schema_temps().temps_courant();
 
-  // les champs seront nommes par le milieu_base
+  // fields will be named by milieu_base
   OWN_PTR(Champ_Don_base) ch_rho;
   dis.discretiser_champ("temperature",domaine_dis,"masse_volumique_p","neant",1,temps,ch_rho);
   ch_rho_ = ch_rho.valeur();
 
-  if (!ch_Cp_ || !sub_type(Champ_Uniforme,ch_Cp_.valeur())) //ie Cp non constant : gaz reels
+  if (!ch_Cp_ || !sub_type(Champ_Uniforme,ch_Cp_.valeur())) //ie Cp non constant : real gases
     {
       Cerr<<"Heat capacity Cp is discretized once more for space variable case."<<finl;
       dis.discretiser_champ("temperature",domaine_dis,"cp_prov","neant",1,temps,ch_Cp_);
@@ -59,7 +59,7 @@ void Fluide_Dilatable_base::discretiser(const Probleme_base& pb, const  Discreti
 
   if (!ch_lambda_ || ((!sub_type(Champ_Uniforme,ch_lambda_.valeur())) && (!sub_type(Champ_Fonc_Tabule,ch_lambda_.valeur()))))
     {
-      // cas particulier etait faux en VEF voir quand cela sert (FM slt) : sera nomme par milieu_base
+      // special case was wrong in VEF; see when this is used (FM only): will be named by milieu_base
       dis.discretiser_champ("champ_elem",domaine_dis,"neant","neant",1,temps,ch_lambda_);
     }
 
@@ -86,8 +86,8 @@ void Fluide_Dilatable_base::set_param(Param& param) const
   Fluide_base::set_param(param);
   param.ajouter_non_std("loi_etat",(this),Param::REQUIRED);
   param.ajouter_non_std("Traitement_PTh",(this));
-  // Lecture de mu et lambda pas specifiee obligatoire car option sutherland possible
-  // On supprime.. et on ajoute non-standard
+  // Reading mu and lambda is not mandatory because the Sutherland option is possible
+  // Remove and re-add as non-standard
   param.supprimer("mu");
   param.ajouter_non_std("mu",(this));
   param.ajouter_non_std("sutherland",(this));
@@ -156,8 +156,8 @@ int Fluide_Dilatable_base::lire_motcle_non_standard(const Motcle& mot, Entree& i
       mu_suth.set_val_params(prob,mu0,C,T0);
       mu_suth.lire_expression();
 
-      //On stocke la valeur de C (ici Slambda) pour construire(cf creer_champs_non_lus())
-      //la loi de Sutherland qui concerne la conductivite
+      // Store the value of C (here Slambda) to build (cf creer_champs_non_lus())
+      // the Sutherland law for the conductivity
       if (Slambda!=-1)
         {
           ch_lambda_.typer("Sutherland");
@@ -179,9 +179,9 @@ int Fluide_Dilatable_base::lire_motcle_non_standard(const Motcle& mot, Entree& i
 }
 
 /*
- * traitement_PTh=0 => resolution classique de l'edo
- * traitement_PTh=1 => pression calculee pour conserver la masse
- * traitement_PTh=2 => pression laissee cste.
+ * traitement_PTh=0 => classical EDO resolution
+ * traitement_PTh=1 => pressure computed to conserve mass
+ * traitement_PTh=2 => pressure kept constant.
  */
 void Fluide_Dilatable_base::checkTraitementPth(const Domaine_Cl_dis_base& domaine_cl)
 {
@@ -226,9 +226,9 @@ void Fluide_Dilatable_base::warn_syntax_Sutherland()
   Process::exit();
 }
 
-/*! @brief Verifie que les champs lus l'ont ete correctement.
+/*! @brief Verifies that the fields read have been correctly set.
  *
- * @throws l'une des proprietes (rho mu Cp ou lambda) du fluide n'a pas ete definie
+ * @throws if one of the properties (rho mu Cp or lambda) of the fluid has not been defined
  */
 void Fluide_Dilatable_base::verifier_coherence_champs(int& err,Nom& msg)
 {
@@ -271,9 +271,9 @@ void Fluide_Dilatable_base::verifier_coherence_champs(int& err,Nom& msg)
   Milieu_base::verifier_coherence_champs(err,msg);
 }
 
-/*! @brief Complete le fluide avec un Cp constant
+/*! @brief Completes the fluid with a constant Cp.
  *
- * @param (double Cp) le cp du fluide
+ * @param Cp_ the heat capacity of the fluid
  */
 void Fluide_Dilatable_base::set_Cp(double Cp_)
 {
@@ -286,10 +286,10 @@ void Fluide_Dilatable_base::set_Cp(double Cp_)
 
 void Fluide_Dilatable_base::update_rho_cp(double temps)
 {
-  // Si l'inconnue est sur le device, on copie les donnees aussi:
+  // If the unknown is on the device, copy the data there too:
   if (equation_.size() && (*(equation_.begin()->second)).inconnue().valeurs().isDataOnDevice())
     {
-      // ToDo_Kokkos deplacer tout cela dans Milieu_base::initialiser ?
+      // ToDo_Kokkos move all this into Milieu_base::initialiser ?
       mapToDevice(ch_rho_->valeurs());
       mapToDevice(ch_rho_Cp_elem_->valeurs());
       mapToDevice(ch_rho_Cp_comme_T_->valeurs());
@@ -311,16 +311,18 @@ void Fluide_Dilatable_base::update_rho_cp(double temps)
     tab_multiply_any_shape(rho_cp,ch_Cp_->valeurs());
 }
 
-/*! @brief Renvoie le tableau des valeurs de le temperature
+/*! @brief Returns the array of temperature values.
  *
+ * @return Array of temperature values.
  */
 const DoubleTab& Fluide_Dilatable_base::temperature() const
 {
   return ch_temperature().valeurs();
 }
 
-/*! @brief Renvoie le champ de le temperature
+/*! @brief Returns the temperature field.
  *
+ * @return Const reference to the temperature field.
  */
 const Champ_Don_base& Fluide_Dilatable_base::ch_temperature() const
 {
@@ -332,7 +334,7 @@ Champ_Don_base& Fluide_Dilatable_base::ch_temperature()
   return loi_etat_->ch_temperature();
 }
 
-/*! @brief Prepare le pas de temps
+/*! @brief Prepares the time step.
  *
  */
 void Fluide_Dilatable_base::preparer_pas_temps()
@@ -350,8 +352,8 @@ void Fluide_Dilatable_base::abortTimeStep()
 
 void Fluide_Dilatable_base::creer_champs_non_lus()
 {
-  // on s'occupe de lamda si mu uniforme et CP uniforme
-  // on type lambda en champ uniforme et on met lambda=mu*Cp/Pr
+  // handle lambda if mu is uniform and Cp is uniform
+  // type lambda as uniform field and set lambda=mu*Cp/Pr
   //
   if (ch_mu_)
     {
@@ -360,7 +362,7 @@ void Fluide_Dilatable_base::creer_champs_non_lus()
           {
             if (!sub_type(Loi_Etat_Multi_GP_QC,loi_etat_.valeur()))
               {
-                // Si mu uniforme et si la loi d'etat est celle d'un gaz parfait
+                // If mu is uniform and the equation of state corresponds to an ideal gas
                 double lold=-1;
                 if (ch_lambda_)
                   lold=ch_lambda_->valeurs()(0,0);
@@ -405,8 +407,10 @@ void Fluide_Dilatable_base::creer_champs_non_lus()
     }
 }
 
-/*! @brief Initialise les parametres du fluide.
+/*! @brief Initializes the fluid parameters.
  *
+ * @param temps Current time.
+ * @return Always returns 1.
  */
 int Fluide_Dilatable_base::initialiser(const double temps)
 {
@@ -424,7 +428,7 @@ int Fluide_Dilatable_base::initialiser(const double temps)
 
   if (equation_.size() && (*(equation_.begin()->second)).inconnue().valeurs().isDataOnDevice())
     {
-      // ToDo_Kokkos deplacer tout cela dans Milieu_base::initialiser ?
+      // ToDo_Kokkos move all this into Milieu_base::initialiser ?
       mapToDevice(ch_rho_->valeurs());
       mapToDevice(ch_rho_Cp_elem_->valeurs());
       mapToDevice(ch_rho_Cp_comme_T_->valeurs());
@@ -432,8 +436,8 @@ int Fluide_Dilatable_base::initialiser(const double temps)
   return 1;
 }
 
-// Initialisation des proprietes radiatives du fluide incompressible
-// (Pour un fluide incompressible semi transparent).
+// Initialization of the radiative properties of the incompressible fluid
+// (for a semi-transparent incompressible fluid).
 void Fluide_Dilatable_base::initialiser_radiatives(const double temps)
 {
   coeff_absorption_->initialiser(temps);
@@ -450,7 +454,7 @@ void Fluide_Dilatable_base::initialiser_radiatives(const double temps)
     }
 }
 
-/*! @brief Calcule la pression totale : pression thermodynamique + pression hydrodynamique
+/*! @brief Computes the total pressure: thermodynamic pressure + hydrodynamic pressure.
  *
  */
 void Fluide_Dilatable_base::calculer_pression_tot()
@@ -460,14 +464,14 @@ void Fluide_Dilatable_base::calculer_pression_tot()
   DoubleTrav tab_PHyd(n, 1);
   if( n != ch_pression_->valeurs().dimension_tot(0) )
     {
-      // Interpolation de pression_ aux elements (ex: P1P0)
+      // Interpolation of pression_ to elements (e.g.: P1P0)
       const Domaine_dis_base& domaine_dis= ch_pression_->domaine_dis_base();
       const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_dis);
       const DoubleTab& centres_de_gravites=domaine.xp();
       ch_pression_->valeur_aux(centres_de_gravites,tab_PHyd);
     }
   else  tab_PHyd = ch_pression_->valeurs();
-  // impl dans les classes filles
+  // implemented in child classes
   remplir_champ_pression_tot(n,tab_PHyd,tab_Ptot);
 }
 
@@ -505,7 +509,7 @@ bool Fluide_Dilatable_base::has_champ(const Motcle& nom, OBS_PTR(Champ_base)& re
   if (loi_etat_->has_champ(nom, ref_champ))
     return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 bool Fluide_Dilatable_base::has_champ(const Motcle& nom) const
@@ -516,7 +520,7 @@ bool Fluide_Dilatable_base::has_champ(const Motcle& nom) const
   if (loi_etat_->has_champ(nom))
     return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 const Champ_base& Fluide_Dilatable_base::get_champ(const Motcle& nom) const
@@ -548,19 +552,19 @@ void Fluide_Dilatable_base::mettre_a_jour(double temps)
   ch_lambda_->changer_temps(temps);
   ch_Cp_->mettre_a_jour(temps);
   update_rho_cp(temps);
-  write_mean_edo(temps); // si besoin (i.e. QC)
+  write_mean_edo(temps); // if needed (i.e. QC)
 }
 
-/*! @brief Prepare le fluide au calcul.
+/*! @brief Prepares the fluid for computation.
  *
  */
 void Fluide_Dilatable_base::preparer_calcul()
 {
   Cerr << "Fluide_Dilatable_base::preparer_calcul()" << finl;
-  //Milieu_base::preparer_calcul(); // Ne fait rien!!
+  //Milieu_base::preparer_calcul(); // Does nothing!!
   Fluide_Dilatable_base::update_pressure_fields(le_probleme_->schema_temps().temps_courant()); // Child can have an overload
   loi_etat_->preparer_calcul();
-  prepare_pressure_edo(); // si besoin (i.e. QC)
+  prepare_pressure_edo(); // if needed (i.e. QC)
   calculer_coeff_T();
 }
 
@@ -570,9 +574,9 @@ void Fluide_Dilatable_base::update_pressure_fields(double temps)
   ch_pression_tot_->mettre_a_jour(temps);
 }
 
-/*! @brief Complete le fluide avec les champs inconnus associes au probleme
+/*! @brief Completes the fluid with the unknown fields associated with the problem.
  *
- * @param (Pb_Thermohydraulique& pb) le probleme a resoudre
+ * @param pb The problem to solve.
  */
 void Fluide_Dilatable_base::completer(const Probleme_base& pb)
 {

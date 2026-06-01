@@ -18,15 +18,15 @@
 #include <TRUSTTab.h>
 #include <Correlation_base.h>
 
-/*! @brief classe Viscosite_turbulente_base correlations de viscosite turbulente decrivant le tenseur de Reynolds R_{ij} = - < u'_i u'_j>
+/*! @brief Turbulent viscosity correlations describing the Reynolds stress tensor R_{ij} = - <u'_i u'_j>.
  *
- *     Methodes implementees :
- *     - eddy_viscosity(nu_t) -> remplit le DoubleTab "nu_t" tel que
- *                               <u'_i u'_j>  = - nu_t (dui / dx_j + duj / dx_i + (partie trace))
- *     - reynolds_stress(R_ij) -> remplit R_ij = < u'_i u'_j> (pour utilisation par un modele GGDH dans une autre equation)
- *                                format : R_ij(e, n, i, j) avec e l'indice d'element, n l'indice de phase, (i, j) les composantes
- *     - k_over_eps(k_sur_eps) -> renvoie la quantite "k / epsilon" (utilisee par exemple dans le GGDH)
- *     Dans les deux cas, les tableaux doivent etre dimensionnes par la fonction appelante.
+ *     Implemented methods:
+ *     - eddy_viscosity(nu_t) -> fills the DoubleTab "nu_t" such that
+ *                               <u'_i u'_j>  = - nu_t (dui / dx_j + duj / dx_i + (trace part))
+ *     - reynolds_stress(R_ij) -> fills R_ij = <u'_i u'_j> (for use by a GGDH model in another equation)
+ *                                format: R_ij(e, n, i, j) with e the element index, n the phase index, (i, j) the components
+ *     - k_over_eps(k_sur_eps) -> returns the quantity "k / epsilon" (used e.g. in GGDH)
+ *     In both cases, the arrays must be sized by the calling function.
  *
  *
  */
@@ -44,7 +44,7 @@ public:
   virtual int gradu_required() const  {  return 0; };
 
 private:
-  double limiter_ = 0.01; //"limiteur" fournissant une valeur minimale de la viscosite turbulente
+  double limiter_ = 0.01; // "limiter" providing a minimum value for the turbulent viscosity
 };
 
 #endif

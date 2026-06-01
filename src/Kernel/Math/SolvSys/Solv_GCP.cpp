@@ -83,7 +83,7 @@ Entree& Solv_GCP::readOn(Entree& is )
   // XD_CONT used in the matrix are exchanged.NL2 Warning: this is experimental and known to fail in some VEF
   // XD_CONT computations (L2 projection step will not converge). Works well in VDF.
   param.lire_avec_accolades_depuis(is);
-  // Obligation de definir un precond
+  // A preconditioner must be defined
   if (!le_precond_ && precond_nul==0 && precond_diag_==0)
     {
       Cerr << "You forgot to define a preconditionner with the keyword precond." << finl;
@@ -128,7 +128,7 @@ int Solv_GCP::resoudre_systeme(const Matrice_Base& matrice, const DoubleVect& se
 
 void Solv_GCP::reinit()
 {
-  if (reinit_ > 1) // Si reinit_ = 0, ne pas toucher.
+  if (reinit_ > 1) // If reinit_ = 0, do not touch.
     reinit_ = 1;
   SolveurSys_base::reinit();
   if (le_precond_)
@@ -139,7 +139,7 @@ void Solv_GCP::prepare_data(const Matrice_Base& matrice, const DoubleVect& secme
 {
   if (reinit_ == 0)
     {
-      // Reconstruction de toute la structure (tableaux d'index et coefficients)
+      // Rebuild the entire structure (index arrays and coefficients)
 
       if (secmem.line_size() != 1)
         {
@@ -151,14 +151,14 @@ void Solv_GCP::prepare_data(const Matrice_Base& matrice, const DoubleVect& secme
       const Matrice_Morse_Sym& mat = ref_cast(Matrice_Morse_Sym, mat_bloc.get_bloc(0,0).valeur());
       const Matrice_Morse& mat_virt = ref_cast(Matrice_Morse, mat_bloc.get_bloc(0,1).valeur());
 
-      // Determination du nombre d'items reellement utilises:
+      // Determine the number of items actually used:
       {
         const int sztot_source = secmem.size_array();
         const int sz = secmem.size();
         renum_.reset();
         renum_.resize(sztot_source, RESIZE_OPTIONS::NOCOPY_NOINIT);
         renum_ = 0;
-        // Retirer les items virtuels
+        // Remove virtual items
         int i;
         for (i = sz; i < sztot_source; i++)
           renum_[i] = -1;
@@ -167,13 +167,13 @@ void Solv_GCP::prepare_data(const Matrice_Base& matrice, const DoubleVect& secme
         const auto n = tab2.size_array();
         for (i = 0; i < n; i++)
           {
-            // Attention: tab2 de la partie reele-virtuelle contient des indices
-            //  relatifs au debut de la partie virtuelle (d'ou "+ sz")
+            // Note: tab2 of the real-virtual part contains indices
+            //  relative to the start of the virtual part (hence "+ sz")
             const int j = tab2[i]-1 + sz; // fortran -> c
             renum_[j] = 0;
           }
       }
-      // Determination du nombre de lignes non vides de mat_virt
+      // Determine the number of non-empty rows of mat_virt
       int nb_lignes_mat_virt = 0;
       {
         const int n = mat_virt.get_tab1().size_array() - 1;
@@ -188,7 +188,7 @@ void Solv_GCP::prepare_data(const Matrice_Base& matrice, const DoubleVect& secme
       const int sz_tot = md->get_nb_items_tot();
       const int sz = md->get_nb_items_reels();
 
-      // Calcul de la taille memoire requise:
+      // Compute the required memory size:
       int mem_size = 0;
       mem_size += sz_tot * (int)sizeof(double); //  vecteurs avec espace virtuel (tmp_p_)
       mem_size += sz * (int)sizeof(double) * 3; // vecteurs sans espace virtuel
@@ -205,26 +205,26 @@ void Solv_GCP::prepare_data(const Matrice_Base& matrice, const DoubleVect& secme
         }
       else
         {
-          // On ne stocke pas les coefficients diagonaux:
+          // Diagonal coefficients are not stored:
           nnz_reel_reel = mat.get_coeff().size_array() - sz;
         }
-      mem_size += (int)(nnz_reel_reel * (int)sizeof(double)); // pour les coefficients
-      mem_size += (int)(nnz_reel_reel * (int)sizeof(int)); // pour les indices
-      // matrice reel/virtuel
-      mem_size += (nb_lignes_mat_virt+1) * (int)sizeof(nnz_reel_reel); // pour tab1_
+      mem_size += (int)(nnz_reel_reel * (int)sizeof(double)); // for the coefficients
+      mem_size += (int)(nnz_reel_reel * (int)sizeof(int)); // for the indices
+      // real/virtual matrix
+      mem_size += (nb_lignes_mat_virt+1) * (int)sizeof(nnz_reel_reel); // for tab1_
       const auto nnz_reel_virtuel = mat_virt.get_coeff().size_array();
       assert(mat_virt.get_tab2().size_array() == nnz_reel_virtuel);
-      mem_size += (int)(nnz_reel_virtuel * (int)sizeof(double)); // pour les coefficients
-      mem_size += (int)(nnz_reel_virtuel * (int)sizeof(int)); // pour les indices
-      // taille de tmp_mat_virt_.lignes_non_vides_
+      mem_size += (int)(nnz_reel_virtuel * (int)sizeof(double)); // for the coefficients
+      mem_size += (int)(nnz_reel_virtuel * (int)sizeof(int)); // for the indices
+      // size of tmp_mat_virt_.lignes_non_vides_
       mem_size += nb_lignes_mat_virt * (int)sizeof(int);
-      // aligner la taille sur un multiple de 8
+      // align size to a multiple of 8
       if (mem_size % 8 != 0)
         mem_size = (mem_size/8+1)*8;
 
-      // Allocation des tableaux:
-      // (on met d'abord tous les tableaux de double, puis a la fin les tableaux d'entiers
-      //  sinon il faut ajouter du padding pour aligner si on remet des double apres de int)
+      // Allocate arrays:
+      // (double arrays first, then integer arrays at the end;
+      //  otherwise padding would be needed to realign doubles after integers)
       //
       Journal() << "Solv_GCP::prepare allocating data chunk : " << mem_size << " bytes" << finl;
       tmp_data_block_.resize_array(mem_size/8, RESIZE_OPTIONS::NOCOPY_NOINIT);
@@ -236,17 +236,17 @@ void Solv_GCP::prepare_data(const Matrice_Base& matrice, const DoubleVect& secme
       ptr += sz;
       tmp_p_avec_items_virt_.ref_data(ptr, sz_tot); // avec espace virtuel
       tmp_p_avec_items_virt_.set_md_vector(md);
-      // tmp_p_ pointe sur la meme domaine:
+      // tmp_p_ points to the same memory region:
       tmp_p_.ref_data(ptr, sz); // sans l'espace virtuel
       ptr += sz_tot;
       tmp_solution_.ref_data(ptr, sz);
       ptr += sz;
-      // Allocation des tableaux pour les matrices:
+      // Allocate arrays for the matrices:
       tmp_mat_.get_set_coeff().ref_data(ptr, nnz_reel_reel);
       ptr += nnz_reel_reel;
       tmp_mat_virt_.get_set_coeff().ref_data(ptr, nnz_reel_virtuel);
       ptr += nnz_reel_virtuel;
-      // On a fini les double, on passe aux tableaux d'entiers:
+      // Done with doubles; now switch to integer arrays:
       // tab1_ stores trustIdType values, tab2_ stores int values
       using tab1_ptr_t = decltype(tmp_mat_.get_set_tab1().addr());
       auto * tidptr = static_cast<tab1_ptr_t>(static_cast<void*>(ptr));
@@ -261,15 +261,15 @@ void Solv_GCP::prepare_data(const Matrice_Base& matrice, const DoubleVect& secme
       iptr += nb_lignes_mat_virt;
       tmp_mat_virt_.get_set_tab2().ref_data(iptr, (int)nnz_reel_virtuel);
       iptr += nnz_reel_virtuel;
-      // Allocation terminee.
+      // Allocation complete.
       assert(((char*)iptr) <= ((char*)tmp_data_block_.addr() + mem_size));
 
-      // Remplissages des tableaux d'index (tab1_, tab2_ et lignes_non_vides_)
+      // Fill index arrays (tab1_, tab2_ and lignes_non_vides_)
       if (! precond_diag_)
         {
           tmp_mat_.get_set_tab1().inject_array(mat.get_tab1());
           {
-            // remplissage de tab2 (renumerotation eventuelle)
+            // fill tab2 (with optional renumbering)
             for (auto i = 0; i < nnz_reel_reel; i++)
               {
                 int j = mat.get_tab2()(i)-1; // fortran->c
@@ -282,33 +282,33 @@ void Solv_GCP::prepare_data(const Matrice_Base& matrice, const DoubleVect& secme
         }
       else
         {
-          // Construction de la matrice D^(-1/2) * A * D^(-1/2)
-          // on ne stocke pas les coeffs diagonaux
-          // Le remplissage de tab1_ n'est pas trivial, du coup:
+          // Build the matrix D^(-1/2) * A * D^(-1/2)
+          // diagonal coefficients are not stored
+          // Filling tab1_ is non-trivial, hence:
           {
             auto src_index = 0; // index dans mat.tab2_ et coeff_
             auto dest_index = 0; // index dans tmp_mat_.tab2_ et coeff_
             int i_ligne;
             for (i_ligne = 0; i_ligne < nb_lignes_mat; i_ligne++)
               {
-                // A chaque ligne on a un coefficient de moins que dans la matrice d'origine
-                // (on ne met pas le coeff diagonal)
+                // Each row has one fewer coefficient than in the original matrix
+                // (the diagonal coefficient is not stored)
                 tmp_mat_.get_set_tab1()(i_ligne) = dest_index + 1; // indice fortran du debut de ligne
                 const int ncoeff = (int)(mat.get_tab1()(i_ligne+1) - mat.get_tab1()(i_ligne) - 1);
-                // Ne pas inserer le coeff diagonal
+                // Do not insert the diagonal coefficient
                 assert(mat.get_tab2()(src_index) == i_ligne + 1); // index fortran
                 src_index++;
-                // Inserer les autres coeffs:
+                // Insert the remaining coefficients:
                 for (int i = 0; i < ncoeff; i++, src_index++, dest_index++)
                   tmp_mat_.get_set_tab2()(dest_index) = mat.get_tab2()(src_index);
 
               }
-            // Fin de la derniere ligne:
+            // End of the last row:
             tmp_mat_.get_set_tab1()(i_ligne) = dest_index + 1; // indice fortran du debut de ligne
           }
           tmp_mat_.set_nb_columns( sz_tot );
         }
-      // remplissage de tmp_mat_virt_
+      // fill tmp_mat_virt_
       {
         tmp_mat_virt_.get_set_tab1()[0] = 1;
         int i_ligne_dest = 0;
@@ -352,9 +352,9 @@ void Solv_GCP::prepare_data(const Matrice_Base& matrice, const DoubleVect& secme
         }
       else
         {
-          // calcul de D^(-1/2)
+          // compute D^(-1/2)
           exit();
-          // calcul du produit D^(-1/2) * A * D^(-1/2)
+          // compute the product D^(-1/2) * A * D^(-1/2)
 
         }
       reinit_ = 2;
@@ -371,7 +371,7 @@ void Solv_GCP::prepare_data(const Matrice_Base& matrice, const DoubleVect& secme
     }
 }
 
-// Calcul de vx = vx * alpha - vy
+// Compute vx = vx * alpha - vy
 static void multiply_sub(DoubleVect& vx, DoubleVect& vy, double alpha)
 {
   int n = vx.size_reelle_ok() ? vx.size() : vx.size_totale();
@@ -385,14 +385,14 @@ static void multiply_sub(DoubleVect& vx, DoubleVect& vy, double alpha)
       x_ptr[0] = a;
       x_ptr[1] = b;
     }
-  // n etait-il impair au depart ?
+  // was n odd to start with?
   if (n == 0)
     x_ptr[0] = x_ptr[0] * alpha - y_ptr[0];
 }
 
-// Calcul de vx += alpha * vy
-// Valeur de retour: somme locale sur ce processeur des vx[i]*vx[i] (apres ajout)
-// Attention: pas code pour les items communs
+// Compute vx += alpha * vy
+// Return value: local sum on this processor of vx[i]*vx[i] (after addition)
+// Warning: not implemented for shared items
 static double ajoute_alpha_v_norme(DoubleVect& vx, double alpha, DoubleVect& vy)
 {
   int n = vx.size();
@@ -409,7 +409,7 @@ static double ajoute_alpha_v_norme(DoubleVect& vx, double alpha, DoubleVect& vy)
       norme1 += a * a;
       norme2 += b * b;
     }
-  // n etait-il impair au depart ?
+  // was n odd to start with?
   if (n == 0)
     {
       double a = x_ptr[0] + alpha * y_ptr[0];
@@ -459,19 +459,19 @@ int Solv_GCP::resoudre_(const Matrice_Base& matrice,
 
   tmp_p_avec_items_virt_.inject_array(tmp_solution_, n_items_reels);
   tmp_p_avec_items_virt_.echange_espace_virtuel();
-  // On n'a pas besoin que residu ait son espace virtuel a jour
-  // En revanche, on a besoin de l'espace virtuel de tmp_p_...
+  // residu does not need an up-to-date virtual space
+  // but tmp_p_ does need its virtual space to be up to date...
   if (optimized)
     {
       tmp_mat_.multvect_(tmp_p_avec_items_virt_, residu_);
-      // calcul du produit, le produit scalaire n'est pas utilise:
+      // compute the product; the scalar product is not used:
       tmp_mat_virt_.ajouter_mult_vect_et_prodscal(tmp_p_avec_items_virt_, residu_);
     }
   else
     {
       matrice.multvect(tmp_p_avec_items_virt_, residu_);
     }
-  // ATTENTION: on suppose que secmem a ete copie dans resu_
+  // WARNING: it is assumed that secmem has been copied into resu_
   operator_sub(residu_, resu_, VECT_REAL_ITEMS); // ne pas toucher a l'espace virtuel
 
   if (avec_precond)
@@ -551,7 +551,7 @@ int Solv_GCP::resoudre_(const Matrice_Base& matrice,
 
           double residu_scalaire_resu = local_prodscal(residu_, resu_);
           norme = norme_residu_locale;
-          // optimisation: on calcule en une seule fois les deux sommes
+          // optimisation: both sums are computed in a single pass
           mp_sum_for_each(residu_scalaire_resu, norme);
           assert(residu_scalaire_resu >= 0);
           multiply_sub(tmp_p_, resu_, residu_scalaire_resu / dold);
@@ -589,7 +589,7 @@ int Solv_GCP::resoudre_(const Matrice_Base& matrice,
   if (get_flag_updated_result())
     solution.echange_espace_virtuel();
 
-  // On affiche quand meme le nombre d'iterations
+  // Display the number of iterations regardless
   if (limpr()>-1)
     {
       double norme_relative=(norme_b>0?norme/(norme_b+DMINFLOAT):norme);

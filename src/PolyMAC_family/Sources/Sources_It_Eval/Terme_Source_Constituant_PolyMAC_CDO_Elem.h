@@ -23,7 +23,7 @@
 
 /*! @brief class Terme_Source_Constituant_PolyMAC_CDO_Elem
  *
- *  Cette classe represente un terme source de l'equation de la thermique du type degagement volumique de puissance thermique uniforme sur un domaine
+ *  This class represents a source term of the heat equation of the type uniform volumetric thermal power release over a domain
  *
  * @sa Terme_Source_Constituant, Terme_Source_PolyMAC_CDO_base
  */

@@ -23,11 +23,11 @@ Sortie& Joints_32_64<_SIZE_>::printOn(Sortie& os) const { return LIST(Joint_32_6
 template <typename _SIZE_>
 Entree& Joints_32_64<_SIZE_>::readOn(Entree& is) { return LIST(Joint_32_64<_SIZE_>)::readOn(is); }
 
-/*! @brief Associe un domaine a tous les joints de la liste.
+/*! @brief Associates a domain with all joints in the list.
  *
- * Les joints de la liste feront partie de cet domaine.
+ * The joints in the list will belong to this domain.
  *
- * @param (Domaine& un_domaine) le domaine a associer aux joints
+ * @param un_domaine The domain to associate with the joints.
  */
 template <typename _SIZE_>
 void Joints_32_64<_SIZE_>::associer_domaine(const Domaine_t& un_domaine)
@@ -35,12 +35,11 @@ void Joints_32_64<_SIZE_>::associer_domaine(const Domaine_t& un_domaine)
   for (auto& itr : *this) itr.associer_domaine(un_domaine);
 }
 
-/*! @brief Renvoie le nombre de face total des Joints_32_64 de la liste.
+/*! @brief Returns the total number of faces in all Joints_32_64 in the list.
  *
- * (la somme des faces de tous les
- *     joints de la liste).
+ * This is the sum of faces over all joints in the list.
  *
- * @return (int) le nombre de face total des Joints_32_64 de la liste
+ * @return Total number of faces across all joints in the list.
  */
 template <typename _SIZE_>
 _SIZE_ Joints_32_64<_SIZE_>::nb_faces() const
@@ -51,13 +50,12 @@ _SIZE_ Joints_32_64<_SIZE_>::nb_faces() const
   return nombre;
 }
 
-/*! @brief Renvoie le nombre de faces du type specifie contenues dans la liste de joints.
+/*! @brief Returns the number of faces of the specified type contained in the joint list.
  *
- *     (somme des faces de ce type sur tous les
- *      joints de la liste)
+ * This is the sum of faces of the given type over all joints in the list.
  *
- * @param (Type_Face type) le type des faces a compter
- * @return (int) le nombre de faces du type specifie contenues dans la liste de joints
+ * @param type The face type to count.
+ * @return Number of faces of the specified type contained in the joint list.
  */
 template <typename _SIZE_>
 _SIZE_ Joints_32_64<_SIZE_>::nb_faces(Type_Face type) const
@@ -70,7 +68,7 @@ _SIZE_ Joints_32_64<_SIZE_>::nb_faces(Type_Face type) const
   return nombre;
 }
 
-/*! @brief Comprime la liste de joints.
+/*! @brief Compresses the joint list by merging joints sharing the same neighboring PE.
  *
  */
 template <typename _SIZE_>
@@ -100,10 +98,10 @@ void Joints_32_64<_SIZE_>::comprimer()
                       fait(rang2) = 1;
                       joint1.nommer(joint1.le_nom() + joint2.le_nom());
 
-                      // Concatenation des faces
+                      // Concatenation of faces
                       joint1.ajouter_faces(joint2.les_sommets_des_faces());
 
-                      // Concatenation des sommets ???
+                      // Concatenation of vertices ???
                       Cerr << "Concatenation of nodes ?" << finl;
                       Process::exit();
 
@@ -127,11 +125,11 @@ void Joints_32_64<_SIZE_>::comprimer()
   Cerr << "Joints_32_64<_SIZE_>::comprimer() - End" << finl;
 }
 
-/*! @brief Renvoie une reference sur le joint qui a pour voisin le PE specifie.
+/*! @brief Returns a reference to the joint whose neighboring PE is the specified one.
  *
- * @param (int pe) un numero de PE
- * @return (Joint&) le joint qui a pour voisin le PE specifie
- * @throws PE voisin specifie non trouve dans la liste des joints.
+ * @param pe A PE index.
+ * @return Reference to the joint whose neighboring PE is pe.
+ * @throws Error if the specified neighboring PE is not found in the joint list.
  */
 template <typename _SIZE_>
 typename Joints_32_64<_SIZE_>::Joint_t& Joints_32_64<_SIZE_>::joint_PE(int pe)

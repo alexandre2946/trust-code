@@ -41,7 +41,7 @@ protected:
 private:
   int precision_; ///< used to keep current precision when new_buffer() is called
 
-  /*! This pointer is just a (typed) view on the smart ptr hold by the base class (Sortie).
+  /*! @brief This pointer is just a (typed) view on the smart ptr hold by the base class (Sortie).
    * The base class is managing the memory.
    */
   std::ostringstream* buf_ = nullptr;

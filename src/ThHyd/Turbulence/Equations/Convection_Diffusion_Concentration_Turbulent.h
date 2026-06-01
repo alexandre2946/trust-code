@@ -19,13 +19,10 @@
 #include <Convection_Diffusion_Turbulent.h>
 #include <Convection_Diffusion_Concentration.h>
 
-/*! @brief classe Convection_Diffusion_Concentration_Turbulent Cette classe represente le cas particulier de
+/*! @brief Turbulent convection-diffusion equation when the unknown is a concentration or a vector of concentrations.
  *
- *      convection diffusion turbulente lorsque l'inconnue
- *      est une concentration ou un vecteur de concentrations
- *      Cette herite de Convection_Diffusion_Turbulent qui contient
- *      le modele de turbulence et de Convection_Diffusion_Concentration
- *      qui modelise l'equation non turbulente.
+ *      Inherits from Convection_Diffusion_Turbulent (which contains the turbulence model)
+ *      and from Convection_Diffusion_Concentration (which models the non-turbulent equation).
  *
  * @sa Convection_Diffusion_Turbulent Convection_Diffusion_Concentration
  */

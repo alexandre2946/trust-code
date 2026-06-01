@@ -71,21 +71,21 @@ void Perte_Charge_VDF_base::ajouter_blocs(matrices_t matrices, DoubleTab& secmem
   DoubleTrav pos(D), v(N, D), vm(D), v_ph(D), dir(D), nv(N), Cf(N), Cf_t(N), Fk(N), G(N), mult(N, 2), Sigma_tab;
 
   for (int n = 0; n < N; n++)
-    mult(n, 0) = 1, mult(n, 1) = 0; //valeur par defaut de mult
+    mult(n, 0) = 1, mult(n, 1) = 0; //default value of mult
 
-  if (fmult) //si multiplicateur -> calcul de sigma
+  if (fmult) //if multiplier -> compute sigma
     {
       const Milieu_composite& milc = ref_cast(Milieu_composite, equation().milieu());
-      // Et pour les methodes span de la classe Saturation
-      const int ne_tot = domaine.nb_elem_tot(), nb_max_sat =  N * (N-1) /2; // oui !! suite arithmetique !!
+      // For the span methods of the Saturation class
+      const int ne_tot = domaine.nb_elem_tot(), nb_max_sat =  N * (N-1) /2; // yes!! arithmetic sequence!!
       Sigma_tab.resize(ne_tot, nb_max_sat);
       for (int k = 0; k < N; k++)
         for (int l = k + 1; l < N; l++)
           if (milc.has_saturation(k, l))
             {
               const Saturation_base& z_sat = milc.get_saturation(k, l);
-              const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Et oui ! matrice triang sup !
-              // recuperer Tsat et sigma ...
+              const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Yes! upper triangular matrix!
+              // retrieve Tsat and sigma ...
               const DoubleTab& sig = z_sat.get_sigma_tab();
 
               // fill in the good case
@@ -158,7 +158,7 @@ void Perte_Charge_VDF_base::ajouter_blocs(matrices_t matrices, DoubleTab& secmem
 
           Fk(n) = Cf(n) * G(n) * G(n) / rho(!cR * e, n) / 2.0 / dh_e; //force
         }
-      double Fm = Cf_t(0) * Gm * Gm / rho(!cR * e, 0) / 2.0 / dh_e; //force paroi "melange" (debit total, mais proprietes physiques du liquide)
+      double Fm = Cf_t(0) * Gm * Gm / rho(!cR * e, 0) / 2.0 / dh_e; //wall "mixture" force (total flow rate, but physical properties of the liquid)
 
       /* appel du multiplicateur diphasique (si il existe) */
       if (fmult)

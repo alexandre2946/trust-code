@@ -41,11 +41,11 @@ Entree& Champ_Generique_Statistiques_base::readOn(Entree& s )
 void Champ_Generique_Statistiques_base::set_param(Param& param) const
 {
   Champ_Gen_de_Champs_Gen::set_param(param);
-  //On ne fixe pas t_deb et t_fin en lecture obligatoire (Param::REQUIRED)
-  //car ces attributs peuvent etre fixes par fixer_tdeb_tfin()
-  //ex : Postraitement::creer_champ_post_stat()
-  //Mais specification obligatoire a conserver dans la doc pour l utilisateur
-  //qui specifie son champ statistique de facon standard dans definition_champs.
+  //We do not set t_deb and t_fin as mandatory reading (Param::REQUIRED)
+  //because these attributes can be set by fixer_tdeb_tfin()
+  //ex: Postraitement::creer_champ_post_stat()
+  //But the mandatory specification should be kept in the documentation for the user
+  //who specifies their statistical field in the standard way in definition_champs.
   param.ajouter("t_deb",&tstat_deb_); // XD attr t_deb floattant t_deb REQ Start of integration time
   param.ajouter("t_fin",&tstat_fin_); // XD attr t_fin floattant t_fin REQ End of integration time
 }
@@ -107,7 +107,7 @@ int Champ_Generique_Statistiques_base::reprendre(Entree& is)
   if(!TRUST_2_PDI::is_PDI_restart())
     {
       Nom bidon;
-      is >> bidon >> bidon; // On saute l'identificateur et le type des champs
+      is >> bidon >> bidon; // We skip the identifier and field type
     }
   Operateur_Statistique().reprendre(is);
   return 1;
@@ -120,8 +120,8 @@ void Champ_Generique_Statistiques_base::mettre_a_jour(double un_temps)
 }
 
 
-//Methodes pour changer t_deb et t_fin pour des reprises de statistiques
-//et pour des statistiques en serie
+//Methods to change t_deb and t_fin for statistics restarts
+//and for series statistics
 void Champ_Generique_Statistiques_base::fixer_serie(const double t1, const double t2)
 {
   Champ_Gen_de_Champs_Gen::fixer_serie(t1,t2);

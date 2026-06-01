@@ -34,7 +34,7 @@ protected:
   DoubleVect porosite_e, porosite_f;
 
 private:
-  double eps = 0.2; //suppression des modes en echiquier
+  double eps = 0.2; //suppression of checkerboard modes
 };
 
 #endif /* Op_Diff_PolyMAC_MPFA_Face_included */

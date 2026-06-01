@@ -22,16 +22,16 @@
 class Fichier_Lata;
 class SFichier;
 
-/*! @brief : Classe de postraitement des champs euleriens au format lata
+/*! @brief : Post-processing class for Eulerian fields in LATA format.
  *
  */
 
-//Pour creer un fichier valide, il faut faire:
-//    (initialisation) initialize("base_nom_fichier", ASCII, SINGLE_FILE);
+//To create a valid file, the following steps are needed:
+//    (initialization) initialize("base_nom_fichier", ASCII, SINGLE_FILE);
 //                       ecrire_entete(temps_courant,reprise,est_le_premier_post)
 //                     ecrire_domaine(domaine,est_le_premier_post)
 
-//    (pour chaque dt) ecrire_temps(temps_courant)
+//    (for each dt)   ecrire_temps(temps_courant)
 //                     ecrire_champ(const Domaine& domaine, const Noms& unite_, const Noms& noms_compo,
 //                                      int ncomp,double temps_,double temps_courant
 //                                      const Nom  & id_du_champ,
@@ -40,13 +40,13 @@ class SFichier;
 //                                    const DoubleTab & data)
 //                    [...                            ]
 
-//  Si option_para = MULTIPLE_FILES :
-//   on ecrit un fichier de postraitement par processeur
-//  Sinon :
-//   on ecrit un fichier unique qui contient l'ensemble des donnees.
-//   Les methodes doivent alors etre appelees simultanement sur tous
-//   les processeurs.
-//  Les specifications du format LATA sont decrites dans le fichier
+//  If option_para = MULTIPLE_FILES:
+//   one post-processing file is written per processor
+//  Otherwise:
+//   a single file is written containing all the data.
+//   The methods must then be called simultaneously on all
+//   processors.
+//  The LATA format specifications are described in the file
 //   Specifications_lata_v2.pdf
 
 class Format_Post_Lata : public Format_Post_base
@@ -54,8 +54,8 @@ class Format_Post_Lata : public Format_Post_base
   Declare_instanciable_sans_constructeur(Format_Post_Lata);
 public:
   //
-  // Methodes declarees dans la classe de base (interface commune a tous
-  // les formats de postraitment de champs):
+  // Methods declared in the base class (common interface for all
+  // field post-processing formats):
   //
   void set_param(Param& param) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
@@ -95,7 +95,7 @@ public:
                       const Nom& reference, const TIDVect& data, const int reference_size);
 
   //
-  // Methodes specifiques a ce format:
+  // Methods specific to this format:
   //
   enum Format { ASCII, BINAIRE };
   enum Options_Para { SINGLE_FILE, SINGLE_FILE_MPIIO, MULTIPLE_FILES };

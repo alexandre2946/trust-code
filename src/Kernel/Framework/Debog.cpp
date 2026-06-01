@@ -32,7 +32,7 @@ void Debog::verifier(const char* const msg, int x)
 
 void Debog::verifier_bord(const char* const msg, const DoubleVect& arr, int num_deb)
 {
-  // Ne fait rien
+  // Does nothing
 }
 
 void Debog::verifier(const char* const msg, const Champ_Inc_base& x)
@@ -47,20 +47,20 @@ void Debog::set_nom_pb_actuel(const Nom& nom)
     Debog_Pb::get_debog_instance()->set_nom_pb_actuel(nom);
 }
 
-/*! @brief teste le contenu du vecteur v en supposant qu'il contient des indices d'items associes au descripteur md.
+/*! @brief Tests the content of the vector v assuming it contains item indices associated with the descriptor md.
  *
- * Exemple: face_keps_imposee_
- *   Les valeurs negatives doivent etre identiques a la reference,
- *   les valeurs positives ou nulles sont interpretees comme un indice et
- *   doivent etre egale a l'indice de reference apres renumerotation.
+ * Example: face_keps_imposee_
+ *   Negative values must be identical to the reference,
+ *   non-negative values are interpreted as an index and
+ *   must be equal to the reference index after renumbering.
  *
  */
 void Debog::verifier_indices_items(const char* const msg, const MD_Vector& md, const IntVect& v)
 {
-  // pas code
+  // not coded
 }
 
-/*! @brief renvoie 1 si on est en mode Debog, 0 sinon
+/*! @brief Returns 1 if we are in Debog mode, 0 otherwise.
  *
  */
 int Debog::active()

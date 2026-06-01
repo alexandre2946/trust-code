@@ -18,7 +18,9 @@
 
 #include <Source_base.h>
 
-/*! @brief classe Correction_Tomiyama_PolyMAC_MPFA Correction de repulsion en paroi d'Tomiyama dans un ecoulement multiphase
+/*! @brief class Correction_Tomiyama_PolyMAC_MPFA
+ *
+ * @brief Tomiyama wall repulsion correction source term in a multiphase flow.
  *
  */
 class Correction_Tomiyama_PolyMAC_MPFA: public Source_base
@@ -35,10 +37,10 @@ public :
   void associer_pb(const Probleme_base& ) override { };
   void mettre_a_jour(double temps) override { };
 protected:
-  int n_l = -1; //phase liquide
+  int n_l = -1; //liquid phase
   int is_turb = 0;
   double g_ =  9.81 ;
-  double secu_diam_ =  0.1 ; // eviter que la force diverge en paroi
+  double secu_diam_ =  0.1 ; // prevent the force from diverging at the wall
 };
 
 #endif /* Correction_Tomiyama_PolyMAC_MPFA_included */

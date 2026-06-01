@@ -18,11 +18,11 @@
 
 #include <Dirichlet_paroi_defilante.h>
 
-/*! @brief classe Paroi_Knudsen_non_negligeable Impose un saut de vitesse de paroi dans une equation de type Navier_Stokes
+/*! @brief Paroi_Knudsen_non_negligeable Imposes a wall velocity slip in a Navier_Stokes type equation,
  *
- *     proportionnel au gradient de vitesse transverse.
+ *     proportional to the transverse velocity gradient.
  *
- * @sa Dirichlet, Objet compatible avec des equations du domaine de l'Hydraulique, ou indetermine. (voir compatible_avec_eqn(const Equation_base&) const)
+ * @sa Dirichlet, Compatible with equations of the Hydraulique domain or indeterminate (see compatible_avec_eqn(const Equation_base&) const)
  */
 class Paroi_Knudsen_non_negligeable: public Dirichlet_paroi_defilante
 {

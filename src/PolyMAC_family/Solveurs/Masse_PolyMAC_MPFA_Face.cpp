@@ -65,15 +65,15 @@ DoubleTab& Masse_PolyMAC_MPFA_Face::appliquer_impl(DoubleTab& sm) const
       int i, f;
       double fac;
 
-      //vitesses aux faces
+      //velocities at faces
       for (f = 0; f < domaine.nb_faces(); f++)
         for (n = 0; n < N; n++)
           {
             for (fac = 0, i = 0; i < 2 && (e = f_e(f, i)) >= 0; i++) fac += vfd(f, i) / vf(f) * (a_r ? (*a_r)(e, n) : 1);
-            sm(f, n) /= pf(f) * vf(f) * fac; //vitesse calculee
+            sm(f, n) /= pf(f) * vf(f) * fac; //computed velocity
           }
 
-      //vitesses aux elements
+      //velocities at elements
       if (sm.dimension_tot(0) > N * nf_tot)
         for (e = 0; e < domaine.nb_elem(); e++)
           for (d = 0; d < D; d++)
@@ -82,17 +82,17 @@ DoubleTab& Masse_PolyMAC_MPFA_Face::appliquer_impl(DoubleTab& sm) const
     }
   else
     {
-      //vitesses aux faces
+      //velocities at faces
       Solveur_Masse_Face_proto::appliquer_impl_proto(sm);
 
-      //vitesses aux elements
+      //velocities at elements
       if (sm.dimension_tot(0) > nf_tot)
         for (e = 0; e < domaine.nb_elem(); e++)
           for (d = 0; d < D; d++)
             for (n = 0; n < N; n++)
               {
                 if ( (a_r ? (*a_r)(e, n) : 1) > 1e-10) sm(nf_tot + D * e + d, n) /= pe(e) * ve(e) * (a_r ? (*a_r)(e, n) : 1);
-                else sm(nf_tot + D * e + d, n) = 0; //cas d'une evanescence
+                else sm(nf_tot + D * e + d, n) = 0; //case of evanescence
               }
     }
 
@@ -103,7 +103,7 @@ DoubleTab& Masse_PolyMAC_MPFA_Face::appliquer_impl(DoubleTab& sm) const
 void Masse_PolyMAC_MPFA_Face::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   const std::string& nom_inc = equation().inconnue().le_nom().getString();
-  if (!matrices.count(nom_inc)) return; //rien a faire
+  if (!matrices.count(nom_inc)) return; //nothing to do
   Matrice_Morse& mat = *matrices.at(nom_inc), mat2;
   const DoubleTab& inco = equation().inconnue().valeurs();
   const Pb_Multiphase *pbm = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()) : nullptr;
@@ -118,7 +118,7 @@ void Masse_PolyMAC_MPFA_Face::dimensionner_blocs(matrices_t matrices, const tabs
   int i, e, nf_tot = le_dom_PolyMAC_CDO->nb_faces_tot(), m, n, N = inco.line_size(), d, D = dimension;
   for (e = 0, i = N * nf_tot; e < le_dom_PolyMAC_CDO->nb_elem_tot(); e++)
     for (d = 0; d < D; d++)
-      for (n = 0; n < N; n++, i++) //tous les elems (pour Op_Grad_PolyMAC_MPFA_Face)
+      for (n = 0; n < N; n++, i++) //all elements (for Op_Grad_PolyMAC_MPFA_Face)
         if (corr)
           for (m = 0; m < N; m++) sten.append_line(i, N * (nf_tot + D * e + d) + m);
         else sten.append_line(i, i);
@@ -127,7 +127,7 @@ void Masse_PolyMAC_MPFA_Face::dimensionner_blocs(matrices_t matrices, const tabs
   mat.nb_colonnes() ? mat += mat2 : mat = mat2;
 }
 
-// XXX : a voir si on peut utiliser Solveur_Masse_Face_proto::ajouter_blocs_proto ...
+// XXX : to check whether Solveur_Masse_Face_proto::ajouter_blocs_proto can be used ...
 void Masse_PolyMAC_MPFA_Face::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, double dt, const tabs_t& semi_impl, int resoudre_en_increments) const
 {
   const DoubleTab& inco = equation().inconnue().valeurs(), &passe = equation().inconnue().passe();
@@ -145,19 +145,19 @@ void Masse_PolyMAC_MPFA_Face::ajouter_blocs(matrices_t matrices, DoubleTab& secm
 
   if (polymac_flica5) resoudre_en_increments = 1;
 
-  /* faces : si CLs, pas de produit par alpha * rho en multiphase */
-  DoubleTrav masse(N, N), masse_e(N, N); //masse alpha * rho, contribution
-  for (f = 0; f < domaine.nb_faces(); f++) //faces reelles
+  /* faces: if BCs, no multiplication by alpha * rho in multiphase */
+  DoubleTrav masse(N, N), masse_e(N, N); //alpha * rho mass, contribution
+  for (f = 0; f < domaine.nb_faces(); f++) //real faces
     {
       const double fac_ale = domaine.domaine().deformable() ? domaine.domaine().old_volumes_entrelaces()(f) / vf(f) : 1.0;
       if (!pbm || fcl(f, 0) >= 2)
-        for (masse = 0, n = 0; n < N; n++) masse(n, n) = coeff_t ? (*coeff_t)[f] : 1.0; //pas Pb_Multiphase ou CL -> pas de alpha * rho
+        for (masse = 0, n = 0; n < N; n++) masse(n, n) = coeff_t ? (*coeff_t)[f] : 1.0; //not Pb_Multiphase or BC -> no alpha * rho
       else for (masse = 0, i = 0; i < 2 && (e = f_e(f, i)) >= 0; i++)
           {
-            for (masse_e = 0, n = 0; n < N; n++) masse_e(n, n) = (*a_r)(e, n); //partie diagonale
-            if (corr) corr->ajouter(&(*alpha)(e, 0), &(*rho)(!cR * e, 0), masse_e); //partie masse ajoutee
+            for (masse_e = 0, n = 0; n < N; n++) masse_e(n, n) = (*a_r)(e, n); //diagonal part
+            if (corr) corr->ajouter(&(*alpha)(e, 0), &(*rho)(!cR * e, 0), masse_e); //added mass part
             for (n = 0; n < N; n++)
-              for (m = 0; m < N; m++) masse(n, m) += vfd(f, i) / vf(f) * masse_e(n, m); //contribution au alpha * rho de la face
+              for (m = 0; m < N; m++) masse(n, m) += vfd(f, i) / vf(f) * masse_e(n, m); //contribution to the face alpha * rho
           }
       for (n = 0; n < N; n++)
         {
@@ -174,11 +174,11 @@ void Masse_PolyMAC_MPFA_Face::ajouter_blocs(matrices_t matrices, DoubleTab& secm
         }
     }
 
-  for (e = 0, i = nf_tot; e < domaine.nb_elem_tot(); e++) //tous les elems (pour Op_Grad_PolyMAC_MPFA_Face)
+  for (e = 0, i = nf_tot; e < domaine.nb_elem_tot(); e++) //all elements (for Op_Grad_PolyMAC_MPFA_Face)
     {
       const double fac_ale = domaine.domaine().deformable() ? domaine.domaine().old_volumes()(e) / ve(e) : 1.0;
-      for (masse = 0, n = 0; n < N; n++) masse(n, n) = a_r ? (*a_r)(e, n) : 1; //partie diagonale
-      if (corr) corr->ajouter(&(*alpha)(e, 0), &(*rho)(!cR * e, 0), masse); //partie masse ajoutee
+      for (masse = 0, n = 0; n < N; n++) masse(n, n) = a_r ? (*a_r)(e, n) : 1; //diagonal part
+      if (corr) corr->ajouter(&(*alpha)(e, 0), &(*rho)(!cR * e, 0), masse); //added mass part
       for (d = 0; d < D; d++, i++)
         for (n = 0; n < N; n++)
           {
@@ -203,7 +203,7 @@ void Masse_PolyMAC_MPFA_Face::ajouter_blocs(matrices_t matrices, DoubleTab& secm
   i++;
 }
 
-//sert a remettre en coherence la partie aux elements avec la partie aux faces
+//brings the element part back in consistency with the face part
 DoubleTab& Masse_PolyMAC_MPFA_Face::corriger_solution(DoubleTab& x, const DoubleTab& y, int incr) const
 {
   const Champ_Face_PolyMAC_MPFA& ch = ref_cast(Champ_Face_PolyMAC_MPFA, equation().inconnue());

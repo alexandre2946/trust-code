@@ -26,9 +26,9 @@ class Op_Dift_Stab_VEF_Face: public Op_Dift_VEF_base, public Op_Dift_VEF_Face_Ge
 public:
   void completer() override;
 
-  DoubleTab& ajouter(const DoubleTab&, DoubleTab&) const override; // pour l'explicite
+  DoubleTab& ajouter(const DoubleTab&, DoubleTab&) const override; // for the explicit scheme
 
-  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override; // pour l'implicite
+  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override; // for the implicit scheme
 
 private:
   IntTab is_dirichlet_faces_;

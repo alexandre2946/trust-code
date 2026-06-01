@@ -79,7 +79,7 @@ bool Pb_Dilatable_base::initTimeStep(double dt)
 void Pb_Dilatable_base::mettre_a_jour(double temps)
 {
   Debog::set_nom_pb_actuel(le_nom());
-  equation(1).mettre_a_jour(temps); // thermique
+  equation(1).mettre_a_jour(temps); // thermal equation
   equation(0).mettre_a_jour(temps); // NS
 
   for(int i=2; i<nombre_d_equations(); i++) // if species ...
@@ -134,11 +134,11 @@ bool Pb_Dilatable_base::iterateTimeStep(bool& converged)
   // Update pressure fields (total/thermo/hydro) if necessary
   update_pressure_fields(temps_futur);
 
-  // on recule les inconnues (le pb mettra a jour les equations)
+  // roll back the unknowns (the problem will update the equations)
   for (int i=0; i<nombre_d_equations(); i++)
     equation(i).inconnue().reculer();
 
-  // Calculs coeffs echange sur l'instant sur lequel doivent agir les operateurs.
+  // Compute exchange coefficients at the time step on which operators act.
   double tps=schema_temps().temps_defaut();
   for(int i=0; i<nombre_d_equations(); i++)
     equation(i).domaine_Cl_dis().calculer_coeffs_echange(tps);

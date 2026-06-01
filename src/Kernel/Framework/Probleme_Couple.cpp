@@ -48,7 +48,7 @@ Implemente_instanciable(Probleme_Couple_Point_Fixe,"Probleme_Couple_Point_Fixe",
 
 ///////////////////////////////////////////////
 //                                           //
-// Implementation de l'interface de Problem  //
+// Implementation of the Problem interface  //
 //                                           //
 ///////////////////////////////////////////////
 
@@ -69,8 +69,8 @@ double Probleme_Couple::computeTimeStep(bool& stop) const
 {
   double dt_=DMAXFLOAT;
 
-  // On prend le dt min.
-  // On stoppe si l'un des problemes veut stopper.
+  // We take the minimum dt.
+  // We stop if one of the problems wants to stop.
   for (int i=0; i<nb_problemes(); i++)
     {
       double dt1=probleme(i).computeTimeStep(stop);
@@ -95,7 +95,7 @@ bool Probleme_Couple::solveTimeStep()
         dom.mettre_a_jour(schema_temps().temps_courant(), pb.domaine_dis(), pb);
     }
 
-  // WEC : A changer !!!!
+  // WEC: To be changed!!!!
   if (sch_clones.size())
     if (sub_type(Schema_Euler_Implicite,schema_temps()))
       {
@@ -103,7 +103,7 @@ bool Probleme_Couple::solveTimeStep()
         int ok = 1, cv;
         cv = sch_eul_imp.faire_un_pas_de_temps_pb_couple(*this, ok);
         if (!ok) return false;
-        // on propage un certain nombre de choses vers les clones
+        // we propagate a certain number of things to the clones
         for (int i=1; i<sch_clones.size(); i++)
           {
             sch_clones[i]->facteur_securite_pas()=schema_temps().facteur_securite_pas();
@@ -144,7 +144,7 @@ bool Probleme_Couple_Point_Fixe::solveTimeStep()
   bool converged = false;
   int compteur = 0;
   int ok = 1;
-  int nb_iter_min = 0; // nombre minimum d'itérations avant de tester la convergence
+  int nb_iter_min = 0; // minimum number of iterations before testing convergence
 
   while (compteur < nb_iter_min || (!converged && ok && compteur < max_fp_iter))
     {
@@ -169,7 +169,7 @@ bool Probleme_Couple_Point_Fixe::solveTimeStep()
             pb.equation(eq).domaine_Cl_dis().calculer_coeffs_echange(temps);
         }
 
-      // 1. problemes
+      // 1. problems
       for (int i = 0; ok && i < nb_problemes(); i++)
         {
           Probleme_base& pb = ref_cast(Probleme_base, probleme(i));
@@ -233,7 +233,7 @@ bool Probleme_Couple::iterateTimeStep(bool& converged)
 
 ////////////////////////////////////////////////////////
 //                                                    //
-// Fin de l'implementation de l'interface de Problem  //
+// End of the implementation of the Problem interface //
 //                                                    //
 ////////////////////////////////////////////////////////
 
@@ -251,7 +251,7 @@ Entree& Probleme_Couple::readOn(Entree& is)
     }
 
   is >> motlu;
-  while (motlu!=Motcle("}"))   // fin du readOn
+  while (motlu!=Motcle("}"))   // end of readOn
     {
 
       if (motlu != Motcle("groupes"))
@@ -291,10 +291,10 @@ Entree& Probleme_Couple::readOn(Entree& is)
   return is;
 }
 
-/*! @brief Surcharge Objet_U::printOn(Sortie&) Imprime les problemes couples sur un flot de sortie.
+/*! @brief Overrides Objet_U::printOn(Sortie&): prints the coupled problems to an output stream.
  *
- * @param (Sortie& os) le flot de sortie sur lequel imprimer
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) the output stream to print to
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Probleme_Couple::printOn(Sortie& os) const
 {
@@ -309,17 +309,17 @@ Sortie& Probleme_Couple_Point_Fixe::printOn(Sortie& os) const { return Probleme_
 
 bool Probleme_Couple::updateGivenFields()
 {
-  // Pas de champs provenant de l'exterieur du couplage.
-  // Les echanges internes se font pendant iterateTimeStep.
+  // No fields coming from outside the coupling.
+  // Internal exchanges are done during iterateTimeStep.
   return true;
 }
 
-/*! @brief Ajoute un probleme a la liste des problemes couples.
+/*! @brief Adds a problem to the list of coupled problems.
  *
- * Met en place la reference du probleme vers this.
- *     Verifie que l'ordre conduction, thHyd est respecte.
+ * Sets up the reference from the problem back to this.
+ *     Verifies that the conduction, thHyd order is respected.
  *
- * @param (Probleme_base& pb) le probleme a ajouter au couplage
+ * @param (Probleme_base& pb) the problem to add to the coupling
  */
 void Probleme_Couple::ajouter(Probleme_base& pb)
 {
@@ -348,7 +348,7 @@ void Probleme_Couple::ajouter(Probleme_base& pb)
 }
 void Probleme_Couple::initialize()
 {
-  // On attribue la valeur 1 a schema_impr_ pour le schema du probleme 0 et 0 pour les autres. Un seul schema doit imprimer.
+  // Assign value 1 to schema_impr_ for the time scheme of problem 0 and 0 for the others. Only one scheme should print.
   for (int i = 0; i < nb_problemes(); i++)
     {
       Probleme_base& pb = ref_cast(Probleme_base, probleme(i));
@@ -358,15 +358,15 @@ void Probleme_Couple::initialize()
   Couplage_U::initialize();
 }
 
-/*! @brief Surcharge Objet_U::associer_(Objet_U&) Associe un objet au probleme couple, en verifiant le type
+/*! @brief Overrides Objet_U::associer_(Objet_U&): associates an object with the coupled problem, checking the type dynamically.
  *
- *     dynamiquement. L'objet peut-etre:
- *       - un schema en temps (Schema_Temps_base), et on l'associe aux problemes
- *       - un probleme (Probleme_base), on l'ajoute a la liste
+ *     The object can be:
+ *       - a time scheme (Schema_Temps_base), associated with the problems
+ *       - a problem (Probleme_base), added to the list
  *
- * @param (Objet_U& ob) l'objet a associer
- * @return (int) 1 si l'association a reussie 0 sinon
- * @throws l'objet n'est pas d'un type attendu
+ * @param (Objet_U& ob) the object to associate
+ * @return (int) 1 if the association succeeded, 0 otherwise
+ * @throws if the object is not of an expected type
  */
 int Probleme_Couple::associer_(Objet_U& ob)
 {
@@ -385,28 +385,26 @@ int Probleme_Couple::associer_(Objet_U& ob)
     return 0;
 }
 
-/*! @brief Associe une copie du schema en temps a chaque probleme du Probleme couple.
+/*! @brief Associates a copy of the time scheme with each problem of the coupled problem.
  *
- * @param (Schema_Temps_base& sch) le schema en temps a associer
+ * @param (Schema_Temps_base& sch) the time scheme to associate
  */
 void Probleme_Couple::associer_sch_tps_base(Schema_Temps_base& sch)
 {
   sch_clones.dimensionner(nb_problemes());
   for (int i=0; i<nb_problemes(); i++)
     {
-      sch_clones[i]=sch; // Clonage du schema
+      sch_clones[i]=sch; // Clone the scheme
       Probleme_base& pb=ref_cast(Probleme_base,probleme(i));
       pb.associer_sch_tps_base(sch_clones[i].valeur()); // association
-      //On attribue la valeur 1 a schema_impr_ pour le schema du probleme 0
-      //et 0 pour les autres. Un seul schema doit imprimer.
+      //We assign the value 1 to schema_impr_ for problem 0's scheme
+      //and 0 for the others. Only one scheme should print.
       if (i!=0) pb.schema_temps().schema_impr()=0;
     }
 }
-/*! @brief Renvoie le schema en temps associe aux problemes couples.
+/*! @brief Returns the time scheme associated with the coupled problems (const version).
  *
- * (version const)
- *
- * @return (Schema_Temps_base&) le schema en temps associe
+ * @return (Schema_Temps_base&) the associated time scheme
  */
 const Schema_Temps_base& Probleme_Couple::schema_temps() const
 {
@@ -419,9 +417,9 @@ const Schema_Temps_base& Probleme_Couple::schema_temps() const
   return pb.schema_temps();
 }
 
-/*! @brief Renvoie le schema en temps associe aux problemes couples.
+/*! @brief Returns the time scheme associated with the coupled problems.
  *
- * @return (Schema_Temps_base&) le schema en temps associe
+ * @return (Schema_Temps_base&) the associated time scheme
  */
 Schema_Temps_base& Probleme_Couple::schema_temps()
 {
@@ -434,13 +432,13 @@ Schema_Temps_base& Probleme_Couple::schema_temps()
   return pb.schema_temps();
 }
 
-/*! @brief Associe une discretisation a tous les problemes du probleme couple.
+/*! @brief Associates a discretization with all problems of the coupled problem.
  *
- *     Appelle Probleme_Base::discretiser(const Discretisation_base&)
- *     sur chacun des problemes du probleme couple.
- *     voir Probleme_Base::discretiser(const Discretisation_base&)
+ *     Calls Probleme_Base::discretiser(const Discretisation_base&)
+ *     on each of the sub-problems of the coupled problem.
+ *     see Probleme_Base::discretiser(const Discretisation_base&)
  *
- * @param (Discretisation_base& dis) une discretisation pour tous les problemes
+ * @param (Discretisation_base& dis) a discretization for all problems
  */
 void Probleme_Couple::discretiser(Discretisation_base& dis)
 {

@@ -16,18 +16,19 @@
 #ifndef VEF_discretisation_included
 #define VEF_discretisation_included
 
-/*! @brief class VEF_discretisation (schema de base) Classe qui gere la dicretisation VEF du probleme
+/*! @brief class VEF_discretisation (base scheme)
  *
- *     c'est ici que :
- *     * l'on discretise les proprietes physiques du fluide et notamment celui du fluide
- *        d'Ostwald( K, N, Mu, ...)
- *     * l'on associe le champ d'Ostwald et l'equation hydraulique, le fluide et la
- *     domaine_dis_base
- *     ** ( nouvelles procedures :
+ * @brief Class that manages the VEF discretization of the problem.
+ *     This is where:
+ *     * the physical properties of the fluid are discretized, in particular those of the
+ *        Ostwald fluid (K, N, Mu, ...)
+ *     * the Ostwald field and the hydraulic equation, the fluid and the
+ *     domaine_dis_base are associated
+ *     ** ( new procedures:
  *   void proprietes_physiques_fluide_Ostwald(Domaine_dis_base& ,Fluide_Ostwald& ,
  *            const Navier_Stokes_std& , const Champ_Inc_base& ) const;
- *    a besoin de la classe Fluide_Ostwald pour avoir acces au fluide etudie
- *                          Navier_Stokes_Std pour avoir acces a l'equation hydraulique
+ *    needs the Fluide_Ostwald class to access the fluid being studied
+ *                          Navier_Stokes_Std to access the hydraulic equation
  *
  * @sa Discret_Thyd_Turb
  */
@@ -50,7 +51,7 @@ public :
   void discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& nom, const Noms& unite, int nb_comp, double temps, OWN_PTR(Champ_Fonc_base)& champ) const override;
   void discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& nom, const Noms& unite, int nb_comp, double temps, OWN_PTR(Champ_Don_base)& champ) const override;
   void distance_paroi(const Schema_Temps_base&, Domaine_dis_base&, OWN_PTR(Champ_Fonc_base)&) const;
-  void distance_paroi_globale(const Schema_Temps_base&, Domaine_dis_base&, OWN_PTR(Champ_Fonc_base)&) const override; // Distance paroi definie sur tout le domaine
+  void distance_paroi_globale(const Schema_Temps_base&, Domaine_dis_base&, OWN_PTR(Champ_Fonc_base)&) const override; // Wall distance defined over the entire domain
   void proprietes_physiques_fluide_Ostwald(const Domaine_dis_base&, Fluide_Ostwald&, const Navier_Stokes_std&, const Champ_Inc_base&) const override;
   Nom domaine_cl_dis_type() const override { return "Domaine_Cl_VEF"; }
 
@@ -81,7 +82,7 @@ private:
   bool alphaRT_ = false;
   int P1Bulle_ = 1;
   int modif_div_face_dirichlet_ = 0;
-  int cl_pression_sommet_faible_ = 0; ///< determine si les cl de pression sont imposees de facon faible ou forte -> voir divergence et assembleur, zcl
+  int cl_pression_sommet_faible_ = 0; ///< determines whether pressure boundary conditions are imposed weakly or strongly -> see divergence and assembler, zcl
 
   void discretiser_champ_(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& nom, const Noms& unite, int nb_comp, int nb_pas_dt, double temps, OWN_PTR(Champ_Inc_base)& champ,
                           const Nom& sous_type = NOM_VIDE) const;

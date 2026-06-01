@@ -49,9 +49,9 @@ Entree& Prisme_32_64<_SIZE_>::readOn(Entree& s )
 }
 
 
-/*! @brief Reordonne les sommets du Prisme.
+/*! @brief Reorders the vertices of the Prism.
  *
- * NE FAIT RIEN: A CODER
+ * DOES NOTHING: TO BE CODED
  *
  */
 template <typename _SIZE_>
@@ -59,13 +59,13 @@ void Prisme_32_64<_SIZE_>::reordonner()
 {
   Cerr << "Prisme_32_64<_SIZE_>::reordonner must be coded " << finl;
   Process::exit();
-  // a coder. remise en conformite de la numerotation des noeuds.
+  // to be coded: restore conforming node numbering.
 }
 
 
-/*! @brief Renvoie le nom LML d'un prisme = "PRISM6".
+/*! @brief Returns the LML name of a prism = "PRISM6".
  *
- * @return (Nom&) toujours egal a "PRISM6"
+ * @return always equal to "PRISM6"
  */
 template <typename _SIZE_>
 const Nom& Prisme_32_64<_SIZE_>::nom_lml() const
@@ -75,32 +75,31 @@ const Nom& Prisme_32_64<_SIZE_>::nom_lml() const
 }
 
 
-/*! @brief NE FAIT RIEN: A CODER, renvoie toujours 0.
+/*! @brief DOES NOTHING: TO BE CODED; always returns 0.
  *
- * Renvoie 1 si l'element "element" du domaine associe a
- *               l'element geometrique contient le point
- *               de coordonnees specifiees par le parametre "pos".
- *     Renvoie 0 sinon.
+ * @brief Returns 1 if element "element" of the domain associated with this geometric element contains the point
+ *               with coordinates specified by parameter "pos".
+ *     Returns 0 otherwise.
  *
- * @param (DoubleVect& pos) coordonnees du point que l'on cherche a localiser
- * @param (int element) le numero de l'element du domaine dans lequel on cherche le point.
- * @return (int) 1 si le point de coordonnees specifiees appartient a l'element "element" 0 sinon
+ * @param pos coordinates of the point to locate
+ * @param ielem the element index in the domain in which the point is searched.
+ * @return 1 if the point belongs to element "element", 0 otherwise
  */
 template <typename _SIZE_>
 int Prisme_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t ielem ) const
 {
-  // a coder :
-  // est-ce que le prisme de numero element contient le point de
-  // coordonnees pos ?
-  // adaptation de tetraedre contient
+  // to be coded:
+  // does the prism with element number contain the point with
+  // coordinates pos?
+  // adaptation of the tetrahedron contains method
   assert(pos.size_array()==3);
   const Domaine_t& domaine=this->mon_dom.valeur();
   const Domaine_t& dom=domaine;
   double prod1,prod2,xn,yn,zn;
   int_t som0, som1, som2, som3,som4,som5;
 
-  // On regarde tout d'abord si le pintr cherche n'est pas un des
-  // sommets du triangle
+  // First check if the sought point is not one of the
+  // vertices of the triangle
   som0 = domaine.sommet_elem(ielem,0);
   som1 = domaine.sommet_elem(ielem,1);
   som2 = domaine.sommet_elem(ielem,2);
@@ -152,9 +151,9 @@ int Prisme_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t ielem ) const
           break;
         }
 
-      // Algorithme : le sommet 3 et le point M doivent pour j=0 a 3 du meme cote
-      // que le plan formes par les points som0,som1,som2.
-      // calcul de la normale au plan som0,som1,som2 :
+      // Algorithm: vertex 3 and point M must for j=0 to 3 be on the same side
+      // as the plane formed by points som0,som1,som2.
+      // compute the normal to the plane som0,som1,som2:
       xn = (dom.coord(som1,1)-dom.coord(som0,1))*(dom.coord(som2,2)-dom.coord(som0,2))
            - (dom.coord(som1,2)-dom.coord(som0,2))*(dom.coord(som2,1)-dom.coord(som0,1));
       yn = (dom.coord(som1,2)-dom.coord(som0,2))*(dom.coord(som2,0)-dom.coord(som0,0))
@@ -167,34 +166,34 @@ int Prisme_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t ielem ) const
       prod2 = xn * ( pos[0] - dom.coord(som0,0) )
               + yn * ( pos[1] - dom.coord(som0,1) )
               + zn * ( pos[2] - dom.coord(som0,2) );
-      // Si le point est sur le plan (prod2 quasi nul) : on ne peut pas conclure...
+      // If the point is on the plane (prod2 nearly zero): cannot conclude...
       if (prod1*prod2 < 0 && std::fabs(prod2)>std::fabs(prod1)*Objet_U::precision_geom) return 0;
     }
   return 1;
 }
 
 
-/*! @brief NE FAIT RIEN: A CODER, renvoie toujours 0 Renvoie 1 si les sommets specifies par le parametre "pos"
+/*! @brief DOES NOTHING: TO BE CODED, always returns 0. Returns 1 if the vertices specified by parameter "pos"
  *
- *     sont les sommets de l'element "element" du domaine associe a
- *     l'element geometrique.
+ *     are the vertices of element "element" of the domain associated with
+ *     the geometric element.
  *
- * @param (IntVect& pos) les numeros des sommets a comparer avec ceux de l'elements "element"
- * @param (int element) le numero de l'element du domaine dont on veut comparer les sommets
- * @return (int) 1 si les sommets passes en parametre sont ceux de l'element specifie, 0 sinon
+ * @param (IntVect& pos) the vertex indices to compare with those of element "element"
+ * @param (int element) the index of the domain element whose vertices are to be compared
+ * @return (int) 1 if the vertices passed as parameter are those of the specified element, 0 otherwise
  */
 template <typename _SIZE_>
 int Prisme_32_64<_SIZE_>::contient(const SmallArrOfTID_t& pos, int_t element ) const
 {
-  // a coder :
+  // to be coded:
   Process::exit();
   return 0;
 }
 
 
-/*! @brief NE FAIT RIEN: A CODER Calcule les volumes des elements du domaine associe.
+/*! @brief DOES NOTHING: TO BE CODED. Computes the volumes of the elements of the associated domain.
  *
- * @param (DoubleVect& volumes) le vecteur contenant les valeurs  des des volumes des elements du domaine
+ * @param (DoubleVect& volumes) the vector containing the volume values of the domain elements
  */
 template <typename _SIZE_>
 void Prisme_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const
@@ -213,7 +212,7 @@ void Prisme_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const
             i5=elem(num_poly,4),
             i6=elem(num_poly,5);
 
-      // recuperer de MEDMEM_Formulae.hxx
+      // retrieved from MEDMEM_Formulae.hxx
       double a1 = (coord(i2,0)-coord(i3,0))/2.0, a2 = (coord(i2,1)-coord(i3,1))/2.0, a3 = (coord(i2,2)-coord(i3,2))/2.0;
       double b1 = (coord(i5,0)-coord(i6,0))/2.0, b2 = (coord(i5,1)-coord(i6,1))/2.0, b3 = (coord(i5,2)-coord(i6,2))/2.0;
       double c1 = (coord(i4,0)-coord(i1,0))/2.0, c2 = (coord(i4,1)-coord(i1,1))/2.0, c3 = (coord(i4,2)-coord(i1,2))/2.0;
@@ -249,14 +248,14 @@ void Prisme_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const
 
 }
 
-/*! @brief remplit le tableau faces_som_local(i,j) qui donne pour 0 <= i < nb_faces()  et  0 <= j < nb_som_face(i) le numero local du sommet
+/*! @brief Fills the array faces_som_local(i,j) giving, for 0 <= i < nb_faces() and 0 <= j < nb_som_face(i), the local vertex index
  *
- *   sur l'element.
- *   On a  0 <= faces_sommets_locaux(i,j) < nb_som()
- *  Si toutes les faces de l'element n'ont pas le meme nombre de sommets, le nombre
- *  de colonnes du tableau est le plus grand nombre de sommets, et les cases inutilisees
- *  du tableau sont mises a -1
- *  On renvoie 1 si toutes les faces ont le meme nombre d'elements, 0 sinon.
+ *   on the element.
+ *   We have 0 <= faces_sommets_locaux(i,j) < nb_som()
+ *  If all faces of the element do not have the same number of vertices, the number
+ *  of columns of the array is the largest number of vertices, and the unused entries
+ *  of the array are set to -1.
+ *  Returns 1 if all faces have the same number of elements, 0 otherwise.
  *
  */
 template <typename _SIZE_>

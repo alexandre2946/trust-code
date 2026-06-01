@@ -82,8 +82,8 @@ void Dispersion_bulles_PolyMAC_MPFA::ajouter_blocs(matrices_t matrices, DoubleTa
       cR = (rho.dimension_tot(0) == 1),
       cM = (mu.dimension_tot(0) == 1),
       Nk = (k_turb) ? (*k_turb).dimension(1) : 1;
-  DoubleTrav nut(domaine.nb_elem_tot(), N); //viscosite turbulente
-  if (is_turb) ref_cast(Viscosite_turbulente_base, ref_cast(Op_Diff_Turbulent_PolyMAC_MPFA_Face, equation().operateur(0).l_op_base()).correlation()).eddy_viscosity(nut); //remplissage par la correlation
+  DoubleTrav nut(domaine.nb_elem_tot(), N); //turbulent viscosity
+  if (is_turb) ref_cast(Viscosite_turbulente_base, ref_cast(Op_Diff_Turbulent_PolyMAC_MPFA_Face, equation().operateur(0).l_op_base()).correlation()).eddy_viscosity(nut); //filled by the correlation
 
   // Input-output
   const Dispersion_bulles_base& correlation_db = ref_cast(Dispersion_bulles_base, correlation_.valeur());
@@ -92,28 +92,28 @@ void Dispersion_bulles_PolyMAC_MPFA::ajouter_blocs(matrices_t matrices, DoubleTa
   in.alpha.resize(N), in.T.resize(N), in.p.resize(N), in.rho.resize(N), in.mu.resize(N), in.sigma.resize(N*(N-1)/2), in.k_turb.resize(N), in.nut.resize(N), in.d_bulles.resize(N), in.nv.resize(N, N);
   out.Ctd.resize(N, N);
 
-  /* calculaiton of the gradient of alpha at the face */
+  /* calculation of the gradient of alpha at the face */
   const Champ_Elem_PolyMAC_MPFA& ch_a = ref_cast(Champ_Elem_PolyMAC_MPFA, pbm.equation_masse().inconnue());
   DoubleTrav grad_f_a(pvit);
   ch_a.init_grad(0);
-  const IntTab& fg_d = ch_a.fgrad_d, &fg_e = ch_a.fgrad_e;  // Tables utilisees dans domaine_PolyMAC_MPFA::fgrad pour le calcul du gradient
+  const IntTab& fg_d = ch_a.fgrad_d, &fg_e = ch_a.fgrad_e;  // Tables used in domaine_PolyMAC_MPFA::fgrad for gradient computation
   const DoubleTab&  fg_w = ch_a.fgrad_w;
-  const Conds_lim& cls_a = ch_a.domaine_Cl_dis().les_conditions_limites(); 		// conditions aux limites du champ alpha
-  const IntTab&    fcl_a = ch_a.fcl();	// tableaux utilitaires sur les CLs : fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
+  const Conds_lim& cls_a = ch_a.domaine_Cl_dis().les_conditions_limites(); 		// boundary conditions of the alpha field
+  const IntTab&    fcl_a = ch_a.fcl();	// utility arrays for BCs: fcl(f, .) = (BC type, BC index, index within BC)
 
-  // Et pour les methodes span de la classe Interface pour choper la tension de surface
-  const int nb_max_sat =  N * (N-1) /2; // oui !! suite arithmetique !!
+  // And for the span methods of the Interface class to retrieve the surface tension
+  const int nb_max_sat =  N * (N-1) /2; // yes !! arithmetic series !!
   DoubleTrav Sigma_tab(ne_tot,nb_max_sat);
 
-  // remplir les tabs ...
+  // fill the arrays ...
   for (int k = 0; k < N; k++)
     for (int l = k + 1; l < N; l++)
       {
         if (milc.has_saturation(k, l))
           {
             Saturation_base& z_sat = milc.get_saturation(k, l);
-            const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Et oui ! matrice triang sup !
-            // recuperer sigma ...
+            const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // yes !! upper triangular matrix !
+            // retrieve sigma ...
             const DoubleTab& sig = z_sat.get_sigma_tab();
             // fill in the good case
             for (int ii = 0; ii < ne_tot; ii++) Sigma_tab(ii, ind_trav) = sig(ii);
@@ -121,7 +121,7 @@ void Dispersion_bulles_PolyMAC_MPFA::ajouter_blocs(matrices_t matrices, DoubleTa
         else if (milc.has_interface(k, l))
           {
             Interface_base& sat = milc.get_interface(k,l);
-            const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Et oui ! matrice triang sup !
+            const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // yes !! upper triangular matrix !
             for (int i = 0 ; i<ne_tot ; i++) Sigma_tab(i,ind_trav) = res_en_T ? sat.sigma(temp(i,k),press(i,k * (Np > 1))) : sat.sigma_h(temp(i,k),press(i,k * (Np > 1))) ;
           }
       }
@@ -134,18 +134,18 @@ void Dispersion_bulles_PolyMAC_MPFA::ajouter_blocs(matrices_t matrices, DoubleTa
           {
             int e = fg_e(j);
             int f_bord;
-            if ( (f_bord = e-ne_tot) < 0) //contribution d'un element
+            if ( (f_bord = e-ne_tot) < 0) //element contribution
               grad_f_a(f, n) += fg_w(j) * alpha(e, n);
             else if (fcl_a(f_bord, 0) == 1 || fcl_a(f_bord, 0) == 2) //Echange_impose_base
               grad_f_a(f, n) += fg_w(j) ? fg_w(j) * ref_cast(Echange_impose_base, cls_a[fcl_a(f_bord, 1)].valeur()).T_ext(fcl_a(f_bord, 2), n) : 0;
-            else if (fcl_a(f_bord, 0) == 4) //Neumann non homogene
+            else if (fcl_a(f_bord, 0) == 4) //non-homogeneous Neumann
               grad_f_a(f, n) += fg_w(j) ? fg_w(j) * ref_cast(Neumann_paroi      , cls_a[fcl_a(f_bord, 1)].valeur()).flux_impose(fcl_a(f_bord, 2), n) : 0;
             else if (fcl_a(f_bord, 0) == 6) // Dirichlet
               grad_f_a(f, n) += fg_w(j) * ref_cast(Dirichlet, cls_a[fcl_a(f_bord, 1)].valeur()).val_imp(fcl_a(f_bord, 2), n);
           }
       }
 
-  /* Calcul du grad aux elems */
+  /* Compute the gradient at elements */
   for (int n = 0; n < N; n++)
     for (int e = 0; e < ne_tot; e++)
       for (int d = 0; d < D; d++)
@@ -200,7 +200,7 @@ void Dispersion_bulles_PolyMAC_MPFA::ajouter_blocs(matrices_t matrices, DoubleTa
   /* elements */
   for (int e = 0; e < ne_tot; e++)
     {
-      /* arguments de coeff */
+      /* coefficient arguments */
       for (int n = 0; n < N; n++)
         {
           in.alpha[n] = alpha(e, n);

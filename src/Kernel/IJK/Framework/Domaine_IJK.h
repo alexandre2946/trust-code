@@ -185,7 +185,7 @@ public:
    */
 //  void discretiser();
 
-  /*! @brief renvoie new(Faces) ! elle est surchargee par Domaine_VDF par ex.
+  /*! @brief Returns new(Faces)! Overridden by Domaine_VDF for example.
    */
   Faces* creer_faces();
 

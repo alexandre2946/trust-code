@@ -17,7 +17,7 @@
 #define Frottement_interfacial_Ishii_Zuber_included
 #include <Frottement_interfacial_base.h>
 
-/*! @brief classe Frottement_interfacial_Ishii_Zuber coefficients de frottement interfacial d'un ecoulement a bulles
+/*! @brief Ishii-Zuber interfacial friction coefficients for bubbly flows.
  *
  *
  *

@@ -22,11 +22,11 @@
 
 class Convection_Diffusion_std;
 
-/*! @brief classe Traitement_particulier_NS_chmoy_faceperio_VEF Cette classe permet de faire les traitements particuliers
+/*! @brief class Traitement_particulier_NS_chmoy_faceperio_VEF This class performs special post-processing
  *
- *      pour le calcul d'un canal plan :
- *          * conservation du debit
- *          * calculs de moyennes
+ *      for plane channel flow computations:
+ *          * flow rate conservation
+ *          * average computations
  *
  *
  * @sa Navier_Stokes_Turbulent, Traitement_particulier_base, Traitement_particulier_VEF

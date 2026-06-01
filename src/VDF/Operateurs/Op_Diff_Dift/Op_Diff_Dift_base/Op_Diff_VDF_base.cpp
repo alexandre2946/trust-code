@@ -31,7 +31,7 @@ Entree& Op_Diff_VDF_base::readOn(Entree& s) { return s; }
 void Op_Diff_VDF_base::completer()
 {
   Operateur_base::completer();
-  // Certains operateurs (Axi) n'ont pas d'iterateurs en VDF... Encore une anomalie dans la conception a corriger un jour !
+  // Some operators (Axi) have no iterators in VDF... another design anomaly to be fixed someday!
   if (iter_)
     {
       const bool is_pb_multi = sub_type(Pb_Multiphase, equation().probleme());
@@ -56,11 +56,11 @@ void Op_Diff_VDF_base::completer()
 
 int Op_Diff_VDF_base::impr(Sortie& os) const
 {
-  // Certains operateurs (Axi) n'ont pas d'iterateurs en VDF... Encore une anomalie dans la conception a corriger un jour !
+  // Some operators (Axi) have no iterators in VDF... another design anomaly to be fixed someday!
   return (bool(iter_)) ? iter_->impr(os) : 0;
 }
 
-/*! @brief calcule la contribution de la diffusion, la range dans resu
+/*! @brief Computes the diffusion contribution and stores it in resu
  *
  */
 DoubleTab& Op_Diff_VDF_base::calculer(const DoubleTab& inco, DoubleTab& resu) const
@@ -73,7 +73,7 @@ void Op_Diff_VDF_base::init_op_ext() const
 {
   const Domaine_VDF& zvdf = iter_->domaine();
   const Domaine_Cl_VDF& zclvdf = iter_->domaine_Cl();
-  op_ext = { this };      //le premier op_ext est l'operateur local
+  op_ext = { this };      //the first op_ext is the local operator
 
   for (int n_bord = 0; n_bord < zvdf.nb_front_Cl(); n_bord++)
     {
@@ -92,10 +92,10 @@ void Op_Diff_VDF_base::init_op_ext() const
   op_ext_init_ = 1;
 }
 
-// Ajout du terme supplementaire en V/(R*R) dans le cas des coordonnees axisymetriques
+// Addition of the supplementary term V/(R*R) in the axisymmetric coordinate case
 void Op_Diff_VDF_base::ajoute_terme_pour_axi(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  if (equation().domaine_application() == Motcle("Hydraulique")) // On est dans le cas des equations de Navier_Stokes
+  if (equation().domaine_application() == Motcle("Hydraulique")) // We are in the case of Navier_Stokes equations
     {
       const std::string& nom_inco = equation().inconnue().le_nom().getString();
       Matrice_Morse* mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr;
@@ -157,26 +157,26 @@ void Op_Diff_VDF_base::ajoute_terme_pour_axi(matrices_t matrices, DoubleTab& sec
 
 double Op_Diff_VDF_base::calculer_dt_stab_(const Domaine_VDF& zone_VDF) const
 {
-  // Calcul du pas de temps de stabilite :
+  // Computation of the stability time step:
   //
   //
-  //  - La diffusivite n'est pas uniforme donc:
+  //  - The diffusivity is not uniform, therefore:
   //
   //     dt_stab = Min (1/(2*diffusivite(elem)*coeff(elem))
   //
-  //     avec :
+  //     where:
   //            coeff =  1/(dx*dx) + 1/(dy*dy) + 1/(dz*dz)
   //
-  //            i decrivant l'ensemble des elements du maillage
+  //            i ranging over all mesh elements
   //
-  //  Rq: en hydraulique on cherche le Max sur les elements du maillage
-  //      initial (comme en thermique) et non le Max sur les volumes de Qdm.
+  //  Note: in hydraulics the Max is sought over the initial mesh elements
+  //        (as in thermics) and not over the momentum control volumes.
   double dt_stab = DMAXFLOAT;
   const Champ_base& ch_diffu = has_champ_masse_volumique() ? diffusivite() : diffusivite_pour_pas_de_temps();
   const DoubleTab& diffu = ch_diffu.valeurs(), *alp = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()).equation_masse().inconnue().passe() : nullptr;
   const bool Cdiffu = sub_type(Champ_Uniforme, ch_diffu);
 
-  // Si la diffusivite est variable, ce doit etre un champ aux elements.
+  // If the diffusivity is variable, it must be an element-based field.
   assert(Cdiffu || diffu.size() == diffu.line_size() * zone_VDF.nb_elem());
 
   int rho_comme_diff = 0;

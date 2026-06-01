@@ -124,7 +124,7 @@ void iterer_eqn_expl(Equation_base& eqn,int nb_iter,double dt,DoubleTab& current
     }
   double dt_stab = eqn.calculer_pas_de_temps();
 
-  // Voir Schema_Temps_base::limpr pour information sur modf
+  // See Schema_Temps_base::limpr for information on modf
   double n_sous_ite;
   modf((dt/dt_stab), &n_sous_ite);
   if (dt>dt_stab*n_sous_ite) n_sous_ite=n_sous_ite+1.;
@@ -168,7 +168,7 @@ void iterer_eqn_expl_diffusion_implicite(Equation_base& eqn,int nb_iter,double d
   current += dudt;
   eqn.valider_iteration();
 
-  //On remet les parametres de diffusion implicite a leur ancienne valeur
+  //Restore the implicit diffusion parameters to their previous values
   sch.set_seuil_diffusion_implicite() = seuil_sa;
   sch.set_diffusion_implicite() = flag_sa;
   converge = 1;
@@ -196,7 +196,7 @@ bool Simple::iterer_eqn(Equation_base& eqn,const DoubleTab& inut,DoubleTab& curr
   if (eqn.equation_non_resolue())
     {
       Cout<<eqn.que_suis_je()<<" equation is not solved."<<finl;
-      // on calcule une fois la derivee pour avoir les flux bord
+      // compute the derivative once to obtain the boundary fluxes
       if  (eqn.schema_temps().nb_pas_dt()==0)
         {
           DoubleTab toto(eqn.inconnue().valeurs());
@@ -245,13 +245,13 @@ bool Simple::iterer_eqn(Equation_base& eqn,const DoubleTab& inut,DoubleTab& curr
     }
 
   //////////////////////////////////////////////////////////////////////////////////////////
-  // Resolution implicite -par iterer_NS pour Navier_Stokes
-  //                          -...solveur.resoudre_systeme()... pour les autres equations
+  // Implicit resolution - via iterer_NS for Navier_Stokes
+  //                     - ...solveur.resoudre_systeme()... for other equations
   /////////////////////////////////////////////////////////////////////////////////////////
 
-  dudt = current; // pour pouvoir tester la convergence.
+  dudt = current; // to be able to test convergence.
   Matrice_Morse matrice;
-  if (!(sub_type(Navier_Stokes_std,eqn) && sub_type(SETS, *this))) //SETS et ICE gerent eux-memes leurs matrices
+  if (!(sub_type(Navier_Stokes_std,eqn) && sub_type(SETS, *this))) //SETS and ICE manage their own matrices
     {
       eqn.dimensionner_matrice(matrice);
       matrice.get_set_coeff() = 0;
@@ -271,7 +271,7 @@ bool Simple::iterer_eqn(Equation_base& eqn,const DoubleTab& inut,DoubleTab& curr
     {
       solveur->reinit();
       DoubleTrav resu_temp(current); /* residu en increments */
-      if (eqn.has_interface_blocs()) /* si assembler_blocs est disponible */
+      if (eqn.has_interface_blocs()) /* if assembler_blocs is available */
         {
           if (eqn.discretisation().is_poly_family() || eqn.que_suis_je().debute_par("Equation_flux"))
             {
@@ -301,7 +301,7 @@ bool Simple::iterer_eqn(Equation_base& eqn,const DoubleTab& inut,DoubleTab& curr
           double norme_b=mp_norme_vect(resu_temp);
           if (norme_b<seuil_test_preliminaire_solveur)
             {
-              //  GF le test suivant est peut etre intelligent ?
+              //  GF the following test might be sensible?
               //      if ( nb_iter>1)
               {
                 converge = 1;
@@ -320,7 +320,7 @@ bool Simple::iterer_eqn(Equation_base& eqn,const DoubleTab& inut,DoubleTab& curr
                 for (int i = 0; i < current.dimension_tot(0); i++)
                   for (int j = 0; j < current.line_size(); j++)
                     current(i, j) = std::max(current(i, j), 0.);
-              ok = eqn.milieu().check_unknown_range(); //verification que l'inconnue est dans les bornes du milieu
+              ok = eqn.milieu().check_unknown_range(); //verify that the unknown is within the medium's bounds
 
               if (ok)
                 {
@@ -338,21 +338,21 @@ bool Simple::iterer_eqn(Equation_base& eqn,const DoubleTab& inut,DoubleTab& curr
                       con = 0;
                     }
                 }
-              else current = eqn.inconnue().passe(); //si ok == 0, on restaure la valeur passee de inco
+              else current = eqn.inconnue().passe(); //if ok == 0, restore the previous value of the unknown
             }
           converge = 0;
         }
     }
 
   ///////////////////////////////////////////////////////////////////////
-  // Test de convergence de la solution entre deux iterations successives
-  // Pas applique pour l inconnue de N_S avec alorithme PISO et Implicite
+  // Convergence test of the solution between two successive iterations
+  // Not applied for the N_S unknown with the PISO and Implicit algorithm
   ///////////////////////////////////////////////////////////////////////
 
   if(!converge && ok)
     {
-      // permet de controler ce qui se passe
-      // en particulier la positivite de K et de eps
+      // allows checking what happens
+      // in particular the positivity of K and eps
       eqn.valider_iteration();
       dudt -= current;
       double dudt_norme = mp_norme_vect(dudt);
@@ -373,37 +373,37 @@ bool Simple::iterer_eqn(Equation_base& eqn,const DoubleTab& inut,DoubleTab& curr
 
 bool Simple::iterer_eqs(LIST(OBS_PTR(Equation_base)) eqs, int nb_iter, int& ok)
 {
-  // on recupere le solveur de systeme lineaire
+  // retrieve the linear system solver
   Parametre_implicite& param = get_and_set_parametre_implicite(eqs[0]);
   SolveurSys& solveur = param.solveur();
   double seuil_convg = param.seuil_convergence_implicite();
-  int i, j, bs = 0; //bs : linesize commune des tableaux si > 0, 0 sinon
+  int i, j, bs = 0; //bs : common line size of arrays if > 0, 0 otherwise
 
-  /* cle pour la memoization */
+  /* key for memoization */
   list_of_eq_ptr_t key(eqs.size());
   for (i = 0; i < eqs.size(); i++) key[i] = (intptr_t) &eqs[i].valeur();
 
-  int init = !mbloc.count(key); //premier passage
+  int init = !mbloc.count(key); //first pass
   Matrice_Bloc& Mglob = mbloc[key];
 
   if (init)
     for (Mglob.dimensionner(eqs.size(), eqs.size()), i = 0; i < eqs.size(); i++)
       for (j = 0; j < eqs.size(); j++) Mglob.get_bloc(i, j).typer("Matrice_Morse");
 
-  /* pour interface_blocs : si toutes les equations ont cette interface, on l'utilise */
+  /* for interface_blocs: if all equations have this interface, we use it */
   int interface_blocs_ok = 1;
   for (i = 0; i < eqs.size(); i++) interface_blocs_ok &= eqs[i]->has_interface_blocs();
-  std::vector<matrices_t> mats(eqs.size()); //ligne de matrices de l'equation i
+  std::vector<matrices_t> mats(eqs.size()); //matrix row for equation i
   for (i = 0; i < eqs.size(); i++)
     for (j = 0; j < eqs.size(); j++)
       {
         Nom nom_i = eqs[j]->inconnue().le_nom();
-        // champ d'un autre probleme : on ajoute un suffixe
+        // field from another problem: add a suffix
         if (eqs[i]->probleme().le_nom().getString() != eqs[j]->probleme().le_nom().getString()) nom_i += Nom("/") + eqs[j]->probleme().le_nom();
         mats[i][nom_i.getString()] = &ref_cast(Matrice_Morse, Mglob.get_bloc(i, j).valeur());
       }
 
-  //Les inconues/residus ont-ils la meme forme?
+  //Do the unknowns/residuals have the same shape?
   for (bs = eqs[0]->inconnue().valeurs().line_size(), i = 1; i < eqs.size(); i++)
     if (eqs[i]->inconnue().valeurs().line_size() != bs) bs = 0;
 
@@ -414,7 +414,7 @@ bool Simple::iterer_eqs(LIST(OBS_PTR(Equation_base)) eqs, int nb_iter, int& ok)
   MD_Vector mdv;
   mdv.copy(mdc);
 
-  if (init) //1er passage -> dimensionnement des MD_Vector et des matrices
+  if (init) //first pass -> sizing of MD_Vector and matrices
     {
       /* dimensionnement de la matrice globale */
       if (interface_blocs_ok)
@@ -436,25 +436,25 @@ bool Simple::iterer_eqs(LIST(OBS_PTR(Equation_base)) eqs, int nb_iter, int& ok)
             }
     }
   else for (i = 0; i < eqs.size(); i++)
-      for (j = 0; j < eqs.size(); j++) //passages suivantes -> il suffit de reallouer les tableaux coeff()
+      for (j = 0; j < eqs.size(); j++) //subsequent passes -> just reallocate the coeff() arrays
         {
           Matrice_Morse& mat = ref_cast(Matrice_Morse, Mglob.get_bloc(i, j).valeur());
           mat.get_set_coeff().resize(mat.get_set_tab2().size_array());
         }
 
-  //tableaux de travail
+  //work arrays
   DoubleTrav inconnues, residus, dudt;
-  if (bs) inconnues.resize(0, bs), residus.resize(0, bs), dudt.resize(0, bs); //pour que les tableaux aggreges aient la bonne line_size() si elle existe
+  if (bs) inconnues.resize(0, bs), residus.resize(0, bs), dudt.resize(0, bs); //so that aggregated arrays have the correct line_size() if it exists
   MD_Vector_tools::creer_tableau_distribue(mdv, inconnues);
   MD_Vector_tools::creer_tableau_distribue(mdv, residus);
   MD_Vector_tools::creer_tableau_distribue(mdv, dudt);
   DoubleTab_parts residu_parts(residus), inconnues_parts(inconnues), dudt_parts(dudt);
 
-  //remplissage des inconnues
+  //fill unknowns
   for(i = 0; i < eqs.size(); i++) inconnues_parts[i] = eqs[i]->inconnue().valeurs();
   dudt = inconnues;
 
-  //remplissage des matrices
+  //fill matrices
   if (interface_blocs_ok)
     {
       for (i = 0; i < eqs.size(); i++)
@@ -473,7 +473,7 @@ bool Simple::iterer_eqs(LIST(OBS_PTR(Equation_base)) eqs, int nb_iter, int& ok)
                 }
             }
         }
-      if (eqs[0]->discretisation().is_poly_family()) Mglob.ajouter_multvect(inconnues, residus); //pour ne pas resoudre en increments
+      if (eqs[0]->discretisation().is_poly_family()) Mglob.ajouter_multvect(inconnues, residus); //to avoid solving in increments
     }
   else for(i = 0; i < eqs.size(); i++)
       for (j = 0; j < eqs.size(); j++)
@@ -481,7 +481,7 @@ bool Simple::iterer_eqs(LIST(OBS_PTR(Equation_base)) eqs, int nb_iter, int& ok)
           Matrice_Morse& mat = ref_cast(Matrice_Morse, Mglob.get_bloc(i, j).valeur());
           eqs[i]->ajouter_termes_croises(inconnues_parts[i], eqs[j]->probleme(), inconnues_parts[j], residu_parts[i]);
           eqs[i]->contribuer_termes_croises(inconnues_parts[i], eqs[j]->probleme(), inconnues_parts[j], mat);
-          /* si i == j, alors assembler_avec_inertie() se charge du produit matrice/vecteur : sinon, on doit le faire a la main */
+          /* if i == j, then assembler_avec_inertie() handles the matrix/vector product: otherwise it must be done manually */
           if (i == j) eqs[i]->assembler_avec_inertie(mat, inconnues_parts[i], residu_parts[i]);
           else mat.ajouter_multvect(inconnues_parts[j], residu_parts[i]);
         }
@@ -491,7 +491,7 @@ bool Simple::iterer_eqs(LIST(OBS_PTR(Equation_base)) eqs, int nb_iter, int& ok)
   solveur.resoudre_systeme(Mglob, residus, inconnues);
   inconnues.echange_espace_virtuel();
 
-  // mise a jour
+  // update
   // Optimization: combine N mp_norme_vect into 1 collective call
   // First pass: compute local squared norms
   ArrOfDouble dudt_carres((int)eqs.size());
@@ -525,7 +525,7 @@ bool Simple::iterer_eqs(LIST(OBS_PTR(Equation_base)) eqs, int nb_iter, int& ok)
     }
   for(i = 0; i < eqs.size(); i++) eqs[i]->probleme().mettre_a_jour(eqs[i]->schema_temps().temps_courant());
 
-  //on desalloue les tableaux de coeffs
+  //deallocate the coefficient arrays
   for (i = 0; i < eqs.size(); i++)
     for (j = 0; j < eqs.size(); j++) ref_cast(Matrice_Morse, Mglob.get_bloc(i, j).valeur()).get_set_coeff().reset();
 
@@ -569,9 +569,9 @@ void Simple::calculer_correction_en_vitesse(const DoubleTrav& correction_en_pres
 }
 
 
-//Entree : Uk-1 ; Pk-1
-//Sortie Uk ; Pk
-//k designe une iteration
+//Input: Uk-1 ; Pk-1
+//Output: Uk ; Pk
+//k denotes an iteration
 
 void Simple::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pression,
                        double dt,Matrice_Morse& matrice,double seuil_resol,DoubleTrav& secmem,int nb_ite,int& converge, int& ok)
@@ -599,12 +599,12 @@ void Simple::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pression
   */
 
   gradient.calculer(pression,gradP);
-  //Construction de matrice et resu
+  //Build matrix and residual
   //matrice = A[Uk-1] = M/dt + CONV + DIFF
   //resu = A[Uk-1]Uk-1 -(A[Uk-1]Uk-1-Ss) + Sv + (M/dt)Uk-1 -BtPk-1
-  if (eqnNS.has_interface_blocs()) //si l'interface blocs est disponible, on l'utilise
+  if (eqnNS.has_interface_blocs()) //if the interface_blocs is available, use it
     eqnNS.assembler_blocs_avec_inertie({{ "vitesse", &matrice }}, resu);
-  else //sinon, on passe par ajouter/contribuer
+  else //otherwise, go through ajouter/contribuer
     {
       resu -= gradP;
       eqnNS.assembler_avec_inertie(matrice,current,resu);
@@ -612,11 +612,11 @@ void Simple::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pression
 
   solveur->reinit();
 
-  //Resolution du systeme A[Uk-1]U* = -BtP* + Sv + Ss + (M/dt)Uk-1
+  //Solve the system A[Uk-1]U* = -BtP* + Sv + Ss + (M/dt)Uk-1
   //current = U*
   solveur.resoudre_systeme(matrice,resu,current);
 
-  //Relaxation du champ de vitesse U*
+  //Velocity field relaxation U*
   //U* = alpha U*_new + (1-alpha)*U*_old
   if (nb_ite==1)
     Ustar_old = current;
@@ -625,13 +625,13 @@ void Simple::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pression
   current.echange_espace_virtuel();
   Ustar_old = current;
 
-  //Construction de matrice_en_pression_2 = BD-1Bt[Uk-1]
+  //Build matrice_en_pression_2 = BD-1Bt[Uk-1]
   Matrice& matrice_en_pression_2 = eqnNS.matrice_pression();
   assembler_matrice_pression_implicite(eqnNS,matrice,matrice_en_pression_2);
   SolveurSys& solveur_pression_ = eqnNS.solveur_pression();
   solveur_pression_->reinit();
 
-  //Calcul de secmem = BU* (en incompressible) BU* -drho/dt (en quasi-compressible)
+  //Compute secmem = BU* (incompressible) BU* -drho/dt (quasi-compressible)
   if (is_dilat)
     {
       if (with_d_rho_dt_)
@@ -649,18 +649,18 @@ void Simple::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pression
   secmem.echange_espace_virtuel();
 
 
-  //Resolution du systeme (BD-1Bt)P' = BU* en incompressible
-  //                          (BD-1Bt)P' = BU* -drho/dt en quasi-compressible
+  //Solve the system (BD-1Bt)P' = BU* (incompressible)
+  //                 (BD-1Bt)P' = BU* -drho/dt (quasi-compressible)
   //correction_en_pression = P'
   solveur_pression_.resoudre_systeme(matrice_en_pression_2.valeur(),
                                      secmem,correction_en_pression);
 
-  //Resolution de DU' = BP'
+  //Solve DU' = BP'
   //correction_en_vitesse = U'
   calculer_correction_en_vitesse(correction_en_pression,gradP,correction_en_vitesse,matrice,gradient);
 
-  //Correction de la pression P = P* + beta_*P'
-  //Correction de la vitesse U = U* + beta_u*U' (beta_u=1)
+  //Pressure correction P = P* + beta_*P'
+  //Velocity correction U = U* + beta_u*U' (beta_u=1)
 
   pression.ajoute(beta_,correction_en_pression);
   eqnNS.assembleur_pression()->modifier_solution(pression);

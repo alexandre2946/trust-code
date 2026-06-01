@@ -47,7 +47,7 @@ void Flux_radiatif_VDF::evaluer_cl_rayonnement(Champ_front_base& Tb, const Champ
   const Front_VF& le_bord = ref_cast(Front_VF, frontiere_dis());
   const IntTab& face_voisins = zvdf.face_voisins();
 
-  // On dimensionne le_champ_front
+  // Dimension le_champ_front
   assert(le_champ_front->nb_comp() == 1);
   DoubleTab& tab = le_champ_front->valeurs_au_temps(temps);
   tab.resize(le_bord.nb_faces(), le_champ_front->nb_comp());
@@ -63,7 +63,7 @@ void Flux_radiatif_VDF::evaluer_cl_rayonnement(Champ_front_base& Tb, const Champ
   double nn = -123., k = -123., l_r = -123.;
   double epsi = -123., T = -123.;
 
-  // Boucle sur les faces de le_bord
+  // Loop over the faces of le_bord
   for (int face = ndeb; face < nfin; face++)
     {
       int elem = face_voisins(face, 0);
@@ -85,19 +85,19 @@ void Flux_radiatif_VDF::evaluer_cl_rayonnement(Champ_front_base& Tb, const Champ
       else
         k = kappa(elem, 0);
 
-      // determination de la temperature de paroi en fonction de la face consideree
+      // Determination of the wall temperature as a function of the face considered
       if (sub_type(Champ_front_uniforme, Tb))
         T = Tb.valeurs()(0, 0);
       else
         T = Tb.valeurs_au_temps(temps)(face - ndeb, 0);
 
-      // Determination de l'emissivite de paroi en fonction de la face consideree
+      // Determination of the wall emissivity as a function of the face considered
       if (sub_type(Champ_front_uniforme, emissivite()))
         epsi = epsilon(0, 0);
       else
         epsi = epsilon(face - ndeb, 0);
 
-      // Remplissage de la condition a la limite pour l'equation de rayonnement
+      // Filling the boundary condition for the radiation equation
       double numer_coeff = l_r;
       numer_coeff *= 4 * nn * nn * sigma * pow(T, 4);
 
@@ -117,7 +117,7 @@ void Flux_radiatif_VDF::evaluer_cl_rayonnement(Champ_front_base& Tb, const Champ
 
 void Flux_radiatif_VDF::calculer_flux_radiatif(const Equation_base& eq_temp)
 {
-  // On doit recuperer la temperature de bord
+  // Retrieve the boundary temperature
   const Front_VF& le_bord = ref_cast(Front_VF, frontiere_dis());
   const int nb_faces = le_bord.nb_faces();
   const Conds_lim& les_cl_temp = eq_temp.domaine_Cl_dis().les_conditions_limites();
@@ -199,7 +199,7 @@ void Flux_radiatif_VDF::calculer_flux_radiatif(const Equation_base& eq_temp)
   double kappa_F = -123., epsi = -123.;
   double Tbord = -123., n = -123.;
 
-  // On fait une boucle sur les faces
+  // Loop over the faces
   for (int face = 0; face < nb_faces; face++)
     {
       int elem = face_voisins(face + ndeb, 0);

@@ -19,11 +19,11 @@
 
 #include <Traitement_particulier_NS_canal.h>
 
-/*! @brief classe Traitement_particulier_NS_canal_VDF Cette classe permet de faire les traitements particuliers
+/*! @brief Traitement_particulier_NS_canal_VDF class
  *
- *      pour le calcul d'un canal plan :
- *          * conservation du debit
- *          * calculs de moyennes
+ *  @brief This class performs special post-processing operations for plane channel flow computations:
+ *          * flow rate conservation
+ *          * mean value computations
  *
  *
  * @sa Navier_Stokes_Turbulent, Traitement_particulier_base, Traitement_particulier_VDF

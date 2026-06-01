@@ -19,12 +19,10 @@
 #include <Sources_Multiphase_base.h>
 #include <Correlation_base.h>
 
-/*! @brief Classe Source_Frottement_interfacial_base
+/*! @brief Interfacial friction source term of the form:
  *
- *    Cette classe implemente un operateur de frottement interfacial
- *
- *     de la forme F_{kl} = - F_{lk} = - C_{kl} (u_k - u_l)
- *     le calcul de C_{kl} est realise par la hierarchie Coefficient_Frottement_interfacial_base
+ *     F_{kl} = - F_{lk} = - C_{kl} (u_k - u_l).
+ *     The coefficient C_{kl} is computed by the Coefficient_Frottement_interfacial_base hierarchy.
  *
  * @sa Source_base
  */
@@ -37,7 +35,7 @@ public :
   void completer() override;
 
 protected:
-  OWN_PTR(Correlation_base) correlation_; //correlation donnant le coeff de frottement interfacial
+  OWN_PTR(Correlation_base) correlation_; // correlation providing the interfacial friction coefficient
   double a_res_ = -1., dv_min = 0.01, beta_ = 1.;
   int exp_res = 2 ;
 

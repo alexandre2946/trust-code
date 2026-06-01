@@ -16,9 +16,9 @@
 #ifndef LireMED_included
 #define LireMED_included
 
-/*! @brief Classe LireMED Lire un fichier MED
+/*! @brief class LireMED Read a MED file.
  *
- *     Structure du jeu de donnee (en dimension 2) :
+ *     Data set structure (in dimension 2):
  *     LireMED dom medfile
  */
 #include <Interprete_geometrique_base.h>

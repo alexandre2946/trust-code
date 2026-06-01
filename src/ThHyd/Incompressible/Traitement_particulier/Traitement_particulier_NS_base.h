@@ -27,10 +27,10 @@ class Navier_Stokes_std;
 class Equation_base;
 class Champ_base;
 
-/*! @brief classe Traitement_particulier_NS_base Derive de Support_Champ_Masse_Volumique: utilisation de rho
+/*! @brief Traitement_particulier_NS_base Derives from Support_Champ_Masse_Volumique: use of rho
  *
- *      pour le calcul de l'energie cinetique par exemple (front-tracking)
- *      voir Traitement_particulier_NS_EC
+ *      for computing kinetic energy for example (front-tracking);
+ *      see Traitement_particulier_NS_EC
  *
  * @sa Navier_Stokes_Standard
  */
@@ -52,7 +52,7 @@ public :
   virtual void reprendre_stat()  = 0;
   virtual void en_cours_de_resolution(int , DoubleTab& , DoubleTab& ,double)  = 0;
 
-  //Methodes de l interface des champs postraitables
+  // Methods of the post-processable fields interface
   /////////////////////////////////////////////////////
   void creer_champ(const Motcle&) override { }
   const Champ_base& get_champ(const Motcle& nom) const override;

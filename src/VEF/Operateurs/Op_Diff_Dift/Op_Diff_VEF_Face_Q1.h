@@ -19,10 +19,10 @@
 
 #include <Op_Diff_VEF_Face.h>
 
-/*! @brief class Op_Diff_VEF_Face_Q1_Q1 Cette classe represente l'operateur de diffusion
+/*! @brief class Op_Diff_VEF_Face_Q1_Q1
  *
- *   La discretisation est VEF
- *   Le champ diffuse est scalaire
+ *  @brief This class represents the diffusion operator with VEF discretization.
+ *         The diffused field is scalar.
  *
  */
 class Op_Diff_VEF_Face_Q1 : public Op_Diff_VEF_base
@@ -38,7 +38,7 @@ public:
   DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const override;
   DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const override;
 
-  // Methodes pour l implicite.
+  // Methods for implicit scheme.
 
   inline void dimensionner(Matrice_Morse& ) const override;
   inline void modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const override;
@@ -55,7 +55,7 @@ protected :
   OBS_PTR(Champ_base) diffusivite_;
 };
 
-/*! @brief on dimensionne notre matrice.
+/*! @brief Size/initialize the matrix.
  *
  */
 
@@ -70,7 +70,7 @@ inline void Op_Diff_VEF_Face_Q1::modifier_pour_Cl(Matrice_Morse& matrice, Double
 }
 
 
-/*! @brief on assemble la matrice.
+/*! @brief Assemble the matrix.
  *
  */
 
@@ -80,7 +80,7 @@ inline void Op_Diff_VEF_Face_Q1::contribuer_a_avec(const DoubleTab& inco,
   ajouter_contribution(inco, matrice);
 }
 
-/*! @brief on ajoute la contribution du second membre.
+/*! @brief Add the contribution to the right-hand side.
  *
  */
 

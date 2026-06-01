@@ -18,7 +18,7 @@
 
 Implemente_instanciable_sans_constructeur(Tri_poly,"Tri_poly",Elem_poly_base);
 
-// printOn et readOn
+// printOn and readOn
 
 
 Sortie& Tri_poly::printOn(Sortie& s ) const
@@ -35,7 +35,7 @@ Tri_poly::Tri_poly()
 {
 }
 
-/*! @brief remplit le tableau face_normales dans le Domaine_poly
+/*! @brief Fills in the face_normales array in the Domaine_poly.
  *
  */
 void Tri_poly::normale(int num_Face, DoubleTab& Face_normales, const IntTab& Face_sommets, const IntTab& Face_voisins, const IntTab& elem_faces, const Domaine& domaine_geom) const
@@ -53,8 +53,8 @@ void Tri_poly::normale(int num_Face, DoubleTab& Face_normales, const IntTab& Fac
   nx = -y1;
   ny = x1;
 
-  // Orientation de la normale de elem1 vers elem2
-  // pour cela recherche du sommet de elem1 qui n'est pas sur la Face
+  // Orient the normal from elem1 to elem2
+  // by searching for the vertex of elem1 that is not on the Face
   int elem1 = Face_voisins(num_Face, 0);
   if ((f0 = elem_faces(elem1, 0)) == num_Face)
     f0 = elem_faces(elem1, 1);

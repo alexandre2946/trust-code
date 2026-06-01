@@ -18,9 +18,9 @@
 
 #include <Convection_Diffusion_Espece_Binaire_base.h>
 
-/*! @brief classe Convection_Diffusion_Espece_Binaire_QC Cas particulier de Convection_Diffusion_Espece_Binaire_base
+/*! @brief Convection_Diffusion_Espece_Binaire_QC class Special case of Convection_Diffusion_Espece_Binaire_base
  *
- *      pour un fluide quasi conpressible iso-therme et iso-bar
+ *      for a quasi-compressible iso-thermal and iso-baric fluid
  *
  * @sa Convection_Diffusion_Espece_Binaire_base
  */

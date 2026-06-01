@@ -184,17 +184,17 @@ void Interpolation_IBM_base::definir_pseudo_level_set()
   distance_signee=-99999.;
   IntTrav deja_fait_elem(nb_elem_tot);
   DoubleTrav nor_ref_i(nb_node_tot,dim_esp);
-  IntList to_do_cut_elem; // Liste voisin cut cell a traiter
-  to_do_cut_elem.vide(); // On vide la List
+  IntList to_do_cut_elem; // List of neighboring cut cells to process
+  to_do_cut_elem.vide(); // Clear the list
   int idebug_lset = 0;
   for (int e=0; e<nb_elem; e++)
     {
-      if (aire(e)>0. && deja_fait_elem(e) == 0) // Determination d un element racine
+      if (aire(e)>0. && deja_fait_elem(e) == 0) // Determine a root element
         {
           if (idebug_lset) Cerr<<">>>>>>>>>>>>>> element racine = "<<e<<finl;
           define_pseudo_level_set_for_one_cut_cell(elem_voisins, e, deja_fait_elem, nor_ref_i, to_do_cut_elem, idebug_lset);
 
-          // Traitement des elements dans to_do_cut_elem
+          // Processing elements in to_do_cut_elem
           if (idebug_lset)
             {
               Cerr<<"to_do_cut_elem after define_pseudo_level_set_for_one_cut_cell : ";
@@ -233,11 +233,11 @@ void Interpolation_IBM_base::define_pseudo_level_set_for_one_cut_cell(IntLists& 
 
   bool exist_ref_e = false;
   DoubleTrav nor_ref_e(dim_esp);
-  // definition d une reference pour l element elem
+  // definition of a reference for element elem
   for (int ilr=0; ilr<nb_som_elem; ilr++)
     {
       int ir = elems(elem,ilr);
-      // On cherche si il existe une reference pour un sommet
+      // Check if a reference exists for a vertex
       if (distance_signee(ir) != -99999.)
         {
           for (int k=0; k<dim_esp; k++) nor_ref_e(k) = nor_ref_i(ir,k);
@@ -248,13 +248,13 @@ void Interpolation_IBM_base::define_pseudo_level_set_for_one_cut_cell(IntLists& 
     }
   if (idebug_lset) Cerr<<" > element = "<<elem<<" exist_ref_e = "<<int(exist_ref_e)<<finl;
 
-  // Distance signee pour les sommets de l element elem
+  // Signed distance for the vertices of element elem
   for (int il=0; il<nb_som_elem; il++)
     {
       int i = elems(elem,il);
-      if (distance_signee(i) == -99999.) // Sommet pas traite
+      if (distance_signee(i) == -99999.) // Vertex not yet processed
         {
-          if (!exist_ref_e) // Pas de reference pour l element
+          if (!exist_ref_e) // No reference for the element
             {
               double norm = 0.;
               for (int k=0; k<dim_esp; k++) norm += nor(i,k) * nor(i,k);
@@ -293,7 +293,7 @@ void Interpolation_IBM_base::define_pseudo_level_set_for_one_cut_cell(IntLists& 
     }
   deja_fait_elem(elem) = 1;
 
-  // definition distance signee pour le cluster d'elements non coupes voisins de e
+  // define signed distance for the cluster of uncut elements neighbouring e
   if (exist_ref_e) calcul_cluster_pseudo_level_set(elem_voisins, elem, deja_fait_elem, nor_ref_i, to_do_cut_elem, idebug_lset);
 }
 
@@ -335,11 +335,11 @@ void Interpolation_IBM_base::calcul_cluster_pseudo_level_set(IntLists& elem_vois
           DoubleTrav nor_ref_e(dim_esp);
           if (elem_voi != elem && deja_fait_elem(elem_voi) == 0 && aire(elem_voi) <= 0.)
             {
-              // definition d une reference pour l element e
+              // definition of a reference for element e
               for (int ilr=0; ilr<nb_som_elem; ilr++)
                 {
                   int ir = elems(elem_voi,ilr);
-                  // On cherche si il existe une reference pour un sommet
+                  // Check if a reference exists for a vertex
                   if (distance_signee(ir) != -99999.)
                     {
                       for (int k=0; k<dim_esp; k++) nor_ref_e(k) = nor_ref_i(ir,k);
@@ -355,7 +355,7 @@ void Interpolation_IBM_base::calcul_cluster_pseudo_level_set(IntLists& elem_vois
                   Cerr<<finl;
                 }
 
-              if (!exist_ref_e) // Pas de reference pour l element
+              if (!exist_ref_e) // No reference for the element
                 {
                   Cerr<<"Interpolation_IBM_base::definir_pseudo_level_set: no reference for the element "<<elem_voi<<finl;
                   exit();
@@ -441,7 +441,7 @@ void Interpolation_IBM_base::calculer_normal_et_distance_proj_solid()
                   deja_fait_vert(i) = 1;
                 }
             }
-          //voisins de e
+          //neighbors of e
           int nb_elem_voi = elem_voisins[e].size();
           for (int voi=0; voi<nb_elem_voi; voi++)
             {

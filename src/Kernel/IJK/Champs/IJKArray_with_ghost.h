@@ -72,11 +72,11 @@ template<typename _TYPE_, typename _TYPE_ARRAY_>
 void IJKArray_with_ghost<_TYPE_,_TYPE_ARRAY_>::echange_espace_virtuel(int pe_min, int pe_max)
 {
   statistics().begin_count(STD_COUNTERS::virtual_swap);
-  // envoi a pe_max et reception de pe_min
+  // send to pe_max and receive from pe_min
   const int n = tab_.size_array() - ghost_ * 2;
   _TYPE_ *pdata = tab_.addr();
   ::envoyer_recevoir(pdata + n, ghost_ * sizeof(_TYPE_), pe_max, pdata, ghost_ * sizeof(_TYPE_), pe_min);
-  // l'autre
+  // the other direction
   ::envoyer_recevoir(pdata + ghost_, ghost_ * sizeof(_TYPE_), pe_min, pdata + n + ghost_, ghost_ * sizeof(_TYPE_), pe_max);
   statistics().end_count(STD_COUNTERS::virtual_swap);
 }

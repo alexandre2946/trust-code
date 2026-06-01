@@ -64,7 +64,7 @@ Entree& Equation_IBM_proto::readOn_ibm_proto(Entree& is, Equation_base& eq)
     }
 
   // XXX Elie Saikali
-  // ok pour temperature pour le moment (cas test Comte_Bellot_EF_IBC dans trio ! a corrriger plus tard Michel !)
+  // ok for temperature for now (test case Comte_Bellot_EF_IBC in trio ! to be corrected later Michel !)
   if (i_source_pdf_ == -1 && eq_IBM_->que_suis_je().debute_par("Navier_Stokes"))
     {
       Cerr << "No PDF source term read in your equation " << eq_IBM_->que_suis_je() << " !!!"<< finl;
@@ -92,7 +92,7 @@ bool Equation_IBM_proto::initTimeStep_ibm_proto(double ddt)
       double delta_t = eq_IBM_->schema_temps().pas_de_temps();
       double temps= eq_IBM_->schema_temps().temps_courant();
 
-      // Deplacement de la frontiere
+      // Boundary displacement
       PDF_model& my_model = ref_cast_non_const(PDF_model, src.get_modele());
       my_model.affecter_vitesse_shape_IBM(le_dom_VF, coords, temps);
       DoubleTab& vitesse = ref_cast_non_const(DoubleTab, src.get_modele().get_vitesse_shape_IBM()) ;
@@ -108,13 +108,13 @@ DoubleTab& Equation_IBM_proto::derivee_en_temps_inco_ibm_proto(DoubleTab& derive
   Cerr<<"(IBM) Immersed Interface: Dirichlet value in Equation for PDF (if any)."<<finl;
   Source_PDF_base& src = dynamic_cast<Source_PDF_base&>((eq_IBM_->sources())[i_source_pdf_].valeur());
 
-  // Terme PDF IB value : -rho/delta_t  ksi_gamma/epsilon U_gamma
+  // PDF IB value term : -rho/delta_t  ksi_gamma/epsilon U_gamma
   DoubleTab secmem_pdf(derivee);
   src.calculer_pdf(secmem_pdf);
   derivee -= secmem_pdf;
   derivee.echange_espace_virtuel();
 
-  // Terme en temps : -rho/delta_t ksi_gamma Un
+  // Time term : -rho/delta_t ksi_gamma Un
   int pdf_bilan = src.get_modele().pdf_bilan();
   if (pdf_bilan == 1|| pdf_bilan == 2)
     {
@@ -132,7 +132,7 @@ DoubleTab& Equation_IBM_proto::derivee_en_temps_inco_ibm_proto(DoubleTab& derive
         }
       else if (nb_comp == 1)
         {
-          //scalar; terme temps en rho
+          //scalar; time term in rho
           i_traitement_special = 1;
         }
       else
@@ -151,7 +151,7 @@ DoubleTab& Equation_IBM_proto::derivee_en_temps_inco_ibm_proto(DoubleTab& derive
       Process::exit();
     }
 
-  // Sauvegarde de secmem_pdf
+  // Save secmem_pdf
   secmem_pdf.echange_espace_virtuel();
   src.set_sec_mem_pdf(secmem_pdf);
 
@@ -183,28 +183,28 @@ void Equation_IBM_proto::modify_initial_variable_ibm_proto(DoubleTab& variable)
     }
 }
 
-// ajoute les contributions des operateurs et des sources
+// adds the contributions of operators and sources
 void Equation_IBM_proto::assembler_ibm_proto(Matrice_Morse& matrice, const DoubleTab& inco, DoubleTab& resu)
 {
   const double rhoCp = eq_IBM_->get_time_factor();
   int size_s = eq_IBM_->sources().size();
 
-  // Test de verification de la methode contribuer_a_avec
+  // Verification test of the contribuer_a_avec method
   for (int op=0; op<eq_IBM_->nombre_d_operateurs(); op++)
     eq_IBM_->operateur(op).l_op_base().tester_contribuer_a_avec(inco, matrice);
 
-  // Contribution des operateurs et des sources:
-  // [Vol/dt+A]Inco(n+1)=somme(residu)+Vol/dt*Inco(n)
-  // Typiquement: si Op=flux(Inco) alors la matrice implicite A contient une contribution -dflux/dInco
-  // Exemple: Op flux convectif en VDF:
-  // Op=T*u*S et A=-d(T*u*S)/dT=-u*S
+  // Contribution of operators and sources:
+  // [Vol/dt+A]Inco(n+1)=sum(residual)+Vol/dt*Inco(n)
+  // Typically: if Op=flux(Inco) then the implicit matrix A contains a contribution -dflux/dInco
+  // Example: convective flux Op in VDF:
+  // Op=T*u*S and A=-d(T*u*S)/dT=-u*S
   const Discretisation_base::type_calcul_du_residu& type_codage=eq_IBM_->probleme().discretisation().codage_du_calcul_du_residu();
   if (type_codage==Discretisation_base::VIA_CONTRIBUER_AU_SECOND_MEMBRE)
     {
       if ( eq_IBM_->probleme().discretisation().que_suis_je() == "EF")
         {
-          // On calcule somme(residu) par contribuer_au_second_membre (typiquement CL non implicitees)
-          // Cette approche necessite de coder 3 methodes (contribuer_a_avec, contribuer_au_second_membre et ajouter pour l'explicite)
+          // We compute sum(residual) via contribuer_au_second_membre (typically non-implicitized BCs)
+          // This approach requires coding 3 methods (contribuer_a_avec, contribuer_au_second_membre and ajouter for the explicit case)
           if (!is_IBM())
             eq_IBM_->sources().contribuer_a_avec(inco, matrice);
           else
@@ -241,8 +241,8 @@ void Equation_IBM_proto::assembler_ibm_proto(Matrice_Morse& matrice, const Doubl
           Cerr << "with discretisation " <<  eq_IBM_->probleme().discretisation().que_suis_je() << "" << finl;
           Process::exit();
         }
-      // // On calcule somme(residu) par contribuer_au_second_membre (typiquement CL non implicitees)
-      // // Cette approche necessite de coder 3 methodes (contribuer_a_avec, contribuer_au_second_membre et ajouter pour l'explicite)
+      // // We compute sum(residual) via contribuer_au_second_membre (typically non-implicitized BCs)
+      // // This approach requires coding 3 methods (contribuer_a_avec, contribuer_au_second_membre and ajouter for the explicit case)
       // sources().contribuer_a_avec(inco,matrice);
       // sources().ajouter(resu);
       // matrice.ajouter_multvect(inco, resu); // Add source residual first
@@ -254,15 +254,15 @@ void Equation_IBM_proto::assembler_ibm_proto(Matrice_Morse& matrice, const Doubl
     }
   else if (type_codage==Discretisation_base::VIA_AJOUTER)
     {
-      // On calcule somme(residu) par somme(operateur)+sources+A*Inco(n)
-      // Cette approche necessite de coder seulement deux methodes (contribuer_a_avec et ajouter)
-      // Donc un peu plus couteux en temps de calcul mais moins de code a ecrire/maintenir
+      // We compute sum(residual) via sum(operator)+sources+A*Inco(n)
+      // This approach requires coding only two methods (contribuer_a_avec and ajouter)
+      // So slightly more expensive in computation time but less code to write/maintain
       for (int op=0; op<eq_IBM_->nombre_d_operateurs(); op++)
         {
           Matrice_Morse mat(matrice);
           mat.get_set_coeff() = 0.0;
           eq_IBM_->operateur(op).l_op_base().contribuer_a_avec(inco, mat);
-          if (op == 1) mat *= rhoCp; // la derivee est multipliee par rhoCp pour la convection
+          if (op == 1) mat *= rhoCp; // the derivative is multiplied by rhoCp for convection
           matrice += mat;
           statistics().end_count(STD_COUNTERS::matrix_assembly);
           {
@@ -295,10 +295,10 @@ void Equation_IBM_proto::assembler_ibm_proto(Matrice_Morse& matrice, const Doubl
               eq_IBM_->sources()(i).ajouter(resu);
         }
       statistics().begin_count(STD_COUNTERS::matrix_assembly,statistics().get_last_opened_counter_level()+1);
-      matrice.ajouter_multvect(inco, resu); // Ajout de A*Inco(n)
-      // PL (11/04/2018): On aimerait bien calculer la contribution des sources en premier
-      // comme dans le cas VIA_CONTRIBUER_AU_SECOND_MEMBRE mais le cas Canal_perio_3D (keps
-      // periodique plante: il y'a une erreur de periodicite dans les termes sources du modele KEps...
+      matrice.ajouter_multvect(inco, resu); // Adding A*Inco(n)
+      // PL (11/04/2018): We would like to compute the source contribution first
+      // as in the VIA_CONTRIBUER_AU_SECOND_MEMBRE case but the Canal_perio_3D case (keps
+      // periodic crashes: there is a periodicity error in the source terms of the KEps model...
     }
   else
     {
@@ -306,7 +306,7 @@ void Equation_IBM_proto::assembler_ibm_proto(Matrice_Morse& matrice, const Doubl
       Process::exit();
     }
 
-  // pour ne pas avoir des termes PDF infinis lors de l'ajout de A*Inco(n)
+  // to avoid infinite PDF terms when adding A*Inco(n)
   if ( is_IBM() )
     for (int i = 0; i < size_s; i++)
       {
@@ -316,6 +316,6 @@ void Equation_IBM_proto::assembler_ibm_proto(Matrice_Morse& matrice, const Doubl
             src_base.contribuer_a_avec(inco,matrice);
           }
       }
-  // ajouter source PDF avec le bon signe
+  // add PDF source with the correct sign
   derivee_en_temps_inco_ibm_proto(resu);
 }

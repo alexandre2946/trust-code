@@ -20,11 +20,11 @@
 #include <Interprete.h>
 #include <Domaine.h>
 
-/*! @brief classe Discretiser Discretise un probleme:
+/*! @brief class Discretiser Discretizes a problem:
  *
- *      {DANS LE JEU DE DONNEES] Discretiser pb dis
- *      Discretise le probleme "pb" avec la discretisation "dis"
- *      ou "dis" est une Discretisation_base VDF ou VEF pour le moment.
+ *      {IN THE DATA SET] Discretiser pb dis
+ *      Discretizes the problem "pb" with the discretization "dis"
+ *      where "dis" is a Discretisation_base VDF or VEF for now.
  *
  * @sa Interprete Discretisation_base
  */

@@ -33,11 +33,11 @@ void Op_Dift_VEF_base::associer_modele_turbulence(const Modele_turbulence_hyd_ba
 
 void Op_Dift_VEF_base::mettre_a_jour(double)
 {
-  if (sub_type(Navier_Stokes_std, equation())) // on traite l'hydraulique
+  if (sub_type(Navier_Stokes_std, equation())) // process the hydraulics equation
     {
       if (le_modele_turbulence->utiliser_loi_paroi())
         {
-          // Modif BM: on ne prend la ref que si le tableau a ete initialise, sinon ca bloque l'initialisation
+          // BM: only take the reference if the array has been initialised, otherwise it blocks initialisation
           const DoubleTab& tab = le_modele_turbulence->loi_paroi().Cisaillement_paroi();
           if (tab.size_array() > 0) tau_tan_.ref(tab);
         }
@@ -90,7 +90,7 @@ void Op_Dift_VEF_base::calculer_borne_locale(DoubleVect& tab_borne_visco_turb, d
   Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_elem, KOKKOS_LAMBDA(const int elem)
   {
     double h_inv = 1. / carre_pas_maille(elem);
-    // C'est pas tres propre pour recuperer diffu mais ca evite de coder cette methode dans plusieurs classes:
+    // Not the cleanest way to retrieve diffu, but avoids code duplication across multiple classes:
     double diffu_elem = (flag ? diffu(elem, 0) : diffu(0, 0));
     double coef = 1. / (2 * (dt_conv + DMINFLOAT) * dim * h_inv * dt_diff_sur_dt_conv) - diffu_elem;
     if (coef > 0 && coef < borne_visco_turb(elem))
@@ -99,19 +99,19 @@ void Op_Dift_VEF_base::calculer_borne_locale(DoubleVect& tab_borne_visco_turb, d
   end_gpu_timer(__KERNEL_NAME__);
 }
 
-// La diffusivite est constante par elements donc il faut calculer dt_diff pour chaque element et dt_stab=Min(dt_diff (K) = h(K)*h(K)/(2*dimension*diffu2_(K)))
-// ou diffu2_ est la somme des 2 diffusivite laminaire et turbulente
+// The diffusivity is constant per element, so dt_diff must be computed per element: dt_stab=Min(dt_diff(K) = h(K)*h(K)/(2*dimension*diffu2_(K)))
+// where diffu2_ is the sum of the laminar and turbulent diffusivities.
 
-//GF : alpha_dt_stab=(alpha+alpha_t)*alpha_dt_stab/alpha ET alpha_dt_stab=(nu+diff_nu_turb)*valeurs_diffusivite_dt/nu
+//GF: alpha_dt_stab=(alpha+alpha_t)*alpha_dt_stab/alpha AND alpha_dt_stab=(nu+diff_nu_turb)*valeurs_diffusivite_dt/nu
 double Op_Dift_VEF_base::calculer_dt_stab() const
 {
-  remplir_nu(nu_); // On remplit le tableau nu contenant la diffusivite en chaque elem
+  remplir_nu(nu_); // Fill nu with the diffusivity at each element
 
   //DoubleVect tab_diffu_turb(diffusivite_turbulente().valeurs());
   DoubleTrav tab_diffu_turb;
   tab_diffu_turb = diffusivite_turbulente().valeurs();
   DoubleTrav tab_diffu;
-  tab_diffu = nu_; // XXX : Elie Saikali : Attention pas pareil que DoubleTrav diffu(nu_) !!!!!!!!!
+  tab_diffu = nu_; // XXX: Elie Saikali: Warning - not the same as DoubleTrav diffu(nu_) !!!!!!!!!
 
   if (equation().que_suis_je().debute_par("Convection_Diffusion_Temp"))
     {
@@ -145,7 +145,7 @@ double Op_Dift_VEF_base::calculer_dt_stab() const
   else
     {
       const DoubleTab& tab_valeurs_diffusivite = diffusivite_pour_pas_de_temps().valeurs();
-      const int nb_comp = tab_valeurs_diffusivite.line_size(), cD = (tab_valeurs_diffusivite.dimension(0) == 1); // uniforme ou pas ?
+      const int nb_comp = tab_valeurs_diffusivite.line_size(), cD = (tab_valeurs_diffusivite.dimension(0) == 1); // uniform or not?
       CDoubleTabView valeurs_diffusivite = tab_valeurs_diffusivite.view_ro();
       Kokkos::parallel_reduce(start_gpu_timer(__KERNEL_NAME__),
                               Kokkos::RangePolicy<>(0, le_dom_nb_elem), KOKKOS_LAMBDA(
@@ -166,7 +166,7 @@ double Op_Dift_VEF_base::calculer_dt_stab() const
   return dt_stab;
 }
 
-// cf Op_Dift_VEF_Face::calculer_dt_stab() pour choix de calcul de dt_stab
+// See Op_Dift_VEF_Face::calculer_dt_stab() for the dt_stab computation strategy
 void Op_Dift_VEF_base::calculer_pour_post(Champ_base& espace_stockage, const Nom& option, int comp) const
 {
   if (Motcle(option) == "stabilite")
@@ -175,7 +175,7 @@ void Op_Dift_VEF_base::calculer_pour_post(Champ_base& espace_stockage, const Nom
 
       if (le_dom_vef)
         {
-          remplir_nu(nu_); // On remplit le tableau nu contenant la diffusivite en chaque elem
+          remplir_nu(nu_); // Fill nu with the diffusivity at each element
 
           const Domaine_VEF& le_dom_VEF = domaine_vef();
           const Domaine& le_dom = le_dom_VEF.domaine();
@@ -200,7 +200,7 @@ void Op_Dift_VEF_base::calculer_pour_post(Champ_base& espace_stockage, const Nom
             {
               const Champ_base& champ_diffusivite = diffusivite_pour_pas_de_temps();
               const DoubleTab& valeurs_diffusivite = champ_diffusivite.valeurs();
-              const int cD = (valeurs_diffusivite.dimension(0) == 1); // uniforme ou pas ?
+              const int cD = (valeurs_diffusivite.dimension(0) == 1); // uniform or not?
               for (int num_elem = 0; num_elem < le_dom_nb_elem; num_elem++)
                 {
                   const double valeurs_diffusivite_dt = valeurs_diffusivite(!cD * num_elem);
@@ -218,8 +218,8 @@ void Op_Dift_VEF_base::calculer_pour_post(Champ_base& espace_stockage, const Nom
     Op_Diff_VEF_base::calculer_pour_post(espace_stockage, option, comp);
 }
 
-// La diffusivite est constante par elements donc il faut calculer dt_diff pour chaque element et dt_stab=Min(dt_diff (K) = h(K)*h(K)/(2*dimension*diffu2_(K)))
-// ou diffu2_ est la somme des 2 diffusivite laminaire et turbulente
+// The diffusivity is constant per element, so dt_diff must be computed per element: dt_stab=Min(dt_diff(K) = h(K)*h(K)/(2*dimension*diffu2_(K)))
+// where diffu2_ is the sum of the laminar and turbulent diffusivities.
 double Op_Dift_VEF_base::calculer_dt_stab_P1NCP1B() const
 {
   const Domaine_VEF& domaine_VEF = domaine_vef();

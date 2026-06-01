@@ -30,7 +30,7 @@ Entree& Champ_P1_isoP1Bulle::readOn(Entree& is )
 
 int Champ_P1_isoP1Bulle::fixer_nb_valeurs_nodales(int n)
 {
-  // On ne doit pas specifier nb_ddl !
+  // Do not specify nb_ddl!
   assert(n < 0);
   const Domaine_VEF& zvef = domaine_vef();
   const MD_Vector& md = zvef.md_vector_p1b();
@@ -112,8 +112,8 @@ Champ_base& Champ_P1_isoP1Bulle::affecter_(const Champ_base& ch)
   if (zvef.get_alphaE() && zvef.get_alphaS())
     {
 
-      DoubleTab& Pk = parties_P[0];  // partie elements
-      DoubleTab& Ps = parties_P[1];  // partie sommets
+      DoubleTab& Pk = parties_P[0];  // element part
+      DoubleTab& Ps = parties_P[1];  // vertex part
 
       //const Domaine_VEF& zvef=domaine_vef();
       const Domaine& le_dom = zvef.domaine();
@@ -128,17 +128,17 @@ Champ_base& Champ_P1_isoP1Bulle::affecter_(const Champ_base& ch)
 
   //  abort();
   Debog::verifier("affecter::champ brut", valeurs());
-  // GF on retire la partie moyenne aux elements si element et sommet
+  // GF: subtract the mean part from elements if both element and vertex supports
   if (zvef.get_alphaE() && zvef.get_alphaS())
     {
 
       //int nb_som=zvef.nb_som();
-      DoubleVect& Pk = parties_P[0];  // partie elements
-      DoubleVect& Ps = parties_P[1];  // partie sommets
+      DoubleVect& Pk = parties_P[0];  // element part
+      DoubleVect& Ps = parties_P[1];  // vertex part
 
       /*
-       // on regarde si Ps vaut 0 on recupere la p aux elems
-       // bidouille ....
+       // if Ps equals 0, retrieve p at elements
+       // workaround ....
        const DoubleTab& coord=zvef.domaine().coord_sommets();
        for (int s=0;s<nb_som;s++)
        if (Ps(s)==0)
@@ -154,7 +154,7 @@ Champ_base& Champ_P1_isoP1Bulle::affecter_(const Champ_base& ch)
        }
        */
 
-      // on retire d'abord la moyenne des sommets a chaque element
+      // first subtract the vertex mean from each element
       const IntTab& som_elem = zvef.domaine().les_elems();
 
       int prs = zvef.numero_premier_sommet();
@@ -170,9 +170,9 @@ Champ_base& Champ_P1_isoP1Bulle::affecter_(const Champ_base& ch)
           Pk(i) -= m;
         }
       Debog::verifier("affecter::champ milieu", valeurs());
-      // Tableaux d'acces aux valeurs Pk et Ps
+      // Access arrays for Pk and Ps values
 
-      double moyenne_K = mp_moyenne_vect(Pk);           // Calcul de la moyenne du champ aux elements
+      double moyenne_K = mp_moyenne_vect(Pk);           // Compute the mean of the element field
       Pk -= moyenne_K;
       valeurs().echange_espace_virtuel();
 

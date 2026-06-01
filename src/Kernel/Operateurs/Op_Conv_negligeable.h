@@ -22,13 +22,13 @@
 
 class Champ_base;
 
-/*! @brief Classe Op_Conv_negligeable Cette classe represente un opperateur de convection negligeable.
+/*! @brief Classe Op_Conv_negligeable This class represents a negligible convection operator.
  *
- *     Lorsqu'un operateur de ce type est utilise dans une equation
- *     cela revient a negliger le terme de convection.
- *     Les methodes de modification et de participation a un calcul de
- *     l'operateur sont en fait des appels aux meme methodes de
- *     Operateur_negligeable qui ne font rien.
+ *     When an operator of this type is used in an equation,
+ *     it amounts to neglecting the convection term.
+ *     The methods for modifying and participating in a computation of
+ *     the operator are in fact calls to the same methods of
+ *     Operateur_negligeable which do nothing.
  *
  * @sa Operateur_negligeable Operateur_Conv_base
  */
@@ -63,7 +63,7 @@ protected :
   inline void associer(const Domaine_dis_base&, const Domaine_Cl_dis_base&, const Champ_Inc_base& ) override ;
 };
 
-/*! @brief Mise a jour en temps d'un operateur negligeable: NE FAIT RIEN Simple appel a Operateur_negligeable::mettre_a_jour(double)
+/*! @brief Time update of a negligible operator: DOES NOTHING Simple call to Operateur_negligeable::mettre_a_jour(double)
  *
  * @param (double temps)
  */
@@ -73,7 +73,7 @@ inline void Op_Conv_negligeable::mettre_a_jour(double temps)
 }
 
 
-/*! @brief Associe divers objets a un operateurs negligeable: NE FAIT RIEN Simple appel a Operateur_negligeable::associer(const Domaine_dis_base&,
+/*! @brief Associates various objects to a negligible operator: DOES NOTHING Simple call to Operateur_negligeable::associer(const Domaine_dis_base&,
  *
  *                                                      const Domaine_Cl_dis_base&,
  *                                                      const Champ_Inc_base&)

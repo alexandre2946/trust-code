@@ -23,7 +23,7 @@ Sortie& Op_Diff_Turbulent_PolyMAC_MPFA_Elem::printOn(Sortie& os) const { return 
 
 Entree& Op_Diff_Turbulent_PolyMAC_MPFA_Elem::readOn(Entree& is)
 {
-  //lecture de la correlation de diffusivite turbulente
+  //read the turbulent diffusivity correlation
   Correlation_base::typer_lire_correlation(corr_, equation().probleme(), "transport_turbulent", is);
   associer_proto(equation().probleme(), champs_compris_);
   ajout_champs_proto_elem();
@@ -57,7 +57,7 @@ void Op_Diff_Turbulent_PolyMAC_MPFA_Elem::completer()
 
 void Op_Diff_Turbulent_PolyMAC_MPFA_Elem::modifier_mu(DoubleTab& mu) const
 {
-  if (!corr_) return; //rien a faire
+  if (!corr_) return; //nothing to do
 
   const Operateur_base& op_qdm = equation().probleme().equation(0).operateur(0).l_op_base();
   if (!sub_type(Op_Diff_Turbulent_PolyMAC_MPFA_Face, op_qdm))
@@ -73,16 +73,16 @@ void Op_Diff_Turbulent_PolyMAC_MPFA_Elem::modifier_mu(DoubleTab& mu) const
       Process::exit();
     }
 
-  // on calcule d_t_
+  // compute d_t_
   DoubleTab& diff_turb = ref_cast_non_const(DoubleTab, nu_ou_lambda_turb_);
   assert (diff_turb.dimension_tot(0) == mu.dimension_tot(0) && diff_turb.line_size() == mu.line_size());
-  diff_turb = 0.; // XXX : pour postraitement et pour n'a pas avoir la partie laminaire
+  diff_turb = 0.; // XXX: for post-processing and to exclude the laminar part
 
   for (int i = 0; i < diff_turb.dimension_tot(0); i++)
     for (int j = 0; j < diff_turb.line_size(); j++)
       diff_turb(i,j) -= mu(i,j);
 
-  // remplissage par la correlation : ICI c'est LAMBDA_T ET PAS ALPHA_T => W/mK et pas m2/s
+  // fill from the correlation: HERE this is LAMBDA_T NOT ALPHA_T => W/mK not m2/s
   ref_cast(Transport_turbulent_base, corr_.valeur()).modifier_mu(ref_cast(Convection_Diffusion_std, equation()),
                                                                  ref_cast(Viscosite_turbulente_base, corr_visc_qdm),
                                                                  mu);

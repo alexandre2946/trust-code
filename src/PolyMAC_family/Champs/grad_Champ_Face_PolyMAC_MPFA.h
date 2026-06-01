@@ -21,7 +21,9 @@
 #include <Domaine_Cl_PolyMAC_family.h>
 #include <TRUST_Ref.h>
 
-/*! @brief class grad_Champ_Face_PolyMAC_MPFA for the calculation of the gradient This field is a Champ_Fonc_Face_PolyMAC_MPFA that calculates the gradient of a velocity field
+/*! @brief class grad_Champ_Face_PolyMAC_MPFA for the calculation of the gradient.
+ *
+ *  @brief This field is a Champ_Fonc_Face_PolyMAC_MPFA that calculates the gradient of a velocity field.
  *
  *       grad_u(f, n*D + dU) returns the gradient of the dU velocity component in the phase n at face f
  *       grad_u(nf_tot + e*D + dX, n*D + dU) returns the gradient of the dU velocity component in the phase n in element e along the dX component
@@ -51,12 +53,12 @@ public:
     le_Dom_Cl_PolyMAC_HFV = static_cast<const Domaine_Cl_PolyMAC_family&>(le_dom_Cl_dis_base);
   }
 
-  // Interpolation du gradient de la vitesse
-  mutable IntTab gradve_d, gradve_e;           // Tables utilisees dans fgrad pour obtenir le grad aux faces de la vitesse aux elems
+  // Interpolation of the velocity gradient
+  mutable IntTab gradve_d, gradve_e;           // Tables used in fgrad to obtain the gradient at faces of the velocity at elements
   mutable DoubleTab gradve_w;
-  void update_tab_grad(int full_stencil);      // Mise a jour des tables utilisees dans fgrad
-  void calc_gradfve();                  // Mise a jour du gradient aux faces de la vitesse aux elements
-  void update_ge();                           // Calcul du gradient aux elements a partir du gradient aux faces ; base sur la methode similaire de Champ_Face_PolyMAC_MPFA
+  void update_tab_grad(int full_stencil);      // Update the tables used in fgrad
+  void calc_gradfve();                  // Update the gradient at faces of the velocity at elements
+  void update_ge();                           // Compute the gradient at elements from the gradient at faces; based on the similar method of Champ_Face_PolyMAC_MPFA
   void init_grad();
 
 protected:
@@ -64,7 +66,7 @@ protected:
   OBS_PTR(Champ_Face_PolyMAC_MPFA) champ_;
 
   int is_init = 0;
-  void init_ge2() const; //ordre 2 -> avec une matrice
+  void init_ge2() const; //second-order -> using a matrix
   mutable IntTab ve2d, ve2j, ve2bj;
   mutable DoubleTab ve2c, ve2bc;
   void update_ge2(DoubleTab& val, int incr = 0) const;

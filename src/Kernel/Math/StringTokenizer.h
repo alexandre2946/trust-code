@@ -23,7 +23,7 @@ class StringTokenizer
 
 public :
 
-  // Les differents operateurs et separateurs
+  // The different operators and separators
   static const int ADD;
   static const int SUBTRACT;
   static const int DIVIDE;
@@ -43,7 +43,7 @@ public :
   static const int EQ;
   static const int NEQ;
 
-  //nb de separateur
+  // Number of separators
 private:
   static const int nb_op;
   static const int nb_op_bis;
@@ -52,7 +52,7 @@ private:
 
 public:
 
-  // Le type d'un element detecte  : nb, chaine, fin de chaine
+  // Type of a detected element: number, string, end of string
   static const int NUMBER;
   static const int STRING;
   static const int EOS;

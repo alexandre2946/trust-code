@@ -99,8 +99,8 @@ const Champ_base& Champ_Generique_Tparoi_VEF::get_champ(OWN_PTR(Champ_base)& esp
   const DoubleTab& inconnue = source_so_val;
   valeurs_espace = source_so_val;
 
-  // Sur toutes les faces ou le flux est impose si le flux turbulent pas calcule on recalcule la temperature
-  // on recuprere l'eqn de temp
+  // For all faces where flux is imposed, if the turbulent flux is not computed, recompute the temperature
+  // retrieve the temperature equation
   const Equation_base& my_eqn=ref_cast(Champ_Inc_base,source).equation();
   const RefObjU& modele_turbulence = my_eqn.get_modele(TURBULENCE);
   if ( modele_turbulence && sub_type(Modele_turbulence_scal_base,modele_turbulence.valeur()))
@@ -127,9 +127,8 @@ const Champ_base& Champ_Generique_Tparoi_VEF::get_champ(OWN_PTR(Champ_base)& esp
               const Cond_lim_base& cl_base=la_cl.valeur();
               const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
 
-              // Les lois de parois ne s'appliquent qu'aux cas ou la CL
-              // est de type temperature imposee, car dans les autres cas
-              // (flux impose et adiabatique) le flux a la paroi est connu et fixe.
+              // Wall laws only apply when the BC is of imposed-temperature type,
+              // because in other cases (imposed flux, adiabatic) the wall flux is known and fixed.
               int ldp_appli=0;
               if ((sub_type(Neumann_paroi,cl_base))||(sub_type(Neumann_homogene,cl_base)))
                 {
@@ -143,19 +142,19 @@ const Champ_base& Champ_Generique_Tparoi_VEF::get_champ(OWN_PTR(Champ_base)& esp
                 {
                   // const DoubleVect& d_equiv = paroi_scal_vef.equivalent_distance(n_bord);
                   const DoubleVect& d_equiv = loiparth.equivalent_distance(n_bord);
-                  // d_equiv contient la distance equivalente pour le bord
-                  // Dans d_equiv, pour les faces qui ne sont pas paroi_fixe (eg periodique, symetrie, etc...)
-                  // il y a la distance geometrique grace a l'initialisation du tableau dans la loi de paroi.
+                  // d_equiv contains the equivalent distance for the boundary.
+                  // In d_equiv, for faces that are not fixed-wall (e.g. periodic, symmetry, etc.)
+                  // the geometric distance is used, set during initialization in the wall law.
 
                   int num1 = 0;
                   int num2 = le_bord.nb_faces_tot();
                   ToDo_Kokkos("boundary");
                   for (int ind_face=num1; ind_face<num2; ind_face++)
                     {
-                      // Tf est la temperature fluide moyenne dans le premier element
-                      // sans tenir compte de la temperature de paroi.
+                      // Tf is the average fluid temperature in the first element,
+                      // without accounting for the wall temperature.
                       double Tf=0.;
-                      // double bon_gradient=0.; // c'est la norme du gradient de temperature normal a la paroi calculee a l'aide de la loi de paroi.
+                      // double bon_gradient=0.; // norm of the temperature gradient normal to the wall, computed using the wall law.
                       le_mauvais_gradient=0.;
                       int num_face = le_bord.num_face(ind_face);
                       int elem1 = face_voisins(num_face,0);
@@ -184,14 +183,14 @@ const Champ_base& Champ_Generique_Tparoi_VEF::get_champ(OWN_PTR(Champ_base)& esp
                       for(int kk=0; kk<nb_dim_pb; kk++)
                         mauvais_gradient+=le_mauvais_gradient(kk)*face_normale(num_face,kk)/surface_face;
 
-                      // valeurs_espace(num_face) est la temperature de paroi : Tw.
-                      // On se fiche du signe de bon gradient car c'est la norme du gradient
-                      // de temperature dans l'element.
-                      // Ensuite ce sera multiplie par le vecteur normal a la face de paroi
-                      // qui lui a les bons signes.
+                      // valeurs_espace(num_face) is the wall temperature: Tw.
+                      // The sign of the good gradient does not matter since it is the norm of the
+                      // temperature gradient in the element.
+                      // It will then be multiplied by the normal vector to the wall face,
+                      // which has the correct signs.
                       //bon_gradient=(Tf-inconnue(num_face))/d_equiv(ind_face)*(-domaine_VEF.oriente_normale(num_face,elem1));
-                      // on doit faire bon=mauvais...
-                      // on fait le calcul de facon a avoir bon_grad =mauva
+                      // we must have bon=mauvais...
+                      // compute so that bon_grad = mauvais
                       valeurs_espace(num_face)=Tf-mauvais_gradient*d_equiv(ind_face)*(-domaine_VEF.oriente_normale(num_face,elem1));
                     }
                 }
@@ -232,8 +231,8 @@ const Noms Champ_Generique_Tparoi_VEF::get_property(const Motcle& query) const
   return Champ_Gen_de_Champs_Gen::get_property(query);
 }
 
-//Nomme le champ en tant que source par defaut
-//"Combinaison_"+nom_champ_source
+// Name the field as source by default
+// "Combinaison_"+nom_champ_source
 void Champ_Generique_Tparoi_VEF::nommer_source()
 {
   if (nom_post_=="??")

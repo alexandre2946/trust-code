@@ -24,8 +24,8 @@
 
 /*! @brief Interprete Decouper_multi.
  *
- * Decoupage simultane de plusieurs domaine avec renseignement des sommets connectes par des Raccords (pour extension
- *   des espaces virtuels)
+ * Simultaneous splitting of several domains with information about vertices connected by Raccords (for extension
+ *   of virtual spaces).
  *
  */
 class Decouper_multi : public Interprete
@@ -37,9 +37,9 @@ public:
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
 
 private:
-  std::vector<Decouper> decoupeurs; //decoupeurs de chaque domaine
-  std::set<std::string> doms_lus;   //noms des domaines a decouper
-  double tolerance = 1e-8; //tolerance geometrique
+  std::vector<Decouper> decoupeurs; //splitters for each domain
+  std::set<std::string> doms_lus;   //names of domains to split
+  double tolerance = 1e-8; //geometric tolerance
 };
 
 #endif

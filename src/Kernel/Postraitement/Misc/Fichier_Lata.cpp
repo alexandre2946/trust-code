@@ -17,22 +17,22 @@
 #include <EcrFicPartageBin.h>
 #include <Fichier_Lata.h>
 
-/*! @brief Construit un fichier de type EcrFicPartage(Bin) ou EcrFicPrive(Bin), binaire ou pas selon le parametre "format".
+/*! @brief Builds a file of type EcrFicPartage(Bin) or EcrFicPrive(Bin), binary or not depending on the "format" parameter.
  *
- *   Si parallel==MULTIPLE_FILES, le fichier est de type EcrFicPrive(Bin).
- *     Dans ce cas, chaque processeur ouvre un fichier different, dont
- *     le nom est "basename_XXXXXextension", ou XXXXX est egal a Process::me().
- *     Tous les processeurs renverront is_master() == 1.
- *   Si parallel==SINGLE_FILE est non nul, le fichier est de type EcrFicPartage(Bin).
- *     Seul le processeur maitre ouvre le fichier, le nom du fichier est
+ *   If parallel==MULTIPLE_FILES, the file is of type EcrFicPrive(Bin).
+ *     In this case, each processor opens a different file named
+ *     "basename_XXXXXextension", where XXXXX equals Process::me().
+ *     All processors will return is_master() == 1.
+ *   If parallel==SINGLE_FILE is non-zero, the file is of type EcrFicPartage(Bin).
+ *     Only the master processor opens the file; the file name is
  *     "basenameextension".
- *     is_master() renverra 1 sur le maitre, 0 sur les autres processeurs.
+ *     is_master() returns 1 on the master, 0 on other processors.
  *
- * @param (basename) debut du nom du fichier
- * @param (extension) fin du nom du fichier
- * @param (mode_append) Si mode_append==ERASE, on ouvre en mode ecriture, si mode_append==APPEND, on ouvre en mode append.
- * @param (format) Determine si on ouvre en binaire ou pas. (valeurs possibles: Format_Post_Lata::ASCII ou Format_Post_Lata::BINAIRE)
- * @param (parallel) fichier unique partage ou plusieurs fichiers prives...
+ * @param (basename) beginning of the file name
+ * @param (extension) end of the file name
+ * @param (mode_append) If mode_append==ERASE, opens in write mode; if mode_append==APPEND, opens in append mode.
+ * @param (format) Determines whether to open in binary mode or not. (possible values: Format_Post_Lata::ASCII or Format_Post_Lata::BINAIRE)
+ * @param (parallel) single shared file or multiple private files...
  */
 Fichier_Lata::Fichier_Lata(const char * basename, const char * extension,
                            Mode mode_append,
@@ -52,8 +52,8 @@ Fichier_Lata::Fichier_Lata(const char * basename, const char * extension,
         is_parallel_ = 1;
         filename_ = basename;
         filename_ += extension;
-        // Pour un calcul sequentiel, on ouvre un fichier SFichier
-        // pour ne pas bufferiser en memoire
+        // For sequential execution, open a SFichier
+        // to avoid buffering in memory
         if  (Process::is_sequential())
           fichier_ = new SFichier;
         else
@@ -138,7 +138,7 @@ SFichier& Fichier_Lata::get_SFichier()
   return *fichier_;
 }
 
-/*! @brief Renvoie le nom du fichier avec le path
+/*! @brief Returns the file name with its path.
  *
  */
 const Nom& Fichier_Lata::get_filename() const
@@ -146,9 +146,9 @@ const Nom& Fichier_Lata::get_filename() const
   return filename_;
 }
 
-/*! @brief Si le fichier est de type partage, renvoie 1 si me() est egal au master du groupe et 0 sinon,
+/*! @brief If the file is of shared type, returns 1 if me() equals the group master, 0 otherwise.
  *
- *   Si le fichier est prive, renvoie 1 sur tous les processeurs.
+ *   If the file is private, returns 1 on all processors.
  *
  */
 int Fichier_Lata::is_master() const
@@ -156,19 +156,19 @@ int Fichier_Lata::is_master() const
   int resu = 0;
   if (is_parallel_ == 0)
     {
-      // Execution sequentielle, fichiers prives chaque processeur est maitre
+      // Sequential execution, private files: each processor is master
       resu = 1;
     }
   else
     {
-      // Execution parallele : un seul maitre
+      // Parallel execution: a single master
       if (Process::je_suis_maitre())
         resu = 1;
     }
   return resu;
 }
 
-/*! @brief Si le fichier est de type partage, appelle la methode syncfile(), sinon ne fait rien.
+/*! @brief If the file is of shared type, calls the syncfile() method; otherwise does nothing.
  *
  */
 void Fichier_Lata::syncfile()
@@ -185,6 +185,6 @@ Fichier_Lata_maitre::Fichier_Lata_maitre(const char * basename,
                mode_append, Format_Post_Lata::ASCII, parallel)
 {
   fichier_->setf(ios::scientific);
-  // On peut changer la precision du fichier maitre a cet endroit:
+  // The precision of the master file can be changed here:
   fichier_->precision(8);
 }

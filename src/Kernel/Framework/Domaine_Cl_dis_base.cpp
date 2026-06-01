@@ -27,17 +27,17 @@ Sortie& Domaine_Cl_dis_base::printOn(Sortie& os) const
   return os;
 }
 
-/*! @brief Surcharge Objet_U::readOn(Sortie&) Lit les conditions aux limites discretisees a partir d'un flot d'entree
+/*! @brief Overrides Objet_U::readOn(Sortie&) Reads the discretized boundary conditions from an input stream
  *
- *     Le format attendu est le suivant:
+ *     The expected format is as follows:
  *     {
- *      Nom Cond_lim [REPETER LECTURE AUTANT DE FOIS QUE NECESSAIRE]
+ *      Name Cond_lim [REPEAT READ AS MANY TIMES AS NECESSARY]
  *     }
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws accolade ouvrante attendue
- * @throws nombre de conditions aux limites lues invalide
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
+ * @throws opening brace expected
+ * @throws invalid number of boundary conditions read
  */
 Entree& Domaine_Cl_dis_base::readOn(Entree& is)
 {
@@ -65,7 +65,7 @@ Entree& Domaine_Cl_dis_base::readOn(Entree& is)
   while(1)
     {
 
-      // lecture d'un nom de bord ou de }
+      // Reading a boundary name or }
       is >> nomlu;
       motlu=nomlu;
       if (motlu == accolade_fermee)
@@ -76,8 +76,8 @@ Entree& Domaine_Cl_dis_base::readOn(Entree& is)
 
       int rang=ledomaine.rang_frontiere(nomlu);
 
-      // Test supplementaire sur les conditions aux limites qui ont ete lues :
-      // on test si deux frontieres ont le meme nom
+      // Additional test on boundary conditions that have been read:
+      // we test if two boundaries have the same name
       if (front_deja_lu(rang) == 0)
         front_deja_lu(rang) = 1;
       else
@@ -90,26 +90,26 @@ Entree& Domaine_Cl_dis_base::readOn(Entree& is)
         }
       //      const Frontiere& frontiere=domaine.frontiere(rang);
       is >> les_conditions_limites(rang);
-      // Si on avait une condition_limite_utilisateur
-      // Il faut recuperer la cl stockee dans celle ci
-      // la copier et detruire celle contenue dans la cond_utilisateur
+      // If we had a condition_limite_utilisateur
+      // We must retrieve the bc stored in it
+      // copy it and destroy the one contained in the cond_utilisateur
       if (sub_type(Cond_lim_utilisateur_base,les_conditions_limites(rang).valeur()))
         {
           Cond_lim_utilisateur_base& la_cl=ref_cast(Cond_lim_utilisateur_base,les_conditions_limites(rang).valeur());
           la_cl.lire(is,equation(),nomlu);
           Cond_lim* sa=&(la_cl.la_cl());
 
-          // WEC : La nouvelle formulation evite la copie de l'objet Cond_lim_base
-          // Cette copie peut poser probleme aux champs qui s'enregistrent dans un vecteur
-          // (Champ_Inputs). Le vecteur pointe sur n'importe quoi...
-          // Adopte la nouvelle et detruit l'ancienne (Cond_lim_utilisateur)
+          // WEC: The new formulation avoids copying the Cond_lim_base object.
+          // This copy can cause problems for fields that register themselves in a vector
+          // (Champ_Inputs). The vector would then point to garbage...
+          // Adopt the new one and destroy the old one (Cond_lim_utilisateur)
           les_conditions_limites(rang).adopt(*sa);
           //les_conditions_limites(rang)=(*sa);
           delete sa;
         }
       les_conditions_limites(rang)->associer_fr_dis_base(domaine_dis().frontiere_dis(rang));
 
-      //Test pour empecher l utilisation de 'Raccord_distant_homogene' en calcul sequentiel
+      // Test to prevent the use of 'Raccord_distant_homogene' in sequential computation
       const Frontiere& frontiere=ledomaine.frontiere(rang);
       if ((frontiere.que_suis_je()=="Raccord_distant_homogene") && Process::is_sequential())
         {
@@ -141,12 +141,12 @@ Entree& Domaine_Cl_dis_base::readOn(Entree& is)
   return is;
 }
 
-/*! @brief Renvoie 1 si l'objet contient une condition aux limites du Nom specifie.
+/*! @brief Returns 1 if the object contains a boundary condition with the specified Name.
  *
- *     Renvoie 0 sinon.
+ *     Returns 0 otherwise.
  *
- * @param (Nom& type) le nom de la condition aux limites a chercher
- * @return (int) 1 si la condition aux limites de nom specifie a ete trouve, 0 sinon.
+ * @param (Nom& type) the name of the boundary condition to search for
+ * @return (int) 1 if the boundary condition with the specified name was found, 0 otherwise.
  */
 int Domaine_Cl_dis_base::contient_Cl(const Nom& type)
 {
@@ -155,32 +155,32 @@ int Domaine_Cl_dis_base::contient_Cl(const Nom& type)
   return 0;
 }
 
-/*! @brief Renvoie une reference sur le domaine discretise associe aux conditions aux limites.
+/*! @brief Returns a reference to the discretized domain associated with the boundary conditions.
  *
- * Ce Domaine_dis est associe au travers de l'equation
- *     associee et pas directement a l'objet Domaine_Cl_dis_base.
+ * This Domaine_dis is associated through the associated equation
+ *     and not directly with the Domaine_Cl_dis_base object.
  *
- * @return (Domaine_dis_base&) le domaine discretise associe a l'equation associe aux conditions aux limites.
+ * @return (Domaine_dis_base&) the discretized domain associated with the equation associated with the boundary conditions.
  */
 Domaine_dis_base& Domaine_Cl_dis_base::domaine_dis()
 {
   return equation().domaine_dis();
 }
 
-/*! @brief Renvoie une reference sur le domaine discretise associe aux conditions aux limites.
+/*! @brief Returns a reference to the discretized domain associated with the boundary conditions.
  *
- * Cet Domaine_dis est associe au travers de l'equation
- *     associee et pas directement a l'objet Domaine_Cl_dis_base.
- *     (version const)
+ * This Domaine_dis is associated through the associated equation
+ *     and not directly with the Domaine_Cl_dis_base object.
+ *     (const version)
  *
- * @return (Domaine_dis_base&) le domaine discretise associe a l'equation associe aux conditions aux limites.
+ * @return (Domaine_dis_base&) the discretized domain associated with the equation associated with the boundary conditions.
  */
 const Domaine_dis_base& Domaine_Cl_dis_base::domaine_dis() const
 {
   return equation().domaine_dis();
 }
 
-/*! @brief Change le i-eme temps futur de toutes les CLs.
+/*! @brief Changes the i-th future time of all BCs.
  *
  */
 void Domaine_Cl_dis_base::changer_temps_futur(double temps,int i)
@@ -189,7 +189,7 @@ void Domaine_Cl_dis_base::changer_temps_futur(double temps,int i)
     les_conditions_limites_[j]->changer_temps_futur(temps,i);
 }
 
-/*! @brief Change le i-eme temps futur de toutes les CLs.
+/*! @brief Changes the i-th future time of all BCs.
  *
  */
 void Domaine_Cl_dis_base::set_temps_defaut(double temps)
@@ -198,7 +198,7 @@ void Domaine_Cl_dis_base::set_temps_defaut(double temps)
     les_conditions_limites_[j]->set_temps_defaut(temps);
 }
 
-/*! @brief Tourne la roue des CLs jusqu'au temps donne
+/*! @brief Rotates the wheel of all BCs up to the given time
  *
  */
 int Domaine_Cl_dis_base::avancer(double temps)
@@ -209,7 +209,7 @@ int Domaine_Cl_dis_base::avancer(double temps)
   return ok;
 }
 
-/*! @brief Tourne la roue des CLsj usqu'au temps donne
+/*! @brief Rotates the wheel of all BCs back to the given time
  *
  */
 int Domaine_Cl_dis_base::reculer(double temps)
@@ -220,9 +220,9 @@ int Domaine_Cl_dis_base::reculer(double temps)
   return ok;
 }
 
-/*! @brief Effectue une mise a jour en temps de toutes les conditions aux limites.
+/*! @brief Performs a time update of all boundary conditions.
  *
- * @param (double temps) le pas de temps de mise a jour
+ * @param (double temps) the time step for update
  */
 void Domaine_Cl_dis_base::mettre_a_jour(double temps)
 {
@@ -236,12 +236,12 @@ void Domaine_Cl_dis_base::resetTime(double temps)
   les_conditions_limites_.resetTime(temps);
 }
 
-/*! @brief Effectue une mise a jour pour des sous pas de temps d'un schema en temps (par exemple dans RungeKutta)
+/*! @brief Performs a time update for sub-time-steps of a time scheme (e.g. in RungeKutta)
  *
- *     pour toutes les Cond Lims renvoyant 1 par le biais de la methode
+ *     for all boundary conditions returning 1 through the method
  *     int Cond_Lim_base::a_mettre_a_jour_ss_pas_dt();
  *
- * @param (double temps) le pas de temps de mise a jour
+ * @param (double temps) the time step for update
  */
 void Domaine_Cl_dis_base::mettre_a_jour_ss_pas_dt(double temps)
 {
@@ -253,21 +253,21 @@ void Domaine_Cl_dis_base::mettre_a_jour_ss_pas_dt(double temps)
     }
 }
 
-/*! @brief Initialise les CLs Contrairement aux methodes mettre_a_jour, les methodes
+/*! @brief Initializes the BCs. Unlike the update methods, the
  *
- *     initialiser des CLs ne peuvent pas dependre de l'exterieur
- *     (lui-meme peut ne pas etre initialise)
+ *     initialize methods of BCs cannot depend on the outside
+ *     (it may not be initialized itself)
  *
- * @return (int) 1 si OK, 0 sinon
+ * @return (int) 1 if OK, 0 otherwise
  */
 int Domaine_Cl_dis_base::initialiser(double temps)
 {
   return les_conditions_limites_.initialiser(temps);
 }
 
-/*! @brief Calcul des coefficients d'echange pour les problemes couples thermiques
+/*! @brief Computes the exchange coefficients for thermally coupled problems
  *
- * @return (int) renvoie toujours 1
+ * @return (int) always returns 1
  */
 int Domaine_Cl_dis_base::calculer_coeffs_echange(double temps)
 {
@@ -275,7 +275,7 @@ int Domaine_Cl_dis_base::calculer_coeffs_echange(double temps)
   return 1;
 }
 
-/*! @brief Appel Cond_lim_base::completer() sur chaque condition aux limites
+/*! @brief Calls Cond_lim_base::completer() on each boundary condition
  *
  */
 void Domaine_Cl_dis_base::completer()
@@ -284,10 +284,10 @@ void Domaine_Cl_dis_base::completer()
   completer(domaine_dis());
 }
 
-/*! @brief Renvoie la condition limite associee a une face reelle donnee.
+/*! @brief Returns the boundary condition associated with a given real face.
  *
- * Met dans face_locale le numero de la face dans la frontiere.
- *  Provoque une erreur si la face ne porte pas de CL.
+ * Stores in face_locale the face number within the boundary.
+ *  Triggers an error if the face does not have a BC.
  *
  */
 const Cond_lim_base& Domaine_Cl_dis_base::condition_limite_de_la_face_reelle(int face_globale, int& face_locale) const
@@ -301,14 +301,14 @@ const Cond_lim_base& Domaine_Cl_dis_base::condition_limite_de_la_face_reelle(int
           return les_conditions_limites(i).valeur();
         }
     }
-  assert(0); // la face ne porte pas de CL
-  return les_conditions_limites(0).valeur(); // Pour compilo
+  assert(0); // the face does not have a BC
+  return les_conditions_limites(0).valeur(); // For compilation
 }
 
-/*! @brief Renvoie la condition limite associee a une face virtuelle donnee.
+/*! @brief Returns the boundary condition associated with a given virtual face.
  *
- * Met dans face_locale le numero de la face dans la frontiere.
- *  Provoque une erreur si la face ne porte pas de CL.
+ * Stores in face_locale the face number within the boundary.
+ *  Triggers an error if the face does not have a BC.
  *
  */
 const Cond_lim_base& Domaine_Cl_dis_base::condition_limite_de_la_face_virtuelle(int face_globale, int& face_locale) const
@@ -324,13 +324,13 @@ const Cond_lim_base& Domaine_Cl_dis_base::condition_limite_de_la_face_virtuelle(
             return les_conditions_limites(i).valeur();
           }
     }
-  assert(0); // la face ne porte pas de CL
-  return les_conditions_limites(0).valeur(); // Pour compilo
+  assert(0); // the face does not have a BC
+  return les_conditions_limites(0).valeur(); // For compilation
 }
 
-/*! @brief Renvoie la condition limite associee a une frontiere de nom donne.
+/*! @brief Returns the boundary condition associated with a boundary of the given name.
  *
- * Provoque une erreur si aucune frontiere ne porte ce nom.
+ * Triggers an error if no boundary has this name.
  *
  */
 Cond_lim_base& Domaine_Cl_dis_base::condition_limite_de_la_frontiere(Nom frontiere)
@@ -341,14 +341,14 @@ Cond_lim_base& Domaine_Cl_dis_base::condition_limite_de_la_frontiere(Nom frontie
       if (fr.le_nom()==frontiere)
         return les_conditions_limites(i).valeur();
     }
-  assert(0); // Aucune frontiere de ce nom
+  assert(0); // No boundary with this name
   exit();
-  return les_conditions_limites(0).valeur(); // Pour compilo
+  return les_conditions_limites(0).valeur(); // For compilation
 }
 
-/*! @brief Renvoie la condition limite associee a une frontiere de nom donne.
+/*! @brief Returns the boundary condition associated with a boundary of the given name.
  *
- * Provoque une erreur si aucune frontiere ne porte ce nom.
+ * Triggers an error if no boundary has this name.
  *
  */
 const Cond_lim_base& Domaine_Cl_dis_base::condition_limite_de_la_frontiere(Nom frontiere) const
@@ -359,12 +359,12 @@ const Cond_lim_base& Domaine_Cl_dis_base::condition_limite_de_la_frontiere(Nom f
       if (fr.le_nom()==frontiere)
         return les_conditions_limites(i).valeur();
     }
-  assert(0); // Aucune frontiere de ce nom
+  assert(0); // No boundary with this name
   exit();
-  return les_conditions_limites(0).valeur(); // Pour compilo
+  return les_conditions_limites(0).valeur(); // For compilation
 }
 
-/*! @brief Calcule le taux d'accroissement des CLs instationnaires entre t1 et t2.
+/*! @brief Computes the growth rate of unsteady BCs between t1 and t2.
  *
  */
 void Domaine_Cl_dis_base::calculer_derivee_en_temps(double t1, double t2)
@@ -376,51 +376,51 @@ void Domaine_Cl_dis_base::calculer_derivee_en_temps(double t1, double t2)
     }
 }
 
-/*! @brief Renvoie la i-ieme condition aux limites.
+/*! @brief Returns the i-th boundary condition.
  *
- * (version const)
+ * (const version)
  *
- * @param (int i) le rang de la i-ieme condition aux limites
- * @return (Cond_lim&) la i-ieme condition aux limites
+ * @param (int i) the rank of the i-th boundary condition
+ * @return (Cond_lim&) the i-th boundary condition
  */
 const Cond_lim& Domaine_Cl_dis_base::les_conditions_limites(int i) const
 {
   return les_conditions_limites_[i];
 }
 
-/*! @brief Renvoie la i-ieme condition aux limites.
+/*! @brief Returns the i-th boundary condition.
  *
- * @param (int i) le rang de la i-ieme condition aux limites
- * @return (Cond_lim&) la i-ieme condition aux limites
+ * @param (int i) the rank of the i-th boundary condition
+ * @return (Cond_lim&) the i-th boundary condition
  */
 Cond_lim& Domaine_Cl_dis_base::les_conditions_limites(int i)
 {
   return les_conditions_limites_[i];
 }
 
-/*! @brief Renvoie le tableaux des conditions aux limites.
+/*! @brief Returns the array of boundary conditions.
  *
- * @return (Conds_lim&) le tableau des conditions aux limites
+ * @return (Conds_lim&) the array of boundary conditions
  */
 Conds_lim& Domaine_Cl_dis_base::les_conditions_limites()
 {
   return les_conditions_limites_;
 }
 
-/*! @brief Renvoie le tableaux des conditions aux limites.
+/*! @brief Returns the array of boundary conditions.
  *
- * (version const)
+ * (const version)
  *
- * @return (Conds_lim&) le tableau des conditions aux limites
+ * @return (Conds_lim&) the array of boundary conditions
  */
 const Conds_lim& Domaine_Cl_dis_base::les_conditions_limites() const
 {
   return les_conditions_limites_;
 }
 
-/*! @brief Renvoie le nombre de conditions aux limites.
+/*! @brief Returns the number of boundary conditions.
  *
- * @return (int) le nombre de conditions aux limites
+ * @return (int) the number of boundary conditions
  */
 int Domaine_Cl_dis_base::nb_cond_lim() const
 {
@@ -441,17 +441,17 @@ const Domaine& Domaine_Cl_dis_base::domaine() const
   return domaine_dis().domaine();
 }
 
-/*! @brief A partir d'un indice de face de bord dans le Domaine_VF, renvoie la condition aux limites a laquelle cette face
+/*! @brief Given a boundary face index in the Domaine_VF, returns the boundary condition to which this face
  *
- *   appartient, pour 0 <= num_face < nb_faces_Cl().
+ *   belongs, for 0 <= num_face < nb_faces_Cl().
  *
  */
 const Cond_lim& Domaine_Cl_dis_base::la_cl_de_la_face(int num_face) const
 {
-  //  Algorithme generique: on parcourt les bords jusqu'a trouver
-  //  celui qui contient la face.
-  //  Les faces du bord 0, puis celle du bord 1, etc... se suivent
-  //  dans le Domaine_VF.
+  // Generic algorithm: we iterate over the boundaries until we find
+  // the one that contains the face.
+  // The faces of boundary 0, then those of boundary 1, etc., follow
+  // each other in the Domaine_VF.
   assert(num_face >= 0);
   int i = 0;
   const int nb_cl = les_conditions_limites_.size();

@@ -29,11 +29,11 @@ class Conds_lim;
 class Reorder_Mesh;
 class Discretisation_base;
 
-/*! @brief classe Domaine_dis_base Cette classe est la base de la hierarchie des domaines discretisees.
+/*! @brief class Domaine_dis_base This class is the base of the hierarchy of discretized domains.
  *
- *      Un objet Domaine est associe au domaine discretise.
- *      A chaque discretisation spatiale (VDF, VEF, PolyMAC_HFV, ...)  de TRUST correspond une classe derivant
- *      de Domaine_dis_base implementant les outils necessaires a la methode.
+ *      A Domaine object is associated with the discretized domain.
+ *      Each spatial discretization (VDF, VEF, PolyMAC_HFV, ...) in TRUST corresponds to a class deriving
+ *      from Domaine_dis_base that implements the tools required by the method.
  */
 class Domaine_dis_base : public Champs_compris_interface, public Objet_U
 {
@@ -93,8 +93,8 @@ public :
   virtual void modifier_pour_Cl(const Conds_lim&) =0;
   virtual void creer_elements_fictifs(const Domaine_Cl_dis_base&);
 
-  // Methodes pour le calcul et l'appel de la distance au bord solide le plus proche
-  // en entree on met le tableau des CL de la QDM
+  // Methods for computing and calling the distance to the nearest solid wall
+  // the input is the array of BCs of the momentum equation
   virtual const DoubleTab& y_elem()  const {return y_elem_;}
   virtual const DoubleTab& y_faces() const {return y_faces_;}
   virtual inline void init_dist_paroi_globale(const Conds_lim& conds_lim)
@@ -103,7 +103,7 @@ public :
     Process::exit();
   }
 
-  // Post processing de champs:
+  // Post-processing of fields:
   const Champ_Fonc_base& volume_maille() const { return volume_maille_; }
   const Champ_Fonc_base& mesh_numbering() const { return mesh_numbering_; }
   void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;

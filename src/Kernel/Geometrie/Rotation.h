@@ -18,14 +18,14 @@
 
 #include <Transformer.h>
 
-/*! @brief Classe Rotation Applique une rotation autour d un axe aligne avec un des axes du repere.
+/*! @brief Class Rotation Applies a rotation around an axis aligned with one of the coordinate axes.
  *
- *     Structure du jeu de donnee :
- *     Rotation nom_domaine nom_axe coord1 coord2 angle
- *     nom_domaine   : nom du domaine auquelon applique une rotation
- *     nom_axe       : axe (X, Y ou Z) avec lequel est aligne l axe de rotation
- *     coord1 coord2 : coordonnees (sens dtrigonometrique direct) du centre de rotation
- *                       dans le plan orthogonal a l axe de rotation
+ *     Data set structure:
+ *     Rotation domain_name axis_name coord1 coord2 angle
+ *     domain_name   : name of the domain to which a rotation is applied
+ *     axis_name     : axis (X, Y or Z) with which the rotation axis is aligned
+ *     coord1 coord2 : coordinates (in direct trigonometric sense) of the rotation center
+ *                       in the plane orthogonal to the rotation axis
  *
  *
  */

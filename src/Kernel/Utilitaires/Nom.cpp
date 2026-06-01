@@ -24,10 +24,10 @@ Implemente_instanciable_sans_constructeur_ni_destructeur(Nom,"Nom",Objet_U);
 // XD nom objet_u nom NO_BRACE Class to name the TRUST objects.
 // XD attr mot chaine mot OPT Chain of characters.
 
-/*! @brief Surcharge Objet_U::printOn(Sortie&) Ecriture d'un Nom sur un flot de sortie
+/*! @brief Overrides Objet_U::printOn(Sortie&). Writes a Nom to an output stream.
  *
- * @param (Sortie& s) le flot de sortie a utiliser
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& s) the output stream to use
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Nom::printOn(Sortie& s) const
 {
@@ -39,9 +39,7 @@ Sortie& Nom::printOn(Sortie& s) const
 }
 #define BUFLEN 100000
 
-/*! @brief Lecture d'un nom.
- *
- * En cas d'echec, le nom vaut "??" a la sortie.
+/*! @brief Reads a name. On failure, the name is set to "??".
  *
  */
 Entree& Nom::readOn(Entree& s)
@@ -55,9 +53,7 @@ Entree& Nom::readOn(Entree& s)
   return s;
 }
 
-/*! @brief Constructeur par defaut.
- *
- * Cree la chaine "??"
+/*! @brief Default constructor. Creates the string "??".
  *
  */
 Nom::Nom()
@@ -65,9 +61,9 @@ Nom::Nom()
   nom_ = "??";
 }
 
-/*! @brief Construction d'un nom a partir d'un caractere
+/*! @brief Constructs a name from a single character.
  *
- * @param (char c) le caractere du nom
+ * @param (char c) the character of the name
  */
 Nom::Nom(char c)
 {
@@ -75,16 +71,16 @@ Nom::Nom(char c)
 }
 
 
-/*! @brief Construction d'un nom a partir d'un entier La chaine cree est la representation de l'entier
+/*! @brief Constructs a name from an integer. The string created is the decimal representation of the integer.
  *
- *     Exemple : Nom(128) cree la chaine "128"
+ *     Example: Nom(128) creates the string "128".
  *
- * @param (int i) l'entier a utiliser
+ * @param (int i) the integer to use
  */
 Nom::Nom(int i)
 {
   nom_ = "";
-  // 22 caracteres suffisent pour stocker n'importe quel entier
+  // 22 characters are sufficient to store any integer
   char chaine[22];
   snprintf(chaine, 22, "%d", i);
   operator=(chaine);
@@ -93,7 +89,7 @@ Nom::Nom(int i)
 Nom::Nom(long i)
 {
   nom_ = "";
-  // 22 caracteres suffisent pour stocker n'importe quel entier
+  // 22 characters are sufficient to store any integer
   char chaine[22];
   snprintf(chaine, 22, "%ld", i);
   operator=(chaine);
@@ -102,15 +98,15 @@ Nom::Nom(long i)
 Nom::Nom(long long i)
 {
   nom_ = "";
-  // 22 caracteres suffisent pour stocker n'importe quel entier long long
+  // 22 characters are sufficient to store any long long integer
   char chaine[22];
   snprintf(chaine, 22, "%lld", i);
   operator=(chaine);
 }
 
-/*! @brief Construction d'un nom a partir d'une chaine de caracteres La chaine est copiee
+/*! @brief Constructs a name from a character string. The string is copied.
  *
- * @param (const char* nom) la chaine de caracteres a utiliser
+ * @param (const char* nom) the character string to use
  */
 Nom::Nom(const char* nom) : nom_(nom)
 {
@@ -121,17 +117,17 @@ Nom::Nom(const std::string& nom) : nom_(nom)
 }
 
 
-/*! @brief Constructeur par copie d'un nom
+/*! @brief Copy constructor for a name.
  *
- * @param (const Nom& nom) le nom a utiliser
+ * @param (const Nom& nom) the name to use
  */
 Nom::Nom(const Nom& nom) : Objet_U(nom), nom_(nom.nom_)
 {
 }
 
-/*! @brief Construction d'un nom a partir d'un flottant La chaine cree est la representation du nombre reel (snprintf)
+/*! @brief Constructs a name from a floating-point number. The string created is the decimal representation of the real number (snprintf).
  *
- * @param (double le_reel) le reel a utiliser
+ * @param (double le_reel) the real number to use
  */
 Nom::Nom(double le_reel)
 {
@@ -141,19 +137,19 @@ Nom::Nom(double le_reel)
   operator=(la_chaine);
 }
 
-/*! @brief Construction d'un nom a partir d'un flottant La chaine cree est la representation du nombre reel (snprintf)
+/*! @brief Constructs a name from a floating-point number with a custom format. The string created is the decimal representation of the real number (snprintf).
  *
- *     Le format du nombre represente par la chaine est donne par format
+ *     The format of the number in the string is given by format.
  *
- * @param (double le_reel) le reel a utiliser
+ * @param (double le_reel) the real number to use
  */
 Nom::Nom(double le_reel, const char* format)
 {
   char la_chaine[80];
   snprintf(la_chaine,80,format,le_reel);
 #ifdef MICROSOFT
-  // sous windows les chiffres s'ecrivent 1.0000e+000 (avec 3 chiffres pour les puissances)
-  // on retire le premier zero
+  // under windows, numbers are written as 1.0000e+000 (with 3 digits for exponents)
+  // remove the first zero
   unsigned int length=strlen(la_chaine);
   if (la_chaine[length-5]=='e')
     {
@@ -167,14 +163,14 @@ Nom::Nom(double le_reel, const char* format)
 }
 
 
-/*! @brief Destructeur
+/*! @brief Destructor.
  *
  */
 Nom::~Nom()
 {
 }
 
-/*! @brief Transforme le nom en majuscules Seules les lettres 'a'-'z' sont modifiees
+/*! @brief Converts the name to uppercase. Only letters 'a'-'z' are modified.
  *
  */
 Nom& Nom::majuscule()
@@ -183,9 +179,9 @@ Nom& Nom::majuscule()
   return *this;
 }
 
-/*! @brief Renvoie le nombre de caracteres de la chaine du Nom y compris le caractere zero de fin de chaine.
+/*! @brief Returns the number of characters in the Nom string, including the null terminator.
  *
- *     Exemple : Nom("hello").longueur() == 6
+ *     Example: Nom("hello").longueur() == 6.
  *
  */
 int Nom::longueur() const
@@ -193,9 +189,9 @@ int Nom::longueur() const
   return (int)nom_.size()+1;
 }
 
-/*! @brief Copie la chaine nom.
+/*! @brief Copies the string nom.
  *
- * Modif BM pour que nom puisse pointer sur une sous-partie de nom_
+ * BM modification so that nom can point to a sub-part of nom_.
  *
  */
 Nom& Nom::operator=(const char* const nom)
@@ -204,10 +200,10 @@ Nom& Nom::operator=(const char* const nom)
   return *this;
 }
 
-/*! @brief Copie le Nom nom
+/*! @brief Copies the Nom nom.
  *
- * @param (const Nom& nom) le nom a copier
- * @return (Nom&) reference sur this qui represente la chaine du Nom nom
+ * @param (const Nom& nom) the name to copy
+ * @return (Nom&) reference to this, representing the string of Nom nom
  */
 Nom& Nom::operator=(const Nom& nom)
 {
@@ -215,10 +211,10 @@ Nom& Nom::operator=(const Nom& nom)
   return *this;
 }
 
-/*! @brief Concatenation avec un Nom
+/*! @brief Concatenation with a Nom.
  *
- * @param (const Nom& x) la nom a concatener
- * @return (Nom&) reference sur this
+ * @param (const Nom& x) the name to concatenate
+ * @return (Nom&) reference to this
  */
 Nom& Nom::operator +=(const Nom& x)
 {
@@ -232,7 +228,7 @@ Nom& Nom::operator+=(const char *x)
   return *this;
 }
 
-/*! @brief concatenation de chaine
+/*! @brief String concatenation.
  *
  */
 Nom& Nom::operator +=(char x)
@@ -260,13 +256,12 @@ Nom& Nom::operator +=(int x)
   return *this;
 }
 
-/*! @brief Extraction de suffixe : Nom x("azerty");
+/*! @brief Suffix extraction: Nom x("azerty");
  *
- *      x.suffix("aze")
- *      x contient "rty".
+ *      x.suffix("aze") leaves x containing "rty".
  *
- * @param (const char* const ch) chaine de caractere a utiliser comme prefixe
- * @return (Nom&) reference sur this
+ * @param (const char* const ch) character string to use as prefix to strip
+ * @return (Nom&) reference to this
  */
 Nom& Nom::suffix(const char* const s)
 {
@@ -350,10 +345,10 @@ const Nom Nom::getPrefix(const char* const s) const
   return *this;
 }
 
-/*! @brief Concatenation avec un Nom
+/*! @brief Concatenation with a Nom.
  *
- * @param (const Nom& x) la nom a concatener
- * @return (Nom) le nouveau Nom cree avec la concatenation de this et de x
+ * @param (const Nom& x) the name to concatenate
+ * @return (Nom) the new Nom created by concatenating this and x
  */
 Nom Nom::operator +(const Nom& x) const
 {
@@ -362,10 +357,10 @@ Nom Nom::operator +(const Nom& x) const
   return nouveau;
 }
 
-/*! @brief Comparaison avec un Objet_U l'Objet_U est caste en Nom pour la comparaison
+/*! @brief Comparison with an Objet_U. The Objet_U is cast to Nom for the comparison.
  *
- * @param (const Objet_U& x) l'Objet_U a utiliser pour la comparaison
- * @return (int) 1 si egalite
+ * @param (const Objet_U& x) the Objet_U to use for comparison
+ * @return (int) 1 if equal
  */
 int Nom::est_egal_a(const Objet_U& x) const
 {
@@ -378,11 +373,9 @@ int Nom::est_egal_a(const Objet_U& x) const
 #endif
 }
 
-/*! @brief Insere _prefix000n (n=me() ou nproc()) dans un nom de fichier (par ex:toto.
+/*! @brief Inserts _prefix000n (n=me() or nproc()) into a file name (e.g. toto.titi) to produce toto_prefix000n.titi.
  *
- * titi) pour donner toto_prefix000n.titi
- *
- * @param (without_padding) flag indiquant que l'on ne souhaite pas ajouter de zeros devant n
+ * @param (without_padding) flag indicating that leading zeros should not be added before n
  */
 Nom Nom::nom_me(int n, const char* prefixe, int without_padding) const
 {
@@ -453,7 +446,7 @@ Nom Nom::nom_me(int n, const char* prefixe, int without_padding) const
   for (int i=prefix_len; i<prefix_len+digits; i++)
     {
       resultat=n/diviseur;
-      char c= (char)((int)'0' + resultat); // on old compilos, '+' is not for char, always int ...
+      char c= (char)((int)'0' + resultat); // on old compilers, '+' is not for char, always int ...
       c_numero[i]=c;
       n-=resultat*diviseur;
       diviseur/=10;
@@ -467,7 +460,7 @@ Nom Nom::nom_me(int n, const char* prefixe, int without_padding) const
   return new_name;
 }
 
-/*! @brief Retourne un nom selon la commande usuelle substr ATTENTION : deb = 1 => premier caractere de la chaine !!!
+/*! @brief Returns a name using the usual substr command. NOTE: deb = 1 means the first character of the string.
  *
  */
 Nom Nom::substr_old(const int deb, const int la_longueur) const
@@ -479,9 +472,8 @@ Nom Nom::substr_old(const int deb, const int la_longueur) const
   return nouveau;
 }
 
-/*! @brief Retourne fichier si le nom est sous la forme /toto/titi/fichier
+/*! @brief Returns the filename part if the name is in the form /toto/titi/filename.
  *
- * @param (Signification)
  */
 Nom Nom::basename() const
 {
@@ -500,20 +492,20 @@ Nom Nom::basename() const
   return the_basename;
 }
 
-/*! @brief Retourne un pointeur sur la chaine de caractere du nom
+/*! @brief Returns a pointer to the character string of the name.
  *
- * @return (char*) pointeur sur la chaine de caractere du nom
+ * @return (char*) pointer to the character string of the name
  */
 Nom::operator const char*() const
 {
   return nom_.c_str();
 }
 
-/*! @brief Comparaison d'un nom avec une chaine de caractere Utilise strcmp
+/*! @brief Compares a name with a character string using strcmp.
  *
  * @param (const Nom& un_nom)
  * @param (const char* const un_autre)
- * @return (int) 1 si les noms sont egaux, 0 sinon
+ * @return (int) 1 if the names are equal, 0 otherwise
  */
 int operator ==(const Nom& un_nom, const char* const un_autre)
 {
@@ -529,11 +521,11 @@ int operator ==(const char* const un_autre, const Nom& un_nom)
   return (un_nom == un_autre);
 }
 
-/*! @brief Comparaison d'un nom avec une chaine de caractere
+/*! @brief Compares a name with a character string.
  *
  * @param (const Nom& un_nom)
  * @param (const char* const un_autre)
- * @return (int) 1 si les noms sont differents, 0 sinon
+ * @return (int) 1 if the names are different, 0 otherwise
  */
 int operator !=(const Nom& un_nom, const char* un_autre)
 {
@@ -556,9 +548,9 @@ bool operator <(const Nom& n1, const Nom& n2)
 }
 
 
-/*! @brief Renvoie *this;
+/*! @brief Returns *this.
  *
- * @return (const Nom&) reference sur le Nom
+ * @return (const Nom&) reference to the Nom
  */
 const Nom& Nom::le_nom() const
 {

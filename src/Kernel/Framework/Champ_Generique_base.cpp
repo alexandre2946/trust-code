@@ -49,21 +49,21 @@ int Champ_Generique_base::lire_motcle_non_standard(const Motcle& mot, Entree& is
   return -1;
 }
 
-/*! @brief Renvoie la dimension de l'espace dans lequel le champ est defini.
+/*! @brief Returns the dimension of the space in which the field is defined.
  *
- * Il s'agit du nombre de composantes des coordonnees qu'il faut fournir dans get_xyz_values.
- *   (par exemple, un champ defini sur une surface peut etre de dimension 3 si les
- *    coordonnees des sommets sont 3D, ou de dimension 2 s'il s'agit de coordonnees curvilignes
- *    le long de la surface)
+ * This is the number of components of the coordinates that must be provided in get_xyz_values.
+ *   (for example, a field defined on a surface can be of dimension 3 if the
+ *    vertex coordinates are 3D, or dimension 2 if it is curvilinear coordinates
+ *    along the surface)
  *
  */
 int Champ_Generique_base::get_dimension() const
 {
   throw Champ_Generique_erreur("NOT_IMPLEMENTED");
-  // On n'arrive jamais ici
+  // We never reach here
 }
 
-/*! @brief Renvoie le temps du Champ_Generique_base.
+/*! @brief Returns the time of the Champ_Generique_base.
  *
  */
 double Champ_Generique_base::get_time() const
@@ -71,7 +71,7 @@ double Champ_Generique_base::get_time() const
   throw Champ_Generique_erreur("NOT_IMPLEMENTED");
 }
 
-/*! @brief Renvoie le probleme qui porte le champ cible
+/*! @brief Returns the problem that carries the target field
  *
  */
 const Probleme_base& Champ_Generique_base::get_ref_pb_base() const
@@ -79,7 +79,7 @@ const Probleme_base& Champ_Generique_base::get_ref_pb_base() const
   throw Champ_Generique_erreur("NOT_IMPLEMENTED");
 }
 
-/*! @brief Renvoie la discretisation associee au probleme
+/*! @brief Returns the discretization associated with the problem
  *
  */
 const Discretisation_base& Champ_Generique_base::get_discretisation() const
@@ -90,8 +90,8 @@ const Discretisation_base& Champ_Generique_base::get_discretisation() const
   return discr;
 }
 
-/*! @brief Renvoie la directive (champ_elem, champ_sommets, champ_face ou pression)
- * pour lancer la discretisation de l espace de stockage rendu par get_champ()
+/*! @brief Returns the directive (champ_elem, champ_sommets, champ_face or pression)
+ * to launch the discretization of the storage space returned by get_champ()
  *
  */
 const Motcle Champ_Generique_base::get_directive_pour_discr() const
@@ -109,7 +109,7 @@ const Nom& Champ_Generique_base::get_nom_post() const
   return nom_post_;
 }
 
-/*! @brief Renvoie la liste des "query" possibles pour le champ.
+/*! @brief Returns the list of possible "queries" for the field.
  *
  */
 void Champ_Generique_base::get_property_names(Motcles& list) const
@@ -117,17 +117,17 @@ void Champ_Generique_base::get_property_names(Motcles& list) const
   throw Champ_Generique_erreur("NOT_IMPLEMENTED");
 }
 
-/*! @brief Renvoie la propriete demandee.
+/*! @brief Returns the requested property.
  *
- * Exemples: "DISCRETISATION" : type du champ discret (P0, P1, P1NC, etc...)
- *   "ELEMENT_TYPE" : type de l'element de plus grande dimension ({TRIANGLE}, {TETRAHEDRA}, {QUAD}, {HEXA}, etc)
- *   "DYNAMIC_MESH" : le maillage est-il dynamique ou pas ({STATIC}, {DYNAMIC})
- *   "NAME" : nom du champ
- *   "COMPONENT_NAMES" : nom des composantes du champ ({K,EPSILON} ou {VITESSE_X,VITESSE_Y,VITESSE_Z})
- *   "BOUNDARY_NAMES" : nom des bords
- *   "COORDINATES" : systeme de coordonnees des noeuds ({X}, {X,Y}, {X,Y,Z}, {R,THETA}, etc...)
+ * Examples: "DISCRETISATION" : type of discrete field (P0, P1, P1NC, etc...)
+ *   "ELEMENT_TYPE" : type of element with the largest dimension ({TRIANGLE}, {TETRAHEDRA}, {QUAD}, {HEXA}, etc)
+ *   "DYNAMIC_MESH" : is the mesh dynamic or not ({STATIC}, {DYNAMIC})
+ *   "NAME" : name of the field
+ *   "COMPONENT_NAMES" : name of the field components ({K,EPSILON} or {VITESSE_X,VITESSE_Y,VITESSE_Z})
+ *   "BOUNDARY_NAMES" : name of the boundaries
+ *   "COORDINATES" : coordinate system of the nodes ({X}, {X,Y}, {X,Y,Z}, {R,THETA}, etc...)
  *  Exceptions:
- *   - GenericFieldError::INVALID : query non comprise
+ *   - GenericFieldError::INVALID : query not understood
  *
  */
 const Noms Champ_Generique_base::get_property(const Motcle& query) const
@@ -136,20 +136,20 @@ const Noms Champ_Generique_base::get_property(const Motcle& query) const
 }
 
 
-/*! @brief Renvoie le type des entites geometriques sur auxquelles les valeurs discretes sont attachees (NODE pour un champ P1, FACE pour un champ P1NC, ELEMENT pour un
+/*! @brief Returns the type of geometric entities on which the discrete values are attached (NODE for a P1 field, FACE for a P1NC field, ELEMENT for a
  *
- *   champ P0, etc). Il est conseille d'utiliser la syntaxe get_localisation() sans
- *   parametre, sauf si on sait quoi faire pour les champs multi-supports.
+ *   P0 field, etc). It is recommended to use the get_localisation() syntax without
+ *   parameter, unless you know what to do for multi-support fields.
  *   @sa get_nb_localisations()
- *  Parametre : index
- *  Signification : index de la localisation demandee (pour les champs multi-support).
- *   Si index = -1 : si le champ est multi-support on leve une exception, sinon on renvoie le support.
- *   Si index >= 0 : on renvoie le i-ieme support.
- *  Valeur par defaut : -1
+ *  Parameter : index
+ *  Meaning : index of the requested localization (for multi-support fields).
+ *   If index = -1 : if the field is multi-support an exception is raised, otherwise the support is returned.
+ *   If index >= 0 : returns the i-th support.
+ *  Default value : -1
  *  Exceptions:
- *   - GenericFieldError::INVALID : le champ n'est pas discretise sur ces entites geometriques
- *     (il peut s'agir d'un champ analytique ou d'un champ multi-localisation), ou le champ
- *     est multi-support alors qu'on a demande index = -1, ou le support "index" n'existe pas.
+ *   - GenericFieldError::INVALID : the field is not discretized on these geometric entities
+ *     (it can be an analytical field or a multi-localization field), or the field
+ *     is multi-support while index = -1 was requested, or the support "index" does not exist.
  *
  */
 Entity Champ_Generique_base::get_localisation(const int index) const
@@ -162,29 +162,29 @@ int Champ_Generique_base::get_nb_localisations() const
   throw Champ_Generique_erreur("NOT_IMPLEMENTED");
 }
 
-/*! @brief Renvoie une reference au tableau de valeurs discretes s'il existe en memoire.
+/*! @brief Returns a reference to the array of discrete values if it exists in memory.
  *
- * La reference est valide au moins jusqu'au prochain appel a une methode non const.
- *   Le maillage sur lequel ces valeurs sont definies est accessible par les methodes
+ * The reference is valid at least until the next call to a non-const method.
+ *   The mesh on which these values are defined is accessible through the methods
  *   get_node_coordinates(), get_connectivity(), get_field_type().
  *  Exceptions:
- *   - GenericFieldError::XYZ_ONLY : les valeurs ne sont accessibles que par get_xyz_values
- *   - GenericFieldError::NO_REF : les valeurs ne sont pas stockees en memoire,
- *      il faut utiliser get_copy_values();
- *   - GenericFieldError::MESH_ONLY : le champ ne porte pas de valeurs, il sert uniquement a decrire une geometrie
+ *   - GenericFieldError::XYZ_ONLY : values are accessible only through get_xyz_values
+ *   - GenericFieldError::NO_REF : values are not stored in memory,
+ *      must use get_copy_values();
+ *   - GenericFieldError::MESH_ONLY : the field carries no values, it serves only to describe a geometry
  *
  */
 const DoubleTab& Champ_Generique_base::get_ref_values() const
 {
-  // Implementation par defaut : exception NO_REF
+  // Default implementation : exception NO_REF
   throw Champ_Generique_erreur("NO_REF");
 }
 
-/*! @brief Remplit le tableau values avec les valeurs discretes du champ (cree une copie).
+/*! @brief Fills the values array with the discrete values of the field (creates a copy).
  *
  * Exceptions:
- *   - GenericFieldError::XYZ_ONLY : les valeurs ne sont accessibles que par get_xyz_values
- *   - GenericFieldError::MESH_ONLY : le champ ne porte pas de valeurs, il sert uniquement a decrire une geometrie
+ *   - GenericFieldError::XYZ_ONLY : values are accessible only through get_xyz_values
+ *   - GenericFieldError::MESH_ONLY : the field carries no values, it serves only to describe a geometry
  *
  */
 void Champ_Generique_base::get_copy_values(DoubleTab& values) const
@@ -192,22 +192,22 @@ void Champ_Generique_base::get_copy_values(DoubleTab& values) const
   throw Champ_Generique_erreur("NOT_IMPLEMENTED");
 }
 
-/*! @brief Calcule la valeur ponctuelle du champ aux coordonnees donnees dans coords et les met dans values.
+/*! @brief Computes the point value of the field at the coordinates given in coords and puts them in values.
  *
- * validity_flag est rempli avec 1 si la valeur est valide
- *   (coordonnees a l'interieur du domaine), 0 sinon.
- *  Attention en parallele:
- *   Chaque processeur traite le tableau coords qui lui est fourni : on peut soit faire
- *   calculer le meme tableau a tout le monde: dans ce cas, validity_flag indique sur
- *   chaque processeur quelles valeurs chaque processeur a pu calculer, soit on sait par
- *   avance quelles coordonnees sont calculable par chaque processeur et on donne au processeur
- *   local uniquement des coordonnees qu'il possede. Si une meme coordonnee est demandee
- *   a plusieurs processeurs, on ne garantit pas que tous donnent le meme resultat. En general,
- *   un seul aura le validity_flag mis pour cette coordonnee.
+ * validity_flag is filled with 1 if the value is valid
+ *   (coordinates inside the domain), 0 otherwise.
+ *  Warning in parallel:
+ *   Each processor processes the coords array provided to it: one can either have
+ *   the same array computed by everyone: in this case, validity_flag indicates on
+ *   each processor which values each processor was able to compute, or one knows in
+ *   advance which coordinates are computable by each processor and gives the processor
+ *   locally only the coordinates it owns. If the same coordinate is requested
+ *   from multiple processors, there is no guarantee that all give the same result. In general,
+ *   only one will have the validity_flag set for this coordinate.
  *  Exceptions:
- *   - GenericFieldError::NOT_IMPLEMENTED : le paresseux n'a pas code les methodes d'interpolation
- *    il faut se debrouiller avec le maillage et les valeurs discretes.
- *   - GenericFieldError::MESH_ONLY : le champ ne porte pas de valeurs, il sert uniquement a decrire une geometrie
+ *   - GenericFieldError::NOT_IMPLEMENTED : the lazy one has not coded the interpolation methods
+ *    must work with the mesh and the discrete values.
+ *   - GenericFieldError::MESH_ONLY : the field carries no values, it serves only to describe a geometry
  *
  */
 void Champ_Generique_base::get_xyz_values(const DoubleTab& coords, DoubleTab& values, ArrOfBit& validity_flag) const
@@ -215,21 +215,21 @@ void Champ_Generique_base::get_xyz_values(const DoubleTab& coords, DoubleTab& va
   throw Champ_Generique_erreur("NOT_IMPLEMENTED");
 }
 
-/*! @brief Renvoie une reference au tableau des coordonnees des sommets du maillage support du champ, s'il existe.
+/*! @brief Returns a reference to the array of coordinates of the vertices of the mesh supporting the field, if it exists.
  *
- * Le tableau a toujours deux dimensions :
- *    dimension(0) = nombre de sommets reels
- *    dimension(1) = get_dimension() (dimension de l'espace dans lequel est defini le champ)
- *   En parallele, le tableau est un tableau distribue avec items communs.
+ * The array always has two dimensions:
+ *    dimension(0) = number of real vertices
+ *    dimension(1) = get_dimension() (dimension of the space in which the field is defined)
+ *   In parallel, the array is a distributed array with common items.
  *  Exceptions:
- *   - GenericFieldError::INVALID : le tableau n'existe pas (champ analytique ...)
- *   - GenericFieldError::NO_REF : les valeurs ne sont pas stockees en memoire,
- *      il faut utiliser get_copy_coordinates();
+ *   - GenericFieldError::INVALID : the array does not exist (analytical field ...)
+ *   - GenericFieldError::NO_REF : values are not stored in memory,
+ *      must use get_copy_coordinates();
  *
  */
 const DoubleTab& Champ_Generique_base::get_ref_coordinates() const
 {
-  // Implementation par defaut : exception NO_REF
+  // Default implementation : exception NO_REF
   throw Champ_Generique_erreur("NO_REF");
 }
 
@@ -239,20 +239,20 @@ void Champ_Generique_base::get_copy_coordinates(DoubleTab&) const
   throw Champ_Generique_erreur("NO_REF");
 }
 
-/*! @brief Renvoie le tableau de connectivite entre l'entite geometrique index1 et l'entite index2.
+/*! @brief Returns the connectivity array between the geometric entity index1 and entity index2.
  *
- * Par exemple
+ * For example
  *    get_ref_connectivity(ELEM, NODE) = Domaine::mes_elems
  *    get_ref_connectivity(ELEM, FACE) = DomaineVF::elem_faces_
  *    get_ref_connectivity(FACE, ELEM) = DomaineVF::face_voisins_
- *   Le tableau a toujours deux dimensions :
- *    dimension(0) = nombre d'entites "index1" reelles
- *    dimension(1) = nombre d'entites "index2" connectees a chaque entite "index1"
- *   En parallele, le tableau est un tableau distribue avec items communs
+ *   The array always has two dimensions:
+ *    dimension(0) = number of real entities "index1"
+ *    dimension(1) = number of entities "index2" connected to each entity "index1"
+ *   In parallel, the array is a distributed array with common items
  *  Exceptions:
- *   - GenericFieldError::INVALID : le tableau n'existe pas (champ analytique ...)
- *   - GenericFieldError::NO_REF : les valeurs ne sont pas stockees en memoire,
- *      il faut utiliser get_copy_connectivity();
+ *   - GenericFieldError::INVALID : the array does not exist (analytical field ...)
+ *   - GenericFieldError::NO_REF : values are not stored in memory,
+ *      must use get_copy_connectivity();
  *
  */
 const IntTab& Champ_Generique_base::get_ref_connectivity(Entity index1, Entity index2) const
@@ -265,9 +265,9 @@ void Champ_Generique_base::get_copy_connectivity(Entity index1, Entity index2, I
   throw Champ_Generique_erreur("NOT_IMPLEMENTED");
 }
 
-/*! @brief Renvoie une ref au domaine sur lequel sera evalue l espace de stockage.
+/*! @brief Returns a ref to the domain on which the storage space will be evaluated.
  *
- * Par defaut le domaine associe au probleme.
+ * By default the domain associated with the problem.
  *
  */
 const Domaine& Champ_Generique_base::get_ref_domain() const
@@ -279,9 +279,9 @@ const Domaine& Champ_Generique_base::get_ref_domain() const
 }
 
 
-/*! @brief Cree une copie du domaine sur lequel sera evalue l espace de stockage.
+/*! @brief Creates a copy of the domain on which the storage space will be evaluated.
  *
- * Par defaut le domaine associe au probleme.
+ * By default the domain associated with the problem.
  *
  */
 void Champ_Generique_base::get_copy_domain(Domaine& domain) const
@@ -291,9 +291,9 @@ void Champ_Generique_base::get_copy_domain(Domaine& domain) const
 }
 
 
-/*! @brief Renvoie une ref au domaine_discretisee du domaine sur lequel sera evalue l espace de stockage.
+/*! @brief Returns a ref to the discretized domain on which the storage space will be evaluated.
  *
- *  Par defaut le domaine associe au probleme.
+ *  By default the domain associated with the problem.
  *
  */
 const Domaine_dis_base& Champ_Generique_base::get_ref_domaine_dis_base() const
@@ -304,7 +304,7 @@ const Domaine_dis_base& Champ_Generique_base::get_ref_domaine_dis_base() const
   return domaine_dis;
 }
 
-/*! @brief Renvoie une ref au domaine_cl_discretisee de l equation portant le champ cible.
+/*! @brief Returns a ref to the discretized boundary conditions domain of the equation carrying the target field.
  *
  */
 const Domaine_Cl_dis_base& Champ_Generique_base::get_ref_zcl_dis_base() const
@@ -337,7 +337,7 @@ bool Champ_Generique_base::has_champ_post(const Motcle& nom) const
         return true;
     }
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 const Champ_Generique_base& Champ_Generique_base::get_champ_post(const Motcle& nom) const

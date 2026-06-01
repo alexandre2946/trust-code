@@ -24,8 +24,8 @@ class Domaine_Cl_PolyMAC_family;
 
 /*! @brief class Op_Grad_PolyMAC_CDO_Face
  *
- *   Cette classe represente l'operateur de gradient La discretisation est PolyMAC_CDO
- *   On calcule le gradient d'un Champ_Elem_PolyMAC_CDO (la pression)
+ *   Gradient operator for the PolyMAC_CDO discretization.
+ *   Computes the gradient of a Champ_Elem_PolyMAC_CDO field (pressure).
  *
  * @sa Operateur_Grad_base
  */

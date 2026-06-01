@@ -23,9 +23,9 @@
 #ifdef HAS_CGNS
 
 /*
- * ***************** *
- * METHODS POUR LINK *
- * ***************** *
+ * ****************** *
+ * METHODS FOR LINKS  *
+ * ****************** *
  */
 
 /**
@@ -110,7 +110,7 @@ void Ecrire_CGNS::cgns_close_grid_or_solution_link_file(const double t, const TY
     {
       if (is_linked_files_comm_group_mode())
         {
-          cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::PAR>(fn /* inutile */, fileId_, false);
+          cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::PAR>(fn /* unused */, fileId_, false);
           Cerr << "**** Multiple parallel CGNS files " << fn << " closed !" << finl;
         }
       else
@@ -140,7 +140,7 @@ void Ecrire_CGNS::cgns_fill_info_grid_link_file(const char* basename, const CGNS
         connectname_.push_back({ "NGON_n" });
     }
   else
-    connectname_.push_back({ "Elem" }); // autre cas
+    connectname_.push_back({ "Elem" }); // other case
 }
 
 void Ecrire_CGNS::cgns_init_solution_link_file(const std::string& LOC, const Nom& nom_dom)
@@ -148,14 +148,14 @@ void Ecrire_CGNS::cgns_init_solution_link_file(const std::string& LOC, const Nom
   assert (LOC == "ELEM" || LOC == "SOM");
   Cerr << "###  Building a new CGNS base with a linked zone to host the field located at : " << LOC << " !" << finl;
   doms_written_.push_back(nom_dom);
-  baseId_.push_back(-123); // pour chaque dom, on a une baseId
+  baseId_.push_back(-123); // one baseId per domain
   zoneId_.push_back(-123);
 }
 
 void Ecrire_CGNS::gather_local_sizeId_for_comm_group()
 {
 #ifdef MPI_
-  if (!vec_proc_maitre_local_comm_.empty()) return; /* rien a faire */
+  if (!vec_proc_maitre_local_comm_.empty()) return; /* nothing to do */
 
   unique_vec_proc_maitre_local_comm_.clear();
   sizeId_som_local_comm_.clear();
@@ -168,7 +168,7 @@ void Ecrire_CGNS::gather_local_sizeId_for_comm_group()
 
   for (int val : vec_proc_maitre_local_comm_)
     if (seen.insert(val).second)
-      unique_vec_proc_maitre_local_comm_.push_back(val); // si val pas dedans
+      unique_vec_proc_maitre_local_comm_.push_back(val); // if val not already present
 
   std::vector<std::vector<cgsize_t>> sizeId_som_local_comm_tmp, sizeId_elem_local_comm_tmp;
   sizeId_som_local_comm_tmp.reserve(sizeId_.size());
@@ -215,7 +215,7 @@ void Ecrire_CGNS::add_new_linked_base(const std::string& LOC, const Nom& nom_dom
   Cerr << "###  Building a new CGNS base with a linked zone to host the field located at : " << LOC << " !" << finl;
 
   doms_written_.push_back(nom_dom);
-  baseId_.push_back(-123); // pour chaque dom, on a une baseId
+  baseId_.push_back(-123); // one baseId per domain
 
   const Nom nom_dom_mod = TRUST_2_CGNS::modify_domaine_name_for_link(nom_dom, LOC);
   const int ind_base = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom_mod); // get index of orig dom
@@ -225,7 +225,7 @@ void Ecrire_CGNS::add_new_linked_base(const std::string& LOC, const Nom& nom_dom
 
   if (Process::is_parallel() && (Option_CGNS::PARALLEL_OVER_ZONE || postraiter_domaine_))
     {
-      zoneId_.clear(); // XXX commencons par ca
+      zoneId_.clear(); // XXX start fresh
       TRUST_2_CGNS& TRUST2CGNS = T2CGNS_[ind_base];
       const std::vector<int>& global_nb_elem = TRUST2CGNS.get_global_nb_elem(),
                               &global_nb_som = TRUST2CGNS.get_global_nb_som(),
@@ -248,7 +248,7 @@ void Ecrire_CGNS::add_new_linked_base(const std::string& LOC, const Nom& nom_dom
           zonename_link = nom_dom_mod.nom_me(indZ).getString();
 
           cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_.back(), zonename, isize, zoneId_.back(), indZ + 1,
-                                                         "" /* meme fichier */, nom_dom_mod.getString(), zonename_link, connectname_[ind_base],
+                                                         "" /* same file */, nom_dom_mod.getString(), zonename_link, connectname_[ind_base],
                                                          "Ecrire_CGNS::add_new_linked_base");
         }
 
@@ -260,7 +260,7 @@ void Ecrire_CGNS::add_new_linked_base(const std::string& LOC, const Nom& nom_dom
       const cgsize_t isize[3] = { sizeId_[ind_base][0] , sizeId_[ind_base][1] , 0 };
 
       cgns_helper_.cgns_write_zone_and_classic_links(true /* write_zone */, fileId_, baseId_.back(), nom_dom.getString(), isize, zoneId_.back(), 1,
-                                                     "" /* meme fichier */, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
+                                                     "" /* same file */, baseZone_name_[ind_base], baseZone_name_[ind_base], connectname_[ind_base],
                                                      "Ecrire_CGNS::add_new_linked_base");
     }
 }
@@ -418,7 +418,7 @@ void Ecrire_CGNS::cgns_write_final_link_file_comm_group()
   if (vec_proc_maitre_local_comm_.empty())
     gather_local_sizeId_for_comm_group();
 
-  /* Fichier link : Only master proc writes the link file ! */
+  /* Link file: only master proc writes the link file ! */
   if (!Process::me())
     {
       std::string fn = baseFile_name_ + ".cgns";
@@ -507,7 +507,7 @@ void Ecrire_CGNS::cgns_write_final_link_file()
       return;
     }
 
-  /* Fichier link : Only master proc writes the link file ! */
+  /* Link file: only master proc writes the link file ! */
   if (!Process::me())
     {
       std::string fn = baseFile_name_ + ".cgns"; // file name
@@ -562,7 +562,7 @@ void Ecrire_CGNS::cgns_write_final_link_file()
             }
         }
 
-      cgns_close_grid_or_solution_link_file(-123. /* inutile*/, TYPE_LINK_CGNS::FINAL_LINK, true); // on ferme
+      cgns_close_grid_or_solution_link_file(-123. /* unused */, TYPE_LINK_CGNS::FINAL_LINK, true); // closing
     }
 }
 
@@ -611,7 +611,7 @@ void Ecrire_CGNS::link_multi_loc_support_pb_deformable()
     }
   else
     {
-      if (first_time_post_) return; /* Mais ouiiiiii car fait dans cgns_fill_field_loc_map !! */
+      if (first_time_post_) return; /* Yes, because it is done in cgns_fill_field_loc_map !! */
 
       for (auto &itr : fld_loc_map_)
         {
@@ -634,7 +634,7 @@ void Ecrire_CGNS::link_multi_loc_support_pb_deformable()
   multi_loc_deformable_support_linked_ = true; // of course !
 }
 
-// Specifique FT !!
+// Specific to FT !!
 void Ecrire_CGNS::link_multi_loc_support_lagrangian()
 {
   for (auto &itr : fld_loc_map_)
@@ -661,7 +661,7 @@ void Ecrire_CGNS::link_multi_loc_support_lagrangian()
 
 void Ecrire_CGNS::cgns_write_final_link_file_lagrangian()
 {
-  if (Process::me()) return; // seul le proc 0 ecrit le fichier link
+  if (Process::me()) return; // only proc 0 writes the link file
 
   const int nsteps = static_cast<int>(time_post_.size());
   const cgsize_t nuse = static_cast<cgsize_t>(nsteps);

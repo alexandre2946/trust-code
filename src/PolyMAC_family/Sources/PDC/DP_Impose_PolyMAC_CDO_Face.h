@@ -34,7 +34,7 @@ class DP_Impose_PolyMAC_CDO_Face: public Perte_Charge_PolyMAC_CDO_Face, public D
 
 public:
   int has_interface_blocs() const override { return 1; }
-  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override { } //rien
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override { } //nothing
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
   void remplir_num_faces(Entree& );
   void mettre_a_jour(double temps) override;

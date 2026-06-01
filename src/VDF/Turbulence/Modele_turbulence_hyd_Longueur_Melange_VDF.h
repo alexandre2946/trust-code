@@ -21,8 +21,10 @@
 class Domaine_Cl_VDF;
 class Domaine_VDF;
 
-/*! @brief Classe Modele_turbulence_hyd_Longueur_Melange_VDF Cette classe represente le modele de turbulence de longueur de melange de Prandtl.
- *     ATTENTION : modele code que pour un canal 2D horizontal !!!!
+/*! @brief Classe Modele_turbulence_hyd_Longueur_Melange_VDF
+ *
+ *  @brief This class represents the Prandtl mixing-length turbulence model.
+ *     WARNING: model implemented only for a 2D horizontal channel!
  *
  * @sa Modele_turbulence_hyd_Longueur_Melange_base
  */

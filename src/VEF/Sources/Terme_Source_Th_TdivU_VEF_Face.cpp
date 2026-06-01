@@ -160,7 +160,7 @@ DoubleTab& Terme_Source_Th_TdivU_VEF_Face::ajouter(DoubleTab& resu) const
   const DoubleTab& temperature=equation().inconnue().valeurs();
   const int nb_faces = temperature.dimension_tot(0);
 
-  // Calcul de TdivU d'apres le schema de convection
+  // Compute TdivU according to the convection scheme
   DoubleTab temp(temperature);
   DoubleTab TdivU(resu);
   TdivU=0.;
@@ -184,11 +184,11 @@ DoubleTab& Terme_Source_Th_TdivU_VEF_Face::ajouter(DoubleTab& resu) const
       Cerr << "May be the advection operator is calculated with the non-conservative formulation." << finl;
     }
 
-  // la partie en TdivU est un bout de l'operateur de convection -> il doit etre multiplie par rhoCp
+  // the TdivU part is a piece of the convection operator -> it must be multiplied by rhoCp
   const double rhoCp = equation().milieu().capacite_calorifique().valeurs()(0, 0) * equation().milieu().masse_volumique().valeurs()(0, 0);
   TdivU *= rhoCp;
   resu-=TdivU;
-  // on remet la bonne domaine_cl_dis
+  // restore the correct domaine_cl_dis
   optype.associer_domaine_cl_dis(domainecl_sa.valeur());
   // We reset flux_bords
   optype.flux_bords() = flux_bords_backup;

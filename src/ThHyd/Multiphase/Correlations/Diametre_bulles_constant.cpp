@@ -41,7 +41,7 @@ Entree& Diametre_bulles_constant::readOn(Entree& is)
 
   champs_compris_.ajoute_champ(diametres_);
 
-  for (int n = 0; n < pb.nb_phases(); n++) //recherche de n_l, n_g : phase {liquide,gaz}_continu en priorite
+  for (int n = 0; n < pb.nb_phases(); n++) //search for n_l, n_g: continuous {liquid,gas} phase with priority
     if (pb.nom_phase(n).debute_par("liquide") && (n_l < 0 || pb.nom_phase(n).finit_par("continu")))
       n_l = n;
 
@@ -62,7 +62,7 @@ bool Diametre_bulles_constant::has_champ(const Motcle& nom, OBS_PTR(Champ_base) 
   if (nom == "diametre_bulles")
     return champs_compris_.has_champ(nom, ref_champ);
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 bool Diametre_bulles_constant::has_champ(const Motcle& nom) const
@@ -70,7 +70,7 @@ bool Diametre_bulles_constant::has_champ(const Motcle& nom) const
   if (nom == "diametre_bulles")
     return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 const Champ_base& Diametre_bulles_constant::get_champ(const Motcle& nom) const

@@ -59,8 +59,8 @@ void calculer_inv_volume_special(DoubleTab& inv_volumes_som, const Domaine_Cl_EF
 }
 void calculer_inv_volume(DoubleTab& inv_volumes_som, const Domaine_Cl_EF& domaine_Cl_EF,const DoubleVect& volumes_som)
 {
-  // maintenant l 'inverse du volume est un DoubleTab
-  // c'est pour faire fonctionner le Piso
+  // the volume inverse is now a DoubleTab
+  // this is to make the PISO solver work
 
   const DoubleTab* doubleT = dynamic_cast<const DoubleTab*>(&volumes_som);
   if (doubleT)
@@ -120,7 +120,7 @@ int Assembleur_P_EF::assembler_rho_variable(Matrice& la_matrice, const Champ_Don
   for (int i=0; i<size; i++)
     quantitee_som(i)=(volumes_som(i)*masse_volumique(i));
 
-  // On assemble la matrice
+  // Assemble the matrix
   return assembler_mat(la_matrice,quantitee_som,1,1);
 }
 
@@ -133,20 +133,20 @@ int  Assembleur_P_EF::assembler_mat(Matrice& la_matrice,const DoubleVect& volume
   set_resoudre_increment_pression(incr_pression);
   set_resoudre_en_u(resoudre_en_u);
   Cerr << "Assemblage de la matrice de pression en cours..." << finl;
-  // Matrice de pression :matrice creuse de taille nb_poly x nb_poly
-  // Cette fonction range la matrice dans une structure de matrice morse
-  // bien adaptee aux matrices creuses.
-  // On commence par calculer les tailles des tableaux tab1 et tab2
-  // (coeff_ a la meme taille que tab2)
-  //   A chaque polyedre on associe :
-  //   - une liste d'ints voisins[i] = {j>i t.q Mij est non nul }
-  //   - une liste de reels  valeurs[i] = {Mij pour j dans Voisins[i]}
-  //   - un reel terme_diag
-  // Implementation temporaire:
-  // On assemble une matrice de pression pour une equation d'hydraulique
-  // On injecte dans cette matrice les conditions aux limites
-  // On peut faire cela car a priori la matrice de pression n'est pas
-  // partagee par plusieurs equations sur une meme domaine.
+  // Pressure matrix: sparse matrix of size nb_poly x nb_poly.
+  // This function stores the matrix in a Morse matrix structure
+  // well suited to sparse matrices.
+  // We start by computing the sizes of arrays tab1 and tab2
+  // (coeff_ has the same size as tab2).
+  //   For each polyhedron we associate:
+  //   - a list of ints neighbors[i] = {j>i such that Mij is non-zero}
+  //   - a list of reals values[i] = {Mij for j in neighbors[i]}
+  //   - a real diagonal_term
+  // Temporary implementation:
+  // Assemble a pressure matrix for a hydraulic equation.
+  // Boundary conditions are injected into this matrix.
+  // This is possible because the pressure matrix is not shared
+  // by multiple equations on the same domain.
 
   const Domaine_EF& le_dom = le_dom_EF.valeur();
   const Domaine_Cl_EF& le_dom_cl = le_dom_Cl_EF.valeur();
@@ -159,7 +159,7 @@ int  Assembleur_P_EF::assembler_mat(Matrice& la_matrice,const DoubleVect& volume
   has_P_ref=0;
 
 
-  // on construit la connectivite som_elem
+  // build the vertex-element connectivity
   int nb_sommets_tot=le_dom.domaine().nb_som_tot();
   Static_Int_Lists som_elem;
   construire_connectivite_som_elem(nb_sommets_tot,le_dom.domaine().les_elems(),som_elem,1);
@@ -169,7 +169,7 @@ int  Assembleur_P_EF::assembler_mat(Matrice& la_matrice,const DoubleVect& volume
   //  const Conds_lim& les_cl = le_dom_cl.les_conditions_limites();
 
   // int premiere_face_std=le_dom.premiere_face_std();
-  // Rajout des porosites.
+  // Addition of porosities.
 
   la_matrice.typer("Matrice_Bloc");
   Matrice_Bloc& matrice=ref_cast(Matrice_Bloc, la_matrice.valeur());
@@ -183,7 +183,7 @@ int  Assembleur_P_EF::assembler_mat(Matrice& la_matrice,const DoubleVect& volume
   MBrv.dimensionner(n2,n1-n2,0);
 
 
-  // On parcourt les sommets
+  // Iterate over vertices
   const IntTab& sommets_elem=le_dom.domaine().les_elems();
   int nb_coeff_rr=0;
   int nb_coeff_rv=0;
@@ -215,7 +215,7 @@ int  Assembleur_P_EF::assembler_mat(Matrice& la_matrice,const DoubleVect& volume
               }
           }
       }
-  // on a surevalue  nb_coeff mais bon....
+  // nb_coeff has been overestimated, but that is fine....
   IntTab indice_rr(nb_coeff_rr,2);
   IntTab indice_rv(nb_coeff_rv,2);
   nb_coeff_rr=0;
@@ -324,13 +324,13 @@ int  Assembleur_P_EF::assembler_mat(Matrice& la_matrice,const DoubleVect& volume
 
   //Debog::verifier_Mat_elems("Assemblage EF avt bord ",matrice);
 
-  // correction due aux bors
+  // correction due to boundaries
   //  const IntTab& faces_sommets=le_dom.face_sommets();
   //  int nb_som_face=faces_sommets.dimension(1);
   // const IntTab& face_voisins = le_dom.face_voisins();
   //const DoubleTab& face_normales = le_dom.face_normales();
   const Domaine_Cl_EF& domaine_Cl_EF  = le_dom_Cl_EF.valeur();
-  // prise en compte des " cl " ajout du temr - int P sur le bord
+  // account for boundary conditions: add term - int P on the boundary
   //int elem_ref=-2;
   for (int n_bord=0; n_bord<le_dom.nb_front_Cl(); n_bord++)
     {
@@ -377,7 +377,7 @@ int  Assembleur_P_EF::assembler_mat(Matrice& la_matrice,const DoubleVect& volume
         for (int i2=0; i2<nb_voisin; i2++)
           {
             elem2 =  som_elem(num_som,i2);
-            // ne marche qu'en 2D !!!!!!!
+            // only works in 2D !!!!!!!
             //int nb_voisin=som_elem.get_list_size(num_som);
             for (int i1=0; i1<nb_voisin; i1++)
               {
@@ -465,10 +465,10 @@ int  Assembleur_P_EF::assembler_mat(Matrice& la_matrice,const DoubleVect& volume
 
 }
 
-/*! @brief Assemble la matrice de pression pour un fluide quasi compressible laplacein(P) est remplace par div(grad(P)/rho).
+/*! @brief Assembles the pressure matrix for a quasi-compressible fluid where laplacian(P) is replaced by div(grad(P)/rho).
  *
- * @param (DoubleTab& tab_rho) mass volumique
- * @return (int) renvoie toujours 1
+ * @param (DoubleTab& tab_rho) density (mass per unit volume)
+ * @return (int) always returns 1
  */
 int Assembleur_P_EF::assembler_QC(const DoubleTab& tab_rho, Matrice& matrice)
 {
@@ -499,7 +499,7 @@ int Assembleur_P_EF::modifier_secmem(DoubleTab& secmem)
   int nb_cond_lim = le_dom_cl.nb_cond_lim();
   const IntTab& face_voisins = le_dom.face_voisins();
 
-  // Modification du second membre :
+  // Modification of the right-hand side:
   int i;
   for (i=0; i<nb_cond_lim; i++)
     {
@@ -509,7 +509,7 @@ int Assembleur_P_EF::modifier_secmem(DoubleTab& secmem)
       int ndeb = la_front_dis.num_premiere_face();
       int nfin = ndeb + la_front_dis.nb_faces();
 
-      // GF on est passe en increment de pression
+      // GF we switched to pressure increment
       if ((sub_type(Neumann_sortie_libre,la_cl_base)) && (!get_resoudre_increment_pression()))
         {
           double Pimp, coef;
@@ -553,8 +553,8 @@ int Assembleur_P_EF::modifier_solution(DoubleTab& pression)
   if(!has_P_ref)
     {
       //abort();
-      // On prend la pression minimale comme pression de reference
-      // afin d'avoir la meme pression de reference en sequentiel et parallele
+      // Take the minimum pressure as the reference pressure
+      // to have the same reference pressure in sequential and parallel
       press_0=DMAXFLOAT;
       int n,nb_elem=le_dom_EF->domaine().nb_elem();
       for(n=0; n<nb_elem; n++)

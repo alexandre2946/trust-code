@@ -16,7 +16,7 @@
 #ifndef Remove_elem_included
 #define Remove_elem_included
 
-/*! @brief class Remove_elem Enleve du maillage les elements specifies par l'utilisateur dans le jeu de donnees
+/*! @brief class Remove_elem Removes from the mesh the elements specified by the user in the data set
  *
  *
  *

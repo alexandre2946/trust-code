@@ -23,9 +23,9 @@
 
 template<typename _TYPE_> class TRUSTList_Curseur;
 
-/*! @brief : Classe qui sert a representer une liste de reels int/double precision.
+/*! @brief : Class used to represent a list of int/double precision reals.
  *
- * On ne peut pas utiliser la classe container List avec des objets du type int/double car int/double est un type predefini du C++ qui ne possede pas les fonctions exigees par List< >.
+ * The container class List cannot be used with objects of type int/double because int/double is a predefined C++ type that does not have the functions required by List< >.
  *
  */
 template<typename _TYPE_>
@@ -42,7 +42,7 @@ public :
     dernier_ = this;
   }
 
-  // Constructeur par copie
+  // Copy constructor
   TRUSTList(const TRUSTList& a_list) : TRUSTListElem<_TYPE_>()
   {
     min_data = a_list.min_data;
@@ -108,10 +108,10 @@ public :
 
   inline operator bool() const {  return (curseur != 0); } // Teste si le curseur est non nul
 
-  // Avance le curseur dans la liste. Si le curseur est sur le dernier element, il devient nul
+  // Advance the cursor in the list. If the cursor is on the last element, it becomes null
   inline void operator++() { curseur = curseur->est_dernier() ? 0 : &(curseur->suivant()); }
 
-  // retourne la valeur du curseur
+  // returns the value of the cursor
   inline _TYPE_ valeur() const { return curseur->valeur(); }
   inline _TYPE_& valeur() { return curseur->valeur(); }
 
@@ -137,6 +137,6 @@ using DoubleList = TRUSTList<double>;
 using IntList_Curseur = TRUSTList_Curseur<int>;
 using DoubleList_Curseur = TRUSTList_Curseur<double>;
 
-#include <TRUSTList.tpp> // templates specializations ici ;)
+#include <TRUSTList.tpp> // template specializations are here ;)
 
 #endif /* TRUSTList_included */

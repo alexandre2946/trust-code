@@ -20,13 +20,11 @@
 #include <Navier_Stokes_Turbulent.h>
 #include <Pb_Fluide_base.h>
 
-/*! @brief classe Pb_Hydraulique_Concentration_Turbulent Cette classe represente un probleme d'hydraulique avec transport
+/*! @brief Turbulent hydraulics problem with species transport (one or more concentrations).
  *
- *     de constituants (1 ou plusieurs) et avec modelisation de la turbulence:
- *      - Equations de Navier_Stokes en regime turbulent
- *        pour un fluide incompressible
- *      - Equation de Convection-Diffusion d'une ou plusieurs concentrations
- *        en regime turbulent
+ *      Couples:
+ *      - Turbulent Navier-Stokes equations for an incompressible fluid
+ *      - Turbulent convection-diffusion equation(s) for one or more concentrations
  *
  * @sa Pb_Fluide_base
  */

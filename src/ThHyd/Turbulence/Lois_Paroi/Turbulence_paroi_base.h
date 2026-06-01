@@ -27,12 +27,10 @@ class Probleme_base;
 class EcrFicPartage;
 class Param;
 
-/*! @brief Classe Turbulence_paroi_base Classe de base pour la hierarchie des classes representant les modeles
+/*! @brief Base class for the hierarchy of wall-law models computing turbulent quantities near walls.
+ *         Contains a reference to a turbulence model.
  *
- *     de calcul des grandeurs turbulentes aux voisinages des parois.
- *     Contient une reference a un modele de turbulence.
- *
- * @sa Paroi_std_hyd_VDF Paroi_std_scal_hyd_VDF, Classe abstraite, Methodes abstraites, void associer(const Domaine_dis_base&, const Domaine_Cl_dis_base&), int init_lois_paroi(), int calculer_hyd(DoubleTab& ), int calculer_hyd(DoubleTab& , DoubleTab& )
+ * @sa Paroi_std_hyd_VDF Paroi_std_scal_hyd_VDF
  */
 class Turbulence_paroi_base: public Champs_compris_interface, public Objet_U
 {
@@ -55,7 +53,7 @@ public:
   inline virtual void imprimer_ustar(Sortie&) const { }
   virtual void imprimer_premiere_ligne_ustar(int, const LIST(Nom)&, const Nom&) const;
   virtual void imprimer_ustar_mean_only(Sortie&, int, const LIST(Nom)&, const Nom&) const;
-  // rajout pour prendre en compte Cisaillement_paroi dans la classe de base
+  // added to account for Cisaillement_paroi in the base class
 
   inline const DoubleTab& Cisaillement_paroi() const;
   inline const DoubleVect& tab_u_star() const;
@@ -63,7 +61,7 @@ public:
   inline const DoubleVect& tab_d_plus() const;
   inline double tab_d_plus(int face) const;
 
-  //OC 01/2006: ajout de la fonctionnalite sauvegarde/reprise : utile pour TBLE pour l'instant.
+  //OC 01/2006: added save/resume functionality: useful for TBLE for now.
   int sauvegarder(Sortie&) const override { return 0; }
   int reprendre(Entree&) override { return 0; }
   virtual std::vector<YAML_data> data_a_sauvegarder() const { return std::vector<YAML_data>(); }
@@ -74,49 +72,50 @@ public:
   bool has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const override;
   bool has_champ(const Motcle& nom) const override;
 
-  // Ecriture dans un fichier separe de u_star, Cisaillement_paroi etc...
+  // Writing u_star, Cisaillement_paroi, etc. to a separate file...
   void ouvrir_fichier_partage(EcrFicPartage&, const Nom&) const;
   void ouvrir_fichier_partage(EcrFicPartage&, const Nom&, const Nom&) const;
-  // indique si on utilise le cisaillement ou non
-  virtual bool use_shear() const { return true; } // Generalement true sauf par exemple pour loi paroi_negligeable_XXX
+  // indicates whether shear is used or not
+  virtual bool use_shear() const { return true; } // Generally true except for example for paroi_negligeable_XXX
 
 protected:
   OBS_PTR(Modele_turbulence_hyd_base) mon_modele_turb_hyd;
-  DoubleTab Cisaillement_paroi_;         //valeurs des contraintes tangentielles aux
-  // parois calculees localement a partir de u*
-  DoubleVect tab_u_star_;                // valeurs des u* calculees localement
-  DoubleVect tab_d_plus_;                // valeurs des d+ calculees localement
-  mutable OWN_PTR(Champ_Fonc_base)  champ_u_star_;                                // Champ pour postraitement
-  mutable int nb_impr_ = 0, nb_impr0_ = 0;                        // Compteur d'impression
+  DoubleTab Cisaillement_paroi_;         // values of tangential stresses at
+  // walls computed locally from u*
+  DoubleVect tab_u_star_;                // values of u* computed locally
+  DoubleVect tab_d_plus_;                // values of d+ computed locally
+  mutable OWN_PTR(Champ_Fonc_base)  champ_u_star_;                                // field for post-processing
+  mutable int nb_impr_ = 0, nb_impr0_ = 0;                        // print counter
   Champs_compris champs_compris_;
   OBS_PTR(Domaine_VF) le_dom_dis_;
   OBS_PTR(Domaine_Cl_dis_base) le_dom_Cl_dis_;
 };
 
-/*! @brief Associe un modele de turbulence a l'objet.
+/*! @brief Associates a turbulence model to the object.
  *
- * @param (Modele_turbulence_hyd_base& le_modele) le modele de turbulence hydraulique a associer a l'objet
+ * @brief Associates a hydraulic turbulence model to the object.
+ * @param (Modele_turbulence_hyd_base& le_modele) the hydraulic turbulence model to associate with the object
  */
 inline void Turbulence_paroi_base::associer_modele(const Modele_turbulence_hyd_base& le_modele)
 {
   mon_modele_turb_hyd = le_modele;
 }
 
-/*! @brief Simple appel a int calculer_hyd(DoubleTab& ).
+/*! @brief Simple call to int calculer_hyd(DoubleTab& ).
  *
  * @param (Champ_Inc_base& ch)
- * @return (int) code de retour propage
+ * @return (int) propagated return code
  */
 inline int Turbulence_paroi_base::calculer_hyd(Champ_Inc_base& ch)
 {
   return calculer_hyd(ch.valeurs());
 }
 
-/*! @brief Simple appel a int calculer_hyd(DoubleTab&, DoubleTab&).
+/*! @brief Simple call to int calculer_hyd(DoubleTab&, DoubleTab&).
  *
  * @param (Champ_Inc_base& ch1)
  * @param (Champ_Inc_base& ch2)
- * @return (int) code de retour propage
+ * @return (int) propagated return code
  */
 inline int Turbulence_paroi_base::calculer_hyd(Champ_Fonc_base& ch1, Champ_Fonc_base& ch2)
 {

@@ -51,7 +51,7 @@ Entree& Sous_domaine_VF::readOn(Entree& is)
 
 ////////////////////////////////////////////////////////////////
 //                                                            //
-//           Fonction principale : discretiser                //
+//           Main function: discretiser                       //
 //                                                            //
 ////////////////////////////////////////////////////////////////
 
@@ -63,7 +63,7 @@ void Sous_domaine_VF::discretiser()
 
   int nb_faces_tot=le_dom_VF->nb_faces_tot();
 
-  // Stockages temporaires :
+  // Temporary storage:
   IntTab faces_internes;
   faces_internes.resize(nb_faces_tot);
   int nb_faces_internes=0;
@@ -84,50 +84,50 @@ void Sous_domaine_VF::discretiser()
   elem_app.resize(le_dom_VF->nb_elem_tot());
   elem_app=0;
 
-  // Remplissage de elem_app
+  // Fill elem_app
   for (int i=0; i<le_sous_domaine->nb_elem_tot(); i++)
     elem_app[le_sous_domaine.valeur()(i)]=1;
 
-  // Boucle sur les faces
+  // Loop over faces
   for (int i=0; i<nb_faces_tot; i++)
     {
       int elem0,elem1;
-      // Quels elements lui sont voisins ?
+      // Which elements are its neighbours?
       elem0=le_dom_VF->face_voisins(i,0);
       elem1=le_dom_VF->face_voisins(i,1);
-      // Remplissage des tableaux temporaires.
-      if (elem1==-1)                           // face au bord du domaine
+      // Fill temporary arrays.
+      if (elem1==-1)                           // face on the domain boundary
         {
-          if (elem_app[elem0])                         // dans le sous_domaine
+          if (elem_app[elem0])                         // in the sub-domain
             {
               faces_bord(nb_faces_bord++)=i;
             }
         }
-      else if (elem0==-1)                      // face au bord du domaine
+      else if (elem0==-1)                      // face on the domain boundary
         {
-          if (elem_app[elem1])                         // dans le sous_domaine
+          if (elem_app[elem1])                         // in the sub-domain
             {
               faces_bord(nb_faces_bord++)=i;
             }
         }
-      else                                     // face interne au domaine
+      else                                     // face internal to the domain
         {
-          if (elem_app[elem0] && elem_app[elem1])          // interne a le sous_domaine
+          if (elem_app[elem0] && elem_app[elem1])          // internal to the sub-domain
             {
               faces_internes(nb_faces_internes++)=i;
             }
-          else if (elem_app[elem0])                    // seul elem0 est dans le sous-domaine
+          else if (elem_app[elem0])                    // only elem0 is in the sub-domain
             {
               faces_bord_0(nb_faces_bord_0++)=i;
             }
-          else if (elem_app[elem1])                    // seul elem1 est dans le sous-domaine
+          else if (elem_app[elem1])                    // only elem1 is in the sub-domain
             {
               faces_bord_1(nb_faces_bord_1++)=i;
             }
         }
     }
 
-  // Regroupement des resultats
+  // Group the results
   premiere_face_bord_0_ = nb_faces_internes;
   premiere_face_bord_1_ = premiere_face_bord_0_+nb_faces_bord_0;
   premiere_face_bord_   = premiere_face_bord_1_+nb_faces_bord_1;
@@ -141,7 +141,7 @@ void Sous_domaine_VF::discretiser()
   for (int i=0; i<nb_faces_bord; i++)
     les_faces_(premiere_face_bord_+i)=faces_bord(i);
 
-  // Calcul des volumes entrelaces
+  // Compute interlaced volumes
   const DoubleVect& volumes=le_dom_VF->volumes();
   volumes_entrelaces_.resize(nb_faces_bord_0+nb_faces_bord_1);
   for (int i=0; i<nb_faces_bord_0; i++)
@@ -153,11 +153,11 @@ void Sous_domaine_VF::discretiser()
       volumes_entrelaces_(nb_faces_bord_0+i)=volumes(le_dom_VF->face_voisins(les_faces_(premiere_face_bord_1_+i),1));
     }
 
-  // Affichage du volume des sous domaines (ca peut etre pratique)
+  // Display the volume of the sub-domains (can be useful)
   double volume_sous_domaine=0;
   for (int j=0; j<le_sous_domaine->nb_elem_tot(); j++)
     {
-      // On ne compte que les mailles reelles
+      // Count only real cells
       if (le_sous_domaine.valeur()(j)<le_dom_VF->domaine().nb_elem())
         volume_sous_domaine+=volumes(le_sous_domaine.valeur()(j));
     }

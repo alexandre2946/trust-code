@@ -16,9 +16,9 @@
 #ifndef Terme_Source_Canal_perio_VDF_Face_included
 #define Terme_Source_Canal_perio_VDF_Face_included
 
-/*! @brief class Terme_Source_Canal_perio_VDF_Face Cette classe permet de conserver le debit dans une simulation
+/*! @brief class Terme_Source_Canal_perio_VDF_Face This class conserves the flow rate in a transient
  *
- *   temporelle de Canal
+ *   channel simulation
  *
  * @sa Terme_Source_Canal_perio
  */

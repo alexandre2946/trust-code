@@ -99,8 +99,8 @@ int Param::read(Entree& is, int with_acco)
           for (int i = 0; i < list_parametre_a_lire_.size(); i++)
             Cerr << list_parametre_a_lire_(i).get_names_message() << " ";
           Cerr << finl;
-          // Evolution des options du mot cle Transformation
-          // On previent les utilisateurs
+          // Evolution of options for the Transformation keyword
+          // Warning users about the change
           if (proprietaire_ == "Transformation")
             {
               if (motlu == "fonction")
@@ -184,7 +184,7 @@ void Objet_a_lire::print(Sortie& s) const
 int Param::check()
 {
   {
-    // ok on a fini de lire est ce que tous les attributs non optionnels ont ete lus ?
+    // ok we finished reading: have all required attributes been read?
     int err = 0;
     for (auto &itr : list_parametre_a_lire_)
       {
@@ -203,7 +203,7 @@ int Param::check()
       return 0;
     //Process::exit();
   }
-  // tests des autres conditions
+  // test the other conditions
   int val = 1;
   LIST(Nom) list_mot;
   int size = list_parametre_a_lire_.size();
@@ -259,12 +259,12 @@ int Param::check()
   return val;
 }
 
-// retourne une liste de mot venant de nom.split('|')
+// returns a list of words from nom.split('|')
 LIST(Nom) split_mot(const Nom& nom)
 {
   LIST(Nom) res;
   Nom n0(nom);
-  // on cherche le dernier |
+  // look for the last |
   const char *marq = strchr(n0, '|');
   while (marq)
     {
@@ -284,10 +284,10 @@ LIST(Nom) split_mot(const Nom& nom)
   return res;
 }
 
-/*! @brief Si le dernier parametre ajoute est de type "int", associe a ce parametre une ou plusieurs chaines de caracteres et pour chacune une valeur numerique.
+/*! @brief If the last parameter added is of type "int", associates one or more strings with this parameter, each mapped to a numeric value.
  *
- *   Il faut appeler dictionnaire pour chaque motcle autorise pour ce parametre
- *   Le parametre lu doit alors etre un motcle parmi ceux du dictionnaire de noms autorises.
+ *   dictionnaire must be called for each allowed keyword for this parameter.
+ *   The parameter read must then be a keyword among those in the allowed name dictionary.
  *
  */
 void Param::dictionnaire(const char *nom_option, int valeur)
@@ -308,7 +308,7 @@ Param& Param::dictionnaire_param(const char *nom_option, int valeur)
   return last.add_dict(nom_option, valeur, name).valeur();
 }
 
-/*! @brief renvoit Objet_a_lire correspondant au mot le rajoute au besoin a la liste
+/*! @brief Returns the Objet_a_lire corresponding to the given word, adding it to the list if necessary.
  *
  */
 Objet_a_lire& Param::create_or_get_objet_a_lire(const char *mot)

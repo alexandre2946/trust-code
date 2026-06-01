@@ -50,15 +50,15 @@ double Op_Conv_PolyMAC_CDO_iterateur_base::calculer_dt_stab() const
   const DoubleVect& vit_associe = vitesse().valeurs();
   const DoubleVect& vit = (vitesse_pour_pas_de_temps_ ? vitesse_pour_pas_de_temps_->valeurs() : vit_associe);
   DoubleTab fluent;
-  // fluent est initialise a zero par defaut:
+  // fluent is initialized to zero by default:
   domaine_PolyMAC_CDO.domaine().creer_tableau_elements(fluent);
 
-  // Remplissage du tableau fluent
+  // Fill the fluent array
   double psc;
   int num1, num2, face;
   int elem1;
 
-  // On traite les bords
+  // Process boundaries
   for (int n_bord = 0; n_bord < domaine_PolyMAC_CDO.nb_front_Cl(); n_bord++)
     {
 
@@ -85,7 +85,7 @@ double Op_Conv_PolyMAC_CDO_iterateur_base::calculer_dt_stab() const
         }
     }
 
-  // Boucle sur les faces internes pour remplir fluent
+  // Loop over internal faces to fill fluent
   int domaine_PolyMAC_CDO_nb_faces = domaine_PolyMAC_CDO.nb_faces();
   int premiere_face = domaine_PolyMAC_CDO.premiere_face_int();
   for (face = premiere_face; face < domaine_PolyMAC_CDO_nb_faces; face++)
@@ -94,7 +94,7 @@ double Op_Conv_PolyMAC_CDO_iterateur_base::calculer_dt_stab() const
       eval_fluent(psc, face_voisins(face, 0), face_voisins(face, 1), fluent);
     }
 
-  // Calcul du pas de temps de stabilite a partir du tableau fluent
+  // Compute the stability time step from the fluent array
   if (vitesse().le_nom() == "rho_u" && equation().probleme().is_dilatable())
     diviser_par_rho_si_dilatable(fluent, equation().milieu());
   double dt_stab = 1.e30;
@@ -108,13 +108,13 @@ double Op_Conv_PolyMAC_CDO_iterateur_base::calculer_dt_stab() const
     }
   dt_stab = Process::mp_min(dt_stab);
 
-  // astuce pour contourner le type const de la methode
+  // trick to work around the const type of the method
   Op_Conv_PolyMAC_CDO_iterateur_base& op = ref_cast_non_const(Op_Conv_PolyMAC_CDO_iterateur_base, *this);
   op.fixer_dt_stab_conv(dt_stab);
   return dt_stab;
 }
 
-// cf Op_Conv_PolyMAC_CDO_iterateur_base::calculer_dt_stab() pour choix de calcul de dt_stab
+// cf Op_Conv_PolyMAC_CDO_iterateur_base::calculer_dt_stab() for the choice of dt_stab computation
 void Op_Conv_PolyMAC_CDO_iterateur_base::calculer_pour_post(Champ_base& espace_stockage, const Nom& option, int comp) const
 {
   if (Motcle(option) == "stabilite")
@@ -130,14 +130,14 @@ void Op_Conv_PolyMAC_CDO_iterateur_base::calculer_pour_post(Champ_base& espace_s
       const DoubleVect& vit = vitesse().valeurs();
       DoubleTrav fluent(domaine_PolyMAC_CDO.domaine().nb_elem_tot());
 
-      // Remplissage du tableau fluent
+      // Fill the fluent array
 
       fluent = 0;
       double psc;
       int num1, num2, face;
       int elem1;
 
-      // On traite les bords
+      // Process boundaries
 
       for (int n_bord = 0; n_bord < domaine_PolyMAC_CDO.nb_front_Cl(); n_bord++)
         {
@@ -165,7 +165,7 @@ void Op_Conv_PolyMAC_CDO_iterateur_base::calculer_pour_post(Champ_base& espace_s
             }
         }
 
-      // Boucle sur les faces internes pour remplir fluent
+      // Loop over internal faces to fill fluent
       int domaine_PolyMAC_CDO_nb_faces = domaine_PolyMAC_CDO.nb_faces();
       for (face = domaine_PolyMAC_CDO.premiere_face_int(); face < domaine_PolyMAC_CDO_nb_faces; face++)
         {

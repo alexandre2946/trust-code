@@ -20,8 +20,8 @@
 
 class Domaine_VDF;
 
-/*! @brief classe Champ_P0_VDF Classe qui represente un champ discret P0 par element
- *  associe a un domaine discretise de type Domaine_VDF
+/*! @brief class Champ_P0_VDF Class representing a P0 discrete field per element
+ *  associated with a discretized domain of type Domaine_VDF.
  *
  * @sa Champ_Inc_P0_base
  */

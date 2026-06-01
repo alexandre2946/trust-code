@@ -18,31 +18,30 @@
 
 void Solv_TDMA::resoudre(const DoubleVect& ma, const DoubleVect& mb, const DoubleVect& mc, const DoubleVect& sm, DoubleVect& vi, int M)
 {
-  DoubleVect malpha, mbeta; //2 vecteurs intermediares
-  DoubleVect my; //vecteur solution du systeme L.y=F
+  DoubleVect malpha, mbeta; //2 intermediate vectors
+  DoubleVect my; //solution vector of the system L.y=F
   int i;
   malpha.resize(M);
   mbeta.resize(M);
   my.resize(M);
 
-  //L'algorithme de Thomas (TDMA) repose sur la decomposition LU de la matrice
-  //tridiagonale a inverser. Soit A.x = y le systeme lineaire a inverser avec A = LU.
-  //On resoud d'abord par descente le syteme L.z = y avec z = U.x et on resoud ensuite
-  //par remontee le systeme U.x = z.
+  //The Thomas algorithm (TDMA) relies on the LU decomposition of the tridiagonal
+  //matrix to be inverted. Let A.x = y be the linear system to solve with A = LU.
+  //We first solve by forward substitution the system L.z = y with z = U.x, then
+  //solve by back substitution the system U.x = z.
 
-  // Les 3 diagonales de la matrice sont chacune conservees sous forme de vecteur
-  // ma : diagonale principale ; mb : diagonale secondaire inferieure
-  // mc : diagonale secondaire superieure
-  // M est l'ordre de la matrice A
+  // The 3 diagonals of the matrix are each stored as a vector:
+  // ma: main diagonal; mb: lower sub-diagonal
+  // mc: upper super-diagonal
+  // M is the order of matrix A
 
-  //La matrice L est composee d'une diagonale principale (malpha) et d'une diagonale
-  //secondaire inferieure (mb). La matrice U est composee d'une diagonale principale
-  //(dont tous les elements sont egaux a 1) et d'une diagonale secondaire superieure
-  //(mbeta).
+  //Matrix L has a main diagonal (malpha) and a lower sub-diagonal (mb).
+  //Matrix U has a main diagonal (all elements equal to 1) and an upper
+  //super-diagonal (mbeta).
 
-  //Resolution correcte d'un systeme lineaire 3*3 antisymetrique, le 23.05.2003
+  //Verified solution of an antisymmetric 3x3 linear system (23.05.2003)
 
-  //Remplissage de malpha et mbeta
+  //Fill malpha and mbeta
 
   malpha(0) = ma(0);
   mbeta(0) = mc(0)/ma(0);
@@ -54,14 +53,14 @@ void Solv_TDMA::resoudre(const DoubleVect& ma, const DoubleVect& mb, const Doubl
     }
   malpha(M-1) = ma(M-1) - mb(M-2)*mbeta(M-2);
 
-  //Resolution du premier systeme par descente
+  //Forward substitution to solve the first system
 
   my(0) = sm(0)/malpha(0);
 
   for (i = 1 ; i<M ; i++)
     my(i) = (sm(i)-mb(i-1)*my(i-1))/malpha(i);
 
-  //Resolution du premier systeme par remontee
+  //Back substitution to solve the second system
 
   vi(M-1) = my(M-1);
 

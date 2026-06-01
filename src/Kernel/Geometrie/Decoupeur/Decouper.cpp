@@ -42,7 +42,7 @@ Entree& Decouper_32_64<_SIZE_>::readOn(Entree& is)
   return is;
 }
 
-/*! @brief lecture du partitionneur dans le jeu de donnees (lecture du type et des parametres et initialisation de d_part)
+/*! @brief Read the partitioner from the data set (reads the type and the parameters and initializes d_part).
  */
 template <typename _SIZE_>
 void Decouper_32_64<_SIZE_>::lire_partitionneur(Entree& is)
@@ -53,11 +53,11 @@ void Decouper_32_64<_SIZE_>::lire_partitionneur(Entree& is)
   type_partitionneur += n;
   Cerr << " Creation of a partitioner of type: " << type_partitionneur << finl;
   deriv_partitionneur_.typer(type_partitionneur);
-  // En cas d'echec (si le nom du type est invalide) : exit
+  // In case of failure (if the type name is invalid): exit
   if (!deriv_partitionneur_)
     Process::exit();
 
-  // Initialisation des parametres du partitionneur
+  // Initialization of the partitioner parameters
   Partitionneur_base_32_64<_SIZE_>& part = deriv_partitionneur_.valeur();
   part.associer_domaine(this->domaine());
   is >> part;
@@ -69,7 +69,7 @@ void Decouper_32_64<_SIZE_>::ecrire_fichier_decoupage() const
   Cerr << "Writing of the splitting array at the format IntVect ascii\n"
        << " in the file " << nom_fichier_decoupage_
        << "\n(for each element, number of the destination processor)" << finl;
-  SFichier file; // Fichier ascii
+  SFichier file; // ASCII file
   if (! file.ouvrir(nom_fichier_decoupage_))
     {
       Cerr << " Error in the opening of the file." << finl;
@@ -85,7 +85,7 @@ void Decouper_32_64<_SIZE_>::ecrire_fichier_decoupage_som() const
   Cerr << "Writing of the splitting array at the format IntVect ascii\n"
        << " in the file " << nom_fichier_decoupage_sommets_
        << "\n(for each node, list of the destination processors)" << finl;
-  SFichier file; // Fichier ascii
+  SFichier file; // ASCII file
   if (! file.ouvrir(nom_fichier_decoupage_sommets_))
     Process::exit(" Error in the opening of the file.");
 
@@ -165,12 +165,12 @@ void Decouper_32_64<_SIZE_>::postraiter_decoupage(const Nom& nom_fichier) const
                         units,
                         noms_compo,
                         1,           // ncomp,
-                        0.0,         //temps,
-                        "partition", // id_du_champ,
-                        domaine.le_nom(), // id_du_domaine
+                        0.0,         //time,
+                        "partition", // field_id,
+                        domaine.le_nom(), // domain_id
                         "ELEM",      // localisation,
                         "scalar",    //nature,
-                        data         // valeurs
+                        data         // values
                        );
       post.finir(1);
     }
@@ -188,12 +188,12 @@ void Decouper_32_64<_SIZE_>::postraiter_decoupage(const Nom& nom_fichier) const
                          units,
                          noms_compo,
                          -1,           // ncomp,
-                         0.0,         //temps,
-                         "partition", // id_du_champ,
-                         "domain", // id_du_domaine
+                         0.0,         //time,
+                         "partition", // field_id,
+                         "domain", // domain_id
                          "ELEM",      // localisation,
                          "scalar",    //nature,
-                         data         // valeurs
+                         data         // values
                         );
       post->finir(1);
     }
@@ -204,11 +204,11 @@ void Decouper_32_64<_SIZE_>::ecrire_sous_domaines(const int nb_parties, const St
 {
   DomaineCutter_32_64<_SIZE_> cutter;
   cutter.initialiser(this->domaine(), elem_part_, nb_parties, epaisseur_joint_);
-  // Reflexion provisoire:
-  // Les joints sont construits dans ecrire_domaines -> construire_sous_domaine
-  // Donc apres renumerotation des PEs et donc de elem_part_, il faudrait
-  // reinitialiser ? Ou bien, tout renumeroter apres le calcul des joints...
-  // Cela parait mieux...
+  // Provisional thought:
+  // Joints are built in ecrire_domaines -> construire_sous_domaine
+  // Therefore after renumbering of PEs and hence of elem_part_, one would need
+  // to re-initialize? Or renumber everything after computing the joints...
+  // The latter seems better...
   cutter.ecrire_domaines(nom_domaines_decoup_, format_, reorder_, som_raccord);
 }
 
@@ -276,11 +276,11 @@ Entree& Decouper_32_64<_SIZE_>::interpreter(Entree& is)
 template <typename _SIZE_>
 Entree& Decouper_32_64<_SIZE_>::lire(Entree& is)
 {
-  // Lecture du nom du domaine a decouper:
+  // Reading the name of the domain to split:
   is >> nom_domaine_;
   Cerr << " Domain name to split : " << nom_domaine_ << finl;
   this->associer_domaine(nom_domaine_);
-  // Avant de decouper on imprime des infos
+  // Before splitting, print some info
   const auto& dom = this->domaine();
   dom.imprimer();
 
@@ -319,14 +319,14 @@ Entree& Decouper_32_64<_SIZE_>::lire(Entree& is)
 template <typename _SIZE_>
 void Decouper_32_64<_SIZE_>::ecrire(const Static_Int_Lists_t* som_raccord)
 {
-  // Calcul du nombre de parties generees par le partitionneur
+  // Compute the number of parts generated by the partitioner
   int nb_parties = 0;
   if (elem_part_.size_array() > 0)
     nb_parties = static_cast<int>(max_array(elem_part_)) + 1;  // cast to int, because max among number of procs (or numb of parts)
   nb_parties = Process::mp_max(nb_parties);
   Cerr << "The partitioner has generated " << nb_parties << " parts." << finl;
 
-  // Prise en compte de la directive nb_parts_tot_
+  // Take into account the nb_parts_tot_ directive
   if (nb_parts_tot_ >= 0)
     {
       if (nb_parties > nb_parts_tot_)
@@ -339,7 +339,7 @@ void Decouper_32_64<_SIZE_>::ecrire(const Static_Int_Lists_t* som_raccord)
            << "Generation of " << nb_parts_tot_ - nb_parties << " empty parts." << finl;
       nb_parties = nb_parts_tot_;
     }
-  // Force un seul fichier .Zones au dela d'un certain nombre de rangs MPI:
+  // Force a single .Zones file beyond a certain number of MPI ranks:
   if (Process::force_single_file(nb_parties, nom_domaines_decoup_+".Zones"))
     format_ = DomainesFileOutputType::HDF5_SINGLE;
 

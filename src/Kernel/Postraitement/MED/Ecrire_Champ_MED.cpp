@@ -34,10 +34,10 @@ Entree& Ecrire_Champ_MED::readOn(Entree& is)
   return Interprete::readOn(is);
 }
 
-/*! @brief Fonction principale de l'interprete Ecrire_Champ_MED: erreur si cela echoue.
+/*! @brief Main function of the Ecrire_Champ_MED interpreter: error if it fails.
  *
- * @param (Entree& is) un flot d'entree, a partir duquel on lit les arguments
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) an input stream from which arguments are read
+ * @return (Entree&) the modified input stream
  */
 Entree& Ecrire_Champ_MED::interpreter(Entree& is)
 {
@@ -73,7 +73,7 @@ Entree& Ecrire_Champ_MED::interpreter(Entree& is)
   int reprise = 0;
   double t_init = 0.;
 
-  // ecriture domaine
+  // write domain
   post.preparer_post(dom.le_nom(),est_le_premier_post,reprise,t_init);
   post.ecrire_domaine(dom, est_le_premier_post);
   double tps=chp.temps();
@@ -81,9 +81,9 @@ Entree& Ecrire_Champ_MED::interpreter(Entree& is)
   post.ecrire_temps(tps);
   post.init_ecriture(tps,-1.,est_le_premier_post,dom);
   chp.corriger_unite_nom_compo();
-  // ecriture champ
+  // write field
   //chp.postraiter_champ(dom, tps, nom_champ, "ELEM", post);
-  // la nature ne sert pas en MED
+  // the nature is not used in MED
   Nom Nature("pas_defini");
   post.ecrire_champ(dom,chp.unites(),chp.noms_compo(),-1,tps,Motcle(chp.le_nom()),dom.le_nom(),Motcle("elem"),Nature,chp.valeurs());
   int fin=1;

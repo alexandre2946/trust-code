@@ -70,10 +70,10 @@ void Domaine_PolyMAC_CDO::discretiser()
 
 void Domaine_PolyMAC_CDO::calculer_h_carre()
 {
-  // Calcul de h_carre
+  // Compute h_carre
   h_carre = 1.e30;
   h_carre_.resize(nb_faces());
-  // Calcul des surfaces
+  // Compute the face surfaces
   Elem_geom_base& elem_geom = domaine().type_elem().valeur();
   int is_polyedre = sub_type(Poly_geom_base, elem_geom) ? 1 : 0;
   const ArrOfInt PolyIndex = is_polyedre ? ref_cast(Poly_geom_base, domaine().type_elem().valeur()).getElemIndex() : ArrOfInt(0);
@@ -138,17 +138,17 @@ void Domaine_PolyMAC_CDO::init_equiv() const
             if (std::fabs(fs(f1) * fs(f2)) < 1e-20) continue;
             if (!is_PolyMAC_CDO || (is_PolyMAC_CDO && Option_PolyMAC_family::MAILLAGE_VDF))
               if (std::fabs(std::fabs(dot(&nf(f1, 0), &nf(f2, 0)) / (fs(f1) * fs(f2))) - 1) > 1e-6)
-                continue; //normales colineaires?
+                continue; //collinear normals?
 
             // XXX Elie Saikali
-            // Options pour forcer le calcul du tableau equiv
-            // car le test ne marche pas si le maillage est hexa, conforme et non-uniforme
+            // Options to force computation of the equiv array
+            // because the test fails for hex, conforming, non-uniform meshes
             if (Option_PolyMAC_family::MAILLAGE_VDF)
               {
                 bool aligned = true;
                 const int orn_f1 = orientation(f1), orn_f2 = orientation(f2);
                 const bool same_orn = (orn_f1 == orn_f2);
-                ok = 1; // pour gnu ...
+                ok = 1; // for gnu ...
 
                 if (same_orn)
                   for (d = 0; d < D; d++)
@@ -161,7 +161,7 @@ void Domaine_PolyMAC_CDO::init_equiv() const
 
                 if (same_orn && aligned && ( f1 != f2 ))
                   {
-                    // on cherche si f1 et f2 trouve le meme elem
+                    // check if f1 and f2 share the same element
                     int ee1 = f_e(f1, 0), ee2 = f_e(f1, 1);
 
                     for (int ii = 0; ii < e_f.dimension(1); ii++)
@@ -180,17 +180,17 @@ void Domaine_PolyMAC_CDO::init_equiv() const
                   }
                 else
                   for (ok = 1, d = 0; d < D; d++)
-                    ok &= std::fabs((xv_(f1, d) - xp_(e1, d)) - (xv_(f2, d) - xp_(e2, d))) < 1e-12; //xv - xp identiques?
+                    ok &= std::fabs((xv_(f1, d) - xp_(e1, d)) - (xv_(f2, d) - xp_(e2, d))) < 1e-12; //xv - xp identical?
               }
             else
               {
-                std::array<double, 3> v1 = cross(D, D, &xv_(f1, 0), &nf(f1, 0), &xp_(e1, 0));//produit vectoriel (xs - xf)xnf
-                std::array<double, 3> v2 = cross(D, D, &xv_(f2, 0), &nf(f2, 0), &xp_(e2, 0));//produit vectoriel (xs - xf)xnf
+                std::array<double, 3> v1 = cross(D, D, &xv_(f1, 0), &nf(f1, 0), &xp_(e1, 0));//cross product (xs - xf)xnf
+                std::array<double, 3> v2 = cross(D, D, &xv_(f2, 0), &nf(f2, 0), &xp_(e2, 0));//cross product (xs - xf)xnf
 
                 double norm1 = (D < 3 ? v1[2]*v1[2] : 0.), norm2 = (D < 3 ? v2[2]*v2[2] : 0.);
                 for (ok = 1, d = 0; d < D; d++)
                   {
-                    ok &= std::fabs((xv_(f1, d) - xp_(e1, d)) - (xv_(f2, d) - xp_(e2, d))) < (is_PolyMAC_CDO ? 1.e-12 /* XXX Elie Saikali : comme avant pour le moment */ : 1e-12); //xv - xp identiques?
+                    ok &= std::fabs((xv_(f1, d) - xp_(e1, d)) - (xv_(f2, d) - xp_(e2, d))) < (is_PolyMAC_CDO ? 1.e-12 /* XXX Elie Saikali : same as before for now */ : 1e-12); //xv - xp identical?
                     norm1 += v1[d]*v1[d];
                     norm2 += v2[d]*v2[d];
                   }
@@ -203,7 +203,7 @@ void Domaine_PolyMAC_CDO::init_equiv() const
 
             equiv_(f, 0, i) = f2;
             equiv_(f, 1, j) = f1;
-            nequiv(f)++; //si oui, on a equivalence
+            nequiv(f)++; //if so, equivalence is found
           }
 
   Cerr << mp_somme_vect_as_double(nequiv) * 100. / mp_somme_vect_as_double(ntot) << "% equivalent faces!" << finl;
@@ -238,11 +238,11 @@ void Domaine_PolyMAC_CDO::modifier_pour_Cl(const Conds_lim& conds_lim)
           assert(nfin>=ndeb);
           int elem1,elem2,k;
           int face;
-          // Modification des tableaux face_voisins_ , face_normales_ , volumes_entrelaces_
-          // On change l'orientation de certaines normales
-          // de sorte que les normales aux faces de periodicite soient orientees
-          // de face_voisins(la_face_en_question,0) vers face_voisins(la_face_en_question,1)
-          // comme le sont les faces internes d'ailleurs
+          // Modification of face_voisins_, face_normales_, volumes_entrelaces_ arrays
+          // Change the orientation of certain normals
+          // so that the normals at periodic faces are oriented
+          // from face_voisins(la_face_en_question,0) toward face_voisins(la_face_en_question,1)
+          // just like internal faces
 
           DoubleVect C1C2(dimension);
           double vol,psc=0;
@@ -286,59 +286,59 @@ void Domaine_PolyMAC_CDO::modifier_pour_Cl(const Conds_lim& conds_lim)
         }
     }
 
-  // PQ : 10/10/05 : les faces periodiques etant a double contribution
-  //		      l'appel a marquer_faces_double_contrib s'effectue dans cette methode
-  //		      afin de pouvoir beneficier de conds_lim.
+  // PQ : 10/10/05 : periodic faces have double contribution,
+  //		      so the call to marquer_faces_double_contrib is done in this method
+  //		      in order to benefit from conds_lim.
   Domaine_VF::marquer_faces_double_contrib(conds_lim);
 }
 
-//stabilisation des matrices m1 et m2 de PolyMAC_CDO
+//stabilization of the m1 and m2 matrices of PolyMAC_CDO
 inline void Domaine_PolyMAC_CDO::ajouter_stabilisation(DoubleTab& M, DoubleTab& N) const
 {
   int i, j, k, i1, i2, j1, j2, n_f = M.dimension(0), lwork = -1, infoo = 0;
   DoubleTab A, S, b(n_f, 1), D(1, 1), x(1, 1), work(1), U(n_f - dimension, n_f - dimension), V;
 
-  /* spectre de M */
+  /* spectrum of M */
   kersol(M, b, 1e-12, nullptr, x, S);
-  double l_max = S(0), l_min = S(dimension - 1); //vp la plus petite sans stabilisation
+  double l_max = S(0), l_min = S(dimension - 1); //smallest eigenvalue without stabilization
 
-  /* D : noyau de N (N.D = 0), de taille n_f * (n_f - dimension) */
+  /* D : kernel of N (N.D = 0), of size n_f * (n_f - dimension) */
   b.resize(dimension, 1), kersol(N, b, 1e-12, &D, x, S);
-  assert(D.dimension(1) == n_f - dimension); //M doit etre de rang d
+  assert(D.dimension(1) == n_f - dimension); //M must have rank d
 
-  /* matrice U telle que M + D.U.Dt mimimise les termes hors diagonale */
-  //une ligne par coeff M(i, j > i), une colonne par terme U(i, j >= i)
+  /* matrix U such that M + D.U.Dt minimizes the off-diagonal terms */
+  //one row per coefficient M(i, j > i), one column per term U(i, j >= i)
   int n_k = D.dimension(1), n_l = n_f * (n_f - 1) / 2, n_c = n_k * (n_k + 1) / 2, un = 1;
   A.resize(n_l, n_c), b.resize(n_l, 1);
   for (i1 = i = 0; i1 < n_f; i1++)
-    for (i2 = i1 + 1; i2 < n_f; i2++, i++) //(i1, i2, i) -> numero de ligne
+    for (i2 = i1 + 1; i2 < n_f; i2++, i++) //(i1, i2, i) -> row index
       for (j1 = j = 0, b(i, 0) = -M(i1, i2); j1 < n_k; j1++)
-        for (j2 = j1; j2 < n_k; j2++, j++) //(j1, j2, j) -> numero de colonne
+        for (j2 = j1; j2 < n_k; j2++, j++) //(j1, j2, j) -> column index
           A(i, j) = D(i1, j1) * D(i2, j2) + (j1 != j2) * D(i1, j2) * D(i2, j1);
   char trans = 'T';
-  //minimise la somme des carres des termes hors diag de M
+  //minimize the sum of squares of the off-diagonal terms of M
   F77NAME(dgels)(&trans, &n_c, &n_l, &un, &A(0, 0), &n_c, &b(0, 0), &n_l, &work(0), &lwork, &infoo); //"workspace query"
   work.resize(lwork = (int)work(0));
-  F77NAME(dgels)(&trans, &n_c, &n_l, &un, &A(0, 0), &n_c, &b(0, 0), &n_l, &work(0), &lwork, &infoo); //le vrai appel
+  F77NAME(dgels)(&trans, &n_c, &n_l, &un, &A(0, 0), &n_c, &b(0, 0), &n_l, &work(0), &lwork, &infoo); //actual call
   assert(infoo == 0);
-  //reconstruction de U
+  //reconstruct U
   for (j1 = j = 0; j1 < n_k; j1++)
     for (j2 = j1; j2 < n_k; j2++, j++) U(j1, j2) = U(j2, j1) = b(j, 0);
 
-  /* ajustement de U pour que la vp minimale depasse eps */
-  //decomposition de Schur U = Vt.S.V
+  /* adjust U so that the minimum eigenvalue exceeds eps */
+  //Schur decomposition U = Vt.S.V
   char jobz = 'V', uplo = 'U';
   V = U, S.resize(n_k);
   F77NAME(dsyev)(&jobz, &uplo, &n_k, &V(0, 0), &n_k, &S(0), &work(0), &lwork, &infoo);//"workspace query"
   work.resize(lwork = (int)work(0));
   F77NAME(dsyev)(&jobz, &uplo, &n_k, &V(0, 0), &n_k, &S(0), &work(0), &lwork, &infoo);
   assert(infoo == 0);
-  //pour garantir des vp plus grandes que eps : S(k) -> std::max(S(k), eps)
+  //to guarantee eigenvalues larger than eps: S(k) -> std::max(S(k), eps)
   for (i = 0, U = 0; i < n_k; i++)
     for (j = 0; j < n_k; j++)
       for (k = 0; k < n_k; k++) U(i, j) += V(k, i) * std::min(std::max(S(k), l_min), l_max) * V(k, j);
 
-  /* ajout a M */
+  /* add to M */
   for (i1 = 0; i1 < n_f; i1++)
     for (i2 = 0; i2 < n_f; i2++)
       for (j1 = 0; j1 < n_k; j1++)
@@ -346,21 +346,21 @@ inline void Domaine_PolyMAC_CDO::ajouter_stabilisation(DoubleTab& M, DoubleTab& 
           M(i1, i2) += D(i1, j1) * U(j1, j2) * D(i2, j2);
 }
 
-/* recherche d'une matrice W verifiant W.R = N avec sum_{i!=j} w_{ij}^2 minimal et un spectre acceptable */
-/* en entree,W contient le stencil admissible  */
+/* find a matrix W satisfying W.R = N with sum_{i!=j} w_{ij}^2 minimal and an acceptable spectrum */
+/* on input, W contains the admissible stencil  */
 int Domaine_PolyMAC_CDO::W_stabiliser(DoubleTab& W, DoubleTab& R, DoubleTab& N, int *ctr, double *spectre) const
 {
   int i, j, k, l, n_f = R.dimension(0), nv = 0, d = R.dimension(1), infoo = 0, lwork = -1, sym, diag, ret, it, cv;
 
-  /* idx : numero de l'inconnue W(i, j) dans le probleme d'optimisation */
-  //si NtR est symetrique, alors on cherche a avoir W symetrique
+  /* idx : index of the unknown W(i, j) in the optimization problem */
+  //if NtR is symmetric, then we seek a symmetric W
   Matrice33 NtR(0, 0, 0, 0, d < 2, 0, 0, 0, d < 3), iNtR;
   for (i = 0; i < d; i++)
     for (j = 0; j < d; j++)
       for (k = 0; k < n_f; k++) NtR(i, j) += N(k, i) * R(k, j);
   for (i = 0, sym = 1; i < d; i++)
     for (j = i + 1; j < d; j++) sym &= (std::fabs(NtR(i, j) - NtR(j, i)) < 1e-8);
-  //remplissage de idx(i, j) : numero de W_{ij} dans le pb d'optimisation
+  //fill idx(i, j): index of W_{ij} in the optimization problem
   IntTrav idx(n_f, n_f);
   if (sym)
     for (i = 0; i < n_f; i++)
@@ -368,42 +368,42 @@ int Domaine_PolyMAC_CDO::W_stabiliser(DoubleTab& W, DoubleTab& R, DoubleTab& N, 
   else for (i = 0; i < n_f; i++)
       for (j = 0; j < n_f; j++) idx(i, j) = (W(i, j) ? nv++ : -1);
 
-  /* version non stabilisee : W0 = N.(NtR)^-1.Nt */
-  Matrice33::inverse(NtR, iNtR); //crash si NtR non inversible
+  /* non-stabilized version: W0 = N.(NtR)^-1.Nt */
+  Matrice33::inverse(NtR, iNtR); //crash if NtR is not invertible
   for (i = 0, W = 0; i < n_f; i++)
     for (j = 0; j < d; j++)
       for (k = 0; k < d; k++)
         for (l = 0; l < n_f; l++) W(i, l) += N(i, j) * iNtR(j, k) * N(l, k);
-  //spectre de Ws (partie symetrique de W)
+  //spectrum of Ws (symmetric part of W)
   DoubleTrav Ws(n_f, n_f), S(n_f), work(1);
   for (i = 0; i < n_f; i++)
     for (j = 0; j < n_f; j++) Ws(i, j) = (W(i, j) + W(j, i)) / 2;
   char jobz = 'N', uplo = 'U';
   F77NAME(dsyev)(&jobz, &uplo, &n_f, &Ws(0, 0), &n_f, &S(0), &work(0), &lwork, &infoo);//"workspace query"
   work.resize(lwork = (int)work(0));
-  F77NAME(dsyev)(&jobz, &uplo, &n_f, &Ws(0, 0), &n_f, &S(0), &work(0), &lwork, &infoo);//vrai appel
+  F77NAME(dsyev)(&jobz, &uplo, &n_f, &Ws(0, 0), &n_f, &S(0), &work(0), &lwork, &infoo);//actual call
   assert(S(0) > -1e-8 && S(n_f - dimension) > 0);
   if (spectre) spectre[0] = std::min(spectre[0], S(n_f - dimension)), spectre[2] = std::max(spectre[2], S(n_f - 1));
-  //bornes sur le spectre de la matrice finale
+  //bounds on the spectrum of the final matrix
   double l_min = S(n_f - dimension) / 100, l_max = S(n_f - 1) * 100;
 
-  /* probleme d'optimisation : sur les W_{ij} autorises */
+  /* optimization problem: over the allowed W_{ij} */
   OSQPData data;
   OSQPSettings settings;
   osqp_set_default_settings(&settings);
   settings.scaled_termination = 1, settings.polish = 1, settings.eps_abs = settings.eps_rel = 1e-8, settings.max_iter = 1e3;
 
-  /* contrainte : W.R = N */
-  std::vector<std::map<int, double>> C(nv); //stockage CSC : C[j][i] = M_{ij}
-  std::vector<double> lb, ub; //bornes inf/sup
-  int il = 0; //suivi de la ligne qu'on est en train de creer
+  /* constraint: W.R = N */
+  std::vector<std::map<int, double>> C(nv); //CSC storage: C[j][i] = M_{ij}
+  std::vector<double> lb, ub; //lower/upper bounds
+  int il = 0; //track the current row being built
   for (i = 0; i < n_f; i++)
     for (j = 0; j < d; j++, il++)
       for (k = 0, lb.push_back(N(i, j)), ub.push_back(N(i, j)); k < n_f; k++)
         if (idx(i, k) >= 0) C[idx(i, k)][il] += R(k, j);
 
-  /* objectif: minimiser la norme l2 des termes hors diagonale */
-  std::vector<int> P_c(nv + 1), P_l(nv), A_c, A_l; //coeffs de la colonne c : indices [P_c(c), P_c(c + 1)[ dans P_l, P_v
+  /* objective: minimize the l2 norm of the off-diagonal terms */
+  std::vector<int> P_c(nv + 1), P_l(nv), A_c, A_l; //coefficients of column c: indices [P_c(c), P_c(c + 1)[ in P_l, P_v
   std::vector<double> P_v(nv), A_v, Q(nv, 0.);
   for (i = 0; i < nv; i++) P_l[i] = i, P_c[i + 1] = i + 1;
   for (i = 0; i < n_f; i++)
@@ -411,22 +411,22 @@ int Domaine_PolyMAC_CDO::W_stabiliser(DoubleTab& W, DoubleTab& R, DoubleTab& N, 
       if (idx(i, j) >= 0) P_v[idx(i, j)] += (i == j ? 0 : 1);
   data.n = nv, data.P = csc_matrix(nv, nv, (int)P_v.size(), P_v.data(), P_l.data(), P_c.data()), data.q = Q.data();
 
-  //iterations : on resout et on ajoute des contraintes tant que W a un spectre hors de [l_min, l_max]
+  //iterations: solve and add constraints as long as W has a spectrum outside [l_min, l_max]
   std::fenv_t fenv;
-  std::feholdexcept(&fenv); //suspend les exceptions FP
+  std::feholdexcept(&fenv); //suspend floating-point exceptions
   std::vector<double> sol(nv);
   for (cv = 0, it = 0; !cv && it < 100; it++)
     {
-      /* assemblage de A : matrice des contraintes */
+      /* assemble A: constraint matrix */
       for (j = 0, A_c.resize(1), A_l.resize(0), A_v.resize(0); j < nv; j++, A_c.push_back((int)A_l.size()))
         for (auto && l_v : C[j]) A_l.push_back(l_v.first), A_v.push_back(l_v.second);
       data.A = csc_matrix((int)lb.size(), nv, (int)A_v.size(), A_v.data(), A_l.data(), A_c.data());
       data.l = lb.data(), data.u = ub.data(), data.m = (int)lb.size();
 
-      /* resolution  */
+      /* solve */
       OSQPWorkspace *osqp = nullptr;
       if (osqp_setup(&osqp, &data, &settings)) Cerr << "Domaine_PolyMAC_CDO::W_stabiliser : osqp_setup error" << finl, Process::exit();
-      if (it) osqp_warm_start_x(osqp, sol.data()); //repart de l'iteration precedente
+      if (it) osqp_warm_start_x(osqp, sol.data()); //warm-start from the previous iteration
       osqp_solve(osqp);
       ret = osqp->info->status_val, sol.assign(osqp->solution->x, osqp->solution->x + nv);
       if (ret == OSQP_PRIMAL_INFEASIBLE || ret == OSQP_PRIMAL_INFEASIBLE_INACCURATE)
@@ -437,12 +437,12 @@ int Domaine_PolyMAC_CDO::W_stabiliser(DoubleTab& W, DoubleTab& R, DoubleTab& N, 
       for (i = 0; i < n_f; i++)
         for (j = 0; j < n_f; j++) W(i, j) = (idx(i, j) >= 0 ? sol[idx(i, j)] : 0);
 
-      /* calcul du spectre : Ws recupere les vecteurs propres */
+      /* compute the spectrum: Ws retrieves the eigenvectors */
       for (i = 0; i < n_f; i++)
         for (j = 0; j < n_f; j++) Ws(i, j) = (W(i, j) + W(j, i)) / 2;
       jobz = 'V', F77NAME(dsyev)(&jobz, &uplo, &n_f, &Ws(0, 0), &n_f, &S(0), &work(0), &lwork, &infoo);
 
-      /* pour chaque vp sortant de [ l_min, l_max ], on ajoute une contrainte pour la restreindre a [l_min * 1.1, l_max / 1.1 ] */
+      /* for each eigenvalue outside [ l_min, l_max ], add a constraint to restrict it to [l_min * 1.1, l_max / 1.1 ] */
       for (i = 0, cv = (osqp->info->status_val == OSQP_SOLVED); i < n_f; i++)
         if (S(i) < l_min || S(i) > l_max)
           {
@@ -478,21 +478,21 @@ void Domaine_PolyMAC_CDO::init_m2_new() const
   const IntTab& e_f = elem_faces();
   const DoubleVect& fs = face_surfaces(), &ve = volumes();
   int i, j, e, n_f, ctr[3] = {0, 0, 0 };
-  double spectre[4] = { DBL_MAX, DBL_MAX, 0, 0 }; //vp min (partie consistante, partie stab), vp max (partie consistante, partie stab)
+  double spectre[4] = { DBL_MAX, DBL_MAX, 0, 0 }; //min eigenvalue (consistent, stabilized), max eigenvalue (consistent, stabilized)
 
   if (is_init["w2"]) return;
   Cerr << domaine().le_nom() << " : initializing w2/m2 ... ";
 
   DoubleTab W, M;
 
-  /* pour le partage entre procs */
+  /* for sharing between processes */
   DoubleTrav m2e(0, e_f.dimension(1), e_f.dimension(1)), w2e(0, e_f.dimension(1), e_f.dimension(1));
   domaine().creer_tableau_elements(m2e), domaine().creer_tableau_elements(w2e);
 
 
-  /* calcul sur les elements reels */
-  //std::map<int, std::vector<int>> som_face; //som_face[s] : faces de l'element e touchant le sommet s
-  IntTrav nnz, nef;//par elements : nombre de coeffs non nuls, nombre de faces (lignes)
+  /* computation on real elements */
+  //std::map<int, std::vector<int>> som_face; //som_face[s]: faces of element e touching vertex s
+  IntTrav nnz, nef;//per element: number of nonzero coefficients, number of faces (rows)
   domaine().creer_tableau_elements(nnz), domaine().creer_tableau_elements(nef);
   for (e = 0; e < nb_elem(); e++)
     {
@@ -506,7 +506,7 @@ void Domaine_PolyMAC_CDO::init_m2_new() const
         for (j = 0; j < n_f; j++) m2e(e, i, j) = M(i, j, 0);
     }
 
-  /* echange et remplissage */
+  /* exchange and fill */
   m2e.echange_espace_virtuel(), w2e.echange_espace_virtuel();
   for (e = 0, m2d.append_line(0), m2i.append_line(0), w2i.append_line(0); e < nb_elem_tot(); e++, m2d.append_line(m2i.size() - 1))
     {
@@ -550,7 +550,7 @@ void Domaine_PolyMAC_CDO::init_m2_osqp() const
   const DoubleVect& fs = face_surfaces(), &ve = volumes();
   const DoubleTab& nf = face_normales();
   int i, j, e, f, s, n_f, ctr[3] = {0, 0, 0 }, infoo = 0;
-  double spectre[4] = { DBL_MAX, DBL_MAX, 0, 0 }; //vp min (partie consistante, partie stab), vp max (partie consistante, partie stab)
+  double spectre[4] = { DBL_MAX, DBL_MAX, 0, 0 }; //min eigenvalue (consistent, stabilized), max eigenvalue (consistent, stabilized)
   char uplo = 'U';
 
   if (is_init["w2"]) return;
@@ -558,36 +558,36 @@ void Domaine_PolyMAC_CDO::init_m2_osqp() const
 
   DoubleTab W, M, R, N;
 
-  /* pour le partage entre procs */
+  /* for sharing between processes */
   DoubleTrav m2e(0, e_f.dimension(1), e_f.dimension(1)), w2e(0, e_f.dimension(1), e_f.dimension(1));
   domaine().creer_tableau_elements(m2e), domaine().creer_tableau_elements(w2e);
 
 
-  /* calcul sur les elements reels */
-  std::map<int, std::vector<int>> som_face; //som_face[s] : faces de l'element e touchant le sommet s
-  IntTrav nnz, nef;//par elements : nombre de coeffs non nuls, nombre de faces (lignes)
+  /* computation on real elements */
+  std::map<int, std::vector<int>> som_face; //som_face[s]: faces of element e touching vertex s
+  IntTrav nnz, nef;//per element: number of nonzero coefficients, number of faces (rows)
   domaine().creer_tableau_elements(nnz), domaine().creer_tableau_elements(nef);
   for (e = 0; e < nb_elem(); e++)
     {
       for (n_f = 0; n_f < e_f.dimension(1) && e_f(e, n_f) >= 0; ) n_f++;
       W.resize(n_f, n_f), R.resize(n_f, dimension), N.resize(n_f, dimension);
 
-      /* matrices R (lignes elements -> faces) et N (normales sortantes aux faces) */
+      /* matrices R (rows: elements -> faces) and N (outward normals at faces) */
       for (i = 0; i < n_f; i++)
         for (j = 0, f = e_f(e, i); j < dimension; j++)
           N(i, j) = nf(f, j) / fs(f) * (e == f_e(f, 0) ? 1 : -1), R(i, j) = (xv_(f, j) - xp_(e, j)) * fs(f) / ve(e);
 
-      /* faces connectees a chaque sommet, puis stencil admissible */
+      /* faces connected to each vertex, then admissible stencil */
       for (i = 0, W = 0, som_face.clear(); i < n_f; i++)
         for (j = 0, f = e_f(e, i); j < f_s.dimension(1) && (s = f_s(f, j)) >= 0; j++) som_face[s].push_back(i);
       for (auto &s_fs : som_face)
         for (auto i1 : s_fs.second)
           for (auto i2 : s_fs.second) W(i1, i2) = 1;
 
-      /* matrice W2 stabilisee */
-      W = 1, W_stabiliser(W, R, N, ctr, spectre); /* il faut une matrice complete */
+      /* stabilized W2 matrix */
+      W = 1, W_stabiliser(W, R, N, ctr, spectre); /* a complete matrix is required */
 
-      /* matrice M2 : W2^-1 */
+      /* M2 matrix: W2^-1 */
       M = W;
       F77NAME(dpotrf)(&uplo, &n_f, M.addr(), &n_f, &infoo);
       F77NAME(dpotri)(&uplo, &n_f, M.addr(), &n_f, &infoo);
@@ -601,7 +601,7 @@ void Domaine_PolyMAC_CDO::init_m2_osqp() const
         for (j = 0; j < n_f; j++) m2e(e, i, j) = M(i, j);
     }
 
-  /* echange et remplissage */
+  /* exchange and fill */
   m2e.echange_espace_virtuel(), w2e.echange_espace_virtuel();
   for (e = 0, m2d.append_line(0), m2i.append_line(0), w2i.append_line(0); e < nb_elem_tot(); e++, m2d.append_line(m2i.size() - 1))
     {
@@ -623,7 +623,7 @@ void Domaine_PolyMAC_CDO::init_m2_osqp() const
   is_init["w2"] = 1;
 }
 
-//matrice mimetique W_2/M_2 : valeurs tangentes aux lignes element-faces <-> valeurs normales aux faces
+//mimetic matrix W_2/M_2: tangential values along element-face lines <-> normal values at faces
 void Domaine_PolyMAC_CDO::init_m2() const
 {
   if (Option_PolyMAC_family::USE_NEW_M2) init_m2_new();
@@ -631,7 +631,7 @@ void Domaine_PolyMAC_CDO::init_m2() const
 }
 
 
-//interpolation normales aux faces -> elements d'ordre 1
+//first-order interpolation of face normals to elements
 void Domaine_PolyMAC_CDO::init_ve() const
 {
   const IntTab& e_f = elem_faces(), &f_e = face_voisins();
@@ -642,7 +642,7 @@ void Domaine_PolyMAC_CDO::init_ve() const
   Cerr << domaine().le_nom() << " : initialisation de ve... ";
   vedeb.resize(1);
   veci.resize(0, 3);
-  //formule (1) de Basumatary et al. (2014) https://doi.org/10.1016/j.jcp.2014.04.033 d'apres Perot
+  //formula (1) from Basumatary et al. (2014) https://doi.org/10.1016/j.jcp.2014.04.033 following Perot
   for (e = 0; e < nb_elem_tot(); vedeb.append_line(veji.dimension(0)), e++)
     for (i = 0; i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++)
       {
@@ -654,7 +654,7 @@ void Domaine_PolyMAC_CDO::init_ve() const
   is_init["ve"] = 1, Cerr << "OK" << finl;
 }
 
-//rotationnel aux faces d'un champ tangent aux aretes
+//curl at faces of a field tangent to edges
 void Domaine_PolyMAC_CDO::init_rf() const
 {
   const IntTab& f_s = face_sommets();
@@ -669,7 +669,7 @@ void Domaine_PolyMAC_CDO::init_rf() const
       {
         int s2 = f_s(f, i + 1 < f_s.dimension(1) && f_s(f, i + 1) >= 0 ? i + 1 : 0),
             a = dimension < 3 ? s : som_arete[s].at(s2);
-        std::array<double, 3> taz = {{ 0, 0, 1 }}, vec; //vecteur tangent a l'arete et produit vectoriel de celui-ci avec xa - xv
+        std::array<double, 3> taz = {{ 0, 0, 1 }}, vec; //tangent vector to the edge and its cross product with xa - xv
         vec = cross(dimension, 3, dimension < 3 ? &xs(a, 0) : &xa_(a, 0), dimension < 3 ? &taz[0] : &ta_(a, 0), &xv_(f, 0));
         int sgn = dot(&vec[0], &nf(f, 0)) > 0 ? 1 : -1;
         rfji.append_line(a), rfci.append_line(sgn * (dimension < 3 ? 1 : la(a)) / fs(f));
@@ -678,12 +678,12 @@ void Domaine_PolyMAC_CDO::init_rf() const
   is_init["rf"] = 1;
 }
 
-//interpolation aux elements d'un champ dont on connait la composante tangente aux aretes (en 3D ), ou la composante verticale aux sommets en 2D
+//interpolation at elements of a field whose tangential component at edges (in 3D) or vertical component at vertices (in 2D) is known
 void Domaine_PolyMAC_CDO::init_we() const
 {
   if (is_init["we"]) return;
 
-  //remplissage de arete_faces_ (liste des faces touchant chaque arete en 3D, chaque sommet en 2D)
+  //fill arete_faces_ (list of faces touching each edge in 3D, each vertex in 2D)
   std::vector<std::vector<int> > a_f_vect(dimension < 3 ? nb_som_tot() : domaine().nb_aretes_tot());
   const IntTab& f_s = face_sommets_;
   for (int f = 0, i, s1; f < nb_faces_tot(); f++)
@@ -713,9 +713,9 @@ void Domaine_PolyMAC_CDO::init_we_2d() const
   std::map<int, double> wemi;
   for (e = 0; e < nb_elem_tot(); wedeb.append_line(weji.dimension(0)), wemi.clear(), e++)
     {
-      //une contribution par "facette" (triangle entre le sommet, le CG de la face et celui de l'element)
+      //one contribution per "facet" (triangle between the vertex, the face centroid, and the element centroid)
       for (i = 0; i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++)
-        for (j = 0; j < f_s.dimension(1) && (s = f_s(f, j)) >= 0; j++) //contrib. de chaque sommet de chaque face
+        for (j = 0; j < f_s.dimension(1) && (s = f_s(f, j)) >= 0; j++) //contrib. from each vertex of each face
           wemi[s] += std::fabs(cross(2, 2, &xp_(e, 0), &xv_(f, 0), &xs(s, 0), &xs(s, 0))[2]) / (2 * ve(e));
       for (auto &&kv : wemi) weji.append_line(kv.first), weci.append_line(kv.second);
     }
@@ -733,14 +733,14 @@ void Domaine_PolyMAC_CDO::init_we_3d() const
   std::map<int, std::array<double, 3> > wemi;
   for (e = 0; e < nb_elem_tot(); wedeb.append_line(weji.dimension(0)), wemi.clear(), e++)
     {
-      //une contribution par "facette" (triangle entre CG de l'arete, le CG de la face et celui de l'element)
+      //one contribution per "facet" (triangle between the edge centroid, the face centroid, and the element centroid)
       for (i = 0; i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++)
-        for (j = 0; j < f_s.dimension(1) && (s = f_s(f, j)) >= 0; j++) //contrib. de chaque sommet de chaque face
+        for (j = 0; j < f_s.dimension(1) && (s = f_s(f, j)) >= 0; j++) //contrib. from each vertex of each face
           {
             int s2 = f_s(f, j + 1 < f_s.dimension(1) && f_s(f, j + 1) >= 0 ? j + 1 : 0),
                 a = som_arete[s].at(s2);
             std::array<double, 3> vec = cross(3, 3, &xp_(e, 0), &xv_(f, 0), &xa_(a, 0), &xa_(a, 0));
-            //on tourne la facette dans la bonne direction
+            //orient the facet in the correct direction
             int sgn = dot(&ta_(a, 0), &vec[0]) > 0 ? 1 : -1;
             for (k = 0; k < 3; k++) wemi[a][k] += sgn * vec[k] * la(a) / (2 * ve(e));
           }
@@ -749,24 +749,24 @@ void Domaine_PolyMAC_CDO::init_we_3d() const
   CRIMP(wedeb), CRIMP(weji), CRIMP(weci);
 }
 
-//matrice mimetique d'un champ aux aretes : (valeur tangente aux aretes) -> (flux a travers l'union des facettes touchant l'arete)
-//en 2D, m1 est toujours diagonale! Il suffit de calculer la surface de l'arete duale...
+//mimetic matrix of an edge field: (tangential value at edges) -> (flux through the union of facets touching the edge)
+//in 2D, m1 is always diagonal! It suffices to compute the area of the dual edge...
 void Domaine_PolyMAC_CDO::init_m1_2d() const
 {
   const IntTab& e_f = elem_faces(), &f_s = face_sommets_;
   const DoubleTab& xs = domaine().coord_sommets();
   int i, j, e, f, s;
 
-  std::vector<std::map<std::array<int, 2>, double>> m1(domaine().nb_som_tot()); //m1[a][{ ab, e }] : contribution de (arete ab, element e)
+  std::vector<std::map<std::array<int, 2>, double>> m1(domaine().nb_som_tot()); //m1[a][{ ab, e }]: contribution from (edge ab, element e)
   for (e = 0; e < nb_elem_tot(); e++)
     {
-      //une contribution par "facette" (triangle entre le sommet, le CG de la face et celui de l'element)
+      //one contribution per "facet" (triangle between the vertex, the face centroid, and the element centroid)
       for (i = 0; i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++)
-        for (j = 0; j < f_s.dimension(1) && (s = f_s(f, j)) >= 0; j++) //contrib. de chaque sommet de chaque face
+        for (j = 0; j < f_s.dimension(1) && (s = f_s(f, j)) >= 0; j++) //contrib. from each vertex of each face
           m1[s][ {{ s, e }}] += std::fabs(cross(2, 2, &xp_(e, 0), &xv_(f, 0), &xs(s, 0), &xs(s, 0))[2]) / 2;
     }
 
-  //remplissage
+  //fill
   m1deb.resize(1);
   m1ji.resize(0, 2);
   for (i = 0; i < domaine().nb_som_tot(); m1deb.append_line(m1ji.dimension(0)), i++)
@@ -799,28 +799,28 @@ void Domaine_PolyMAC_CDO::init_m1_3d() const
           {
             s2 = f_s(f, j + 1 < f_s.dimension(1) && f_s(f, j + 1) >= 0 ? j + 1 : 0), a = som_arete[s].at(s2);
             std::array<double, 3> vec = cross(3, 3, &xp_(e, 0), &xv_(f, 0), &xa_(a, 0), &xa_(a, 0));
-            //on tourne la facette dans la bonne direction
+            //orient the facet in the correct direction
             int sgn = dot(&ta_(a, 0), &vec[0]) > 0 ? 1 : -1;
             for (k = wedeb(e); k < wedeb(e + 1); k++) M(idxa[a], idxa[weji(k)]) += sgn * la(a) * dot(&vec[0], &weci(k, 0)) / 2 / ve(e);
           }
       for (i = 0; i < e_a.dimension(1) && (a = e_a(e, i)) >= 0; i++)
         for (j = 0; j < dimension; j++) N(j, i) = ta_(a, j);
 
-      /* stabilisation et stockage */
+      /* stabilization and storage */
       ajouter_stabilisation(M, N);
       for (i = 0; i < n_a; i++)
         for (j = 0; j < n_a; j++) m1e(e, i, j) = M(i, j);
     }
 
-  /* echange et remplissage d'un map global */
+  /* exchange and fill a global map */
   m1e.echange_espace_virtuel();
-  std::vector<std::map<std::array<int, 2>, double>> m1(domaine().nb_aretes_tot()); //m1[a][{ ab, e }] : contribution de (arete ab, element e)
+  std::vector<std::map<std::array<int, 2>, double>> m1(domaine().nb_aretes_tot()); //m1[a][{ ab, e }]: contribution from (edge ab, element e)
   for (e = 0; e < nb_elem_tot(); e++)
     for (i = 0; i < e_a.dimension(1) && (a = e_a(e, i)) >= 0; i++)
       for (j = 0; j < e_a.dimension(1) && (ab = e_a(e, j)) >= 0; j++)
         if (std::fabs(m1e(e, i, j)) > 1e-8) m1[a][ {{ ab, e }}] += ve(e) * m1e(e, i, j);
 
-  /* remplissage final */
+  /* final fill */
   m1deb.resize(1);
   m1ji.resize(0, 2);
   for (a = 0; a < domaine().nb_aretes_tot(); m1deb.append_line(m1ji.dimension(0)), a++)
@@ -839,12 +839,12 @@ void Domaine_PolyMAC_CDO::init_m1() const
   is_init["m1"] = 1;
 }
 
-/* initisalisation de solveurs lineaires pour inverser m1 ou m2 */
+/* initialization of linear solvers to invert m1 or m2 */
 void Domaine_PolyMAC_CDO::init_m2solv() const
 {
   init_m2();
   if (is_init["m2solv"]) return;
-  /* stencil et allocation */
+  /* stencil and allocation */
   const IntTab& e_f = elem_faces(), &f_e = face_voisins();
   Stencil stencil(0, 2);
   int e, i, j, k, f, fb;
@@ -856,7 +856,7 @@ void Domaine_PolyMAC_CDO::init_m2solv() const
   tableau_trier_retirer_doublons(stencil);
   Matrix_tools::allocate_symmetric_morse_matrix(nb_elem_tot() + nb_faces_tot(), stencil, m2mat);
 
-  /* remplissage */
+  /* fill */
   for (e = 0; e < nb_elem_tot(); e++)
     for (i = 0, j = m2d(e); j < m2d(e + 1); i++, j++)
       for (f = e_f(e, i), k = m2i(j); f < nb_faces() && k < m2i(j + 1); k++)
@@ -872,7 +872,7 @@ void Domaine_PolyMAC_CDO::init_m2solv() const
 
 void Domaine_PolyMAC_CDO::init_virt_ef_map() const
 {
-  if (is_init["virt_ef"]) return; //deja initialisa
+  if (is_init["virt_ef"]) return; //already initialized
   int e, f;
   IntTrav p_e(0, 2), p_f(0, 2);
   domaine().creer_tableau_elements(p_e), creer_tableau_faces(p_f);
@@ -885,7 +885,7 @@ void Domaine_PolyMAC_CDO::init_virt_ef_map() const
 }
 
 
-/* "clamping" a 0 des coeffs petits dans M1/W1/M2/W2 */
+/* "clamping" to 0 of small coefficients in M1/W1/M2/W2 */
 inline void clamp(DoubleTab& m)
 {
   for (int i = 0; i < m.dimension(0); i++)
@@ -894,57 +894,57 @@ inline void clamp(DoubleTab& m)
         if (1e6 * std::abs(m(i, j, n)) < std::abs(m(i, i, n)) + std::abs(m(j, j, n))) m(i, j, n) = 0;
 }
 
-//matrices locales par elements (operateurs de Hodge) permettant de faire des interpolations :
-//normales aux faces -> tangentes aux faces duales : (nu x_ef.v) = m2 (|f|n_ef.v)
+//local matrices per element (Hodge operators) for performing interpolations:
+//face normals -> dual face tangentials: (nu x_ef.v) = m2 (|f|n_ef.v)
 void Domaine_PolyMAC_CDO::M2(const DoubleTab *nu, int e, DoubleTab& m2) const
 {
   int i, j, k, f, n, N = nu ? nu->dimension(1) : 1, e_nu = nu && nu->dimension_tot(0) == 1 ? 0 : e, n_f, d, D = dimension;
   const IntTab& e_f = elem_faces(), &f_e = face_voisins();
   const DoubleTab& xe = xp(), &xf = xv(), &nf = face_normales();
   const DoubleVect& ve = volumes();
-  for (n_f = 0; n_f < e_f.dimension(1) && e_f(e, n_f) >= 0; ) n_f++; //nombre de faces de e
-  double prefac, fac, beta = n_f == D + 1 ? 1. / D : D == 2 ? 1. / sqrt(2) : 1. / sqrt(3); //stabilisation : DGA sur simplexes, SUSHI sinon
+  for (n_f = 0; n_f < e_f.dimension(1) && e_f(e, n_f) >= 0; ) n_f++; //number of faces of e
+  double prefac, fac, beta = n_f == D + 1 ? 1. / D : D == 2 ? 1. / sqrt(2) : 1. / sqrt(3); //stabilization: DGA on simplices, SUSHI otherwise
   m2.resize(n_f, n_f, N), m2 = 0;
-  DoubleTrav v_e(n_f, D), v_ef(n_f, n_f, D); //interpolations du vecteur complet : non stabilisee en e, stabilisee en (e, f)
+  DoubleTrav v_e(n_f, D), v_ef(n_f, n_f, D); //full vector interpolations: non-stabilized at e, stabilized at (e, f)
   for (i = 0; i < n_f; i++)
     for (f = e_f(e, i), d = 0; d < D; d++) v_e(i, d) = (xf(f, d) - xe(e, d)) / ve(e);
   for (i = 0; i < n_f; i++)
     for (f = e_f(e, i), prefac = D * beta / std::abs(dot(&xf(f, 0), &nf(f, 0), &xe(e, 0))), j = 0; j < n_f; j++)
       for (fac = prefac * ((j == i) - (e == f_e(f, 0) ? 1 : -1) * dot(&nf(f, 0), &v_e(j, 0))), d = 0; d < D; d++)
         v_ef(i, j, d) = v_e(j, d) + fac * (xf(f, d) - xe(e, d));
-  //matrice!
+  //matrix!
   for (m2 = 0, i = 0; i < n_f; i++)
     for (j = 0; j < n_f; j++)
       if (j < i)
-        for (n = 0; n < N; n++) m2(i, j, n) = m2(j, i, n); //sous la diagonale -> avec l'autre cote
+        for (n = 0; n < N; n++) m2(i, j, n) = m2(j, i, n); //below diagonal -> copy from the other side
       else for (k = 0; k < n_f; k++)
           for (f = e_f(e, k), fac = std::abs(dot(&xf(f, 0), &nf(f, 0), &xe(e, 0))) / D, n = 0; n < N; n++)
             m2(i, j, n) += fac * nu_dot(nu, e_nu, n, &v_ef(k, i, 0), &v_ef(k, j, 0));
   clamp(m2);
 }
 
-//tangentes aux faces duales -> normales aux faces : nu|f|n_ef.v = w2.(x_ef.v)
+//dual face tangentials -> face normals: nu|f|n_ef.v = w2.(x_ef.v)
 void Domaine_PolyMAC_CDO::W2(const DoubleTab *nu, int e, DoubleTab& w2) const
 {
   int i, j, k, f, n, N = nu ? nu->dimension(1) : 1, e_nu = nu && nu->dimension_tot(0) == 1 ? 0 : e, n_f, d, D = dimension;
   const IntTab& e_f = elem_faces(), &f_e = face_voisins();
   const DoubleTab& xe = xp(), &xf = xv(), &nf = face_normales();
   const DoubleVect& ve = volumes();
-  for (n_f = 0; n_f < e_f.dimension(1) && e_f(e, n_f) >= 0; ) n_f++; //nombre de faces de e
-  double prefac, fac, beta = n_f == D + 1 ? 1. / D : D == 2 ? 1. / sqrt(2) : 1. / sqrt(3); //stabilisation : DGA sur simplexes, SUSHI sinon
+  for (n_f = 0; n_f < e_f.dimension(1) && e_f(e, n_f) >= 0; ) n_f++; //number of faces of e
+  double prefac, fac, beta = n_f == D + 1 ? 1. / D : D == 2 ? 1. / sqrt(2) : 1. / sqrt(3); //stabilization: DGA on simplices, SUSHI otherwise
   w2.resize(n_f, n_f, N), w2 = 0;
-  DoubleTrav v_e(n_f, D), v_ef(n_f, n_f, D); //interpolations du vecteur complet : non stabilisee en e, stabilisee en (e, f)
+  DoubleTrav v_e(n_f, D), v_ef(n_f, n_f, D); //full vector interpolations: non-stabilized at e, stabilized at (e, f)
   for (i = 0; i < n_f; i++)
     for (f = e_f(e, i), d = 0; d < D; d++) v_e(i, d) = (e == f_e(f, 0) ? 1 : -1) * nf(f, d) / ve(e);
   for (i = 0; i < n_f; i++)
     for (f = e_f(e, i), prefac = D * beta * (e == f_e(f, 0) ? 1 : -1) / std::abs(dot(&xf(f, 0), &nf(f, 0), &xe(e, 0))), j = 0; j < n_f; j++)
       for (fac = prefac * ((j == i) - dot(&xf(f, 0), &v_e(j, 0), &xe(e, 0))), d = 0; d < D; d++)
         v_ef(i, j, d) = v_e(j, d) + fac * nf(f, d);
-  //matrice!
+  //matrix!
   for (i = 0; i < n_f; i++)
     for (j = 0; j < n_f; j++)
       if (j < i)
-        for (n = 0; n < N; n++) w2(i, j, n) = w2(j, i, n); //sous-diagonale -> on copie l'autre cote
+        for (n = 0; n < N; n++) w2(i, j, n) = w2(j, i, n); //below diagonal -> copy from the other side
       else for (k = 0; k < n_f; k++)
           for (f = e_f(e, k), fac = std::abs(dot(&xf(f, 0), &nf(f, 0), &xe(e, 0))) / D, n = 0; n < N; n++)
             w2(i, j, n) += fac * nu_dot(nu, e_nu, n, &v_ef(k, i, 0), &v_ef(k, j, 0));

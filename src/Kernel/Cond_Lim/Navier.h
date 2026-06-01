@@ -18,12 +18,12 @@
 
 #include <Cond_lim_base.h>
 
-/*! @brief classe Navier Condition aux limites sur la vitesse de type "Navier" :
+/*! @brief Navier Velocity boundary condition of type "Navier":
  *
- *       - composante normale de la vitesse nulle
- *       - composante tangentielle de la vitesse libre
- *       - contrainte imposee
- *     Exemples : Symetrie (contrainte nulle), Paroi_frottante (contrainte non nulle)
+ *       - normal component of velocity is zero
+ *       - tangential component of velocity is free
+ *       - imposed stress
+ *     Examples: Symetrie (zero stress), Paroi_frottante (non-zero stress)
  *
  * @sa Cond_lim_base
  */

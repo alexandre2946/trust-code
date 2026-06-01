@@ -56,7 +56,7 @@ public:
   virtual void get_sigma(const SpanD T, const SpanD P, SpanD sig , int ncomp = 1, int ind = 0) const final;
   virtual void get_sigma_h(const SpanD H, const SpanD P, SpanD sig , int ncomp = 1, int ind = 0) const final;
 
-  // methodes particulieres par application pour gagner en performance : utilisees dans Pb_Multiphase (pour le moment !)
+  // application-specific methods to improve performance: used in Pb_Multiphase (for now!)
   virtual void compute_all_flux_interfacial_pb_multiphase(const SpanD P, MSatSpanD , int ncomp = 1, int ind = 0) const;
 
   // Methods that can be called if point-to-point calculation is required

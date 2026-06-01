@@ -20,13 +20,11 @@
 #include <Correlation_base.h>
 #include <Champs_Fonc.h>
 
-/*! @brief Classe Source_Portance_interfaciale_base
+/*! @brief Interfacial lift force source term of the form:
  *
- *  Cette classe implemente un operateur de portance interfaciale
- *
- *     de la forme F_{n_l} = - F_{k} = C_{n_l, k} (u_k - u_n_l) x rot(u_n_l) ou la phase
- *     n_l est la phase liquide porteuse et k une phase gazeuse
- *     le calcul de C_{n_l, k} est realise par la hierarchie Portance_interfaciale_base
+ *     F_{n_l} = - F_{k} = C_{n_l, k} (u_k - u_n_l) x rot(u_n_l), where phase
+ *     n_l is the carrier liquid phase and k is a gas phase.
+ *     The coefficient C_{n_l, k} is computed by the Portance_interfaciale_base hierarchy.
  *
  * @sa Source_base
  */
@@ -41,8 +39,8 @@ public :
   void completer() override;
 
 protected:
-  OWN_PTR(Correlation_base) correlation_; //correlation donnant le coeff de portance interfaciale
-  int n_l = -1; //phase liquide
+  OWN_PTR(Correlation_base) correlation_; // correlation providing the interfacial lift coefficient
+  int n_l = -1; // liquid phase index
   double beta_ = 1. ; // To adjust the force in .data
   double g_ = 9.81;
   OWN_PTR(Champ_Fonc_base)  wobble; // postreatment

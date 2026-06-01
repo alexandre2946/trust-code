@@ -59,7 +59,7 @@ public:
   inline const Fluide_base& fluide() const { return le_fluide_.valeur(); }
   inline int nombre_d_operateurs() const override { return 1; }
 
-  // pas de flux calcule correctement par les operateurs...
+  // no flux correctly computed by the operators...
   inline int impr(Sortie& os) const override { return 1; }
 
   void Mat_Morse_to_Mat_Bloc(Matrice& matrice_tmp);

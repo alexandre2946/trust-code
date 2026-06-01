@@ -29,11 +29,11 @@ Entree& Operateur_Diff_base::readOn(Entree& is)
   return is;
 }
 
-/*! @brief Associe la vraie diffusivite en m^2/s (en QC par exemple, l'operateur est applique a rho*u, et on associe alors la viscosite dynamique a
+/*! @brief Associates the true diffusivity in m^2/s (in QC for example, the operator is applied to rho*u, and the dynamic viscosity is then associated to
  *
- *   l'operateur au lieu de la viscosite dynamique. Dans ce cas, il
- *   faut associer la vraie diffusivite ici pour le calcul du pas de
- *   temps de stabilite.
+ *   the operator instead of the kinematic viscosity. In that case, it
+ *   is necessary to associate the true diffusivity here for the computation
+ *   of the stability time step.
  *
  */
 void Operateur_Diff_base::associer_diffusivite_pour_pas_de_temps(
@@ -48,17 +48,17 @@ void Operateur_Diff_base::associer_diffusivite_pour_pas_de_temps(
   diffusivite_pour_pas_de_temps_ = diffu;
 }
 
-/*! @brief Renvoie le champ_don correspondant a la vraie diffusivite du milieu qui sert pour le calcul du pas de temps.
+/*! @brief Returns the field corresponding to the true diffusivity of the medium used for the time step computation.
  *
- * Si l'operateur s'applique a rho*v
- *   par exemple (cas du QC par exemple), la diffusivite associee est la
- *   viscosite dynamique et non la viscosite cinematique. Il faut utiliser
- *   la viscosite cinematique pour le calcul du pas de temps...
- *   La vraie diffusivite (en m^2/s) est determinee comme suit:
- *   * si diffusivite_pour_pas_de_temps_ a ete initialise => on l'utilise
- *      (systeme mis en place pour le front-tracking, car le milieu
- *       est invalide)
- *   * sinon on utilise diffusivite()
+ * If the operator is applied to rho*v
+ *   for example (QC case for instance), the associated diffusivity is the
+ *   dynamic viscosity and not the kinematic viscosity. The kinematic
+ *   viscosity must be used for the time step computation...
+ *   The true diffusivity (in m^2/s) is determined as follows:
+ *   * if diffusivite_pour_pas_de_temps_ has been initialised => it is used
+ *      (mechanism set up for front-tracking, because the medium
+ *       is invalid)
+ *   * otherwise diffusivite() is used
  *
  */
 const Champ_base& Operateur_Diff_base::diffusivite_pour_pas_de_temps() const

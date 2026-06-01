@@ -53,7 +53,7 @@ DoubleTab& Op_Rot_VEFP1B::calculer(const DoubleTab& vorticite, DoubleTab& rot) c
 
 }
 
-//Methode de calcul du rotationnel de la vorticite.
+//Method for computing the curl of the vorticity.
 DoubleTab& Op_Rot_VEFP1B::ajouter(const DoubleTab& vorticite, DoubleTab& rot) const
 {
   const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
@@ -63,7 +63,7 @@ DoubleTab& Op_Rot_VEFP1B::ajouter(const DoubleTab& vorticite, DoubleTab& rot) co
   int elem0, elem1;
   int sommet_global, face_opp;
 
-  //Quelques variables bien utiles
+  //Some useful variables
   DoubleTab vecteur_normal_elem0(dimension);
   DoubleTab vecteur_normal_elem1(dimension);
   DoubleTab vecteur_normal_opp_elem0(dimension);
@@ -92,14 +92,14 @@ DoubleTab& Op_Rot_VEFP1B::ajouter(const DoubleTab& vorticite, DoubleTab& rot) co
       elem0 = face_voisins(face, 0);
       elem1 = face_voisins(face, 1);
 
-      // Calcul du rotationnel de la vorticite: partie P0 de l'inconnue
+      // Compute the curl of the vorticity: P0 part of the unknown
 
-      /* Calcul du vecteur tangent adequat pour la partie P0 de l'inconnue */
+      /* Compute the appropriate tangent vector for the P0 part of the unknown */
       vecteur_normal_elem0 = vecteur_normal(face, elem0);
       vecteur_normal_elem1 = vecteur_normal(face, elem1);
 
-      /* Calcul du rotationnel de la vorticite proprement dit */
-      /* Partie P0 */
+      /* Compute the curl of the vorticity properly */
+      /* P0 part */
       for (int composante = 0; composante < dimension; composante++)
         {
           modulo = (1 + composante) % dimension;
@@ -107,11 +107,11 @@ DoubleTab& Op_Rot_VEFP1B::ajouter(const DoubleTab& vorticite, DoubleTab& rot) co
 
         }
 
-      // Calcul du rotationnel de la vorticite: partie P1 de l'inconnue
+      // Compute the curl of the vorticity: P1 part of the unknown
 
-      /* On a besoin pour chaque triangle de connaitre la liste */
-      /* des sommets qui en font parti ainsi que les faces */
-      /* opposees a ces sommets */
+      /* We need for each triangle to know the list */
+      /* of vertices belonging to it and the faces */
+      /* opposite to these vertices */
       if (!sommets_elem0.est_vide())
         sommets_elem0.vide();
       if (!sommets_elem1.est_vide())
@@ -129,11 +129,11 @@ DoubleTab& Op_Rot_VEFP1B::ajouter(const DoubleTab& vorticite, DoubleTab& rot) co
           faces_opp_elem1.add_if_not(domaine_VEF.elem_faces(elem1, i));
         }
 
-      /* Maintenant, on calcule la contribution au rotationnel */
-      /* pour la partie P1 de l'inconnue */
-      /* ATTENTION: compte tenu de la definition de l'espace */
-      /* vectoriel engendrant omega, il NE FAUT PAS tenir compte */
-      /* du sommet de plus GRAND numero */
+      /* Now, compute the contribution to the curl */
+      /* for the P1 part of the unknown */
+      /* WARNING: given the definition of the vector space */
+      /* generating omega, the vertex with the LARGEST index */
+      /* must NOT be taken into account */
       for (int composante = 0; composante < dimension; composante++)
         {
           modulo = (1 + composante) % dimension;
@@ -142,25 +142,25 @@ DoubleTab& Op_Rot_VEFP1B::ajouter(const DoubleTab& vorticite, DoubleTab& rot) co
           /* Partie (w,curl Psi_c e_i) */
           //////////////////////////////
           double sommation_sommets = 0.;
-          //On fait les calculs pour "elem0"
+          //Compute for "elem0"
           for (int i = 0; i < sommets_elem0.size(); i++)
             {
               sommet_global = sommets_elem0[i];
 
-              //Pour eliminer le dernier sommet
+              //To eliminate the last vertex
               if (sommet_global != domaine.nb_som() - 1)
                 sommation_sommets += vorticite(domaine.nb_elem() + sommet_global);
             }
 
           rot(face, composante) += -pow(-1., modulo) / (dimension + 1) * vecteur_normal_elem0(modulo) * sommation_sommets;
 
-          //On fait les calculs pour "elem1"
+          //Compute for "elem1"
           sommation_sommets = 0.;
           for (int i = 0; i < sommets_elem1.size(); i++)
             {
               sommet_global = sommets_elem1[i];
 
-              //Pour eliminer le dernier sommet
+              //To eliminate the last vertex
               if (sommet_global != domaine.nb_som() - 1)
                 sommation_sommets += vorticite(domaine.nb_elem() + sommet_global);
             }
@@ -168,18 +168,18 @@ DoubleTab& Op_Rot_VEFP1B::ajouter(const DoubleTab& vorticite, DoubleTab& rot) co
           rot(face, composante) += -pow(-1., modulo) / (dimension + 1) * vecteur_normal_elem1(modulo) * sommation_sommets;
 
           //////////////////////////////////////
-          /* Fin de partie (w,curl Psi_c e_i) */
+          /* End of (w,curl Psi_c e_i) part */
           /////////////////////////////////////
           ///////////////////////////////
-          /* Partie (curl w,Psi_c e_i) */
+          /* (curl w,Psi_c e_i) part */
           //////////////////////////////
-          //On fait les calculs pour "elem0"
+          //Compute for "elem0"
           sommation_sommets = 0.;
           for (int i = 0; i < sommets_elem0.size(); i++)
             {
               sommet_global = sommets_elem0[i];
 
-              //Pour eliminer le dernier sommet
+              //To eliminate the last vertex
               if (sommet_global != domaine.nb_som() - 1)
                 {
                   face_opp = faces_opp_elem0[i];
@@ -192,13 +192,13 @@ DoubleTab& Op_Rot_VEFP1B::ajouter(const DoubleTab& vorticite, DoubleTab& rot) co
 
           rot(face, composante) += pow(-1., modulo) / (dimension * (dimension + 1)) * sommation_sommets;
 
-          //On fait les calculs pour "elem1"
+          //Compute for "elem1"
           sommation_sommets = 0.;
           for (int i = 0; i < sommets_elem1.size(); i++)
             {
               sommet_global = sommets_elem1[i];
 
-              //Pour eliminer le dernier sommet
+              //To eliminate the last vertex
               if (sommet_global != domaine.nb_som() - 1)
                 {
                   face_opp = faces_opp_elem1[i];
@@ -213,11 +213,11 @@ DoubleTab& Op_Rot_VEFP1B::ajouter(const DoubleTab& vorticite, DoubleTab& rot) co
           rot(face, composante) += pow(-1., modulo) / (dimension * (dimension + 1)) * sommation_sommets;
 
           //////////////////////////////////////
-          /* Fin de partie (curl w,Psi_c e_i) */
+          /* End of (curl w,Psi_c e_i) part */
           /////////////////////////////////////
-        } //fin du for sur "composante" pour la partie P1 de l'inconnue
+        } //end of for loop over "composante" for the P1 part of the unknown
 
-    } //fin du for sur "face"
+    } //end of for loop over "face"
 
   return rot;
 

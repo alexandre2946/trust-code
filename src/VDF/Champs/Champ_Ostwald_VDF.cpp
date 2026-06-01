@@ -30,12 +30,11 @@ void Champ_Ostwald_VDF::mettre_a_jour(double tps)
   Champ_Don_base::mettre_a_jour(tps);
 }
 
-/*! @brief Calcul la viscosite mu en fonction de la consistance et de l'indice de structure en utilisant la loi d'Ostwald.
+/*! @brief Computes the viscosity mu as a function of consistency and structural index using the Ostwald law.
  *
- * Pour
- *    des viscsites tres faible et tres fortes on utilise une regression
+ * @brief For very low and very high viscosities, a regression is used.
  *
- * @param (DoubleTab&) les viscosite au temps precedent
+ * @param mu_tab Viscosity values at the previous time step.
  */
 
 void Champ_Ostwald_VDF::calculer_mu(DoubleTab& mu_tab)
@@ -54,7 +53,7 @@ void Champ_Ostwald_VDF::calculer_mu(DoubleTab& mu_tab)
           else
             mu_tab[i] = d_k * pow(0.5 * mu_tab[i], (d_n - 1.) / 2.);
         }
-      else  // K varie en fonction de la temperature
+      else  // K varies as a function of temperature
         {
           const DoubleTab& K_tab = mon_fluide_->consistance().valeurs();
           if (mu_tab[i] < 1.E-4)

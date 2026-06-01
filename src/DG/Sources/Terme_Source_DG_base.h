@@ -47,7 +47,7 @@ public:
   Terme_Source_DG_base(const Iterateur_Source_base& iter_base) { iter_ = iter_base; }
 
   int has_interface_blocs() const override { return 1; }
-  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override { }; //rien
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override { }; //nothing to size
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override { iter_->ajouter(secmem); }
   void completer() override;
 

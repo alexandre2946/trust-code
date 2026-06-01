@@ -34,20 +34,20 @@
 #include <Periodique.h>
 #include <Symetrie.h>
 
-/*! @brief Dimensionnement de la matrice qui devra recevoir les coefficients provenant de la convection, de la diffusion pour le cas des faces.
+/*! @brief Dimensioning of the matrix that will receive the coefficients from convection and diffusion for the face-based case.
  *
- *  Cette matrice a une structure de matrice morse.
- *  Nous commencons par calculer les tailles des tableaux tab1 et tab2.
+ *  This matrix has a Morse matrix structure.
+ *  We start by computing the sizes of arrays tab1 and tab2.
  *
  */
 
 void Op_VEF_Face::dimensionner(const Domaine_VEF& le_dom, const Domaine_Cl_VEF& le_dom_cl, Matrice_Morse& la_matrice) const
 {
-  // Dimensionnement de la matrice qui devra recevoir les coefficients provenant de
-  // la convection, de la diffusion pour le cas des faces.
-  // Cette matrice a une structure de matrice morse.
-  // Nous commencons par calculer les tailles des tableaux tab1 et tab2.
-  // Pour ce faire il faut chercher les faces voisines de la face consideree.
+  // Dimensioning of the matrix that will receive the coefficients from
+  // convection and diffusion for the face-based case.
+  // This matrix has a Morse matrix structure.
+  // We start by computing the sizes of arrays tab1 and tab2.
+  // To do so, we need to find the neighbouring faces of the current face.
 
   int nfin = le_dom.nb_faces_tot();
   int nb_faces_elem = le_dom.domaine().nb_faces_elem();
@@ -62,13 +62,13 @@ void Op_VEF_Face::dimensionner(const Domaine_VEF& le_dom, const Domaine_Cl_VEF& 
   const IntTab& elem_faces = le_dom.elem_faces();
   const IntTab& face_voisins = le_dom.face_voisins();
 
-  // A chaque face on associe un tableau d'entiers et une liste de reels:
-  // voisines[i] = {j t.q j>i et M(i,j) est non nul }
+  // For each face, we associate an integer array and a list of reals:
+  // voisines[i] = {j such that j>i and M(i,j) is non-zero }
 
   //  IntVect rang_voisin(nfin*nb_comp);
   IntTrav rang_voisin(nfin * nb_comp);
   rang_voisin = nb_comp;
-  // On traite toutes les faces
+  // Process all faces
   int j;
   ToDo_Kokkos("Port with kokkos ? It will be called once...");
   for (int num_face = 0; num_face < nfin; num_face++)
@@ -96,8 +96,8 @@ void Op_VEF_Face::dimensionner(const Domaine_VEF& le_dom, const Domaine_Cl_VEF& 
         }
     }
 
-  // les faces voisines de num_face etant desormais comtabilisees
-  // nous dimensionnons tab1 et tab2 au nombre de faces
+  // The neighbouring faces of num_face have now been counted;
+  // dimension tab1 and tab2 to the number of faces
 
   tab1(0) = 1;
   for (int num_face = 0; num_face < nfin; num_face++)
@@ -122,7 +122,7 @@ void Op_VEF_Face::dimensionner(const Domaine_VEF& le_dom, const Domaine_Cl_VEF& 
         }
     }
 
-  // On traite toutes les faces
+  // Process all faces
   for (int num_face = 0; num_face < nfin; num_face++)
     {
       int elem1 = face_voisins(num_face, 0);
@@ -161,16 +161,16 @@ void Op_VEF_Face::dimensionner(const Domaine_VEF& le_dom, const Domaine_Cl_VEF& 
     }
 }
 
-/*! @brief Modification des coef de la matrice et du second membre pour les conditions de Dirichlet
+/*! @brief Modify the matrix coefficients and the right-hand side for Dirichlet boundary conditions.
  *
  */
 
 void Op_VEF_Face::modifier_pour_Cl(const Domaine_VEF& le_dom, const Domaine_Cl_VEF& le_dom_cl, Matrice_Morse& la_matrice, DoubleTab& tab_secmem) const
 {
-  // Dimensionnement de la matrice qui devra recevoir les coefficients provenant de
-  // la convection, de la diffusion pour le cas des faces.
-  // Cette matrice a une structure de matrice morse.
-  // Nous commencons par calculer les tailles des tableaux tab1 et tab2.
+  // Dimensioning of the matrix that will receive the coefficients from
+  // convection and diffusion for the face-based case.
+  // This matrix has a Morse matrix structure.
+  // We start by computing the sizes of arrays tab1 and tab2.
   const Conds_lim& les_cl = le_dom_cl.les_conditions_limites();
   const DoubleTab& champ_inconnue = le_dom_cl.equation().inconnue().valeurs();
   const int nb_comp = champ_inconnue.line_size();
@@ -196,11 +196,11 @@ void Op_VEF_Face::modifier_pour_Cl(const Domaine_VEF& le_dom, const Domaine_Cl_V
               {
                 auto idiag = tab1[face * nb_comp + comp] - 1;
                 coeff[idiag] = 1;
-                // pour les voisins
+                // for the neighbours
                 auto nbvois = tab1[face * nb_comp + 1 + comp] - tab1[face * nb_comp + comp];
                 for (auto k = 1; k < nbvois; k++)
                   coeff[idiag + k] = 0;
-                // pour le second membre
+                // for the right-hand side
                 int j = nb_comp == 1 ? 0 : comp;
                 secmem(face, j) = has_val_imp ? val_imp(ind_face, j) : 0.;
               }
@@ -212,7 +212,7 @@ void Op_VEF_Face::modifier_pour_Cl(const Domaine_VEF& le_dom, const Domaine_Cl_V
           const auto& tab1 = la_matrice.get_tab1();
           const auto& tab2 = la_matrice.get_tab2();
           const DoubleTab& face_normales = le_dom.face_normales();
-          ArrOfDouble somme(la_matrice.nb_colonnes()); // On dimensionne au plus grand
+          ArrOfDouble somme(la_matrice.nb_colonnes()); // Dimensioned to the maximum size
           ToDo_Kokkos("critical");
           for (int ind_face = 0; ind_face < nfaces; ind_face++)
             {
@@ -233,7 +233,7 @@ void Op_VEF_Face::modifier_pour_Cl(const Domaine_VEF& le_dom, const Domaine_Cl_V
               normale /= sqrt(n2);
               max_coef = normale[ind_max];
 
-              // On commence par recalculer secmem=secmem-A *present pour pouvoir modifier A (on en profite pour projeter)
+              // Start by recomputing secmem=secmem-A*present to allow modifying A (and project at the same time)
               auto nb_coeff_ligne = tab1[face * nb_comp + 1] - tab1[face * nb_comp];
               for (auto k = 0; k < nb_coeff_ligne; k++)
                 {
@@ -253,11 +253,11 @@ void Op_VEF_Face::modifier_pour_Cl(const Domaine_VEF& le_dom, const Domaine_Cl_V
               for (int comp = 0; comp < nb_comp; comp++)
                 somme_b += tab_secmem(face, comp) * normale[comp];
 
-              // on retire secmem.n n
+              // subtract secmem.n * n
               for (int comp = 0; comp < nb_comp; comp++)
                 tab_secmem(face, comp) -= somme_b * normale[comp];
 
-              // on doit remettre la meme diagonale partout on prend la moyenne
+              // the same diagonal must be set everywhere, take the average
               double ref = 0;
               for (int comp = 0; comp < nb_comp; comp++)
                 {
@@ -277,7 +277,7 @@ void Op_VEF_Face::modifier_pour_Cl(const Domaine_VEF& le_dom, const Domaine_Cl_V
                     }
                   assert(est_egal(la_matrice(j0, j0), ref));
                 }
-              // on annule tous les coef extra diagonaux du bloc
+              // zero all off-diagonal coefficients of the block
               //
               for (auto k = 1; k < nb_coeff_ligne; k++)
                 {
@@ -290,26 +290,26 @@ void Op_VEF_Face::modifier_pour_Cl(const Domaine_VEF& le_dom, const Domaine_Cl_V
                     }
                 }
 
-              // pour les blocs extra diagonaux on assure que Aij.ni=0
+              // for the off-diagonal blocks ensure that Aij.ni=0
               //ArrOfDouble somme(nb_coeff_ligne);
               for (auto k = 0; k < nb_coeff_ligne; k++)
                 {
                   somme[(int)k] = 0;
                   int j = tab2[tab1[face * nb_comp] - 1 + k] - 1;
 
-                  // le coeff j doit exister sur les nb_comp lignes
+                  // the coefficient j must exist on all nb_comp rows
                   double dsomme = 0;
                   for (int comp = 0; comp < nb_comp; comp++)
                     dsomme += la_matrice(face * nb_comp + comp, j) * normale[comp];
 
-                  // on retire somme ni
+                  // subtract sum*ni
 
                   for (int comp = 0; comp < nb_comp; comp++)
-                    // on modifie que les coefficients ne faisant pas intervenir u(face,comp)
+                    // only modify coefficients not involving u(face,comp)
                     if ((j < (face * nb_comp)) || (j >= (face * nb_comp + nb_comp)))
                       la_matrice(face * nb_comp + comp, j) -= (dsomme) * normale[comp];
                 }
-              // Finalement on recalcule secmem=secmem+A*champ_inconnue (A a ete beaucoup modiife)
+              // Finally recompute secmem=secmem+A*champ_inconnue (A has been heavily modified)
               for (auto k = 0; k < nb_coeff_ligne; k++)
                 {
                   for (int comp = 0; comp < nb_comp; comp++)
@@ -326,7 +326,7 @@ void Op_VEF_Face::modifier_pour_Cl(const Domaine_VEF& le_dom, const Domaine_Cl_V
                 double somme_c = 0;
                 for (int comp = 0; comp < nb_comp; comp++)
                   somme_c += tab_secmem(face, comp) * normale[comp];
-                // on retire secmem.n n
+                // subtract secmem.n * n
                 for (int comp = 0; comp < nb_comp; comp++)
                   tab_secmem(face, comp) -= somme_c * normale[comp];
               }
@@ -345,7 +345,7 @@ void Op_VEF_Face::modifier_flux(const Operateur_base& op) const
 
   const Domaine_VEF& le_dom_vef = ref_cast(Domaine_VEF, op.equation().domaine_dis());
   int nb_compo = flux_bords_.dimension(1);
-  // On multiplie le flux au bord par rho*Cp sauf si c'est un operateur de diffusion avec la conductivite comme champ
+  // Multiply the boundary flux by rho*Cp unless it is a diffusion operator with conductivity as the field
   if (op.equation().inconnue().le_nom() == "temperature" && !( sub_type(Operateur_Diff_base,op) && ref_cast(Operateur_Diff_base,op).diffusivite().le_nom() == "conductivite"))
     {
       const Champ_base& rho = op.equation().milieu().masse_volumique();
@@ -360,14 +360,14 @@ void Op_VEF_Face::modifier_flux(const Operateur_base& op) const
       Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_faces_bords, KOKKOS_LAMBDA(
                              const int face)
       {
-        // si on est en QC temperature et si on a calcule div(rhou * T)
-        // il ne faut pas remultiplier par rho
+        // if in QC temperature mode and div(rhou * T) has been computed,
+        // do not multiply by rho again
         flux_bords(face) *= (is_rho_u ? 1 : rho_face(rho_uniforme?0:face)) * Cp_face(cp_uniforme?0:face);
       });
       end_gpu_timer(__KERNEL_NAME__);
     }
 
-  // On multiplie par rho si Navier Stokes incompressible
+  // Multiply by rho if incompressible Navier-Stokes
   Nom nom_eqn = op.equation().que_suis_je();
   if (nom_eqn.debute_par("Navier_Stokes") && pb.milieu().que_suis_je() == "Fluide_Incompressible")
     {
@@ -390,7 +390,7 @@ void Op_VEF_Face::modifier_flux(const Operateur_base& op) const
     }
 }
 
-/*! @brief Impression des flux d'un operateur VEF aux faces (ie: diffusion, convection)
+/*! @brief Print the face fluxes of a VEF operator (e.g. diffusion, convection).
  *
  */
 int Op_VEF_Face::impr(Sortie& os, const Operateur_base& op) const
@@ -411,7 +411,7 @@ int Op_VEF_Face::impr(Sortie& os, const Operateur_base& op) const
   int nb_compo = flux_bords_.dimension(1);
   const Probleme_base& pb = op.equation().probleme();
   const Schema_Temps_base& sch = pb.schema_temps();
-  // On n'imprime les moments que si demande et si on traite l'operateur de diffusion de la vitesse
+  // Print moments only if requested and if treating the velocity diffusion operator
   int impr_mom = 0;
   if (le_dom_vef.domaine().moments_a_imprimer() && sub_type(Operateur_Diff_base, op) && op.equation().inconnue().le_nom() == "vitesse")
     impr_mom = 1;
@@ -419,12 +419,12 @@ int Op_VEF_Face::impr(Sortie& os, const Operateur_base& op) const
   const int impr_sum = (le_dom_vef.domaine().bords_a_imprimer_sum().est_vide() ? 0 : 1);
   const int impr_bord = (le_dom_vef.domaine().bords_a_imprimer().est_vide() ? 0 : 1);
 
-  // Calcul des moments
+  // Compute moments
   DoubleTab xgr;
   if (impr_mom)
     xgr = le_dom_vef.calculer_xgr();
 
-  // On parcours les frontieres pour sommer les flux par frontiere dans le tableau flux_bord
+  // Loop over the boundaries to sum the fluxes per boundary into the flux_bord array
   DoubleVect bilan(nb_compo);
   bilan = 0;
   int nb_cl = le_dom_vef.nb_front_Cl();
@@ -458,7 +458,7 @@ int Op_VEF_Face::impr(Sortie& os, const Operateur_base& op) const
             }
           if (impr_mom)
             {
-              // Calcul du moment exerce par le fluide sur le bord (OM/\F)
+              // Compute the moment exerted by the fluid on the boundary (OM x F)
               if (Objet_U::dimension == 2)
                 flux_bords(3, num_cl, 0) += flux_bords_(face, 1) * xgr(face, 0) - flux_bords_(face, 0) * xgr(face, 1);
               else
@@ -468,13 +468,13 @@ int Op_VEF_Face::impr(Sortie& os, const Operateur_base& op) const
                   flux_bords(3, num_cl, 2) += flux_bords_(face, 1) * xgr(face, 0) - flux_bords_(face, 0) * xgr(face, 1);
                 }
             }
-        } // fin for face
-    } // fin for num_cl
+        } // end for face
+    } // end for num_cl
 
-  // On somme les contributions de chaque processeur
+  // Sum the contributions from each processor
   Process::mp_sum_for_each_item(flux_bords);
 
-  // Ecriture dans les fichiers
+  // Write to files
   if (Process::je_suis_maitre())
     {
       op.ouvrir_fichier(Flux, "", 1);
@@ -508,12 +508,12 @@ int Op_VEF_Face::impr(Sortie& os, const Operateur_base& op) const
               if (le_dom_vef.domaine().bords_a_imprimer_sum().contient(la_fr.le_nom()))
                 Flux_sum.add_col(flux_bords(0, num_cl, k));
 
-              // On somme les flux de toutes les frontieres pour mettre dans le tableau bilan
+              // Sum the fluxes from all boundaries into the bilan array
               bilan(k) += flux_bords(0, num_cl, k);
             }
         }
 
-      // On imprime les bilans et on va a la ligne
+      // Print the balance values and go to a new line
       for (int k = 0; k < nb_compo; k++)
         Flux.add_col(bilan(k));
       Flux << finl;
@@ -528,7 +528,7 @@ int Op_VEF_Face::impr(Sortie& os, const Operateur_base& op) const
     {
       EcrFicPartage Flux_face;
       op.ouvrir_fichier_partage(Flux_face, "", impr_bord);
-      // Impression sur chaque face si demande
+      // Print per face if requested
       for (int num_cl = 0; num_cl < nb_cl; num_cl++)
         {
           const Frontiere_dis_base& la_fr = op.equation().domaine_Cl_dis().les_conditions_limites(num_cl)->frontiere_dis();
@@ -536,7 +536,7 @@ int Op_VEF_Face::impr(Sortie& os, const Operateur_base& op) const
           const Front_VF& frontiere_dis = ref_cast(Front_VF, la_cl->frontiere_dis());
           int ndeb = frontiere_dis.num_premiere_face();
           int nfin = ndeb + frontiere_dis.nb_faces();
-          // Impression sur chaque face
+          // Print per face
           if (Liste_bords_a_imprimer.contient(la_fr.le_nom()))
             {
               Flux_face << "# Flux par face sur " << la_fr.le_nom() << " au temps ";
@@ -562,7 +562,7 @@ int Op_VEF_Face::impr(Sortie& os, const Operateur_base& op) const
 }
 
 /////////////////////////////////////////
-// Methode pour l'implicite
+// Method for the implicit scheme
 /////////////////////////////////////////
 void modif_matrice_pour_periodique_avant_contribuer(Matrice_Morse& matrice_morse, const Equation_base& eqn)
 {
@@ -577,8 +577,8 @@ void modif_matrice_pour_periodique_avant_contribuer(Matrice_Morse& matrice_morse
       if (sub_type(Periodique, la_cl.valeur()))
         {
           const Periodique& la_cl_perio = ref_cast(Periodique, la_cl.valeur());
-          // on ne parcourt que la moitie des faces periodiques
-          // on copiera a la fin le resultat dans la face associe..
+          // only iterate over half the periodic faces;
+          // the result will be copied to the associated face at the end
           const Front_VF& le_bord = ref_cast(Front_VF, la_cl->frontiere_dis());
           int num1 = le_bord.num_premiere_face();
           int num2 = num1 + le_bord.nb_faces() / 2;
@@ -647,8 +647,8 @@ void modif_matrice_pour_periodique_apres_contribuer(Matrice_Morse& matrice_morse
       if (sub_type(Periodique, la_cl.valeur()))
         {
           const Periodique& la_cl_perio = ref_cast(Periodique, la_cl.valeur());
-          // on ne parcourt que la moitie des faces periodiques
-          // on copiera a la fin le resultat dans la face associe..
+          // only iterate over half the periodic faces;
+          // the result will be copied to the associated face at the end
           const Front_VF& le_bord = ref_cast(Front_VF, la_cl->frontiere_dis());
           int num1 = le_bord.num_premiere_face();
           int num2 = num1 + le_bord.nb_faces() / 2;
@@ -718,32 +718,32 @@ void modif_matrice_pour_periodique_apres_contribuer(Matrice_Morse& matrice_morse
     }
 }
 
-/*! @brief divise les coefficients sur les ligne des faces periodiques par 2 en prevision de l'application modifier_matrice_pour_periodique_apres_contribuer qui va sommer les 2 lignes des faces periodiques associees
+/*! @brief Divides the coefficients on the periodic face rows by 2 in preparation for applying modifier_matrice_pour_periodique_apres_contribuer, which will sum the 2 rows of the associated periodic faces.
  *
  */
 
 void Op_VEF_Face::modifier_matrice_pour_periodique_avant_contribuer(Matrice_Morse& matrice, const Equation_base& eqn) const
 {
-  // si matrice_morse_diag pas de contribution n0 n0perio
+  // if matrice_morse_diag, no contribution n0 n0perio
   if (sub_type(Matrice_Morse_Diag, matrice))
     return;
   modif_matrice_pour_periodique_avant_contribuer(matrice, eqn);
 }
-/*! @brief Somme  les 2 lignes des faces periodiques associees permet de calculer dans le code sans se poser de question pour retrouver la face_associee
+/*! @brief Sums the 2 rows of the associated periodic faces, allowing computations in the code without needing to find the associated face.
  *
- *  on ne parcourt que la moitiee des faces periodiques dans contribuer_a_avec (en general).
+ *  Only half the periodic faces are iterated over in contribuer_a_avec (in general).
  *
  */
 
 void Op_VEF_Face::modifier_matrice_pour_periodique_apres_contribuer(Matrice_Morse& matrice, const Equation_base& eqn) const
 {
-  // si matrice_morse_diag pas de contribution n0 n0perio
+  // if matrice_morse_diag, no contribution n0 n0perio
   if (sub_type(Matrice_Morse_Diag, matrice))
     return;
 
   modif_matrice_pour_periodique_apres_contribuer(matrice, eqn);
 
-  // verification que la matrice est bien periodique
+  // verify that the matrix is properly periodic
 #ifndef  NDEBUG
 
   const int nb_comp = eqn.inconnue().valeurs().line_size();
@@ -766,8 +766,8 @@ void Op_VEF_Face::modifier_matrice_pour_periodique_apres_contribuer(Matrice_Mors
         {
           const Periodique& la_cl_perio = ref_cast(Periodique, la_cl.valeur());
           int fac_asso;
-          // on ne parcourt que la moitie des faces periodiques
-          // on copiera a la fin le resultat dans la face associe..
+          // only iterate over half the periodic faces;
+          // the result will be copied to the associated face at the end
           int num2 = num1 + le_bord.nb_faces() / 2;
           for (int num_face = num1; num_face < num2; num_face++)
             for (int nc = 0; nc < nb_comp; nc++)
@@ -775,7 +775,7 @@ void Op_VEF_Face::modifier_matrice_pour_periodique_apres_contribuer(Matrice_Mors
                 fac_asso = la_cl_perio.face_associee(num_face - num1) + num1;
                 int n0 = num_face * nb_comp + nc;
                 int n0perio = fac_asso * nb_comp + nc;
-                // on verifie que les 2 lignes sont identiques ( sauf la case diagonale qui n'est pas au meme endroit)
+                // verify that the 2 rows are identical (except for the diagonal entry which is not in the same position)
                 for (auto j = tab1[n0] - 1; j < tab1[n0 + 1] - 1; j++)
                   {
                     int c = tab2[j] - 1;

@@ -38,8 +38,8 @@ Entree& Multiplicateur_diphasique_Muhler_Steinhagen::readOn(Entree& is)
 
   const Pb_Multiphase *pbm = sub_type(Pb_Multiphase, pb_.valeur()) ? &ref_cast(Pb_Multiphase, pb_.valeur()) : nullptr;
 
-  if (!pbm || pbm->nb_phases() == 1) n_l = 0, n_g = -1; //pas un Pb_Multiphase -> monophasique liquide
-  else for (int n = 0; n < pbm->nb_phases(); n++) //recherche de n_l, n_g : phase {liquide,gaz}_continu en priorite
+  if (!pbm || pbm->nb_phases() == 1) n_l = 0, n_g = -1; //not a Pb_Multiphase -> single-phase liquid
+  else for (int n = 0; n < pbm->nb_phases(); n++) //search for n_l, n_g: continuous {liquid,gas} phase with priority
       if (pbm->nom_phase(n).debute_par("liquide") && (n_l < 0 || pbm->nom_phase(n).finit_par("continu")))  n_l = n;
       else if (pbm->nom_phase(n).debute_par("gaz") && (n_g < 0 || pbm->nom_phase(n).finit_par("continu"))) n_g = n;
 
@@ -53,10 +53,10 @@ void Multiplicateur_diphasique_Muhler_Steinhagen::coefficient(const double *alph
                                                               const double Fm, DoubleTab& coeff) const
 {
   int min_ = min_sensas_ || min_lottes_flinn_;
-  double G = alpha[n_l] * rho[n_l] * std::fabs(v[n_l]) + alpha[n_g] * rho[n_g] * std::fabs(v[n_g]), //debit total
-         x = G ? alpha[n_g] * rho[n_g] * v[n_g] / G : 0, //titre
+  double G = alpha[n_l] * rho[n_l] * std::fabs(v[n_l]) + alpha[n_g] * rho[n_g] * std::fabs(v[n_g]), //total mass flux
+         x = G ? alpha[n_g] * rho[n_g] * v[n_g] / G : 0, //quality
          fm_sur_rhom = (f[n_l] / rho[n_l] + a_ * (f[n_g] / rho[n_g] - f[n_l] / rho[n_l]) * std::pow(x, b_)) * std::pow(1 - x, 1. / c_) + f[n_g] / rho[n_g] * std::pow(x, c_),
-         frac_g = std::min(std::max((alpha[n_g] - alpha_min_) / (alpha_max_ - alpha_min_), 0.), 1.), frac_l = 1 - frac_g, //fraction appliquee au liquide
+         frac_g = std::min(std::max((alpha[n_g] - alpha_min_) / (alpha_max_ - alpha_min_), 0.), 1.), frac_l = 1 - frac_g, //fraction applied to the liquid
          mul = min_sensas_ ? std::min(1., 1.4429 * std::pow(alpha[n_l], 0.6492)) : 1;
   coeff = 0;
   /* si min_ == 1 et si Lottes-Flinn/SENSAS donne un frottement plus bas -> on le prend */

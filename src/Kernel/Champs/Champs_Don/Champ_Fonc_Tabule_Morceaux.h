@@ -23,11 +23,12 @@
 
 class Champ_base;
 
-/*! @brief classe Champ_Fonc_Tabule_Morceaux Cette classe represente un champ prenant par morceaux des valuers fonctions
+/*! @brief class Champ_Fonc_Tabule_Morceaux
  *
- *      de l'espace et d'un autre champ scalaire passe en parametre .
+ * @brief This class represents a piecewise field whose values are functions
+ *      of space and of another scalar field passed as parameter.
  *
- * @sa : TRUSTChamp_Morceaux_generique
+ * @sa TRUSTChamp_Morceaux_generique
  */
 class Champ_Fonc_Tabule_Morceaux : public TRUSTChamp_Morceaux_generique<Champ_Morceaux_Type::FONC_TABULE>
 {
@@ -40,18 +41,18 @@ protected :
   bool is_interp_ = false;
   using ArrStr = std::array<std::string, 3>;
 
-  std::set<ArrStr> s_pb_ch; // couples { probleme, champ, nature } utilises par au moins un probleme
-  std::vector<std::vector<ArrStr>> m_pb_ch; //m_pb_ch[i][j] : { probleme, champ, nature } du parametre j du morceau i
-  std::vector<const Champ_base *> ch_param; /* liste de champs parametres */
+  std::set<ArrStr> s_pb_ch; // pairs { problem, field, nature } used by at least one problem
+  std::vector<std::vector<ArrStr>> m_pb_ch; //m_pb_ch[i][j] : { problem, field, nature } of parameter j of piece i
+  std::vector<const Champ_base *> ch_param; /* list of parameter fields */
 
-  /* un morceau de champ */
+  /* a piece of the field */
   typedef struct
   {
-    std::vector<int> i_ch; /* indices des champs parametres utilises pour ce morceau */
+    std::vector<int> i_ch; /* indices of the parameter fields used for this piece */
     Table la_table;
   } CHTAB;
-  std::vector<CHTAB> morceaux; /* les morceaux */
-  IntVect i_mor; //i_mor[e] : morceau de l'element e
+  std::vector<CHTAB> morceaux; /* the pieces */
+  IntVect i_mor; //i_mor[e] : piece index of element e
   OWN_PTR(Champ_base) espace_stockage_;
 };
 

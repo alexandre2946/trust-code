@@ -47,15 +47,15 @@ protected:
 
   double omega_;
   int algo_fortran_, avec_assert_;
-  // Membres initialises par la methode prepare()
-  // Drapeaux des items a traiter (meme structure que le second membre) (traitement des items communs si algo_items_communs_)
+  // Members initialised by the prepare() method
+  // Flags for items to process (same structure as the RHS) (shared items handled if algo_items_communs_)
   IntTab items_a_traiter_;
-  // pour chaque partie du vecteur, y a-t-il des items communs ?
+  // For each part of the vector: are there any shared items?
   int algo_items_communs_;
-  // Le descripteur du second membre (utiliser pour verifier qu'on a initialise l'algo)
+  // Descriptor of the RHS (used to verify that the algorithm has been initialised)
   MD_Vector md_secmem_;
   int line_size_;
-  // Precalcul de omega divise par le coefficient diagonal de la matrice
+  // Precomputed omega divided by the diagonal coefficient of the matrix
   ArrOfDouble omega_diag_;
 };
 

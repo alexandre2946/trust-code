@@ -16,18 +16,18 @@
 #ifndef VDF_discretisation_included
 #define VDF_discretisation_included
 
-/*! @brief class VDF_discretisation classe qui gere la dicretisation VDF du probleme
+/*! @brief class VDF_discretisation
  *
- *     c'est ici que :
- *     * l'on discretise les proprietes physiques du fluide et notemment celui du fluide
- *        d'Ostwald( K, N, Mu, ...)
- *     * l'on associe le champ d'Ostwald, le fluide et le domaine_dis_base
- *     ** ( nouvelles procedures :
+ *   This class manages the VDF discretization of the problem.
+ *   Here:
+ *   * the physical properties of the fluid are discretized, notably for the Ostwald fluid (K, N, Mu, ...)
+ *   * the Ostwald field, the fluid and the domaine_dis_base are associated
+ *   * (new procedures:
  *   void proprietes_physiques_fluide_Ostwald(Domaine_dis_base& ,Fluide_Ostwald& ,
  *            const Navier_Stokes_std& , const Champ_Inc_base& ) const;
- *    a besoin de la classe Fluide_Ostwald pour avoir acces au fluide etudie
- *                          Navier_Stokes_Std pour avoir acces a l'equation hydraulique
- *                          (donc a la vitesse
+ *    needs the Fluide_Ostwald class to access the studied fluid,
+ *    and Navier_Stokes_Std to access the hydraulic equation
+ *    (hence the velocity)
  *
  * @sa Discret_Thyd_Turb
  */
@@ -47,7 +47,7 @@ class VDF_discretisation: public Discret_Thyd
 
 public:
   //
-  // Methodes surchargees de Discretisation_base
+  // Methods overriding Discretisation_base
   //
   void discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& nom, const Noms& unite, int nb_comp, int nb_pas_dt, double temps,
                          OWN_PTR(Champ_Inc_base) &champ,

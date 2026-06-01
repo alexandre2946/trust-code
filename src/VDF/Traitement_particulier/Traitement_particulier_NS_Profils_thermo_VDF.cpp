@@ -143,7 +143,7 @@ void Traitement_particulier_NS_Profils_thermo_VDF::post_traitement_particulier()
   double tps = mon_equation->inconnue().temps();
 
 
-  // On ne fait des statistiques sur le champ thermique que si l'on fait des statistiques sur le champ dynamique en meme temps.
+  // Statistics on the thermal field are only computed simultaneously with statistics on the dynamic field.
   if ((oui_u_inst != 0)&&(oui_stats_thermo != 0))
     {
       calculer_moyennes_spatiales_thermo(Tmoy_m,Trms_m,upTp_m,vpTp_m,wpTp_m,corresp_uv_m,compt_uv_m,Nuv,xUVm);
@@ -159,16 +159,16 @@ void Traitement_particulier_NS_Profils_thermo_VDF::post_traitement_particulier()
     }
 
 
-  // Moyennes temporelles :
+  // Temporal averages:
 
-  // On ne fait des statistiques sur le champ thermique que si l'on fait des statistiques sur le champ dynamique en meme temps.
+  // Statistics on the thermal field are only computed simultaneously with statistics on the dynamic field.
   if ((oui_u_inst != 0)&&(oui_stats_thermo != 0)&&(oui_stat != 0))
     {
       double tpsbis = mon_equation->inconnue().temps();
       if ((tpsbis>=temps_deb)&&(tpsbis<=temps_fin))
         {
           static int init_stat_temps = 0;
-          if((init_stat_temps==0)&&( oui_repr != 1))  // si ce n est pas une reprise : sinon valeurs lues dans le fichier
+          if((init_stat_temps==0)&&( oui_repr != 1))  // if this is not a restart: otherwise values are read from the file
             {
               double dt_v = mon_equation->schema_temps().pas_de_temps();
               temps_deb = tpsbis-dt_v;
@@ -196,7 +196,7 @@ void Traitement_particulier_NS_Profils_thermo_VDF::post_traitement_particulier()
 
 
 
-// #################### Calcul Moyennes #################################
+// #################### Compute Averages #################################
 
 void Traitement_particulier_NS_Profils_thermo_VDF::calculer_moyennes_spatiales_thermo(DoubleTab& tmoy, DoubleTab& trms, DoubleTab& uptp, DoubleTab& vptp, DoubleTab& wptp, const IntTab& corresp, const IntTab& compt, const IntVect& NN, const DoubleTab& xUV)
 {
@@ -205,22 +205,22 @@ void Traitement_particulier_NS_Profils_thermo_VDF::calculer_moyennes_spatiales_t
   const Domaine_VDF& domaine_VDF=ref_cast(Domaine_VDF, zdisbase);
   const IntTab& elem_faces = domaine_VDF.elem_faces();
 
-  // Pour trouver les coordonnees des points de temperature max et min :
+  // To find the coordinates of the max and min temperature points:
   const DoubleTab& xp = domaine_VDF.xp();
 
-  // Le nombre d'elements du domaine VDF.
+  // The number of elements in the VDF domain.
   int nb_elems = domaine_VDF.domaine().nb_elem();
 
-  // On veut acceder aux valeurs des 3 composantes de la vitesse a partir de mon_equation.
+  // Access the values of the 3 velocity components from mon_equation.
   const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
 
-  // On veut acceder aux valeurs de la temperature a partir de mon_equation_NRJ.
+  // Access the temperature values from mon_equation_NRJ.
   const DoubleTab& Temp = mon_equation_NRJ->inconnue().valeurs();
 
 
 
-  // Ces 3 vecteurs comportent les valeurs des 3 composantes U, V et W moyennees au centre des elements et sur tout l'espace.
-  // Ils correspondent a <U>, <V> et <W>.
+  // These 3 vectors hold the values of the 3 velocity components U, V and W averaged at element centers over the entire space.
+  // They correspond to <U>, <V> and <W>.
   DoubleTab u_moy_cent(n_probes,Nap);
   u_moy_cent= 0.;
   DoubleTab v_moy_cent(n_probes,Nap);
@@ -228,29 +228,29 @@ void Traitement_particulier_NS_Profils_thermo_VDF::calculer_moyennes_spatiales_t
   DoubleTab w_moy_cent(n_probes,Nap);
   w_moy_cent= 0.;
 
-  // t2moy correspond
+  // t2moy corresponds to
   DoubleTab t2moy(n_probes,Nap);
   t2moy     = 0.;
 
-  // vitu, vitv et vitw sont les valeurs des 3 composantes de la vitesse prises au centre de l'element,
-  // c'est a dire moyennees.
+  // vitu, vitv and vitw are the values of the 3 velocity components taken at element centers,
+  // i.e. averaged.
   double vitu,vitv,vitw;
 
-  // Pour verification des bornes de temperature en canal plan
+  // For checking temperature bounds in plane channel flow
   double Tmin=1000000000.,Tmax=0.;
   int elem_min=0, elem_max=0;
 
-  // On se sert de face_ui_j pour avoir le numero de la face portant la composante de la vitesse ui
-  // et 0 et 1 etant les deux faces qui se font face pour faire une moyenne au centre de l'element.
-  // On doit procede comme ca entre autre parceque l'on va parcourir les elements.
+  // face_ui_j is used to get the face number carrying the velocity component ui,
+  // with 0 and 1 being the two opposing faces used to average at the element center.
+  // This approach is necessary among other reasons because we iterate over elements.
   int face_u_0,face_u_1,face_v_0,face_v_1,face_w_0,face_w_1;
 
   int i,j,deja_fait=0;
   int num_elem;
 
-  // tmoy est la moyenne de T : <T>(y,t)
+  // tmoy is the mean of T : <T>(y,t)
   tmoy = 0.;
-  // trms est l'ecart-type de la temperature : sqrt(<Tp^2>)(y,t)=<T^2>-<T>^2
+  // trms is the standard deviation of temperature : sqrt(<Tp^2>)(y,t)=<T^2>-<T>^2
   trms = 0.;
   // uptp : <U><T>-<UT>
   uptp = 0.;
@@ -261,7 +261,7 @@ void Traitement_particulier_NS_Profils_thermo_VDF::calculer_moyennes_spatiales_t
 
   for(i=0; i<n_probes; i++)
     {
-      // On parcourt tous les elements pour faire toutes les moyennes au centre des elements.
+      // We iterate over all elements to compute all averages at element centers.
       for (num_elem=0; num_elem<nb_elems; num_elem++)
         {
           // <T>
@@ -285,15 +285,15 @@ void Traitement_particulier_NS_Profils_thermo_VDF::calculer_moyennes_spatiales_t
               v_moy_cent(i,corresp(i,num_elem)) += vitv;
               // <W>
               w_moy_cent(i,corresp(i,num_elem)) += vitw;
-              // Trms : en fait ici on calcul <T^2> mais ensuite on va soustraire la partie <T>^2
+              // Trms : here we compute <T^2> but then subtract the <T>^2 part
               trms(i,corresp(i,num_elem)) += Temp[num_elem]*Temp[num_elem];
-              // On calcule <uT>, <vT>, et <wT>
+              // Compute <uT>, <vT>, and <wT>
               uptp(i,corresp(i,num_elem)) += vitu*Temp[num_elem];
               vptp(i,corresp(i,num_elem)) += vitv*Temp[num_elem];
               wptp(i,corresp(i,num_elem)) += vitw*Temp[num_elem];
             }
 
-          // Pour trouver les temperatures max et min dans l'ecoulement.
+          // To find the max and min temperatures in the flow.
           if(Temp[num_elem]<Tmin)
             {
               Tmin=Temp[num_elem];
@@ -305,7 +305,7 @@ void Traitement_particulier_NS_Profils_thermo_VDF::calculer_moyennes_spatiales_t
               elem_max=num_elem;
             }
 
-        }//FIN boucle sur les elements
+        }//END loop over elements
 
       if((tmin_tmax==1)&&(deja_fait==0))
         {
@@ -317,13 +317,13 @@ void Traitement_particulier_NS_Profils_thermo_VDF::calculer_moyennes_spatiales_t
           fic1.close();
           deja_fait=1;
         }
-    } // On a parcouru tous les profils
+    } // All profiles have been iterated over
 
-  // NN correspond au nombre de valeurs differentes pour Y, c'est a dire le nombre de points de la courbe finale apres moyenne.
+  // NN is the number of distinct Y values, i.e. the number of points in the final curve after averaging.
 
-  // compt[j] correspond au nombre d'elements qui ont ete utilises pour calculer une meme valeur de temperature moyenne,
-  // ie le nombre d'elements ayant la meme coordonnee Y.
-  // POUR LE PARALLELE !!
+  // compt[j] is the number of elements that were used to compute a given mean temperature value,
+  // i.e. the number of elements sharing the same Y coordinate.
+  // FOR PARALLEL !!
   IntTab compt_p(compt);
   envoyer(compt_p,Process::me(),0,Process::me());
 
@@ -423,15 +423,15 @@ void Traitement_particulier_NS_Profils_thermo_VDF::calculer_moyennes_spatiales_t
               vptp(i,j) -= v_moy_cent(i,j)*tmoy(i,j);
               wptp(i,j) -= w_moy_cent(i,j)*tmoy(i,j);
             }
-        }// Fin boucle sur les profils
+        }// End loop over profiles
 
-    }// FIN Parallele
+    }// END Parallel section
 
 }
 
 
 
-// #################### Calcul Integrale Temporelle ###############################
+// #################### Compute Temporal Integral ###############################
 
 void Traitement_particulier_NS_Profils_thermo_VDF::calculer_integrales_temporelles(DoubleTab& moy_temp, const DoubleTab& moy_spat_m, const DoubleTab& moy_spat_p, const DoubleVect& delta_m, const DoubleVect& delta_p)
 {
@@ -456,7 +456,7 @@ void Traitement_particulier_NS_Profils_thermo_VDF::calculer_integrales_temporell
 
 
 
-// #################### Ecriture Moyennes Spatiales dans Fichier ##################
+// #################### Writing Spatial Averages to File ##################
 
 
 void Traitement_particulier_NS_Profils_thermo_VDF::ecriture_fichier_moy_spat_thermo(const DoubleTab& Tmoy_m, const DoubleTab& Trms_m, const DoubleTab& upTp_m, const DoubleTab& vpTp_m, const DoubleTab& wpTp_m, const DoubleTab& Tmoy_p, const DoubleTab& Trms_p, const DoubleTab& upTp_p, const DoubleTab& vpTp_p, const DoubleTab& wpTp_p, const DoubleTab& Y, const IntVect& NN, const DoubleVect& delta_m,  const DoubleVect& delta_p)
@@ -523,15 +523,15 @@ void Traitement_particulier_NS_Profils_thermo_VDF::ecriture_fichier_moy_spat_the
             fic << Y(i,j) << " " << Tmoy(i,j) << " " << sqrt(std::max(Trms(i,j),0.0)) << " " << upTp(i,j) << " " << -vpTp(i,j) << " " << -wpTp(i,j) << finl;
           fic.flush();
           fic.close();
-        } //Fin du si je suis maitre
-    }//FIN de boucle sur les probes
+        } //End of "if I am master"
+    }//END loop over probes
 }
 
 
 
 
 
-// #################### Ecriture Moyennes temporelles dans Fichier ################
+// #################### Writing Temporal Averages to File ################
 
 void Traitement_particulier_NS_Profils_thermo_VDF::ecriture_fichier_moy_temp_thermo(const DoubleTab& Tmoy, const DoubleTab& Trms, const DoubleTab& upTp, const DoubleTab& vpTp, const DoubleTab& wpTp, const DoubleTab& Y, const double dt, const IntVect& NN)
 {
@@ -581,14 +581,14 @@ void Traitement_particulier_NS_Profils_thermo_VDF::ecriture_fichier_moy_temp_the
           fic.flush();
           fic.close();
         }
-    }//FIN boucle sur les probes
+    }//END loop over probes
 }
 
 
 
 
 
-// #################### Sauvegarde des statistiques temporelles ###################
+// #################### Saving temporal statistics ###################
 
 void Traitement_particulier_NS_Profils_thermo_VDF::sauver_stat() const
 {
@@ -599,14 +599,14 @@ void Traitement_particulier_NS_Profils_thermo_VDF::sauver_stat() const
   if (  (oui_stat == 1)&&(tps>=temps_deb)&&(tps<=temps_fin) )
     {
       Cerr << "In Traitement_particulier_NS_Profils_thermo_VDF::sauver_stat" << finl;
-      // On sauve la somme (sans diviser par dt)
+      // Save the sum (without dividing by dt)
       int i,j;
       Nom temps = Nom(tps);
       Nom fich_sauv_temp ="temperature_field_avg_time_";
       fich_sauv_temp+=temps;
       fich_sauv_temp+=".sauv";
 
-      // On sauve u_moy!!
+      // Save u_moy!!
       EcrFicCollecteBin fict (fich_sauv_temp);
       fict << temps << finl;
       for(i=0; i<n_probes; i++)
@@ -737,16 +737,16 @@ void  Traitement_particulier_NS_Profils_thermo_VDF::init_calcul_moyenne()
 void  Traitement_particulier_NS_Profils_thermo_VDF::preparer_calcul_particulier()
 {
   if ((oui_u_inst != 0)||(oui_profil_nu_t != 0))
-    // On fait appel uniquement a la methode dans NS_Profils_VDF pour initialiser
-    // le calcul des moyennes puisque on y fait uniquement la creation des tableaux
-    // de correspondance et le dimensionnement des grandeurs Yuv et Nuv.
+    // Call only the method in NS_Profils_VDF to initialize
+    // the averaging computation, since only the correspondence tables
+    // and the sizing of Yuv and Nuv quantities are done there.
 
     Traitement_particulier_NS_Profils_VDF::init_calcul_moyenne();
 
   if (oui_stat != 0)
-    // Par contre, pour debuter le calcul des stats il faut faire un petit traitement
-    // pour la thermo puisqu'il faut dimensionner les tableaux des moyennes temporelles
-    // specifiques a la thermo, ainsi que ceux de l'hydraulique classique dans NS_Profils.
+    // However, to start computing the stats a small processing step is needed
+    // for the thermo since the arrays for the temporal averages
+    // specific to thermo, as well as those of the classical hydraulics in NS_Profils, must be sized.
 
     init_calcul_stats();
 }
@@ -760,9 +760,9 @@ void Traitement_particulier_NS_Profils_thermo_VDF::init_calcul_stats()
 
   if (oui_repr_stats_thermo!=1)
     {
-      // L'utilisateur ne demande pas de reprise, c'est a dire qu'il n'y aura pas de lecture
-      // dans un fichier et qu'il faut donc dimensionner nos tableaux nous meme pour debuter les statistiques.
-      // Ces tableaux sont declares dans le Traitement_particulier_NS_Profils_thermo_VDF.h
+      // The user does not request a restart, meaning there will be no reading
+      // from a file and the arrays must therefore be sized manually to start the statistics.
+      // These arrays are declared in Traitement_particulier_NS_Profils_thermo_VDF.h
 
       Tmoy_temp.resize(n_probes,Nap);
       Tmoy_temp=0;

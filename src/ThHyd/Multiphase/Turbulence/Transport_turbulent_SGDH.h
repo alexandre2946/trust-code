@@ -18,11 +18,10 @@
 #include <TRUSTTab.h>
 #include <Transport_turbulent_base.h>
 
-/*! @brief classe Transport_turbulent_SGDH Transport turbulent de type SGDH:
+/*! @brief Simple Gradient Diffusion Hypothesis (SGDH) turbulent transport model:
  *
  *     < u'_i theta'> = - nu_t / Pr_t d_i theta = - sigma_t nu_t d_i theta
- *     (l'utilisateur peut donner sigma_t ou Pr_t)
- *
+ *     (the user may supply either sigma_t or Pr_t)
  *
  */
 class Transport_turbulent_SGDH : public Transport_turbulent_base
@@ -37,9 +36,9 @@ public:
   inline double sigma() const {return sigma_;};
 
 private:
-  double sigma_ = 1; //facteur multiplicatif
-  int no_alpha_ = 0; // no_alpha = 1 pour equation sur omega
-  int gas_turb_ = 0 ; // Si 0, pas de turbulence dans la phase gazeuse ; si 1, il y en a
+  double sigma_ = 1; // multiplicative factor
+  int no_alpha_ = 0; // no_alpha = 1 for the omega equation
+  int gas_turb_ = 0 ; // 0: no turbulence in the gas phase; 1: turbulence present
 
 };
 

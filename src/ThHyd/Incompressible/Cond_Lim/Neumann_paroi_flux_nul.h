@@ -18,7 +18,7 @@
 
 #include <Neumann_paroi_adiabatique.h>
 
-/*! @brief Classe Neumann_paroi_flux_nul Cette condition limite flux nul a la frontiere.
+/*! @brief Classe Neumann_paroi_flux_nul This boundary condition imposes a zero flux at the boundary.
  *
  * @sa Neumann_homogene Neumann_paroi_adiabatique
  */

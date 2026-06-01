@@ -28,10 +28,10 @@
 
 Implemente_instanciable_sans_constructeur(Matrice_Morse,"Matrice_Morse",Matrice_Base);
 
-/*! @brief Ecrit les trois tableaux de la structure de stockage Morse sur un flot de sortie.
+/*! @brief Writes the three arrays of the Morse storage structure to an output stream.
  *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie& s) le flot de sortie modifie
+ * @param (Sortie& s) an output stream
+ * @return (Sortie& s) the modified output stream
  */
 Sortie& Matrice_Morse::printOn(Sortie& s) const
 {
@@ -42,11 +42,11 @@ Sortie& Matrice_Morse::printOn(Sortie& s) const
   return s;
 }
 
-/*! @brief NON CODE
+/*! @brief NOT IMPLEMENTED
  *
- * @param (Entree& s) un flot d'entree
- * @return (Entree& s) le flot d'entree
- * @throws NON CODE
+ * @param (Entree& s) an input stream
+ * @return (Entree& s) the input stream
+ * @throws NOT IMPLEMENTED
  */
 Entree& Matrice_Morse::readOn(Entree& s)
 {
@@ -219,11 +219,11 @@ void Matrice_Morse::WriteFileMTX(const Nom& name) const
       mtx << row+1 << " " << get_tab2()[j-1] << " " << get_coeff()[j-1] << finl;
 }
 
-/*! @brief Constructeur par copie d'une Matrice_Morse.
+/*! @brief Copy constructor of a Matrice_Morse.
  *
- * Copie de chaque membre donne du paramtre.
+ * Copies each member of the given parameter.
  *
- * @param (Matrice_Morse& acopier) la matrice morse a copier
+ * @param (Matrice_Morse& acopier) the Morse matrix to copy
  */
 Matrice_Morse::Matrice_Morse(const Matrice_Morse& acopier) :Matrice_Base(),
   tab1_(acopier.tab1_),
@@ -236,13 +236,12 @@ Matrice_Morse::Matrice_Morse(const Matrice_Morse& acopier) :Matrice_Base(),
   morse_matrix_structure_has_changed_=1, sorted_ = 0;
   is_stencil_up_to_date_ = acopier.is_stencil_up_to_date_ ;
 }
-/*! @brief Constructeur d'une matrice Morse carree d'ordre n et pouvant stocker au maximum nnz elements non nuls.
+/*! @brief Constructor of a square Morse matrix of order n that can store at most nnz non-zero elements.
  *
- *     Egalement constructeur par defaut car les 2 parametres
- *     ont une valeur par defaut.
+ *     Also the default constructor as both parameters have a default value.
  *
- * @param (int n) l'ordre de la matrice carree a construire
- * @param (int nnz) le nombre d'elements non nuls que pourra stocker la matrice.
+ * @param (int n) the order of the square matrix to construct
+ * @param (int nnz) the number of non-zero elements the matrix can store.
  */
 template<typename _SIZE_>
 Matrice_Morse::Matrice_Morse(int n, _SIZE_ nnz) :
@@ -263,11 +262,11 @@ Matrice_Morse::Matrice_Morse()
 }
 
 
-/*! @brief Constructeur d'une matrice Morse avec n lignes et m colonnes pouvant stocker au maximum nnz elements non nuls.
+/*! @brief Constructor of a Morse matrix with n rows and m columns that can store at most nnz non-zero elements.
  *
- * @param (int n) le nombre de ligne de la matrice
- * @param (int m) le nombre de colonne de la matrice
- * @param (int nnz) le nombre d'elements non nuls que pourra stocker la matrice.
+ * @param (int n) the number of rows of the matrix
+ * @param (int m) the number of columns of the matrix
+ * @param (int nnz) the number of non-zero elements the matrix can store.
  */
 template<typename _SIZE_>
 Matrice_Morse::Matrice_Morse(int n, int m, _SIZE_ nnz):
@@ -309,29 +308,29 @@ void Matrice_Morse::dimensionner(int n, _SIZE_ nnz)
 }
 
 
-/*! @brief Redimensionne la matrice creuse en ajoutant eventuellement des coefficients non nuls
+/*! @brief Resizes the sparse matrix, optionally adding new non-zero coefficients
  *
  *
- *    Parametre : const IntTab &Ind
- *       Signification : tableau de taille nc * 2
- *                       ou nc est le nombre de couples (i,j)
- *                       pour les indices des nouveaux coefficients
+ *    Parameter: const IntTab &Ind
+ *       Meaning: array of size nc * 2
+ *                where nc is the number of pairs (i,j)
+ *                for the indices of the new coefficients
  *
  *
  */
 void Matrice_Morse::dimensionner(const IntTab& Ind)
 {
-  if (Ind.size()==0) return; // On ne fait rien si la structure est vide
+  if (Ind.size()==0) return; // Do nothing if the structure is empty
   int n_ancien = nb_lignes(), m_ancien = nb_colonnes();
 
   assert(Ind.nb_dim() == 2);
   assert(Ind.dimension(1) == 2);
 
-  // Calcul du nouveau nombre de lignes
-  //   = max (ancien, indices de ligne des nouveaux coeffs)
+  // Compute the new number of rows
+  //   = max (old, row indices of new coefficients)
   //
-  // et du nouveau nombre de colonnes
-  //   = max (ancien, indices de colonne des nouveaux coeffs)
+  // and the new number of columns
+  //   = max (old, column indices of new coefficients)
 
   int nInd = Ind.dimension(0);
   int n = 0;
@@ -346,11 +345,11 @@ void Matrice_Morse::dimensionner(const IntTab& Ind)
   if (n < n_ancien) n = n_ancien;
   if (m < m_ancien) m = m_ancien;
 
-  // Copies des anciens tableaux d'indices
+  // Copies of the old index arrays
 
   auto tab1_temp(tab1_);
 
-  // Initialisation au nombre de coefficients deja presents a chaque ligne
+  // Initialize to the number of coefficients already present at each row
 
   tab1_.resize(n+1);
   m_ = m;
@@ -360,8 +359,8 @@ void Matrice_Morse::dimensionner(const IntTab& Ind)
   for (int i=n_ancien+1; i<=n; i++)
     tab1_[i] = 0;
 
-  // Parcourt des indices des nouveaux coeffs pour voir s'ils sont
-  // deja presents
+  // Iterate over the indices of new coefficients to check if they are
+  // already present
 
   int i_nouveaux = 0;
   for (int i=0; i<nInd; i++)
@@ -394,7 +393,7 @@ void Matrice_Morse::dimensionner(const IntTab& Ind)
       return;
     }
 
-  // Nouveau tableau des positions des premiers coeffs de chaque ligne
+  // New array of positions of the first coefficients of each row
   tab1_[0] = 1;
   for (int i=1; i<=n; i++)
     tab1_[i] += tab1_[i-1];
@@ -407,8 +406,8 @@ void Matrice_Morse::dimensionner(const IntTab& Ind)
   tab2_.resize(nnz);
   coeff_.resize(nnz);
 
-  // Recopie des anciens coefficients et de leurs indices
-  // de colonne dans les nouveaux tableaux
+  // Copy old coefficients and their column indices
+  // into the new arrays
 
   tab2_ = -1;
   for (int i=0; i<n_ancien; i++)
@@ -438,7 +437,7 @@ void Matrice_Morse::dimensionner(const IntTab& Ind)
           coeff_[k] = 0.0;
         }
     }
-  // on remet les coeffs dans l'ordre... pas optimal mais pour voir..
+  // reorder coefficients... not optimal but for checking..
   coeff_=0;
   //
   {
@@ -473,7 +472,7 @@ void Matrice_Morse::dimensionner(int n, int m, _SIZE_ nnz)
   coeff_.resize(nnz);
   m_=m;
 
-  // on regarde si tab1 a la bonne taille et si tab1[n1]==nnz.
+  // check if tab1 has the right size and if tab1[n1]==nnz.
   if ( tab1_.size_array()!=(n+1) || (tab1_[n]-1)!=nnz )
     {
       tab1_.resize(n+1);
@@ -485,7 +484,7 @@ void Matrice_Morse::dimensionner(int n, int m, _SIZE_ nnz)
   morse_matrix_structure_has_changed_=1, sorted_ = 0;
 }
 
-/*! @brief Initialisation a la matrice unite (modif MT)
+/*! @brief Initialize to the identity matrix (modif MT)
  *
  */
 void Matrice_Morse::unite()
@@ -496,11 +495,11 @@ void Matrice_Morse::unite()
     operator()(i,i) = 1.0;
 }
 
-/*! @brief Renvoie l'ordre de la matrice: - le nombre de lignes si la matrice est carree
+/*! @brief Returns the order of the matrix: - the number of rows if the matrix is square
  *
- *      - 0 sinon
+ *      - 0 otherwise
  *
- * @return (int) l'ordre de la matrice
+ * @return (int) the order of the matrix
  */
 int Matrice_Morse::ordre() const
 {
@@ -512,9 +511,9 @@ int Matrice_Morse::ordre() const
 
 /*! @brief Method to check/clean the Matrice_Morse matrix: -Suppress coefficient defined several times
  *
- *  -elim_coeff_nul=0, on ne supprime pas les coefficients nuls de la matrice
- *  -elim_coeff_nul=1, on supprime les coefficients nuls de la matrice
- *  -elim_coeff_nul=2, on supprime les coefficients nuls et quasi-nuls de la matrice
+ *  -elim_coeff_nul=0, zero coefficients are not removed from the matrix
+ *  -elim_coeff_nul=1, zero coefficients are removed from the matrix
+ *  -elim_coeff_nul=2, zero and near-zero coefficients are removed from the matrix
  *
  */
 void Matrice_Morse::compacte(int elim_coeff_nul)
@@ -528,7 +527,7 @@ void Matrice_Morse::compacte(int elim_coeff_nul)
     {
       ArrOfDouble tab_coeff_max(n);
       tab_coeff_max = 0.;
-      // Recherche des coefficients nuls hors diagonale a supprimer de la matrice morse
+      // Search for off-diagonal zero coefficients to remove from the Morse matrix
       {
         ArrOfInt tab_cnt(1);
         tab_cnt = 0;
@@ -558,7 +557,7 @@ void Matrice_Morse::compacte(int elim_coeff_nul)
 
       if (elim_coeff_nul==2)
         {
-          // Recherche des coefficients quasi nuls hors diagonale (1.e-12 plus petit que le coefficient le plus grand de la ligne) a supprimer de la matrice morse
+          // Search for near-zero off-diagonal coefficients (1.e-12 smaller than the largest coefficient in the row) to remove from the Morse matrix
           const double eps = Objet_U::precision_geom;
           ArrOfInt tab_cnt(1);
           tab_cnt = 0;
@@ -724,7 +723,7 @@ void Matrice_Morse::compacte(int elim_coeff_nul)
       nnz = tab1_[n] - 1;
     }
 
-  // On redimensionne les tableaux
+  // Resize the arrays
   tab2_.resize(nnz);
   coeff_.resize(nnz);
 
@@ -732,9 +731,9 @@ void Matrice_Morse::compacte(int elim_coeff_nul)
   assert_check_morse_matrix_structure( );
 }
 
-/*! @brief Operateur d'affectation d'une Matrice_Morse dans une autre Matrice_Morse.
+/*! @brief Assignment operator from one Matrice_Morse to another.
  *
- * @param (Matrice_Morse& a) la partie droite de l'affectation
+ * @param (Matrice_Morse& a) the right-hand side of the assignment
  */
 Matrice_Morse& Matrice_Morse::operator=(const Matrice_Morse& a )
 {
@@ -747,9 +746,9 @@ Matrice_Morse& Matrice_Morse::operator=(const Matrice_Morse& a )
   return(*this);
 }
 
-/*! @brief *this = a transposee.
+/*! @brief *this = transpose of a.
  *
- * @param (Matrice_Morse& a) la matrice a transposee
+ * @param (Matrice_Morse& a) the matrix to transpose
  */
 Matrice_Morse& Matrice_Morse::transpose(const Matrice_Morse& a)
 {
@@ -802,9 +801,9 @@ Matrice_Morse& Matrice_Morse::transpose(const Matrice_Morse& a)
 }
 
 
-//A=x*A avec x une matrice diagonale stockee dans un vecteur
-//la meme methode peut etre utilisee pour stocke le resultat dans
-//un autre matrice que la matrice initiale
+//A=x*A with x a diagonal matrix stored as a vector
+//the same method can be used to store the result in
+//a different matrix than the initial one
 Matrice_Morse& Matrice_Morse::diagmulmat(const DoubleVect& x)
 {
   int m=nb_lignes();
@@ -821,8 +820,8 @@ Matrice_Morse& Matrice_Morse::diagmulmat(const DoubleVect& x)
   return(*this);
 }
 
-//extraction de la partie superieure d'une matrice morse
-//la matrice resultat est celle appelante
+//extract the upper part of a Morse matrix
+//the result matrix is the calling one
 Matrice_Morse& Matrice_Morse::partie_sup(const Matrice_Morse& a)
 {
   int m=nb_lignes();
@@ -879,7 +878,7 @@ DoubleVect& Matrice_Morse::ajouter_multvect_(const DoubleVect& tab_x,DoubleVect&
   assert_check_morse_matrix_structure();
   const int n = tab1_.size_array() - 1;
   assert(tab_x.size_array() == nb_colonnes());
-  // Test dans cet ordre car l'attribut size() peut etre invalide:
+  // Test in this order as the size() attribute may be invalid:
   assert(tab_resu.size_array() == n || tab_resu.size() == n);
   // If matrix, x, resu are on device, we compute on the device to avoid expensive copy during TRUST GCP:
   if (tab_x.isDataOnDevice() && tab_resu.isDataOnDevice() && coeff_.isDataOnDevice())
@@ -919,17 +918,17 @@ DoubleVect& Matrice_Morse::ajouter_multvect_(const DoubleVect& tab_x,DoubleVect&
       const auto *tab1_ptr = tab1_.addr() + 1;
       const int *tab2_ptr = tab2_.addr();
       const double *coeff_ptr = coeff_.addr();
-      const double *x_fortran = x.addr() - 1; // Pour indexer x avec un indice fortran
-      auto k_fortran = 1; // indice fortran dans tab2 et coeff
+      const double *x_fortran = x.addr() - 1; // to index x with a Fortran index
+      auto k_fortran = 1; // Fortran index in tab2 and coeff
       for (int i = 0; i < n; i++, tab1_ptr++)
         {
-          const auto kmax = *tab1_ptr; // tab1_[i+1] = indice fortran dans tab2_
+          const auto kmax = *tab1_ptr; // tab1_[i+1] = Fortran index in tab2_
           assert(kmax >= k_fortran && kmax <= tab2_.size_array() + 1);
           double t = resu[i];
           assert(k_fortran == tab1_[i] && tab2_ptr == tab2_.addr() + (k_fortran - 1));
           for (; k_fortran < kmax; k_fortran++, tab2_ptr++, coeff_ptr++)
             {
-              int colonne = *tab2_ptr; // indice fortran
+              int colonne = *tab2_ptr; // Fortran index
               assert(colonne >= 1 && colonne <= nb_colonnes());
               t += (*coeff_ptr) * x_fortran[colonne];
             }
@@ -939,7 +938,7 @@ DoubleVect& Matrice_Morse::ajouter_multvect_(const DoubleVect& tab_x,DoubleVect&
   return tab_resu;
 }
 
-// Multiplication de la matrice par un vecteur x en prenant uniquement les items reels non communs pour x
+// Multiplication of the matrix by a vector x, using only the non-shared real items for x
 ArrOfDouble& Matrice_Morse::ajouter_multvect_(const ArrOfDouble& x,ArrOfDouble& resu,ArrOfInt& est_reel_pas_com) const
 {
   ToDo_Kokkos("critical ?");
@@ -961,13 +960,13 @@ ArrOfDouble& Matrice_Morse::ajouter_multvect_(const ArrOfDouble& x,ArrOfDouble& 
   return resu;
 }
 
-/*! @brief Operation de multiplication-accumulation (saxpy) matrice matrice (matrice X representee par un tableau)
+/*! @brief Matrix-matrix multiply-accumulate operation (saxpy) (matrix X represented by an array)
  *
  *     Operation: RESU = RESU + A*X
  *
- * @param (DoubleTab& x) la matrice a multiplier
- * @param (DoubleTab& resu) la matrice resultat de l'operation
- * @return (DoubleTab&) la matrice resultat de l'operation
+ * @param (DoubleTab& x) the matrix to multiply
+ * @param (DoubleTab& resu) the result matrix of the operation
+ * @return (DoubleTab&) the result matrix of the operation
  */
 DoubleTab& Matrice_Morse::ajouter_multTab_(const DoubleTab& x,DoubleTab& resu) const
 {
@@ -1000,13 +999,13 @@ DoubleTab& Matrice_Morse::ajouter_multTab_(const DoubleTab& x,DoubleTab& resu) c
 }
 
 
-/*! @brief Operation de multiplication-accumulation (saxpy) matrice vecteur, par la matrice transposee.
+/*! @brief Matrix-vector multiply-accumulate operation (saxpy), by the transposed matrix.
  *
  *     Operation: resu = resu + A^{T}*x
  *
- * @param (DoubleVect& x) le vecteur a multiplier
- * @param (DoubleVect& resu) le vecteur resultat de l'operation
- * @return (DoubleVect&) le vecteur resultat de l'operation
+ * @param (DoubleVect& x) the vector to multiply
+ * @param (DoubleVect& resu) the result vector of the operation
+ * @return (DoubleVect&) the result vector of the operation
  */
 DoubleVect& Matrice_Morse::ajouter_multvectT_(const DoubleVect& x,DoubleVect& resu) const
 {
@@ -1022,7 +1021,7 @@ DoubleVect& Matrice_Morse::ajouter_multvectT_(const DoubleVect& x,DoubleVect& re
   return resu;
 }
 
-// Multiplication de la tranposee de la matrice par un vecteur x en prenant uniquement les items reels non communs
+// Multiplication of the transposed matrix by a vector x, using only the non-shared real items
 ArrOfDouble& Matrice_Morse::ajouter_multvectT_(const ArrOfDouble& x,ArrOfDouble& resu,ArrOfInt& est_reel_pas_com) const
 {
   assert_check_morse_matrix_structure( );
@@ -1042,21 +1041,21 @@ ArrOfDouble& Matrice_Morse::ajouter_multvectT_(const ArrOfDouble& x,ArrOfDouble&
   return resu;
 }
 
-/*! @brief Fonction (hors classe) amie de la classe Matrice_Morse Addition de 2 matrices au format Morse.
+/*! @brief Friend function (outside the class) of the Matrice_Morse class. Addition of 2 Morse-format matrices.
  *
- *     Operation: renvoie (A+B)
+ *     Operation: returns (A+B)
  *
- * @param (Matrice_Morse& A) une matrice au format Morse
- * @param (Matrice_Morse& B) une matrice au format Morse
- * @return (Matrice_Morse) le resultat de l'operation
+ * @param (Matrice_Morse& A) a Morse-format matrix
+ * @param (Matrice_Morse& B) a Morse-format matrix
+ * @return (Matrice_Morse) the result of the operation
  */
 Matrice_Morse operator+(const Matrice_Morse& A , const Matrice_Morse& B )
 {
   int nrow=A.nb_lignes();
   int ncol=A.nb_colonnes();
   Matrice_Morse C;
-  // PL: avant de dimensionner a nzmax on verifie si A et B n'ont pas la meme structure par hasard...
-  // Cela evite un pic memoire provoque par l'addition de matrices dans Equation_base::dimensionner_matrice
+  // PL: before sizing to nzmax we check if A and B don't happen to have the same structure...
+  // This avoids a memory spike caused by matrix addition in Equation_base::dimensionner_matrice
   auto nzmax = A.has_same_morse_matrix_structure(B) ? A.nb_coeff() : A.nb_coeff() + B.nb_coeff();
   C.dimensionner(nrow, ncol, nzmax);
 #ifndef TRUST_USE_GPU
@@ -1149,22 +1148,22 @@ bool Matrice_Morse::has_same_morse_matrix_structure(const Matrice_Morse& A) cons
   return true;
 }
 
-/*! @brief Calcule la solution du systeme lineaire: A * solution = secmem.
+/*! @brief Computes the solution of the linear system: A * solution = secmem.
  *
- * La methode utilisee est GMRES preconditionnee avec ILUT.
- *   ATTENTION: cette methode n'a vraisemblablement jamais ete testee en parallele
+ * The method used is GMRES preconditioned with ILUT.
+ *   WARNING: this method has probably never been tested in parallel
  *
- * @param (DoubleVect& secmem) le second membre du systeme lineaire
- * @param (DoubleVect& solution) la solution du systeme
+ * @param (DoubleVect& secmem) the right-hand side of the linear system
+ * @param (DoubleVect& solution) the solution of the system
  * @param (double coeff_seuil)
- * @return (int) renvoie toujours 1
- * @throws Erreur dans ilut 'matrix may be wrong' dixit SAAD
- * @throws Erreur dans ilut : debordement dans L
- * @throws Erreur dans ilut : debordement dans U
- * @throws Valeur illegale de lfil : sans doute ecrasement memoire
- * @throws Ligne vide rencontree
- * @throws Pivot nul rencontre ! au pas
- * @throws Il s'est passe quelque chose de bizarre : je prefere tout arreter.
+ * @return (int) always returns 1
+ * @throws Error in ilut 'matrix may be wrong' dixit SAAD
+ * @throws Error in ilut: overflow in L
+ * @throws Error in ilut: overflow in U
+ * @throws Illegal value for lfil: probably a memory corruption
+ * @throws Empty row encountered
+ * @throws Null pivot encountered! at step
+ * @throws Something abnormal has happened: it is preferable to stop.
  */
 // Delegates to the 4-arg version with max_iter=-1 (retry-on-failure mode, maxits=ordre())
 int Matrice_Morse::inverse(const DoubleVect& secmem, DoubleVect& solution,
@@ -1298,14 +1297,14 @@ precond:
 }
 
 
-/*! @brief Operateur de multiplication d'une matrice par un vecteur: scaling des lignes de la matrice par les coefficients
+/*! @brief Matrix-vector multiplication operator: scales rows of the matrix by the corresponding
  *
- *     correspondants du vecteur passe en parametre.
- *     A *= x, effectue les scaling suivants:
- *       A(i,:) = A(i,:) * x(i), pour toutes les lignes i de A
+ *     coefficients of the vector passed as a parameter.
+ *     A *= x performs the following scalings:
+ *       A(i,:) = A(i,:) * x(i), for all rows i of A
  *
- * @param (DoubleVect& x) vecteur de scaling
- * @return (Matrice_Morse&) le resultat de l'operation (*this)
+ * @param (DoubleVect& x) scaling vector
+ * @return (Matrice_Morse&) the result of the operation (*this)
  */
 Matrice_Morse& Matrice_Morse::operator *=(const DoubleVect& x)
 {
@@ -1316,25 +1315,25 @@ Matrice_Morse& Matrice_Morse::operator *=(const DoubleVect& x)
 }
 
 
-/*! @brief Affecte le produit de 2 matrices Morse A et B a l'objet (this).
+/*! @brief Assigns the product of 2 Morse matrices A and B to this object.
  *
  * Operation: this = A * B
  *
- * @param (Matrice_Morse& A) une matrice au format Morse
- * @param (Matrice_Morse& B) une matrice au format Morse
- * @return (Matrice_Morse&) le resultat de l'operation (*this)
+ * @param (Matrice_Morse& A) a Morse-format matrix
+ * @param (Matrice_Morse& B) a Morse-format matrix
+ * @return (Matrice_Morse&) the result of the operation (*this)
  */
 Matrice_Morse& Matrice_Morse::affecte_prod(const Matrice_Morse& a, const Matrice_Morse& b)
 {
-  int nrow= a.nb_lignes();                // nb de lignes de A
-  int ncol= b.nb_colonnes();                // nb de colonnes de B
+  int nrow= a.nb_lignes();                // number of rows of A
+  int ncol= b.nb_colonnes();                // number of columns of B
   //assert(nrow==ncol);
   // Jloi non?
   assert(a.nb_colonnes()==b.nb_lignes());
   tab1_.resize(nrow+1);
   m_ = ncol;
-  int job = 1 ;                      // on recupere tout (tab1, tab2, coeff de matrice_resu)
-  auto  nzmax = nb_coeff();                // nb de valeurs maximales de la matrice resultante
+  int job = 1 ;                      // retrieve everything (tab1, tab2, coeff of matrice_resu)
+  auto  nzmax = nb_coeff();                // max number of values of the result matrix
   if(nzmax==0)
     {
       nzmax=a.nb_coeff();
@@ -1342,7 +1341,7 @@ Matrice_Morse& Matrice_Morse::affecte_prod(const Matrice_Morse& a, const Matrice
       coeff_.resize(nzmax);
       assert(nzmax==nb_coeff());
     }
-  IntVect iw(ncol+1);                        // tableau de travail
+  IntVect iw(ncol+1);                        // work array
   double scal=0. ;
   int ii, jj ;
   int values = 0;
@@ -1393,14 +1392,14 @@ Matrice_Morse& Matrice_Morse::affecte_prod(const Matrice_Morse& a, const Matrice
 
 
 
-/*! @brief Fonction (hors classe) amie de la classe Matrice_Morse Scaling de la matrice par un scalaire: multiplie tous
+/*! @brief Friend function (outside the class) of the Matrice_Morse class. Scaling of the matrix by a scalar: multiplies all
  *
- *     les elements de la matrice par un scalaire.
- *     Operation: renvoie x*A
+ *     elements of the matrix by a scalar.
+ *     Operation: returns x*A
  *
- * @param (double x) valeur du scaling
- * @param (Matrice_Morse& B) une matrice au format Morse
- * @return (Matrice_Morse) le resultat de l'operation
+ * @param (double x) scaling value
+ * @param (Matrice_Morse& B) a Morse-format matrix
+ * @return (Matrice_Morse) the result of the operation
  */
 Matrice_Morse operator *(double x , const Matrice_Morse& A)
 {
@@ -1409,9 +1408,9 @@ Matrice_Morse operator *(double x , const Matrice_Morse& A)
   return(mat_res);
 }
 
-/*! @brief Operateur de negation unaire, renvoie l'opposee de la matrice: - A Appelle operator*(double,const Matrice_Morse&)
+/*! @brief Unary negation operator, returns the opposite of the matrix: - A. Calls operator*(double,const Matrice_Morse&)
  *
- * @return (Matrice_Morse) le resultat de l'appel a operator*(double,const Matrice_Morse&)
+ * @return (Matrice_Morse) the result of the call to operator*(double,const Matrice_Morse&)
  */
 Matrice_Morse Matrice_Morse::operator -() const
 {
@@ -1419,15 +1418,15 @@ Matrice_Morse Matrice_Morse::operator -() const
 }
 
 
-/*! @brief NE FAIT RIEN
+/*! @brief DOES NOTHING
  *
- * @param (Matrice_Morse&) une matrice morse
- * @return (Matrice_Morse&) renvoie toujours *this
+ * @param (Matrice_Morse&) a Morse matrix
+ * @return (Matrice_Morse&) always returns *this
  */
 Matrice_Morse& Matrice_Morse::operator +=(const Matrice_Morse& A)
 {
-  // PL: Avant de verifier de faire des operations couteuses en RAM, on verifie
-  // si ce n'est pas la meme structure:
+  // PL: Before doing expensive RAM operations, we check
+  // if it is not the same structure:
   if (has_same_morse_matrix_structure(A))
     {
       auto size = A.nb_coeff();
@@ -1444,12 +1443,12 @@ Matrice_Morse& Matrice_Morse::operator +=(const Matrice_Morse& A)
 }
 
 
-/*! @brief Operateur de multiplication (de tous les elements) d'une matrice par un scalaire.
+/*! @brief Operator multiplying all elements of a matrix by a scalar.
  *
  *     Operation: A = x * A
  *
- * @param (double x) le parametre de scaling
- * @return (Matrice_Morse&) le resultat de l'operation (*this)
+ * @param (double x) the scaling parameter
+ * @return (Matrice_Morse&) the result of the operation (*this)
  */
 Matrice_Morse& Matrice_Morse::operator *=(double x )
 {
@@ -1596,13 +1595,13 @@ void Matrice_Morse::get_stencil_and_coefficients( Stencil&       stencil,
 }
 
 
-/*! @brief Operateur de division (de tous les elements) d'une matrice par un scalaire.
+/*! @brief Operator dividing all elements of a matrix by a scalar.
  *
  *     Operation: A =  A / x
  *
- * @param (double x) le parametre de scaling
- * @return (Matrice_Morse&) le resultat de l'operation (*this)
- * @throws division par zero impossible
+ * @param (double x) the scaling parameter
+ * @return (Matrice_Morse&) the result of the operation (*this)
+ * @throws division by zero not possible
  */
 Matrice_Morse& Matrice_Morse::operator /=(double x )
 {
@@ -1618,7 +1617,7 @@ void Matrice_Morse::remplir(const IntLists& voisins,
   int num_elem;
   int compteur,rang =0;
 
-  // Remplissage des tableaux tab1, tab2 et coeff_ :
+  // Fill arrays tab1, tab2 and coeff_:
   auto* p_tab1 = tab1_.addr();
   int* p_tab2 = tab2_.addr();
   double* p_coeff = coeff_.addr();
@@ -1661,7 +1660,7 @@ void Matrice_Morse::remplir(const IntLists& voisins,
   int num_elem;
   int compteur,rang =0;
 
-  // Remplissage des tableaux tab1, tab2 et coeff_ :
+  // Fill arrays tab1, tab2 and coeff_:
   auto* p_tab1 = tab1_.addr();
   int* p_tab2 = tab2_.addr();
   double* p_coeff = coeff_.addr();
@@ -1694,7 +1693,7 @@ void Matrice_Morse::remplir(const IntLists& voisins,
   is_stencil_up_to_date_=false;
 }
 
-/*! @brief Remplissage d'une matrice morse par une matrice morse plus petite
+/*! @brief Fill a Morse matrix from a smaller Morse matrix
  *
  */
 void Matrice_Morse::remplir(const int ideb, const int jdeb, const int n, const int m, const Matrice_Morse& mat)
@@ -1703,27 +1702,27 @@ void Matrice_Morse::remplir(const int ideb, const int jdeb, const int n, const i
   assert(ideb<=n);
   assert(jdeb<=m);
 
-  // On va construire une matrice locale
+  // Build a local matrix
   Matrice_Morse matrice_locale(mat);
-  // Cas ou la matrice locale est symetrique
+  // Case where the local matrix is symmetric
   if (sub_type(Matrice_Morse_Sym,mat))
     {
-      // Creation de la partie inferieure L
+      // Create the lower part L
       Matrice_Morse L(matrice_locale);
       L.transpose(matrice_locale);
       int lordre = L.ordre();
       for (int i=0; i<lordre; i++)
         L(i, i) = 0.;
-      // On ajoute M=U+L
+      // Add M=U+L
       matrice_locale += L;
     }
 
-  // Dimensionnement de la matrice globale
+  // Size the global matrix
   auto nnz=matrice_locale.nb_coeff();
   dimensionner(n,m,(int)nnz);
 
-  // Remplissage de la matrice globale par la matrice locale:
-  // Remplissage de tab1_ avec le decalage par ideb:
+  // Fill the global matrix from the local matrix:
+  // Fill tab1_ with offset ideb:
   int mon_nb_lignes=matrice_locale.nb_lignes();
   assert(mon_nb_lignes+ideb<=n);
   for (int i=0; i<ideb; i++)
@@ -1733,11 +1732,11 @@ void Matrice_Morse::remplir(const int ideb, const int jdeb, const int n, const i
   for (int i=mon_nb_lignes+ideb; i<n+1; i++)
     tab1_(i)=matrice_locale.tab1_(mon_nb_lignes);
 
-  // Remplissage de tab2_ avec le decalage par jdeb:
+  // Fill tab2_ with offset jdeb:
   for (auto i=0; i<nnz; i++)
     tab2_(i)=matrice_locale.tab2_(i)+jdeb;
 
-  // Remplissage de coeff_:
+  // Fill coeff_:
   for (auto i=0; i<nnz; i++)
     coeff_(i)=matrice_locale.coeff_(i);
 
@@ -1772,9 +1771,9 @@ void Matrice_Morse::formeF()
 
 
 
-/*! @brief NE FAIT RIEN
+/*! @brief DOES NOTHING
  *
- * @return (int) renvoie toujours 1
+ * @return (int) always returns 1
  */
 int Matrice_Morse_test()
 {
@@ -1790,7 +1789,7 @@ void Matrice_Morse::clean()
   coeff_ = 0;
 }
 
-/*! @brief Calcule la largeur de bande d'une matrice morse
+/*! @brief Computes the bandwidth of a Morse matrix
  *
  */
 int Matrice_Morse::largeur_de_bande() const
@@ -2010,7 +2009,7 @@ void Matrice_Morse::construire_sous_bloc(int nl0, int nc0, int nl1, int nc1, Mat
 
 void Matrice_Morse::sort_stencil()
 {
-  if (sorted_) return; //deja fait
+  if (sorted_) return; //already done
   for (int i = 0; i + 1 < tab1_.size_array(); i++) //indice de ligne
     std::sort(tab2_.addr() + tab1_(i) - 1, tab2_.addr() + tab1_(i + 1) - 1);
   morse_matrix_structure_has_changed_ = sorted_ = 1;

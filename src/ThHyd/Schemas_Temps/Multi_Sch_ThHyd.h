@@ -18,7 +18,7 @@
 
 #include <Schema_Temps_base.h>
 
-/*! @brief classe Multi_Sch_ThHyd
+/*! @brief Time scheme that splits the time step between a Navier-Stokes sub-scheme and a scalar sub-scheme.
  *
  * @sa Schema_Temps_base
  */
@@ -31,7 +31,7 @@ public :
 
   ////////////////////////////////
   //                            //
-  // Caracteristiques du schema //
+  // Scheme characteristics     //
   //                            //
   ////////////////////////////////
 
@@ -42,7 +42,7 @@ public :
 
   /////////////////////////////////////////
   //                                     //
-  // Fin des caracteristiques du schema  //
+  // End of scheme characteristics       //
   //                                     //
   /////////////////////////////////////////
 

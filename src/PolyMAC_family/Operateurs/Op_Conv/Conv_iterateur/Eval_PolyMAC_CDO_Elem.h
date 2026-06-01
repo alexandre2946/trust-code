@@ -30,9 +30,9 @@
 
 class Champ_base;
 
-// Cette classe represente le prototype fonctionnel
-// des evaluateurs de flux associes aux equations de
-// conservation integrees sur les elements
+// This class represents the functional prototype
+// of flux evaluators associated with conservation
+// equations integrated over elements
 class Eval_PolyMAC_CDO_Elem
 {
 public:

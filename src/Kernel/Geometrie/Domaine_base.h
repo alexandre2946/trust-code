@@ -118,7 +118,7 @@ protected:
 
   void duplique_bords_internes();
 
-  /// Volume total du domaine (somme sur tous les processeurs)
+  /// Total volume of the domain (sum over all processors)
   double volume_total_;
   Champs_compris champs_compris_;
   bool mesh_update_required_ = false;

@@ -51,7 +51,7 @@ void Champ_front_fonc_gradient_VEF::mettre_a_jour(double temps)
 
   DoubleTab& tab=valeurs_au_temps(temps);
 
-  // on traite les faces sur la frontiere
+  // process the faces on the boundary
 
   DoubleTab vecteur_tang(le_bord.nb_faces(),3);
 

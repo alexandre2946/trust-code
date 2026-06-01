@@ -23,7 +23,7 @@
 
 /*! @brief : class Champ_Inc_P0_base
  *
- *  Decrire ici la classe Champ_Inc_P0_base
+ *  Describe here the Champ_Inc_P0_base class
  *
  */
 class Champ_Inc_P0_base : public Champ_Inc_base, public Champ_implementation_P0
@@ -36,15 +36,15 @@ public :
   Champ_base& affecter_(const Champ_base& ) override ;
   int fixer_nb_valeurs_nodales(int n) override;
 
-  //tableaux utilitaires sur les CLs : fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
-  //types de CL : 0 -> pas de CL
-  //              1 -> Echange_externe_impose
-  //              2 -> Echange_global_impose
-  //              3 -> Echange_contact_PolyMAC_HFV
-  //              4 -> Neumann_paroi
-  //              5 -> Neumann_val_ext ou Neumann_homogene ou Symetrie
-  //              6 -> Dirichlet
-  //              7 -> Dirichlet_homogene
+  //utility arrays for boundary conditions: fcl(f, .) = (BC type, BC number, index in BC)
+  //BC types: 0 -> no BC
+  //          1 -> Echange_externe_impose
+  //          2 -> Echange_global_impose
+  //          3 -> Echange_contact_PolyMAC_HFV
+  //          4 -> Neumann_paroi
+  //          5 -> Neumann_val_ext or Neumann_homogene or Symetrie
+  //          6 -> Dirichlet
+  //          7 -> Dirichlet_homogene
   inline const IntTab& fcl() const
   {
     if (!fcl_init_) init_fcl();
@@ -97,7 +97,7 @@ protected:
 
   virtual void init_fcl() const;
   mutable IntTab fcl_;
-  mutable int fcl_init_ = 0; // fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
+  mutable int fcl_init_ = 0; // fcl(f, .) = (BC type, BC number, index in BC)
 };
 
 #endif /* Champ_Inc_P0_base_included */

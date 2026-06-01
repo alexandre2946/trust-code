@@ -18,10 +18,10 @@
 
 //Implemente_base_sans_constructeur_ni_destructeur(MD_Vector_base,"MD_Vector_base",Objet_U);
 
-/*! @brief construction d'un objet MD_Vector par copie d'un objet existant.
+/*! @brief Constructs an MD_Vector object by copying an existing object.
  *
- * C'est la methode recommandee pour creer un objet MD_Vector (autrement que
- * par copie d'un autre MD_Vector)
+ * This is the recommended method for creating an MD_Vector object (other than
+ * by copying another MD_Vector).
  */
 void MD_Vector::copy(const MD_Vector_base& src)
 {
@@ -31,21 +31,21 @@ void MD_Vector::copy(const MD_Vector_base& src)
   ptr_.reset(p);
 }
 
-/*! @brief renvoie 1 si les structures sont identiques, 0 sinon
+/*! @brief Returns 1 if the structures are identical, 0 otherwise.
  *
  */
 int MD_Vector::operator==(const MD_Vector& md) const
 {
-  // Pour l'instant, test tres restrictif: les deux structures sont
-  //  identiques si et seulement si les pointeurs sont identiques,
-  //  (autrement dit la deuxieme a ete creee par copie de la premiere)
-  // Si on veut debrancher le systeme de reference multiple et dupliquer
-  //  les structures a la copie, il faut faire le test complet d'egalite
-  //  sur toute la structure !
+  // For now, very strict test: the two structures are
+  //  identical if and only if the pointers are identical,
+  //  (i.e. the second was created by copying the first).
+  // If we want to remove the multi-reference system and duplicate
+  //  the structures on copy, a full equality test
+  //  over the entire structure must be done!
   return ptr_ == md.ptr_;
 }
 
-/*! @brief reponse inverse de == ...
+/*! @brief Inverse of ==.
  */
 int MD_Vector::operator!=(const MD_Vector& md) const
 {

@@ -49,7 +49,7 @@ Entree&  TRUSTArray<_TYPE_, _SIZE_>::readOn(Entree& is)
   is >> sz;
   if (sz >= 0)
     {
-      // Appel a la methode sans precondition sur le type derive (car readOn est virtuelle, les autres proprietes seront initialisees correctement)
+      // Call to the method without precondition on the derived type (since readOn is virtual, other properties will be correctly initialised)
       resize_array_(sz);
       if (sz > 0)
         {
@@ -158,7 +158,7 @@ void TRUSTArray<_TYPE_, _SIZE_>::resize_array_(_SIZE_ new_size, RESIZE_OPTIONS o
               if (onDevice)
                 {
                   // ToDo Kokkos: resize on device is not optimal for the moment as it makes 2 copy D2H and H2D
-                  copyFromDevice(*this); // Force copie sur le host
+                  copyFromDevice(*this); // Force copy to host
                   _TYPE_ * prev_ad = span_.data(); // before resize!
                   deleteOnDevice(prev_ad, sz_arr); // Delete current block
                   set_data_location(DataLocation::HostOnly);
@@ -181,15 +181,15 @@ void TRUSTArray<_TYPE_, _SIZE_>::resize_array_(_SIZE_ new_size, RESIZE_OPTIONS o
     }
 }
 
-/**  Copie les elements source[first_element_source + i] dans les elements  (*this)[first_element_dest + i] pour 0 <= i < nb_elements
-*    Les autres elements de (*this) sont inchanges.
+/**  Copies elements source[first_element_source + i] into elements (*this)[first_element_dest + i] for 0 <= i < nb_elements
+*    The other elements of (*this) are left unchanged.
 
-* @param  const ArrOfDouble& m: le tableau a utiliser, doit etre different de *this !
-* @param _SIZE_ nb_elements: nombre d'elements a copier, nb_elements >= -1. Si nb_elements==-1, on copie tout le tableau m. Valeurs par defaut: -1
-* @param _SIZE_ first_element_dest. Valeurs par defaut: 0
-* @param _SIZE_ first_element_source. Valeurs par defaut: 0
+* @param  const ArrOfDouble& m: the array to use, must be different from *this !
+* @param _SIZE_ nb_elements: number of elements to copy, nb_elements >= -1. If nb_elements==-1, the entire array m is copied. Default value: -1
+* @param _SIZE_ first_element_dest. Default value: 0
+* @param _SIZE_ first_element_source. Default value: 0
 * @return ArrOfDouble& : *this
-* @throw Sort en erreur si la taille du tableau m est plus grande que la taille de tableau this.
+* @throw Exits with an error if the size of array m is larger than the size of array this.
 */
 template <typename _TYPE_, typename _SIZE_>
 TRUSTArray<_TYPE_, _SIZE_>& TRUSTArray<_TYPE_, _SIZE_>::inject_array(const TRUSTArray& source, _SIZE_ nb_elements, _SIZE_ first_element_dest, _SIZE_ first_element_source)
@@ -218,7 +218,7 @@ TRUSTArray<_TYPE_, _SIZE_>& TRUSTArray<_TYPE_, _SIZE_>::inject_array(const TRUST
         }
       else
         {
-          // PL: On utilise le memcpy car c'est VRAIMENT plus rapide (10% +vite sur RNR_G20)
+          // PL: We use memcpy because it is REALLY faster (10% faster on RNR_G20)
           const _TYPE_ * addr_source = source.span_.data() + first_element_source;
           _TYPE_ * addr_dest = span_.data() + first_element_dest;
           memcpy(addr_dest, addr_source, nb_elements * sizeof(_TYPE_));
@@ -246,9 +246,10 @@ void TRUSTArray<_TYPE_, _SIZE_>::ref_conv_helper_(_TAB_& out) const
   out.storage_type_ = storage_type_;
 }
 
-/*! Conversion methods - from a small array (_SIZE_=int) of TID (_TYPE_=trustIdType), return a big one (_SIZE_=trustIdType).
+/*! @brief Conversion methods - from a small array (_SIZE_=int) of TID (_TYPE_=trustIdType), return a big one (_SIZE_=trustIdType).
  * No data copied! This behaves somewhat like a ref_array. Used in LATA stuff notably. Not implemented for _TYPE_=double or float
  * (because never needed).
+ * @param out the output big array that will reference the same data
  */
 template<>
 void TRUSTArray<trustIdType, int>::ref_as_big(TRUSTArray<trustIdType,trustIdType>& out) const
@@ -264,9 +265,10 @@ void TRUSTArray<_TYPE_,_SIZE_>::ref_as_big(TRUSTArray<_TYPE_,trustIdType>& out) 
   Process::exit("TRUSTArray<>::ref_as_big() should not be used with those current template types.");
 }
 
-/*! Conversion methods - from a big array (_SIZE_=trustIdType), return a small one (_SIZE_=int).
+/*! @brief Conversion methods - from a big array (_SIZE_=trustIdType), return a small one (_SIZE_=int).
  * Overflow is detected in debug if array is too big to be fit into _SIZE_=int.
  * No data copied! This behaves somewhat like a ref_array. Used in LATA stuff and FT notably.
+ * @param out the output small array that will reference the same data
  */
 template<>
 void TRUSTArray<float, trustIdType>::ref_as_small(TRUSTArray<float, int>& out) const
@@ -292,8 +294,9 @@ void TRUSTArray<_TYPE_,_SIZE_>::ref_as_small(TRUSTArray<_TYPE_, int>& out) const
   Process::exit("TRUSTArray<>::ref_as_big() should not be used with those current template types.");
 }
 
-/*! Conversion from a BigArrOfTID to an ArrOfInt. Careful, it always does a copy! It is your responsibility
+/*! @brief Conversion from a BigArrOfTID to an ArrOfInt. Careful, it always does a copy! It is your responsibility
  * to invoke it only when necessary (typically you should avoid this when trustIdType == int ...)
+ * @param out the output ArrOfInt filled with the converted values
  */
 template<>
 void TRUSTArray<trustIdType,trustIdType>::from_tid_to_int(TRUSTArray<int, int>& out) const
@@ -321,7 +324,7 @@ void TRUSTArray<_TYPE_,_SIZE_>::from_tid_to_int(TRUSTArray<int, int>& out) const
 }
 
 
-/** Remplit le tableau avec la x en parametre (x est affecte a toutes les cases du tableau)
+/** Fills the array with the value x passed as parameter (x is assigned to every element of the array)
  */
 template <typename _TYPE_, typename _SIZE_>
 TRUSTArray<_TYPE_, _SIZE_>& TRUSTArray<_TYPE_, _SIZE_>::operator=(_TYPE_ x)
@@ -349,7 +352,7 @@ TRUSTArray<_TYPE_, _SIZE_>& TRUSTArray<_TYPE_, _SIZE_>::operator=(_TYPE_ x)
   return *this;
 }
 
-/** Addition case a case sur toutes les cases du tableau : la taille de y doit etre au moins egale a la taille de this
+/** Element-wise addition over all elements of the array: the size of y must be at least equal to the size of this
  */
 template <typename _TYPE_, typename _SIZE_>
 TRUSTArray<_TYPE_, _SIZE_>& TRUSTArray<_TYPE_, _SIZE_>::operator+=(const TRUSTArray& y)
@@ -380,7 +383,7 @@ TRUSTArray<_TYPE_, _SIZE_>& TRUSTArray<_TYPE_, _SIZE_>::operator+=(const TRUSTAr
   return *this;
 }
 
-/** Ajoute la meme valeur a toutes les cases du tableau
+/** Adds the same value to every element of the array
  */
 template <typename _TYPE_, typename _SIZE_>
 TRUSTArray<_TYPE_, _SIZE_>& TRUSTArray<_TYPE_, _SIZE_>::operator+=(const _TYPE_ dy)
@@ -408,7 +411,7 @@ TRUSTArray<_TYPE_, _SIZE_>& TRUSTArray<_TYPE_, _SIZE_>::operator+=(const _TYPE_ 
   return *this;
 }
 
-/** Soustraction case a case sur toutes les cases du tableau : tableau de meme taille que *this
+/** Element-wise subtraction over all elements of the array: array must be the same size as *this
  */
 template <typename _TYPE_, typename _SIZE_>
 TRUSTArray<_TYPE_, _SIZE_>& TRUSTArray<_TYPE_, _SIZE_>::operator-=(const TRUSTArray& y)

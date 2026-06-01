@@ -26,8 +26,8 @@ Sortie& Convection_Diffusion_Concentration_Turbulent::printOn(Sortie& is) const 
 
 Entree& Convection_Diffusion_Concentration_Turbulent::readOn(Entree& is)
 {
-  //On conserve cette initialisation ici car si on la deplace dans le constructeur
-  //elle est ecrasee par Convection_Diffusion_Concentration::discretiser()
+  //This initialization is kept here because if moved to the constructor
+  //it is overwritten by Convection_Diffusion_Concentration::discretiser()
   nb_constituants_ = 1;
   Convection_Diffusion_Concentration::readOn(is);
   return is;
@@ -47,8 +47,8 @@ int Convection_Diffusion_Concentration_Turbulent::lire_motcle_non_standard(const
       Cerr << "Reading and typing of the diffusion operator : " << finl;
       terme_diffusif.associer_diffusivite(diffusivite_pour_transport());
       lire_op_diff_turbulent(is, *this, terme_diffusif);
-      // GF pas sur que cela soit boin
-      // le champ pour le dt_stab est le meme que celui de l'operateur
+      // GF not sure this is correct
+      // the field for dt_stab is the same as that of the operator
       terme_diffusif.associer_diffusivite_pour_pas_de_temps(diffusivite_pour_pas_de_temps());
       return 1;
     }
@@ -76,14 +76,13 @@ std::vector<YAML_data> Convection_Diffusion_Concentration_Turbulent::data_a_sauv
   return data;
 }
 
-/*! @brief Sauvergarde de l'equation sur un flot de sortie.
+/*! @brief Saves the equation to an output stream via a double call to:
  *
- * Double appel a:
- *       Convection_Diffusion_Concentration::sauvegarder(Sortie& );
- *       Convection_Diffusion_Turbulent::sauvegarder(Sortie& );
+ *       Convection_Diffusion_Concentration::sauvegarder(Sortie&);
+ *       and Convection_Diffusion_Turbulent::sauvegarder(Sortie&);
  *
- * @param (Sortie& os) un flot de sortie
- * @return (int) renvoie toujours 1
+ * @param os Output stream.
+ * @return Always returns 1.
  */
 int Convection_Diffusion_Concentration_Turbulent::sauvegarder(Sortie& os) const
 {
@@ -93,12 +92,12 @@ int Convection_Diffusion_Concentration_Turbulent::sauvegarder(Sortie& os) const
   return bytes;
 }
 
-/*! @brief Reprise a partir d'un flot d'entree, double appel a: Convection_Diffusion_Concentration::reprendre(Entree& );
+/*! @brief Restores from an input stream via a double call to: Convection_Diffusion_Concentration::reprendre(Entree&);
  *
- *       Convection_Diffusion_Turbulent::reprendre(Entree&);
+ *       and Convection_Diffusion_Turbulent::reprendre(Entree&);
  *
- * @param (Entree& is) un flot d'entree
- * @return (int) renvoie toujours 1
+ * @param is Input stream.
+ * @return Always returns 1.
  */
 int Convection_Diffusion_Concentration_Turbulent::reprendre(Entree& is)
 {
@@ -107,9 +106,9 @@ int Convection_Diffusion_Concentration_Turbulent::reprendre(Entree& is)
   return 1;
 }
 
-/*! @brief Double appel a: Convection_Diffusion_Turbulent::completer()
+/*! @brief Double call to: Convection_Diffusion_Turbulent::completer()
  *
- *      Convection_Diffusion_Concentration::completer()
+ *      and Convection_Diffusion_Concentration::completer()
  *
  */
 void Convection_Diffusion_Concentration_Turbulent::completer()
@@ -118,11 +117,11 @@ void Convection_Diffusion_Concentration_Turbulent::completer()
   Convection_Diffusion_Concentration::completer();
 }
 
-/*! @brief Mise a jour en temps de l'equation, double appel a: Convection_Diffusion_Concentration::mettre_a_jour(double );
+/*! @brief Time update of the equation via a double call to: Convection_Diffusion_Concentration::mettre_a_jour(double);
  *
- *       Convection_Diffusion_Turbulent::mettre_a_jour(double );
+ *       and Convection_Diffusion_Turbulent::mettre_a_jour(double);
  *
- * @param (double temps) le temps de mise a jour
+ * @param temps Current time.
  */
 void Convection_Diffusion_Concentration_Turbulent::mettre_a_jour(double temps)
 {
@@ -147,7 +146,7 @@ bool Convection_Diffusion_Concentration_Turbulent::has_champ(const Motcle& nom, 
     if (le_modele_turbulence->has_champ(nom, ref_champ))
       return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 bool Convection_Diffusion_Concentration_Turbulent::has_champ(const Motcle& nom) const
@@ -159,7 +158,7 @@ bool Convection_Diffusion_Concentration_Turbulent::has_champ(const Motcle& nom) 
     if (le_modele_turbulence->has_champ(nom))
       return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 const Champ_base& Convection_Diffusion_Concentration_Turbulent::get_champ(const Motcle& nom) const
@@ -183,11 +182,11 @@ void Convection_Diffusion_Concentration_Turbulent::get_noms_champs_postraitables
     le_modele_turbulence->get_noms_champs_postraitables(nom, opt);
 }
 
-/*! @brief Double appel a: Convection_Diffusion_Turbulent::preparer_calcul()
+/*! @brief Double call to: Convection_Diffusion_Turbulent::preparer_calcul()
  *
- *       Convection_Diffusion_Concentration::preparer_calcul()
+ *       and Convection_Diffusion_Concentration::preparer_calcul()
  *
- * @return (int) renvoie toujours 1
+ * @return Always returns 1.
  */
 int Convection_Diffusion_Concentration_Turbulent::preparer_calcul()
 {

@@ -29,25 +29,25 @@ class Convection_Diffusion_std;
 class Champ_Don_base;
 class Param;
 
-/*! @brief Classe Terme_Boussinesq_base Cette classe represente le terme de gravite qui figure dans l'equation
+/*! @brief Classe Terme_Boussinesq_base This class represents the gravity term appearing in the momentum equation
  *
- *     de la dynamique divisee par la masse volumique de reference.
- *     On est dans le cadre de l'hypothese de Boussinesq:la masse volumique est
- *     supposee constante et egale a sa valeur de reference sauf dans le terme
- *     des forces de volumes ou on prend en compte une petite variation de la
- *     masse volumique en fonction d'un ou de plusieurs scalaires transportes
- *     par l'ecoulement (la temperature et/ou une ou plusieurs concentrations).
- *     Cas particulier de Terme_Boussinesq_base pour la temperature
- *     Le terme de gravite a pour expression: beta*(T-T0) ou beta
- *     represente la dilatabilite de la masse volumique et T0 une valeur
- *     de reference pour la temperature
- *     Cas particulier de Terme_Boussinesq_base pour une concentration
- *     Le terme de gravite a pour expression : beta*(C-C0)
- *     ou (beta[0]*(C[0]-C0[0]) + .....+ beta[i]*(C[i]-C0[i])) dans
- *     le cas d'un vecteur de concentrations
- *     beta represente la variation de la masse volumique en fonction
- *     de la concentration du constituant et C0 une valeur de reference
- *     pour la concentration
+ *     divided by the reference density.
+ *     We are in the framework of the Boussinesq hypothesis: the density is
+ *     assumed constant and equal to its reference value except in the
+ *     body force term where a small variation of the density as a function
+ *     of one or more scalars transported by the flow (temperature and/or
+ *     one or more concentrations) is taken into account.
+ *     Special case of Terme_Boussinesq_base for temperature:
+ *     the gravity term has the expression: beta*(T-T0) where beta
+ *     represents the thermal expansion coefficient and T0 a reference
+ *     value for temperature.
+ *     Special case of Terme_Boussinesq_base for concentration:
+ *     the gravity term has the expression: beta*(C-C0)
+ *     or (beta[0]*(C[0]-C0[0]) + .....+ beta[i]*(C[i]-C0[i])) in
+ *     the case of a vector of concentrations.
+ *     beta represents the variation of density as a function
+ *     of the constituent concentration and C0 a reference value
+ *     for the concentration.
  *
  *
  */
@@ -94,10 +94,10 @@ protected :
 
 inline void Terme_Boussinesq_base::check() const
 {
-  // Pas de verification autre qu'au premier pas de temps, si verification pas desactivee et uniquement pour la temperature
+  // No verification other than at the first time step, if verification is not disabled and only for temperature
   if (equation_scalaire().probleme().schema_temps().nb_pas_dt()>0 || equation_scalaire().probleme().reprise_effectuee() || verif_==0 || !sub_type(Convection_Diffusion_Temperature,equation_scalaire())) return;
 
-  // Nouveau : on verifie que moyenne(T)==T0 au demarrage du calcul uniquement
+  // New: verify that average(T)==T0 only at the start of the computation
   const double T0 = Scalaire0(0);
   double moyenne_T = mp_moyenne_vect(equation_scalaire().inconnue().valeurs());
   if (inf_ou_egal(moyenne_T,T0-10) || sup_ou_egal(moyenne_T,T0+10))
@@ -116,7 +116,7 @@ inline void Terme_Boussinesq_base::check() const
     }
 }
 
-// Methode de calcul de la valeur sur un champ aux elements d'un champ uniforme ou non a plusieurs composantes
+// Method to compute the value on a cell-centered field for a uniform or multi-component field
 inline double valeur(const DoubleTab& valeurs, const int elem, const int dim)
 {
   if(valeurs.nb_dim()==1)
@@ -125,14 +125,14 @@ inline double valeur(const DoubleTab& valeurs, const int elem, const int dim)
     return valeurs(elem,dim);
 }
 
-// Methode de calcul de la valeur sur une face encadree par elem1 et elem2 d'un champ uniforme ou non a plusieurs composantes
+// Method to compute the value on a face bounded by elem1 and elem2 for a uniform or multi-component field
 inline double valeur(const DoubleTab& valeurs_champ, int elem1, int elem2, const int compo)
 {
   if (valeurs_champ.dimension(0)==1)
-    return valeurs_champ(0,compo); // Champ uniforme
+    return valeurs_champ(0,compo); // Uniform field
   else
     {
-      if (elem2<0) elem2 = elem1; // face frontiere
+      if (elem2<0) elem2 = elem1; // boundary face
       if (valeurs_champ.nb_dim()==1)
         return 0.5*(valeurs_champ(elem1)+valeurs_champ(elem2));
       else
@@ -143,10 +143,10 @@ KOKKOS_INLINE_FUNCTION
 double valeur(CDoubleTabView valeurs_champ, int valeurs_champ_dimension0, int nb_dim, int elem1, int elem2, const int compo, int nb_compo)
 {
   if (valeurs_champ_dimension0==1)
-    return valeurs_champ(compo,0); // Champ uniforme
+    return valeurs_champ(compo,0); // Uniform field
   else
     {
-      if (elem2 < 0) elem2 = elem1; // face frontiere
+      if (elem2 < 0) elem2 = elem1; // boundary face
       if (nb_dim == 1)
         return 0.5*(valeurs_champ(elem1,0)+valeurs_champ(elem2,0));
       else

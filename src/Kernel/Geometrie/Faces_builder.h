@@ -29,8 +29,8 @@
 #include <Domaine_forward.h>
 #include <Static_Int_Lists.h>
 #include <NettoieNoeuds.h>
-/*! @brief classe outil pour construire les faces d'un domaine
- * (utilisee uniquement pour creer les tableau des faces reelles)
+/*! @brief Helper class for building the faces of a domain.
+ * (used only to create the arrays of real faces)
  *
  */
 
@@ -78,22 +78,22 @@ private:
 
   const IntTab_t& les_elements() const { return *les_elements_ptr_; }
   const Static_Int_Lists_t& connectivite_som_elem() const { return *connectivite_som_elem_ptr_; }
-  const IntTab& faces_element_reference(int_t elem_t) const; // redonne les faces pour un element, dans le cas des polyhedres cela depend du numero de l'element.
+  const IntTab& faces_element_reference(int_t elem_t) const; // returns the faces for an element; for polyhedra this depends on the element index.
 
 
-  // Tous les membres suivants sont initialises dans creer_faces_reeles:
+  // All the following members are initialized in creer_faces_reeles:
 
-  // Raccourci vers les elements du domaine
+  // Shortcut to the domain elements
   const IntTab_t * les_elements_ptr_;
-  // La connectivite elements-sommets (pour chaque sommet, liste des
-  // elements adjacents, y compris les sommets et elements virtuels)
+  // The element-vertex connectivity (for each vertex, list of
+  // adjacent elements, including virtual vertices and elements)
   const Static_Int_Lists_t * connectivite_som_elem_ptr_;
-  /*! @brief des faces de l'element de reference (voir elem_geom_base::get_tab_faces_sommets_locaux)
+  /*! @brief Faces of the reference element (see elem_geom_base::get_tab_faces_sommets_locaux)
    *
    */
   IntTab faces_element_reference_old_;
   int_t is_polyedre_;
-  // pour check_erreur_faces :
+  // for check_erreur_faces:
   OBS_PTR(Domaine_t)   ref_domaine_;
   OBS_PTR(IntTab_t) faces_sommets_;
   OBS_PTR(IntTab_t) face_elem_;

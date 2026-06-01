@@ -19,14 +19,14 @@
 #include <Triangulation_base.h>
 #include <Domaine_forward.h>
 
-/*! @brief Classe Tetraedriser Cette classe est un interprete qui sert a lire et executer
+/*! @brief Class Tetraedriser This class is an interpreter used to read and execute
  *
- *     la directive Tetraedriser:
+ *     the Tetraedriser directive:
  *         Tetraedriser nom_domaine
- *     Cette directive est a utiliser en discretisation VEF pour obtenir
- *     un maillage tetraedrique a partir d'un maillage constitue de paves.
+ *     This directive is used in VEF discretization to obtain
+ *     a tetrahedral mesh from a mesh made of hexahedral blocks.
  *
- * @sa Interprete Pave Tetraedre, Cette classe est utilisable en 3D
+ * @sa Interprete Pave Tetraedre, This class is usable in 3D
  */
 class Tetraedriser : public Triangulation_base
 {

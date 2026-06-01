@@ -19,10 +19,10 @@
 #include <Elem_geom_base.h>
 #include <TRUSTTab.h>
 
-/*! @brief Classe Triangle Cette classe represente l'element geometrique Triangle.
+/*! @brief Class Triangle: represents the geometric element Triangle.
  *
- *     Un triangle a 3 faces, 3 sommets et un seul type de face ayant
- *     2 sommets par face.
+ *     A triangle has 3 faces, 3 vertices, and a single face type with
+ *     2 vertices per face.
  *
  * @sa Elem_geom_base Elem_geom
  */
@@ -65,9 +65,9 @@ protected:
 
 };
 
-/*! Calcul de l'aire d'un triangle en 2D ou 3D
- * Parametres passes
- * pos : tableau contenant les coordonnees des 3 sommets du triangle
+/*! Computes the area of a triangle in 2D or 3D.
+ * Parameters passed:
+ * pos: array containing the coordinates of the 3 vertices of the triangle
  */
 inline double aire_triangle(const DoubleTab& pos)
 {
@@ -91,11 +91,11 @@ inline double aire_triangle(const DoubleTab& pos)
     }
 }
 
-/*! @brief Renvoie le numero du j-ieme sommet de la i-ieme face de l'element.
+/*! @brief Returns the index of the j-th vertex of the i-th face of the element.
  *
- * @param (int i) un numero de face
- * @param (int j) un numero de sommet
- * @return (int) le numero du j-ieme sommet de la i-ieme face
+ * @param i a face index
+ * @param j a vertex index
+ * @return the index of the j-th vertex of the i-th face
  */
 template <typename _SIZE_>
 inline int Triangle_32_64<_SIZE_>::face_sommet(int i, int j) const
@@ -114,10 +114,10 @@ inline int Triangle_32_64<_SIZE_>::face_sommet(int i, int j) const
     }
 }
 
-/*! @brief Renvoie le nombre de faces du type specifie que possede l'element geometrique.
+/*! @brief Returns the number of faces of the specified type that the geometric element has.
  *
- * @param (int i) le type de face
- * @return (int) le nombre de faces de type i
+ * @param i the face type
+ * @return the number of faces of type i
  */
 template <typename _SIZE_>
 inline int Triangle_32_64<_SIZE_>::nb_faces(int i) const
@@ -127,10 +127,10 @@ inline int Triangle_32_64<_SIZE_>::nb_faces(int i) const
 }
 
 
-/*! @brief Renvoie le nombre de sommets des faces du type specifie.
+/*! @brief Returns the number of vertices of faces of the specified type.
  *
- * @param (int i) le type de face
- * @return (int) le nombre de sommets des faces de type i
+ * @param i the face type
+ * @return the number of vertices of faces of type i
  */
 template <typename _SIZE_>
 inline int Triangle_32_64<_SIZE_>::nb_som_face(int i) const
@@ -140,10 +140,10 @@ inline int Triangle_32_64<_SIZE_>::nb_som_face(int i) const
 }
 
 
-/*! @brief Renvoie le numero du i-ieme sommet de la face 0
+/*! @brief Returns the index of the i-th vertex of face 0.
  *
- * @param (int i) le numero du sommet a renvoyer
- * @return (int) le numero du i-ieme sommet de la face 0
+ * @param i the index of the vertex to return
+ * @return the index of the i-th vertex of face 0
  */
 template <typename _SIZE_>
 inline int Triangle_32_64<_SIZE_>::face_sommet0(int i) const
@@ -154,10 +154,10 @@ inline int Triangle_32_64<_SIZE_>::face_sommet0(int i) const
 }
 
 
-/*! @brief Renvoie le numero du i-ieme sommet de la face 1
+/*! @brief Returns the index of the i-th vertex of face 1.
  *
- * @param (int i) le numero du sommet a renvoyer
- * @return (int) le numero du i-ieme sommet de la face 1
+ * @param i the index of the vertex to return
+ * @return the index of the i-th vertex of face 1
  */
 template <typename _SIZE_>
 inline int Triangle_32_64<_SIZE_>::face_sommet1(int i) const
@@ -168,10 +168,10 @@ inline int Triangle_32_64<_SIZE_>::face_sommet1(int i) const
 }
 
 
-/*! @brief Renvoie le numero du i-ieme sommet de la face 2
+/*! @brief Returns the index of the i-th vertex of face 2.
  *
- * @param (int i) le numero du sommet a renvoyer
- * @return (int) le numero du i-ieme sommet de la face 2
+ * @param i the index of the vertex to return
+ * @return the index of the i-th vertex of face 2
  */
 template <typename _SIZE_>
 inline int Triangle_32_64<_SIZE_>::face_sommet2(int i) const
@@ -182,12 +182,12 @@ inline int Triangle_32_64<_SIZE_>::face_sommet2(int i) const
 }
 
 
-/*! @brief Renvoie le i-ieme type de face.
+/*! @brief Returns the i-th face type.
  *
- * Un triangle n'a qu'un seul type de face.
+ * A triangle has only one face type.
  *
- * @param (int i) le rang du type de face a renvoyer
- * @return (Type_Face) un type de face
+ * @param i the rank of the face type to return
+ * @return a face type
  */
 template <typename _SIZE_>
 inline Type_Face Triangle_32_64<_SIZE_>::type_face(int i) const

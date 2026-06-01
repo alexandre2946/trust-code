@@ -25,8 +25,8 @@ Implemente_instanciable(Traitement_particulier_NS_canal_VDF,"Traitement_particul
 
 /*! @brief
  *
- * @param (Sortie& is) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param is output stream
+ * @return modified output stream
  */
 Sortie& Traitement_particulier_NS_canal_VDF::printOn(Sortie& is) const
 {
@@ -36,8 +36,8 @@ Sortie& Traitement_particulier_NS_canal_VDF::printOn(Sortie& is) const
 
 /*! @brief
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param is input stream
+ * @return modified input stream
  */
 Entree& Traitement_particulier_NS_canal_VDF::readOn(Entree& is)
 {
@@ -51,9 +51,9 @@ Entree& Traitement_particulier_NS_canal_VDF::lire(Entree& is)
 
 void Traitement_particulier_NS_canal_VDF::remplir_Y(DoubleVect& tab_Y,  DoubleVect& tab_compt, int& nNy) const
 {
-  // On va initialiser les differents parametres membres de la classe
-  // utiles au calcul des differentes moyennes
-  // Initialisation de : Y, compt
+  // Initialize the various member parameters of the class
+  // needed for computing the various spatial averages
+  // Initialization of: Y, compt
 
   const Domaine_dis_base& zdisbase = mon_equation->inconnue().domaine_dis_base();
   const Domaine_VF& domaine_VF = ref_cast(Domaine_VF, zdisbase);
@@ -70,7 +70,7 @@ void Traitement_particulier_NS_canal_VDF::remplir_Y(DoubleVect& tab_Y,  DoubleVe
   tab_Y = -100.;
   tab_compt = 0;
 
-  //Remplissage du tableau Y
+  //Fill the Y array
   ////////////////////////////////////////////////////////
 
   for (num_elem=0; num_elem<nb_elems; num_elem++)
@@ -106,14 +106,14 @@ void Traitement_particulier_NS_canal_VDF::remplir_Y(DoubleVect& tab_Y,  DoubleVe
   tab_compt.resize(nNy);
 }
 
-//Ajout F.A 15/02/11 on va faire un changement,
-// l'objectif est de reunir des operations faites et refaite pour profiter pleinement de l'espace memoire (boucles)
-// par la creation d'un tableau de grande taille (+/- 7M par proc mais qui ne s'echange pas)
-// le tableau aura la structure suivant : La ligne est le numero de l'elemennt
-// numero de l'element au dessus, numero de l'element au dessous,position dans le vecteur Y.
-// soit un tableau de nelem x 3.
-// pour cela apres remplir_Y on va appeller la fonction qui fais les differenent calculs,
-// en utilisant le tableau comme argument de la fonction.
+//Addition F.A 15/02/11: reorganizing operations that were repeated
+// to make full use of the memory space (loops),
+// by creating a large array (~7M per proc but not exchanged).
+// The array has the following structure: the row is the element index,
+// index of the element above, index of the element below, position in the Y vector.
+// i.e. an array of nelem x 3.
+// After remplir_Y, this function is called to perform the various calculations,
+// using this array as a function argument.
 
 void Traitement_particulier_NS_canal_VDF::remplir_Tab_recap(IntTab& Tab_rec) const
 {
@@ -122,35 +122,35 @@ void Traitement_particulier_NS_canal_VDF::remplir_Tab_recap(IntTab& Tab_rec) con
   const DoubleTab& xp = domaine_VDF.xp();
   const IntTab& elem_faces = domaine_VDF.elem_faces();
 
-  int face; //recepteur des faces
-  int elem_test,elem_test2; // element de test pour les ficitfs
-  int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot(); // nombre total d'elements (reel + fict)
+  int face; //face receiver
+  int elem_test,elem_test2; // element for testing fictitious elements
+  int nb_elem_tot = domaine_VDF.domaine().nb_elem_tot(); // total number of elements (real + fictitious)
   int nb_elems = domaine_VDF.domaine().nb_elem();
 
-  IntTab trouve(1);// tableau des elements deja effectue
+  IntTab trouve(1);// array of elements already processed
   double y=0;
-  int i,num_elem; // compteurs
-  int q=1; //Curseur pour les tableau haut
+  int i,num_elem; // counters
+  int q=1; //Cursor for the upper arrays
   trouve[0]=0;
 
 
-  Tab_rec.resize(nb_elems,3); // On dimenssione le tableau.
+  Tab_rec.resize(nb_elems,3); // Size the array.
 
-  for (num_elem=nb_elems; num_elem<nb_elem_tot; num_elem++) // boucle sur les elements fictifs
+  for (num_elem=nb_elems; num_elem<nb_elem_tot; num_elem++) // loop over fictitious elements
     {
       face = elem_faces(num_elem,1+dimension);
       elem_test=domaine_VDF.elem_voisin(num_elem,face,0);
       face = elem_faces(num_elem,1);
       elem_test2=domaine_VDF.elem_voisin(num_elem,face,1);
 
-      if ((elem_test>0) && (elem_test<nb_elems)) // si l'element en dessus est un element reel alors
+      if ((elem_test>0) && (elem_test<nb_elems)) // if the element above is a real element
         {
           trouve[q-1]=elem_test;
           q =q +1;
           trouve.resize(q);
 
-          Tab_rec(elem_test,0)=num_elem; // on affecte la meme valeur aux deux case haut et bas
-          Tab_rec(elem_test,1)=num_elem; //ainsi la fonction qui calcul les valeurs voie un element normal.
+          Tab_rec(elem_test,0)=num_elem; // assign the same value to both upper and lower slots
+          Tab_rec(elem_test,1)=num_elem; //so the function computing values sees a normal element
 
           y=xp(elem_test,1);
           for (i=0; i<Ny; i++)
@@ -159,16 +159,16 @@ void Traitement_particulier_NS_canal_VDF::remplir_Tab_recap(IntTab& Tab_rec) con
                 break;
             }
 
-          Tab_rec(elem_test,2)=i; // on garde la valeur de i pour ne pas reefectuer la boucle a chaque pas de temps.
+          Tab_rec(elem_test,2)=i; // store i to avoid repeating the loop at each time step
         }
-      else if ((elem_test2<nb_elems)&&(elem_test2>0)) //sinon si l'element en dessous est un element reel alors
+      else if ((elem_test2<nb_elems)&&(elem_test2>0)) //otherwise if the element below is a real element
         {
           trouve[q-1]=elem_test2;
           q =q +1;
           trouve.resize(q);
 
-          Tab_rec(elem_test2,0)=num_elem; // on affecte la meme valeur aux deux case haut et bas
-          Tab_rec(elem_test2,1)=num_elem; //ainsi la fonction qui calcul les valeurs voie un element normal.
+          Tab_rec(elem_test2,0)=num_elem; // assign the same value to both upper and lower slots
+          Tab_rec(elem_test2,1)=num_elem; //so the function computing values sees a normal element
 
           y=xp(elem_test2,1);
           for (i=0; i<Ny; i++)
@@ -258,12 +258,12 @@ void Traitement_particulier_NS_canal_VDF::calculer_moyenne_spatiale_vitesse_rho_
       face_y_0 = elem_faces(num_elem,1);
       face_y_1 = elem_faces(num_elem,1+dimension);
 
-      // PQ : 12/10 : pour eviter de moyenner localement la vitesse u et w
-      //              on fait le choix de "deplacer" celles-ci
-      //              du centre de la face au centre de l'element
-      //              en se basant sur le principe que l'ecoulement est homogene
-      //                    suivant les plans xz
-      //                    Pour v, la moyenne s'impose si l'on veut revenir au centre des elements
+      // PQ : 12/10 : to avoid averaging the velocity u and w locally,
+      //              we choose to "shift" them
+      //              from the face center to the element center
+      //              based on the assumption that the flow is homogeneous
+      //                    in the xz planes.
+      //                    For v, the average is necessary to return to the element center.
 
       //  u = .5*(vitesse[face_x_0]+vitesse[face_x_1]);
       u = vitesse[face_x_0];
@@ -277,7 +277,7 @@ void Traitement_particulier_NS_canal_VDF::calculer_moyenne_spatiale_vitesse_rho_
       val_moy(i,4) += v*v;
       val_moy(i,6) += u*v;
 
-      if(dimension==2)   val_moy(i,9) += sqrt(u*u);      //vitesse tangentielle pour calcul du frottement
+      if(dimension==2)   val_moy(i,9) += sqrt(u*u);      //tangential velocity for friction computation
 
       if(dimension==3)
         {
@@ -291,7 +291,7 @@ void Traitement_particulier_NS_canal_VDF::calculer_moyenne_spatiale_vitesse_rho_
           val_moy(i,5) += wl*wl;
           val_moy(i,7) += u*wl;
           val_moy(i,8) += v*wl;
-          val_moy(i,9) += sqrt(u*u+wl*wl);      //vitesse tangentielle pour calcul du frottement
+          val_moy(i,9) += sqrt(u*u+wl*wl);      //tangential velocity for friction computation
         }
 
       if (taille_rho==1)  val_moy(i,10) += tab_rho_elem(0,0);

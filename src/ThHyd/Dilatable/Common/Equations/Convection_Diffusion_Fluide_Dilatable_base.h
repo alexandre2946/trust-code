@@ -22,7 +22,7 @@
 
 class Fluide_Dilatable_base;
 
-/*! @brief classe Convection_Diffusion_Fluide_Dilatable_base pour un fluide dilatable
+/*! @brief @brief Base class for convection-diffusion equations for a dilatable fluid.
  *
  * @sa Conv_Diffusion_std Convection_Diffusion_Temperature
  */
@@ -45,12 +45,12 @@ public :
   void set_param(Param& titi) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
 
-  // je sais, je sais ... mais pas maintenant !
+  // TODO: to be refactored
   void calculer_div_u_ou_div_rhou(DoubleTab& res) const override = 0;
   bool is_thermal() const override = 0;
   bool is_generic() const override = 0;
 
-  // Methodes inlines
+  // Inline methods
   inline const Champ_Inc_base& inconnue() const override { return l_inco_ch; }
   inline Champ_Inc_base& inconnue() override { return l_inco_ch; }
   inline const Domaine_Cl_dis_base& domaine_cl_modif() const { return zcl_modif_.valeur();}

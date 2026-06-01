@@ -18,7 +18,7 @@
 
 #include <SFichier.h>
 
-/*! @brief Ecriture dans un fichier d'objets ecrits au format binaire
+/*! @brief Writes objects to a file in binary format.
  *
  * @sa EFichierBin SFichier
  */

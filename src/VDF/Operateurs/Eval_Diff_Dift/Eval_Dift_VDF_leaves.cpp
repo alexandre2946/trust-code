@@ -32,7 +32,7 @@ void Eval_Dift_VDF_Face::mettre_a_jour()
   Eval_Dift_VDF::mettre_a_jour();
   if (le_modele_turbulence->has_loi_paroi_hyd())
     {
-      // Modif E. Saikali : on fait le ref seulement si le tableau a ete initialise, sinon pointeur nulle
+      // Modif E. Saikali : only do the ref if the array has been initialized, otherwise null pointer
       const DoubleTab& tab = le_modele_turbulence->loi_paroi().Cisaillement_paroi();
       if (tab.size_array() > 0) tau_tan_.ref(tab);
     }

@@ -21,7 +21,7 @@
 class Nom;
 #include <Domaine_forward.h>
 
-/*! @brief Classe Create_domain_from_sub_domain Lecture d'un fichier
+/*! @brief Class Create_domain_from_sub_domain File reading
  *
  * @sa Interprete
  */

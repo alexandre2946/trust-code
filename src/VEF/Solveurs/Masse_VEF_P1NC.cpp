@@ -47,7 +47,7 @@ Entree& Masse_VEF_P1NC::readOn(Entree& s)
 
 ///////////////////////////////////////////////////////////////
 //
-//  Implementation des fonctions de la classe Masse_VEF_P1NC
+//  Implementation of the Masse_VEF_P1NC class member functions
 //
 //////////////////////////////////////////////////////////////
 
@@ -84,11 +84,11 @@ DoubleTab& Masse_VEF_P1NC::appliquer_impl(DoubleTab& tab_sm) const
   });
   end_gpu_timer(__KERNEL_NAME__);
 
-  // On traite les faces non standard
-  // les faces des bord sont des faces non standard susceptibles de porter des C.L
-  // les faces internes non standard ne portent pas de C.L
+  // Process non-standard faces
+  // boundary faces are non-standard faces that may carry boundary conditions
+  // internal non-standard faces carry no boundary conditions
 
-  // On traite les conditions aux limites
+  // Process boundary conditions
   CIntTabView face_voisins = domaine_VEF.face_voisins().view_ro();
   CDoubleTabView normales = domaine_VEF.face_normales().view_ro();
   CDoubleArrView volumes_entrelaces_Cl = domaine_Cl_VEF.volumes_entrelaces_Cl().view_ro();
@@ -102,7 +102,7 @@ DoubleTab& Masse_VEF_P1NC::appliquer_impl(DoubleTab& tab_sm) const
       if ((sub_type(Dirichlet,la_cl.valeur())) ||
           (sub_type(Dirichlet_homogene,la_cl.valeur())))
         {
-          // Pour les faces de Dirichlet on met sm a 0
+          // For Dirichlet faces set sm to 0
           Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__),
                                range_1D(num1, num2),
                                KOKKOS_LAMBDA(const int face)
@@ -181,7 +181,7 @@ Matrice_Base& Masse_VEF_P1NC::ajouter_masse(double dt, Matrice_Base& matrice, in
 {
   if (penalisation||(le_dom_Cl_VEF->equation().inconnue().nature_du_champ()!=vectoriel))
     return Solveur_Masse_base::ajouter_masse(dt,matrice,penalisation);
-  // Sinon on modifie temporairement la nature du champ pour que appliquer_impl ne projette pas sur n.
+  // Otherwise temporarily change the field nature so that appliquer_impl does not project onto n.
   Champ_Inc_base& inco=ref_cast_non_const( Champ_Inc_base,le_dom_Cl_VEF->equation().inconnue());
   inco.fixer_nature_du_champ(multi_scalaire);
   Solveur_Masse_base::ajouter_masse(dt,matrice,penalisation);
@@ -197,7 +197,7 @@ DoubleTab& Masse_VEF_P1NC::ajouter_masse(double dt, DoubleTab& x, const DoubleTa
   if (penalisation||(le_dom_Cl_VEF->equation().inconnue().nature_du_champ()!=vectoriel))
     return Solveur_Masse_base::ajouter_masse(dt, x, y, penalisation, use_old_volumes);
 
-  // Sinon on modifie temporairement la nature du champ pour que appliquer_impl ne projette pas sur n.
+  // Otherwise temporarily change the field nature so that appliquer_impl does not project onto n.
   Champ_Inc_base& inco=ref_cast_non_const( Champ_Inc_base,le_dom_Cl_VEF->equation().inconnue());
   inco.fixer_nature_du_champ(multi_scalaire);
   Solveur_Masse_base::ajouter_masse(dt, x, y, penalisation, use_old_volumes);

@@ -22,14 +22,14 @@
 class Champ_base;
 class Equation_base;
 
-/*! @brief classe MorEqn Classe qui regroupe les fonctionnalites de liaison avec une
+/*! @brief class MorEqn Class that groups the functionalities of linking with an
  *
- *      Equation. Le membre MorEqn::mon_equation contient une reference
- *      vers un objet Equation_base. Les classes qui sont des "Morceaux d'equation"
- *      sont associe par une liaison 1-1 a leur equation en heritant de MorEqn,
- *      par exemple: Operateur_base, Solveur_Masse, Source_base ...
+ *      Equation. The member MorEqn::mon_equation contains a reference
+ *      to an Equation_base object. The classes that are "Equation pieces"
+ *      are associated by a 1-1 link to their equation by inheriting from MorEqn,
+ *      for example: Operateur_base, Solveur_Masse, Source_base ...
  *
- * @sa Equation_base, Ce n'est pas une classe de l'arbre TRUST a elle seule., Cette classe est faite etre une classe mere d'une classe, qui heritera par ailleurs d'Objet_U
+ * @sa Equation_base, This is not a class of the TRUST tree by itself., This class is intended to be a base class of a class, which will also inherit from Objet_U
  */
 class MorEqn
 {
@@ -43,7 +43,7 @@ public:
 
   inline int mon_equation_non_nul() const;
 
-  /* compatibilite avec les equations multiphase : par defaut, message d'erreur */
+  /* compatibility with multiphase equations : by default, error message */
   virtual void check_multiphase_compatibility() const;
 protected :
   OBS_PTR(Equation_base) mon_equation;
@@ -52,12 +52,12 @@ protected :
 
 MorEqn::~MorEqn()
 {}
-/*! @brief Renvoie la reference sur l'equation pointe par MorEqn::mon_equation.
+/*! @brief Returns the reference to the equation pointed to by MorEqn::mon_equation.
  *
- *     (version const)
+ *     (const version)
  *
- * @return (Equation_base&) l'equation associee a l'objet
- * @throws pas d'equation associee
+ * @return (Equation_base&) the equation associated with the object
+ * @throws no associated equation
  */
 inline const Equation_base& MorEqn::equation() const
 {
@@ -69,9 +69,9 @@ inline const Equation_base& MorEqn::equation() const
   return mon_equation.valeur();
 }
 
-/*! @brief Renvoie la reference sur l'equation pointe par MorEqn::mon_equation.
+/*! @brief Returns the reference to the equation pointed to by MorEqn::mon_equation.
  *
- * @return (Equation_base&) l'equation associee a l'objet
+ * @return (Equation_base&) the equation associated with the object
  */
 inline  Equation_base& MorEqn::equation()
 {

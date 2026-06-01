@@ -14,13 +14,13 @@
 *****************************************************************************/
 /*! @brief class Fluide_Ostwald
  *
- *  Possede les proprietes d'un fluide incompressible plus:
- *  N : indice de structure
- *  K : consistance du fluide
- *  La viscosite dynamique dans ce cas depend de K, N et Grad(U)
- *  Nouveau fluide. c'est un fluide incompressible non newtonien. Il derive donc
- *    de fluide_Incompressible et possede quelques proprietes de plus (K, N)
- *    mu depend de K, N, et de grad(U)
+ *  Has the properties of an incompressible fluid plus:
+ *  N: structure index
+ *  K: fluid consistency
+ *  The dynamic viscosity in this case depends on K, N and Grad(U).
+ *  A new fluid: it is a non-Newtonian incompressible fluid. It therefore derives
+ *    from Fluide_Incompressible and has a few additional properties (K, N).
+ *    mu depends on K, N, and grad(U).
  *
  * @sa Fluide_Incompressible
  */
@@ -50,8 +50,8 @@ public :
 
 protected :
 
-  OWN_PTR(Champ_Don_base) K_;  // consistance lue
-  OWN_PTR(Champ_Don_base) N_;  // indice de structure lue
+  OWN_PTR(Champ_Don_base) K_;  // consistency read from input
+  OWN_PTR(Champ_Don_base) N_;  // structure index read from input
 
 
 };

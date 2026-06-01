@@ -25,12 +25,12 @@ class Equation_base;
 class Fluide_base;
 class Param;
 
-/*! @brief classe Discret_Thyd Cette classe est la classe de base representant une discretisation
+/*! @brief class Discret_Thyd This class is the base class representing a discretization
  *
- *     spatiale appliquee aux problemes de thermo-hydrauliques.
- *     Les methodes virtuelles pures sont a implementer dans les classes
- *     derivees pour typer et discretiser les champs portes par les
- *     equations liees a la discretisation.
+ *     spatially applied to thermohydraulic problems.
+ *     The pure virtual methods must be implemented in the derived
+ *     classes to type and discretize the fields carried by the
+ *     equations related to the discretization.
  *
  * @sa Discret_Thermique
  */
@@ -56,18 +56,18 @@ public :
   void diametre_hydraulique_face(const Domaine_dis_base&, const DoubleVect&, const Schema_Temps_base&, OWN_PTR(Champ_Fonc_base)&) const;
   void section_passage(const Domaine_dis_base&, const DoubleVect&, const Schema_Temps_base&, OWN_PTR(Champ_Fonc_base)&) const;
 
-  // Methodes virtuelles
+  // Virtual methods
   virtual void creer_champ_vorticite(const Schema_Temps_base&, const Champ_Inc_base&, OWN_PTR(Champ_Fonc_base)&) const;
   virtual void grad_u(const Domaine_dis_base&, const Domaine_Cl_dis_base&, const Champ_Inc_base&, OWN_PTR(Champ_Fonc_base)&) const;
   virtual void proprietes_physiques_fluide_Ostwald(const Domaine_dis_base&, Fluide_Ostwald&, const Navier_Stokes_std&, const Champ_Inc_base&) const;
 
-  // cette methode permets de calculer/visualiser y dans tout le domaine : utile pour k-omega SST et les forces parois
+  // this method allows computing/visualizing y throughout the domain: useful for k-omega SST and wall forces
   virtual void distance_paroi_globale(const Schema_Temps_base& , Domaine_dis_base&, OWN_PTR(Champ_Fonc_base)&) const;
   virtual void y_plus(const Domaine_dis_base& ,const Domaine_Cl_dis_base&,  const Champ_Inc_base&, OWN_PTR(Champ_Fonc_base)& ) const;
   virtual void grad_T(const Domaine_dis_base& z,const Domaine_Cl_dis_base& zcl, const Champ_Inc_base& eqn,OWN_PTR(Champ_Fonc_base)& ch) const;
   virtual void h_conv(const Domaine_dis_base& z,const Domaine_Cl_dis_base& zcl, const Champ_Inc_base& eqn,OWN_PTR(Champ_Fonc_base)& ch, Motcle& nom, int temp_ref) const;
 
-  //pour VEF implemente const =0;
+  // for VEF, implemented as const = 0;
   virtual void critere_Q(const Domaine_dis_base& ,const Domaine_Cl_dis_base&,  const Champ_Inc_base&, OWN_PTR(Champ_Fonc_base)& ) const;
 
   inline virtual void reynolds_maille(const Domaine_dis_base&, const Fluide_base&, const Champ_Inc_base&, OWN_PTR(Champ_Fonc_base)&) const

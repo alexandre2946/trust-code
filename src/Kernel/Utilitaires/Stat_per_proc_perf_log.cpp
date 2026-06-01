@@ -20,10 +20,10 @@ Implemente_instanciable(Stat_per_proc_perf_log,"Stat_per_proc_perf_log",Interpre
 // XD_CONT statistics per processor (by default this is false, and only the master proc will produce stats).
 // XD attr flg entier flg REQ A flag that can be either 0 or 1 to turn off (default) or on the detailed stats.
 
-/*! @brief Simple appel a: Interprete::printOn(Sortie&)
+/*! @brief Simple call to: Interprete::printOn(Sortie&)
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param os output stream
+ * @return the modified output stream
  */
 Sortie& Stat_per_proc_perf_log::printOn(Sortie& os) const
 {
@@ -31,10 +31,10 @@ Sortie& Stat_per_proc_perf_log::printOn(Sortie& os) const
 }
 
 
-/*! @brief Simple appel a: Interprete::readOn(Entree&)
+/*! @brief Simple call to: Interprete::readOn(Entree&)
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param is input stream
+ * @return the modified input stream
  */
 Entree& Stat_per_proc_perf_log::readOn(Entree& is)
 {
@@ -42,10 +42,10 @@ Entree& Stat_per_proc_perf_log::readOn(Entree& is)
 }
 
 
-/*! @brief Fonction principale de l'interprete Dimension Lit la dimension d'espace du probleme.
+/*! @brief Main interpreter function. Reads whether detailed per-processor statistics should be enabled.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param is input stream
+ * @return the modified input stream
  */
 Entree& Stat_per_proc_perf_log::interpreter(Entree& is)
 {

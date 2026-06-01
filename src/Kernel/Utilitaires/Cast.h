@@ -17,14 +17,14 @@
 #ifndef Cast_H
 #define Cast_H
 
-/*! @brief Informations de types : static_type_info(T) : renvoie le type_info de la classe T.
+/*! @brief Type information utilities: static_type_info(T): returns the type_info of class T.
  *
- *       ptr_type_info(p) : renvoie le type_info de l'objet pointe par p.
- *       ref_type_info(r) : renvoie le type_info de l'objet r ou de l'alias r
- *       sub_type(T,r) : renvoie 1 ssi r est une instance d'une classe fille de T; 0 sinon.
- *     Les cast securises :
- *       ptr_cast(T,p) : renvoie (T*)(p) ssi *p est d'un sous type de T; 0 sinon.
- *       ref_cast(T,r) : : renvoie (T&)(r) ssi r est d'un sous type de T; 0 sinon.
+ *       ptr_type_info(p): returns the type_info of the object pointed to by p.
+ *       ref_type_info(r): returns the type_info of object r or alias r.
+ *       sub_type(T,r): returns 1 iff r is an instance of a subclass of T; 0 otherwise.
+ *     Safe casts:
+ *       ptr_cast(T,p): returns (T*)(p) iff *p is of a subtype of T; 0 otherwise.
+ *       ref_cast(T,r): returns (T&)(r) iff r is of a subtype of T; 0 otherwise.
  *
  */
 

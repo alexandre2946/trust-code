@@ -29,18 +29,18 @@ class MD_Vector_renumber;
 class Domaine_VF;
 class Echange_EV_Options;
 
-//format de structure pour demander d'agrandir un MD_Vector : (proc, item sur le proc) -> item distant sur Process::me()
+// Structure format to request enlarging a MD_Vector: (proc, item on proc) -> distant item on Process::me()
 typedef std::map<std::array<int, 2>, int> extra_item_t;
 
 class MD_Vector_tools
 {
 public:
-  // ECHANGE_EV: echange traditionnel
-  // EV_SOMME: items sequentiels = somme sur tous les procs qui partagent l'item
-  // EV_SOMME_ECHANGE: idem, suivi d'un ECHANGE_EV pour mettre a jour les items virtuels
-  // EV_MIN: items sequentiel = min sur tous les procs
-  // EV_MIN_COLONNE1: pour chaque ligne partagee du tableau, prend le processeur qui a la plus petite valeur
-  //   dans la colonne1, envoie toute la ligne au processeur qui possede la ligne.
+  // ECHANGE_EV: traditional exchange
+  // EV_SOMME: sequential items = sum over all procs sharing the item
+  // EV_SOMME_ECHANGE: same, followed by an ECHANGE_EV to update the virtual items
+  // EV_MIN: sequential items = min over all procs
+  // EV_MIN_COLONNE1: for each shared row of the array, takes the processor with the smallest value
+  //   in column 1, sends the entire row to the processor that owns the row.
   enum Operations_echange { ECHANGE_EV, EV_SOMME, EV_SOMME_ECHANGE, EV_MAX, EV_MINCOL1 };
 
   static void creer_tableau_distribue(const MD_Vector&, Array_base&, RESIZE_OPTIONS opt=RESIZE_OPTIONS::COPY_INIT);
@@ -52,7 +52,7 @@ public:
   static void echange_espace_virtuel(DoubleVect&, Operations_echange opt=ECHANGE_EV,  IsExchangeBlocking is_exchange_blocking = IsExchangeBlocking::DefaultBlocking,  const std::string kernel_name="noname");
   static void echange_espace_virtuel(FloatVect&, Operations_echange opt=ECHANGE_EV,  IsExchangeBlocking is_exchange_blocking = IsExchangeBlocking::DefaultBlocking,  const std::string kernel_name="noname");
 
-  // valeur de retour: nombre d'items sequentiels sur ce proc (nombre de flags a un dans le tableau)
+  // return value: number of sequential items on this proc (number of flags equal to one in the array)
   static void compute_sequential_items_index(const MD_Vector&, MD_Vector_renumber&, int line_size = 1);
   static void creer_md_vect_renum(const IntVect& renum, MD_Vector& md_vect);
   static void creer_md_vect_renum_auto(IntVect& flags_renum, MD_Vector& md_vect);

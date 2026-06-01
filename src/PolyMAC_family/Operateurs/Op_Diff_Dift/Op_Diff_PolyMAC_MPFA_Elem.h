@@ -29,7 +29,7 @@ class Op_Diff_PolyMAC_MPFA_Elem : public Op_Diff_PolyMAC_MPFA_base
 public :
   Op_Diff_PolyMAC_MPFA_Elem();
   void completer() override;
-  void init_op_ext() const override; //fait plus de travail qu'en PolyMAC_HFV: op_ext + som_ext, pe_ext...
+  void init_op_ext() const override; //does more work than in PolyMAC_HFV: op_ext + som_ext, pe_ext...
 
   /* interface {dimensionner,ajouter}_blocs */
   int has_interface_blocs() const override { return 1; }
@@ -39,7 +39,7 @@ public :
   void modifier_pour_Cl(Matrice_Morse& la_matrice, DoubleTab& secmem) const override { }
   void mettre_a_jour(double t) override;
 
-  /* flux paroi_interface : d_nucleation(e, k) : diametre de nucleation de la phase k dans l'element e */
+  /* wall-interface flux: d_nucleation(e, k): nucleation diameter of phase k in element e */
   const DoubleTab& d_nucleation() const;
 
   inline const bool& has_echange_contact() const { return has_echange_contact_; }
@@ -50,7 +50,7 @@ private:
   Couplage_Parietal_PolyMAC_MPFA_helper couplage_parietal_helper_;
 };
 
-/* comme des synonymes, mais avec l'info de ce qu'on est dans que_suis_je() */
+/* treated as synonyms, but with the identity exposed through que_suis_je() */
 class Op_Dift_PolyMAC_MPFA_Elem : public Op_Diff_PolyMAC_MPFA_Elem
 {
   Declare_instanciable( Op_Dift_PolyMAC_MPFA_Elem ) ;

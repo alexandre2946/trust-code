@@ -20,7 +20,7 @@
 
 /*! @brief : class Champ_implementation_Q1
  *
- *  Decrire ici la classe Champ_implementation_Q1
+ *  Describe here the Champ_implementation_Q1 class
  *
  */
 class Champ_implementation_Q1: public Champ_implementation_sommet

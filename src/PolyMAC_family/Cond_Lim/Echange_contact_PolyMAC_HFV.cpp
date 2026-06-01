@@ -58,7 +58,7 @@ void Echange_contact_PolyMAC_HFV::init_op() const
   const Equation_base& eqn = domaine_Cl_dis().equation(), &o_eqn = ch.equation(); //equations
   i_fvf = eqn.domaine_dis().rang_frontiere(fvf->le_nom()), i_o_fvf = o_eqn.domaine_dis().rang_frontiere(nom_bord_);
 
-  int i_op = -1, o_i_op = -1, i; //indice de l'operateur de diffusion dans l'autre equation
+  int i_op = -1, o_i_op = -1, i; //index of the diffusion operator in the other equation
   for (i = 0; i < eqn.nombre_d_operateurs(); i++)
     if (sub_type(Op_Diff_PolyMAC_HFV_Elem, eqn.operateur(i).l_op_base())) i_op = i;
   if (i_op < 0) Process::exit(le_nom() + " : no diffusion operator found in " + eqn.probleme().le_nom() + " !");
@@ -69,17 +69,17 @@ void Echange_contact_PolyMAC_HFV::init_op() const
   o_diff = ref_cast(Op_Diff_PolyMAC_HFV_Elem, o_eqn.operateur(o_i_op).l_op_base());
 }
 
-/* identification des elements / faces de l'autre cote de la frontiere, avec offsets */
+/* identification of elements / faces on the other side of the boundary, with offsets */
 void Echange_contact_PolyMAC_HFV::init_f_dist() const
 {
-  if (f_dist_init_) return; //deja fait
+  if (f_dist_init_) return; //already done
   const Domaine_PolyMAC_HFV& domaine = ref_cast(Domaine_PolyMAC_HFV, fvf->domaine_dis()), &o_domaine = ref_cast(Domaine_PolyMAC_HFV, o_fvf->domaine_dis());
   const DoubleTab& xv = domaine.xv(), &o_xv = o_domaine.xv();
 
   int i, f, o_f, nf_tot = fvf->nb_faces_tot(), o_nf_tot = o_fvf->nb_faces_tot(), d, D = dimension;
   f_dist.resize(nf_tot);
 
-  DoubleTrav xvf(nf_tot, D), o_xvf(o_nf_tot, D); //positions locales/distantes -> pour calcul de correspondance
+  DoubleTrav xvf(nf_tot, D), o_xvf(o_nf_tot, D); //local/remote positions -> for computing correspondence
   for (i = 0; i <   nf_tot; i++)
     for (d = 0; d < D; d++)   xvf(i, d) =   xv(  fvf->num_face(i), d);
   for (i = 0; i < o_nf_tot; i++)
@@ -88,10 +88,10 @@ void Echange_contact_PolyMAC_HFV::init_f_dist() const
 #ifdef MEDCOUPLING_
   MCAuto<DataArrayDouble> fdad(DataArrayDouble::New()), o_fdad(DataArrayDouble::New());
   fdad->useExternalArrayWithRWAccess(xvf.addr(), nf_tot, D), o_fdad->useExternalArrayWithRWAccess(o_xvf.addr(), o_nf_tot, D);
-  //point de o_fdad le plus proche de chaque point de {f,s}dad
+  //closest point in o_fdad for each point of {f,s}dad
   MCAuto<DataArrayIdType> f_idx(nf_tot && o_nf_tot ? o_fdad->findClosestTupleId(fdad) : nullptr);
 
-  for (i = 0; i < nf_tot; i++) //remplissage de f_dist : face distante si coincidence, -1 sinon
+  for (i = 0; i < nf_tot; i++) //fill f_dist: distant face if coincident, -1 otherwise
     {
       f = fvf->num_face(i), o_f = o_nf_tot ? o_fvf->num_face((int)(f_idx->getIJ(i, 0))) : -1;
       double d2 = o_f >= 0 ? domaine.dot(&xv(f, 0), &xv(f, 0), &o_xv(o_f, 0), &o_xv(o_f, 0)) : 1e8;

@@ -19,7 +19,7 @@
 #include <TRUST_Vector.h>
 #include <Nom.h>
 
-/*! @brief Une chaine de caractere (Nom) en majuscules
+/*! @brief A character string (Nom) in uppercase.
  *
  */
 class Motcle : public Nom
@@ -56,7 +56,7 @@ public:
   friend int operator !=(const Nom& , const Motcle& ) ;
 };
 
-/*! @brief Un tableau d'objets de la classe Motcle
+/*! @brief An array of Motcle objects.
  *
  */
 class Motcles : public VECT(Motcle)

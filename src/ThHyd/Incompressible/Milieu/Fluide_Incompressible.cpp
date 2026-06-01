@@ -51,15 +51,15 @@ Entree& Fluide_Incompressible::readOn(Entree& is)
 void Fluide_Incompressible::set_param(Param& param) const
 {
   Fluide_base::set_param(param);
-  //La lecture de rho est rendue obligatoire ici
+  //Reading rho is made mandatory here
   param.supprimer("rho");
   param.ajouter("rho",&ch_rho_,Param::REQUIRED);
 }
 
-/*! @brief Verifie que les champs lus l'ont ete correctement.
+/*! @brief Verifies that the fields read have been set correctly.
  *
- * @throws la masse volumique (rho) n'est pas de type Champ_Uniforme
- * @throws la capacite calorifique (Cp) n'est pas de type Champ_Uniforme
+ * @throws density (rho) is not of type Champ_Uniforme
+ * @throws heat capacity (Cp) is not of type Champ_Uniforme
  */
 void Fluide_Incompressible::verifier_coherence_champs(int& err,Nom& msg)
 {

@@ -17,10 +17,10 @@
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Parser_U,"Parser_U",Objet_U);
 
-/*! @brief Surcharge Objet_U::printOn(Sortie&) Ecriture d'un Parser_U sur un flot de sortie
+/*! @brief Override of Objet_U::printOn(Sortie&). Writes a Parser_U to an output stream.
  *
- * @param (Sortie& s) le flot de sortie a utiliser
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& s) the output stream to use
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Parser_U::printOn(Sortie& s) const
 {
@@ -28,10 +28,10 @@ Sortie& Parser_U::printOn(Sortie& s) const
 }
 
 
-/*! @brief Surcharge Objet_U::readOn(Entree&) Lecture d'un Parser_U dans un flot d'entree
+/*! @brief Override of Objet_U::readOn(Entree&). Reads a Parser_U from an input stream.
  *
- * @param (Entree& s) le flot d'entree a utiliser
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& s) the input stream to use
+ * @return (Entree&) the modified input stream
  */
 Entree& Parser_U::readOn(Entree& s)
 {

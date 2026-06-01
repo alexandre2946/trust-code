@@ -16,7 +16,7 @@
 #ifndef communications_incl_H
 #define communications_incl_H
 
-/*! @brief Methodes de communications
+/*! @brief Communication methods
  *
  */
 
@@ -33,7 +33,7 @@
 
 #include <mpi.h>
 #pragma GCC diagnostic pop
-// Extensions d'OpenMPI dont Cuda-Aware:
+// OpenMPI extensions including Cuda-Aware:
 #if defined(OPEN_MPI) && OPEN_MPI
 #include <mpi-ext.h>
 #endif

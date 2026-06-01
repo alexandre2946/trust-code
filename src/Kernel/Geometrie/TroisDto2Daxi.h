@@ -19,9 +19,9 @@
 
 
 
-/*! @brief Classe TroisDto2Daxi x->alpha x
+/*! @brief Class TroisDto2Daxi x->alpha x
  *
- * @sa Interprete Pave, Actuellement le seul tyep d'objet reconnu par TRUST pour mailler, un domaine est l'objet Pave
+ * @sa Interprete Pave, Currently the only type of object recognised by TRUST for meshing a domain is the Pave object.
  */
 #include <TroisDto2D.h>
 class TroisDto2Daxi : public TroisDto2D

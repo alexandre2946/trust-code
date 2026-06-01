@@ -22,7 +22,7 @@
 
 class Champ_Face_VDF;
 
-/*! @brief classe Rotationnel_Champ_Face
+/*! @brief class Rotationnel_Champ_Face
  *
  * @sa Champ_Rotationnel Champ_Fonc_P0_VDF
  */

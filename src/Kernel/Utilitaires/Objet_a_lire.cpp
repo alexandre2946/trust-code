@@ -123,7 +123,7 @@ void Objet_a_lire::set_map_obj_initializer(map_obj_initializer_t initializer)
 void Objet_a_lire::set_flag(bool *quoi)
 {
   flag_a_lire = quoi;
-  // initialisation du flag a false
+  // initialize the flag to false
   *flag_a_lire = false;
   type = FLAG;
 }
@@ -186,9 +186,9 @@ const Nom& Objet_a_lire::get_name() const
 
 ptrParam& Objet_a_lire::add_dict(const char *nom_option, int valeur, const char *aname)
 {
-  // Le dictionnaire ne fonctionne que pour des parametres de type int:
+  // The dictionary only works for parameters of type int:
   assert(int_a_lire != 0);
-  // L'option ne doit pas encore exister dans le dictionnaire:
+  // The option must not yet exist in the dictionary:
   assert(dictionnaire_noms.search(nom_option) < 0);
 
   dictionnaire_noms.add(nom_option);
@@ -227,7 +227,7 @@ double Objet_a_lire::get_value() const
       Process::exit();
       break;
     }
-  // pour les compilos
+  // for compilers
   return 0.;
 }
 
@@ -587,7 +587,7 @@ void Objet_a_lire::read(Motcle const& motcle, Entree& is)
       {
         ArrOfInt& arr = *arrofint_a_lire;
         int size = arr.size_array();
-        // on ne veut pas de taille nulle pour etre sur que l'utilisateur a bien fait dimensionner...
+        // we don't want zero size to be sure the user has properly sized the array...
         assert(size > 0);
         for (int i = 0; i < size; i++)
           is >> arr[i];
@@ -597,7 +597,7 @@ void Objet_a_lire::read(Motcle const& motcle, Entree& is)
       {
         ArrOfDouble& arr = *arrofdouble_a_lire;
         int size = arr.size_array();
-        // on ne veut pas de taille nulle pour etre sur que l'utilisateur a bien fait dimensionner...
+        // we don't want zero size to be sure the user has properly sized the array...
         assert(size > 0);
         for (int i = 0; i < size; i++)
           is >> arr[i];

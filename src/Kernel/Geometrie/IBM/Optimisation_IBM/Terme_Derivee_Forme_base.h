@@ -23,7 +23,7 @@
 #include <TRUST_Deriv.h>
 #include <TRUST_Ref.h>
 
-/*! @brief Classe Terme_Derivee_Forme_base Cette classe represente un terme source de l'equation de projection en optimisation de forme
+/*! @brief Class Terme_Derivee_Forme_base represents a source term of the projection equation in shape optimization.
  *
  */
 class Terme_Derivee_Forme_base : public Source_base
@@ -37,7 +37,7 @@ public :
   void set_source_derivee_forme(DoubleTab&) const;
   const DoubleTab& get_source_derivee_forme() const { return source_derivee_forme->valeurs(); };
 
-  // Methodes de l interface des champs postraitables
+  // Methods of the postprocessable field interface
   void creer_champ(const Motcle& motlu) override;
   void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
   bool has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const override;
@@ -46,7 +46,7 @@ public :
 
 protected:
   OWN_PTR(Champ_Don_base) source_derivee_forme;
-  mutable OWN_PTR(Champ_Fonc_base)  champ_derivee_forme_; //!< Champ pour postraitement
+  mutable OWN_PTR(Champ_Fonc_base)  champ_derivee_forme_; //!< Field for postprocessing
 };
 
 #endif /* Terme_Derivee_Forme_base_included */

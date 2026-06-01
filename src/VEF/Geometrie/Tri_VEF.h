@@ -50,56 +50,56 @@ KOKKOS_INLINE_FUNCTION void calcul_vc_tri_views(const int* Face, double *vc, con
   int comp;
   switch(type_cl)
     {
-    case 0: // le triangle n'a pas de Face de Dirichlet
+    case 0: // the triangle has no Dirichlet face
       {
         for (comp=0; comp<2; comp++)
           vc[comp] = vs[comp]/3;
         break;
       }
 
-    case 1: // le triangle a une Face de Dirichlet :la Face 2
+    case 1: // the triangle has one Dirichlet face: face 2
       {
         for (comp=0; comp<2; comp++)
           vc[comp] = vitesse(Face[2], comp) * porosite_face(Face[2]);
         break;
       }
 
-    case 2: // le triangle a une Face de Dirichlet :la Face 1
+    case 2: // the triangle has one Dirichlet face: face 1
       {
         for (comp=0; comp<2; comp++)
           vc[comp] = vitesse(Face[1], comp) * porosite_face(Face[1]);
         break;
       }
 
-    case 4: // le triangle a une Face de Dirichlet :la Face 0
+    case 4: // the triangle has one Dirichlet face: face 0
       {
         for (comp=0; comp<2; comp++)
           vc[comp] = vitesse(Face[0], comp) * porosite_face(Face[0]);
         break;
       }
 
-    case 3: // le triangle a deux faces de Dirichlet :les faces 1 et 2
+    case 3: // the triangle has two Dirichlet faces: faces 1 and 2
       {
         for (comp=0; comp<2; comp++)
           vc[comp] = vsom[comp];
         break;
       }
 
-    case 5: // le triangle a deux faces de Dirichlet :les faces 0 et 2
+    case 5: // the triangle has two Dirichlet faces: faces 0 and 2
       {
         for (comp=0; comp<2; comp++)
           vc[comp] = vsom[2+comp];
         break;
       }
 
-    case 6: // le triangle a deux faces de Dirichlet :les faces 0 et 1
+    case 6: // the triangle has two Dirichlet faces: faces 0 and 1
       {
         for (comp=0; comp<2; comp++)
           vc[comp] = vsom[4+comp];
         break;
       }
 
-    } // fin du switch
+    } // end of switch
 }
 #endif
 

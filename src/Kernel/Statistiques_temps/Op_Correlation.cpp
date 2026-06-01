@@ -37,10 +37,10 @@ void Op_Correlation::completer(const Probleme_base& Pb, const Nom& prefix)
   integrale_tps_a_ = la_moyenne_a().integrale();
   integrale_tps_b_ = la_moyenne_b().integrale();
 
-  // On recupere le domaine discretise
+  // Retrieve the discretized domain
   const Domaine_dis_base& domaine = a->get_ref_domaine_dis_base();
 
-  // Dimensionnement du champ integrale_champ a la meme taille que mon_champ
+  // Size the integrale_champ field to the same size as mon_champ
   const DoubleTab& tab_a = valeurs_a();
   const DoubleTab& tab_b = valeurs_b();
 
@@ -51,8 +51,8 @@ void Op_Correlation::completer(const Probleme_base& Pb, const Nom& prefix)
   const int nb_compo_a = source_a.nb_comp();
   const int nb_compo_b = source_b.nb_comp();
 
-  //Pour utiliser nom_cible uniquement si a et b sont des Champ_Generique_refChamp
-  //pour pouvoir reproduire le nom des variables dans le lml
+  // Use nom_cible only if both a and b are Champ_Generique_refChamp,
+  // so that the variable names can be reproduced in the lml output.
   Noms noms_a, noms_b;
 
   if (!(sub_type(Champ_Generique_refChamp,a.valeur()) && (sub_type(Champ_Generique_refChamp, b.valeur()))))
@@ -69,8 +69,8 @@ void Op_Correlation::completer(const Probleme_base& Pb, const Nom& prefix)
   const Nom nom_a = noms_a[0];
   const Nom nom_b = noms_b[0];
 
-  //Cas particulier si a et b sont des Champ_Generique_refChamp
-  //pour pouvoir reproduire le nom des variables dans le lml
+  // Special case when a and b are Champ_Generique_refChamp,
+  // so that the variable names can be reproduced in the lml output.
   Noms compo_a, compo_b;
 
   if (!(sub_type(Champ_Generique_refChamp,a.valeur()) && (sub_type(Champ_Generique_refChamp, b.valeur()))))
@@ -89,16 +89,16 @@ void Op_Correlation::completer(const Probleme_base& Pb, const Nom& prefix)
 
   int nb_valeurs_nodales = -1;
 
-  // Note B.M.: integrale_tps_ab_ est deja type dans Correlation::associer
-  // En revanche fixer_nb_valeurs_nodales n'est pas fait.
+  // Note B.M.: integrale_tps_ab_ is already typed in Correlation::associer,
+  // but fixer_nb_valeurs_nodales has not yet been called.
 
   if ((tab_a.get_md_vector() != tab_b.get_md_vector())
       || (tab_a.dimension_tot(0) != tab_b.dimension_tot(0))
       || (nb_compo_a > 1 && (tab_a.nb_dim() == 1 || tab_a.dimension(1) != nb_compo_a))
       || (nb_compo_b > 1 && (tab_b.nb_dim() == 1 || tab_b.dimension(1) != nb_compo_b)))
     {
-      // Support different pour les champs a et b ou pour leurs composantes
-      // Alors on ramene aux elements en creant un Champ_Fonc_PO_VDF ou VEF
+      // Different support for fields a and b or for their components:
+      // bring everything to elements by creating a Champ_Fonc_P0_VDF or VEF.
       integrale_tps_ab_.support_different() = 1;
       Nom Champ_Fonc_P0 = "Champ_Fonc_P0_";
       Champ_Fonc_P0 += Pb.discretisation().que_suis_je().substr_old(1, 3);
@@ -107,7 +107,7 @@ void Op_Correlation::completer(const Probleme_base& Pb, const Nom& prefix)
     }
   else
     {
-      // Meme support pour les champs a et b
+      // Same support for fields a and b
       integrale_tps_ab_.support_different() = 0;
       if (tab_a.size_reelle_ok())
         nb_valeurs_nodales = tab_a.dimension(0);
@@ -120,11 +120,11 @@ void Op_Correlation::completer(const Probleme_base& Pb, const Nom& prefix)
   if (nb_compo_a == 1)
     if (nb_compo_b == 1)
       {
-        // A et B champs scalaires
+        // A and B are scalar fields
       }
     else
       {
-        // A champ scalaire, B champ vectoriel
+        // A is a scalar field, B is a vector field
         noms_composantes.dimensionner(nb_comp);
         Nom debut("Correlation_");
         debut += nom_a + "_";
@@ -133,7 +133,7 @@ void Op_Correlation::completer(const Probleme_base& Pb, const Nom& prefix)
       }
   else if (nb_compo_b == 1)
     {
-      // A champ vectoriel, B champ scalaire
+      // A is a vector field, B is a scalar field
       noms_composantes.dimensionner(nb_comp);
       Nom debut("Correlation_");
       debut += nom_b + "_";
@@ -142,7 +142,7 @@ void Op_Correlation::completer(const Probleme_base& Pb, const Nom& prefix)
     }
   else
     {
-      // A et B champs vectoriels
+      // A and B are vector fields
       noms_composantes.dimensionner(nb_comp);
       Nom debut("Correlation_");
       for (int i = 0; i < nb_compo_a; i++)
@@ -164,11 +164,11 @@ void Op_Correlation::completer(const Probleme_base& Pb, const Nom& prefix)
   integrale_tps_ab_.le_champ_calcule().fixer_nb_comp(nb_comp);
 
   // BM: le parametre de fixer_nb_valeurs_nodales est inutile,
-  //  le champ sait determiner tout seul combien de ddl il a, mais
-  //  il y a un test sur le parametre: il faut que la valeur soit la bonne.
+  //  The field can determine on its own how many DOFs it has, but
+  //  there is a check on the parameter: the value must be correct.
   integrale_tps_ab_.le_champ_calcule().fixer_nb_valeurs_nodales(nb_valeurs_nodales);
 
-  // On fixe les unites
+  // Set the units
   Nom unite(unites_a[0]);
   unite += ".";
   unite += unites_b[0];
@@ -192,7 +192,7 @@ DoubleTab Op_Correlation::calculer_valeurs() const
   const double dt_ab = dt_integration_ab();
   if (dt_ab > 0)
     {
-      // On calcule Moyenne(a'b')=Moyenne(ab)-Moyenne(a)*Moyenne(b)
+      // Compute Mean(a'b') = Mean(ab) - Mean(a)*Mean(b)
       correlation.le_champ_calcule().valeurs() /= dt_ab;
       const double dt_a = dt_integration_a();
       const double dt_b = dt_integration_b();

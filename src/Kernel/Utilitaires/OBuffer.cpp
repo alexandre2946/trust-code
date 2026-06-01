@@ -41,28 +41,28 @@ int OBuffer::get_precision()
 {
   return (int)buf_->precision();
 }
-/*! @brief Force l'ecriture sur disque des donnees dans le tampon Utilise l'implementation de la classe ofstream
+/*! @brief @brief Forces writing of buffered data to disk. Uses the ofstream implementation.
  *
- * @return (Sortie&) *this
+ * @return *this
  */
 Sortie& OBuffer::flush()
 {
   return *this;
 }
 
-/*! @brief ajoute le caractere nul a la fin du buffer pour en faire une chaine de caracteres valide.
+/*! @brief Appends a null character at the end of the buffer to make it a valid C string.
  *
- * len() renvoie la longueur du buffer, y compris le \0
- *   Voir Ecr_Fic_Par::syncfile()
+ * len() returns the buffer length including the null terminator.
+ *   See EcrFicPartage::syncfile().
  *
  */
 void OBuffer::put_null_char()
 {
-  assert(! bin_); // Ca n'a pas de sens en binaire
+  assert(! bin_); // Makes no sense in binary mode
   buf_->put('\0');
 }
 
-/*! @brief Renvoie un pointeur sur le debut du buffer.
+/*! @brief Returns a pointer to the beginning of the buffer.
  *
  */
 const char* OBuffer::str()
@@ -72,7 +72,7 @@ const char* OBuffer::str()
   return string_.c_str();
 }
 
-// Renvoie le nombre d'octets contenus dans le buffer.
+// Returns the number of bytes in the buffer.
 int OBuffer::len()
 {
   return (int)buf_->tellp();

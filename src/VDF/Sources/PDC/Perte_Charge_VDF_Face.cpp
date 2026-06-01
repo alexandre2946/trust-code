@@ -45,9 +45,9 @@ Entree& Perte_Charge_VDF_Face::readOn(Entree& s )
 
 /////////////////////////////////////////////////////////////////////
 //
-//                    Implementation des fonctions
+//                    Implementation of functions
 //
-//               de la classe Perte_Charge_VDF_Face
+//               of the Perte_Charge_VDF_Face class
 //
 ////////////////////////////////////////////////////////////////////
 

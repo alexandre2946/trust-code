@@ -34,14 +34,13 @@ void Temperature_imposee_paroi_rayo_semi_transp::completer()
   Temperature_imposee_paroi::completer();
 }
 
-/*! @brief Renvoie un booleen indiquant la compatibilite des conditions aux limites avec l'equation specifiee en parametre.
+/*! @brief Returns a boolean indicating whether the boundary conditions are compatible with the specified equation.
  *
- *     Des CL de type Temperature_imposee_paroi sont compatibles
- *     avec une equation dont le domaine est la Thermique
- *     ou bien indetermine.
+ *  @brief Boundary conditions of type Temperature_imposee_paroi are compatible
+ *     with an equation whose domain is Thermique or indetermine.
  *
- * @param (Equation_base& eqn) l'equation avec laquelle il faut verifier la compatibilite
- * @return (int) valeur booleenne, 1 si les CL sont compatibles avec l'equation 0 sinon
+ * @param eqn the equation against which compatibility must be verified
+ * @return (int) boolean value, 1 if the BCs are compatible with the equation, 0 otherwise
  */
 int Temperature_imposee_paroi_rayo_semi_transp::compatible_avec_eqn(const Equation_base& eqn) const
 {
@@ -76,8 +75,8 @@ void Temperature_imposee_paroi_rayo_semi_transp::calculer_temperature_bord(doubl
     }
   else
     {
-      // La temperature de paroi etant directement donnee par le champ_front
-      // associe a la condition a la limite, il n'y a rien a calculer ici
+      // The wall temperature is directly given by the champ_front
+      // associated with the boundary condition, so there is nothing to compute here
     }
 }
 

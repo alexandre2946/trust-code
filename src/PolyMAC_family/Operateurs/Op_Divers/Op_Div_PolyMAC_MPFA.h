@@ -20,8 +20,8 @@
 
 /*! @brief class Op_Div_PolyMAC_MPFA
  *
- *   Cette classe represente l'operateur de divergence La discretisation est PolyMAC_MPFA
- *   On calcule la divergence d'un champ_P1NC (la vitesse)
+ *   Divergence operator for the PolyMAC_MPFA discretization.
+ *   Computes the divergence of a velocity field.
  *
  * @sa Op_Div_PolyMAC_HFV
  *

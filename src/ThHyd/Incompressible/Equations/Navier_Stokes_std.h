@@ -27,28 +27,27 @@
 
 class Fluide_base;
 
-/*! @brief classe Navier_Stokes_std Cette classe porte les termes de l'equation de la dynamique
+/*! @brief Navier_Stokes_std This class carries the terms of the momentum equation
  *
- *     pour un fluide sans modelisation de la turbulence.
- *     On suppose l'hypothese de fluide incompressible: div U = 0
- *     On considere la masse volumique constante (egale a rho_0) sauf dans le
- *     terme des forces de gravite (hypotheses de Boussinesq).
- *     Sous ces hypotheses, on utilise la forme suivante des equations de
- *     Navier_Stokes:
- *        DU/dt = div(terme visqueux) - gradP/rho_0 + Bt(T-T0)g + autres sources/rho_0
+ *     for a fluid without turbulence modelling.
+ *     The incompressible fluid hypothesis is assumed: div U = 0.
+ *     The density is considered constant (equal to rho_0) except in the
+ *     gravity force term (Boussinesq hypothesis).
+ *     Under these hypotheses, the following form of the Navier-Stokes equations is used:
+ *        DU/dt = div(viscous term) - gradP/rho_0 + Bt(T-T0)g + other sources/rho_0
  *        div U = 0
- *     avec DU/dt : derivee particulaire de la vitesse
- *          rho_0 : masse volumique de reference
- *          T0    : temperature de reference
- *          Bt    : coefficient de dilatabilite du fluide
- *          g     : vecteur gravite
- *     Rq : l'implementation de la classe permet bien sur de negliger
- *          certains termes de l'equation (le terme visqueux, le terme
- *          convectif, tel ou tel terme source).
- *     L'inconnue est le champ de vitesse.
+ *     where DU/dt : material derivative of velocity
+ *           rho_0 : reference density
+ *           T0    : reference temperature
+ *           Bt    : thermal expansion coefficient of the fluid
+ *           g     : gravity vector
+ *     Note: the class implementation allows neglecting
+ *           certain terms of the equation (viscous term, convective term,
+ *           any given source term).
+ *     The unknown is the velocity field.
  *
- *     Pour le traitement des cas un peu particulier : ajout de Traitement_particulier
- *     exemple : THI, canal (CA)
+ *     For handling special cases: addition of Traitement_particulier
+ *     example: THI, channel (CA)
  *
  * @sa Equation_base Pb_Hydraulique Pb_Thermohydraulique
  */
@@ -131,7 +130,7 @@ public :
   virtual const Champ_base& diffusivite_pour_pas_de_temps() const;
   virtual const Champ_base& vitesse_pour_transport() const;
 
-  //Methodes de l interface des champs postraitables
+  // Methods of the post-processable fields interface
   /////////////////////////////////////////////////////
   void creer_champ(const Motcle& motlu) override;
   const Champ_base& get_champ(const Motcle& nom) const override;
@@ -193,15 +192,15 @@ protected:
   Nom chaine_champ_combi;
   int methode_calcul_pression_initiale_;
   bool postraiter_gradient_pression_sans_masse_ = false;
-  // pour genepi il est important d avoir divu =0 car accumulation d'erreur
-  // meme si c'est pas faisable avec tous les schemas
+  // for genepi it is important to have divu=0 because of error accumulation
+  // even if it is not achievable with all schemes
   int div_u_nul_et_non_dsurdt_divu_;
 
 private :
-  // Pression au debut du pas de temps, utile pour abortTimeStep, notamment en Piso
-  // WEC : a terme, mettre 2 cases en temps pour le champ la_pression
+  // Pressure at the beginning of the time step, useful for abortTimeStep, in particular for Piso
+  // WEC: eventually, use 2 time slots for the la_pression field
   DoubleTab P_n;
-  // Pour ne pas calculer un gradient de plus si pas de postraitement du gradient de pression
+  // To avoid computing an extra gradient if no post-processing of the pressure gradient
   mutable int postraitement_gradient_P_;
   double LocalFlowRateRelativeError() const;  // Estimation of a flow rate relative error
 };

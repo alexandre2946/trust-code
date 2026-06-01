@@ -58,7 +58,7 @@ Entree& Champ_Composite::readOn(Entree& is)
         Process::exit();
       }
 
-  // pour la methode valeurs()
+  // for the valeurs() method
   const int ncompo = z_fld_[0]->nb_comp() * dim_, nnodes = z_fld_[0]->valeurs().dimension_tot(0);
   fixer_nb_comp(ncompo);
   fixer_nb_valeurs_nodales(nnodes);

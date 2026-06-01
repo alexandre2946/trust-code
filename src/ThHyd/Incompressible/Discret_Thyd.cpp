@@ -105,8 +105,8 @@ void Discret_Thyd::creer_champ_vorticite(const Schema_Temps_base&, const Champ_I
 
 void Discret_Thyd::critere_Q(const Domaine_dis_base&, const Domaine_Cl_dis_base&, const Champ_Inc_base&, OWN_PTR(Champ_Fonc_base)&) const
 {
-  // pour le VDF, on a besoin du OWN_PTR(Domaine_Cl_dis_base), mais pas pour le VEF
-  // -->> on passe quand meme l argument mais on n en fait rien!!!
+  // for VDF, the OWN_PTR(Domaine_Cl_dis_base) is needed, but not for VEF
+  // -->> the argument is passed anyway but nothing is done with it!!!
   Cerr << "Discret_Thyd::critere_Q() does nothing" << finl;
   Cerr << que_suis_je() << " needs to overload it !" << finl;
   Process::exit();
@@ -133,8 +133,8 @@ void Discret_Thyd::section_passage(const Domaine_dis_base& z, const DoubleVect& 
 
 void Discret_Thyd::y_plus(const Domaine_dis_base&, const Domaine_Cl_dis_base&, const Champ_Inc_base&, OWN_PTR(Champ_Fonc_base)&) const
 {
-  // pour le VDF, on a besoin du OWN_PTR(Domaine_Cl_dis_base), mais pas pour le VEF
-  // -->> on passe quand meme l argument mais on n en fait rien!!!
+  // for VDF, the OWN_PTR(Domaine_Cl_dis_base) is needed, but not for VEF
+  // -->> the argument is passed anyway but nothing is done with it!!!
   Cerr << "Discret_Thyd::y_plus() does nothing" << finl;
   Cerr << que_suis_je() << " needs to overload it !" << finl;
   Process::exit();

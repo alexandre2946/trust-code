@@ -40,9 +40,9 @@ Sortie& Solveur_U_P::printOn(Sortie& os ) const { return Simple::printOn(os); }
 
 Entree& Solveur_U_P::readOn(Entree& is ) { return Simple::readOn(is); }
 
-//Entree : Uk-1 ; Pk-1
-//Sortie Uk ; Pk
-//k designe une iteration
+//Input: Uk-1 ; Pk-1
+//Output: Uk ; Pk
+//k denotes an iteration
 void Solveur_U_P::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pression,double dt,Matrice_Morse& matrice_inut,double seuil_resol,DoubleTrav& secmem,int nb_ite,int& converge, int& ok)
 {
   if (eqn.probleme().is_dilatable())
@@ -62,7 +62,7 @@ void Solveur_U_P::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pre
   /* MD_Vector (vitesse, pression) */
   MD_Vector md_UP;
   MD_Vector_composite mds;
-  DoubleTab_parts ppart(pression); //dans PolyMAC_CDO, pression contient (p, v) -> on doit ignorer la 2e partie...
+  DoubleTab_parts ppart(pression); //in PolyMAC_CDO, pression contains (p, v) -> the second part must be ignored...
 
   mds.add_part(current.get_md_vector(), current.line_size());
   if (is_PolyMAC_CDO)
@@ -82,20 +82,20 @@ void Solveur_U_P::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pre
   Inconnues_parts[0] = current;
   Inconnues_parts[1] = is_PolyMAC_CDO ? ppart[0] : pression;
 
-  Matrice_Bloc Matrice_global(2,2) ; //matrice M.(du, dp) = (Navier-Stokes, divergence)
+  Matrice_Bloc Matrice_global(2,2) ; //matrix M.(du, dp) = (Navier-Stokes, divergence)
 
-  /* ligne Navier-Stokes : blocs N-S, bloc gradient */
+  /* Navier-Stokes row: N-S block, gradient block */
   Matrice_global.get_bloc(0,0).typer("Matrice_Morse");
   Matrice_Morse& matrice=ref_cast(Matrice_Morse, Matrice_global.get_bloc(0,0).valeur());
   Matrice_global.get_bloc(0,1).typer("Matrice_Morse");
   Matrice_Morse& mat_grad=ref_cast(Matrice_Morse, Matrice_global.get_bloc(0,1).valeur());
 
-  if (eqnNS.has_interface_blocs()) /* si interface_blocs : on peut remplir les deux d'un coup */
+  if (eqnNS.has_interface_blocs()) /* if interface_blocs: both can be filled at once */
     {
       eqnNS.dimensionner_blocs({{ "vitesse", &matrice }, { "pression", &mat_grad }});
       eqnNS.assembler_blocs_avec_inertie({{ "vitesse", &matrice }, { "pression", &mat_grad }}, residu_parts[0]);
     }
-  else /* sinon : moins elegant */
+  else /* otherwise: less elegant */
     {
       Operateur_Grad& gradient = eqnNS.operateur_gradient();
 
@@ -104,7 +104,7 @@ void Solveur_U_P::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pre
       gradient->dimensionner( mat_grad);
       gradient->contribuer_a_avec(pression, mat_grad);
       mat_grad.get_set_coeff()*=-1;
-      /* pour repasser en increments */
+      /* to convert back to increments */
       residu_parts[0]*=-1;
       matrice.ajouter_multvect(current, residu_parts[0]);
       gradient->ajouter(pression,residu_parts[0]);
@@ -133,7 +133,7 @@ void Solveur_U_P::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pre
 
       if (!has_P_ref && !Process::me()) mat_diag.coeff(0, 0) = 1; //revient a imposer P(0) = 0
 
-      //en PolyMAC_CDO, on doit ajouter des lignes vides a grad et des colonnes vides a div
+      //in PolyMAC_CDO, empty rows must be added to grad and empty columns to div
       int n = matrice.get_tab1().size_array();
       mat_grad.get_set_tab1().resize(n);
       for (int i = mat_grad.get_tab1().size_array(); i < n; i++)
@@ -171,15 +171,15 @@ void Solveur_U_P::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pre
       Operateur_Div_base& divergence = eqnNS.operateur_divergence().valeur();
       Matrice_global.get_bloc(1,0).typer("Matrice_Morse");
       Matrice_Morse& mat_div_v = ref_cast(Matrice_Morse, Matrice_global.get_bloc(1,0).valeur());
-      if (divergence.has_interface_blocs()) /* si interface_blocs : direct */
+      if (divergence.has_interface_blocs()) /* if interface_blocs: direct */
         {
           Matrice_global.get_bloc(1,1).typer("Matrice_Morse");
           Matrice_Morse& mat_div_p = ref_cast(Matrice_Morse, Matrice_global.get_bloc(1,1).valeur());
           divergence.dimensionner_blocs({ { "vitesse", &mat_div_v } , { "pression", &mat_div_p}});
           divergence.ajouter_blocs({ { "vitesse", &mat_div_v } , { "pression", &mat_div_p}}, residu_parts[1]);
-          if (!has_P_ref && !Process::me()) mat_div_p(0, 0) += 1; //revient a imposer P(0) = 0
+          if (!has_P_ref && !Process::me()) mat_div_p(0, 0) += 1; //equivalent to imposing P(0) = 0
         }
-      else /* sinon : l'operateur remplit mat_div_v, on construit a la main mat_div_p = 0 */
+      else /* otherwise: the operator fills mat_div_v, and mat_div_p = 0 is built manually */
         {
           divergence.dimensionner(mat_div_v);
           divergence.contribuer_a_avec(current, mat_div_v);
@@ -187,17 +187,17 @@ void Solveur_U_P::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pre
           Matrice_global.get_bloc(1,1).typer("Matrice_Diagonale");
           Matrice_Diagonale& mat_div_p = ref_cast(Matrice_Diagonale,Matrice_global.get_bloc(1,1).valeur());
           mat_div_p.dimensionner(mat_div_v.nb_lignes());
-          if (!has_P_ref && !Process::me()) mat_div_p.coeff(0, 0) += 1; //revient a imposer P(0) = 0
+          if (!has_P_ref && !Process::me()) mat_div_p.coeff(0, 0) += 1; //equivalent to imposing P(0) = 0
         }
       le_solveur_->reinit();
       le_solveur_->resoudre_systeme(Matrice_global,residu,Inconnues);
 
-      //Calcul de Uk = U*_k + U'k
+      //Compute Uk = U*_k + U'k
       current  += Inconnues_parts[0];
       pression += Inconnues_parts[1];
       //current.echange_espace_virtuel();
       Debog::verifier("Solveur_U_P::iterer_NS current",current);
-      eqn.solv_masse().corriger_solution(current, current);    //CoviMAC : mise en coherence de ve avec vf
+      eqn.solv_masse().corriger_solution(current, current);    //CoviMAC: enforce consistency between ve and vf
       eqnNS.assembleur_pression()->modifier_solution(pression);
 
       if (1)

@@ -19,11 +19,11 @@
 #include <Traitement_particulier_NS_base.h>
 #include <TRUSTTabs_forward.h>
 
-/*! @brief classe Traitement_particulier_NS_canal Cette classe permet de faire les traitements particuliers
+/*! @brief Traitement_particulier_NS_canal This class performs specific post-processing treatments
  *
- *      pour le calcul d'un canal plan :
- *          * conservation du debit
- *          * calculs de moyennes
+ *      for plane channel flow simulations:
+ *          * flow rate conservation
+ *          * statistical averaging
  *
  *
  * @sa Navier_Stokes_Turbulent, Traitement_particulier_base, Traitement_particulier_VDF
@@ -63,7 +63,7 @@ protected :
   int Ny = -10, Nval, Nphase;
   DoubleTab val_moy_tot, val_moy_temp, val_moy_phase;
   DoubleVect Y, Y_tot, compt, compt_tot;
-  IntVect Nb_ech_phase;     // nombre d'echantillons par phase
+  IntVect Nb_ech_phase;     // number of samples per phase
   IntTab Tab_recap;
   double w = -100., freq= -100.;
   int ind_phase, oui_profil_nu_t, oui_profil_Temp, oui_repr, oui_pulse;

@@ -97,17 +97,17 @@ static void choose_internal_diagonal_for_tetrahedron(Domaine& domain)
 
       if (id == 0)
         {
-          // on echange les sommets 1 et 2
+          // swap vertices 1 and 2
           cells(cell,1) = s2;
           cells(cell,2) = s1;
         }
       else if (id == 1)
         {
-          // rien a faire
+          // nothing to do
         }
       else if (id == 2)
         {
-          // on echange les sommets 2 et 3
+          // swap vertices 2 and 3
           cells(cell,2) = s3;
           cells(cell,3) = s2;
         }
@@ -168,7 +168,7 @@ static void ensure_positive_volumes_for_triangle(Domaine& domain)
       const double area = 0.5 * ((x1-x0)*(y2-y0) - (x2-x0)*(y1-y0));
       if ( area < 0.)
         {
-          // on echange les sommets 0 et 2
+          // swap vertices 0 and 2
           cells(cell,0) = s2;
           cells(cell,2) = s0;
         }
@@ -212,7 +212,7 @@ static void ensure_positive_volumes_for_tetrahedron(Domaine& domain)
 
       if (volume < 0.)
         {
-          // on echange les sommets 0 et 2
+          // swap vertices 0 and 2
           cells(cell,0) = s2;
           cells(cell,2) = s0;
         }

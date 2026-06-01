@@ -50,13 +50,13 @@ public:
   virtual const Domaine_dis_base& domaine_dis_base() const =0;
   virtual const Domaine_Cl_dis_base& domaine_Cl_dis_base() const =0;
   virtual int modifier_secmem(DoubleTab&)=0;
-  /* prise en compte des variations de pression aux CLs lors du calcul d'increments de pression.
-     Utilise seulement par PolyMAC_HFV. fac est le coefficient tel que p_final - press = fac * sol */
+  /* accounting for pressure variations at boundary conditions during pressure increment calculation.
+     Used only by PolyMAC_HFV. fac is the coefficient such that p_final - press = fac * sol */
   virtual void modifier_secmem_pour_incr_p(const DoubleTab& press, const double fac, DoubleTab& incr) const { };
   virtual int modifier_solution(DoubleTab&)=0;
 
-  /* dimensionnement / assemblage de l'equation de continuite sum_k alpha_k = 1 en Pb_continuite */
-  /* meme interface que dimensionner/assembler_blocs dans Equation_base */
+  /* sizing / assembly of the continuity equation sum_k alpha_k = 1 in Pb_continuite */
+  /* same interface as dimensionner/assembler_blocs in Equation_base */
   virtual void dimensionner_continuite(matrices_t matrices, int aux_only = 0) const
   {
     Process::exit(Nom("dimensionner_continuite(...) must be overloaded by ") + que_suis_je());
@@ -79,8 +79,8 @@ public:
   }
 
 private:
-  // Drapeau, indique si le solveur resout un increment de pression ou
-  // la pression.
+  // Flag, indicates whether the solver solves a pressure increment or
+  // the pressure.
   int resoudre_increment_pression_;
   int resoudre_en_u_;
 };

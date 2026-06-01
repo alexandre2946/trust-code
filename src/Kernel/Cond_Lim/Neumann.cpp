@@ -26,11 +26,11 @@ Sortie& Neumann::printOn(Sortie& s) const { return s << que_suis_je() << finl; }
 
 Entree& Neumann::readOn(Entree& s) { return Cond_lim_base::readOn(s); }
 
-/*! @brief Renvoie la valeur du flux impose sur la i-eme composante du champ representant le flux a la frontiere.
+/*! @brief Returns the value of the imposed flux on the i-th component of the field representing the flux at the boundary.
  *
- * @param (int i) indice suivant la premiere dimension du champ
- * @return (double) la valeur imposee sur la composante du champ specifiee
- * @throws deuxieme dimension du champ de frontiere superieur a 1
+ * @param (int i) index along the first dimension of the field
+ * @return (double) the imposed value on the specified field component
+ * @throws second dimension of the boundary field greater than 1
  */
 double Neumann::flux_impose(int i) const
 {
@@ -44,11 +44,11 @@ double Neumann::flux_impose(int i) const
   return 0.;
 }
 
-/*! @brief Renvoie la valeur du flux impose sur la (i,j)-eme composante du champ representant le flux a la frontiere.
+/*! @brief Returns the value of the imposed flux on the (i,j)-th component of the field representing the flux at the boundary.
  *
- * @param (int i) indice suivant la premiere dimension du champ
- * @param (int j) indice suivant la deuxieme dimension du champ
- * @return (double) la valeur imposee sur la composante du champ specifiee
+ * @param (int i) index along the first dimension of the field
+ * @param (int j) index along the second dimension of the field
+ * @return (double) the imposed value on the specified field component
  */
 double Neumann::flux_impose(int i, int j) const
 {

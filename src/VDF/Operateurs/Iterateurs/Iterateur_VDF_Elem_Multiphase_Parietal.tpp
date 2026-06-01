@@ -93,7 +93,7 @@ void Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_bords_flux_parietal_(const BC& cl
           if (milc.has_saturation(k, l))
             {
               Saturation_base& z_sat = milc.get_saturation(k, l);
-              const int ind_trav = (k * (N - 1) - (k - 1) * (k) / 2) + (l - k - 1); // Et oui ! matrice triang sup !
+              const int ind_trav = (k * (N - 1) - (k - 1) * (k) / 2) + (l - k - 1); // Yes! upper triangular matrix!
               assert(press.line_size() == 1);
 
               // recuperer Tsat et sigma ...
@@ -107,7 +107,7 @@ void Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_bords_flux_parietal_(const BC& cl
                 }
 
               z_sat.Lvap(press.get_span_tot() /* elem reel */, Lvap_tab.get_span_tot(), nb_max_sat, ind_trav);
-              z_sat.Tsat(press.get_span_tot() /* elem reel */, Ts_tab.get_span_tot(), nb_max_sat, ind_trav); // Tentative avec pression passee
+              z_sat.Tsat(press.get_span_tot() /* elem reel */, Ts_tab.get_span_tot(), nb_max_sat, ind_trav); // Attempt with previous pressure
             }
     }
 
@@ -200,7 +200,7 @@ void Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_bords_flux_parietal_(const BC& cl
         }
       else if (is_Neumann_flux_parietal) // Neumann
         {
-          // Ici on fait un Newton simple
+          // Here we perform a simple Newton iteration
           in.Tp = donnee(e, 0);
 
           double flux_imp = ref_cast(Neumann, cl).flux_impose(face - ndeb);

@@ -61,7 +61,7 @@ Entree&  Raffiner_isotrope_parallele::interpreter(Entree& is)
   // XD_CONT writing Domaines in hdf format
   param.lire_avec_accolades(is);
 
-  // Force un fichier unique au dela d'un certain nombre de rangs MPI:
+  // Force a single file beyond a certain number of MPI ranks:
   if (Process::force_single_file(Process::nproc(), org+".Zones"))
     format_hdf = true;
   int binaire=!form;

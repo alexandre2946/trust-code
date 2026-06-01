@@ -39,12 +39,12 @@ Sortie& Echange_global_impose::printOn(Sortie& s ) const
   return s << que_suis_je() << finl;
 }
 
-/*! @brief Simple appel a Echange_impose_base::readOn(Entree&) Lit les specifications des conditions aux limites
+/*! @brief Simple call to Echange_impose_base::readOn(Entree&) Reads the boundary condition specifications
  *
- *     a partir d'un flot d'entree.
+ *     from an input stream.
  *
- * @param (Entree& s) un flot d'entree
- * @return (Entree&) le flot de sortie modifie
+ * @param (Entree& s) an input stream
+ * @return (Entree&) the modified output stream
  */
 Entree& Echange_global_impose::readOn(Entree& s )
 {
@@ -132,8 +132,8 @@ double Echange_global_impose::champ_exterieur(int i, const Champ_front_base& cha
       const Champ_base& rho=mil.masse_volumique();
       if ((nom_pb.debute_par("Probleme_Interface")|| nom_pb==Nom("Probleme_Thermo_Front_Tracking"))||!sub_type(Champ_Uniforme,rho)||nom_pb==Nom("Pb_Conduction"))
         {
-          // Pour le front tracking, on ne divise pas par Rho*Cp
-          // ni pour QC
+          // For front tracking, we do not divide by Rho*Cp
+          // nor for QC
           d_rho=1.;
           d_Cp=1.;
         }
@@ -186,8 +186,8 @@ double Echange_global_impose::champ_exterieur(int i,int j, const Champ_front_bas
       const Champ_base& rho=mil.masse_volumique();
       if ((nom_pb.debute_par("Probleme_Interface")|| nom_pb.debute_par("Probleme_FT")|| nom_pb==Nom("Probleme_Thermo_Front_Tracking"))||!sub_type(Champ_Uniforme,rho)||nom_pb==Nom("Pb_Conduction"))
         {
-          // Pour le front tracking, on ne divise pas par Rho*Cp
-          // ni pour QC
+          // For front tracking, we do not divide by Rho*Cp
+          // nor for QC
           d_rho=1.;
           d_Cp=1.;
         }

@@ -58,7 +58,7 @@ Champ_Fonc_base& Modele_turbulence_hyd_LES_Wale_VEF::calculer_viscosite_turbulen
 
   const int nb_elem_tot = domaine_VEF.nb_elem_tot();
   DoubleTrav tab_duidxj(nb_elem_tot,dimension,dimension);
-  // Patrick : on travaille sur le champ filtre.
+  // Patrick: we work on the filtered field.
   //const Champ_P1NC& ch=(const Champ_P1NC&) mon_equation->inconnue();
   //DoubleTab ubar(la_vitesse);
   //ch.filtrer_L2(ubar);
@@ -79,7 +79,7 @@ Champ_Fonc_base& Modele_turbulence_hyd_LES_Wale_VEF::calculer_viscosite_turbulen
     double gij2[3][3];
     double sd[3][3];
 
-    // Calcul du terme gij2.
+    // Compute the term gij2.
     for (int i = 0; i < dim; i++)
       for (int j = 0; j < dim; j++)
         {
@@ -88,44 +88,44 @@ Champ_Fonc_base& Modele_turbulence_hyd_LES_Wale_VEF::calculer_viscosite_turbulen
             gij2[i][j] += duidxj(elem,i,k) * duidxj(elem,k,j);
         }
 
-    // Calcul du terme gkk2.
+    // Compute the term gkk2.
     double gkk2 = 0;
     for (int k = 0; k < dim; k++)
       gkk2 += gij2[k][k];
 
-    // Calcul de sd.
+    // Compute sd.
     for (int i = 0; i < dim; i++)
       for (int j = 0; j < dim; j++)
         {
           sd[i][j] = 0.5 * (gij2[i][j] + gij2[j][i]);
           if (i == j)
-            sd[i][j] -= gkk2 / 3.; // Terme derriere le tenseur de Kronecker.
+            sd[i][j] -= gkk2 / 3.; // Term behind the Kronecker tensor.
         }
 
-    // Calcul de sd2 et Sij2.
+    // Compute sd2 and Sij2.
     double sd2 = 0.;
     double Sij2 = 0.;
     for (int i = 0; i < dim; i++)
       for (int j = 0; j < dim; j++)
         {
           sd2 += sd[i][j] * sd[i][j];
-          //Deplacement du calcul de Sij
+          //Displacement of the Sij computation
           double Sij = 0.5 * (duidxj(elem,i,j) + duidxj(elem,j,i));
           Sij2 += Sij * Sij;
         }
 
-    // Calcul de OP1 et OP2.
+    // Compute OP1 and OP2.
     // Replace pow by sqrt and multiply, faster
     //OP1=pow(sd2,1.5);
     double OP1 = sd2 * sqrt(sd2);
     //OP2=pow(Sij2,2.5)+pow(sd2,1.25);
     double OP2 = Sij2 * Sij2 * sqrt(Sij2) + sd2 * sqrt(sqrt(sd2));
 
-    if (OP1 != 0.) // donc sd2 et OP2 par voie de consequence sont differents de zero
+    if (OP1 != 0.) // so sd2 and OP2 are consequently non-zero
       visco_turb(elem) = cw * cw * l(elem) * l(elem) * OP1 / OP2;
     else
       visco_turb(elem) = 0;
-  }); // fin de la boucle sur les elements
+  }); // end of loop over elements
   end_gpu_timer(__KERNEL_NAME__);
 
   Debog::verifier("Modele_turbulence_hyd_LES_Wale_VEF::calculer_viscosite_turbulente visco_turb 1", tab_visco_turb);

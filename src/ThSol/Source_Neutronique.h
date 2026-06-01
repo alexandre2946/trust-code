@@ -25,10 +25,9 @@ class Param;
 
 /*! @brief class Source_Neutronique
  *
- *  Cette classe represente un terme source de l'equation de la thermique
- *  du type puissance volumique issue de la neutronique.
- *  La determination de la puissance s'effectue par resolution d'equations
- *  differentielles regissant la cinetique neutronique.
+ *  Represents a source term in the thermal equation corresponding to a
+ *  volumetric power from neutronics. The power is determined by solving
+ *  the differential equations governing neutron point kinetics.
  *
  *
  * @sa Terme_Puissance_Thermique
@@ -58,22 +57,22 @@ public:
 private :
   void mul(DoubleTab& m, DoubleVect& v, DoubleVect& resu);
   void mettre_a_jour_matA(double t);
-  int N = -1;                 // Nombre de groupe >= 1
-  double Tvie = -100.;         // duree de vie d'un neutron
-  DoubleVect Un, Unp1;// Inconnus a l'instant n et n+1 : Puissance Un(0) et Concentrations Un(i) du groupe i
-  DoubleVect beta;        // beta(i) = nombre de neutrons retardees issue de l espece i,
-  double beta_som = -100.;          // somme des beta(i)
+  int N = -1;                 // number of groups >= 1
+  double Tvie = -100.;         // neutron lifetime
+  DoubleVect Un, Unp1;// unknowns at time n and n+1: power Un(0) and concentrations Un(i) of group i
+  DoubleVect beta;        // beta(i) = number of delayed neutrons from species i
+  double beta_som = -100.;          // sum of the beta(i)
   DoubleVect lambda;         //
-  DoubleTab matA;           // matrice du systeme d'equa diff
-  double dt= -100.;                 // pas de temps
+  DoubleTab matA;           // matrix of the differential equation system
+  double dt= -100.;                 // time step
   int init = 1;
-  double P0= -100.;                 // Puissance a t=0
-  DoubleVect Ci0;         // Concentration a t=0
+  double P0= -100.;                 // power at t=0
+  DoubleVect Ci0;         // concentration at t=0
   int Ci0_ok=0;
   double dt_impr = 1e10;
   double temps_courant= -100.;
   void (Source_Neutronique::*faire_un_pas_de_temps)() = nullptr;
-  double Tmoy= -100.; // temperature moyenne
+  double Tmoy= -100.; // average temperature
 
   Parser_U fct_tT;
   Nom f_xyz;

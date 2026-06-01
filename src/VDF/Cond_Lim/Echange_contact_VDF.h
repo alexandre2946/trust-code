@@ -27,10 +27,10 @@ class Front_VF;
 class Domaine_VDF;
 #include <Domaine_forward.h>
 
-/*! @brief classe : Echange_contact_VDF Outre le champ_front representant la temperature de paroi,
+/*! @brief class: Echange_contact_VDF In addition to the boundary field representing the wall temperature,
  *
- *   cette classe possede un autre champ_front avec autant de valeurs
- *   temporelles qui represente la temperature dans l'autre probleme.
+ *   this class holds another boundary field with the same number of
+ *   time values, representing the temperature in the other problem.
  *
  */
 void calculer_h_local(DoubleTab& tab, const Equation_base& une_eqn, const Domaine_VDF& zvdf_2, const Front_VF& front_vf, const Milieu_base& le_milieu, double invhparoi, int opt);
@@ -52,8 +52,8 @@ public:
   inline const DoubleTab& T_wall() const { return T_wall_; }
   inline const DoubleTab& h_autre_pb() const { return autre_h; }
 
-  // renvoie e_pb1 -> e_pb2 pour e voisin d'une face de paroi contact
-  // avec nl, nc  le nombre de lignes et de colonnes de la matrice de couplage entre le pb1 et le pb2
+  // returns e_pb1 -> e_pb2 for e neighboring a contact wall face
+  // with nl, nc the number of rows and columns of the coupling matrix between pb1 and pb2
   inline const IntTab& get_remote_elems() const { return remote_elems_; }
   inline const Nom& nom_autre_pb() const { return nom_autre_pb_; }
 
@@ -61,9 +61,9 @@ public:
   int avancer(double temps) override;
   int reculer(double temps) override;
 
-  //item(i) : indice du ieme item dont on a besoin pour la face i de la frontiere
+  //item(i): index of the i-th item needed for face i of the boundary
   mutable IntTab item;
-  int monolithic = 0; //1 si on resout la thermique en monolithique
+  int monolithic = 0; //1 if the thermal problem is solved monolithically
 
 protected:
   double h_paroi = -100.;

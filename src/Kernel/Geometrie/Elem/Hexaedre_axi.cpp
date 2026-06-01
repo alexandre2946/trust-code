@@ -19,10 +19,10 @@
 Implemente_instanciable_32_64(Hexaedre_axi_32_64,"Hexaedre_axi",Hexaedre_32_64<_T_>);
 
 
-/*! @brief NE FAIT RIEN
+/*! @brief Does nothing.
  *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie
+ * @param s An output stream.
+ * @return The output stream.
  */
 template <typename _SIZE_>
 Sortie& Hexaedre_axi_32_64<_SIZE_>::printOn(Sortie& s ) const
@@ -31,10 +31,10 @@ Sortie& Hexaedre_axi_32_64<_SIZE_>::printOn(Sortie& s ) const
 }
 
 
-/*! @brief NE FAIT RIEN
+/*! @brief Does nothing.
  *
- * @param (Entree& s) un flot d'entree
- * @return (Entree&) le flot d'entree
+ * @param (Entree& s) an input stream
+ * @return (Entree&) the input stream
  */
 template <typename _SIZE_>
 Entree& Hexaedre_axi_32_64<_SIZE_>::readOn(Entree& s )
@@ -43,9 +43,9 @@ Entree& Hexaedre_axi_32_64<_SIZE_>::readOn(Entree& s )
 }
 
 
-/*! @brief Renvoie le nom LML d'un triangle = "VOXEL8".
+/*! @brief Returns the LML name of a Hexaedre_axi element = "VOXEL8".
  *
- * @return (Nom&) toujours egal a "VOXEL8"
+ * @return (Nom&) always equal to "VOXEL8"
  */
 template <typename _SIZE_>
 const Nom& Hexaedre_axi_32_64<_SIZE_>::nom_lml() const
@@ -55,9 +55,9 @@ const Nom& Hexaedre_axi_32_64<_SIZE_>::nom_lml() const
 }
 
 
-/*! @brief Calcule les centres de gravites de tous les elements du domaine associe a l'element goemetrique.
+/*! @brief Computes the center of gravity of all elements of the domain associated with the geometric element.
  *
- * @param (DoubleTab& xp) le tableau contenant les coordonnees des centres de gravite
+ * @param (DoubleTab& xp) the array containing the coordinates of the centers of gravity
  */
 template <typename _SIZE_>
 void Hexaedre_axi_32_64<_SIZE_>::calculer_centres_gravite(DoubleTab_t& xp) const
@@ -101,16 +101,16 @@ void Hexaedre_axi_32_64<_SIZE_>::calculer_centres_gravite(DoubleTab_t& xp) const
 }
 
 
-/*! @brief NE FAIT RIEN: A CODER,renvoie toujours 0
+/*! @brief DOES NOTHING: TO BE CODED, always returns 0.
  *
- *     Renvoie 1 si l'element "elemen" du domaine associe a
- *               l'element geometrique contient le point
- *               de coordonnees specifiees par le parametre "pos".
- *     Renvoie 0 sinon.
+ *     Returns 1 if element "element" of the domain associated with
+ *               the geometric element contains the point
+ *               with coordinates specified by parameter "pos".
+ *     Returns 0 otherwise.
  *
- * @param (DoubleVect& pos) coordonnees du point que l'on cherche a localiser
- * @param (int element) le numero de l'element du domaine dans lequel on cherche le point.
- * @return (int) 1 si le point de coordonnees specifiees appartient a l'element "element" 0 sinon
+ * @param (DoubleVect& pos) coordinates of the point to locate
+ * @param (int element) the index of the domain element in which the point is searched.
+ * @return (int) 1 if the point belongs to element "element", 0 otherwise
  */
 template <typename _SIZE_>
 int Hexaedre_axi_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t element ) const
@@ -130,13 +130,13 @@ int Hexaedre_axi_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t element )
 }
 
 
-/*! @brief Renvoie 1 si les sommets specifies par le parametre "pos" sont les sommets de l'element "element" du domaine associe a
+/*! @brief Returns 1 if the vertices specified by parameter "pos" are the vertices of element "element" of the domain associated with
  *
- *     l'element geometrique.
+ *     the geometric element.
  *
- * @param (IntVect& pos) les numeros des sommets a comparer avec ceux de l'elements "element"
- * @param (int element) le numero de l'element du domaine dont on veut comparer les sommets
- * @return (int) 1 si les sommets passes en parametre sont ceux de l'element specifie, 0 sinon
+ * @param (IntVect& pos) the vertex indices to compare with those of element "element"
+ * @param (int element) the index of the domain element whose vertices are to be compared
+ * @return (int) 1 if the vertices passed as parameter are those of the specified element, 0 otherwise
  */
 template <typename _SIZE_>
 int Hexaedre_axi_32_64<_SIZE_>::contient(const SmallArrOfTID_t& som, int_t element ) const
@@ -157,9 +157,9 @@ int Hexaedre_axi_32_64<_SIZE_>::contient(const SmallArrOfTID_t& som, int_t eleme
 
 
 
-/*! @brief Calcule les volumes des elements du domaine associe.
+/*! @brief Computes the volumes of the elements of the associated domain.
  *
- * @param (DoubleVect& volumes) le vecteur contenant les valeurs  des des volumes des elements du domaine
+ * @param (DoubleVect& volumes) the vector containing the volume values of the domain elements
  */
 template <typename _SIZE_>
 void Hexaedre_axi_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const

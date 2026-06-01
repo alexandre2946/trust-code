@@ -20,9 +20,9 @@
 
 class Champ_Don_base;
 
-/*! @brief Classe Terme_Source_Qdm Cette classe represente un terme source qui figure dans l'equation
+/*! @brief Classe Terme_Source_Qdm This class represents a source term appearing in the momentum equation
  *
- *      de la dynamique divisee par la masse volumique de reference.
+ *      divided by the reference density.
  *
  */
 class Terme_Source_Qdm

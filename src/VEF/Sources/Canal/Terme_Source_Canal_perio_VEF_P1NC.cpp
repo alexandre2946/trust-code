@@ -24,7 +24,7 @@
 #include <SFichier.h>
 #include <Convection_Diffusion_std.h>
 
-// Mai 04 : modif pour terme source en QC
+// May 04: modification for QC source term
 //
 Implemente_instanciable(Terme_Source_Canal_perio_VEF_P1NC,"Canal_perio_VEF_P1NC",Terme_Source_Canal_perio);
 Implemente_instanciable(Terme_Source_Canal_perio_QC_VEF_P1NC,"Canal_perio_QC_VEF_P1NC",Terme_Source_Canal_perio_VEF_P1NC);
@@ -137,11 +137,11 @@ void Terme_Source_Canal_perio_VEF_P1NC::calculer_debit(double& debit_e) const
               int axe = direction_ecoulement_;
               int dim = Objet_U::dimension;
               bool is_dilatable = equation().probleme().is_dilatable();
-              // Si l'on est en Quasi Compressible, il faut conserver le debit massique et non pas le debit volumique.
-              // C'est pour cela que dans le cas QC, on multiplie les vecteurs vitesse
-              // par la masse volumique discretisee aux faces pour que lorsqu'on integre sur la surface,
-              // on obtienne bien un debit massique et non pas un debit volumique.
-              const DoubleTab& tab_rho_face = is_dilatable ? ref_cast(Fluide_Dilatable_base,equation().milieu()).rho_discvit() : velocity.valeurs() /* tableau de meme format mais non utilise */;
+              // In the quasi-compressible case, the mass flow rate must be conserved rather than the volumetric flow rate.
+              // For this reason, in the QC case, the velocity vectors are multiplied
+              // by the face-discretized density so that when integrating over the surface,
+              // one obtains a mass flow rate rather than a volumetric flow rate.
+              const DoubleTab& tab_rho_face = is_dilatable ? ref_cast(Fluide_Dilatable_base,equation().milieu()).rho_discvit() : velocity.valeurs() /* array of the same format but not used */;
               CDoubleArrView rho_face = static_cast<const DoubleVect&>(tab_rho_face).view_ro();
               CDoubleTabView face_normales = domaine_VF.face_normales().view_ro();
               CDoubleArrView porosite_face = equation().milieu().porosite_face().view_ro();

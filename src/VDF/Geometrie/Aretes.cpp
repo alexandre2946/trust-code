@@ -19,7 +19,7 @@
 Implemente_instanciable(Aretes,"Aretes",Objet_U);
 
 
-// printOn et readOn
+// printOn and readOn
 
 Sortie& Aretes::printOn(Sortie& s ) const
 {
@@ -35,19 +35,28 @@ Entree& Aretes::readOn(Entree& s )
   return s ;
 }
 
-/*! @brief affecte a l'arete numero les faces f1, f2, f3, f4
+/*! @brief Assigns faces f1, f2, f3, f4 to edge numero.
  *
- *  l'arete est de type2_ type ou :
- *  type2_ = -1 si arete coin
- *  type2_ = 0 si arete bord
- *  type2_ = 1 si arete mixte
- *  type2_ = 2 si arete interne
- *  l'arete est de type1_ dir ou :
- *  type1_ = 0 si arete XY
- *  type1_ = 1 si arete XZ
- *  type1_ = 2 si arete YZ
- *  En dimension 2 il n'y a que des aretes XY
+ * @brief The edge type2_ is defined as:
+ *  type2_ = -1 for a corner edge
+ *  type2_ = 0 for a boundary edge
+ *  type2_ = 1 for a mixed edge
+ *  type2_ = 2 for an internal edge
+ *  The edge type1_ dir is defined as:
+ *  type1_ = 0 for an XY edge
+ *  type1_ = 1 for an XZ edge
+ *  type1_ = 2 for a YZ edge
+ *  In 2D there are only XY edges.
  *
+ * @param numero_a Edge index (incremented in place).
+ * @param dir Edge direction type.
+ * @param type Edge category type.
+ * @param nb_face Total number of faces.
+ * @param f1 First face index.
+ * @param f2 Second face index.
+ * @param f3 Third face index.
+ * @param f4 Fourth face index.
+ * @param est_une_plaque Array indicating which faces are plate faces.
  */
 void Aretes::affecter(int& numero_a, int dir, int type, int nb_face,
                       int f1, int f2, int f3, int f4, const ArrOfInt& est_une_plaque)
@@ -108,14 +117,14 @@ void Aretes::calculer_centre_de_gravite(Domaine_VDF& domaine)
   int type;
   int nb_aretes = faces_.dimension(0);
   //const IntVect& orient =  domaine.orientation();
-  // Calcul des ccordonnees de l'arete
+  // Compute the edge coordinates
   if(dimension==2)
     {
       xa_.resize(nb_aretes,2);
       for(i=0; i<nb_aretes; i++)
         {
           type = type2_(i);
-          if((type==2)||(type==1)) // arete interne ou mixte
+          if((type==2)||(type==1)) // internal or mixed edge
             {
               f0 = faces_(i,0);
               s00 = so(f0,0);
@@ -182,7 +191,7 @@ void Aretes::calculer_centre_de_gravite(Domaine_VDF& domaine)
       for(i=0; i<nb_aretes; i++)
         {
           type = type2_(i);
-          if((type==2)||(type==1)) // arete interne ou mixte
+          if((type==2)||(type==1)) // internal or mixed edge
             {
               f0 = faces_(i,0);
               f1 = faces_(i,1);
@@ -211,7 +220,7 @@ void Aretes::calculer_centre_de_gravite(Domaine_VDF& domaine)
               xa_(i,1) = (co(s0,1)+co(s1,1))/2.0;
               xa_(i,2) = (co(s0,2)+co(s1,2))/2.0;
             }
-          else if((type == 0)||(type == -1)) // arete bord ou coin
+          else if((type == 0)||(type == -1)) // boundary or corner edge
             {
               int f,fdeux;
               int s0,s1,s0j;
@@ -255,7 +264,7 @@ void Aretes::calculer_centre_de_gravite(Domaine_VDF& domaine)
     }
 }
 
-/*! @brief Dimensionne les tableaux.
+/*! @brief Resizes the arrays.
  *
  */
 void Aretes::dimensionner(int n)
@@ -265,7 +274,7 @@ void Aretes::dimensionner(int n)
   type2_.resize(n) ;
 }
 
-/*! @brief appelee par trier Echange les aretes a1 et a2
+/*! @brief Called by trier. Swaps edges a1 and a2.
  *
  */
 void Aretes::swap(int a1, int a2)
@@ -290,11 +299,11 @@ void Aretes::swap(int a1, int a2)
   type2_(a1)=type2_(a2);
   type2_(a2)=tmp;
 }
-/*! @brief reoordonne le tableaux des aretes avec d'abord les aretes coins (elles n'ont que deux faces)
+/*! @brief Reorders the edge array: first corner edges (they have only two faces),
  *
- *  puis les aretes bord (elles ont trois faces dont deux de bord)
- *  puis les aretes mixte (elles ont quatre faces dont deux de bord)
- *  puis les aretes_internes (elles ont quatre faces internes)
+ *  then boundary edges (they have three faces, two of which are boundary),
+ *  then mixed edges (they have four faces, two of which are boundary),
+ *  then internal edges (they have four internal faces).
  *
  */
 void Aretes::trier(int& nb_aretes_coin, int& nb_aretes_bord,

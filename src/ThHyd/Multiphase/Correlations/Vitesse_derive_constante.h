@@ -18,9 +18,9 @@
 
 #include <Vitesse_derive_base.h>
 
-/*! @brief classe Vitesse_derive_constante
+/*! @brief Vitesse_derive_constante class
  *
- *  vitesse de derive constante entre une phase gaz et une phase liquide parametres : non!
+ *  Constant drift velocity between a gas phase and a liquid phase. Parameters: none!
  *
  */
 

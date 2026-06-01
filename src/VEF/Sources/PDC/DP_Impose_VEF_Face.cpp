@@ -80,7 +80,7 @@ int DP_Impose_VEF_Face::sauvegarder(Sortie& os) const
       os << flush;
       Cerr << "Saving fac_regul at time : " << Nom(temps, "%e")  << " with value " << fac_regul_ << finl;
     }
-  return 8;//un double
+  return 8;//one double
 }
 
 int DP_Impose_VEF_Face::reprendre(Entree& is)
@@ -122,7 +122,7 @@ void DP_Impose_VEF_Face::mettre_a_jour(double temps)
   update_dp_regul(equation(), calculate_Q(equation(), num_faces, sgn), bilan());
   if (regul_) return;
 
-  bilan()(2) = calculate_Q(equation(), num_faces, sgn) * (Process::me() ? 0 : 1); //pour eviter le sommage en sortie
+  bilan()(2) = calculate_Q(equation(), num_faces, sgn) * (Process::me() ? 0 : 1); //to avoid double counting in output
 }
 
 void DP_Impose_VEF_Face::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
@@ -197,6 +197,6 @@ void DP_Impose_VEF_Face::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, c
       bilan()(3) = num_faces.size() ? DP(0, 2) * rho : -DBL_MAX;
       Process::mp_max_for_each(bilan()(0), bilan()(1), bilan()(3));
       if (Process::me())
-        bilan() = 0; //pour eviter un sommage en sortie
+        bilan() = 0; //to avoid double counting in output
     }
 }

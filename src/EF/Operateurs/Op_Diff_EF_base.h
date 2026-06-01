@@ -30,7 +30,7 @@ class Sortie;
 enum class AJOUTE_SCAL { GEN , D3_8 , D2_4 };
 enum class AJOUTE_VECT { GEN , D3_8 , D2_4 };
 
-/*! @brief class Op_Diff_EF_base Classe de base des operateurs de diffusion EF
+/*! @brief class Op_Diff_EF_base Base class for EF diffusion operators.
  *
  */
 class Op_Diff_EF_base : public Operateur_Diff_base, public Op_EF_base

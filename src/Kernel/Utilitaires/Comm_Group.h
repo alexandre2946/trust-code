@@ -20,20 +20,17 @@
 #include <TRUSTArray.h>
 #include <assert.h>
 
-/*! @brief : Cette classe decrit un groupe de processeurs sur lesquels
+/*! @brief : This class describes a group of processors on which
  *
- *   une portion de code s'execute simultanement. Elle fournit
- *   toutes les methodes permettant d'echanger des donnees entre
- *   les processeurs du groupe (mpsum, send, recv, ...),
- *   et de synchroniser les processeurs (barrier).
- *   Elle est specialisee selon le support reseau (MPI, PVM, ...)
- *   Attention, ces methodes sont reservees a des operations de bas niveau
- *   (noyau TRUST).
- *   Dans le code courant, il faut utiliser les methodes classes de communications
- *   de haut niveau :
- *   (envoyer(), envoyer_broadcast(), class Schema_Comm, class Process, etc)
- *   Pour creer un nouveau groupe et l'utiliser, voir class PE_Groups
- *   Pour la procedure d'initialisation, voir PE_Groups::Initialize()
+ *   a portion of code executes simultaneously. It provides all the methods
+ *   for exchanging data between the processors of the group (mpsum, send, recv, ...),
+ *   and for synchronizing processors (barrier).
+ *   It is specialized according to the network layer (MPI, PVM, ...).
+ *   Note: these methods are reserved for low-level operations (TRUST kernel).
+ *   In normal code, use the high-level communication class methods:
+ *   (envoyer(), envoyer_broadcast(), class Schema_Comm, class Process, etc.)
+ *   To create a new group and use it, see class PE_Groups.
+ *   For the initialization procedure, see PE_Groups::Initialize().
  *
  */
 class Comm_Group : public Objet_U
@@ -44,11 +41,11 @@ public:
   ~Comm_Group() override;
   virtual void   abort() const = 0;
 
-  // COLL_SUM: somme sur tous les procs
+  // COLL_SUM: sum over all procs
   // COLL_MIN: minimum
   // COLL_MAX: max
-  // COLL_PARTIAL_SUM calcule la somme partielle des valeurs sur les processeurs de rang
-  // strictement inferieurs a me() (le resultat vaut toujours 0 sur le processeur 0).
+  // COLL_PARTIAL_SUM computes the partial sum of values over processors with rank
+  // strictly less than me() (the result is always 0 on processor 0).
   enum Collective_Op { COLL_SUM, COLL_MIN, COLL_MAX, COLL_PARTIAL_SUM };
   virtual void mp_collective_op(const double *x, double *resu, int n, Collective_Op op) const = 0;
   virtual void mp_collective_op(const double *x, double *resu, const Collective_Op *op, int n) const = 0;
@@ -63,8 +60,8 @@ public:
 
   virtual void barrier(int tag) const = 0;
 
-  // Calcule un nouveau tag de communication qui permet d'identifier les
-  // echanges de facon unique pour l'ensemble des groupes.
+  // Computes a new communication tag that allows identifying exchanges
+  // uniquely across all groups.
   inline int get_new_tag() const;
 
   inline int rank() const;
@@ -74,21 +71,21 @@ public:
   inline int get_number_of_nodes() const;
 
 
-  // Veut-on faire des verifications supplementaires sur les communications ?
-  // Ces verifications impliquent des communications en plus, ce qui modifie
-  // le deroulement du programme. C'est donc un mecanisme separe des "assert".
+  // Do we want to perform additional checks on communications?
+  // These checks imply extra communications, which modifies the program flow.
+  // This is therefore a separate mechanism from "assert".
   inline static int check_enabled();
 
   enum TypeHint { CHAR, INT, DOUBLE, FLOAT };
-  // Demarre l'echange des buffers.
-  // send_list / recv_list = liste de PEs (rangs dans le groupe courant)
-  // send_size / recv_size = taille des messages en bytes
-  // send_buffers / recv_buffers = adresse des buffers
-  // Les buffers en reception doivent avoir une taille suffisante.
-  // Note au sujet des const :
-  //  send_buffers est completement const, on n'a le droit de rien modifier
-  //  recv_buffers est const, recv_buffers[i] est const mais *(recv_buffers[i])
-  //               n'est pas const car on y stocke les donnees recues.
+  // Starts the exchange of buffers.
+  // send_list / recv_list = list of PEs (ranks within the current group)
+  // send_size / recv_size = size of messages in bytes
+  // send_buffers / recv_buffers = address of buffers
+  // Reception buffers must have sufficient size.
+  // Note about const:
+  //  send_buffers is completely const, nothing may be modified
+  //  recv_buffers is const, recv_buffers[i] is const but *(recv_buffers[i])
+  //               is not const because received data is stored there.
   virtual void send_recv_start(const ArrOfInt& send_list,
                                const ArrOfInt& send_size,
                                const char * const * const send_buffers,
@@ -96,18 +93,18 @@ public:
                                const ArrOfInt& recv_size,
                                char * const * const recv_buffers,
                                TypeHint typehint = CHAR) const = 0;
-  // Attend que les communications lancees par send_recv soient terminees.
+  // Waits until communications started by send_recv are finished.
   virtual void send_recv_finish() const = 0;
 
-  // Methodes d'envoi / reception blocantes: a chaque send doit correpondre
-  // simultanement un recv sur le processeur destination.
-  virtual void send(int pe, const void *buffer, int size, int tag) const = 0; // Envoi bloquant
-  virtual void recv(int pe, void *buffer, int size, int tag) const = 0; // Reception bloquante
+  // Blocking send/receive methods: each send must be matched
+  // simultaneously by a recv on the destination processor.
+  virtual void send(int pe, const void *buffer, int size, int tag) const = 0; // Blocking send
+  virtual void recv(int pe, void *buffer, int size, int tag) const = 0; // Blocking receive
 
-  // Methodes de broadcast : a appeler sur tous les processeurs en meme temps
+  // Broadcast methods: must be called on all processors simultaneously
   virtual void broadcast(void *buffer, int size, int pe_source) const = 0;
 
-  // Methodes all_to_all
+  // All-to-all methods
   virtual void all_to_all(const void *src_buffer, void *dest_buffer, int data_size) const = 0;
   virtual void all_gather(const void *src_buffer, void *dest_buffer, int data_size) const = 0;
   virtual void gather(const void *src_buffer, void *dest_buffer, int data_size, int root) const = 0;
@@ -115,8 +112,8 @@ public:
 
   static void set_check_enabled(int flag);
 protected:
-  Comm_Group(const Comm_Group&);  // interdit !
-  const Comm_Group& operator=(const Comm_Group&);   // interdit !
+  Comm_Group(const Comm_Group&);  // forbidden!
+  const Comm_Group& operator=(const Comm_Group&);   // forbidden!
   virtual void       init_group(const ArrOfInt& pe_list);
   void               init_group_node(int nproc, int loc_rank, int glob_rank);
   void               init_group_trio(int nproc, int rank);
@@ -132,27 +129,25 @@ private:
   static int check_enabled_;
   static int static_group_number_;
 
-  // Rang du processeur local dans le groupe, -1 s'il n'est pas dans le groupe
+  // Rank of the local processor in the group, -1 if it is not in the group
   int rank_ = -1;
-  // Nombre de processeurs dans le groupe
+  // Number of processors in the group
   int nproc_ = -1;
-  // Pour chaque pe du calcul complet (taille du tableau = groupe_TRUST().nproc())
-  //  indice au sein du groupe si le pe est dedans,
-  //  -1 si le pe n'est pas dans le groupe
+  // For each PE in the full computation (array size = groupe_TRUST().nproc())
+  //  index within the group if the PE is in it,
+  //  -1 if the PE is not in the group
   ArrOfInt  local_ranks_;
-  // Liste des processeurs du groupes (indices des processeurs dans groupe_TRUST())
-  // (taille du tableau = nproc_)
+  // List of processors in the group (indices of processors in groupe_TRUST())
+  // (array size = nproc_)
   ArrOfInt  world_ranks_;
 
-  // Mon numero de groupe (egal au static_group_number_ au moment de la
-  // creation du groupe).
+  // My group number (equal to static_group_number_ at the time the group was created).
   int group_number_ = -1;
-  // On incremente le group_communication_tag_ de cette quantite a chaque
-  // operation. C'est un nombre premier, ce qui permet d'avoir des tags
-  // differents pour chaque groupe pendant un bon bout de temps (jusqu'a ce
-  // que le numero de tag depasse MAXINT...)
+  // The group_communication_tag_ is incremented by this amount at each
+  // operation. It is a prime number, which allows different tags
+  // for each group for a long time (until the tag number exceeds MAXINT...).
   int group_tag_increment_ = -1;
-  // On incremente le tag a chaque operation, ce qui permet de verifier que les processus sont bien synchronises.
+  // The tag is incremented at each operation, allowing verification that processes are properly synchronized.
   mutable int group_communication_tag_ = -1;
 };
 
@@ -161,22 +156,22 @@ inline int Comm_Group::check_enabled()
   return check_enabled_;
 }
 
-/*! @brief Cette fonction renvoie un nouveau tag de communication pour le groupe.
+/*! @brief Returns a new communication tag for the group.
  *
- * Effet de bord : incremente le membre group_communication_tag_.
+ * Side effect: increments the group_communication_tag_ member.
  *
  */
 inline int Comm_Group::get_new_tag() const
 {
-  // B.M. Cette fonctionnalite est finalement tres peu utile en pratique
-  // et quand le compteur depasse une limite ca plante mpi. Je desactive:
+  // B.M. This feature is ultimately of little practical use
+  // and when the counter exceeds a limit, MPI crashes. Disabling:
   //group_communication_tag_ += group_tag_increment_;
   return group_communication_tag_;
 }
 
-/*! @brief Renvoie le rang du processeur local dans le groupe *this.
+/*! @brief Returns the rank of the local processor in the group *this.
  *
- * ou -1 si je ne suis pas dans le groupe.
+ * or -1 if this processor is not in the group.
  *
  */
 inline int Comm_Group::rank() const
@@ -184,7 +179,7 @@ inline int Comm_Group::rank() const
   return rank_;
 }
 
-/*! @brief Renvoie le nombre de processeurs dans le groupe *this
+/*! @brief Returns the number of processors in the group *this
  *
  */
 inline int Comm_Group::nproc() const

@@ -80,7 +80,7 @@ Entree& Distanceparoi::interpreter_(Entree& is)
   //le_dom.creer_faces(les_faces);
 
   {
-    // bloc a factoriser avec Domaine_VF.cpp :
+    // block to factorize with Domaine_VF.cpp:
     Type_Face type_face = dom.type_elem()->type_face(0);
     les_faces.typer(type_face);
     les_faces.associer_domaine(dom);
@@ -95,7 +95,7 @@ Entree& Distanceparoi::interpreter_(Entree& is)
                                      1 /* include virtual elements */);
 
     Faces_builder faces_builder;
-    IntTab elem_faces; // Tableau dont on aura pas besoin
+    IntTab elem_faces; // Array that will not be needed
     faces_builder.creer_faces_reeles(dom,
                                      connectivite_som_elem,
                                      les_faces,
@@ -103,9 +103,9 @@ Entree& Distanceparoi::interpreter_(Entree& is)
   }
   Cerr << "In Distanceparoi::interpreter : Generate faces finished" << finl;
 
-  DoubleTab xp;                                     // centres de gravite des elements
-  DoubleTab xv;                                     // centres de gravite des faces
-  const DoubleTab& xs=dom.coord_sommets();        // coordonnees des sommets
+  DoubleTab xp;                                     // centers of gravity of the elements
+  DoubleTab xv;                                     // centers of gravity of the faces
+  const DoubleTab& xs=dom.coord_sommets();        // vertex coordinates
 
   les_faces.calculer_centres_gravite(xv);
   dom.calculer_centres_gravite(xp);
@@ -132,7 +132,7 @@ Entree& Distanceparoi::interpreter_(Entree& is)
           int rang=dom.rang_frontiere(nom_paroi[b]);
           const Frontiere& la_frontiere=dom.frontiere(rang);
 
-          // pas de methode const pour Frontiere::les_sommets_des_faces();
+          // no const method for Frontiere::les_sommets_des_faces();
           const IntTab& sommets_face = (ref_cast(Frontiere,la_frontiere)).les_sommets_des_faces();
 
           int ndeb = la_frontiere.num_premiere_face();
@@ -274,9 +274,9 @@ Entree& Distanceparoi::interpreter_(Entree& is)
                   Cerr << "ERROR : Dimension 2 or 3 are required to calculate wall distance "<< finl;
                   exit();
                 }
-            }// fin face
+            }// end face
           Cerr<<finl;
-        }// fin nb_paroi
+        }// end nb_paroi
     }//(!fic1)
 
   Cerr<<" Max distance"<< local_max_vect(dist_min)<<" "<< local_max_vect(wall_length)<<finl;
@@ -287,7 +287,7 @@ Entree& Distanceparoi::interpreter_(Entree& is)
 
   fic_sauv<<nom_paroi<<finl;
   int ntot=(nb_elem_tot*(1+Objet_U::dimension));
-  // entete pour  pouvoir passer les blocs
+  // header to allow block reading
   //    fic_sauv<<1 <<finl<<ntot << finl<< (int)1 <<ntot<<finl<<ntot<<finl;
   fic_sauv << (int)1 <<ntot << (int)1 << ntot << finl << ntot << finl;
   //    fic_sauv << (int)1 << ntot << (int)1 << ntot << ntot;
@@ -307,7 +307,7 @@ Entree& Distanceparoi::interpreter_(Entree& is)
       SFichier fic_sauv_format(fichier);
       fic_sauv_format<<nom_paroi<<finl;
       int ntot2=(nb_elem_tot*(1+Objet_U::dimension));
-      // entete pour  pouvoir passer les blocs
+      // header to allow block reading
       fic_sauv_format << (int)1 <<ntot2 << (int)1 << ntot2 << finl << ntot2 << finl;
       for (int p=0; p<nb_elem_tot; p++)
         {

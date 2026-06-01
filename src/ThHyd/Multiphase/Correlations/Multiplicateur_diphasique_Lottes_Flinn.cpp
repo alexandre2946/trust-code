@@ -32,8 +32,8 @@ Entree& Multiplicateur_diphasique_Lottes_Flinn::readOn(Entree& is)
 
   const Pb_Multiphase *pbm = sub_type(Pb_Multiphase, pb_.valeur()) ? &ref_cast(Pb_Multiphase, pb_.valeur()) : nullptr;
 
-  if (!pbm || pbm->nb_phases() == 1) n_l = 0, n_g = -1; //pas un Pb_Multiphase -> monophasique liquide
-  else for (int n = 0; n < pbm->nb_phases(); n++) //recherche de n_l, n_g : phase {liquide,gaz}_continu en priorite
+  if (!pbm || pbm->nb_phases() == 1) n_l = 0, n_g = -1; //not a Pb_Multiphase -> single-phase liquid
+  else for (int n = 0; n < pbm->nb_phases(); n++) //search for n_l, n_g: continuous {liquid,gas} phase with priority
       if (pbm->nom_phase(n).debute_par("liquide") && (n_l < 0 || pbm->nom_phase(n).finit_par("continu")))  n_l = n;
       else if (pbm->nom_phase(n).debute_par("gaz") && (n_g < 0 || pbm->nom_phase(n).finit_par("continu"))) n_g = n;
 

@@ -16,9 +16,9 @@
 #ifndef Champ_grad_T_included
 #define Champ_grad_T_included
 
-/*! @brief classe Champ_grad_T Permet d'avoir une visualisation du gradient de temperature
+/*! @brief class Champ_grad_T Allows visualization of the temperature gradient
  *
- * @sa Classe abstraite, Methode abstraite, void me_calculer(double )
+ * @sa Abstract class, Abstract method, void me_calculer(double )
  */
 class Champ_grad_T
 {

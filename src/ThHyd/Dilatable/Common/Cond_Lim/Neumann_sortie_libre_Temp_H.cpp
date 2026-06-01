@@ -35,7 +35,7 @@ Entree& Neumann_sortie_libre_Temp_H::readOn(Entree& s)
   return s;
 }
 
-/*! @brief Complete les conditions aux limites.
+/*! @brief Complete the boundary conditions.
  *
  */
 void Neumann_sortie_libre_Temp_H::completer()
@@ -44,11 +44,10 @@ void Neumann_sortie_libre_Temp_H::completer()
   modifier_val_imp = 1;
 }
 
-/*! @brief Renvoie la valeur de la i-eme composante du champ impose a l'exterieur de la frontiere.
+/*! @brief Returns the value of the i-th component of the field imposed outside the boundary.
  *
- * @param (int i) indice suivant la premiere dimension du champ
- * @return (double) la valeur imposee sur la composante du champ specifiee
- * @throws deuxieme dimension du champ de frontiere superieur a 1
+ * @param i Index along the first dimension of the field.
+ * @return Imposed value for the specified field component.
  */
 double Neumann_sortie_libre_Temp_H::val_ext(int i) const
 {
@@ -76,11 +75,11 @@ double Neumann_sortie_libre_Temp_H::val_ext(int i) const
   return 0.;
 }
 
-/*! @brief Renvoie la valeur de la (i,j)-eme composante du champ impose a l'exterieur de la frontiere.
+/*! @brief Returns the value of the (i,j)-th component of the field imposed outside the boundary.
  *
- * @param (int i) indice suivant la premiere dimension du champ
- * @param (int j) indice suivant la deuxieme dimension du champ
- * @return (double) la valeur imposee sur la composante du champ specifiee
+ * @param i Index along the first dimension of the field.
+ * @param j Index along the second dimension of the field.
+ * @return Imposed value for the specified field component.
  */
 double Neumann_sortie_libre_Temp_H::val_ext(int i, int j) const
 {

@@ -105,7 +105,7 @@ Entree& Extraire_plan::interpreter_(Entree& is)
 
   if (via_extraire_surface)
     {
-      // determination de la normale
+      // determine the normal
       ArrOfDouble normal(3);
       calcul_normal_norme(origine,point1,point2,normal);
 
@@ -175,7 +175,7 @@ Entree& Extraire_plan::interpreter_(Entree& is)
     }
 
   Domaine& dom=domaine();
-  // on recupere le pb
+  // retrieve the problem
   if(! sub_type(Probleme_base, objet(nom_pb)))
     {
       Cerr << nom_pb << " is of type " << objet(nom_pb).que_suis_je() << finl;
@@ -195,7 +195,7 @@ Entree& Extraire_plan::interpreter_(Entree& is)
       exit();
     }
 
-  // creation d'un domaine pipo pour pouvoir chercher les faces
+  // create a dummy domain to be able to search for faces
   Domaine domaine_test;
   ArrOfDouble normal(3);
   {
@@ -218,7 +218,7 @@ Entree& Extraire_plan::interpreter_(Entree& is)
         for (int t=0; t<nb_som; t++)
           somm_hexa(t+nb_som,dir)=somm_hexa(t,dir);
       }
-    // il faut maintenant epaissir l'hexa dans la direction normale
+    // now thicken the hexa in the normal direction
 
     calcul_normal_norme(origine,point1,point2,normal);
     double d_epaisseur=epaisseur/2.;
@@ -241,7 +241,7 @@ Entree& Extraire_plan::interpreter_(Entree& is)
   int nbfaces=domaine_vf.nb_faces();
 
   ArrOfInt marq(nbfaces);
-  // on marque les joints
+  // mark the joints
   //const Joints& joints=domaine_vf.face_joints();
   int nbjoints=domaine_vf.nb_joints();
 
@@ -267,7 +267,7 @@ Entree& Extraire_plan::interpreter_(Entree& is)
       if (domaine_test.chercher_elements(xv(fac,0),xv(fac,1),xv(fac,2))==0)
         if (marq[fac]!=-1)
           {
-            // tester si item_commun....
+            // test if item_commun....
             marq[fac]=1;
             nb_t++;
           }
@@ -284,7 +284,7 @@ Entree& Extraire_plan::interpreter_(Entree& is)
         //Cerr<<fac <<" ";
         for (int s=0; s<3; s++)
           les_elems(nb,s)=face_sommets(fac,s);
-        // on calcule la normale
+        // compute the normal
         ArrOfDouble normal_b(3);
         for (int i=0; i<3; i++)
           {
@@ -295,7 +295,7 @@ Entree& Extraire_plan::interpreter_(Entree& is)
         calcul_normal(point0b.addr(),point1b.addr(),point2b.addr(),normal_b.addr());
         if (dotproduct_array(normal,normal_b)<0)
           {
-            // si normal a l'envers on inverse les deux sommets
+            // if normal is reversed, swap the two vertices
             les_elems(nb,1)=face_sommets(fac,2);
             les_elems(nb,2)=face_sommets(fac,1);
           }

@@ -18,10 +18,10 @@
 
 #include <EDO_Pression_th_VEF.h>
 
-/*! @brief classe EDO_Pression_th_VEF_Gaz_Parfait Cette classe represente l'EDO sur la pression associee au schema de
+/*! @brief class EDO_Pression_th_VEF_Gaz_Parfait
  *
- *      de calcul pour les fluides faiblement compressibles, et relatif a
- *      discretisation de type VEF et pour les gaz parfaits.
+ * @brief This class represents the ODE on the pressure associated with the computation scheme for
+ *      weakly compressible fluids, relative to VEF discretization and for ideal gases.
  *
  * @sa Fluide_Quasi_Compressible EDO_Pression_th_base
  */

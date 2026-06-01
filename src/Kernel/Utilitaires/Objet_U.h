@@ -17,8 +17,7 @@
 #ifndef Objet_U_included
 #define Objet_U_included
 
-//     On rencontre des fous
-//     qui #define min max ou throw!
+//     Some macros may #define min, max or throw — undo them here
 #undef min
 #undef max
 #undef throw
@@ -45,29 +44,25 @@ class Interprete;
 class Motcle;
 class Param; // need this forward for pure virtual set_param
 
-/*! @brief classe Objet_U Cette classe est la classe de base des Objets de TRUST
+/*! @brief Base class for TRUST objects (Objet_U).
  *
- *      Dans les classes derivees de Objet_U, on ajoute toujours
- *       une macro Declare_instanciable ou Declare_base qui donne aux
- *       objets les proprietes suivantes:
- *      Un Objet_U peut etre lu dans une Entree ou ecrit dans une Sortie
- *       (entree/sortie standard, jeu de donnees .data, fichier disque,
- *        buffer memoire, buffer de communication parallele).
- *        Il faut donc toujours implementer les methodes readOn et printOn
- *      Un Objet_U d'un type quelconque peut etre instancie grace a une
- *       chaine de caracteres qui l'identifie (que_suis_je()), voir OWN_PTR::typer
- *      Un Objet_U peut etre "sauvegarde" ou "repris" sur disque (au sens sauvegarde
- *       et reprise d'un calcul). Ces operations sont differentes de readOn/printOn
- *       car elles permettent eventuellement une redistribution des donnees paralleles
- *       ou des changements de version.
- *      Un Objet_U, s'il est "Declare_instanciable", peut etre cree dynamiquement et lu
- *       dans le jeu de donnees TRUST (a travers readOn). Il possede alors le nom
- *       (le_nom()) attribue dans le jeu de donnees (voir les classes Interprete_bloc et Lire)
- *      Un Objet_U fait l'objet d'une gestion memoire speciale par le noyau permettant
- *       le debuggage et l'optimisation (operations specifiques a la creation,
- *       a la destruction et a la copie)
+ *      In classes derived from Objet_U, a Declare_instanciable or Declare_base macro is always added,
+ *       which gives objects the following properties:
+ *      An Objet_U can be read from an Entree or written to a Sortie
+ *       (standard I/O, .data dataset, disk file, memory buffer, parallel communication buffer).
+ *       The readOn and printOn methods must therefore always be implemented.
+ *      An Objet_U of any type can be instantiated using a character string that identifies it
+ *       (que_suis_je()), see OWN_PTR::typer.
+ *      An Objet_U can be "saved" or "resumed" on disk (in the sense of checkpoint/restart).
+ *       These operations differ from readOn/printOn because they optionally allow redistribution
+ *       of parallel data or version changes.
+ *      An Objet_U, if "Declare_instanciable", can be dynamically created and read from the TRUST
+ *       dataset (via readOn). It then has the name (le_nom()) assigned in the dataset
+ *       (see Interprete_bloc and Lire classes).
+ *      An Objet_U is subject to special memory management by the kernel for debugging and optimization
+ *       (specific operations at creation, destruction and copy).
  *
- * @sa Memoire Objet_U_ptr Process, Classe abstraite
+ * @sa Memoire Objet_U_ptr Process, Abstract class
  */
 class Objet_U : public Process
 {
@@ -93,7 +88,7 @@ public:
 #ifndef LATATOOLS            // All the below is not needed in lata_tools:
   int        get_object_id() const;
 
-  // Elie Saikali : add to this to statically test if class templates are REF/OWN_PTR or normal !
+  // Elie Saikali: add this to statically test whether class templates are REF/OWN_PTR or plain objects!
   static constexpr bool HAS_POINTER = false;
 
   static int dimension;
@@ -118,7 +113,7 @@ public:
   virtual int    associer_(Objet_U&) ;
   const Interprete& interprete() const;
   Interprete& interprete();
-  /* methode rajoutee pour caster en python */
+  /* method added for casting in Python */
   static const Objet_U& self_cast(const Objet_U&);
   static Objet_U& self_cast( Objet_U&);
 
@@ -135,14 +130,14 @@ protected:
   virtual void set_param(Param&) const {}
 
 private:
-  // Numero de l'objet (indice de l'objet dans Memoire::data)
-  // Ce numero peut changer entre la construction et la destruction.
+  // Object number (index of the object in Memoire::data).
+  // This number may change between construction and destruction.
   int _num_obj_;
-  // Identifiant unique de l'objet (attribue par le constructeur,
-  // et jamais modifie ensuite).
+  // Unique identifier of the object (assigned by the constructor
+  // and never modified afterwards).
   const int object_id_;
 
-  // Compteur d'objets crees (incremente par le constructeur).
+  // Counter of created objects (incremented by the constructor).
   static int static_obj_counter_;
   static Interprete* l_interprete;
 

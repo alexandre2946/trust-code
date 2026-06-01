@@ -67,12 +67,12 @@ double norm_2D_vit(const DoubleVect& vit, int elem, int iori, const Domaine_VDF&
   moy_2D_vit(vit, elem, iori, domaine, v);
 
   //YB:30/01/04:
-  //Les valeurs du cisaillement parietal sont maintenant signees.
-  //En considerant les valeurs signees de la projection de la vitesse sur le plan parietal
+  //Wall shear values are now signed.
+  //Using signed values of the projection of velocity onto the wall plane
   v = v - vit_paroi;
   n_v = std::fabs(v);
 
-  //Fin modif YB
+  //End modif YB
 
   if (v == 0)
     u = 0;
@@ -218,7 +218,7 @@ void calcul_bord2D(int num_elem, int elx0, int elx1, int ely0, int ely1, const D
 
   for (n=0; n<N; n++)
     {
-      // Traitement des elements bord
+      // Treatment of boundary elements
       if ((elx0 == -1) || (elx1 == -1))
         {
           if (elx0 == -1)
@@ -233,7 +233,7 @@ void calcul_bord2D(int num_elem, int elx0, int elx1, int ely0, int ely1, const D
               else
                 deriv_vx = 0;
             }
-          else // elx1 = -1 et elx0 != -1
+          else // elx1 = -1 and elx0 != -1
             {
               delta_x_0 = domaine_VDF.dist_elem_period(num_elem, elx0, 0);
               deriv_vx = (val(elem_faces(num_elem, 1), n) - val(elem_faces(elx0, 1), n) + val(elem_faces(num_elem, 3), n) - val(elem_faces(elx0, 3), n));
@@ -241,7 +241,7 @@ void calcul_bord2D(int num_elem, int elx0, int elx1, int ely0, int ely1, const D
 
             }
         }
-      else // elx0 != -1 et elx1 != -1
+      else // elx0 != -1 and elx1 != -1
         {
           delta_x_0 = domaine_VDF.dist_elem_period(num_elem, elx0, 0);
           delta_x_1 = domaine_VDF.dist_elem_period(elx1, num_elem, 0);
@@ -266,7 +266,7 @@ void calcul_bord2D(int num_elem, int elx0, int elx1, int ely0, int ely1, const D
               else
                 deriv_uy = 0;
             }
-          else // ely1 = -1 et ely0 != -1
+          else // ely1 = -1 and ely0 != -1
             {
               delta_y_0 = domaine_VDF.dist_elem_period(num_elem, ely0, 1);
               deriv_uy = (val(elem_faces(num_elem, 0), n) - val(elem_faces(ely0, 0), n) + val(elem_faces(num_elem, 2), n) - val(elem_faces(ely0, 2), n));
@@ -274,7 +274,7 @@ void calcul_bord2D(int num_elem, int elx0, int elx1, int ely0, int ely1, const D
 
             }
         }
-      else  // ely0 != -1 et ely1 != -1
+      else  // ely0 != -1 and ely1 != -1
         {
           delta_y_0 = domaine_VDF.dist_elem_period(num_elem, ely0, 1);
           delta_y_1 = domaine_VDF.dist_elem_period(ely1, num_elem, 1);
@@ -304,7 +304,7 @@ void calrotord2centelemdim2(DoubleTab& rot, const DoubleTab& val, const Domaine_
       ely1 = face_voisins(elem_faces(num_elem, 3), 1);
 
       if ((elx0 != -1) && (elx1 != -1) && (ely0 != -1) && (ely1 != -1))
-        // Cas d'un element interne
+        // Case of an internal element
 
         calcul_interne2D(num_elem, elx0, elx1, ely0, ely1, domaine_VDF, val, rot);
       else
@@ -312,7 +312,7 @@ void calrotord2centelemdim2(DoubleTab& rot, const DoubleTab& val, const Domaine_
     }
 }
 
-// Traitement des elements internes
+// Treatment of internal elements
 void calcul_interne3D(int num_elem, int elx0, int elx1, int ely0, int ely1, int elz0, int elz1, const Domaine_VDF& domaine_VDF, const DoubleTab& val, DoubleTab& rot)
 {
   const IntTab& elem_faces = domaine_VDF.elem_faces();
@@ -372,7 +372,7 @@ void calcul_interne3D(int num_elem, int elx0, int elx1, int ely0, int ely1, int 
     }
 }
 
-// Traitement des elements bord
+// Treatment of boundary elements
 void calcul_bord3D(int num_elem, int elx0, int elx1, int ely0, int ely1, int elz0, int elz1, const Domaine_VDF& domaine_VDF, const DoubleTab& val, DoubleTab& rot)
 {
   const IntTab& elem_faces = domaine_VDF.elem_faces();
@@ -392,7 +392,7 @@ void calcul_bord3D(int num_elem, int elx0, int elx1, int ely0, int ely1, int elz
   for (int n=0; n<N; n++)
     {
 
-      // Traitement des elements bord
+      // Treatment of boundary elements
 
       if ((elx0 == -1) || (elx1 == -1))
         {
@@ -412,7 +412,7 @@ void calcul_bord3D(int num_elem, int elx0, int elx1, int ely0, int ely1, int elz
                   deriv_wx = 0;
                 }
             }
-          else // elx1 = -1 et elx0 != -1
+          else // elx1 = -1 and elx0 != -1
             {
               delta_x_0 = domaine_VDF.dist_elem_period(num_elem, elx0, 0);
               deriv_vx = (val(elem_faces(num_elem, 1), n) - val(elem_faces(elx0, 1), n) + val(elem_faces(num_elem, 4), n) - val(elem_faces(elx0, 4), n));
@@ -439,7 +439,7 @@ void calcul_bord3D(int num_elem, int elx0, int elx1, int ely0, int ely1, int elz
                       deriv_wy = 0;
                     }
                 }
-              else // ely1 = -1 et ely0 != -1
+              else // ely1 = -1 and ely0 != -1
                 {
                   delta_y_0 = domaine_VDF.dist_elem_period(num_elem, ely0, 1);
                   deriv_uy = (val(elem_faces(num_elem, 0), n) - val(elem_faces(ely0, 0), n) + val(elem_faces(num_elem, 3), n) - val(elem_faces(ely0, 3), n));
@@ -481,7 +481,7 @@ void calcul_bord3D(int num_elem, int elx0, int elx1, int ely0, int ely1, int elz
                       deriv_vz = 0;
                     }
                 }
-              else // elz1 = -1 et elz0 != -1
+              else // elz1 = -1 and elz0 != -1
                 {
                   delta_z_0 = domaine_VDF.dist_elem_period(num_elem, elz0, 2);
                   deriv_uz = (val(elem_faces(num_elem, 0), n) - val(elem_faces(elz0, 0), n) + val(elem_faces(num_elem, 3), n) - val(elem_faces(elz0, 3), n));
@@ -606,7 +606,7 @@ void calcul_bord3D(int num_elem, int elx0, int elx1, int ely0, int ely1, int elz
                   deriv_vz = 0;
                 }
             }
-          else // elz1 = -1 et elz0 != -1
+          else // elz1 = -1 and elz0 != -1
             {
               delta_z_0 = domaine_VDF.dist_elem_period(num_elem, elz0, 2);
               deriv_uz = (val(elem_faces(num_elem, 0), n) - val(elem_faces(elz0, 0), n) + val(elem_faces(num_elem, 3), n) - val(elem_faces(elz0, 3), n));
@@ -663,7 +663,7 @@ void calrotord2centelemdim3(DoubleTab& rot, const DoubleTab& val, const Domaine_
       elz1 = face_voisins(elem_faces(num_elem, 5), 1);
 
       if ((elx0 != -1) && (elx1 != -1) && (ely0 != -1) && (ely1 != -1) && (elz0 != -1) && (elz1 != -1))
-        // Cas d'un element interne
+        // Case of an internal element
 
         calcul_interne3D(num_elem, elx0, elx1, ely0, ely1, elz0, elz1, domaine_VDF, val, rot);
       else
@@ -671,9 +671,9 @@ void calrotord2centelemdim3(DoubleTab& rot, const DoubleTab& val, const Domaine_
     }
 }
 
-// Calcul du produit scalaire du tenseur des vitesses de deformation
-// en coordonnees cartesiennes : calcul 2D puis 3D.
-// Traitement des elements internes
+// Compute the scalar product of the strain rate tensor
+// in Cartesian coordinates: 2D then 3D computation.
+// Treatment of internal elements
 
 // Cas 2D
 void calcul_dscald_interne2D(int num_elem, int elx0, int elx1, int ely0, int ely1, const Domaine_VDF& domaine_VDF, const DoubleTab& val, DoubleTab& dscald)
@@ -781,7 +781,7 @@ void calcul_dscald_interne3D(int num_elem, int elx0, int elx1, int ely0, int ely
                      + 2. * ((deriv_uy + deriv_vx) * (deriv_uy + deriv_vx) + (deriv_wx + deriv_uz) * (deriv_wx + deriv_uz) + (deriv_wy + deriv_vz) * (deriv_wy + deriv_vz));
 }
 
-// Traitement des elements bord
+// Treatment of boundary elements
 
 // Cas 2D
 void calcul_dscald_bord2D(int num_elem, int elx0, int elx1, int ely0, int ely1, const Domaine_VDF& domaine_VDF, const DoubleTab& val, DoubleTab& dscald)
@@ -797,7 +797,7 @@ void calcul_dscald_bord2D(int num_elem, int elx0, int elx1, int ely0, int ely1, 
   deriv_uy = 0;
   deriv_vy = 0;
 
-  // Traitement des elements bord
+  // Treatment of boundary elements
   if ((elx0 == -1) || (elx1 == -1))
     {
       if (elx0 == -1)
@@ -819,7 +819,7 @@ void calcul_dscald_bord2D(int num_elem, int elx0, int elx1, int ely0, int ely1, 
               deriv_vx = 0;
             }
         }
-      else // elx1 = -1 et elx0 != -1
+      else // elx1 = -1 and elx0 != -1
         {
           delta_x_0 = domaine_VDF.dist_elem(num_elem, elx0, 0);
           delta_xbis = domaine_VDF.dim_elem(num_elem, 0);
@@ -830,7 +830,7 @@ void calcul_dscald_bord2D(int num_elem, int elx0, int elx1, int ely0, int ely1, 
           deriv_ux *= (1. / delta_xbis);
         }
     }
-  else // elx0 != -1 et elx1 != -1
+  else // elx0 != -1 and elx1 != -1
     {
       delta_x_0 = domaine_VDF.dist_elem(num_elem, elx0, 0);
       delta_x_1 = domaine_VDF.dist_elem(elx1, num_elem, 0);
@@ -877,7 +877,7 @@ void calcul_dscald_bord2D(int num_elem, int elx0, int elx1, int ely0, int ely1, 
           deriv_vy *= (1. / delta_ybis);
         }
     }
-  else  // ely0 != -1 et ely1 != -1
+  else  // ely0 != -1 and ely1 != -1
     {
       delta_y_0 = domaine_VDF.dist_elem(num_elem, ely0, 1);
       delta_y_1 = domaine_VDF.dist_elem(ely1, num_elem, 1);
@@ -915,7 +915,7 @@ void calcul_dscald_bord3D(int num_elem, int elx0, int elx1, int ely0, int ely1, 
   deriv_wy = 0;
   deriv_wz = 0;
 
-  // Traitement des elements bord
+  // Treatment of boundary elements
 
   if ((elx0 == -1) || (elx1 == -1))
     {
@@ -925,7 +925,7 @@ void calcul_dscald_bord3D(int num_elem, int elx0, int elx1, int ely0, int ely1, 
             {
               delta_x_1 = domaine_VDF.dist_elem(elx1, num_elem, 0);
               delta_xbis = domaine_VDF.dim_elem(num_elem, 0);
-              // A ecrire et a voir sur papier : calcul de deriv_ux pres de la paroi
+              // TODO: to be written and verified on paper: computation of deriv_ux near the wall
               deriv_vx = (val(elem_faces(elx1, 1)) - val(elem_faces(num_elem, 1)) + val(elem_faces(elx1, 4)) - val(elem_faces(num_elem, 4)));
               deriv_vx *= 0.5 / delta_x_1;
               deriv_wx = (val(elem_faces(elx1, 2)) - val(elem_faces(num_elem, 2)) + val(elem_faces(elx1, 5)) - val(elem_faces(num_elem, 5)));
@@ -940,7 +940,7 @@ void calcul_dscald_bord3D(int num_elem, int elx0, int elx1, int ely0, int ely1, 
               deriv_wx = 0;
             }
         }
-      else // elx1 = -1 et elx0 != -1
+      else // elx1 = -1 and elx0 != -1
         {
           delta_x_0 = domaine_VDF.dist_elem(num_elem, elx0, 0);
           delta_xbis = domaine_VDF.dim_elem(num_elem, 0);
@@ -976,7 +976,7 @@ void calcul_dscald_bord3D(int num_elem, int elx0, int elx1, int ely0, int ely1, 
                   deriv_wy = 0;
                 }
             }
-          else // ely1 = -1 et ely0 != -1
+          else // ely1 = -1 and ely0 != -1
             {
               delta_y_0 = domaine_VDF.dist_elem(num_elem, ely0, 1);
               delta_ybis = domaine_VDF.dim_elem(num_elem, 1);
@@ -1030,7 +1030,7 @@ void calcul_dscald_bord3D(int num_elem, int elx0, int elx1, int ely0, int ely1, 
                   deriv_wz = 0;
                 }
             }
-          else // elz1 = -1 et elz0 != -1
+          else // elz1 = -1 and elz0 != -1
             {
               delta_z_0 = domaine_VDF.dist_elem(num_elem, elz0, 2);
               delta_zbis = domaine_VDF.dim_elem(num_elem, 2);
@@ -1191,7 +1191,7 @@ void calcul_dscald_bord3D(int num_elem, int elx0, int elx1, int ely0, int ely1, 
               deriv_wz = 0;
             }
         }
-      else // elz1 = -1 et elz0 != -1
+      else // elz1 = -1 and elz0 != -1
         {
           delta_z_0 = domaine_VDF.dist_elem(num_elem, elz0, 2);
           delta_zbis = domaine_VDF.dim_elem(num_elem, 2);
@@ -1255,7 +1255,7 @@ void caldscaldcentelemdim2(DoubleTab& dscald, const DoubleTab& val, const Domain
       ely1 = face_voisins(elem_faces(num_elem, 3), 1);
 
       if ((elx0 != -1) && (elx1 != -1) && (ely0 != -1) && (ely1 != -1))
-        // Cas d'un element interne
+        // Case of an internal element
 
         calcul_dscald_interne2D(num_elem, elx0, elx1, ely0, ely1, domaine_VDF, val, dscald);
       else
@@ -1281,7 +1281,7 @@ void caldscaldcentelemdim3(DoubleTab& dscald, const DoubleTab& val, const Domain
       elz1 = face_voisins(elem_faces(num_elem, 5), 1);
 
       if ((elx0 != -1) && (elx1 != -1) && (ely0 != -1) && (ely1 != -1) && (elz0 != -1) && (elz1 != -1))
-        // Cas d'un element interne
+        // Case of an internal element
 
         calcul_dscald_interne3D(num_elem, elx0, elx1, ely0, ely1, elz0, elz1, domaine_VDF, val, dscald);
       else

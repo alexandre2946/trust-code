@@ -129,7 +129,7 @@ void Impl_32_64<_SIZE_>::check_internal_diagonal_for_tetrahedron(Domaine_t& doma
         }
       else if (id == 1)
         {
-          // rien a faire
+          // nothing to do
         }
       else if (id == 2)
         {

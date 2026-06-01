@@ -39,7 +39,7 @@ double Op_Dift_VDF_Face_base::calculer_dt_stab(const Domaine_VDF& domaine_VDF) c
   double dt_stab, coef = -1.e10;
   const DoubleTab& diffu = diffusivite().valeurs(), &diffu_turb = diffusivite_turbulente().valeurs();
 
-  // B.Mat. 9/3/2005: pour traiter monophasique/qc/front-tracking de facon generique. Mettre a jour le qc et l'ancien ft pour utiliser ce mecanisme
+  // B.Mat. 9/3/2005: to handle single-phase/qc/front-tracking generically. Update qc and the old ft to use this mechanism
   const int nb_elem = domaine_VDF.nb_elem(), dim = Objet_U::dimension;
   if (has_champ_masse_volumique())
     {
@@ -87,8 +87,8 @@ double Op_Dift_VDF_Face_base::calculer_dt_stab(const Domaine_VDF& domaine_VDF) c
 
           for (int ncomp = 1; ncomp < diffu_dt.line_size(); ncomp++) diffu_dt_l = std::max(diffu_dt_l, diffu_dt(item, ncomp));
 
-          // si on a associe mu au lieu de nu , on a nu sans diffu_dt
-          // le pas de temps de stab est nu+nu_t, on calcule (mu+mu_t)*(nu/mu)=(mu+mu_t)/rho=nu+nu_t (avantage par rapport a la division par rho ca marche aussi pour alpha et lambda et en VEF
+          // if mu was associated instead of nu, we have nu without diffu_dt
+          // the stability time step is nu+nu_t; compute (mu+mu_t)*(nu/mu)=(mu+mu_t)/rho=nu+nu_t (advantage over dividing by rho: also works for alpha and lambda and in VEF)
           diflo *= (mu_physique + mu_turbulent)*(diffu_dt_l)/mu_physique ;
           coef = std::max(coef, diflo);
         }
@@ -124,7 +124,7 @@ void Op_Dift_VDF_Face_base::calculer_borne_locale(DoubleVect& borne_visco_turb,d
 void Op_Dift_VDF_Face_base::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   const std::string& nom_inco = equation().inconnue().le_nom().getString();
-  if (!matrices.count(nom_inco) || semi_impl.count(nom_inco)) return; //semi-implicite ou pas de bloc diagonal -> rien a faire
+  if (!matrices.count(nom_inco) || semi_impl.count(nom_inco)) return; //semi-implicit or no diagonal block -> nothing to do
 
   Matrice_Morse *mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr, mat2;
   Op_VDF_Face::dimensionner(iter_->domaine(), iter_->domaine_Cl(), mat2);

@@ -23,7 +23,7 @@
 class Domaine_Cl_VEF;
 class Champ_P1NC;
 
-/*! @brief classe T_paroi_Champ_P1NC
+/*! @brief class T_paroi_Champ_P1NC
  *
  * @sa Champ_y_plus Champ_Fonc_P0_VEF
  */

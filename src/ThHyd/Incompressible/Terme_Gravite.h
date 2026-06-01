@@ -20,10 +20,10 @@
 
 class Champ_Don_base;
 
-/*! @brief Classe Terme_Gravite Cette represente un terme de gravite.
+/*! @brief Classe Terme_Gravite This represents a gravity term.
  *
- * Elle contient
- *     une reference sur champ donne qui represente une gravite.
+ * It contains
+ *     a reference to a given field representing gravity.
  *
  * @sa Champ_Don_base, Classe hors hierarchie TrioU
  */
@@ -38,9 +38,9 @@ protected:
 };
 
 
-/*! @brief Associe un champ representant la gravite a l'objet Gravite.
+/*! @brief Associates a field representing gravity to the Gravite object.
  *
- * @param (Champ_Don_base& g) un champ donne representant une gravite
+ * @param (Champ_Don_base& g) a given field representing gravity
  */
 inline void Terme_Gravite::associer_gravite(const Champ_Don_base& g)
 {

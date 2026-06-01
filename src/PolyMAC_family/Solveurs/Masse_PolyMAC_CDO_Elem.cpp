@@ -31,7 +31,7 @@ Sortie& Masse_PolyMAC_CDO_Elem::printOn(Sortie& s) const { return s << que_suis_
 
 Entree& Masse_PolyMAC_CDO_Elem::readOn(Entree& s) { return s; }
 
-//ne touche que la partie "elements"
+//only touches the "elements" part
 DoubleTab& Masse_PolyMAC_CDO_Elem::appliquer_impl(DoubleTab& sm) const
 {
   const Domaine_PolyMAC_CDO& domaine_PolyMAC_CDO = le_dom_PolyMAC_CDO.valeur();
@@ -80,11 +80,11 @@ void Masse_PolyMAC_CDO_Elem::dimensionner(Matrice_Morse& matrix) const
   domaine.init_m2(), ch.fcl();
   Stencil indice(0, 2);
 
-  //partie superieure : diagonale
+  //upper part: diagonal
   for (e = 0; e < domaine.nb_elem(); e++)
     for (n = 0; n < N; n++)
       indice.append_line(N * e + n, N * e + n);
-  //partie inferieure : diagonale pour les CLs de Dirichlet
+  //lower part: diagonal for Dirichlet BCs
   for (f = 0; !only_ne && f < domaine.nb_faces(); f++)
     if (no_diff_ || ch.fcl()(f, 0) > 5)
       for (n = 0; n < N; n++)
@@ -111,12 +111,12 @@ DoubleTab& Masse_PolyMAC_CDO_Elem::ajouter_masse(double dt, DoubleTab& secmem, c
   if (has_coefficient_temporel_) appliquer_coef(coef);
 
   ch.fcl();
-  //partie superieure : diagonale
+  //upper part: diagonal
   for (e = 0; e < domaine.nb_elem(); e++)
     for (n = 0; n < N; n++)
       secmem(e, n) += coef(e) * pe(e) * ve(e) * inco(e, n) / dt;
 
-  //partie inferieure : valeur imposee pour les CLs de Neumann / Dirichlet / Echange_Impose
+  //lower part: imposed value for Neumann / Dirichlet / Echange_Impose BCs
   for (f = 0; secmem.dimension_tot(0) > ne_tot && f < domaine.nb_faces(); f++)
     if (ch.fcl()(f, 0) == 4)
       for (n = 0; n < N; n++) //Neumann_paroi
@@ -140,15 +140,15 @@ Matrice_Base& Masse_PolyMAC_CDO_Elem::ajouter_masse(double dt, Matrice_Base& mat
   if (has_coefficient_temporel_) appliquer_coef(coef);
 
   domaine.init_m2(), ch.fcl();
-  //partie superieure : diagonale
+  //upper part: diagonal
   for (e = 0; e < domaine.nb_elem(); e++)
     for (n = 0; n < N; n++)
-      mat(N * e + n, N * e + n) += coef(e) * pe(e) * ve(e) / dt; //diagonale
+      mat(N * e + n, N * e + n) += coef(e) * pe(e) * ve(e) / dt; //diagonal
 
-  //partie inferieure : 1 pour les flux imposes par CLs aux faces (si diffusion) ou pour toutes les faces (sinon)
+  //lower part: 1 for fluxes imposed by BCs at faces (if diffusion) or for all faces (otherwise)
   for (f = 0; mat.nb_lignes() > N * ne_tot && f < domaine.nb_faces(); f++)
     if (ch.fcl()(f, 0) > 5 || no_diff_)
-      for (n = 0; n < N; n++) //Dirichlet ou Dirichlet_homogene
+      for (n = 0; n < N; n++) //Dirichlet or Dirichlet_homogene
         mat(N * (ne_tot + f) + n, N * (ne_tot + f) + n) += 1;
 
   return matrice;

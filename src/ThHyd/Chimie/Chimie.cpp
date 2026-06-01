@@ -49,7 +49,7 @@ double Chimie::calculer_pas_de_temps() const
 {
   double dt=1e30;
   double dt_reaction;
-  for (int i=0; i<reactions_.size(); i++) // boucle sur l'ensemble des reactions
+  for (int i=0; i<reactions_.size(); i++) // loop over all reactions
     {
       dt_reaction=reactions_[i].calculer_pas_de_temps();
       if(i==0) Cout<<"Pour le(s) reaction(s), dt_max = ";
@@ -58,9 +58,9 @@ double Chimie::calculer_pas_de_temps() const
       dt=std::min(dt,dt_reaction);
     }
   // double dt_n=pb_->schema_temps().pas_de_temps();
-  // filtre Butterworth :
-  //        alpha=1    -> pas de filtre
-  //        alpha.0   -> tres filtre
+  // Butterworth filter:
+  //        alpha=1    -> no filter
+  //        alpha->0   -> heavily filtered
   // double alpha_Butterworth=1.;
   // return (dt_n*(1.-alpha_Butterworth)+alpha_Butterworth*dt);
   return dt;
@@ -70,11 +70,11 @@ double Chimie::calculer_pas_de_temps() const
 
 void  Chimie::completer(const Probleme_base& pb)
 {
-  // si pas de reaction on ne fait rien
+  // if no reaction, do nothing
   if (reactions_.size()==0)
     return;
   pb_=pb;
-  // 1) determination du nombre de FM
+  // 1) determine the number of FM
   int nb_fm=0;
   int nb_grains=0;
   int nb_concentration=0;
@@ -88,7 +88,7 @@ void  Chimie::completer(const Probleme_base& pb)
 
     }
 
-  // 2 stockage des alias et des masses molaires
+  // 2) store aliases and molar masses
   masses_molaires.resize_array(nb_grains+nb_fm+nb_concentration);
   alias.dimensionner(nb_grains+nb_fm+nb_concentration);
   nb_grains_=nb_grains;
@@ -107,7 +107,7 @@ void  Chimie::completer(const Probleme_base& pb)
         }
     }
   assert(liste_ai_.size()==nb_grains_);
-  // verification de l'unicite des  alias
+  // check uniqueness of aliases
   marqueur_espece_en_competition_micro_melange_=-1;
   {
     LIST(Nom) test;
@@ -180,14 +180,14 @@ int Chimie::preparer_calcul()
 
 void  Chimie::mettre_a_jour(double temps)
 {
-  if (reactions_.size()==0) // pas de reaction
+  if (reactions_.size()==0) // no reaction
     return;
 
   double dt=pb_->schema_temps().pas_de_temps();
 
   if (liste_C_.size())
     {
-      // On suppose qu'il n'y a pas de temperature pour l'instant...
+      // We assume there is no temperature for now...
       int old=0;
       int nbr=reactions_.size();
       if (old)
@@ -328,8 +328,8 @@ void  Chimie::mettre_a_jour(double temps)
                         tau_melange = (tau_mel(face_voisins(elem,0)));
                     }
                 }
-              // tau_melange <0 pas pris en compte
-              // recuperation des valeurs initiales
+              // tau_melange <0 not taken into account
+              // retrieval of initial values
               for (int i=0; i<nbc; i++)
                 {
                   C[i]=liste_C_[i]->valeurs()(elem);
@@ -357,7 +357,7 @@ void  Chimie::mettre_a_jour(double temps)
               double rtol=0;
               double atol=1e-10;
               F77NAME(DLSODECHIMIES)(&nbc, C.addr(),&t, &tout,&tau_melange, &itol, &rtol, &atol, rwork.addr(), &lrw, iwork.addr(), &liw);
-              // mise a jour des inconnues
+              // update unknowns
               for (int i=0; i<liste_C_.size(); i++)
                 liste_C_[i]->valeurs()(elem)=C[i];
             }
@@ -365,7 +365,7 @@ void  Chimie::mettre_a_jour(double temps)
             liste_C_[i]->valeurs().echange_espace_virtuel();
           return;
         }
-      // on calcule le nb_sous_pas_temps_max
+      // compute nb_sous_pas_temps_max
       int nb_sous_pas_de_temps_reaction_max=1;
       int nbr_directe=0;
 
@@ -437,12 +437,12 @@ void  Chimie::mettre_a_jour(double temps)
                           exit();
                         }
                     }
-                  // on utilise proportion_directe pour ne pas avoir la limitation par la securite
+                  // use proportion_directe to avoid the security limitation
                   proportion_eq[i]=proportion_directe;
 
 
                 }
-              // pour chaque consitutant on regarde si il faut limiter ....
+              // for each constituent, check whether limiting is needed...
               double securite=1-1e-6;
               for (int c=0; c<nbc; c++)
                 {
@@ -460,7 +460,7 @@ void  Chimie::mettre_a_jour(double temps)
 
                   if (rapport>C[c])
                     {
-                      // on risque de trop consommer .... on limite.
+                      // risk of consuming too much... limiting.
                       Cerr<< c<<" limite ici0 "<< rapport <<" st "<<St<<" "<<C[c]<<" "<<C[c]/rapport<<finl;
                       // exit();
                       for (int i=0; i<nbr_directe; i++)
@@ -474,7 +474,7 @@ void  Chimie::mettre_a_jour(double temps)
                         }
                     }
                 }
-              // on fait reagir les reactions directes C(c)-=St;
+              // apply direct reactions C(c)-=St;
               for (int c=0; c<nbc; c++)
                 {
                   double St=0;
@@ -493,7 +493,7 @@ void  Chimie::mettre_a_jour(double temps)
                   // Cerr<< C(c)<<finl;
 
                 }
-              // on taite maintenant les reactions equilibrees les unes apres les autres
+              // now process equilibrium reactions one by one
 
               securite=0.5;
               for (int reac=0; reac<nbr; reac++)
@@ -505,7 +505,7 @@ void  Chimie::mettre_a_jour(double temps)
                       double proportion_directe;
                       double proportion=reaction.calcul_proportion_implicite(C_tmp, C,dt_chimie,1e-7,proportion_directe);
                       for (int i=0; i<nbc; i++)
-                        if (reaction.coeff_Y_[i]!=0.) // c'est un reactif ou un produit
+                        if (reaction.coeff_Y_[i]!=0.) // it is a reactant or a product
                           {
                             C[i]=C[i]-proportion*reaction.coeff_stoechio_[i];
                           }
@@ -541,7 +541,7 @@ bool Chimie::has_champ(const Motcle& nom, OBS_PTR(Champ_base)& ref_champ) const
         }
     }
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 bool Chimie::has_champ(const Motcle& nom) const
@@ -554,7 +554,7 @@ bool Chimie::has_champ(const Motcle& nom) const
         return true;
     }
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 const Champ_base& Chimie::get_champ(const Motcle& nom) const

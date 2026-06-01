@@ -66,7 +66,7 @@
 #define declare(a,t) name2(declare_,a)(t)
 #define implemente(a,t) name2(implemente_,a)(t)
 
-// GF nouvelle macro pour fabriquer des vrais noms pour les listes, les Deriv, les Ref,
+// GF new macro to build real names for lists, Deriv, Ref,
 #ifdef _COMPILE_AVEC_GCC_
 #define string_macro_trio(a,b) _inter_name(b)
 #define _inter_name(a) #a

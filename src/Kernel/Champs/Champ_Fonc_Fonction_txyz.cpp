@@ -21,8 +21,8 @@ Implemente_instanciable(Champ_Fonc_Fonction_txyz,"Champ_Fonc_Fonction_txyz",Cham
 
 Sortie& Champ_Fonc_Fonction_txyz::printOn(Sortie& os) const { return os; }
 
-// Voir Champ_Fonction_fonction
-// Lecture du Champ a partir d'un flot d'entree (On ne sait traiter que les champs scalaires.)
+// See Champ_Fonction_fonction
+// Read the field from an input stream (only scalar fields are handled.)
 Entree& Champ_Fonc_Fonction_txyz::readOn(Entree& is)
 {
   int nbcomp;

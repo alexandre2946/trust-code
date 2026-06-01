@@ -64,7 +64,7 @@ Entree& Champ_Post_Operateur_Eqn::readOn(Entree& s )
 
 void Champ_Post_Operateur_Eqn::verification_cas_compo() const
 {
-  // On applique compo a un vecteur
+  // Applying compo to a vector
   if ((!ref_eq_->inconnue().is_vectorial()) && (compo_ != -1 ))
     {
       Cerr<<"Error in Champ_Post_Operateur_Eqn::verification_cas_compo()"<<finl;
@@ -72,7 +72,7 @@ void Champ_Post_Operateur_Eqn::verification_cas_compo() const
       Process::exit();
     }
 
-  // Verification de compo
+  // Checking compo
   const int nb_compo= ref_eq_->inconnue().nb_comp();
   if ((compo_<-1)||(compo_>nb_compo-1))
     {
@@ -80,7 +80,7 @@ void Champ_Post_Operateur_Eqn::verification_cas_compo() const
       Cerr<<"compo="<<compo_<<" is not allowed."<<" You must give a value between 0 and "<< nb_compo-1<<finl;
       Process::exit();
     }
-  // Verifier qu'on n'est pas en VDF
+  // Check that we are not in VDF
   if (ref_eq_->discretisation().is_vdf() && (compo_ != -1 ))
     {
       Cerr<<"Error in Champ_Post_Operateur_Eqn::verification_cas_compo()"<<finl;
@@ -107,8 +107,8 @@ void Champ_Post_Operateur_Eqn::completer(const Postraitement_base& post)
 
           {
 
-            //On recupere l equation alors qu elle n est pas encore associee au Champ_Inc
-            //On parcours les equatiosn du probleme et on identifie celle qui correspond au champ inconnu
+            //Retrieving the equation before it is associated with the Champ_Inc
+            //Iterating over the problem equations and identifying the one corresponding to the unknown field
 
             int nb_eq = Pb.nombre_d_equations();
             int i=0;
@@ -203,7 +203,7 @@ const Champ_base& Champ_Post_Operateur_Eqn::get_champ_compo_without_evaluation(O
 
 const Champ_base& Champ_Post_Operateur_Eqn::get_champ(OWN_PTR(Champ_base)& espace_stockage) const
 {
-  // On commence par construire le champ vectoriel complet
+  // Start by building the complete vector field
   OWN_PTR(Champ_base) espace_stockage_complet;
   espace_stockage_complet = get_champ_without_evaluation(espace_stockage_complet);
   DoubleTab& es = (espace_stockage_complet->valeurs());
@@ -212,7 +212,7 @@ const Champ_base& Champ_Post_Operateur_Eqn::get_champ(OWN_PTR(Champ_base)& espac
   {
     if (numero_op_!=-1)
       {
-        // certains calculer  sont faux !!!! il faudrait tous les recoder en res =0 ajouter();
+        // some compute methods are wrong!!!! they should all be recoded as res=0 ajouter();
         es=0;
         Operateur().ajouter(ref_eq_->operateur(numero_op_).mon_inconnue().valeurs(),es);
       }
@@ -221,8 +221,8 @@ const Champ_base& Champ_Post_Operateur_Eqn::get_champ(OWN_PTR(Champ_base)& espac
     else if ((numero_masse_!=-1) && ref_eq_->has_interface_blocs())
       es=0, ref_eq_->schema_temps().ajouter_blocs({},es,ref_eq_.valeur());
     if (!sans_solveur_masse_)
-      ref_eq_->solv_masse().appliquer_impl(es); //On divise par le volume
-    // Hack: car Masse_PolyMAC_CDO_Face::appliquer_impl ne divise pas par le volume (matrice de masse)....
+      ref_eq_->solv_masse().appliquer_impl(es); //We divide by the volume
+    // Hack: because Masse_PolyMAC_CDO_Face::appliquer_impl does not divide by the volume (mass matrix)....
     if (ref_eq_->solv_masse().que_suis_je()=="Masse_PolyMAC_CDO_Face")
       {
         //Cerr << "Volumic source terms on faces with PolyMAC_CDO can't be post-processed yet." << finl;
@@ -232,10 +232,10 @@ const Champ_base& Champ_Post_Operateur_Eqn::get_champ(OWN_PTR(Champ_base)& espac
       }
   }
   es.echange_espace_virtuel();
-  // apres je recupere juste la composante si elle est demandee
+  // then I retrieve only the component if it was requested
   if (compo_>-1)
     {
-      // on prepare l'espace de stockage pour une composante
+      // prepare the storage space for a single component
       OWN_PTR(Champ_base) espace_stockage_compo;
       espace_stockage_compo = get_champ_compo_without_evaluation(espace_stockage_compo);
       DoubleTab& es_compo = (espace_stockage_compo->valeurs());
@@ -254,7 +254,7 @@ const Champ_base& Champ_Post_Operateur_Eqn::get_champ(OWN_PTR(Champ_base)& espac
 
 const Noms Champ_Post_Operateur_Eqn::get_property(const Motcle& query) const
 {
-//Creation des composantes serait a faire de maniere dynamique (Eqn_...)
+//Component creation should be done dynamically (Eqn_...)
 
   Motcles motcles(2);
   motcles[0] = "composantes";
@@ -300,7 +300,7 @@ const Noms Champ_Post_Operateur_Eqn::get_property(const Motcle& query) const
           }
         else
           {
-            // J'utilise un vecteur car la methode renvoie Noms
+            // Using a vector because the method returns Noms
             Noms unites(1);
             unites[0] = "unit";
             return unites;
@@ -317,8 +317,8 @@ Entity Champ_Post_Operateur_Eqn::get_localisation(const int index) const
   return localisation_inco_;
 
 }
-//Nomme le champ en tant que source par defaut
-//"Eqn_" + nom_champ_source
+//Name the field as a source by default
+//"Eqn_" + source_field_name
 void Champ_Post_Operateur_Eqn::nommer_source()
 {
   if (nom_post_=="??")

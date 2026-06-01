@@ -47,20 +47,19 @@ protected:
   virtual void append_from_other_std(const MD_Vector_std& src, int offset, int multiplier) { throw; }
   virtual void append_from_other_seq(const MD_Vector_seq& src, int offset, int multiplier) { throw; }
 
-  // ***** Les membres suivants sont utilises pour calculer des sommes, produits scalaires, normes ******
-  // Indices de tous les items dont je suis proprietaire (ce sont les "items sequentiels", definis comme
-  //  etant tous ceux dont la valeur n'est pas recue d'un autre processeur lors d'un echange_espace_virtuel).
-  //  Pour faire une somme sur tous les items, il faut sommer les valeurs de tous les items
-  //  de ces blocs. Le tableau contient debut_bloc1, fin_bloc1, debut_bloc2, fin_bloc2, etc...
-  //  (fin_bloc est l'indice du dernier element + 1)
-  //  (structure utilisee pour les sauvegardes sequentielles (xyz ou debog), les calculs de normes de vecteurs, etc)
+  // ***** The following members are used to compute sums, dot products, norms ******
+  // Indices of all items owned by this processor (these are the "sequential items", defined as
+  //  all items whose value is not received from another processor during an echange_espace_virtuel).
+  //  To sum over all items, the values of all items in these blocks must be summed.
+  //  The array contains start_bloc1, end_bloc1, start_bloc2, end_bloc2, etc...
+  //  (end_bloc is the index of the last element + 1)
+  //  (structure used for sequential saves (xyz or debog), vector norm computations, etc)
   ArrOfInt blocs_items_to_sum_;
   mutable ArrOfInt items_to_sum_; // All items (more suitable for TRUSTVect_tools kernels on GPU)
-  // Indices de tous les items pour lesquels il faut calculer une valeur
-  //  (utilise par DoubleTab::operator+=(const DoubleTab &) par exemple)
-  // En theorie, il suffirait de prendre blocs_items_to_sum_, mais ce dernier est
-  //  plein de trous et peut etre inefficace. En pratique, on calcule toutes les valeurs
-  //  reeles.
+  // Indices of all items for which a value must be computed
+  //  (used by DoubleTab::operator+=(const DoubleTab &) for example)
+  // In theory, blocs_items_to_sum_ would suffice, but it is full of holes
+  //  and can be inefficient. In practice, all real values are computed.
   ArrOfInt blocs_items_to_compute_;
   mutable ArrOfInt items_to_compute_; // All items (more suitable for TRUSTVect_tools kernels on GPU)
 };

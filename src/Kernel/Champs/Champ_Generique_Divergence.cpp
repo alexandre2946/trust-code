@@ -39,7 +39,7 @@ void Champ_Generique_Divergence::completer(const Postraitement_base& post)
 {
   Champ_Gen_de_Champs_Gen::completer(post);
   const Probleme_base& Pb = get_ref_pb_base();
-  //On ne complete l operateur que s il sagit du champ de vitesse
+  //We only complete the operator if it concerns the velocity field
 
   if (sub_type(Champ_Generique_refChamp,get_source(0)))
     {
@@ -51,8 +51,8 @@ void Champ_Generique_Divergence::completer(const Postraitement_base& post)
           Op_Div_.typer();
           Op_Div_.l_op_base().associer_eqn(eqn);
 
-          //La methode completer() lance l association du domaine_discretisee
-          //qui est recuperre par l equation associee a l operateur
+          //The completer() method triggers the association of the discretized domain
+          //which is retrieved by the equation associated with the operator
           Op_Div_->completer();
         }
     }
@@ -146,7 +146,7 @@ const Noms Champ_Generique_Divergence::get_property(const Motcle& query) const
   return Champ_Gen_de_Champs_Gen::get_property(query);
 }
 
-//Nomme le champ en tant que source par defaut
+//Name the field as a source by default
 //"Divergence_" + nom_champ_source
 void Champ_Generique_Divergence::nommer_source()
 {

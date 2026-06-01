@@ -35,39 +35,39 @@ Implemente_base_sans_constructeur(Champ_Inc_base,"Champ_Inc_base",Champ_base);
 Sortie& Champ_Inc_base::printOn(Sortie& os) const { return Champ_base::printOn(os); }
 Entree& Champ_Inc_base::readOn(Entree& is) { return Champ_base::readOn(is); }
 
-/*! @brief Fixe le nombre de valeurs temporelles a conserver.
+/*! @brief Sets the number of temporal values to keep.
  *
- * (un nombre different suivant le schema en temps utilise)
- *     Appelle Roue::fixer_nb_cases(int)
+ * (a different number depending on the time scheme used)
+ *     Calls Roue::fixer_nb_cases(int)
  *
- * @param (int i) le nombre de valeurs temporelles a conserver
- * @return (int) le nombre de valeurs temporelles a conserver
+ * @param (int i) the number of temporal values to keep
+ * @return (int) the number of temporal values to keep
  */
 int Champ_Inc_base::fixer_nb_valeurs_temporelles(int i)
 {
   return les_valeurs->fixer_nb_cases(i);
 }
 
-/*! @brief Renvoie le nombre de valeurs temporelles actuellement conservees.
+/*! @brief Returns the number of temporal values currently kept.
  *
- * Cette valeur est stockee par la Roue du Champ_Inc_base
+ * This value is stored by the Roue of Champ_Inc_base
  *
- * @return (int) le nombre de valeurs temporelles actuellement conservees
+ * @return (int) the number of temporal values currently kept
  */
 int Champ_Inc_base::nb_valeurs_temporelles() const
 {
   return les_valeurs->nb_cases();
 }
 
-/*! @brief Lit les valeurs du champs a partir d'un flot d'entree.
+/*! @brief Reads the field values from an input stream.
  *
- * Format de lecture:
- *       int [LE NOMBRE DE VALEURS A LIRE]
- *       [LIRE LE NOMBRE DE VALEUR VOULUES]
+ * Reading format:
+ *       int [THE NUMBER OF VALUES TO READ]
+ *       [READ THE NUMBER OF VALUES WANTED]
  *
- * @param (Entree& is) le flot d'entree
- * @return (int) renvoie 1 si la lecture est correcte
- * @throws le nombre de valeur a lire est incorrect
+ * @param (Entree& is) the input stream
+ * @return (int) returns 1 if the reading is correct
+ * @throws the number of values to read is incorrect
  */
 int Champ_Inc_base::lire_donnees(Entree& is)
 {
@@ -97,12 +97,12 @@ void Champ_Inc_base::creer_tableau_distribue(const MD_Vector& md, RESIZE_OPTIONS
   for (int i = 0; i < n; i++)
     {
       DoubleTab& tab = futur(i);
-      // Note B.M: Ce test n'est pas symetrique avec Champ_Fonc_base => incoherence de nb_dim
-      // pour les champs "multiscalaires" a une composante.
+      // Note B.M: This test is not symmetric with Champ_Fonc_base => inconsistency in nb_dim
+      // for "multi-scalar" fields with one component.
       if (tab.size_array() == 0 && (!tab.get_md_vector()))
         {
-          // Note B.M.: les methodes fixer_nb_valeurs_nodales sont appelees a tort et a travers.
-          // Ne rien faire si le tableau a deja la bonne structure
+          // Note B.M.: the fixer_nb_valeurs_nodales methods are called haphazardly.
+          // Do nothing if the array already has the correct structure
           tab.resize(0, nb_compo_);
         }
       if (!(tab.get_md_vector() == md))
@@ -131,14 +131,14 @@ int Champ_Inc_base::nb_valeurs_nodales() const
   return n;
 }
 
-/*! @brief Renvoie les valeurs du champs a l'instant temps.
+/*! @brief Returns the field values at time instant.
  *
- * @param (double temps) le  temps  auquel on veut les valeurs du champ
- * @return (DoubleTab&) les valeurs du champs a l'instant temps
+ * @param (double temps) the time at which we want the values of the field
+ * @return (DoubleTab&) the field values at time instant
  */
-// WEC : Attention dans le cas de Pb_Couple on utilisait le fait que cette fonction renvoyait le present quand elle ne trouvait
-// pas un temps superieur a tous les temps disponibles!!!
-// Le comportement est maintenant plus explicite : un WARNING est affiche des que le present est renvoye a la place du temps demande.
+// WEC : Warning in the case of Pb_Couple we used the fact that this function returned the present when it didn't find
+// a time greater than all available times!!!
+// The behavior is now more explicit : a WARNING is displayed as soon as the present is returned instead of the requested time.
 DoubleTab& Champ_Inc_base::valeurs(double tps)
 {
   if (temps() == tps)
@@ -173,13 +173,13 @@ DoubleTab& Champ_Inc_base::valeurs(double tps)
   return valeurs();
 }
 
-/*! @brief Renvoie les valeurs du champs a l'instant temps.
+/*! @brief Returns the field values at time instant.
  *
- * @param (double temps) le  temps  auquel on veut les valeurs du champ
- * @return (DoubleTab&) les valeurs du champs a l'instant temps
+ * @param (double temps) the time at which we want the values of the field
+ * @return (DoubleTab&) the field values at time instant
  */
 const DoubleTab& Champ_Inc_base::valeurs(double tps) const
-// See above !
+// See above!
 {
   if (temps() == tps)
     return valeurs();
@@ -189,7 +189,7 @@ const DoubleTab& Champ_Inc_base::valeurs(double tps) const
 
       if (temps() < tps)
         {
-          // Futur ?
+          // Future?
           for (int i = 0; i < nb_valeurs_temporelles(); i++)
             {
               if (la_roue.futur(i).temps() == tps)
@@ -200,7 +200,7 @@ const DoubleTab& Champ_Inc_base::valeurs(double tps) const
         }
       else if (temps() > tps)
         {
-          // Passe ?
+          // Past?
           for (int i = 1; i < nb_valeurs_temporelles(); i++)
             {
               if (la_roue.passe(i).temps() == tps)
@@ -216,10 +216,10 @@ const DoubleTab& Champ_Inc_base::valeurs(double tps) const
   return valeurs();
 }
 
-/*! @brief Avance le pointeur courant de i pas de temps, dans la liste des valeurs temporelles conservees.
+/*! @brief Advances the current pointer by i time steps, in the list of kept temporal values.
  *
- * @param (int i) le nombre de pas de temps dont on avance
- * @return (Champ_Inc_base&) renvoie *this, le champ au pas de temps voulu
+ * @param (int i) the number of time steps to advance
+ * @return (Champ_Inc_base&) returns *this, the field at the desired time step
  */
 Champ_Inc_base& Champ_Inc_base::avancer(int i)
 {
@@ -229,10 +229,10 @@ Champ_Inc_base& Champ_Inc_base::avancer(int i)
   return *this;
 }
 
-/*! @brief Recule le pointeur courant de i pas de temps, dans la liste des valeurs temporelles conservees.
+/*! @brief Rewinds the current pointer by i time steps, in the list of kept temporal values.
  *
- * @param (int i) le nombre de pas de temps dont on recule
- * @return (Champ_Inc_base&) renvoie *this, le champ au pas de temps voulu
+ * @param (int i) the number of time steps to rewind
+ * @return (Champ_Inc_base&) returns *this, the field at the desired time step
  */
 Champ_Inc_base& Champ_Inc_base::reculer(int i)
 {
@@ -242,17 +242,17 @@ Champ_Inc_base& Champ_Inc_base::reculer(int i)
   return *this;
 }
 
-/*! @brief Effectue une mise a jour en temps du champ inconnue.
+/*! @brief Performs a time update of the unknown field.
  *
- * WEC : Maintenant si on l'appelle 2 fois de suite avec le meme
- *     argument, la 2eme ne fait rien.
+ * WEC : Now if we call it 2 times in a row with the same
+ *     argument, the 2nd one does nothing.
  *
- * @param (double temps) le nouveau temps
+ * @param (double temps) the new time
  */
 void Champ_Inc_base::mettre_a_jour(double un_temps)
 {
-  // Champ a plusieurs valeurs temporelle :
-  // On avance a la bonne valeur temporelle.
+  // Field with multiple temporal values:
+  // Advance to the correct temporal value.
   if (les_valeurs->nb_cases() > 1)
     {
       for (int i = 0; i < les_valeurs->nb_cases(); i++)
@@ -261,11 +261,11 @@ void Champ_Inc_base::mettre_a_jour(double un_temps)
             {
               avancer(i);
               temps_ = un_temps;
-              //Inutile:
+              //Useless:
               //valeurs().echange_espace_virtuel();
               if (fonc_calc_)
                 fonc_calc_(obj_calc_.valeur(), valeurs(), val_bord_, deriv_);
-              /* premier calcul d'un Champ_Fonc_Calc -> on copie les valeurs calculees dans toutes les cases */
+              /* first calculation of a Champ_Fonc_Calc -> copy the calculated values to all cases */
               if (fonc_calc_ && !fonc_calc_init_)
                 for (int j = 1; j < les_valeurs->nb_cases(); j++, fonc_calc_init_ = 1)
                   les_valeurs[j].valeurs() = valeurs();
@@ -279,22 +279,22 @@ void Champ_Inc_base::mettre_a_jour(double un_temps)
         Cerr << "  " << les_valeurs[i].temps() << finl;
       Process::exit();
     }
-  // Champ a une seule valeur temporelle :
-  // On change le temps associe.
+  // Field with a single temporal value:
+  // Change the associated time.
   else
     {
       changer_temps(un_temps);
       if (fonc_calc_)
         fonc_calc_(obj_calc_.valeur(), valeurs(), val_bord_, deriv_);
-      //Inutile:
+      //Useless:
       //valeurs().echange_espace_virtuel();
     }
 }
 
-/*! @brief Fixe le temps du ieme champ futur.
+/*! @brief Sets the time of the i-th future field.
  *
- * @param (double t, int i) le nouveau temps
- * @return (double) le nouveau temps
+ * @param (double t, int i) the new time
+ * @return (double) the new time
  */
 double Champ_Inc_base::changer_temps_futur(double t, int i)
 {
@@ -303,10 +303,10 @@ double Champ_Inc_base::changer_temps_futur(double t, int i)
   return t;
 }
 
-/*! @brief Fixe le temps du ieme champ passe.
+/*! @brief Sets the time of the i-th past field.
  *
- * @param (double t, int i) le nouveau temps
- * @return (double) le nouveau temps
+ * @param (double t, int i) the new time
+ * @return (double) the new time
  */
 double Champ_Inc_base::changer_temps_passe(double t, int i)
 {
@@ -315,10 +315,10 @@ double Champ_Inc_base::changer_temps_passe(double t, int i)
   return t;
 }
 
-/*! @brief Retourne le temps du ieme champ futur.
+/*! @brief Returns the time of the i-th future field.
  *
- * @param (int i) le temps
- * @return (double) le temps
+ * @param (int i) the time
+ * @return (double) the time
  */
 double Champ_Inc_base::recuperer_temps_futur(int i) const
 {
@@ -326,10 +326,10 @@ double Champ_Inc_base::recuperer_temps_futur(int i) const
   return la_roue.futur(i).temps();
 }
 
-/*! @brief Retourne le temps du ieme champ passe.
+/*! @brief Returns the time of the i-th past field.
  *
- * @param (int i) le temps
- * @return (double) le temps
+ * @param (int i) the time
+ * @return (double) the time
  */
 double Champ_Inc_base::recuperer_temps_passe(int i) const
 {
@@ -368,16 +368,16 @@ std::vector<YAML_data> Champ_Inc_base::data_a_sauvegarder() const
   return data;
 }
 
-/*! @brief Sauvegarde le champ inconnue sur un flot de sortie.
+/*! @brief Saves the unknown field to an output stream.
  *
- *  Ecrit un identifiant, les valeurs du champs, et la date (le temps au moment de la sauvegarde).
+ *  Writes an identifier, the field values, and the date (the time at the moment of saving).
  *
- * @param (Sortie& fich) un flot de sortie
+ * @param (Sortie& fich) an output stream
  * @return (int) returns the size of array
  */
 int Champ_Inc_base::sauvegarder(Sortie& fich) const
 {
-  // en mode ecriture special seul le maitre ecrit l'entete
+  // in special write mode only the master writes the header
   int a_faire, special;
   EcritureLectureSpecial::is_ecriture_special(special, a_faire);
 
@@ -424,7 +424,7 @@ int Champ_Inc_base::sauvegarder(Sortie& fich) const
 
   if (a_faire)
     {
-      // fich << flush ; Ne flushe pas en binaire !
+      // fich << flush ; Does not flush in binary mode!
       fich.flush();
     }
   Cerr << "Backup of the field " << nom_ << " performed on time : " << Nom(temps_, "%e") << finl;
@@ -438,16 +438,16 @@ int Champ_Inc_base::sauvegarder(Sortie& fich) const
   return bytes;
 }
 
-/*! @brief Lecture d'un champ inconnue a partir d'un flot d'entree en vue d'une reprise.
+/*! @brief Reads an unknown field from an input stream for a restart.
  *
- * @param (Entree& fich) un flot d'entree
- * @return (int) renvoie toujours 1
+ * @param (Entree& fich) an input stream
+ * @return (int) always returns 1
  */
 int Champ_Inc_base::reprendre(Entree& fich)
 {
   double un_temps;
   int special = EcritureLectureSpecial::is_lecture_special();
-  if (nom_ != Nom("anonyme")) // lecture pour reprise
+  if (nom_ != Nom("anonyme")) // reading for restart
     {
       Cerr << "Resume of the field " << nom_ << finl;
       if(TRUST_2_PDI::is_PDI_restart())
@@ -482,7 +482,7 @@ int Champ_Inc_base::reprendre(Entree& fich)
         }
       Cerr << " performed." << finl;
     }
-  else // lecture pour sauter le bloc
+  else // reading to skip the block
     {
       if(TRUST_2_PDI::is_PDI_restart())
         {
@@ -497,11 +497,11 @@ int Champ_Inc_base::reprendre(Entree& fich)
   return 1;
 }
 
-/*! @brief Calcule les valeurs du champs inconnue aux positions specifiees.
+/*! @brief Computes the values of the unknown field at the specified positions.
  *
- * @param (DoubleTab& positions) les positions ou l'ont doit calculer le champ inconnues
- * @param (DoubleTab& valeurs) le tableau des valeurs du champ inconnue aux positions voulues
- * @return (DoubleTab&) le tableau des valeurs du champ inconnue aux positions voulues
+ * @param (DoubleTab& positions) the positions where the unknown field must be computed
+ * @param (DoubleTab& valeurs) the array of unknown field values at the desired positions
+ * @return (DoubleTab&) the array of unknown field values at the desired positions
  */
 DoubleTab& Champ_Inc_base::valeur_aux(const DoubleTab& positions, DoubleTab& tab_valeurs) const
 {
@@ -512,12 +512,12 @@ DoubleTab& Champ_Inc_base::valeur_aux(const DoubleTab& positions, DoubleTab& tab
   return valeur_aux_elems(positions, les_polys, tab_valeurs);
 }
 
-/*! @brief Calcule les valeurs du champs inconnue aux positions specifiees, pour une certaine composante du champ.
+/*! @brief Computes the values of the unknown field at the specified positions, for a given component of the field.
  *
- * @param (DoubleTab& positions) les positions ou l'ont doit calculer le champ inconnues
- * @param (DoubleTab& les_valeurs) le tableau des valeurs du champ inconnue aux positions voulues
- * @param (int) l'index de la composante du champ a calculer
- * @return (DoubleVect&) le tableau des valeurs de la composante du champ specifiee aux positions voulues
+ * @param (DoubleTab& positions) the positions where the unknown field must be computed
+ * @param (DoubleTab& les_valeurs) the array of unknown field values at the desired positions
+ * @param (int) the index of the field component to compute
+ * @return (DoubleVect&) the array of values of the specified field component at the desired positions
  */
 DoubleVect& Champ_Inc_base::valeur_aux_compo(const DoubleTab& positions, DoubleVect& tab_valeurs, int ncomp) const
 {
@@ -527,11 +527,11 @@ DoubleVect& Champ_Inc_base::valeur_aux_compo(const DoubleTab& positions, DoubleV
   return valeur_aux_elems_compo(positions, les_polys, tab_valeurs, ncomp);
 }
 
-/*! @brief Calcule la valeur du champs inconnue a la position specifiee.
+/*! @brief Computes the value of the unknown field at the specified position.
  *
- * @param (DoubleVect& position) la position a laquelle on veut calculer le champ
- * @param (DoubleVect& les_valeurs) la valeur du champ inconnue a la position specifiee
- * @return (DoubleVect&) la valeur du champ inconnue a la position specifiee
+ * @param (DoubleVect& position) the position at which the field is to be computed
+ * @param (DoubleVect& les_valeurs) the value of the unknown field at the specified position
+ * @return (DoubleVect&) the value of the unknown field at the specified position
  */
 DoubleVect& Champ_Inc_base::valeur_a(const DoubleVect& position, DoubleVect& tab_valeurs) const
 {
@@ -541,10 +541,10 @@ DoubleVect& Champ_Inc_base::valeur_a(const DoubleVect& position, DoubleVect& tab
   return valeur_a_elem(position, tab_valeurs, le_poly(0));
 }
 
-/*! @brief Affectation d'un OWN_PTR(Champ_base) generique (Champ_base) dans un champ inconnue.
+/*! @brief Assignment of a generic OWN_PTR(Champ_base) (Champ_base) to an unknown field.
  *
- * @param (Champ_base& ch) le champ partie droite de l'affectation
- * @return (Champ_base&) le resultat de l'affectation (*this)
+ * @param (Champ_base& ch) the field on the right side of the assignment
+ * @return (Champ_base&) the result of the assignment (*this)
  */
 Champ_base& Champ_Inc_base::affecter_(const Champ_base& ch)
 {
@@ -553,13 +553,13 @@ Champ_base& Champ_Inc_base::affecter_(const Champ_base& ch)
 
   if (valeurs().size_reelle_ok())
     {
-      // Modif B.M. pour ne pas faire d'interpolation sur les cases virtuelles
+      // Modif B.M. to avoid interpolation on virtual cells
       const int n = valeurs().dimension(0);
       DoubleTab pos, val;
       pos.ref_tab(noeuds, 0, n);
       val.ref_tab(valeurs(), 0, n);
       ch.valeur_aux(pos, val);
-      //copie dans toutes les cases
+      //copy to all cases
       valeurs().echange_espace_virtuel();
       for (int i = 1; i < les_valeurs->nb_cases(); i++)
         les_valeurs[i].valeurs() = valeurs();
@@ -572,18 +572,18 @@ Champ_base& Champ_Inc_base::affecter_(const Champ_base& ch)
   return *this;
 }
 
-//-Cas CL periodique : assure que les valeurs sur des faces periodiques
-// en vis a vis sont identiques. Pour cela on prend la demi somme des deux valeurs.
-//La methode est a surcharger pour des champs discretises aux faces.
+//-Periodic BC case: ensures that the values on opposing periodic faces
+// are identical. To do so, we take the half sum of the two values.
+//The method must be overridden for fields discretized at faces.
 void Champ_Inc_base::verifie_valeurs_cl()
 {
 }
 
-/*! @brief Affectation d'une composante d'un OWN_PTR(Champ_base) quelconque (Champ_base) dans une composante d'un champ inconnue
+/*! @brief Assignment of a component of a generic OWN_PTR(Champ_base) (Champ_base) to a component of an unknown field
  *
- * @param (Champ_base& ch) la partie droite de l'affectation
- * @param (int compo) l'index de la composante a affecter
- * @return (Champ_base&) le resultat de l'affectation (avec upcast)
+ * @param (Champ_base& ch) the right side of the assignment
+ * @param (int compo) the index of the component to assign
+ * @return (Champ_base&) the result of the assignment (with upcast)
  */
 Champ_base& Champ_Inc_base::affecter_compo(const Champ_base& ch, int compo)
 {
@@ -599,10 +599,10 @@ Champ_base& Champ_Inc_base::affecter_compo(const Champ_base& ch, int compo)
   return *this;
 }
 
-/*! @brief voir Champ_base Cas particulier (malheureusement) du Champ_P0_VDF :
+/*! @brief See Champ_base. Special case (unfortunately) of Champ_P0_VDF:
  *
- *     Si la frontiere est un raccord, le resultat est calcule sur le raccord associe. Dans ce cas, le DoubleTab x doit etre
- *     dimensionne sur le raccord associe.
+ *     If the boundary is a connector, the result is computed on the associated connector. In this case, the DoubleTab x must be
+ *     dimensioned on the associated connector.
  *
  */
 DoubleTab& Champ_Inc_base::trace(const Frontiere_dis_base&, DoubleTab& x, double tps, int distant) const
@@ -611,21 +611,21 @@ DoubleTab& Champ_Inc_base::trace(const Frontiere_dis_base&, DoubleTab& x, double
   return x;
 }
 
-/*! @brief NE FAIT RIEN Methode a surcharger
+/*! @brief DOES NOTHING. Method to override
  *
  * @param (DoubleTab&)
  * @param (IntVect&)
- * @return (int) renvoie toujours 0
+ * @return (int) always returns 0
  */
 int Champ_Inc_base::remplir_coord_noeuds_et_polys(DoubleTab&, IntVect&) const
 {
   return 0;
 }
 
-/*! @brief Simple appel a Champ_Inc_base::remplir_coord_noeuds(DoubleTab&)
+/*! @brief Simple call to Champ_Inc_base::remplir_coord_noeuds(DoubleTab&)
  *
- * @param (DoubleTab& coord) coordonnees des noeuds a modifier
- * @param (int) l'index de la composante a modifier
+ * @param (DoubleTab& coord) coordinates of the nodes to modify
+ * @param (int) the index of the component to modify
  * @return (DoubleTab&)
  */
 DoubleTab& Champ_Inc_base::remplir_coord_noeuds_compo(DoubleTab& coord, int) const
@@ -633,12 +633,12 @@ DoubleTab& Champ_Inc_base::remplir_coord_noeuds_compo(DoubleTab& coord, int) con
   return remplir_coord_noeuds(coord);
 }
 
-/*! @brief Simple appel a: Champ_Inc_base::remplir_coord_noeuds_et_polys(DoubleTab&,IntVect& poly)
+/*! @brief Simple call to: Champ_Inc_base::remplir_coord_noeuds_et_polys(DoubleTab&,IntVect& poly)
  *
  * @param (DoubleTab& coord)
  * @param (IntVect& poly)
  * @param (int)
- * @return (int) code de retour propage
+ * @return (int) propagated return code
  */
 int Champ_Inc_base::remplir_coord_noeuds_et_polys_compo(DoubleTab& coord, IntVect& poly, int) const
 {
@@ -664,10 +664,10 @@ double Champ_Inc_base::integrale_espace(int ncomp) const
   return 0.;
 }
 
-/*! @brief Fixe le temps du champ.
+/*! @brief Sets the time of the field.
  *
- * @param (double t) le nouveau temps
- * @return (double) le nouveau temps
+ * @param (double t) the new time
+ * @return (double) the new time
  */
 double Champ_Inc_base::changer_temps(const double t)
 {
@@ -684,11 +684,11 @@ void Champ_Inc_base::resetTime(double time)
   changer_temps(time);
 }
 
-/*! @brief Associe le champ a l'equation dont il represente une inconnue.
+/*! @brief Associates the field with the equation of which it represents an unknown.
  *
- * Simple appel a MorEqn::associer_eqn(const Equation_base&)
+ * Simple call to MorEqn::associer_eqn(const Equation_base&)
  *
- * @param (Equation_base& eqn) l'equation auquel le champ doit s'associer
+ * @param (Equation_base& eqn) the equation to which the field must be associated
  */
 void Champ_Inc_base::associer_eqn(const Equation_base& eqn)
 {
@@ -740,7 +740,7 @@ DoubleTab Champ_Inc_base::valeur_aux_bords() const
       result.ref(val_bord_);
       return result;
     }
-  //sinon, calcul a partir des CLs
+  //otherwise, compute from the BCs
   const Domaine_VF& domaine = ref_cast(Domaine_VF, domaine_dis_base());
   const IntTab& f_e = domaine.face_voisins(), &f_s = domaine.face_sommets();
   DoubleTrav result(domaine.xv_bord().dimension_tot(0), valeurs().line_size());
@@ -750,21 +750,21 @@ DoubleTab Champ_Inc_base::valeur_aux_bords() const
   for (const auto& itr : cls)
     {
       const Front_VF& fr = ref_cast(Front_VF, itr->frontiere_dis());
-      //valeur au bord imposee, sauf si c'est une paroi (dans ce cas, la CL peut avoir moins de composantes que le champ -> Energie_Multiphase)
+      //imposed boundary value, except if it is a wall (in which case the BC may have fewer components than the field -> Energie_Multiphase)
       if (is_p ? sub_type(Neumann, itr.valeur()) : (sub_type(Dirichlet, itr.valeur()) && !sub_type(Scalaire_impose_paroi, itr.valeur())))
         for (j = 0; j < fr.nb_faces_tot(); j++)
           for (f = fr.num_face(j), fb = domaine.fbord(f), n = 0; n < N; n++)
             result(fb, n) = is_p ? ref_cast(Neumann, itr.valeur()).flux_impose(j, n) : ref_cast(Dirichlet, itr.valeur()).val_imp(j, n);
-      else if (sub_type(Neumann_val_ext, itr.valeur())) //valeur externe imposee
+      else if (sub_type(Neumann_val_ext, itr.valeur())) //externally imposed value
         for (j = 0; j < fr.nb_faces_tot(); j++)
           for (f = fr.num_face(j), fb = domaine.fbord(f), n = 0; n < N; n++)
             result(fb, n) = ref_cast(Neumann_val_ext, itr.valeur()).val_ext(j, n);
       else if (sub_type(Champ_Inc_P0_base, *this))
-        for (j = 0; j < fr.nb_faces_tot(); j++) //Champ P0 : on peut prendre la valeur en l'element
+        for (j = 0; j < fr.nb_faces_tot(); j++) //P0 field: we can take the value at the element
           for (f = fr.num_face(j), fb = domaine.fbord(f), n = 0; n < N; n++)
             result(fb, n) = valeurs()(f_e(f, f_e(f, 0) == -1), n);
       else if (sub_type(Champ_Inc_P1_base, *this))
-        for (j = 0; j < fr.nb_faces_tot(); j++) //Champ P1 : moyenne des valeurs aux sommets
+        for (j = 0; j < fr.nb_faces_tot(); j++) //P1 field: average of vertex values
           {
             f = fr.num_face(j), fb = domaine.fbord(f);
             for (n_som = 0; n_som < f_s.dimension(1) && f_s(f, n_som) >= 0;)

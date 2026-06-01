@@ -82,15 +82,13 @@ DoubleTab& Op_Conv_Vort_VEF_Face::ajouter(const DoubleTab& transporte,
   int num_calc;
 
 
-  // Pour le traitement de la convection on distingue les polyedres
-  // standard qui ne "voient" pas les conditions aux limites et les
-  // polyedres non standard qui ont au moins une face sur le bord.
-  // Un polyedre standard a n facettes sur lesquelles on applique le
-  // schema de convection.
-  // Pour un polyedre non standard qui porte des conditions aux limites
-  // de Dirichlet, une partie des facettes sont portees par les faces.
-  // En bref pour un polyedre le traitement de la convection depend
-  // du type (triangle, tetraedre ...) et du nombre de faces de Dirichlet.
+  // For the convection treatment, standard polyhedra (not "seeing" boundary conditions)
+  // are distinguished from non-standard polyhedra (having at least one boundary face).
+  // A standard polyhedron has n facets on which the convection scheme is applied.
+  // For a non-standard polyhedron with Dirichlet boundary conditions, part of its
+  // facets are carried by the boundary faces.
+  // In short, for a polyhedron the convection treatment depends on the type
+  // (triangle, tetrahedron ...) and the number of Dirichlet faces.
 
   int ncomp_ch_transporte;
   if (transporte.nb_dim() == 1)
@@ -100,16 +98,16 @@ DoubleTab& Op_Conv_Vort_VEF_Face::ajouter(const DoubleTab& transporte,
 
   //  Cerr << "ncomp_ch_transporte=" << ncomp_ch_transporte << finl;
 
-  // On remet a zero le tableau qui sert pour
-  // le calcul du pas de temps de stabilite
+  // Reset the array used for
+  // computing the stability time step
   fluent_ = 0;
 
-  // ATENTION : PBL pour determiner le fluent
-  // ********   on le met a 1!!!
+  // WARNING: issue with determining the flux (fluent)
+  // ********  set to 1 for now!!!
   //  fluent_ = 1.;
 
 
-  // Traitement particulier pour les faces de periodicite
+  // Special treatment for periodic faces
 
   int nb_faces_perio = 0;
   for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
@@ -155,36 +153,35 @@ DoubleTab& Op_Conv_Vort_VEF_Face::ajouter(const DoubleTab& transporte,
 
   //  Cerr << "tab=" << tab << finl;
 
-  // Les polyedres non standard sont ranges en 2 groupes dans le Domaine_VEF:
-  //  - polyedres bords et joints
-  //  - polyedres bords et non joints
-  // On traite les polyedres en suivant l'ordre dans lequel ils figurent
-  // dans le domaine
+  // Non-standard polyhedra are grouped into 2 sets in Domaine_VEF:
+  //  - boundary and joint polyhedra
+  //  - boundary and non-joint polyhedra
+  // Polyhedra are processed in the order in which they appear in the domain
 
-  // boucle sur les polys
+  // loop over polyhedra
 
 
-  // Boucle pour ajouter la partie : Gradient(U^2/2)
-  // ******* boucle sur les elements
-  // 06/01/2000 On ne s'occupe pas encore des conditions aux limites (sauf periodique)
+  // Loop to add the part: Gradient(U^2/2)
+  // ******* loop over elements
+  // 06/01/2000 Boundary conditions not yet handled here (except periodic)
   const IntTab& KEL=domaine_VEF.type_elem().KEL();
   for (poly=0; poly<nb_elem_tot; poly++)
     {
 
       rang = rang_elem_non_std(poly);
 
-      // calcul des numeros des faces du polyedre
+      // compute the face indices of the polyhedron
       for (face_adj=0; face_adj<nfac; face_adj++)
         face[face_adj]= elem_faces(poly,face_adj);
 
-      // On cherche les numeros globaux de toutes les faces
+      // Find the global indices of all faces
       for (fa7=0; fa7<nfa7; fa7++)
         {
           nu1=-1;
           nu2=-1;
           num10 = face[KEL(0,fa7)];
           num20 = face[KEL(1,fa7)];
-          // La facette est entouree des faces num1 et num2
+          // The facet is surrounded by faces num1 and num2
           //        Cerr << "num1=" << num1 << "  num2=" << num2 << finl;
 
           //           i=0;
@@ -200,7 +197,7 @@ DoubleTab& Op_Conv_Vort_VEF_Face::ajouter(const DoubleTab& transporte,
           //               i++;
           //             }
 
-          // On cherche le numero des autres faces (locaux et globaux)
+          // Find the indices of the other faces (local and global)
 
           i=0;
           j=0;
@@ -238,7 +235,7 @@ DoubleTab& Op_Conv_Vort_VEF_Face::ajouter(const DoubleTab& transporte,
             for (i=0; i<dimension; i++)
               cc[i] = normales_facettes_Cl(rang,fa7,i);
 
-          // On calcule les produits scalaires u(xi).n.S  // >>> calcul de fluent!!
+          // Compute the scalar products u(xi).n.S  // >>> fluent computation!!
           for (i=0; i<nfac; i ++)
             {
               psc[i] = 0.;
@@ -248,8 +245,8 @@ DoubleTab& Op_Conv_Vort_VEF_Face::ajouter(const DoubleTab& transporte,
                 }
             }
 
-          // Calcul du flux
-          // Boucle sur les composantes : uu+vv+(ww)
+          // Compute the flux
+          // Loop over components: uu+vv+(ww)
           flux = 0.;
           if (dimension == 2)
             {
@@ -280,7 +277,7 @@ DoubleTab& Op_Conv_Vort_VEF_Face::ajouter(const DoubleTab& transporte,
               resu(num20, comp0) += 0.5*flux*cc[comp0];
             }
 
-          // *** ??? : evaluation du fluent
+          // *** ??? : flux (fluent) evaluation
           if (f_int>0.)
             {
               // fluent_[num2] += std::fabs(f_int);
@@ -296,19 +293,19 @@ DoubleTab& Op_Conv_Vort_VEF_Face::ajouter(const DoubleTab& transporte,
     }
 
   // FIN DE LA BOUCLE SUR LES ELEMENTS
-  ////////// On fait la compensation ici, car la boucle suivante est sur les faces
-  ////////// En le faisant a la fin, on aurait deux fois la contribution aux faces
+  ////////// Apply compensation here, because the next loop is over faces.
+  ////////// Doing it at the end would count the face contribution twice.
   int voisine;
   nb_faces_perio = 0;
   double diff1,diff2;
 
-  // Dimensionnement du tableau des flux convectifs au bord du domaine
-  // de calcul
+  // Dimensioning the array of convective fluxes at the boundary
+  // of the computational domain
   DoubleTab& flux_b = flux_bords_;
   flux_b.resize(domaine_VEF.nb_faces_bord(),ncomp_ch_transporte);
   flux_b = 0.;
 
-  // Boucle sur les bords pour traiter les conditions aux limites
+  // Loop over the boundaries to process the boundary conditions
 
   for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
@@ -357,10 +354,10 @@ DoubleTab& Op_Conv_Vort_VEF_Face::ajouter(const DoubleTab& transporte,
     }
 
   /////////////////////////////////////////////////////
-  // Boucle pour ajouter la partie avec la vorticite
-  // ****** Boucle sur les faces
+  // Loop to add the vorticity part
+  // ****** Loop over faces
 
-  // Calcul de la vorticite
+  // Compute the vorticity
   DoubleTab vorticite;
   if (dimension == 2)
     vorticite.resize(nb_elem);
@@ -397,9 +394,9 @@ DoubleTab& Op_Conv_Vort_VEF_Face::ajouter(const DoubleTab& transporte,
           resu(num_face,0) -= -inter*la_vitesse.valeurs()(num_face,1);
           resu(num_face,1) -= inter*la_vitesse.valeurs()(num_face,0);
 
-          // signe - car on est dans le second membre
+          // minus sign because we are in the right-hand side
 
-          // *** PBL : evaluation du fluent
+          // *** PBL : flux (fluent) evaluation
           //               if(psc >= 0)
           //                 fluent_[num2] += psc;
           //               else
@@ -418,9 +415,9 @@ DoubleTab& Op_Conv_Vort_VEF_Face::ajouter(const DoubleTab& transporte,
           resu(num_face,1) -= a2*la_vitesse.valeurs()(num_face,0)-a0*la_vitesse.valeurs()(num_face,2) ;
           resu(num_face,2) -= a0*la_vitesse.valeurs()(num_face,1)-a1*la_vitesse.valeurs()(num_face,0) ;
 
-          // signe - car on est dans le second membre
+          // minus sign because we are in the right-hand side
 
-          // *** PBL : evaluation du fluent
+          // *** PBL : flux (fluent) evaluation
           //               if(psc >= 0)
           //                 fluent_[num2] += psc;
           //               else

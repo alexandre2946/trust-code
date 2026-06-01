@@ -19,7 +19,7 @@
 #include <TRUST_List.h>
 #include <Bord_Interne.h>
 
-/*! @brief Class Bords_Internes Cette classe represente une liste d'objets de type Bords_Interne
+/*! @brief Class Bords_Internes This class represents a list of objects of type Bords_Interne.
  *
  * @sa Bords_Interne
  */

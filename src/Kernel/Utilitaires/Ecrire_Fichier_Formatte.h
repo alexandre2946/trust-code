@@ -19,7 +19,7 @@
 
 #include <Ecrire_Fichier.h>
 
-/*! @brief Ecriture d'un fichier au format binaire
+/*! @brief Writing a file in binary format.
  *
  */
 class Ecrire_Fichier_Formatte : public Ecrire_Fichier

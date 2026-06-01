@@ -129,7 +129,7 @@ const Champ_base& Terme_Derivee_Forme_base::get_champ(const Motcle& nom) const
       if (!champ_derivee_forme_)
         throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 
-      // Initialisation a 0 du champ_derivee_forme_
+      // Initialization of champ_derivee_forme_ to 0
       DoubleTab& valeurs = champ_derivee_forme_->valeurs();
       valeurs=0.;
       const DoubleTab& derivee_forme_Array = source_derivee_forme->valeurs();

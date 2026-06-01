@@ -39,10 +39,10 @@ Entree& Sortie_libre_pression_imposee::readOn(Entree& s)
   return s;
 }
 
-/*! @brief Complete les conditions aux limites.
+/*! @brief Completes the boundary conditions.
  *
- * Impose la masse volumique constante du milieu
- *     physique de l'equation a d_rho.
+ * Sets the constant density of the physical medium
+ *     of the equation to d_rho.
  *
  */
 void Sortie_libre_pression_imposee::completer()
@@ -59,7 +59,7 @@ void Sortie_libre_pression_imposee::completer()
         {
           d_rho = -1;
 
-          // GF dans les cas a rho non const QC FT on ne doit pas diviser par rho on met d_rho=1
+          // GF: in non-constant rho cases (QC, FT) we must not divide by rho, so d_rho=1
           d_rho = 1;
         }
     }
@@ -67,28 +67,28 @@ void Sortie_libre_pression_imposee::completer()
     d_rho = 1;
 }
 
-/*! @brief Renvoie la valeur du flux impose sur la i-eme composante du champ representant le flux a la frontiere.
+/*! @brief Returns the value of the imposed flux on the i-th component of the field representing the flux at the boundary.
  *
- *     Le champ a la frontiere est considere constant sur tous les elements de la frontiere.
- *     La valeur du flux impose a la frontiere est egale a la valeur du champ (considere constant) a la frontiere divise par d_rho.
+ *     The boundary field is considered constant over all elements of the boundary.
+ *     The imposed flux value at the boundary equals the value of the (constant) boundary field divided by d_rho.
  *
- * @param (int i) indice suivant la premiere dimension du champ
- * @return (double) la valeur imposee sur la composante du champ specifiee
- * @throws deuxieme dimension du champ de frontiere superieur a 1
+ * @param (int i) index along the first dimension of the field
+ * @return (double) the value imposed on the specified component of the field
+ * @throws second dimension of the boundary field greater than 1
  */
 double Sortie_libre_pression_imposee::flux_impose(int i) const
 {
   return flux_impose(i,0);
 }
 
-/*! @brief Renvoie la valeur du flux impose sur la (i,j)-eme composante du champ representant le flux a la frontiere.
+/*! @brief Returns the value of the imposed flux on the (i,j)-th component of the field representing the flux at the boundary.
  *
- *     Le champ a la frontiere n'est PAS constant sur tous les elements
- *     la frontiere.
+ *     The boundary field is NOT constant over all elements
+ *     of the boundary.
  *
- * @param (int i) indice suivant la premiere dimension du champ
- * @param (int j) indice suivant la deuxieme dimension du champ
- * @return (double) la valeur imposee sur la composante du champ specifiee
+ * @param (int i) index along the first dimension of the field
+ * @param (int j) index along the second dimension of the field
+ * @return (double) the value imposed on the specified component of the field
  */
 double Sortie_libre_pression_imposee::flux_impose(int i, int j) const
 {

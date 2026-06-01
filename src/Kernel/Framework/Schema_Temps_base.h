@@ -33,33 +33,33 @@ class Param;
 
 /*! @brief class Schema_Temps_base
  *
- * Cette classe represente un schema en temps, c'est-a-dire un
- * algorithme de resolution particulier qui sera associe a un
- * Probleme_base (un probleme simple et non un couplage).
- * Schema_Temps_base est la classe abstraite qui est a la base de
- * la hierarchie des schemas en temps.
+ * This class represents a time scheme, i.e. a particular
+ * resolution algorithm that will be associated with a
+ * Probleme_base (a simple problem and not a coupling).
+ * Schema_Temps_base is the abstract class at the base of
+ * the time scheme hierarchy.
  *
- * On note n le temps present, et n+1 le temps a l'issue du pas de temps.
- * Un schema en temps permet de calculer u(n+1) connaissant u jusqu'a u(n).
- * Il utilise u(n), mais peut aussi avoir besoin  de valeurs passees de u,
- * telles que u(n-1), ...
- * Il peut aussi en cours de calcul utiliser des valeurs de u a des temps
- * intermediaires entre n et n+1, par exemple n+1/2.
- * nb_valeurs_temporelles compte toutes les valeurs allouees :
- * n, n+1, les valeurs passees retenues etles valeurs intermediaires
- * entre n et n+1.
- * nb_valeurs_futures compte n+1 et les valeurs intermediaires entre n et n+1.
- * C'est donc le nombre de crans dont tournent les roues en avancant d'un pas de temps.
- * temps_futur(i) renvoie la i-eme valeur future du temps.
- * Enfin temps_defaut est le temps que doivent rendre les champs a
- * l'appel de valeurs() - donc notamment dans les operateurs.
- * Pour le moment n'est respecte que par les Champ_Front des CLs.
+ * We denote n as the current time, and n+1 as the time at the end of the time step.
+ * A time scheme computes u(n+1) knowing u up to u(n).
+ * It uses u(n), but may also need past values of u,
+ * such as u(n-1), ...
+ * It may also during computation use values of u at intermediate
+ * times between n and n+1, e.g. n+1/2.
+ * nb_valeurs_temporelles counts all allocated values:
+ * n, n+1, the retained past values and the intermediate values
+ * between n and n+1.
+ * nb_valeurs_futures counts n+1 and the intermediate values between n and n+1.
+ * It is therefore the number of notches the wheels turn when advancing one time step.
+ * temps_futur(i) returns the i-th future time value.
+ * Finally temps_defaut is the time that fields must return
+ * when valeurs() is called - particularly in operators.
+ * Currently only respected by Champ_Front of boundary conditions.
  *
  * @sa Equation_base Probleme_base Algo_MG_base
  *
- * Classe abstraite dont tous les schemas en temps doivent deriver.
+ * Abstract class from which all time schemes must derive.
  *
- * Methodes abstraites:
+ * Abstract methods:
  *   int faire_un_pas_de_temps_eqn_base(Equation_base&)
  */
 
@@ -82,7 +82,8 @@ public :
 
   ////////////////////////////////
   //                            //
-  // Caracteristiques du schema //
+  // Characteristics of the     //
+  // time scheme                //
   //                            //
   ////////////////////////////////
 
@@ -93,7 +94,7 @@ public :
 
   /////////////////////////////////////////
   //                                     //
-  // Fin des caracteristiques du schema  //
+  // End of time scheme characteristics  //
   //                                     //
   /////////////////////////////////////////
 
@@ -167,8 +168,8 @@ public :
   inline int precision_impr() const { return precision_impr_; }
   inline int wcol() const
   {
-    // largeur minimale des colonnes des fichiers .out
-    // precision_impr_ + 9 car : -1.000e+150 on ajoute la longueur de "-1." et de "e+150" plus un espace
+    // minimum column width for .out files
+    // precision_impr_ + 9 because: -1.000e+150 we add the length of "-1." and "e+150" plus one space
     return precision_impr_ + 9;
   }
   inline int gnuplot_header() const { return gnuplot_header_; }
@@ -190,7 +191,7 @@ public :
   inline double& set_dt_min() { return dt_min_; }
   inline double& set_dt_max()
   {
-    dt_max_str_ = Nom(); //desactive la fonction dt_max = f(t)
+    dt_max_str_ = Nom(); //deactivates the function dt_max = f(t)
     return dt_max_;
   }
   inline double& set_dt_sauv() { return dt_sauv_; }
@@ -224,10 +225,10 @@ public :
   Probleme_base& pb_base();
   const Probleme_base& pb_base() const;
 
-  //pour les schemas en temps a pas multiples
+  // for multi-step time schemes
   inline virtual void modifier_second_membre(const Equation_base& eqn, DoubleTab& secmem) { };
 
-  // pour implicite ajoute l'inertie a la matrice et au scd membre
+  // for implicit schemes: add inertia to matrix and right-hand side
   virtual void ajouter_inertie(Matrice_Base& mat_morse,DoubleTab& secmem,const Equation_base& eqn) const;
 
   //interface ajouter_blocs
@@ -250,12 +251,12 @@ public :
 protected :
   OBS_PTR(Probleme_base) mon_probleme;
   Nom nom_;
-  double dt_ = 0.0;                         ///< Pas de temps de calcul
+  double dt_ = 0.0;                         ///< Computation time step
   DoubleTab dt_locaux_;                     ///< Local time steps: Vector of size nb faces of the mesh
 
   double temps_courant_ = -100.;
   double temps_precedent_ = -100.;
-  double dt_failed_ = -100.;            ///< Si on a rate un pas de temps, sa valeur
+  double dt_failed_ = -100.;            ///< Value of a time step if it failed
   double dt_gf_ = DMAXFLOAT;
   double tinit_ = -DMAXFLOAT;
   double tmax_ = 1.e30;
@@ -263,24 +264,24 @@ protected :
   int nb_pas_dt_ = 0;
   int nb_pas_dt_max_ = std::numeric_limits<int>::max();
   mutable int nb_impr_ = 0;
-  double dt_min_ = 1.e-16;               ///< Pas de temps min fixe par l'utilisateur
-  mutable double dt_max_ = 1.e30;        ///< Pas de temps max fixe par l'utilisateur
-  Nom dt_max_str_;                       ///< reglage de dt_max comme une fonction du temps
-  mutable Parser_U dt_max_fn_;           ///< Parser_U associe
-  double dt_stab_=-100.;                 ///<  Pas de temps de stabilite
+  double dt_min_ = 1.e-16;               ///< Minimum time step set by the user
+  mutable double dt_max_ = 1.e30;        ///< Maximum time step set by the user
+  Nom dt_max_str_;                       ///< setting of dt_max as a function of time
+  mutable Parser_U dt_max_fn_;           ///< Associated Parser_U
+  double dt_stab_=-100.;                 ///<  Stability time step
   mutable double facsec_ = 1.;
   double seuil_statio_ = 1.e-12;
-  int seuil_statio_relatif_deconseille_ = 0; ///< Drapeau pour specifier si seuil_statio_ est une valeur absolue (defaut) ou relative
+  int seuil_statio_relatif_deconseille_ = 0; ///< Flag to specify whether seuil_statio_ is an absolute (default) or relative value
   Nom norm_residu_;
   double dt_sauv_ = 1.e30;
   mutable int nb_sauv_ = 0;              ///< how many checkpoints have we performed so far?
   int nb_sauv_max_ = 10;                 ///< Max number of checkpoints that will be performed (useful for PDI backup file)
-  double limite_cpu_sans_sauvegarde_ = 23 * 3600;  ///< Par defaut 23 heures;
-  double periode_cpu_sans_sauvegarde_ = 23 * 3600;  ///< Par defaut 23 heures;
+  double limite_cpu_sans_sauvegarde_ = 23 * 3600;  ///< Default 23 hours;
+  double periode_cpu_sans_sauvegarde_ = 23 * 3600;  ///< Default 23 hours;
   double temps_cpu_ecoule_ = 0;
-  double dt_impr_ = 1.e30;            ///< Pas de temps d'impression
-  int precision_impr_ = 8;            ///< Nombre de chiffres significatifs impression
-  double mode_dt_start_ = -2;         ///< Mode calcul du pas de temps de depart - contient un double si option dt_init
+  double dt_impr_ = 1.e30;            ///< Output time interval
+  int precision_impr_ = 8;            ///< Number of significant digits for output
+  double mode_dt_start_ = -2;         ///< Mode for computing the initial time step - contains a double if dt_init option is used
   double residu_ = 0;
   double residu_old_slope_ = -1000;
   double cumul_slope_ = 1e-20;
@@ -292,14 +293,14 @@ protected :
   bool ind_temps_cpu_max_atteint = false;
   bool lu_ = false;
   int ind_diff_impl_ = 0;
-  double seuil_diff_impl_ = 1.e-6;   ///<  Seuil pour implicitation de la diffusion par GC
+  double seuil_diff_impl_ = 1.e-6;   ///<  Threshold for implicit treatment of diffusion by CG
   int impr_diff_impl_ = 0;
   int impr_extremums_ = 0;
-  int niter_max_diff_impl_ = 1000;      ///< Iterations maximale pour GC implicitation - Above 1000 iterations, diffusion implicit algorithm may be diverging
+  int niter_max_diff_impl_ = 1000;      ///< Maximum iterations for CG diffusion implicitation - Above 1000 iterations, diffusion implicit algorithm may be diverging
   int no_conv_subiteration_diff_impl_ = 0;
   int no_error_if_not_converged_diff_impl_ = 0;
-  int schema_impr_ = -1;                  // 1 si le schema a le droit d'imprimer dans le .out et dt_ev
-  int file_allocation_ = 0;                // 1 = allocation espace disque (par defaut), 0 sinon
+  int schema_impr_ = -1;                  // 1 if the scheme is allowed to print to .out and dt_ev files
+  int file_allocation_ = 0;                // 1 = disk space allocation (default), 0 otherwise
   int max_length_cl_ = -10;
 private:
   int stationnaire_atteint_ = 0;          ///< Stationary reached by the problem using this scheme
@@ -309,18 +310,18 @@ private:
   bool disable_dt_ev_ = false;                 ///< Flag to disable the writing of the .dt_ev file
 };
 
-/*! @brief surcharge Objet_U::nommer(const Nom&) Donne un nom au shema en temps
+/*! @brief overrides Objet_U::nommer(const Nom&) Gives a name to the time scheme
  *
- * @param (Nom& name) le nom a donner au shema en temps
+ * @param (Nom& name) the name to give to the time scheme
  */
 inline void Schema_Temps_base::nommer(const Nom& name)
 {
   nom_=name;
 }
 
-/*! @brief surcharge Objet_U::le_nom() Renvoie le nom du shema en temps
+/*! @brief overrides Objet_U::le_nom() Returns the name of the time scheme
  *
- * @return (Nom&) le nom du shema en temps
+ * @return (Nom&) the name of the time scheme
  */
 inline const Nom& Schema_Temps_base::le_nom() const
 {
@@ -332,7 +333,7 @@ inline void Schema_Temps_base::notify_failed_timestep()
   dt_failed_ = dt_;
 }
 
-/*! @brief Renvoie une reference sur le nombre de pas maxi
+/*! @brief Returns a reference to the maximum number of time steps
  *
  * @return (double&)
  */
@@ -341,7 +342,7 @@ inline int Schema_Temps_base::nb_pas_dt_max() const
   return nb_pas_dt_max_;
 }
 
-/*! @brief Renvoie une reference sur le seuil stationnaire
+/*! @brief Returns a reference to the stationarity threshold
  *
  * @return (double&)
  */
@@ -350,7 +351,7 @@ inline double Schema_Temps_base::seuil_statio() const
   return seuil_statio_;
 }
 
-/*! @brief Renvoie une reference sur le temps d'impression
+/*! @brief Returns a reference to the output time interval
  *
  * @return (double&)
  */
@@ -359,7 +360,7 @@ inline double Schema_Temps_base::temps_impr() const
   return dt_impr_;
 }
 
-/*! @brief Renvoie une reference sur le temps de sauvegarde
+/*! @brief Returns a reference to the checkpoint time interval
  *
  * @return (double&)
  */
@@ -368,7 +369,7 @@ inline double Schema_Temps_base::temps_sauv() const
   return dt_sauv_;
 }
 
-/*! @brief Renvoie le nb maximum de sauvegarde (estimation)
+/*! @brief Returns the maximum number of checkpoints (estimate)
  *
  * @return (int)
  */
@@ -377,7 +378,7 @@ inline int Schema_Temps_base::nb_sauv_max() const
   return nb_sauv_max_;
 }
 
-/*! @brief Renvoie une reference sur le temps maximum
+/*! @brief Returns a reference to the maximum time
  *
  * @return (double&)
  */
@@ -386,9 +387,9 @@ inline double Schema_Temps_base::temps_max() const
   return tmax_;
 }
 
-/*! @brief Renvoie le pas de temps (delta_t) courant.
+/*! @brief Returns the current time step (delta_t).
  *
- * @return (double) le pas de temps courant
+ * @return (double) the current time step
  */
 inline double Schema_Temps_base::pas_de_temps() const
 {
@@ -398,155 +399,155 @@ inline const DoubleTab& Schema_Temps_base::pas_de_temps_locaux() const
 {
   return dt_locaux_;
 }
-/*! @brief Renvoie le pas de temps minimum.
+/*! @brief Returns the minimum time step.
  *
- * (version const)
+ * (const version)
  *
- * @return (double) le pas de temps minimum du schema en temps
+ * @return (double) the minimum time step of the time scheme
  */
 inline double Schema_Temps_base::pas_temps_min() const
 {
   return dt_min_;
 }
 
-/*! @brief Renvoie une reference sur le pas de temps minimum.
+/*! @brief Returns a reference to the minimum time step.
  *
- * @return (double&) le pas de temps minimum du schema en temps
+ * @return (double&) the minimum time step of the time scheme
  */
 inline double& Schema_Temps_base::pas_temps_min()
 {
   return dt_min_;
 }
 
-/*! @brief Renvoie le pas de temps maximum.
+/*! @brief Returns the maximum time step.
  *
- * (version const)
+ * (const version)
  *
- * @return (double) le pas de temps maximum du schema en temps
+ * @return (double) the maximum time step of the time scheme
  */
 inline double Schema_Temps_base::pas_temps_max() const
 {
   return dt_max_;
 }
 
-/*! @brief Renvoie une reference sur le pas de temps maximum.
+/*! @brief Returns a reference to the maximum time step.
  *
- * @return (double&) le pas de temps maximum du schema en temps
+ * @return (double&) the maximum time step of the time scheme
  */
 inline double& Schema_Temps_base::pas_temps_max()
 {
   return dt_max_;
 }
 
-/*! @brief Renvoie le temps courant.
+/*! @brief Returns the current time.
  *
- * @return (double) le temps courant du schema en temps
+ * @return (double) the current time of the time scheme
  */
 inline double Schema_Temps_base::temps_courant() const
 {
   return temps_courant_;
 }
 
-/*! @brief Renvoie le temps courant.
+/*! @brief Returns the previous time.
  *
- * @return (double) le temps courant du schema en temps
+ * @return (double) the previous time of the time scheme
  */
 inline double Schema_Temps_base::temps_precedent() const
 {
   return temps_precedent_;
 }
 
-/*! @brief Renvoie le temps de calcul ecoule i.
+/*! @brief Returns the elapsed computation time i.
  *
- * e. (temps courant - temps initial).
+ * e. (current time - initial time).
  *
- * @return (double) le temps de calcul ecoule
+ * @return (double) the elapsed computation time
  */
 inline double Schema_Temps_base::temps_calcul() const
 {
   return temps_courant_ - tinit_;
 }
 
-/*! @brief Renvoie le temps initial.
+/*! @brief Returns the initial time.
  *
- * @return (double) le temps de calcul ecoule
+ * @return (double) the initial time
  */
 inline double Schema_Temps_base::temps_init() const
 {
   return tinit_;
 }
 
-/*! @brief Renvoie le nombre de pas de temps effectues.
+/*! @brief Returns the number of time steps performed.
  *
- * @return (int) le nombre de pas de temps effectues
+ * @return (int) the number of time steps performed
  */
 inline int Schema_Temps_base::nb_pas_dt() const
 {
   return nb_pas_dt_;
 }
 
-/*! @brief Renvoie le nombre d'impressions effectuees.
+/*! @brief Returns the number of outputs performed.
  *
- * @return (int) le nombre d'impressions effectuees
+ * @return (int) the number of outputs performed
  */
 inline int Schema_Temps_base::nb_impr() const
 {
   return nb_impr_;
 }
 
-/*! @brief Change le temps courant.
+/*! @brief Changes the current time.
  *
- * @param (double& t) le nouveau temps courant
+ * @param (double& t) the new current time
  */
 inline void Schema_Temps_base::changer_temps_courant(const double t)
 {
   temps_courant_ = t;
 }
 
-/*! @brief Renvoie le facteur de securite ou multiplicateur de delta_t.
+/*! @brief Returns the safety factor or multiplier of delta_t.
  *
- * Ce facteur est utilise lors de la correction/verification du
- *     pas de temps. Voir Schema_Temps_base::corriger_dt_calcule(double&)
- *     (version const)
+ * This factor is used during the correction/verification of
+ *     the time step. See Schema_Temps_base::corriger_dt_calcule(double&)
+ *     (const version)
  *
- * @return (double) le facteur de securite du schema en temps
+ * @return (double) the safety factor of the time scheme
  */
 inline double Schema_Temps_base::facteur_securite_pas() const
 {
   return facsec_;
 }
 
-/*! @brief Renvoie une reference sur le facteur de securite ou multiplicateur de delta_t.
+/*! @brief Returns a reference to the safety factor or multiplier of delta_t.
  *
- * Ce facteur est utilise lors de la correction/verification du
- *     pas de temps. Voir Schema_Temps_base::corriger_dt_calcule(double&)
+ * This factor is used during the correction/verification of
+ *     the time step. See Schema_Temps_base::corriger_dt_calcule(double&)
  *
- * @return (double&) le facteur de securite du schema en temps
+ * @return (double&) the safety factor of the time scheme
  */
 inline double& Schema_Temps_base::facteur_securite_pas()
 {
   return facsec_;
 }
 
-/*! @brief Renvoie 1 si le temps final est atteint (ou depasse).
+/*! @brief Returns 1 if the final time has been reached (or exceeded).
  *
- * Renvoie 1 si temps_courant_ >= tmax
- *     Renvoie 0 sinon
+ * Returns 1 if temps_courant_ >= tmax
+ *     Returns 0 otherwise
  *
- * @return (int) 1 si le temps final est atteint 0 sinon
- * @throws temps final atteint
+ * @return (int) 1 if the final time is reached, 0 otherwise
+ * @throws final time reached
  */
 inline int Schema_Temps_base::temps_final_atteint() const
 {
   return ind_tps_final_atteint;
 }
 
-/*! @brief Renvoie 1 si (le nombre de pas de temps >= nombre de pas de temps maximum).
+/*! @brief Returns 1 if (the number of time steps >= maximum number of time steps).
  *
- * Renvoie 0 sinon
+ * Returns 0 otherwise
  *
- * @return (int) 1 si le nombre de pas de temps maximum est depasse 0 sinon
- * @throws nombre de pas de temps maximum atteint
+ * @return (int) 1 if the maximum number of time steps is exceeded, 0 otherwise
+ * @throws maximum number of time steps reached
  */
 inline int Schema_Temps_base::nb_pas_dt_max_atteint() const
 {
@@ -558,9 +559,9 @@ inline int Schema_Temps_base::temps_cpu_max_atteint() const
   return ind_temps_cpu_max_atteint;
 }
 
-/*! @brief Renvoie 1 si le schema en temps a ete lu diffusion_implicite.
+/*! @brief Returns 1 if the time scheme has been read with diffusion_implicite.
  *
- * @return (int) 1 si le schema en temps a ete lu 0 sinon.
+ * @return (int) 1 if the time scheme has been read, 0 otherwise.
  */
 inline int Schema_Temps_base::diffusion_implicite() const
 {

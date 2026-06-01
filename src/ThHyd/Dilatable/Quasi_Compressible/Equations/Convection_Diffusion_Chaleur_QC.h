@@ -18,11 +18,9 @@
 
 #include <Convection_Diffusion_Chaleur_Fluide_Dilatable_base.h>
 
-/*! @brief classe Convection_Diffusion_Chaleur_QC Cas particulier de Convection_Diffusion_Chaleur_Fluide_Dilatable_base pour un fluide quasi conpressible
+/*! @brief Particular case of Convection_Diffusion_Chaleur_Fluide_Dilatable_base for a quasi-compressible fluid, where the transported scalar is temperature (ideal gases) or enthalpy (real gases).
  *
- *      quand le scalaire subissant le transport est la temperature en gaz parfaits,
- *      ou l'enthalpie en gaz reels.
- *      (generalisation de Convection_Diffusion_Temperature pour les gaz reels)
+ * Generalisation of Convection_Diffusion_Temperature for real gases.
  *
  * @sa Conv_Diffusion_std Convection_Diffusion_Temperature
  */
@@ -40,13 +38,13 @@ public :
   int preparer_calcul() override;
   const Champ_base& vitesse_pour_transport() const override;
 
-  // Methodes inlines
+  // Inline methods
   inline bool is_generic() const override { return mode_convection_ == 2 ? true : false;}
 
 protected :
   double TMIN_ = std::numeric_limits<double>::quiet_NaN();
   double TMAX_ = std::numeric_limits<double>::quiet_NaN();
-  int mode_convection_; // 0 par divergence u 1 par conv(u) 2 par conv(rho u)
+  int mode_convection_; // 0: by divergence of u, 1: by conv(u), 2: by conv(rho*u)
 };
 
 #endif /* Convection_Diffusion_Chaleur_QC_included */

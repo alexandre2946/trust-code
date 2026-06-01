@@ -20,15 +20,15 @@ Implemente_instanciable_sans_constructeur(Format_Post_Lml,"Format_Post_Lml",Form
 
 
 /////////////////////////////////////////////////////////////////////////////
-//Parametre: lml_basename_
-// Signification: debut du nom du fichier
+//Parameter: lml_basename_
+// Meaning: beginning of the file name
 //Extension lml
 
-//Specificites de ce format
-//Ecriture dans un seul fichier (sequentiel ou parallele)
+//Specifics of this format
+//Writing to a single file (sequential or parallel)
 ///////////////////////////////////////////////////////////////////////////
 
-/*! @brief Constructeur par defaut: Specifier dans commentaire ce qui est fixe par defaut
+/*! @brief Default constructor: specify in comments what is set by default
  *
  */
 
@@ -37,14 +37,14 @@ Format_Post_Lml::Format_Post_Lml()
   reset();
 }
 
-/*! @brief Remet l'objet dans l'etat obtenu par le constructeur par defaut.
+/*! @brief Resets the object to the state obtained by the default constructor.
  *
  */
 void Format_Post_Lml::reset()
 {
   lml_basename_ = "??";
 }
-/*! @brief erreur => exit
+/*! @brief error => exit
  *
  */
 Sortie& Format_Post_Lml::printOn(Sortie& os) const
@@ -54,7 +54,7 @@ Sortie& Format_Post_Lml::printOn(Sortie& os) const
   return os;
 }
 
-/*! @brief Lecture des parametres du postraitement au format "jeu de donnees" Le format attendu est le suivant:
+/*! @brief Reads post-processing parameters in "dataset" format. The expected format is:
  *
  *   {
  *     nom_fichier basename_sans_extension
@@ -72,7 +72,7 @@ void Format_Post_Lml::set_param(Param& param) const
   param.ajouter("nom_fichier",&lml_basename_,Param::REQUIRED);
 }
 
-/*! @brief Initialisation de la classe avec des parametres par defaut
+/*! @brief Initializes the class with default parameters.
  *
  */
 int Format_Post_Lml::initialize_by_default(const Nom& file_basename)
@@ -134,23 +134,23 @@ int Format_Post_Lml::preparer_post(const Nom& id_du_domaine,const int est_le_pre
 
 }
 
-/*! @brief voir Format_Post_base::ecrire_domaine
+/*! @brief see Format_Post_base::ecrire_domaine
  *
  */
 int Format_Post_Lml::ecrire_domaine(const Domaine& domaine,const int est_le_premier_post)
 {
-  //Appel de la methode statique specifique au format lml
+  //Call to the static method specific to lml format
   Nom nom_fich(lml_basename_);
   nom_fich +=".";
   Nom format="lml";
   nom_fich += format;
   ecrire_domaine_lml(domaine,nom_fich);
-  return 1; // ok tout va bien
+  return 1; // ok all is well
 }
 
-/*! @brief commence l'ecriture d'un nouveau pas de temps En l'occurence pour le format Lml:
+/*! @brief Starts writing a new time step. For the LML format specifically:
  *
- *   Ouvre le fichier maitre en mode APPEND et ajoute une ligne
+ *   Opens the master file in APPEND mode and adds a line
  *    "TEMPS xxxxx"
  *
  */
@@ -167,7 +167,7 @@ int Format_Post_Lml::ecrire_temps(const double temps)
   return 1;
 }
 
-/*! @brief voir Format_Post_base::ecrire_champ
+/*! @brief see Format_Post_base::ecrire_champ
  *
  */
 int Format_Post_Lml::ecrire_champ(const Domaine& domaine,const Noms& unite_, const Noms& noms_compo,
@@ -180,7 +180,7 @@ int Format_Post_Lml::ecrire_champ(const Domaine& domaine,const Noms& unite_, con
 
 {
 
-  //Appel de la methode statique specifique au format lml
+  //Call to the static method specific to lml format
   Nom nom_fich(lml_basename_);
   nom_fich +=".";
   Nom format="lml";
@@ -269,7 +269,7 @@ int Format_Post_Lml::preparer_post_lml()
 
 int Format_Post_Lml::ecrire_domaine_lml(const Domaine& domaine,Nom& nom_fich)
 {
-  //Actuellement copie identique de la methode Domaine::postraiter_lml()
+  //Currently an identical copy of the Domaine::postraiter_lml() method
 
   EcrFicPartage s;
   s.ouvrir(nom_fich,ios::app);
@@ -291,15 +291,15 @@ int Format_Post_Lml::ecrire_domaine_lml(const Domaine& domaine,Nom& nom_fich)
   int nb_elem_tot = static_cast<int>(nb_elem_tot0);
   int dim = domaine.les_sommets().dimension(1);
 
-  // Ecriture des coordonnees des noeuds
-  // Toutes les grandeurs qui apparaissent dans le .lml doivent
-  // etre exprimees dans le repere des coordonnees cartesiennes
-  // Si l'option Axi a ete choisie on recalcule les coordonnees
-  // cartesiennes a partir des coordonnees cylindriques.
+  // Writing node coordinates
+  // All quantities appearing in the .lml file must
+  // be expressed in the Cartesian coordinate frame.
+  // If the Axi option was chosen, Cartesian coordinates
+  // are recomputed from the cylindrical coordinates.
 
   if (axi)
     {
-      // Ecriture des noeuds du maillage
+      // Writing mesh nodes
       if ( dim == 3)
         {
           if(je_suis_maitre())
@@ -321,7 +321,7 @@ int Format_Post_Lml::ecrire_domaine_lml(const Domaine& domaine,Nom& nom_fich)
           if(je_suis_maitre())
             s << nom_grille << " " << "3 " << 2*nb_som_tot << "" << finl;
           s.lockfile();
-          // Ecriture des noeuds du maillage
+          // Writing mesh nodes
           int nsom;
 
           for (nsom=0; nsom<domaine.nb_som(); nsom++)
@@ -343,7 +343,7 @@ int Format_Post_Lml::ecrire_domaine_lml(const Domaine& domaine,Nom& nom_fich)
     }
   else
     {
-      // Ecriture des noeuds du maillage
+      // Writing mesh nodes
       if ( dim == 3)
         {
           if(je_suis_maitre())
@@ -365,7 +365,7 @@ int Format_Post_Lml::ecrire_domaine_lml(const Domaine& domaine,Nom& nom_fich)
           if(je_suis_maitre())
             s << nom_grille << " " << "3 " << 2*nb_som_tot << "" << finl;
           s.lockfile();
-          // Ecriture des noeuds du maillage
+          // Writing mesh nodes
           int nsom;
 
           for (nsom=0; nsom<domaine.nb_som(); nsom++)
@@ -386,7 +386,7 @@ int Format_Post_Lml::ecrire_domaine_lml(const Domaine& domaine,Nom& nom_fich)
         }
     }
 
-  //Actuellement copie identique de la methode Domaine::postraiter_lml()
+  //Currently an identical copy of the Domaine::postraiter_lml() method
 
   //////////////////////////////////////////////////////////////
 
@@ -399,7 +399,7 @@ int Format_Post_Lml::ecrire_domaine_lml(const Domaine& domaine,Nom& nom_fich)
   Nom type_maille=domaine.type_elem()->nom_lml();
 
 
-  //Ajout pour modification syntaxe ci-dessous
+  //Added for syntax modification below
   int nb_elem = domaine.nb_elem() ;
   int nb_som_elem = domaine.nb_som_elem();
   const IntTab& sommet_elem = domaine.les_elems();
@@ -412,7 +412,7 @@ int Format_Post_Lml::ecrire_domaine_lml(const Domaine& domaine,Nom& nom_fich)
       s << nb_elem_tot << "" << finl;
     }
 
-  // Ecriture des elements du maillage
+  // Writing mesh elements
   if (dim == 3 )
     {
       s.lockfile();
@@ -622,7 +622,7 @@ int Format_Post_Lml::ecrire_item_int_lml(const Nom&   id_item,
   Nom nom_topologie("Topologie_");
   nom_topologie+= id_domaine;
 
-  //Actuellement temp_courant n est pas passe en argument
+  //Currently temps_courant is not passed as argument
   ////os << "CHAMPMAILLE " << nom_vect << " "<< nom_topologie << " " << temps_courant << finl;
 
   const IntTab* intT = dynamic_cast<const IntTab*>(&vect);

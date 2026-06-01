@@ -39,7 +39,7 @@ Entree& Saturation_generique_CoolProp::readOn(Entree& is)
 
 void Saturation_generique_CoolProp::set_param(Param& param) const
 {
-  Saturation_base::set_param(param); // T_ref_ et P_ref_ ?? sais pas si utile ...
+  Saturation_base::set_param(param); // T_ref_ and P_ref_ ?? not sure if useful ...
   param.ajouter("model|modele", &model_name_, Param::REQUIRED);
   param.ajouter("fluid|fluide", &fluid_name_, Param::REQUIRED);
   param.ajouter("phase", &phase_, Param::OPTIONAL); // optional : liquid or vapor. PI : specify the phase it is really useful (better perf for coolprop) !

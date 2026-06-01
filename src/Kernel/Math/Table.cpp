@@ -19,9 +19,7 @@
 Implemente_instanciable_sans_constructeur_ni_destructeur(Table,"Table",Objet_U);
 
 
-/*! @brief Constructeur par defaut.
- *
- * Table vide.
+/*! @brief Default constructor. Creates an empty table.
  *
  */
 Table::Table() : les_valeurs() , les_parametres() { }
@@ -31,8 +29,8 @@ Table::Table(const Table& t): Objet_U(t),Parser_Eval()
   (*this)=t;
 }
 
-//Lecture d'une expression analytique dependant des valeurs (val) d'un champ parametre
-//isf est fixe a 1
+// Reads an analytic expression depending on the values (val) of a parameter field.
+// isf is set to 1.
 Entree& Table::lire_f(Entree& is, const int nb_comp)
 {
   isf=1;
@@ -54,9 +52,9 @@ Entree& Table::lire_f(Entree& is, const int nb_comp)
   return is;
 }
 
-//Lecture d'une expression analytique dependant des valeurs (val) d'un champ parametre,
-//de l espace (x,y,z) et du temps (t)
-//isf est fixe a 2
+// Reads an analytic expression depending on the values (val) of a parameter field,
+// on space (x, y, z) and on time (t).
+// isf is set to 2.
 Entree& Table::lire_fxyzt(Entree& is,const int dim)
 {
   isf=2;
@@ -82,10 +80,10 @@ Entree& Table::lire_fxyzt(Entree& is,const int dim)
   return is;
 }
 
-/*! @brief Ecriture sur un flot de Sortie N'ecrit que le type et le nom de l'objet
+/*! @brief Writes only the type and name of the object to an output stream.
  *
- * @param (Sortie& s) le flot de sortie a utiliser
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& s) the output stream to use
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Table::printOn(Sortie& s ) const
 {
@@ -94,10 +92,10 @@ Sortie& Table::printOn(Sortie& s ) const
 
 
 
-/*! @brief Lecture sur un flot d'entree Lecture des parametres et des valeurs de la table.
+/*! @brief Reads the parameters and values of the table from an input stream.
  *
- * @param (Entree& s) le flot d'entree a utiliser
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& s) the input stream to use
+ * @return (Entree&) the modified input stream
  */
 Entree& Table::readOn(Entree& s )
 {
@@ -112,12 +110,12 @@ double nlinear_interpolation(const std::vector<double>& x, const std::vector<std
 {
   const int n = (int)x.size();
 
-  // on construit les poids pour chaque sommet de l'hyper-rectangle
+  // Build the weights for each vertex of the hyper-rectangle
   std::vector<double> weight(n);
   for (int i = 0; i < n; i++)
     weight[i] = std::min(1.0, std::max(0.0, (x[i] - gridpoints[i].first) / (gridpoints[i].second - gridpoints[i].first)));
 
-  // le calcul est effecte en utilisant une representation en bit j (int) -> index (n valeurs 0 ou 1)
+  // Computation uses a bit-representation of j (int) -> index (n values of 0 or 1)
   // j=0 -> index=00...000 ; j=1 -> index=00...001 ; j=2 -> index=00...010
   double interpolant = 0.0, prod;
   for (int j = 0, i; j < (1<<n); interpolant += prod, j++)
@@ -126,7 +124,7 @@ double nlinear_interpolation(const std::vector<double>& x, const std::vector<std
   return interpolant;
 }
 
-// n'utilise pas nlinear_interpolation : codage pour nb_comp = 1 et nb_param = 1
+// Does not use nlinear_interpolation: optimized path for nb_comp = 1 and nb_param = 1
 double Table::val_simple(double vp) const
 {
   assert(les_parametres.size() == 1);
@@ -182,7 +180,7 @@ double Table::val(const std::vector<double>& vals_param, int ncomp) const
           std::vector<int> index(nb_param, 0);
           for (int k = 0; k < nb_param; k++) index[nb_param - 1 - k] = icube[nb_param - 1 - k] + ((j >> k) & 1);
 
-          // indice dans le tableau global des valeurs tabulees
+          // Index in the global array of tabulated values
           int k = index[0];
           for (int i = 1; i < nb_param; i++)
             k = k * les_parametres[i].size() + index[i];
@@ -204,9 +202,7 @@ double Table::val(const std::vector<double>& vals_param, int ncomp) const
   return 0;
 }
 
-/*! @brief Pas encore code.
- *
- * Sort en erreur.
+/*! @brief Not yet implemented. Exits with an error.
  *
  */
 double Table::val(const DoubleVect& val_param) const
@@ -217,14 +213,15 @@ double Table::val(const DoubleVect& val_param) const
 }
 
 
-/*! @brief Retourne les valeurs calculees pour le point val_param (cas du tableau valeurs a 2 dimensions) Les valeurs sont exacteS si le point correspond a un parametre donne.
+/*! @brief Returns the computed values at point val_param (for a 2D value array).
  *
- *     Sinon, les valeurs sont interpolees (interp. lineaire d'ordre 1)
+ *     Values are exact if the point matches a tabulated parameter value,
+ *     otherwise they are linearly interpolated (order 1).
  *
- * @param (DoubleVect& x) vecteur des valeurs
- * @param (const double& val_param) le point en lequel calculer la valeur
- * @return (DoubleVect& x) x modifie
- * @throws Sort en erreur s'il manque des parametres
+ * @param (DoubleVect& x) output vector of values
+ * @param (const double val_param) the evaluation point
+ * @return (DoubleVect&) the modified vector x
+ * @throws Exits with an error if parameters are missing
  */
 DoubleVect& Table::valeurs(DoubleVect& x, const double val_param) const
 {
@@ -275,9 +272,7 @@ DoubleVect& Table::valeurs(DoubleVect& x, const double val_param) const
   return x;
 }
 
-/*! @brief Pas encore code.
- *
- * Sort en erreur.
+/*! @brief Not yet implemented. Exits with an error.
  *
  */
 DoubleVect& Table::valeurs(DoubleVect& x, const DoubleVect& val_param) const
@@ -287,8 +282,8 @@ DoubleVect& Table::valeurs(DoubleVect& x, const DoubleVect& val_param) const
   return x;
 }
 
-//Evaluation d un tableau de valeurs (val) a partir d une expression analytique fonction des valeurs (val_param)
-//d un champ parametre, de l espace (pos) et du temps (t)
+// Evaluates an array of values (val) from an analytic expression depending on the values (val_param)
+// of a parameter field, on space (pos) and on time (t).
 DoubleTab& Table::valeurs(const DoubleTab& val_param,const DoubleTab& pos,const double tps,DoubleTab& aval) const
 {
   eval_fct(pos,tps,val_param,aval);
@@ -296,14 +291,14 @@ DoubleTab& Table::valeurs(const DoubleTab& val_param,const DoubleTab& pos,const 
 
 }
 
-/*! @brief Affecte les parametres et les valeurs de la table
+/*! @brief Sets the parameters and values of the table.
  *
- * @param (const DoubleVect& param) les parametres
- * @param (const DoubleTab& val) les valeurs
+ * @param (const DoubleVect& param) the parameter values
+ * @param (const DoubleTab& aval) the table values
  */
 void Table::remplir(const DoubleVect& param,const DoubleTab& aval)
 {
-  // on verifie que param est strictement monotone
+  // Check that param is strictly monotone
   double val_ = param[0];
   for (int i = 1; i < param.size(); i++)
     if (val_ < param[i]) val_ = param[i];
@@ -316,7 +311,7 @@ void Table::remplir(const DoubleVect& param,const DoubleTab& aval)
 
 void Table::remplir(const DoubleVects& params, const DoubleVect& aval)
 {
-  // on verifie que les params sont strictement monotones
+  // Check that each parameter array is strictly monotone
   for (int n = 0; n < params.size(); n++)
     {
       double val_ = params[n][0];

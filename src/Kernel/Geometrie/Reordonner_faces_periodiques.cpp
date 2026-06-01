@@ -37,7 +37,7 @@ inline void calculer_vecteur_2faces(const DoubleTab_T<_SIZE_>& coord,
   const int dim = coord.dimension_int(1);
   assert(vect.size_array() == dim);
   vect = 0.;
-  // Calcul du vecteur entre le centre de la face i et le centre de la face i+n
+  // Compute the vector between the centre of face i and the centre of face i+n
   for (int j = 0; j < nb_som_faces; j++)
     {
       const _SIZE_ sommet1 = faces(i_face1, j),
@@ -68,7 +68,7 @@ void build_trad_space(const Domaine_32_64<_SIZE_>& domaine, IntTab_T<_SIZE_>& re
   assert(Process::is_parallel());
 
   const MD_Vector& md_sommets = domaine.les_sommets().get_md_vector();
-  Scatter::construire_espace_virtuel_traduction(md_sommets, md_sommets, renum, 1 /* erreurs fatales */);
+  Scatter::construire_espace_virtuel_traduction(md_sommets, md_sommets, renum, 1 /* fatal errors */);
 }
 
 #if INT_is_64_ == 2
@@ -126,13 +126,13 @@ void Reordonner_faces_periodiques_32_64<_SIZE_>::chercher_direction_perio(ArrOfD
   Cerr << "Periodicity direction for " << dom.le_nom() << "/" << bord << " " << direction_perio;
 }
 
-/*! @brief Reordonne le tableau "faces" selon la convention des faces periodiques: D'abord les faces d'une extremite, puis dans le meme ordre, les faces jumelles.
+/*! @brief Reorders the "faces" array according to the periodic face convention: First the faces of one end, then in the same order, the twin faces.
  *
- *   Attention, l'algorithme est en n carre (lent), et ne fonctionne qu'en sequentiel.
+ *   Warning, the algorithm is O(n^2) (slow), and only works in sequential mode.
  *
- * @param (domaine) le domaine a laquelle appartiennent les faces
- * @param (direction_perio) le vecteur qui separe le centre d'une face au centre de la face opposee
- * @param (faces) le tableau des faces (pour chaque face, indices de ses sommets) a reordonner Valeur de retour: 1 si ok, 0 si on n'a pas trouve de face jumelle a une face a precision_geom pres.
+ * @param (domaine) the domain to which the faces belong
+ * @param (direction_perio) the vector from the centre of a face to the centre of the opposite face
+ * @param (faces) the faces array (for each face, indices of its vertices) to reorder. Return value: 1 if ok, 0 if no twin face was found within precision_geom.
  */
 template<typename _SIZE_>
 int Reordonner_faces_periodiques_32_64<_SIZE_>::reordonner_faces_periodiques(const Domaine_32_64<_SIZE_>& domaine,
@@ -140,9 +140,9 @@ int Reordonner_faces_periodiques_32_64<_SIZE_>::reordonner_faces_periodiques(con
                                                                              const ArrOfDouble& direction_perio,
                                                                              const double epsilon)
 {
-  // Modif B.M. 04/06/2010: j'autorise l'operation en parallele car c'est utilise par
-  // l'interprete MaillerParallel...
-  // PL 18/11/2010: Je deplace neanmoins l'interdiction de l'utilisation de l'interprete en // dans le jeu de donnees (voir ::interpreter_)
+  // Modif B.M. 04/06/2010: allowing parallel operation since it is used by
+  // the MaillerParallel interpreter...
+  // PL 18/11/2010: Nevertheless moving the prohibition of using the interpreter in // parallel in the data set (see ::interpreter_)
   using IntTab_t = IntTab_T<_SIZE_>;
   using DoubleTab_t = DoubleTab_T<_SIZE_>;
   using ArrOfInt_t = ArrOfInt_T<_SIZE_>;
@@ -151,7 +151,7 @@ int Reordonner_faces_periodiques_32_64<_SIZE_>::reordonner_faces_periodiques(con
   const int_t nb_faces = faces.dimension(0);
   const int nb_som_faces = static_cast<int>(faces.dimension(1));
   const int dim = static_cast<int>(domaine.les_sommets().dimension(1));
-  // Calcul des coordonnees des centres des faces:
+  // Compute the coordinates of the face centres:
   DoubleTab_t centres(nb_faces, 3);
   {
     const DoubleTab_t& coord = domaine.les_sommets();
@@ -167,14 +167,14 @@ int Reordonner_faces_periodiques_32_64<_SIZE_>::reordonner_faces_periodiques(con
       }
   }
 
-  // Construction d'un octree contenant les centres des faces:
+  // Build an octree containing the face centres:
   Octree_Double_t octree;
   octree.build_nodes(centres, 0 /* do not include virtual nodes */);
 
-  // Pour chaque face, on cherche sa face periodique associee (dont le centre
-  // est decale de direction_perio).
+  // For each face, find its associated periodic face (whose centre
+  // is offset by direction_perio).
 
-  // Pour chaque face, son nouvel indice dans le tableau des faces
+  // For each face, its new index in the faces array
   ArrOfInt_t renum_faces(nb_faces);
   renum_faces= -1;
   ArrOfInt_t nodes_list;
@@ -184,8 +184,8 @@ int Reordonner_faces_periodiques_32_64<_SIZE_>::reordonner_faces_periodiques(con
   for (int_t i_face = 0; i_face < nb_faces; i_face++)
     {
       if (renum_faces[i_face] >= 0)
-        continue; // Face deja traitee, on passe
-      // Cherche la face opposee dans les deux directions (-1. et +1.)
+        continue; // Face already processed, skip
+      // Search for the opposite face in both directions (-1. and +1.)
       double facteur;
       int_t i_face2 = -1;
       for (facteur = -1.; facteur < 1.5; facteur += 2.)
@@ -225,7 +225,7 @@ int Reordonner_faces_periodiques_32_64<_SIZE_>::reordonner_faces_periodiques(con
           return 0;
         }
     }
-  // Reordonner les faces:
+  // Reorder the faces:
   const IntTab_t oldfaces(faces);
   for (int_t i = 0; i < nb_faces; i++)
     {
@@ -236,13 +236,13 @@ int Reordonner_faces_periodiques_32_64<_SIZE_>::reordonner_faces_periodiques(con
   return 1;
 }
 
-/*! @brief essaie de verifier si les faces du bord num_bord sont ordonnees suivant la convention des faces periodiques.
+/*! @brief Tries to verify whether the faces on boundary num_bord are ordered according to the periodic face convention.
  *
- * On stocke dans vecteur_delta la direction de periodicite presumee (intervalle
- *  mesure entre la premiere face et la face jumelle), et erreur le max de l'erreur par rapport a cette
- *  mesure pour les autres faces.
- *  En parallele, l'erreur est le max sur tous les processeurs
- *  Valeur de retour: 1 si ok, 0 si l'erreur est superieure a precision_geom.
+ * Stores in vecteur_delta the presumed periodicity direction (interval
+ *  measured between the first face and its twin), and in erreur the max error relative to this
+ *  measurement for the other faces.
+ *  In parallel, the error is the max over all processors.
+ *  Return value: 1 if ok, 0 if the error exceeds precision_geom.
  *
  */
 template <typename _SIZE_>
@@ -276,22 +276,22 @@ int Reordonner_faces_periodiques_32_64<_SIZE_>::check_faces_periodiques(const Fr
   const DoubleTab_t coord = frontiere.domaine().les_sommets();
 
   int i;
-  // Calculer un vecteur delta (tous les procs n'ont pas forcement des faces de ce bord)
+  // Compute a delta vector (not all procs necessarily have faces on this boundary)
   vecteur_delta = -1.e37;
   if (n > 0)
     calculer_vecteur_2faces<_SIZE_>(coord, faces, 0, n, vecteur_delta);
   Process::mp_max_for_each_item(vecteur_delta);
 
-  // Calculer pour chaque face l'erreur par rapport a ce vecteur delta.
+  // Compute for each face the error relative to this delta vector.
   ArrOfDouble vect(dim);
   for (i = 0; i < n; i++)
     {
       calculer_vecteur_2faces<_SIZE_>(coord, faces, i, i+n, vect);
-      // Calcul de la difference entre vect et vecteur_delta:
+      // Compute the difference between vect and vecteur_delta:
       for (int compo = 0; compo < dim; compo++)
         erreur[compo] = std::max(erreur[compo], std::fabs(vecteur_delta[compo] - vect[compo]));
     }
-  // Calcul du max sur tous les procs:
+  // Compute the max over all procs:
   Process::mp_max_for_each_item(erreur);
   double maxerr = 0.;
   for (i = 0; i < dim; i++)
@@ -312,7 +312,7 @@ int Reordonner_faces_periodiques_32_64<_SIZE_>::check_faces_periodiques(const Fr
           Cerr << " This boundary is not detected as periodic (geometric error > precision_geom)" << finl;
           message();
           if (Process::is_parallel()) Cerr << "Or you forgot to define the periodic boundary in the Decouper keyword." << finl;
-        } // attendre qu'on ait ecrit pour continuer (sinon risque de exit() avant d'avoir affiche le message)
+        } // wait until output is done before continuing (otherwise risk of exit() before message is displayed)
       Process::barrier();
       return 0;
     }
@@ -335,34 +335,34 @@ void Reordonner_faces_periodiques_32_64<_SIZE_>::renum_som_perio(const Domaine_3
   const DoubleTab_t& coord = domaine.coord_sommets();
   const int dim = coord.dimension_int(1);
 
-  // Etape 1: pour chaque sommet reel, trouver un sommet associe (si plusieurs directions
-  //  de periodicite, un sommet peut etre associe a plusieurs autres).
+  // Step 1: for each real vertex, find an associated vertex (if multiple periodicity directions,
+  //  a vertex may be associated with several others).
   for (auto& itr : liste_bords_periodiques)
     {
       const Nom& nom_bord = itr;
       const Frontiere_32_64<_SIZE_>& front = domaine.bord(nom_bord);
-      // Direction periodique de ce bord:
+      // Periodic direction for this boundary:
       ArrOfDouble delta;
       ArrOfDouble erreur;
       if (!check_faces_periodiques(front, delta, erreur, true /* verbose */))
         Process::exit();
-      // Tableau pointant vers tous les sommets de toutes les faces
-      // (on cast le IntTab en ArrOfInt)
+      // Array pointing to all vertices of all faces
+      // (cast IntTab to ArrOfInt)
       const IntTab_t& faces_sommets = front.les_sommets_des_faces();
       const int nb_som_face = faces_sommets.dimension_int(1);
       const int_t nb_faces = faces_sommets.dimension(0) / 2;
-      // Boucle sur les faces d'un cote du domaine (premiere moitie des faces)
+      // Loop over faces on one side of the domain (first half of faces)
       for (int_t i_face = 0; i_face < nb_faces; i_face++)
         {
           for (int i_som = 0; i_som < nb_som_face; i_som++)
             {
               const int_t sommet = faces_sommets(i_face, i_som);
 
-              // Trouver le sommet associe
-              // Comme les frontieres sont ordonnees (voir check_faces_periodiques),
-              // le sommet est forcement un des sommets de la face opposee.
-              // Le vecteur qui va de "sommet" a "sommet_oppose" doit etre egal a "delta"
-              // la direction de periodicite.
+              // Find the associated vertex.
+              // Since the boundaries are ordered (see check_faces_periodiques),
+              // the vertex must be one of the vertices of the opposite face.
+              // The vector from "sommet" to "sommet_oppose" must equal "delta",
+              // the periodicity direction.
               const int_t i_face_opposee = i_face + nb_faces;
               int_t sommet_opp = -1;
               int i_som_opp = 0;
@@ -376,7 +376,7 @@ void Reordonner_faces_periodiques_32_64<_SIZE_>::renum_som_perio(const Domaine_3
                       if (epsilon > Objet_U::precision_geom)
                         break;
                     }
-                  // On a trouve le sommet oppose
+                  // Found the opposite vertex
                   if (i == dim) break;
                 }
               if (i_som_opp >= nb_som_face)
@@ -393,22 +393,22 @@ void Reordonner_faces_periodiques_32_64<_SIZE_>::renum_som_perio(const Domaine_3
         }
     }
 
-  // Deuxieme etape: faire pointer tous les sommets periodiques lies entre eux vers le meme sommet
+  // Second step: make all mutually linked periodic vertices point to the same vertex
 
   for (int_t i = 0; i < nb_som; i++)
     {
       int_t j = renum[i];
-      // Parcourir les sommet relies pour cette chaine:
+      // Traverse the chain of linked vertices:
       while (j != renum[j])
         j = renum[j];
       renum[i] = j;
     }
-  // Calcul des valeurs pour les sommets virtuels.
-  // Les sommets opposes aux sommets virtuels doivent etre connus, donc erreurs fatales.
+  // Compute values for virtual vertices.
+  // The vertices opposite to virtual vertices must be known, hence fatal errors.
   if (Process::is_parallel() && calculer_espace_virtuel)
     ::build_trad_space(domaine, renum);
 
-  // Recopie du resultat dans le tableau renum_som_perio
+  // Copy the result into the renum_som_perio array
   assert(renum.dimension_tot(0) == domaine.nb_som_tot());
   renum_som_perio = renum;
 }

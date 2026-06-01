@@ -21,9 +21,9 @@
 
 #include <Domaine_forward.h>
 
-/*! @brief classe Champ_front_lu Classe derivee de Champ_front_var qui represente les
+/*! @brief class Champ_front_lu Derived class of Champ_front_var representing
  *
- *      champs aux frontieres dont les valeurs sont lues dans un fichier de format :
+ *      boundary fields whose values are read from a file with format:
  *         nval
  *         xi yi zi val_i
  *

@@ -44,7 +44,7 @@ Entree& Op_Conv_EF_Stab_PolyMAC_CDO_Face::readOn(Entree& is)
   Op_Conv_PolyMAC_CDO_base::readOn(is);
   Param param(que_suis_je());
   param.ajouter("alpha", &alpha_);            // XD_ADD_P double
-  // XD_CONT parametre ajustant la stabilisation de 0 (schema centre) a 1 (schema amont)
+  // XD_CONT parameter adjusting stabilization from 0 (centered scheme) to 1 (upwind scheme)
   param.lire_avec_accolades_depuis(is);
   return is;
 }
@@ -70,29 +70,29 @@ double Op_Conv_EF_Stab_PolyMAC_CDO_Face::calculer_dt_stab() const
   const DoubleTab& vit = vitesse_->valeurs();
   const IntTab& e_f = domaine.elem_faces(), &f_e = domaine.face_voisins();
   const int N = vit.line_size();
-  DoubleTrav flux(N); //somme des flux pf * |f| * vf, volume minimal des mailles d'elements/faces affectes par ce flux
+  DoubleTrav flux(N); //sum of fluxes pf * |f| * vf, minimum volume of elements/faces affected by this flux
 
   for (int e = 0; e < domaine.nb_elem(); e++)
     {
-      // Calcul du volume effectif de l'element
+      // Compute the effective volume of the element
       const double vol = pe(e) * ve(e);
       flux = 0.;
 
-      // Parcourt des faces associees a l'element
+      // Loop over faces associated with the element
       for (int i = 0; i < e_f.dimension(1); i++)
         {
           int f = e_f(e, i);
-          if (f < 0) continue; // face in-existante
+          if (f < 0) continue; // non-existent face
 
           for (int n = 0; n < N; n++)
             {
-              // Ajout du flux entrant pour la composante n : Seuls les flux entrants comptent
+              // Add incoming flux for component n: only incoming fluxes count
               double flux_f = pf(f) * fs(f) * std::max((e == f_e(f, 1) ? 1 : -1) * vit(f, n), 0.);
               flux(n) += flux_f;
             }
         }
 
-      // Calcul du pas de temps pour chaque composante n
+      // Compute the time step for each component n
       for (int n = 0; n < N; n++)
         if (std::abs(flux(n)) > 1e-12)
           dt = std::min(dt, vol / flux(n));
@@ -105,7 +105,7 @@ void Op_Conv_EF_Stab_PolyMAC_CDO_Face::completer()
 {
   Op_Conv_PolyMAC_CDO_base::completer();
 
-  /* au cas ou... */
+  /* just in case... */
   const Domaine_PolyMAC_CDO& domaine = le_dom_poly_.valeur();
   if (domaine.domaine().nb_joints() && domaine.domaine().joint(0).epaisseur() < 2)
     {
@@ -140,15 +140,15 @@ void Op_Conv_EF_Stab_PolyMAC_CDO_Face::dimensionner(Matrice_Morse& mat) const
           if ((e = f_e(f, i)) >= 0)
             {
               for (k = 0; k < e_f.dimension(1) && (fb = e_f(e, k)) >= 0; k++)
-                if (fb < domaine.nb_faces() &&  ch.fcl()(fb, 0) < 2) //partie "faces"
+                if (fb < domaine.nb_faces() &&  ch.fcl()(fb, 0) < 2) //"faces" part
                   {
                     if ((fc = equiv(f, i, k)) >= 0 || f_e(f, 1) < 0)
-                      for (j = 0; j < 2; j++) //equivalence : face fd -> face fb
+                      for (j = 0; j < 2; j++) //equivalence: face fd -> face fb
                         {
                           fd = (j == i ? fb : fc); //element/face sources
                           if (fd >= 0) stencil.append_line(fb,fd);
                         }
-                    else for (j = 0; j < 2; j++)  //pas d'equivalence : n_f * operateur aux elements
+                    else for (j = 0; j < 2; j++)  //no equivalence: n_f * element operator
                         {
                           for (eb = f_e(f, j), l = 0; l < e_f.dimension(1) && (fc = e_f(eb, l)) >= 0; l++)
                             stencil.append_line(fb,fc);
@@ -157,16 +157,16 @@ void Op_Conv_EF_Stab_PolyMAC_CDO_Face::dimensionner(Matrice_Morse& mat) const
             }
       }
 
-  // Tri et suppression des doublons
+  // Sort and remove duplicates
   tableau_trier_retirer_doublons(stencil);
 
-  // Allocation de la matrice
+  // Allocate the matrix
   int taille = domaine.nb_faces_tot() + (dimension < 3 ? domaine.domaine().nb_som_tot() : domaine.domaine().nb_aretes_tot());
   Matrix_tools::allocate_morse_matrix(taille, taille, stencil, mat);
 }
 
-// ajoute la contribution de la convection au second membre resu
-// renvoie resu
+// adds the convection contribution to the right-hand side resu
+// returns resu
 
 DoubleTab& Op_Conv_EF_Stab_PolyMAC_CDO_Face::ajouter(const DoubleTab& inco, DoubleTab& secmem) const
 {
@@ -197,7 +197,7 @@ DoubleTab& Op_Conv_EF_Stab_PolyMAC_CDO_Face::ajouter(const DoubleTab& inco, Doub
       const int elem1 = f_e(f, 1);
       if (elem0 >= 0 && (elem1 >= 0 || ch.fcl()(f, 0) == 1 || ch.fcl()(f, 0) == 3))
         {
-          //masse : diagonale + masse ajoutee si correlation
+          //mass: diagonal + added mass if correlation
           const double inv_masse = 1.0 / (std::fabs(vit[f]) > 1e-10 ? inco(f) / vit[f] : 1.0);
           for (i = 0, dfac = 0; i < 2; i++)
             {
@@ -220,14 +220,14 @@ DoubleTab& Op_Conv_EF_Stab_PolyMAC_CDO_Face::ajouter(const DoubleTab& inco, Doub
               {
                 double inv_ve = 1.0 / ve(e);
                 for (k = 0; k < nb_face_elem && (fb = e_f(e, k)) >= 0; k++)
-                  if (fb < nb_faces && ch.fcl()(fb, 0) < 2) //partie "faces"
+                  if (fb < nb_faces && ch.fcl()(fb, 0) < 2) //"faces" part
                     {
                       if ((fc = equiv(f, i, k)) >= 0 || elem1 < 0)
-                        for (j = 0; j < 2; j++) //equivalence : face fd -> face fb
+                        for (j = 0; j < 2; j++) //equivalence: face fd -> face fb
                           {
                             eb = f_e(f, j), fd = (j == i ? fb : fc); //element/face sources
                             mult = (fd < 0 || domaine.dot(&nf(fb, 0), &nf(fd, 0)) > 0 ? 1 : -1) *
-                                   (fd >= 0 ? pf(fd) / pe(eb) : 1); //multiplicateur pour passer de vf a ve
+                                   (fd >= 0 ? pf(fd) / pe(eb) : 1); //multiplier to convert from vf to ve
                             for (n = 0; n < N; n++)
                               for (m = 0; m < N; m++)
                                 if (dfac(j, n, m))
@@ -235,22 +235,22 @@ DoubleTab& Op_Conv_EF_Stab_PolyMAC_CDO_Face::ajouter(const DoubleTab& inco, Doub
                                     double fac = (e == elem0 ? 1 : -1) * vfd(fb, e != f_e(fb, 0)) *
                                                  dfac(j, n, m) * inv_ve;
                                     if (fd >= 0)
-                                      secmem[fb] -= fac * mult * vit[fd]; //autre face calculee
+                                      secmem[fb] -= fac * mult * vit[fd]; //other computed face
                                     else
                                       {
                                         const Cond_lim_base& my_cl = cls[ch.fcl()(f, 1)].valeur();
-                                        if (sub_type(Dirichlet, my_cl)) // sinon : paroi -> pas de contrib
-                                          for (d = 0; d < D; d++)  //CL de Dirichlet
+                                        if (sub_type(Dirichlet, my_cl)) // otherwise: wall -> no contribution
+                                          for (d = 0; d < D; d++)  //Dirichlet BC
                                             secmem[fb] -= fac * nf(fb, d) / fs(fb) *
                                                           ref_cast(Dirichlet, my_cl).val_imp(
                                                             ch.fcl()(f, 2), N * d + m) * inv_masse;
                                       }
-                                    if (comp) secmem[fb] += fac * vit[fb]; //partie v div(alpha rho v)
+                                    if (comp) secmem[fb] += fac * vit[fb]; //v div(alpha rho v) part
                                   }
                           }
                       else
                         {
-                          for (j = 0; j < 2; j++)  //pas d'equivalence : n_f * operateur aux elements
+                          for (j = 0; j < 2; j++)  //no equivalence: n_f * element operator
                             {
                               for (eb = f_e(f, j), l = 0; l < nb_face_elem && (fc = e_f(eb, l)) >= 0; l++)
                                 {
@@ -289,7 +289,7 @@ DoubleTab& Op_Conv_EF_Stab_PolyMAC_CDO_Face::ajouter(const DoubleTab& inco, Doub
   return secmem;
 }
 
-/*! @brief on assemble la matrice.
+/*! @brief Assemble the matrix.
  *
  */
 inline void Op_Conv_EF_Stab_PolyMAC_CDO_Face::contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& matrice) const
@@ -317,7 +317,7 @@ inline void Op_Conv_EF_Stab_PolyMAC_CDO_Face::contribuer_a_avec(const DoubleTab&
       {
         for (i = 0, dfac = 0; i < 2; i++)
           {
-            //masse : diagonale + masse ajoutee si correlation
+            //mass: diagonal + added mass if correlation
             masse(0, 0) = std::fabs(vit[f]) > 1e-10 ? inco(f) / vit[f] : 1.0;
             //contribution a dfac
             for (eb = f_e(f, i), n = 0; n < N; n++)
@@ -329,23 +329,23 @@ inline void Op_Conv_EF_Stab_PolyMAC_CDO_Face::contribuer_a_avec(const DoubleTab&
           if ((e = f_e(f, i)) >= 0)
             {
               for (k = 0; k < e_f.dimension(1) && (fb = e_f(e, k)) >= 0; k++)
-                if (fb < domaine.nb_faces() &&  ch.fcl()(fb, 0) < 2) //partie "faces"
+                if (fb < domaine.nb_faces() &&  ch.fcl()(fb, 0) < 2) //"faces" part
                   {
                     if ((fc = equiv(f, i, k)) >= 0 || f_e(f, 1) < 0)
-                      for (j = 0; j < 2; j++) //equivalence : face fd -> face fb
+                      for (j = 0; j < 2; j++) //equivalence: face fd -> face fb
                         {
                           eb = f_e(f, j), fd = (j == i ? fb : fc); //element/face sources
-                          mult = (fd < 0 || domaine.dot(&nf(fb, 0), &nf(fd, 0)) > 0 ? 1 : -1) * (fd >= 0 ? pf(fd) / pe(eb) : 1); //multiplicateur pour passer de vf a ve
+                          mult = (fd < 0 || domaine.dot(&nf(fb, 0), &nf(fd, 0)) > 0 ? 1 : -1) * (fd >= 0 ? pf(fd) / pe(eb) : 1); //multiplier to convert from vf to ve
                           for (n = 0; n < N; n++)
                             for (m = 0; m < N; m++)
                               if (dfac(j, n, m))
                                 {
                                   double fac = (e == f_e(f, 0) ? 1 : -1) * vfd(fb, e != f_e(fb, 0)) * dfac(j, n, m) / ve(e);
-                                  if (fd >= 0) matrice(fb,fd) += fac * mult; //autre face calculee
-                                  if (comp) matrice(fb,fb) -= fac; //partie v div(alpha rho v)
+                                  if (fd >= 0) matrice(fb,fd) += fac * mult; //other computed face
+                                  if (comp) matrice(fb,fb) -= fac; //v div(alpha rho v) part
                                 }
                         }
-                    else for (j = 0; j < 2; j++)  //pas d'equivalence : n_f * operateur aux elements
+                    else for (j = 0; j < 2; j++)  //no equivalence: n_f * element operator
                         {
                           for (eb = f_e(f, j), l = 0; l < e_f.dimension(1) && (fc = e_f(eb, l)) >= 0; l++)
                             {

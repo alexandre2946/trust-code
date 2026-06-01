@@ -51,7 +51,7 @@ DoubleTab& Solveur_Masse_Elem_proto::appliquer_impl_proto(DoubleTab& sm) const
       if (std::abs(der(e, n)) > 1e-10)
         sm(e, n) /= pe(e) * ve(e) * der(e, n);
       else
-        sm(e, n) = 0; //cas d'une evanescence
+        sm(e, n) = 0; //evanescence case
 
   return sm;
 }
@@ -59,7 +59,7 @@ DoubleTab& Solveur_Masse_Elem_proto::appliquer_impl_proto(DoubleTab& sm) const
 void Solveur_Masse_Elem_proto::dimensionner_blocs_proto(matrices_t matrices, const tabs_t& semi_impl) const
 {
   solv_mass_->equation().init_champ_conserve();
-  /* une diagonale par derivee de champ_conserve_ presente dans matrices */
+  /* one diagonal per derivative of champ_conserve_ present in matrices */
   const Domaine_VF& domaine = le_dom_.valeur();
   const Champ_Inc_base& cc = solv_mass_->equation().champ_conserve();
   int e, ne = domaine.nb_elem(), n, N = cc.valeurs().line_size();
@@ -67,8 +67,8 @@ void Solveur_Masse_Elem_proto::dimensionner_blocs_proto(matrices_t matrices, con
   for (auto &&i_m : matrices)
     if (cc.derivees().count(i_m.first))
       {
-        /* nombre de composantes de la variable : autant que le champ par defaut, mais peut etre different pour la pression */
-        const DoubleTab& col = solv_mass_->equation().probleme().get_champ(i_m.first.c_str()).valeurs(); //tableau de l'inconnue par rapport a laquelle on derive
+        /* number of components of the variable: same as the default field, but may differ for pressure */
+        const DoubleTab& col = solv_mass_->equation().probleme().get_champ(i_m.first.c_str()).valeurs(); //array of the unknown with respect to which we differentiate
         int m, M = col.line_size();
 
         Stencil stencil(0, 2);
@@ -92,7 +92,7 @@ void Solveur_Masse_Elem_proto::ajouter_blocs_proto(matrices_t matrices, DoubleTa
   const DoubleVect& ve = domaine.volumes(), &pe = solv_mass_->equation().milieu().porosite_elem(), &fs = domaine.face_surfaces();
   int e, f, n, N = cc.valeurs().line_size(), ne = domaine.nb_elem();
 
-  /* second membre : avec ou sans resolution en increments*/
+  /* right-hand side : with or without resolution in increments*/
   for (e = 0; e < ne; e++)
     {
       const double fac_ale = domaine.domaine().deformable() ? domaine.domaine().old_volumes()(e) / ve(e) : 1.0;
@@ -100,7 +100,7 @@ void Solveur_Masse_Elem_proto::ajouter_blocs_proto(matrices_t matrices, DoubleTa
         secmem(e, n) += pe(e) * ve(e) * (passe(e, n) * fac_ale - resoudre_en_increments * present(e, n)) / dt;
     }
 
-  /* si on n'a pas d'operateur de diffusion (operateur(0) negligeable ou operateur(0) convectif pour Masse_Multiphase), alors ajout des flux aux faces de Neumann */
+  /* if there is no diffusion operator (operateur(0) negligible or operateur(0) convective for Masse_Multiphase), add fluxes at Neumann faces */
   if ( (sub_type(Op_Diff_negligeable, solv_mass_->equation().operateur(0).l_op_base())) || (!sub_type(Operateur_Diff_base, solv_mass_->equation().operateur(0).l_op_base())) )
     for (f = 0; f < domaine.premiere_face_int(); f++)
       if (fcl(f, 0) == 4)

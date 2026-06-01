@@ -47,7 +47,7 @@ Entree& Paroi_contact_rayo::readOn(Entree& s )
 {
   s >> nom_autre_pb;
   s >> nom_autre_bord;
-  s >> type_rayo; /* pour l'autre probleme */
+  s >> type_rayo; /* for the other problem */
 
   if (type_rayo != "TRANSP" && type_rayo != "SEMI_TRANSP")
     {

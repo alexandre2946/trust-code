@@ -21,7 +21,7 @@
 class Nom;
 #include <Domaine_forward.h>
 
-/*! @brief Classe Extraire_plan Lecture d'un fichier
+/*! @brief Class Extraire_plan Reading a file
  *
  * @sa Interprete
  */

@@ -21,9 +21,9 @@
 
 class Champ_base;
 
-/*! @brief classe Operateur_Conv_base Cette classe est la base de la hierarchie des operateurs representant
+/*! @brief Operateur_Conv_base This class is the base of the hierarchy of operators representing
  *
- *      un terme de convection dans une equation.
+ *      a convection term in an equation.
  *
  * @sa Operateur_base, Classe abstraite, Methode abstraite, void associer_vitesse(const Champ_Inc_base& vit )
  */
@@ -47,19 +47,17 @@ protected :
   OBS_PTR(Champ_base) la_norme_vitesse;
   OBS_PTR(Champ_base) vitesse_pour_pas_de_temps_;
   double dt_stab_conv_;
-  int incompressible_ = 1; // incompressible_= 1 -> l'operateur discretise div(v x inco), incompressible_ = 0 -> il discretise v.grad(inco)
+  int incompressible_ = 1; // incompressible_= 1 -> the operator discretizes div(v x inco), incompressible_ = 0 -> it discretizes v.grad(inco)
 };
 
-//Descrition
-// renvoie la valeur du pas de temps de stabilite en convection
+// Returns the value of the convective stability time step.
 inline double Operateur_Conv_base::dt_stab_conv() const
 {
   assert(!est_egal(dt_stab_conv_,123.));
   return dt_stab_conv_;
 }
 
-//Descrition
-// permet de fixer la valeur du pas de temps de stabilite en convection
+// Sets the value of the convective stability time step.
 inline void Operateur_Conv_base::fixer_dt_stab_conv(double dt)
 {
   dt_stab_conv_ = dt;

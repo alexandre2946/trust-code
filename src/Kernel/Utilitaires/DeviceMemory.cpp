@@ -82,7 +82,7 @@ void* DeviceMemory::addrOnDevice(void * ptr)
         return device_ptr;
       else
         {
-          // Cas de buffer_base (ptr n'est pas forcement l'adresse de debut du bloc memoire...) ou de DoubleTab_parts
+          // Case of buffer_base (ptr is not necessarily the start address of the memory block...) or DoubleTab_parts
           if (ptr >= host_ptr && ptr < static_cast<char *>(host_ptr) + bytes)
             return static_cast<char *>(device_ptr) + (static_cast<char *>(ptr) - static_cast<char *>(host_ptr));
         }

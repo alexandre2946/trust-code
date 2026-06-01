@@ -21,13 +21,13 @@
 
 
 
-/*! @brief classe Champ_front_base Classe de base pour les Champs aux frontieres instationnaires,
+/*! @brief class Champ_front_base Base class for unsteady boundary Fields,
  *
- *      mais uniformes en espace.
- *      Les aspects temporels sont equivalents a ceux de
+ *      but uniform in space.
+ *      The temporal aspects are equivalent to those of
  *      Ch_front_var_instationnaire.
- *      En revanche, le tableau de valeurs est dimensionne a une seule
- *      valeur et n'a pas d'espace virtuel.
+ *      On the other hand, the value array is dimensioned to a single
+ *      value and has no virtual space.
  *
  * @sa Champ_front_base
  */

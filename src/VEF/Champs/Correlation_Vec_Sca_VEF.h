@@ -18,7 +18,7 @@
 
 #include <Champ_Fonc_P1NC.h>
 
-/*! @brief classe Correlation_Vec_Sca_VEF
+/*! @brief class Correlation_Vec_Sca_VEF
  *
  * @sa Champ_Fonc_P1NC Correlation_Vec_Sca_VEF
  */

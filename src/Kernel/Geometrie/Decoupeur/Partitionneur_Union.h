@@ -19,11 +19,11 @@
 #include <TRUST_Ref.h>
 #include <Domaine_forward.h>
 
-/*! @brief Decoupeur permettant de decouper un domaine global de maniere conforme avec un ensemble de sous-domaines deja decoupes.
+/*! @brief Partitioner allowing a global domain to be split conformally with a set of already-partitioned sub-domains.
  *
- * C'est l'operation inverse de Partitionneur_Sous_Domaine.
+ * This is the inverse operation of Partitionneur_Sous_Domaine.
  *
- *  Syntaxe:
+ *  Syntax:
  *     partitionneur union
  *      {
  *        sous_domaines N ssdom1 ... ssdomN
@@ -46,8 +46,8 @@ public:
   void construire_partition(IntVect& elem_part, int& nb_parts_tot) const override;
 
 protected:
-  // Parametres du partitionneur
+  // Partitioner parameters
   OBS_PTR(Domaine) ref_domaine_;
-  std::map<std::string, std::string> fic_ssz; //fic_ssz[nom de la sous domaine] = { fichier de decoupage }
+  std::map<std::string, std::string> fic_ssz; //fic_ssz[sub-domain name] = { partitioning file }
 };
 #endif

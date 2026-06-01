@@ -18,13 +18,13 @@
 
 #include <Viscosite_turbulente_LES_base.h>
 
-/*! @brief classe Viscosite_turbulente_WALE
+/*! @brief Wall-Adapting Local Eddy-viscosity (WALE) SGS turbulent viscosity model:
  *
  *                                               (Sij_d * Sij_d)^1.5
  *    visc_SGS = (Cw * delta)^2 * ---------------------------------------------------,
  *                                  (Sij_bar * Sij_bar)^2.5 + (Sij_d * Sij_d)^1.25
  *
- *    avec
+ *    where
  *
  *        Sij_d = 0.5 * (gij_bar^2 + gji_bar^2) -1/3 gkk_bar^2,
  *        gij_bar = du_i / dx_j,

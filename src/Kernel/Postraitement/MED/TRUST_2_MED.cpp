@@ -43,7 +43,7 @@ void traite_nom_fichier_med(Nom& nom_fic)
   nom_fic2.prefix("_0000");
   nom_fic2+=".med";
   nom_fic=nom_fic2.nom_me(nom_fic.me());
-  // on essaye en premier les fichiers _0000.med
+  // try _0000.med files first
   {
     std::ifstream test(nom_fic);
     if (!test)
@@ -53,7 +53,7 @@ void traite_nom_fichier_med(Nom& nom_fic)
     std::ifstream test(nom_fic);
     if (!test)
       {
-        // on essaye Cas_0000.med
+        // try Cas_0000.med
         nom_fic=nom_fic2.nom_me(0);
         std::ifstream test2(nom_fic);
         if (!test2)
@@ -69,8 +69,8 @@ extern "C" int MEDimport(char*,char*);
 void test_version(Nom& nom)
 {
 #ifdef MED_
-  // on regarde si le fichier est d'une version differente, si oui
-  // on cree un fichier au format MED majeur courant, et on change le nom du fichier
+  // check if the file is of a different version; if so,
+  // create a file in the current major MED format and update the file name
   med_bool med_ok, hdf_ok;
   if (MEDfileCompatibility(nom, &med_ok, &hdf_ok))
     {
@@ -78,12 +78,12 @@ void test_version(Nom& nom)
       Process::exit();
     }
 
-  if (hdf_ok && med_ok) return; //pas besoin de convertir
+  if (hdf_ok && med_ok) return; //no conversion needed
 
-  // On serialise pour eviter que le fichier soit cree plusieurs fois en //
+  // Serialize to avoid creating the file multiple times in parallel
 
   Nom nom2bis("Conv_");
-  // ajout prefixe Conv_
+  // add Conv_ prefix
   Nom nom2 ;
 
   char* nomtmp = new char[strlen(nom)+1];
@@ -94,28 +94,28 @@ void test_version(Nom& nom)
   const char* ptr=nomtmp+compteur;
   bool pas_de_slach=false;
 
-  while((*ptr!='/')&&(compteur>0))  // recherche du dernier slach dans le nom du fichier
+  while((*ptr!='/')&&(compteur>0))  // search for the last slash in the file name
     {
       ptr--;
       compteur--;
       if (*ptr=='/') pas_de_slach=true;
     }
 
-  if (!pas_de_slach) // Cas ou le fichier med est dans le repertoire courant
+  if (!pas_de_slach) // Case where the MED file is in the current directory
     {
       nom2=nom2bis;
       nom2+=nom;
     }
-  else // Cas ou le fichier med est defini par un chemin
+  else // Case where the MED file is defined by a path
     {
       Nom cible(ptr);
-      cible.suffix("/");  // nom du fichier
-      nom2bis+= cible;   // nom du fichier + prefix Conv_
+      cible.suffix("/");  // file name
+      nom2bis+= cible;   // file name + prefix Conv_
 
       Nom nomentier(nom);
-      nomentier.prefix(cible);  // nom du chemin pour trouver fichier
+      nomentier.prefix(cible);  // path to find the file
 
-      nomentier+=nom2bis;  // nom du chemin + prefixe Conv . nom fichier
+      nomentier+=nom2bis;  // path + prefix Conv . file name
       nom2=nomentier;
     }
 
@@ -190,7 +190,7 @@ void read_med_field_names(const Nom& nom_fic, Noms& noms_chps, ArrOfDouble& temp
 }
 
 #ifdef MED_
-// renvoit le type med a partir du type trio
+// returns the MED type corresponding to the TRUST type
 med_geometry_type type_geo_trio_to_type_med(const Nom& type_elem_i,med_axis_type& rep)
 {
   rep=MED_CARTESIAN;
@@ -383,7 +383,7 @@ void fill_connectivity_from_mc_mesh(const MEDCoupling::MEDCouplingUMesh * mc_mes
 #endif /* MEDCOUPLING_ */
 #endif /* MED_ */
 
-/*! @brief Passage de la connectivite TRUST a MED si toMED=true de MED a trio si toMED=false
+/*! @brief Convert connectivity from TRUST to MED if toMED=true, from MED to TRUST if toMED=false.
  */
 template <typename _SIZE_>
 void conn_trust_to_med(IntTab_T<_SIZE_>& les_elems, const Nom& type_elem, bool toMED)
@@ -393,7 +393,7 @@ void conn_trust_to_med(IntTab_T<_SIZE_>& les_elems, const Nom& type_elem, bool t
   using IntTab_t = IntTab_T<_SIZE_>;
 
   int_t nele=les_elems.dimension(0);
-  // cas face_bord vide
+  // case of empty boundary face
   if (nele==0) return;
   med_geometry_type type_elem_med;
   type_elem_med=type_geo_trio_to_type_med(type_elem);

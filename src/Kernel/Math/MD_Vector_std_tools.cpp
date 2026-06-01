@@ -47,9 +47,9 @@ void vect_items_generic_kernel(int line_size, int idx, int idx_end_of_list, cons
       Kokkos::parallel_for(policy, KOKKOS_LAMBDA(
                              const int item)
       {
-        // Indice de l'item geometrique a copier (ou du premier item du bloc)
+        // Index of the geometric item to copy (or the first item of the block)
         int premier_item_bloc = items_to_process_view[item];
-        // Adresse des elements a copier dans le vecteur
+        // Address of the elements to copy in the vector
         for (int j = 0; j < n; j++)
           {
             int ii = (item - idx) * n + j;
@@ -66,9 +66,9 @@ void vect_items_generic_kernel(int line_size, int idx, int idx_end_of_list, cons
       Kokkos::parallel_for(policy, KOKKOS_LAMBDA(
                              const int item)
       {
-        // Indice de l'item geometrique a copier (ou du premier item du bloc)
+        // Index of the geometric item to copy (or the first item of the block)
         int premier_item_bloc = items_to_process_view[item];
-        // Adresse des elements a copier dans le vecteur
+        // Address of the elements to copy in the vector
         for (int j = 0; j < n; j++)
           {
             int ii = (item - idx) * n + j;
@@ -96,10 +96,10 @@ void vect_items_generic(const int line_size, const ArrOfInt& voisins, const Stat
   const int nb_voisins = list.get_nb_lists();
   for (int i_voisin = 0; i_voisin < nb_voisins; i_voisin++)
     {
-      // Indice dans list.get_data() de la fin de la liste d'items/blocs pour ce voisin:
+      // Index in list.get_data() of the end of the item/block list for this neighbour:
       const int idx = index[i_voisin];
       const int idx_end_of_list = index[i_voisin + 1];
-      // Nombre d'elements de tableau a envoyer/recevoir de ce voisin
+      // Number of array elements to send/receive from this neighbour
       const int nb_elems = (idx_end_of_list - idx) * line_size;
       if (nb_elems>0)
         {
@@ -145,12 +145,12 @@ void vect_blocs_generic_kernel(int line_size, int idx, int idx_end_of_list, cons
   int ii_base = 0;
   for (int item = idx; item < idx_end_of_list; item += 2)
     {
-      // Indice de l'item geometrique a copier (ou du premier item du bloc)
+      // Index of the geometric item to copy (or the first item of the block)
       int premier_item_bloc = items_to_process[item];
       // For blocs, the array contains begin_bloc, end_bloc, begin_bloc, end_bloc...
       const int dernier_item_bloc = items_to_process[item + 1];
       const int bloc_size = dernier_item_bloc - premier_item_bloc;
-      // Adresse des elements a copier dans le vecteur
+      // Address of the elements to copy in the vector
 #ifndef TRUST_USE_GPU
       assert(premier_item_bloc >= 0 && bloc_size > 0 &&
              (premier_item_bloc + bloc_size) * line_size <= vect.size_array());
@@ -198,11 +198,11 @@ void vect_blocs_generic(const int line_size, const ArrOfInt& voisins, const Stat
   const int nb_voisins = list.get_nb_lists();
   for (int i_voisin = 0; i_voisin < nb_voisins; i_voisin++)
     {
-      // Nombre d'elements de tableau a envoyer/recevoir de ce voisin
+      // Number of array elements to send/receive from this neighbour
       const int nb_elems = nb_items_par_voisin[i_voisin] * line_size;
       if (nb_elems > 0)
         {
-          // Indice dans list.get_data() de la fin de la liste d'items/blocs pour ce voisin:
+          // Index in list.get_data() of the end of the item/block list for this neighbour:
           const int idx = index[i_voisin];
           const int idx_end_of_list = index[i_voisin + 1];
           TRUSTArray<_TYPE_>& buffer = buffers.get_next_area_template<_TYPE_>(voisins[i_voisin], nb_elems);

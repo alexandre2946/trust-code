@@ -19,7 +19,7 @@ Implemente_instanciable(Ecrire_Fichier_Formatte,"Ecrire_Fichier_Formatte",Ecrire
 // XD_CONT name_obj to a file filename in ASCII format.
 
 
-/*! @brief Appel a la methode printOn de la classe Interprete
+/*! @brief Call to the printOn method of the Interprete class.
  *
  */
 Sortie& Ecrire_Fichier_Formatte::printOn(Sortie& os) const
@@ -27,7 +27,7 @@ Sortie& Ecrire_Fichier_Formatte::printOn(Sortie& os) const
   return Interprete::printOn(os);
 }
 
-/*! @brief Appel a la methode readOn de la classe Interprete
+/*! @brief Call to the readOn method of the Interprete class.
  *
  */
 Entree& Ecrire_Fichier_Formatte::readOn(Entree& is)
@@ -35,9 +35,9 @@ Entree& Ecrire_Fichier_Formatte::readOn(Entree& is)
   return Interprete::readOn(is);
 }
 
-/*! @brief Interprete sequentiel.
+/*! @brief Sequential interpreter.
  *
- * Syntaxe: Ecrire_Fichier_Formatte nom_objet nom_fichier
+ * Syntax: Ecrire_Fichier_Formatte object_name file_name
  *
  */
 Entree& Ecrire_Fichier_Formatte::interpreter(Entree& is)

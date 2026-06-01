@@ -20,13 +20,13 @@
 #include <Champ_Uniforme.h>
 
 
-/*! @brief classe Champ_Uniforme_inst Un champ constant dans l'espace mais dependant du temps.
+/*! @brief Champ_Uniforme_inst A field that is constant in space but time-dependent.
  *
- *      Cette classe est abstraite, une classe concrete derivant de
- *      Champ_Uniforme_inst devra surcharger la methode me_calculer(double t)
- *      de calcul du champ en fonction du temps.
+ *      This class is abstract; a concrete class deriving from
+ *      Champ_Uniforme_inst must override the me_calculer(double t) method
+ *      for computing the field as a function of time.
  *
- * @sa Champ_Uniforme, Classe abstraite, Methode abstraite, void me_calculer(double t)
+ * @sa Champ_Uniforme, Abstract class, Abstract method, void me_calculer(double t)
  */
 class Champ_Uniforme_inst : public Champ_Uniforme
 {
@@ -44,9 +44,9 @@ private :
 };
 
 
-/*! @brief Mise a jour en temps du champ.
+/*! @brief Updates the field in time.
  *
- * @param (double temps) temps de mise a jour
+ * @param (double temps) update time
  */
 inline void Champ_Uniforme_inst::mettre_a_jour(double un_temps)
 {

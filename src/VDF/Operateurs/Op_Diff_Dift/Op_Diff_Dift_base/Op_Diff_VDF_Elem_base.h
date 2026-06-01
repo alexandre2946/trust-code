@@ -23,10 +23,10 @@
 
 class Eval_VDF_Elem;
 
-/*! @brief class Op_Diff_VDF_Elem_base Cette classe represente l'operateur de diffusion associe a une equation de transport.
+/*! @brief class Op_Diff_VDF_Elem_base This class represents the diffusion operator associated with a transport equation.
  *
- *   La discretisation est VDF. Le champ diffuse est scalaire. Le champ de diffusivite est uniforme
- *   L'iterateur associe est de type Iterateur_VDF_Elem. L'evaluateur associe est de type Eval_Diff_VDF_const_Elem
+ *   The discretization is VDF. The diffused field is scalar. The diffusivity field is uniform.
+ *   The associated iterator is of type Iterateur_VDF_Elem. The associated evaluator is of type Eval_Diff_VDF_const_Elem
  *
  */
 class Op_Diff_VDF_Elem_base : public Op_Diff_VDF_base, public Op_VDF_Elem

@@ -28,12 +28,12 @@ Entree& Flux_parietal_diphasique_simple_lineaire::readOn(Entree& is)
   param.ajouter("coeff_osv|osv_coeff", &coeff_, Param::REQUIRED);
   param.lire_avec_accolades_depuis(is);
 
-  /* n_l / n_g : phases liquide / gaz continu */
+  /* n_l / n_g : continuous liquid / gas phases */
   const Pb_Multiphase *pbm = sub_type(Pb_Multiphase, pb_.valeur()) ? &ref_cast(Pb_Multiphase, pb_.valeur()) : nullptr;
 
-  if (!pbm || pbm->nb_phases() == 1) // pas un Pb_Multiphase -> monophasique liquide
+  if (!pbm || pbm->nb_phases() == 1) // not a Pb_Multiphase -> single-phase liquid
     Process::exit("Flux_parietal_diphasique_simple_lineaire can only be used for a multiphase problem with 2 phases!");
-  else // recherche de n_l, n_g : phase {liquide,gaz}_continu en priorite
+  else // search for n_l, n_g: continuous {liquid,gas} phase with priority
     {
       for (int n = 0; n < pbm->nb_phases(); n++)
         if (pbm->nom_phase(n).debute_par("liquide") && (n_l < 0 || pbm->nom_phase(n).finit_par("continu")))
@@ -68,7 +68,7 @@ double Flux_parietal_diphasique_simple_lineaire::fraction_flux_vap(const input_t
 
   const double eps = std::min(1.0, std::max(0.0, (in.T[n_l] - Tld) / (Ts - Tld)));
 
-  if (in.T[n_l] > Tld && in.T[n_l] < Ts) // derivee non nulle
+  if (in.T[n_l] > Tld && in.T[n_l] < Ts) // non-zero derivative
     {
       dTf_eps = ((Ts - Tld) * (-dTf_Tld) + (in.T[n_l] - Tld) * dTf_Tld) / (Ts - Tld) / (Ts - Tld);
       dp_eps = ((Ts - Tld) * (-dp_Tld) - (in.T[n_l] - Tld) * (sat->dP_Tsat(in.p) - dp_Tld)) / (Ts - Tld) / (Ts - Tld);

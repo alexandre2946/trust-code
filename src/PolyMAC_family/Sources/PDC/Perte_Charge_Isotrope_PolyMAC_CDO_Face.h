@@ -19,11 +19,11 @@
 #include <Perte_Charge_PolyMAC_HFV.h>
 #include <PDC_PolyMAC_CDO_impl.h>
 
-//!  Perte de charge isotrope (proportionnelle a -u )
+//!  Isotropic pressure drop (proportional to -u)
 /**
  du/dt = - lambda(Re,x,y,z,t) * u * ||u|| / 2 Dh
 
- Lecture des arguments :
+ Reading arguments:
 
  Perte_Charge_Isotrope_PolyMAC_CDO_Face diametre_hydraulique {
  lambda expression(Re,x,y,z,t)
@@ -39,7 +39,7 @@ public:
   void mettre_a_jour(double temps) override { Perte_Charge_PolyMAC_CDO::mettre_a_jour(temps); diam_hydr->mettre_a_jour(temps); }
 
 protected:
-  //! Implemente le calcul effectif de la perte de charge pour un lieu donne
+  //! Implements the effective computation of the pressure drop for a given location
   void coeffs_perte_charge(const DoubleVect&, const DoubleVect&, double, double, double, double, double, double&, double&, double&, DoubleVect&) const override;
 };
 

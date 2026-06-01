@@ -21,12 +21,12 @@
 #include <Source_base.h>
 
 
-/*! @brief classe Source_Generique_base Cette classe est la base de la hierarchie des sources portant
+/*! @brief Source_Generique_base This class is the base of the source term hierarchy carrying
  *
- *      un OWN_PTR(Champ_Generique_base) qui permet d'evaluer une expression dependante
- *      de champs du probleme.
+ *      an OWN_PTR(Champ_Generique_base) that allows evaluating an expression depending
+ *      on fields of the problem.
  *
- * @sa Source_base, Classe abstraite., Methodes abstraites:, DoubleTab& ajouter(DoubleTab& ) const, void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) [protected], void associer_pb(const Probleme_base& ) [protected], Nom localisation_source(), Syntaxe :, Sources { Source_Generique "Champ_Generique { ...} " }, avec "Champ_Generique" un champ generique a specifier., Rq : la discretisation du champ renvoye par le champ generique, doit correspondre a celle ou est evaluee le terme source.
+ * @sa Source_base, Abstract class., Abstract methods:, DoubleTab& ajouter(DoubleTab& ) const, void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) [protected], void associer_pb(const Probleme_base& ) [protected], Nom localisation_source(), Syntax:, Sources { Source_Generique "Champ_Generique { ...} " }, with "Champ_Generique" a generic field to specify., Note: the discretization of the field returned by the generic field, must correspond to that where the source term is evaluated.
  */
 class Source_Generique_base : public Source_base
 {

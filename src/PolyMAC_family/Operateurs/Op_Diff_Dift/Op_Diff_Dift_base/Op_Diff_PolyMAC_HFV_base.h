@@ -20,7 +20,7 @@
 
 /*! @brief class Op_Diff_PolyMAC_HFV_base
  *
- *  Classe de base des operateurs de diffusion PolyMAC_HFV
+ *  Base class for PolyMAC_HFV diffusion operators.
  *
  *
  */
@@ -32,11 +32,11 @@ public:
 
   void mettre_a_jour(double t) override;
 
-  /* versions etendues de dimensionner/ajouter_blocs permettant de traiter les seules variables auxiliaires */
+  /* extended versions of dimensionner/ajouter_blocs allowing treatment of auxiliary variables only */
   virtual void dimensionner_blocs_ext(int aux_only, matrices_t matrices, const tabs_t& semi_impl = { }) const = 0;
   virtual void ajouter_blocs_ext(int aux_only, matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = { }) const = 0;
 
-  /* implementations de dimensionner/ajouter_blocs a partir de ces methodes */
+  /* implementations of dimensionner/ajouter_blocs from these methods */
   int has_interface_blocs() const override { return 1; }
 
   void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = { }) const override
@@ -49,18 +49,18 @@ public:
     ajouter_blocs_ext(0, matrices, secmem, semi_impl);
   }
 
-  void update_nu() const override; //mise a jour
+  void update_nu() const override; //update
 
 protected:
-  double t_last_nu_ = -1e10; //pour detecter quand on doit recalculer nu, les variables auxiliaires
+  double t_last_nu_ = -1e10; //to detect when nu and auxiliary variables need to be recomputed
 
-  /* gestion des variables auxiliaires en semi-implicite */
+  /* management of auxiliary variables in semi-implicit mode */
   void update_aux(double t) const;
-  mutable double t_last_aux_ = -1e10; /* dernier temps auquel on les a calcule */
-  mutable int use_aux_ = 0; /* les variables auxiliaires sont-elles stockees dans var_aux ? */
-  mutable Matrice_Bloc mat_aux; /* systeme a resoudre : mat.var_aux = secmem */
+  mutable double t_last_aux_ = -1e10; /* last time at which they were computed */
+  mutable int use_aux_ = 0; /* whether auxiliary variables are stored in var_aux */
+  mutable Matrice_Bloc mat_aux; /* system to solve: mat.var_aux = secmem */
   mutable DoubleTab var_aux;
-  mutable SolveurSys solv_aux; //solveur
+  mutable SolveurSys solv_aux; //solver
 };
 
 #endif /* Op_Diff_PolyMAC_HFV_base_included */

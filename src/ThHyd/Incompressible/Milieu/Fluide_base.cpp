@@ -47,23 +47,23 @@ Sortie& Fluide_base::printOn(Sortie& os) const
   return os;
 }
 
-/*! @brief Lit les caracteristiques du fluide a partir d'un flot d'entree.
+/*! @brief Reads the fluid characteristics from an input stream.
  *
  *    Format:
  *      Fluide_base
  *      {
- *       Mu type_champ bloc de lecture de champ
+ *       Mu type_champ field reading block
  *       Rho Champ_Uniforme 1 vrel
  *       [Cp Champ_Uniforme 1 vrel]
- *       [Lambda type_champ bloc de lecture de champ]
- *       [Beta_th type_champ bloc de lecture de champ]
- *       [Beta_co type_champ bloc de lecture de champ]
+ *       [Lambda type_champ field reading block]
+ *       [Beta_th type_champ field reading block]
+ *       [Beta_co type_champ field reading block]
  *      }
  *  cf Milieu_base::readOn
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws accolade ouvrante attendue
+ * @param is input stream
+ * @return modified input stream
+ * @throws opening brace expected
  */
 Entree& Fluide_base::readOn(Entree& is)
 {
@@ -80,7 +80,7 @@ Entree& Fluide_base::readOn(Entree& is)
 void Fluide_base::set_param(Param& param) const
 {
   Milieu_base::set_param(param);
-  //La lecture de rho n est pas specifiee obligatoire ici car ce champ ne doit pas etre lu pour un fluide dilatable
+  //Reading rho is not mandatory here because this field must not be read for a dilatable fluid
   param.ajouter("mu", &ch_mu_, Param::REQUIRED);
   param.ajouter("beta_co", &ch_beta_co_);
   param.ajouter("kappa", &coeff_absorption_);
@@ -142,16 +142,16 @@ void Fluide_base::discretiser(const Probleme_base& pb, const Discretisation_base
 
   Milieu_base::discretiser(pb, dis);
 }
-/*! @brief Verifie que les champs lus l'ont ete correctement.
+/*! @brief Verifies that the fields read have been set correctly.
  *
- * @throws la masse volumique (rho) n'est pas strictement positive
- * @throws la masse volumique (rho) n'est pas de type Champ_Uniforme
- * @throws la viscosite (mu) n'est pas strictement positive
- * @throws l'une des proprietes (rho ou mu) du fluide n'a pas ete definie
- * @throws la capacite calorifique (Cp) n'est pas strictement positive
- * @throws la capacite calorifique (Cp) n'est pas de type Champ_Uniforme
- * @throws la conductivite (lambda) n'est pas strictement positive
- * @throws toutes les proprietes du fluide anisotherme n'ont pas ete definies
+ * @throws density (rho) is not strictly positive
+ * @throws density (rho) is not of type Champ_Uniforme
+ * @throws viscosity (mu) is not strictly positive
+ * @throws one of the fluid properties (rho or mu) has not been defined
+ * @throws heat capacity (Cp) is not strictly positive
+ * @throws heat capacity (Cp) is not of type Champ_Uniforme
+ * @throws conductivity (lambda) is not strictly positive
+ * @throws not all properties of the anisotherm fluid have been defined
  */
 void Fluide_base::verifier_coherence_champs(int& err, Nom& msg)
 {
@@ -213,8 +213,8 @@ void Fluide_base::verifier_coherence_champs(int& err, Nom& msg)
       if (err == 0) err = 2;
     }
 
-  // Test de la coherence des proprietees radiatives du fluide incompressible
-  // (pour un milieu semi transparent
+  // Check consistency of the radiative properties of the incompressible fluid
+  // (for a semi-transparent medium)
   if ((bool(coeff_absorption_)) && (!indice_refraction_))
     {
       msg += " Physical properties for semi tranparent radiation case : \n";
@@ -242,10 +242,7 @@ void Fluide_base::verifier_coherence_champs(int& err, Nom& msg)
   Milieu_base::verifier_coherence_champs(err, msg);
 }
 
-/*! @brief Si l'objet reference par nu et du type Champ_Uniforme type nu en "Champ_Uniforme" et le remplit
- *
- *      avec mu(0,0)/rho(0,0).
- *     Sinon n efait rien.
+/*! @brief @brief If the object referenced by nu is of type Champ_Uniforme, types nu as "Champ_Uniforme" and fills it with mu(0,0)/rho(0,0). Otherwise does nothing.
  *
  */
 void Fluide_base::creer_nu()
@@ -278,21 +275,19 @@ void Fluide_base::calculer_nu()
 bool Fluide_base::initTimeStep(double dt)
 {
   if (!equation_.size() || !e_int_auto_)
-    return true; //pas d'equation associee ou pas de e_int a gerer
-  const Schema_Temps_base& sch = equation_.begin()->second->schema_temps(); //on recupere le schema en temps par la 1ere equation
+    return true; //no associated equation or no e_int to manage
+  const Schema_Temps_base& sch = equation_.begin()->second->schema_temps(); //retrieve the time scheme from the first equation
   Champ_Inc_base& ch = ref_cast(Champ_Inc_base, ch_e_int_.valeur());
   for (int i = 1; i <= sch.nb_valeurs_futures(); i++)
     ch.changer_temps_futur(sch.temps_futur(i), i), ch.futur(i) = ch.valeurs();
   return true;
 }
 
-/*! @brief Effectue une mise a jour en temps du milieu, et donc de ses parametres caracteristiques.
+/*! @brief Performs a time update of the medium and therefore of its characteristic parameters.
  *
- *     Les champs uniformes sont recalcules pour le
- *     nouveau temps specifie, les autres sont mis a
- *     par un appel a CLASSE_DU_CHAMP::mettre_a_jour(double temps).
+ *  @brief Uniform fields are recomputed for the new specified time; others are updated by calling FIELD_CLASS::mettre_a_jour(double temps).
  *
- * @param (double temps) le temps de mise a jour
+ * @param temps the update time
  */
 void Fluide_base::mettre_a_jour(double temps)
 {
@@ -306,14 +301,14 @@ void Fluide_base::mettre_a_jour(double temps)
   if (e_int_auto_)
     ch_e_int_->mettre_a_jour(temps);
 
-  // Mise a jour des proprietes radiatives du fluide incompressible
-  // (Pour un fluide incompressible semi transparent).
+  // Update of the radiative properties of the incompressible fluid
+  // (for a semi-transparent incompressible fluid).
   if (coeff_absorption_ && indice_refraction_)
     {
       coeff_absorption_->mettre_a_jour(temps);
       indice_refraction_->mettre_a_jour(temps);
 
-      // Mise a jour de longueur_rayo
+      // Update of longueur_rayo
       longueur_rayo_->mettre_a_jour(temps);
 
       if (sub_type(Champ_Uniforme, kappa()))
@@ -332,7 +327,7 @@ void Fluide_base::mettre_a_jour(double temps)
     }
 }
 
-/*! @brief Initialise les parametres du fluide.
+/*! @brief Initializes the fluid parameters.
  *
  */
 int Fluide_base::initialiser(const double temps)
@@ -348,15 +343,15 @@ int Fluide_base::initialiser(const double temps)
   ch_nu_->valeurs().echange_espace_virtuel();
   ch_nu_->changer_temps(temps);
 
-  // Initialisation des proprietes radiatives du fluide incompressible
-  // (Pour un fluide incompressible semi transparent).
+  // Initialization of the radiative properties of the incompressible fluid
+  // (for a semi-transparent incompressible fluid).
   if (coeff_absorption_ && indice_refraction_)
     {
       Cerr << "Semi transparent fluid properties initialization." << finl;
       coeff_absorption_->initialiser(temps);
       indice_refraction_->initialiser(temps);
 
-      // Initialisation de longueur_rayo
+      // Initialization of longueur_rayo
       longueur_rayo_->initialiser(temps);
       if (sub_type(Champ_Uniforme, kappa()))
         longueur_rayo().valeurs()(0, 0) = 1 / (3 * kappa().valeurs()(0, 0));
@@ -428,7 +423,7 @@ void Fluide_base::creer_temperature_multiphase() const
 
   const Equation_base& eq = equation("enthalpie");
   if (!ch_e_int_) creer_e_int();
-  ch_h_ou_T_ = ch_e_int_; // on initialise
+  ch_h_ou_T_ = ch_e_int_; // initialize
   ch_h_ou_T_->nommer("temperature");
   ch_h_ou_T_->mettre_a_jour(eq.inconnue().temps());
 }

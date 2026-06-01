@@ -97,7 +97,7 @@ const Champ_base& Champ_Generique_Ecart_Type::get_champ_without_evaluation(OWN_P
 
 const Champ_base& Champ_Generique_Ecart_Type::get_champ(OWN_PTR(Champ_base)&) const
 {
-  // Creation de l'espace_stockage
+  // Creation of the storage space
   const OBS_PTR(Champ_Generique_base)& mon_champ = integrale().le_champ();
   OWN_PTR(Champ_base) espace_stockage_source;
   const Champ_base& source = mon_champ->get_champ(espace_stockage_source);
@@ -115,7 +115,7 @@ const Champ_base& Champ_Generique_Ecart_Type::get_champ(OWN_PTR(Champ_base)&) co
 
 const Noms Champ_Generique_Ecart_Type::get_property(const Motcle& query) const
 {
-  //Creation des composantes serait a faire de maniere dynamique (Ecart_Type_...)
+  //Component creation should be done dynamically (Ecart_Type_...)
 
   Motcles motcles(1);
   motcles[0] = "composantes";
@@ -126,11 +126,11 @@ const Noms Champ_Generique_Ecart_Type::get_property(const Motcle& query) const
 
     case 0:
       {
-        //On fixe les composantes specifiques pour le Champ_Generique_Ecart_Type
-        //car dans Format_Post_Lml::ecrire_champ_lml() dans le cas d une localisation ELEM
-        //elles sont utilisees
+        //We set the specific components for Champ_Generique_Ecart_Type
+        //because in Format_Post_Lml::ecrire_champ_lml() in the case of ELEM localisation
+        //they are used
 
-        //Actuellement choix fait d ajouter simplement numero de composante
+        //Currently the choice is simply to add the component number
         /*
           const Noms compo_cibles = get_source(0).get_property("composantes");
           int size = compo_cibles.size();
@@ -161,7 +161,7 @@ const Noms Champ_Generique_Ecart_Type::get_property(const Motcle& query) const
   return Champ_Gen_de_Champs_Gen::get_property(query);
 }
 
-//Nomme le champ en tant que source par defaut
+//Name the field as a source by default
 //"Ecart_Type_"+nom_champ_source
 void Champ_Generique_Ecart_Type::nommer_source()
 {

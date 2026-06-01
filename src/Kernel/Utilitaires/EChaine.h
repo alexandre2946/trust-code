@@ -19,11 +19,11 @@
 #include <Entree.h>
 #include <sstream>
 using std::istringstream;
-/*! @brief Une entree dont la source est une chaine de caracteres.
+/*! @brief An input stream whose source is a character string.
  *
- * Le constructeur cree sa propre copie de la chaine, de sorte
- *    que la chaine d'origine peut etre modifiee ensuite sans modifier
- *    la EChaine.
+ * The constructor creates its own copy of the string, so that
+ *    the original string can be modified afterwards without modifying
+ *    the EChaine.
  *
  */
 

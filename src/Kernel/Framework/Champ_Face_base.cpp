@@ -29,7 +29,7 @@ Implemente_base(Champ_Face_base, "Champ_Face_base", Champ_Inc_base);
 Sortie& Champ_Face_base::printOn(Sortie& os) const { return os; }
 Entree& Champ_Face_base::readOn(Entree& is) { return is; }
 
-//tableaux de correspondance pour les CLs
+//correspondence arrays for BCs
 void Champ_Face_base::init_fcl() const
 {
   const Domaine_VF& domaine = ref_cast(Domaine_VF,le_dom_VF.valeur());

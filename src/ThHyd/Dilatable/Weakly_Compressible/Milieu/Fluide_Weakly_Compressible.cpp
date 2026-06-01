@@ -139,7 +139,7 @@ void Fluide_Weakly_Compressible::completer(const Probleme_base& pb)
         }
     }
 
-  // XXX : On l'a besoin pour initialiser rho ...
+  // XXX: needed to initialize rho ...
   if (!use_saved_data())
     {
       if (use_pth_xyz())
@@ -165,7 +165,7 @@ void Fluide_Weakly_Compressible::completer(const Probleme_base& pb)
       else
         {
           Cerr << "Initializing the thermo-dynamic pressure ..." << finl;
-          // Pth_tab_ doit avoir meme dimensions que rho (elem en VDF et faces en VEF)
+          // Pth_tab_ must have the same dimensions as rho (element in VDF and face in VEF)
           Pth_tab_ = masse_volumique().valeurs();
           const int n = Pth_tab_.dimension_tot(0);
           for (int i = 0; i < n; i++)
@@ -197,7 +197,7 @@ void Fluide_Weakly_Compressible::checkTraitementPth(const Domaine_Cl_dis_base& d
       Cerr << "Please use either conservation_masse or constant options !" << finl;
       Process::exit();
     }
-  // appel a la classe mere
+  // call to the parent class
   Fluide_Dilatable_base::checkTraitementPth(domaine_cl);
 }
 
@@ -218,14 +218,14 @@ void Fluide_Weakly_Compressible::discretiser(const Probleme_base& pb, const Disc
 
   Fluide_Dilatable_base::discretiser(pb, dis);
 
-  // XXX XXX : Champs pour WC : comme la temperature car elem en VDF et faces en VEF
+  // XXX XXX: WC fields: like temperature, element in VDF and face in VEF
   dis.discretiser_champ("temperature", domaine_dis, "pression_hydro", "Pa", 1, temps, ch_pression_hydro_);
   champs_compris_.ajoute_champ(ch_pression_hydro_.valeur());
 
   dis.discretiser_champ("temperature", domaine_dis, "pression_eos", "Pa", 1, temps, ch_pression_eos_);
   champs_compris_.ajoute_champ(ch_pression_eos_.valeur());
 
-  // Seulement pour multi-especes
+  // Only for multi-species
   if (pb.que_suis_je() == "Pb_Thermohydraulique_Especes_WC")
     {
       dis.discretiser_champ("temperature", domaine_dis, "fraction_massique_nonresolue", "neant", 1, temps, ch_unsolved_species_);
@@ -299,7 +299,7 @@ void Fluide_Weakly_Compressible::calculer_pression_hydro()
     remplir_champ_pression_for_EOS();
 }
 
-/*! @brief Calcule la pression utilisee dans les lois d'etat WC
+/*! @brief Computes the pressure used in the WC equation of state
  *
  */
 void Fluide_Weakly_Compressible::remplir_champ_pression_for_EOS()
@@ -313,9 +313,9 @@ void Fluide_Weakly_Compressible::remplir_champ_pression_for_EOS()
           if (Pth_tab_.dimension_tot(0) == P_NS_elem_.dimension_tot(0)) // VDF
             for (int i = 0; i < Pth_tab_.dimension_tot(0); i++)
               Pth_tab_(i, 0) = P_NS_elem_(i, 0) + Pth_;
-          else // VEF : on verra le jour ou on fait du PolyMAC_HFV
+          else // VEF: to be handled when PolyMAC_HFV support is added
             {
-              // on a P_NS_elem_ aux elems et Pth_tab_ comme rho, i.e aux faces
+              // P_NS_elem_ is at elements and Pth_tab_ is like rho, i.e. at faces
               const Domaine_VF& zvf = ref_cast(Domaine_VF, inco_chaleur().domaine_dis_base());
               assert(Pth_tab_.dimension_tot(0) == zvf.nb_faces_tot());
 

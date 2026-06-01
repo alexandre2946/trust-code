@@ -21,7 +21,7 @@
 
 class Conduction;
 
-/*! @brief classe Traitement_particulier_Solide_canal
+/*! @brief Special post-processing treatment for solid channel configurations.
  *
  */
 class Traitement_particulier_Solide_canal : public Traitement_particulier_Solide_base

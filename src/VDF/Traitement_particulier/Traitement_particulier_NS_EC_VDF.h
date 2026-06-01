@@ -19,10 +19,10 @@
 
 #include <Traitement_particulier_NS_EC.h>
 
-/*! @brief classe Traitement_particulier_NS_EC_VDF Cette classe permet de faire les traitements particuliers
+/*! @brief Traitement_particulier_NS_EC_VDF class This class performs special post-processing operations
  *
- *      pour les calculs de l'energie cinetique totale en VDF
- *      Rien de particulier au VDF, calculs implementes dans la classe de base.
+ *      for total kinetic energy computations in VDF.
+ *      Nothing specific to VDF, computations are implemented in the base class.
  *
  * @sa Navier_Stokes_Turbulent, Traitement_particulier_base, Traitement_particulier_NS_EC
  */

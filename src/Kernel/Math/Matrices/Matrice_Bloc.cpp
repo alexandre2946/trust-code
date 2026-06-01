@@ -68,7 +68,7 @@ int Matrice_Bloc::nb_lignes() const
   int sum=0;
   for( int i=0; i<N_; ++i )
     {
-      // Codage pour fonctionner avec le stockage de Mat_Bloc_Sym (j>=i)
+      // Coded to work with the Mat_Bloc_Sym storage (j>=i)
       sum += get_bloc(i,M_-1).valeur( ).nb_lignes();
     }
   return sum;
@@ -91,18 +91,18 @@ DoubleVect& Matrice_Bloc::ajouter_multvect_( const DoubleVect& x,
   double * x_addr = ( double * ) const_x_addr;
   double * r_addr = r.addr( );
 
-  DoubleVect x_bloc; // Une sous-partie de x
-  DoubleVect r_bloc; // Une sous-partie de y
+  DoubleVect x_bloc; // A sub-part of x
+  DoubleVect r_bloc; // A sub-part of y
 
-  int r_bloc_debut = 0; // Premier element de r du bloc courant
-  // Boucle sur les lignes de blocs
+  int r_bloc_debut = 0; // First element of r in the current block
+  // Loop over block rows
   for ( int i_ligne = 0; i_ligne < N_; ++i_ligne )
     {
       const int r_bloc_size = get_bloc( i_ligne, 0 ).valeur( ).nb_lignes( );
       r_bloc.ref_data( r_addr + r_bloc_debut, r_bloc_size );
       assert( r_bloc_debut+r_bloc_size <= r.size_array( ) );
-      int x_bloc_debut = 0; // Premier element de x du bloc courant
-      // Boucle sur les colonnes de blocs
+      int x_bloc_debut = 0; // First element of x in the current block
+      // Loop over block columns
       for ( int i_colonne = 0; i_colonne < M_; ++i_colonne )
         {
           const Matrice& sub_bloc = get_bloc( i_ligne, i_colonne );
@@ -124,18 +124,18 @@ DoubleVect& Matrice_Bloc::ajouter_multvectT_(const DoubleVect& x,
   double * x_addr = ( double * ) const_x_addr;
   double * r_addr = r.addr( );
 
-  DoubleVect x_bloc; // Une sous-partie de x
-  DoubleVect r_bloc; // Une sous-partie de r
+  DoubleVect x_bloc; // A sub-part of x
+  DoubleVect r_bloc; // A sub-part of r
 
-  int r_bloc_debut = 0; // Premier element de r du bloc courant
-  // Boucle sur les lignes de blocs
+  int r_bloc_debut = 0; // First element of r in the current block
+  // Loop over block rows
   for ( int i_ligne = 0; i_ligne < M_; ++i_ligne )
     {
       const int r_bloc_size = get_bloc( 0, i_ligne ).valeur( ).nb_colonnes( );
       r_bloc.ref_data( r_addr + r_bloc_debut, r_bloc_size );
       assert( r_bloc_debut+r_bloc_size <= r.size_array( ) );
-      int x_bloc_debut = 0; // Premier element de x du bloc courant
-      // Boucle sur les colonnes de blocs
+      int x_bloc_debut = 0; // First element of x in the current block
+      // Loop over block columns
       for ( int i_colonne = 0; i_colonne < N_; ++i_colonne )
         {
           const Matrice& sub_bloc = get_bloc( i_colonne, i_ligne );
@@ -665,7 +665,7 @@ int Matrice_Bloc::nb_bloc_colonnes() const
 }
 
 /*!
- * Remplissage d'une Matrice_Morse par une Matrice_Bloc de Matrice_Morse quelconques
+ * Fills a Matrice_Morse from a Matrice_Bloc of arbitrary Matrice_Morse blocks
  */
 void Matrice_Bloc::block_to_morse( Matrice_Morse& result ) const
 {
@@ -684,9 +684,9 @@ void Matrice_Bloc::BlocToMatMorse( Matrice_Morse& result ) const
 }
 
 
-//Produit matrice-vecteur
+//Matrix-vector product
 
-// Remplissage partiel (i premieres lignes) d'une matrice bloc par une matrice morse symetrique
+// Partial fill (first i rows) of a block matrix from a symmetric Morse matrix
 // RR | RV
 // ------
 // VR | VV
@@ -700,7 +700,7 @@ void Matrice_Bloc::remplir(const IntLists& voisins, const DoubleLists& valeurs, 
   remplir(voisins, valeurs, terme_diag, i, n, i, n);
 }
 
-// Remplissage partiel (n premieres lignes, m premieres colonnes) d'une matrice bloc par une matrice morse non symetrique
+// Partial fill (first n rows, first m columns) of a block matrix from a non-symmetric Morse matrix
 // RR | RV
 // ------
 // VR | VV
@@ -715,7 +715,7 @@ void Matrice_Bloc::remplir(const IntLists& voisins, const DoubleLists& valeurs, 
   remplir(voisins, valeurs, diagonale_vide, i, n, j, m);
 }
 
-// Remplissage partiel (i premieres lignes, j premieres colonnes) d'une matrice bloc par une matrice morse symetrique ou non
+// Partial fill (first i rows, first j columns) of a block matrix from a symmetric or non-symmetric Morse matrix
 // RR | RV
 // ------
 // VR | VV
@@ -726,7 +726,7 @@ void Matrice_Bloc::remplir(const IntLists& voisins, const DoubleLists& valeurs, 
   Matrice_Morse& VR=ref_cast(Matrice_Morse,get_bloc(1,0).valeur());
   Matrice_Morse& VV=ref_cast(Matrice_Morse,get_bloc(1,1).valeur());
 
-  // Premiere passe pour le dimensionnement
+  // First pass for sizing
   int RR_compteur;
   auto RR_rang=0;
   int RV_compteur;
@@ -747,7 +747,7 @@ void Matrice_Bloc::remplir(const IntLists& voisins, const DoubleLists& valeurs, 
       VR_compteur=0;
       VV_compteur=0;
 
-      // Diagonale
+      // Diagonal
       if (terme_diag.size_array()!=0)
         {
           if (num_elem<i)
@@ -762,16 +762,16 @@ void Matrice_Bloc::remplir(const IntLists& voisins, const DoubleLists& valeurs, 
           if (colonne<j)
             {
               if (num_elem<i)
-                RR_compteur++;         // Sous Bloc RR
+                RR_compteur++;         // Sub-block RR
               else
-                VR_compteur++;        // Sous Bloc VR
+                VR_compteur++;        // Sub-block VR
             }
           else
             {
               if (num_elem<i)
-                RV_compteur++;        // Sous Bloc RV
+                RV_compteur++;        // Sub-block RV
               else
-                VV_compteur++;         // Sous Bloc VV
+                VV_compteur++;         // Sub-block VV
             }
           ++liste_vois;
           ++liste_val;
@@ -786,32 +786,32 @@ void Matrice_Bloc::remplir(const IntLists& voisins, const DoubleLists& valeurs, 
   VR.dimensionner(n-i,        j,        VR_rang);        // Dimension VR
   VV.dimensionner(n-i,        m-j,        VV_rang);        // Dimension VV
 
-  // Initialisations necessaires
+  // Required initializations
   RR.get_set_tab1()=1;
   RV.get_set_tab1()=1;
   VR.get_set_tab1()=1;
   VV.get_set_tab1()=1;
 
-  // Deuxieme passe pour le remplissage
-  // Tableaux tab1, tab2 et coeff_ pour le bloc RR
+  // Second pass for filling
+  // Arrays tab1, tab2 and coeff_ for block RR
   auto* RR_tab1 = RR.get_set_tab1().addr();
   int* RR_tab2 = RR.get_set_tab2().addr();
   double* RR_coeff = RR.get_set_coeff().addr();
   int* RR_tab2_ptr = RR_tab2;
 
-  // Tableaux tab1, tab2 et coeff_ pour le bloc RV
+  // Arrays tab1, tab2 and coeff_ for block RV
   auto* RV_tab1 = RV.get_set_tab1().addr();
   int* RV_tab2 = RV.get_set_tab2().addr();
   double* RV_coeff = RV.get_set_coeff().addr();
   int* RV_tab2_ptr = RV_tab2;
 
-  // Tableaux tab1, tab2 et coeff_ pour le bloc VR
+  // Arrays tab1, tab2 and coeff_ for block VR
   auto* VR_tab1 = VR.get_set_tab1().addr();
   int* VR_tab2 = VR.get_set_tab2().addr();
   double* VR_coeff = VR.get_set_coeff().addr();
   int* VR_tab2_ptr = VR_tab2;
 
-  // Tableaux tab1, tab2 et coeff_ pour le bloc VV
+  // Arrays tab1, tab2 and coeff_ for block VV
   auto* VV_tab1 = VV.get_set_tab1().addr();
   int* VV_tab2 = VV.get_set_tab2().addr();
   double* VV_coeff = VV.get_set_coeff().addr();
@@ -840,7 +840,7 @@ void Matrice_Bloc::remplir(const IntLists& voisins, const DoubleLists& valeurs, 
           *VR_tab1++ = VR_rang;
           *VV_tab1++ = VV_rang;
         }
-      // Diagonale eventuelle
+      // Optional diagonal
       if (terme_diag.size_array()!=0)
         {
           if (num_elem<i)
@@ -862,13 +862,13 @@ void Matrice_Bloc::remplir(const IntLists& voisins, const DoubleLists& valeurs, 
           double coeff = liste_val.valeur();
           if (colonne<j)
             {
-              if (num_elem<i) // Sous Bloc RR
+              if (num_elem<i) // Sub-block RR
                 {
                   *RR_tab2_ptr++ = colonne;
                   *RR_coeff++ = coeff;
                   RR_compteur++;
                 }
-              else  // Sous Bloc VR
+              else  // Sub-block VR
                 {
                   *VR_tab2_ptr++ = colonne;
                   *VR_coeff++ = coeff;
@@ -877,13 +877,13 @@ void Matrice_Bloc::remplir(const IntLists& voisins, const DoubleLists& valeurs, 
             }
           else
             {
-              if (num_elem<i) // Sous Bloc RV
+              if (num_elem<i) // Sub-block RV
                 {
                   *RV_tab2_ptr++ = colonne-j;
                   *RV_coeff++ = coeff;
                   RV_compteur++;
                 }
-              else // Sous Bloc VV
+              else // Sub-block VV
                 {
                   *VV_tab2_ptr++ = colonne-j;
                   *VV_coeff++ = coeff;
@@ -902,13 +902,13 @@ void Matrice_Bloc::remplir(const IntLists& voisins, const DoubleLists& valeurs, 
   RV.get_set_tab1()(i)=RV_rang;
   VR.get_set_tab1()(n-i)=VR_rang;
   VV.get_set_tab1()(n-i)=VV_rang;
-  // Passage a la numerotation Fortran
+  // Switch to Fortran numbering
   RR.formeF();
   RV.formeF();
   VR.formeF();
   VV.formeF();
 
-  // Compactage de la matrice
+  // Compact the matrix
   RR.compacte();
   RV.compacte();
   VR.compacte();

@@ -29,7 +29,7 @@
 #endif /* INT_is_64_ */
 #endif /* MPI_ */
 
-// Pour Objet_U ... on buffer !!
+// For Objet_U ... we use a buffer!!
 bool envoyer(const Objet_U& t, int source, int cible, int canal);
 bool envoyer(const Objet_U& t, int cible, int canal);
 bool recevoir(Objet_U& t, int source, int cible, int canal);
@@ -64,8 +64,8 @@ bool comm_check_enabled();
  * FUNCTION TEMPLATE IMPLEMENTATIONS with SFINAE to avoid substitution failure because now IT IS AN ERROR ! *
  * ******************************************************************************************************** */
 
-// Pour les types simples, on passe par envoyer_array_ qui n'utilise pas un buffer mais envoie directement les valeurs. Plus rapide.
-// TYPES SIMPLES (std::is_arithmetic) => PAS Objet_U => SFINAE
+// For simple types, we go through envoyer_array_ which does not use a buffer but sends values directly. Faster.
+// SIMPLE TYPES (std::is_arithmetic) => NOT Objet_U => SFINAE
 template<typename _TYPE_> std::enable_if_t<std::is_arithmetic<_TYPE_>::value,bool >
 inline envoyer(const _TYPE_ t, int source, int cible, int canal)
 {
@@ -116,7 +116,7 @@ inline envoyer_broadcast(_TYPE_& t, int source)
 inline bool envoyer_broadcast(long& t, int source) { return envoyer_broadcast_array<long>(&t, 1, source); }
 #endif
 
-/*! @brief en mode comm_check_enabled(), verifie que le parametre a la meme valeur sur tous les processeurs
+/*! @brief In comm_check_enabled() mode, verifies that the parameter has the same value on all processors.
  *
  */
 template<typename _TYPE_> std::enable_if_t<(std::is_arithmetic<_TYPE_>::value),void >
@@ -133,10 +133,10 @@ inline assert_parallel(const _TYPE_ x)
     }
 }
 
-/*! @brief On suppose que les tableaux en entree et en sortie sont de taille nproc() .
+/*! @brief Assumes that the input and output arrays are of size nproc().
  *
- * On envoie src[0] au proc 0, src[1] au proc 1, etc... la valeur recue du processeur 0 et mise dans dest[0], processeur 1 dans dest[1], etc...
- *   Il est autorise d'appeler la fonction avec le meme tableau src et dest.
+ * src[0] is sent to proc 0, src[1] to proc 1, etc... the value received from processor 0 is placed in dest[0], processor 1 in dest[1], etc...
+ *   It is allowed to call this function with the same array for src and dest.
  *
  */
 template<typename _TYPE_>

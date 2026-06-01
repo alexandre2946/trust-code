@@ -33,8 +33,8 @@ Implemente_instanciable_sans_destructeur(Terme_Source_Canal_RANS_LES_VDF_Face,"C
 
 Terme_Source_Canal_RANS_LES_VDF_Face::~Terme_Source_Canal_RANS_LES_VDF_Face()
 {
-  //Le destructeur est appele a l'initialisation alors
-  //la sauvegarde du champ se fait hors initialisation
+  //The destructor is called at initialization, therefore
+  //the field saving takes place outside initialization
 
   if(umoy.size()!=0)
     {
@@ -276,7 +276,7 @@ void Terme_Source_Canal_RANS_LES_VDF_Face::init_calcul_moyenne_spat()
   int nb_elems = domaine_VDF.domaine().nb_elem();
   int nb_faces_y = domaine_VDF.nb_faces_Y();
 
-  int Ny; //Nombre de maille en y + 1 (=nombre de faces)
+  int Ny; //Number of cells in y + 1 (= number of faces)
   Ny = nb_elems/(nb_faces_y-nb_elems);
   Nxy = Ny;
   Nyy = Ny+1;
@@ -291,7 +291,7 @@ void Terme_Source_Canal_RANS_LES_VDF_Face::init_calcul_moyenne_spat()
   indicv = 0;
   indicw = 0;
 
-  // dimensionnement aux valeurs rentrees dans le jeu de donnees
+  // sizing based on values entered in the dataset
   Yu.resize(Nxy);
   Yv.resize(Nyy);
   Yw.resize(Nzy);
@@ -327,9 +327,9 @@ void Terme_Source_Canal_RANS_LES_VDF_Face::init_calcul_moyenne_spat()
   corresp_v = -1;
   corresp_w = -1;
 
-  // remplissage des tableaux ci-dessus
+  // filling the arrays above
 
-  // Pour le calcul de u, v, w sur les plans d hmogeneite
+  // For computing u, v, w on homogeneity planes
   for (num_face=0; num_face<nb_faces; num_face++)
     {
       ori = orientation(num_face);
@@ -458,7 +458,7 @@ DoubleTab Terme_Source_Canal_RANS_LES_VDF_Face::norme_vit() const
       norme_vit_elem(num_elem) = sqrt(vit1*vit1 + vit2*vit2 + vit3*vit3);
     }
 
-  //Redistribution de la norme sur les faces
+  //Redistribution of the norm onto the faces
 
   for(int num_face = 0 ; num_face<nb_faces ; num_face++)
     {
@@ -638,7 +638,7 @@ void Terme_Source_Canal_RANS_LES_VDF_Face::mettre_a_jour(double temps)
 
 
   //****************************************************
-  //******* MaJ de la vitesse cible (RANS) ***********
+  //******* Update of the target velocity (RANS) ***********
   //**************************************************
   if(nom_pb_rans != "non_couple")
     {
@@ -660,7 +660,7 @@ void Terme_Source_Canal_RANS_LES_VDF_Face::mettre_a_jour(double temps)
       if(tps>(f_start))
         {
           //******************************************************
-          //*************** MOYENNE SPATIALE *********************
+          //*************** SPATIAL AVERAGE *********************
           //******************************************************
 
           int num_face,Nx, Ny, Nz, j;
@@ -693,7 +693,7 @@ void Terme_Source_Canal_RANS_LES_VDF_Face::mettre_a_jour(double temps)
                 }
             }
 
-          //       // Ecriture des profils moyens
+          //       // Writing mean profiles
           int i;
           for (i=0 ; i<Ny ; i++)
             {
@@ -708,7 +708,7 @@ void Terme_Source_Canal_RANS_LES_VDF_Face::mettre_a_jour(double temps)
               fic_moyz << i << " " << umoy_z(i) << finl;
             }
 
-          // Redistribution du profil moyen spatial sur tout le champ de vitesse
+          // Redistribute the spatial mean profile over the entire velocity field
 
           for(num_face = 0 ; num_face<nb_faces ; num_face++)
             {
@@ -743,11 +743,11 @@ void Terme_Source_Canal_RANS_LES_VDF_Face::mettre_a_jour(double temps)
   else if(moyenne==1)
     {
       //****************************************************************
-      //*************** MOYENNE TEMPORELLE GLISSANTE *******************
+      //*************** SLIDING TEMPORAL AVERAGE *******************
       //****************************************************************
 
-      //Initialisation de la moyenne temp glissante
-      //avec une moyenne temporelle classique
+      //Initialization of the sliding temporal average
+      //with a classical temporal average
 
 
       //       if(/*(tps>(f_start-t_av))&&*/(tps<f_start))
@@ -773,7 +773,7 @@ void Terme_Source_Canal_RANS_LES_VDF_Face::mettre_a_jour(double temps)
       //         }
 
 
-      //Calcul d'une premiere moyenne temporelle significative
+      //Compute a first meaningful temporal average
 
       //       if((tps>(f_start-t_av))&&(tps<f_start))
       //         {
@@ -797,8 +797,8 @@ void Terme_Source_Canal_RANS_LES_VDF_Face::mettre_a_jour(double temps)
       //           //fic_f << tps << " " << utemp_sum(123) << " " << umoy(123) << finl;
 
       //         }
-      //Calcul de la moyenne temporelle glissante
-      //t_av est le temps d'integration de la moyenne temp glissante
+      //Compute the sliding temporal average
+      //t_av is the integration time of the sliding temporal average
 
       //       if(tps>=f_start)
       //         {
@@ -857,17 +857,17 @@ void Terme_Source_Canal_RANS_LES_VDF_Face::mettre_a_jour(double temps)
         }
 
       //****************************************************************
-      //*************** FIN MOYENNE TEMPORELLE GLISSANTE ***************
+      //*************** END SLIDING TEMPORAL AVERAGE ***************
       //****************************************************************
 
-    }// fin moyenne = 1
+    }// end moyenne = 1
   else if(moyenne==2)
     {
       //******************************************************
-      //*************** MOYENNE TEMPORELLE *******************
+      //*************** TEMPORAL AVERAGE *******************
       //******************************************************
 
-      //Calcul d'une premiere moyenne temporelle significative
+      //Compute a first meaningful temporal average
 
       //       if((tps>=f_start)/*&&(tps<f_start)*/)
       //         {
@@ -931,7 +931,7 @@ void Terme_Source_Canal_RANS_LES_VDF_Face::mettre_a_jour(double temps)
 
 
       //***********************************************************
-      //*************** FIN MOYENNE TEMPORELLE  ***************
+      //*************** END TEMPORAL AVERAGE  ***************
       //*******************************************************
 
 
@@ -1015,7 +1015,7 @@ void Terme_Source_Canal_RANS_LES_VDF_Face::mettre_a_jour(double temps)
   calculer_integrale_temporelle(force_y_temp_2, force_y_2);
   calculer_integrale_temporelle(force_z_temp_2, force_z_2);
 
-  // Voir Schema_Temps_base::limpr pour information sur epsilon et modf
+  // See Schema_Temps_base::limpr for information on epsilon and modf
   double i, j, epsilon = 1.e-8;
   double dt_post_inst=2.;
   double tps_stats=10.;
@@ -1031,7 +1031,7 @@ void Terme_Source_Canal_RANS_LES_VDF_Face::mettre_a_jour(double temps)
     }
 
   //////////////////////////////////////////
-  //developpement a nettoyer apres la these
+  //development code to clean up after the thesis
   //////////////////////////////////////////
 
   int num_face = 123;
@@ -1053,7 +1053,7 @@ void Terme_Source_Canal_RANS_LES_VDF_Face::mettre_a_jour(double temps)
   fic_fface <<  tps << " " << vitesse(num_face) << " " << force(num_face) << finl;
   //////////////////////////////////////////////////////////
 
-}//fin mettre_a_jour
+}//end mettre_a_jour
 
 
 
@@ -1079,7 +1079,7 @@ void Terme_Source_Canal_RANS_LES_VDF_Face::ajouter_blocs(matrices_t matrices, Do
   //   int cpt2=0;
   //  static double beta=1000;
 
-  // Calcul de la norme des vitesses au centre des elements
+  // Compute the norm of velocities at element centers
 
   DoubleTab norm=norme_vit();
 

@@ -18,18 +18,18 @@
 
 #include <Postraitement.h>
 
-/*! @brief Classe de champ particuliere qui encapsule une reference a un champ volumique de TRUST de type Champ_base.
+/*! @brief Special field class that encapsulates a reference to a volume field of TRUST of type Champ_base.
  *
- *   La classe ne gere pas la memoire de Champ_base.
+ *   The class does not manage the memory of Champ_base.
  *
  */
 
-// Syntaxe a respecter pour jdd
+// Syntax to follow in the data file
 //
-// "nom_champ" refChamp { Pb_champ "nom_pb" "nom_champ_discret" }
-// "nom_champ" fixe par utilisateur sera le nom du champ generique
-// "nom_pb" nom du probleme auquel appartient le champ discret
-// "nom_champ_discret" nom du champ cible ou une de ses composantes
+// "field_name" refChamp { Pb_champ "pb_name" "discrete_field_name" }
+// "field_name" set by the user will be the name of the generic field
+// "pb_name" name of the problem to which the discrete field belongs
+// "discrete_field_name" name of the target field or one of its components
 
 class Champ_Generique_refChamp : public Champ_Generique_base
 {
@@ -60,12 +60,12 @@ public:
   void completer(const Postraitement_base& post) override;
   void              mettre_a_jour(double temps) override;
 
-  //get_champ() particulier car n utilise pas d espace de stockage
-  //Actualise le champ discret si champ calcule du probleme
-  //et renvoie la reference
+  //Particular get_champ() that does not use a storage space
+  //Updates the discrete field if it is a computed field of the problem
+  //and returns the reference
   const Champ_base& get_champ(OWN_PTR(Champ_base)& espace_stockage) const override;
   const Champ_base& get_champ_without_evaluation(OWN_PTR(Champ_base)& espace_stockage) const override;
-  virtual const Champ_base& get_ref_champ_base() const; //renvoie la reference au champ encapsule
+  virtual const Champ_base& get_ref_champ_base() const; //returns the reference to the encapsulated field
 
   virtual void set_ref_champ(const Champ_base&);
 
@@ -75,8 +75,8 @@ public:
   void nommer_source(const Postraitement_base& post);
   int get_info_type_post() const override;
 
-  //L attribut compo_ de Champ_Generique_refChamp n est rempli que pour CGNS
-  //crees par macro et cela afin de reproduire les noms de composantes pour les champs aux faces
+  //The compo_ attribute of Champ_Generique_refChamp is only filled for CGNS
+  //instances created by macro, in order to reproduce component names for face fields
   const Noms& fixer_noms_compo(const Noms& noms) override;
   const Noms& fixer_noms_synonyms(const Noms& noms) override;
 
@@ -84,9 +84,9 @@ protected:
   Noms compo_,syno_;
 
   OBS_PTR(Champ_base) ref_champ_;
-  mutable OWN_PTR(Champ_base) ptr_champ_; /* XXX Elie Saikali : sais pas quoi faire */
+  mutable OWN_PTR(Champ_base) ptr_champ_; /* XXX Elie Saikali : not sure what to do here */
 
-  //temporaire voir utilite
+  //temporary - check usefulness
   Motcle localisation_;
 
   Nom nom_champ_;

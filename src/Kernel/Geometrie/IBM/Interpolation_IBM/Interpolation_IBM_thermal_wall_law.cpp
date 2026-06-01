@@ -36,26 +36,26 @@ void Interpolation_IBM_thermal_wall_law::set_param(Param& param) const
 {
   Interpolation_IBM_elem_fluid::set_param( param );
   param.ajouter("formulation_Tplus",&formulation_Tp_,Param::OPTIONAL);  // XD_ADD_P entier
-  // XD_CONT Choix formulation calcul T+ (Kader si rien)
+  // XD_CONT Choice of T+ computation formulation (Kader if not specified)
   param.ajouter("boundary_type",&boundary_type_,Param::REQUIRED); // XD_ADD_P entier
-  // XD_CONT Choix type de cond limite
+  // XD_CONT Choice of boundary condition type
   param.ajouter("T_inlet",&T_inlet_,Param::REQUIRED); // XD_ADD_P double
-  // XD_CONT Demande la température d'écoulement d'entrée moyenne
+  // XD_CONT Requests the mean inlet flow temperature
   param.ajouter("Prandlt_mol",&Prandlt_mol_,Param::REQUIRED); // XD_ADD_P double
-  // XD_CONT Demande le Prandlt du fluide
+  // XD_CONT Requests the molecular Prandtl number of the fluid
 }
 
 double Interpolation_IBM_thermal_wall_law::Kader(double yplus, double Prandlt)
 {
-// Calcul de Beta
+// Compute Beta
   double a = 3.85*pow(Prandlt,1/3) -1.3;
   double b = 2.12 * log(Prandlt);
   double Beta = pow(a,2) + b;
-// Calcul de Gamma
+// Compute Gamma
   a = 0.01*pow(yplus*Prandlt,4);
   b = 1 + 5*yplus + pow(Prandlt,3);
   double Gamma = a/b;
-// Calcul de theta+
+// Compute theta+
   a = yplus * exp(- Gamma) * Prandlt;
   b = 2.12 * log(1 + yplus) + Beta;
   double c = exp (- 1 / Gamma);

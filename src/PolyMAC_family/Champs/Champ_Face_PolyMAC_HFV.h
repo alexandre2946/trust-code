@@ -22,8 +22,8 @@
 
 /*! @brief : class Champ_Face_PolyMAC_HFV
  *
- *  Champ correspondant a une inconnue decrite par ses flux aux faces (type vitesse)
- *  Degres de libertes : composante normale aux faces + composante tangentielle aux aretes de la vorticite
+ *  @brief Field corresponding to an unknown described by its face fluxes (e.g. velocity).
+ *  Degrees of freedom: normal component at faces + tangential component at edges of the vorticity.
  *
  */
 class Champ_Face_PolyMAC_HFV : public Champ_Face_PolyMAC_CDO
@@ -39,10 +39,10 @@ public :
 
   int fixer_nb_valeurs_nodales(int n) override;
 
-  virtual void init_auxiliary_variables(); /* demande l'ajout des variables auxiliaires ( [lambda rot u] aux aretes )*/
+  virtual void init_auxiliary_variables(); /* request addition of auxiliary variables ( [lambda rot u] at edges )*/
   int reprendre(Entree& fich) override;
 
-  //interpolations aux elements : vitesse val(e, i) = v_i, gradient vals(e, i, j) = dv_i / dx_j
+  //interpolations at elements: velocity val(e, i) = v_i, gradient vals(e, i, j) = dv_i / dx_j
   void interp_ve(const DoubleTab& inco, DoubleTab& val, bool is_vit = true) const override;
   void interp_ve(const DoubleTab& inco, const IntVect&, DoubleTab& val, bool is_vit = true) const override;
 };

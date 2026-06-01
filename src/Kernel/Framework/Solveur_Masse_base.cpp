@@ -31,9 +31,9 @@ Entree& Solveur_Masse_base::readOn(Entree& is) { return is; }
 
 /*! @brief DOES NOTHING - to override in derived classes.
  *
- * Mise a jour en temps du solveur de masse.
+ * Time update of the mass solver.
  *
- * @param (double) le pas de temps de mise a jour
+ * @param (double) the time step for the update
  */
 void Solveur_Masse_base::mettre_a_jour(double )
 {
@@ -50,17 +50,17 @@ void Solveur_Masse_base::resetTime(double )
 
 /*! @brief DOES NOTHING
  *
- * Eventuellement a surcharger dans les classes derivees
- * si la matrice de masse necessite un assemblage.
- * Assemble le solveur de masse (en general la matrice de masse)
+ * May be overridden in derived classes
+ * if the mass matrix requires assembly.
+ * Assembles the mass solver (generally the mass matrix)
  */
 void Solveur_Masse_base::assembler()
 {
 }
 
-/*! @brief permet de choisir le nom du coefficient temporelle que l'on veut utiliser pour appliquer
+/*! @brief Allows choosing the name of the temporal coefficient to use for apply
  *
- *  verifie que le champ exsite bien
+ *  Verifies that the field exists
  *
  */
 void Solveur_Masse_base::set_name_of_coefficient_temporel(const Nom& name)
@@ -84,7 +84,7 @@ void Solveur_Masse_base::set_name_of_coefficient_temporel(const Nom& name)
     }
 }
 
-/*! @brief renvoie appliquer_impl(x/coeffient_temporelle) si on a un coefficient temporel sinon renvoie appliquer_impl(x)
+/*! @brief Returns appliquer_impl(x/temporal_coefficient) if a temporal coefficient is set, otherwise returns appliquer_impl(x)
  *
  *  Return M-1.x
  */
@@ -368,7 +368,7 @@ DoubleTab& Solveur_Masse_base::corriger_solution(DoubleTab& tab_x, const DoubleT
   DoubleTrav tab_diag(equation().inconnue().valeurs());
   tab_diag=1.;
   appliquer(tab_diag); // M-1
-  // Si x et y sont sur le device, on deporte l'execution sur le device:
+  // If x and y are on the device, offload execution to the device:
   bool kernelOnDevice = tab_x.checkDataOnDevice(tab_y);
   if (kernelOnDevice)
     {
@@ -391,10 +391,10 @@ DoubleTab& Solveur_Masse_base::corriger_solution(DoubleTab& tab_x, const DoubleT
   return tab_x;
 }
 
-// Ajout d'une methode dimensionner()
-// qui dimensionne la matrice a la diagonale quand
-// tous les operateurs sont negligeables
-// Le code est celui utilise dans la version Noyau de Equation_base::dimensionner_matrice()
+// Added method dimensionner()
+// which sizes the matrix to the diagonal when
+// all operators are negligible.
+// The code is the one used in the Noyau version of Equation_base::dimensionner_matrice()
 void Solveur_Masse_base::dimensionner(Matrice_Morse& matrix) const
 {
   if (has_interface_blocs())
@@ -423,11 +423,11 @@ void Solveur_Masse_base::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, d
   Process::exit(que_suis_je() + " : ajouter_blocs not coded!");
 }
 
-// Ajout d'une methode completer
-// Ne fait rien par defaut
+// Added method completer
+// Does nothing by default
 void Solveur_Masse_base::completer() { }
 
-// Ajout d'une methode preparer_calcul
-// Ne fait rien par defaut
+// Added method preparer_calcul
+// Does nothing by default
 void Solveur_Masse_base::preparer_calcul() { }
 

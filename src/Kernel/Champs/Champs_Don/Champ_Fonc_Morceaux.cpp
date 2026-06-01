@@ -19,10 +19,10 @@ Implemente_instanciable(Champ_Fonc_Morceaux,"Champ_Fonc_Morceaux",TRUSTChamp_Mor
 
 Sortie& Champ_Fonc_Morceaux::printOn(Sortie& os) const { return os << valeurs(); }
 
-/*! @brief Lit les valeurs du champ uniforme par morceaux a partir d'un flot d'entree.
+/*! @brief Reads the values of the piecewise uniform field from an input stream.
  *
- * On lit le nom du domaine (nom_domaine) le nombre de composantes du champ (nb_comp) la valeur par defaut
- *     du champ ainsi que les valeurs sur les sous domaines.
+ * Reads the domain name (nom_domaine), the number of field components (nb_comp), the default value
+ *     of the field and the values on the subdomains.
  *     Format:
  *      Champ_Fonc_Morceaux nom_domaine nb_comp { Defaut val_def sous_domaine_1 val_1 ... sous_domaine_i val_i }
  *

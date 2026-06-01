@@ -21,23 +21,23 @@
 class Domaine_dis_base;
 class Domaine_Cl_dis_base;
 
-/*! @brief classe Champ_val_tot_sur_vol_base Classe de base derivee de Champ_Uniforme_Morceaux qui represente les champs
+/*! @brief Champ_val_tot_sur_vol_base Base class derived from Champ_Uniforme_Morceaux representing fields
  *
- *      dont on veut une evaluation exprimee par val_lue_loc/(Somme_vol_poro_loc)
+ *      whose evaluation is expressed as val_lue_loc/(Somme_vol_poro_loc)
  *
- *      val_lue_loc designe la valeur lue pour une localisation de l espace (sous domaine ou domaine par defaut)
- *      cas VDF : Somme_vol_poro_loc exprime la sommation de vol_element*poro_volumique
- *                pour les elements contenus dans la localisation loc
- *      cas VEF : Somme_vol_poro_loc exprime la sommation de vol_entrelaces*poro_surface
- *                  pour les faces contenues dans la localisation loc
- *      Somme_vol_poro_loc est evalue par la methode eval_contrib_loc() des classes derivees
+ *      val_lue_loc denotes the value read for a spatial localization (subdomain or default domain)
+ *      VDF case: Somme_vol_poro_loc is the sum of vol_element*poro_volumique
+ *                for elements contained in localization loc
+ *      VEF case: Somme_vol_poro_loc is the sum of vol_entrelaces*poro_surface
+ *                for faces contained in localization loc
+ *      Somme_vol_poro_loc is evaluated by the eval_contrib_loc() method of derived classes
  *
- *  La syntaxe utilisateur a respecter est la suivante :
+ *  The user syntax to follow is:
  *                Valeur_totale_sur_volume nom_domaine nb_comp { defaut val_lue_dom ...domainei val_lue_szi ... }
- *                nom_domaine : nom du domaine de calcul
- *                  nb_comp     : nombre de composantes du champ
- *                  val_lue_dom : valeur lue pour le domaine par defaut
- *                  val_lue_szi : valeur lue pour la sous domaine domainei
+ *                nom_domaine : name of the computational domain
+ *                  nb_comp     : number of field components
+ *                  val_lue_dom : value read for the default domain
+ *                  val_lue_szi : value read for subdomain domainei
  *
  *
  *

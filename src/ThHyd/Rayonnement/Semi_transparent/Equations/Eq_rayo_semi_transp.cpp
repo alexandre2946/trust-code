@@ -87,7 +87,7 @@ void Eq_rayo_semi_transp::completer()
       le_dom_Cl_dis->les_conditions_limites(i)->associer_fr_dis_base(la_fr_dis);
     }
 
-  // typage de l'operateur de diffusion
+  // typing of the diffusion operator
   Cerr << "Reading and typing of the diffusion operator of equation " << que_suis_je() << finl;
 
   if (sub_type(Fluide_base, fluide()))
@@ -125,14 +125,14 @@ void Eq_rayo_semi_transp::completer()
 
   Equation_base::completer();
 
-  // On assemble la matrice une fois pour toute au debut du calcul
-  // XXX Attention, ceci n'est valable que si kappa est constant au cours du temps
+  // The matrix is assembled once and for all at the start of the computation
+  // XXX Warning: this is only valid if kappa is constant over time
   rayo_solv_->assembler_matrice();
 }
 
-/*! @brief Associe un milieu physique a l'equation
+/*! @brief Associates a physical medium with the equation.
  *
- * @param (Milieu_base& un_milieu) le milieu physique a associer a l'equation
+ * @param un_milieu The physical medium to associate with the equation.
  */
 void Eq_rayo_semi_transp::associer_milieu_base(const Milieu_base& un_milieu)
 {
@@ -159,9 +159,9 @@ void Eq_rayo_semi_transp::associer_milieu_base(const Milieu_base& un_milieu)
     }
 }
 
-/*! @brief Renvoie le milieu physique de l'equation (le Fluide_base upcaste en Milieu_base)
+/*! @brief Returns the physical medium of the equation (the Fluide_base upcast to Milieu_base).
  *
- * @return (Milieu_base&) le Fluide_base de l'equation upcaste en Milieu_base
+ * @return The Fluide_base of the equation upcast to Milieu_base.
  */
 const Milieu_base& Eq_rayo_semi_transp::milieu() const
 {
@@ -173,11 +173,11 @@ const Milieu_base& Eq_rayo_semi_transp::milieu() const
   return le_fluide_.valeur();
 }
 
-/*! @brief Renvoie le milieu physique de l'equation (le Fluide_base upcaste en Milieu_base)
+/*! @brief Returns the physical medium of the equation (the Fluide_base upcast to Milieu_base).
  *
- *     (version const)
+ *     (non-const version)
  *
- * @return (Milieu_base&) le Fluide_base de l'equation upcaste en Milieu_base
+ * @return The Fluide_base of the equation upcast to Milieu_base.
  */
 Milieu_base& Eq_rayo_semi_transp::milieu()
 {
@@ -189,14 +189,13 @@ Milieu_base& Eq_rayo_semi_transp::milieu()
   return le_fluide_.valeur();
 }
 
-/*! @brief Renvoie l'operateur specifie par son index: renvoie terme_diffusif si i = 0
+/*! @brief Returns the operator at the specified index: returns terme_diffusif if i = 0, exits if i > 0.
  *
- *      exit si i>0
- *     (version const)
+ *     (const version)
  *
- * @param (int i) l'index de l'operateur a renvoyer
- * @return (Operateur&) l'operateur specifie
- * @throws l'equation n'a pas plus de 1 operateur
+ * @param i Index of the operator to return.
+ * @return The specified operator.
+ * @throws The equation has at most 1 operator.
  */
 const Operateur& Eq_rayo_semi_transp::operateur(int i) const
 {
@@ -213,14 +212,13 @@ const Operateur& Eq_rayo_semi_transp::operateur(int i) const
   return terme_diffusif_;
 }
 
-/*! @brief Renvoie l'operateur specifie par son index: renvoie terme_diffusif si i = 0
+/*! @brief Returns the operator at the specified index: returns terme_diffusif if i = 0, exits if i > 0.
  *
- *      exit si i>0
- *     (version const)
+ *     (non-const version)
  *
- * @param (int i) l'index de l'operateur a renvoyer
- * @return (Operateur&) l'operateur specifie
- * @throws l'equation n'a pas plus de 1 operateur
+ * @param i Index of the operator to return.
+ * @return The specified operator.
+ * @throws The equation has at most 1 operator.
  */
 Operateur& Eq_rayo_semi_transp::operateur(int i)
 {
@@ -247,10 +245,10 @@ void Eq_rayo_semi_transp::get_noms_champs_postraitables(Noms& noms, Option opt) 
 
 void Eq_rayo_semi_transp::discretiser()
 {
-  // Discretisation de l'equation de rayonnement
+  // Discretisation of the radiation equation
   const Discret_Thyd& dis = ref_cast(Discret_Thyd, discretisation());
   Cerr << "Radiation equation discretisation" << finl;
-  dis.discretiser_champ("temperature", domaine_dis(), "irradiance", "w/m2", 1, 1 /* une case */, schema_temps().temps_courant(), irradiance_);
+  dis.discretiser_champ("temperature", domaine_dis(), "irradiance", "w/m2", 1, 1 /* one slot */, schema_temps().temps_courant(), irradiance_);
   champs_compris_.ajoute_champ(irradiance_);
 
   Equation_base::discretiser();
@@ -263,10 +261,10 @@ void Eq_rayo_semi_transp::discretiser()
   rayo_solv_->associer_equation_rayo(*this);
 }
 
-/*! @brief Renvoie la discretisation associee a l'equation.
+/*! @brief Returns the discretisation associated with the equation.
  *
- * @return (Discretisation_base&) a discretisation associee a l'equation
- * @throws pas de probleme associe
+ * @return The discretisation associated with the equation.
+ * @throws If no problem is associated.
  */
 const Discretisation_base& Eq_rayo_semi_transp::discretisation() const
 {
@@ -300,16 +298,16 @@ void Eq_rayo_semi_transp::Mat_Morse_to_Mat_Bloc(Matrice& matrice_tmp)
   for (int i = 0; i < n2; i++)
     {
       int k;
-      // On recopie le premier bloc de la matrice dans un tableau :
+      // Copy the first block of the matrix into a temporary array:
       //      ligne_tmp = 0;
       for (k = la_matrice_.get_tab1()(i) - 1; k < la_matrice_.get_tab1()(i + 1) - 1; k++)
         ligne_tmp(la_matrice_.get_tab2()(k) - 1) = la_matrice_.get_coeff()(k);
 
-      // On complete la partie reelle de la matrice
+      // Fill in the real part of the matrix
       for (k = tab1RR(i) - 1; k < tab1RR(i + 1) - 1; k++)
         coeffRR[k] = ligne_tmp(tab2RR[k] - 1);
 
-      // On complete la partie virtuelle
+      // Fill in the virtual part
       for (k = tab1RV(i) - 1; k < tab1RV(i + 1) - 1; k++)
         coeffRV[k] = ligne_tmp(n2 + tab2RV[k] - 1);
     }
@@ -345,8 +343,8 @@ void Eq_rayo_semi_transp::dimensionner_Mat_Bloc_Morse_Sym(Matrice& matrice_tmp)
   compteur_MBrr = 0;
   compteur_MBrv = 0;
 
-  // On parcours les lignes de la_matrice pour compter les elements
-  // non nuls de chaque ligne
+  // Iterate over the rows of la_matrice to count the non-zero
+  // elements of each row
   int jcolonne;
   for (iligne = 0; iligne < n2; iligne++)
     {
@@ -356,22 +354,22 @@ void Eq_rayo_semi_transp::dimensionner_Mat_Bloc_Morse_Sym(Matrice& matrice_tmp)
           jcolonne = tab2(k) - 1;
           if (jcolonne < n2)
             {
-              // l'element correspondant est dans la partie RR de la_matrice
+              // the corresponding element is in the RR part of la_matrice
               if ((jcolonne >= iligne) && (jcolonne < n2))
                 {
-                  // l'element correspondant est  situe au dessus de la diagonale de la_matrice
+                  // the corresponding element is located above the diagonal of la_matrice
                   compteur_MBrr(iligne)++;
                 }
             }
           else
             {
-              // l'element correspondant est dans la partie RV de la_matrice
+              // the corresponding element is in the RV part of la_matrice
               compteur_MBrv(iligne)++;
             }
         }
     }
 
-  // On remplie tab1RR et tab1RV
+  // Fill tab1RR and tab1RV
   tab1RR(0) = 1;
   tab1RV(0) = 1;
   for (int i = 0; i < n2; i++)
@@ -379,11 +377,11 @@ void Eq_rayo_semi_transp::dimensionner_Mat_Bloc_Morse_Sym(Matrice& matrice_tmp)
       tab1RR(i + 1) = compteur_MBrr(i) + tab1RR(i);
       tab1RV(i + 1) = compteur_MBrv(i) + tab1RV(i);
     }
-  // On dimensionne tab2RR et tab2RV
+  // Size tab2RR and tab2RV
   MBrr.dimensionner(n2, tab1RR(n2) - 1);
   MBrv.dimensionner(n2, n1 - n2, tab1RV(n2) - 1);
 
-  // On remplit tab2RR et tab2RV
+  // Fill tab2RR and tab2RV
   int compteurRR, compteurRV;
   for (iligne = 0; iligne < n2; iligne++)
     {
@@ -395,17 +393,17 @@ void Eq_rayo_semi_transp::dimensionner_Mat_Bloc_Morse_Sym(Matrice& matrice_tmp)
           jcolonne = tab2(k) - 1;
           if (jcolonne < n2)
             {
-              // l'element correspondant est dans la partie RR de la_matrice
+              // the corresponding element is in the RR part of la_matrice
               if ((jcolonne >= iligne) && (jcolonne < n2))
                 {
-                  // l'element correspondant est  situe au dessus de la diagonale de la_matrice
+                  // the corresponding element is located above the diagonal of la_matrice
                   tab2RR(compteurRR) = tab2(k);
                   compteurRR++;
                 }
             }
           else
             {
-              // l'element correspondant est dans la partie RV de la_matrice
+              // the corresponding element is in the RV part of la_matrice
               tab2RV(compteurRV) = tab2(k) - n2;
               compteurRV++;
             }

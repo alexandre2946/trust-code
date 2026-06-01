@@ -20,7 +20,7 @@
 #include <Interprete_geometrique_base.h>
 
 
-/*! @brief class Lire_Fichier Lecture d'un fichier
+/*! @brief class Lire_Fichier Reads a file.
  *
  */
 class Lire_Tgrid : public Interprete_geometrique_base

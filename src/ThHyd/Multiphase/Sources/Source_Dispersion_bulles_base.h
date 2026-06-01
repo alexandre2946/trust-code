@@ -20,13 +20,11 @@
 #include <Correlation_base.h>
 #include <TRUST_Ref.h>
 
-/*! @brief Classe Source_Dispersion_bulles_base
+/*! @brief Turbulent dispersion operator of the form:
  *
- *  Cette classe implemente un operateur de dispersion turbulente
- *
- *       F_{kl} = - F_{lk} = - C_{kl} grad(alpha{k}) + C_{lk} grad(alpha{l}) ou la phase
- *       l est la phase liquide porteuse et k != 0 une phase quelconque
- *     le calcul de C_{n_l, k} est realise par la hierarchie Dispersion_turbulente_base
+ *       F_{kl} = - F_{lk} = - C_{kl} grad(alpha{k}) + C_{lk} grad(alpha{l}), where phase
+ *       l is the carrier liquid phase and k != 0 is any other phase.
+ *     The coefficient C_{n_l, k} is computed by the Dispersion_turbulente_base hierarchy.
  *
  * @sa Source_base
  */
@@ -39,7 +37,7 @@ public :
   const Correlation_base& correlation() const { return correlation_.valeur(); }
 
 protected:
-  OBS_PTR(Correlation_base) correlation_; //correlation donnant le coeff de dispersion turbulente
+  OBS_PTR(Correlation_base) correlation_; // correlation providing the turbulent dispersion coefficient
   int is_turb = 0;
   double beta_ = 1.; // To adjust the force in .data
 

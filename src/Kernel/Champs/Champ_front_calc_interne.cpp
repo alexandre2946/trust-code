@@ -31,25 +31,25 @@ Champ_front_calc_interne::Champ_front_calc_interne()
   set_distant(0);
 }
 
-/*! @brief NE FAIT RIEN
+/*! @brief DOES NOTHING
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Champ_front_calc_interne::printOn(Sortie& os) const
 {
   return os;
 }
 
-/*! @brief Lit le nom d'un champ inconnue a partir d'un flot d'entree.
+/*! @brief Read the name of an unknown field from an input stream.
  *
- * Cree ensuite le champ de frontiere correspondant qui mettra en relation les deux
- *     cotes de la frontiere interne.
+ * Then creates the corresponding boundary field that will relate the two
+ *     sides of the internal boundary.
  *     Format:
- *       Champ_front_calc_interne nom_pb nom_bord nom_champ
+ *       Champ_front_calc_interne pb_name boundary_name field_name
  *
- * @param (Entree& is) un flot d'entre
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
  */
 Entree& Champ_front_calc_interne::readOn(Entree& is)
 {
@@ -100,7 +100,7 @@ void Champ_front_calc_interne::completer()
       int nb_faces_dup = (int)cP->getNumberOfTuples();
       if (nb_faces_dup == nbfaces)
         {
-          // Faces dupliquees -> singularite au niveau du gap
+          // Duplicated faces -> singularity at the gap level
           MCAuto<DataArrayIdType> dsi(cIP->deltaShiftIndex());
 
           if (!dsi->isUniform(2))
@@ -119,8 +119,8 @@ void Champ_front_calc_interne::completer()
         }
       else
         {
-          // Gap de dimension non-nulle -> on cherche le point
-          // d'en face le plus proche
+          // Non-zero dimension gap -> we search for the closest
+          // opposite face point
           const DoubleVect& face_surfaces = zvf.face_surfaces();
           MCAuto<DataArrayDouble> fnorm(DataArrayDouble::New());
           fnorm->alloc(nbfaces, 1);

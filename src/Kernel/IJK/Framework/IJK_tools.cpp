@@ -27,15 +27,15 @@ static void extend_array(const Domaine_IJK& geom1, const int direction, const in
 
   if (geom1.get_periodic_flag(direction))
     {
-      // On cree des mailles supplementaires au debut et a la fin,
-      // on decale l'origine vers la "gauche"
-      const int n = delta.size_array(); // nombre de mailles initial
+      // Create extra cells at the beginning and end,
+      // shift the origin to the "left"
+      const int n = delta.size_array(); // initial number of cells
       delta.resize_array(n + 2 * ncells);
       int i;
-      // On decale les mailles vers la droite dans delta, de ncells:
+      // Shift cells to the right in delta by ncells:
       for (i = n - 1; i >= 0; i--)
         delta[i + ncells] = delta[i];
-      // On duplique les mailles dont on a besoin:
+      // Duplicate the cells that are needed:
       if (n < ncells)
         {
           Cerr << "Error in build_extended_splitting, direction " << direction << " extension of " << ncells << " not possible because we only have " << n << " cells in the domain." << finl;
@@ -43,20 +43,20 @@ static void extend_array(const Domaine_IJK& geom1, const int direction, const in
         }
       for (i = 0; i < ncells; i++)
         {
-          // Copie des mailles de droite a gauche:
+          // Copy cells from right to left:
           delta[i] = delta[i + n];
-          // Decalage de l'origine:
+          // Shift the origin:
           origin -= delta[i];
-          // Copie des mailles de gauche a droite:
+          // Copy cells from left to right:
           delta[ncells + i + n] = delta[ncells + i];
         }
     }
 }
 
-// split1 : Maillage d'origine sur lequel sont resolues les equations de NS.
-// split2 : Resultat etendu contenant le domaine ou vivent les interfaces.
-// n_cells : Nombre de cellules supplementaires crees de chaque cote.
-//           (doit etre inferieur au nombre de mailles dans le domaine decoupee).
+// split1: Original mesh on which the NS equations are solved.
+// split2: Extended result containing the domain where the interfaces live.
+// n_cells: Number of extra cells created on each side.
+//          (must be less than the number of cells in the partitioned domain).
 void build_extended_splitting(const Domaine_IJK& geom1, Domaine_IJK& split2, int n_cells)
 {
   double origin_x, origin_y, origin_z;
@@ -65,20 +65,20 @@ void build_extended_splitting(const Domaine_IJK& geom1, Domaine_IJK& split2, int
   extend_array(geom1, DIRECTION_J, n_cells, dy, origin_y);
   extend_array(geom1, DIRECTION_K, n_cells, dz, origin_z);
 
-  // Le domaine etendu n'est pas periodique: le champ n'est pas continu
-  // entre les bords opposes du domaine etendu.
+  // The extended domain is not periodic: the field is not continuous
+  // between the opposite boundaries of the extended domain.
   Domaine_IJK geom2;
   Nom n(geom1.le_nom());
   geom2.nommer(n + "_EXT");
   geom2.initialize_origin_deltas(origin_x, origin_y, origin_z, dx, dy, dz, geom1.get_periodic_flag(0), geom1.get_periodic_flag(1), geom1.get_periodic_flag(2));
-  // Construction du decoupage parallele: on utilise les memes parametres
-  // de decoupage que pour le maillage d'origine:
+  // Build the parallel splitting: use the same splitting parameters
+  // as for the original mesh:
   split2.initialize_splitting(geom2, geom1.get_nprocessor_per_direction(DIRECTION_I), geom1.get_nprocessor_per_direction(DIRECTION_J), geom1.get_nprocessor_per_direction(DIRECTION_K));
 }
 
 Probleme_base& creer_domaine_vdf(const Domaine_IJK& geom, const Nom& nom_domaine)
 {
-  // On va construire une partie de jdd a faire interpreter:
+  // Build part of the data set to be interpreted:
   const double x0 = geom.get_origin(DIRECTION_I);
   const double y0 = geom.get_origin(DIRECTION_J);
   const double z0 = geom.get_origin(DIRECTION_K);
@@ -150,7 +150,7 @@ Probleme_base& creer_domaine_vdf(const Domaine_IJK& geom, const Nom& nom_domaine
   EChaine is(instructions.get_str());
   Interprete_bloc::interprete_courant().interpreter_bloc(is, Interprete_bloc::BLOC_EOF, 0 /* flag verifie sans interpreter */);
 
-  // Il faut construire une structure de donnees du Domaine_VF qui n'est pas construite par defaut:
+  // A Domaine_VF data structure needs to be built that is not constructed by default:
   Probleme_base& pb = ref_cast(Probleme_base, Interprete_bloc::objet_global(pb_name));
   Domaine& domaine = pb.domaine_dis().domaine();
   domaine.construire_elem_virt_pe_num();
@@ -171,7 +171,7 @@ static void ijk_interpolate_implementation(const IJK_Field_double& field, const 
   const double dy = geom.get_constant_delta(DIRECTION_J);
   const double dz = geom.get_constant_delta(DIRECTION_K);
   const Domaine_IJK::Localisation loc = field.get_localisation();
-  // L'origine est sur un noeud. Donc que la premiere face en I est sur get_origin(DIRECTION_I)
+  // The origin is at a node. Therefore the first face in I is at get_origin(DIRECTION_I)
   double origin_x = geom.get_origin(DIRECTION_I) + ((loc == Domaine_IJK::FACES_J || loc == Domaine_IJK::FACES_K || loc == Domaine_IJK::ELEM) ? (dx * 0.5) : 0.);
   double origin_y = geom.get_origin(DIRECTION_J) + ((loc == Domaine_IJK::FACES_K || loc == Domaine_IJK::FACES_I || loc == Domaine_IJK::ELEM) ? (dy * 0.5) : 0.);
   double origin_z = geom.get_origin(DIRECTION_K) + ((loc == Domaine_IJK::FACES_I || loc == Domaine_IJK::FACES_J || loc == Domaine_IJK::ELEM) ? (dz * 0.5) : 0.);
@@ -188,7 +188,7 @@ static void ijk_interpolate_implementation(const IJK_Field_double& field, const 
       const int index_i = (int) (floor(x2)) - geom.get_offset_local(DIRECTION_I);
       const int index_j = (int) (floor(y2)) - geom.get_offset_local(DIRECTION_J);
       const int index_k = (int) (floor(z2)) - geom.get_offset_local(DIRECTION_K);
-      // Coordonnes barycentriques du points dans la cellule :
+      // Barycentric coordinates of the point within the cell:
       const double xfact = x2 - floor(x2);
       const double yfact = y2 - floor(y2);
       const double zfact = z2 - floor(z2);
@@ -242,7 +242,7 @@ static double ijk_interpolate_one_value(const IJK_Field_double& field, const Vec
   const double dy = geom.get_constant_delta(DIRECTION_J);
   const double dz = geom.get_constant_delta(DIRECTION_K);
   const Domaine_IJK::Localisation loc = field.get_localisation();
-  // L'origine est sur un noeud. Donc que la premiere face en I est sur get_origin(DIRECTION_I)
+  // The origin is at a node. Therefore the first face in I is at get_origin(DIRECTION_I)
   double origin_x = geom.get_origin(DIRECTION_I) + ((loc == Domaine_IJK::FACES_J || loc == Domaine_IJK::FACES_K || loc == Domaine_IJK::ELEM) ? (dx * 0.5) : 0.);
   double origin_y = geom.get_origin(DIRECTION_J) + ((loc == Domaine_IJK::FACES_K || loc == Domaine_IJK::FACES_I || loc == Domaine_IJK::ELEM) ? (dy * 0.5) : 0.);
   double origin_z = geom.get_origin(DIRECTION_K) + ((loc == Domaine_IJK::FACES_I || loc == Domaine_IJK::FACES_J || loc == Domaine_IJK::ELEM) ? (dz * 0.5) : 0.);
@@ -255,7 +255,7 @@ static double ijk_interpolate_one_value(const IJK_Field_double& field, const Vec
   const int index_i = (int) (floor(x2)) - geom.get_offset_local(DIRECTION_I);
   const int index_j = (int) (floor(y2)) - geom.get_offset_local(DIRECTION_J);
   const int index_k = (int) (floor(z2)) - geom.get_offset_local(DIRECTION_K);
-  // Coordonnes barycentriques du points dans la cellule :
+  // Barycentric coordinates of the point within the cell:
   const double xfact = x2 - floor(x2);
   const double yfact = y2 - floor(y2);
   const double zfact = z2 - floor(z2);
@@ -371,7 +371,7 @@ void set_field_data(IJK_Field_double& f, double func(double, double, double))
   f.echange_espace_virtuel(f.ghost());
 }
 
-// GAB, Vy_initial non nul en reprise
+// GAB, non-zero Vy_initial on restart
 //  field with specified string expression (must be understood by Parser class)
 void compose_field_data(IJK_Field_double& f, const Nom& parser_expression_of_x_y_z)
 {
@@ -620,7 +620,7 @@ void interpolate_to_center(IJK_Field_vector3_double& cell_center_field, const IJ
   // We are not changing the const semantic of the field to update ghost cells:
   IJK_Field_vector3_double& face_fld_non_const = const_cast<IJK_Field_vector3_double&>(face_field);
   face_fld_non_const.echange_espace_virtuel();
-  /* Interpole le champ face_field aux centres des elements et le stocke dans cell_center_field */
+  /* Interpolate the face_field field to element centres and store it in cell_center_field */
   const int kmax = cell_center_field[0].nk();
   const int jmax = cell_center_field[0].nj();
   const int imax = cell_center_field[0].ni();

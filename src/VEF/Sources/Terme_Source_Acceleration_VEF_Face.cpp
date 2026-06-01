@@ -28,7 +28,7 @@ Sortie& Terme_Source_Acceleration_VEF_Face::printOn(Sortie& s ) const
   return s << que_suis_je() ;
 }
 
-/*! @brief Appel a Terme_Source_Acceleration::lire_data
+/*! @brief Call Terme_Source_Acceleration::lire_data.
  *
  */
 Entree& Terme_Source_Acceleration_VEF_Face::readOn(Entree& s )
@@ -37,9 +37,7 @@ Entree& Terme_Source_Acceleration_VEF_Face::readOn(Entree& s )
   return s;
 }
 
-/*! @brief Methode appelee par Source_base::completer() apres associer_domaines Remplit les ref.
- *
- * aux domaines et domaine_cl
+/*! @brief Method called by Source_base::completer() after associer_domaines. Fills the references to the domains and domain_cl.
  *
  */
 void Terme_Source_Acceleration_VEF_Face::associer_domaines(const Domaine_dis_base& domaine_dis,
@@ -51,16 +49,16 @@ void Terme_Source_Acceleration_VEF_Face::associer_domaines(const Domaine_dis_bas
   le_dom_Cl_VEF_ = ref_cast(Domaine_Cl_VEF, domaine_Cl_dis);
 }
 
-/*! @brief Fonction outil pour Terme_Source_Acceleration_VEF_Face::ajouter Ajout des contributions d'une liste contigue de faces du terme source de translation:
+/*! @brief Helper function for Terme_Source_Acceleration_VEF_Face::ajouter. Adds contributions from a contiguous list of faces of the translation source term:
  *
- *    s_face = terme_source * rho
- *    resu  += integrale (s_face) sur le volume de controle de la vitesse.
- *   On traite les cas suivants:
- *     rho = reference nulle (=> rho = 1.)  sinon rho != nul
- *     faces de bord => sortie libre
- *     periodicite
- *     symetrie car en VEF la vitesse sur la face de bord peut ne pas etre nul (V_tangentielle)
- *     faces_internes
+ *    s_face = source_term * rho
+ *    resu  += integral (s_face) over the velocity control volume.
+ *   Handles the following cases:
+ *     rho = null reference (=> rho = 1.)  otherwise rho != null
+ *     boundary faces => free outlet
+ *     periodicity
+ *     symmetry because in VEF the velocity on a boundary face may not be zero (V_tangential)
+ *     internal faces
  *
  */
 static void TSAVEF_ajouter_liste_faces(const int premiere_face, const int derniere_face,
@@ -74,8 +72,8 @@ static void TSAVEF_ajouter_liste_faces(const int premiere_face, const int dernie
                                        DoubleTab& resu)
 {
   int num_face;
-  // Pointeur constant sur tableau constant.
-  // Pointeur nul si ref_rho_ est une reference nulle.
+  // Constant pointer to a constant array.
+  // Null pointer if ref_rho_ is a null reference.
   const DoubleTab * const rho_elem =
     (bool(ref_rho)) ? &(ref_rho->valeurs()) : 0;
   const int dim = Objet_U::dimension;
@@ -91,7 +89,7 @@ static void TSAVEF_ajouter_liste_faces(const int premiere_face, const int dernie
 
       double rho = 1.;
 
-      // Calcul d'un rho moyen sur le volume de controle de la vitesse
+      // Compute a mean rho over the velocity control volume
       if (rho_elem)
         {
           const int elem0 = face_voisins(num_face,0);
@@ -114,24 +112,24 @@ static void TSAVEF_ajouter_liste_faces(const int premiere_face, const int dernie
         {
           double a = src[j] * rho;
           s_face(num_face, j) = a;
-          // Integrale sur le volume de controle :
+          // Integral over the control volume:
           resu(num_face, j) += a * vol;
         }
     }
 }
 
-/*! @brief Ajoute le terme (la_source_ * rho * volume_entrelace) au champ resu.
+/*! @brief Adds the term (la_source_ * rho * volume_entrelace) to the resu field.
  *
- * On suppose que resu est discretise comme la vitesse.
- *   L'espace virtuel de "resu" n'est PAS mis a jour !
+ * Assumes that resu is discretized like the velocity.
+ *   The virtual space of "resu" is NOT updated!
  *
- *   Commentaire sur le schema: L'acceleration d/dt(v) est calculee aux elements,
- *    puis multipliee par "rho" aux elements, puis evaluee aux faces par une
- *    moyenne sur les elements voisins de la face. C'est un premier essai, pas
- *    forcement la meilleure idee. Comme l'acceleration depend de la vitesse qui
- *    est aux faces, on passe par deux interpolations successives.
- *  Effet de bord:
- *   On met (la_source_ * rho) dans terme_source_post_
+ *   Note on the scheme: the acceleration d/dt(v) is computed at elements,
+ *    then multiplied by "rho" at elements, then evaluated at faces via an
+ *    average over the neighbouring elements of the face. This is a first attempt,
+ *    not necessarily the best approach. Since the acceleration depends on the velocity
+ *    which is at faces, two successive interpolations are used.
+ *  Side effect:
+ *   (la_source_ * rho) is stored in terme_source_post_
  *
  */
 DoubleTab& Terme_Source_Acceleration_VEF_Face::ajouter(DoubleTab& resu) const
@@ -145,20 +143,19 @@ DoubleTab& Terme_Source_Acceleration_VEF_Face::ajouter(DoubleTab& resu) const
   DoubleTab& s_face = get_set_terme_source_post().valeurs();
   s_face = 0.;
 
-  // Calcul de la_source_ en fonction des champs d'acceleration et de la
-  // vitesse du fluide.
+  // Compute la_source_ from the acceleration fields and the fluid velocity.
   const int dim     = Objet_U::dimension;
   const int nb_faces = resu.dimension(0);
   DoubleTab acceleration_aux_faces(nb_faces, dim);
   calculer_la_source(acceleration_aux_faces);
 
-  // Boucle sur les conditions limites pour traiter les faces de bord
+  // Loop over the boundary conditions to process the boundary faces
 
   for (int n_bord = 0; n_bord < domaine.nb_front_Cl(); n_bord++)
     {
-      // pour chaque Condition Limite on regarde son type
-      // Si face de Dirichlet on ne fait rien
-      // Si face de Neumann, Periodique ou de Symetrie on calcule la contribution au terme source
+      // for each boundary condition check its type
+      // If Dirichlet face do nothing
+      // If Neumann, Periodic or Symmetry face compute the contribution to the source term
       const Cond_lim& la_cl = domaine_Cl.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       const int ndeb = le_bord.num_premiere_face();
@@ -175,7 +172,7 @@ DoubleTab& Terme_Source_Acceleration_VEF_Face::ajouter(DoubleTab& resu) const
                                  resu);
 
     }
-  // Boucle sur les faces internes
+  // Loop over internal faces
   {
     const int ndeb = domaine.premiere_face_int();
     const int nfin = domaine.nb_faces();
@@ -191,7 +188,7 @@ DoubleTab& Terme_Source_Acceleration_VEF_Face::ajouter(DoubleTab& resu) const
   }
 
   {
-    // Force la periodicite
+    // Enforce periodicity
     int nb_comp=resu.line_size();
     for (int n_bord=0; n_bord<domaine.nb_front_Cl(); n_bord++)
       {

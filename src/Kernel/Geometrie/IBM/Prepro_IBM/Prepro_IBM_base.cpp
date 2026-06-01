@@ -191,7 +191,7 @@ void Prepro_IBM_base::discretiser()
   DoubleTab& aireArray = champ_aire_->valeurs();
   aireArray = 0.;
 
-  // Barycentres
+  // Barycenters
   nb_comp=dim_esp;
   Noms nom_bary(nb_comp);
   Noms unites_bary(nb_comp);
@@ -232,7 +232,7 @@ void Prepro_IBM_base::discretiser()
   DoubleTab& h_max_node = h_max_node_->valeurs();
   h_max_node = 0.;
 
-  // coord projection solide
+  // coord of solid projection
   nb_comp=dim_esp;
   Noms nom_c4(nb_comp);
   nom_c4[0] = "X";
@@ -242,12 +242,12 @@ void Prepro_IBM_base::discretiser()
   DoubleTab&  solideArray = solid_points_->valeurs();
   solideArray = 0.;
 
-  // elem number projection solide
+  // elem number of solid projection
   pb.discretisation().discretiser_champ("champ_sommets",le_dom_dis,"so_elem_number","",1,0., solid_elems_);
   DoubleTab& solid_elemsArray = solid_elems_->valeurs();
   solid_elemsArray = -2.0;
 
-  // coord projection fluide
+  // coord of fluid projection
   nb_comp=dim_esp;
   Noms nom_c5(nb_comp);
   nom_c5[0] = "X";
@@ -257,7 +257,7 @@ void Prepro_IBM_base::discretiser()
   DoubleTab&  fluidArray = fluid_points_->valeurs();
   fluidArray = 0.;
 
-  // elem number projection fluide
+  // elem number of fluid projection
   pb.discretisation().discretiser_champ("champ_sommets",le_dom_dis,"fl_elem_number","",1,0., fluid_elems_);
   DoubleTab& fluid_elemsArray = fluid_elems_->valeurs();
   fluid_elemsArray = -2.0;
@@ -265,13 +265,13 @@ void Prepro_IBM_base::discretiser()
   // correspondance elems
   pb.discretisation().discretiser_champ("champ_elem",le_dom_dis,"TRUST_SALOME_correspondance","",1,0., corresp_elems_);
   DoubleTab& corresp_elemsArray = corresp_elems_->valeurs();
-  int nbElemVol = corresp_elemsArray.dimension(0);  // Nombre de cellules du maillage volumique
+  int nbElemVol = corresp_elemsArray.dimension(0);  // Number of cells in the volumetric mesh
   for (int elem = 0; elem <nbElemVol; elem++) corresp_elemsArray(elem) = elem;
 
   // computing effective error :
   compute_effective_error();
 
-  // Intersection Euler/Lagrange si lecture du maillage Lagrangien
+  // Euler/Lagrange intersection when reading the Lagrangian mesh
   if (barySurf_.dimension(0)) computeAire2();
 }
 
@@ -333,7 +333,7 @@ void Prepro_IBM_base::computeLocalFrame(const DoubleTab& normal, DoubleTab& t1, 
   if (sqrt(nt) > 1.0e-12) t2 /= sqrt(nt) ;
 }
 
-void Prepro_IBM_base::computeMatRot(const DoubleTab& normal, DoubleTab& t1, DoubleTab& t2, int elem) // calcul de la matrice de rotation
+void Prepro_IBM_base::computeMatRot(const DoubleTab& normal, DoubleTab& t1, DoubleTab& t2, int elem) // compute the rotation matrix
 {
   DoubleTab& rotationArray = champ_rotation_->valeurs();
   assert(rotationArray.dimension(1) == Objet_U::dimension * Objet_U::dimension);
@@ -363,10 +363,10 @@ void Prepro_IBM_base::computeAire2()
   DoubleTab& isNodeDirichletArray = isNodeDirichlet_->valeurs();
   DoubleTab& baryArray = champ_bary_->valeurs();
 
-  int nbPtsDom =  le_dom_dis.domaine().nb_som();// Nombre de noeuds du maillage volumique
-  int nbElemVol = aireArray.dimension(0);  // Nombre de cellules du maillage volumique
+  int nbPtsDom =  le_dom_dis.domaine().nb_som();// Number of nodes in the volumetric mesh
+  int nbElemVol = aireArray.dimension(0);  // Number of cells in the volumetric mesh
   assert(nbElemVol==le_mc_mesh->getNumberOfCells());
-  int nbElemSur = normalArr_.dimension(0); // Nombre de cellules (faces) du maillage surfacique
+  int nbElemSur = normalArr_.dimension(0); // Number of cells (faces) in the surface mesh
   int dim_esp = Objet_U::dimension; // dimension Euler
   assert(normalArr_.dimension(1)==dim_esp);
 
@@ -376,7 +376,7 @@ void Prepro_IBM_base::computeAire2()
   std::vector<mcIdType> numNodes, numNodes2D, numNodes3D;
   ArrOfDouble mesh2DBBox(2*dim_esp);
   Octree_Double octree_mesh3D;
-  octree_mesh3D.build_nodes(le_dom.les_sommets(), 0, eps_); //ne pas inclure les sommets virtuels
+  octree_mesh3D.build_nodes(le_dom.les_sommets(), 0, eps_); //do not include virtual vertices
   MCAuto<MEDCouplingFieldDouble> measure_aSkinUMesh(aSkinUMesh_->getMeasureField(true));
   assert(measure_aSkinUMesh->getNumberOfComponents()==1);
   double mesure_tot_aSkinUMesh = measure_aSkinUMesh->accumulate(0);
@@ -394,7 +394,7 @@ void Prepro_IBM_base::computeAire2()
   double aire_tot_calcul = 0.;
   double mesure_sig_aSkinUMesh = 0.;
   /////////////////////////////////////////////////////////////////////
-  // Boucle sur les elements du maillage surfacique dans l'espace 3D
+  // Loop over the elements of the surface mesh in 3D space
   /////////////////////////////////////////////////////////////////////
   for (int e = 0; e < nbElemSur; e++)
     {
@@ -405,7 +405,7 @@ void Prepro_IBM_base::computeAire2()
       int nbNodesSur = int(numNodes.size());
       Cerr<<"nbNodesSur = "<< nbNodesSur <<finl;
 
-      // definition du repere local (normalArr_, t1Arr, t2Arr)
+      // definition of the local frame (normalArr_, t1Arr, t2Arr)
       Cerr << "normalArr_ (" << normalArr_(e,0) ;
       for (int cc = 1; cc <dim_esp; cc++) Cerr << " ,"<<normalArr_(e,cc);
       Cerr << ")" << finl;
@@ -418,7 +418,7 @@ void Prepro_IBM_base::computeAire2()
       Cerr << ")" << finl;
       if (idebug) Cerr<<"barySurf[e]_ ("<<barySurf_(e, 0)<<" , "<<barySurf_(e, 1)<<" , "<<barySurf_(e, 2)<<")"<<finl;
 
-      // Mesh 2D de la facette 3D numero e
+      // 2D mesh of the 3D facet number e
       MCAuto<MEDCouplingUMesh> mesh2DSurf(MEDCouplingUMesh::New("surf_"+std::to_string(e),2));
       DoubleTrav surfCoords2D(nbNodesSur, 2);
       for (int node =0; node < nbNodesSur; node++)
@@ -463,7 +463,7 @@ void Prepro_IBM_base::computeAire2()
           Cerr << finl;
         }
 
-      // Calcul de la Bounding Box 3D du polygone 2D
+      // Compute the 3D Bounding Box of the 2D polygon
       for (int c =0; c < dim_esp; c++)
         {
           int index0 = 2*c;
@@ -484,9 +484,9 @@ void Prepro_IBM_base::computeAire2()
       for (int cc = 0; cc <dim_esp; cc++) Cerr<<"["<<mesh2DBBox(2*cc)<<", "<<mesh2DBBox(2*cc+1)<<"] ";
       Cerr<<finl;
 
-      // Détection des éléments volumiques dans la Bounding Box
+      // Detection of volumetric elements in the Bounding Box
       const double bbox[] = {mesh2DBBox(0), mesh2DBBox(1), mesh2DBBox(2), mesh2DBBox(3), mesh2DBBox(4), mesh2DBBox(5)};
-      MCAuto<MEDCoupling::DataArrayIdType> cellIdsArr(le_mc_mesh->getCellsInBoundingBox(bbox, 0.)); //precision = 0 pour ne pas avoir d'element 3D non coupe par la frontiere
+      MCAuto<MEDCoupling::DataArrayIdType> cellIdsArr(le_mc_mesh->getCellsInBoundingBox(bbox, 0.)); //precision = 0 to avoid getting 3D elements not cut by the boundary
       const mcIdType *daP = cellIdsArr->begin();
       int NbCellsInBB = int(cellIdsArr->getNumberOfTuples());
       int NbCompsInBB = int(cellIdsArr->getNumberOfComponents());
@@ -498,7 +498,7 @@ void Prepro_IBM_base::computeAire2()
 
       double aire_elem_calcul = 0.;
       ////////////////////////////////////////////////////////////////////////////
-      // Calcul de l'intersection volume-surface pour chaque element intercepte
+      // Compute the volume-surface intersection for each intercepted element
       ////////////////////////////////////////////////////////////////////////////
       for (int k = 0; k < NbCellsInBB; k++)
         {
@@ -511,7 +511,7 @@ void Prepro_IBM_base::computeAire2()
           assert(mesh3D->getNumberOfCells()==1);
           int NumberOfNodes3D = int(mesh3D->getNumberOfNodes());
 
-          // verification element mesh3D intercepte par plan infini
+          // verify that mesh3D element is intercepted by an infinite plane
           const double *crd3D = mesh3D->getCoords()->begin();
           DoubleTab coord3D;
           coord3D.resize(NumberOfNodes3D, dim_esp);
@@ -531,7 +531,7 @@ void Prepro_IBM_base::computeAire2()
               continue;
             }
 
-          //  on calcule l'intersection entre l'element volumique mesh3D et l'element surfacique "e"
+          //  compute the intersection between volumetric element mesh3D and surface element "e"
           const double origin[] = {barySurf_(e,0), barySurf_(e,1), barySurf_(e,2)};
           const double vec[] = {normalArr_(e,0), normalArr_(e,1), normalArr_(e,2)};
           if (idebug)
@@ -546,7 +546,7 @@ void Prepro_IBM_base::computeAire2()
           MEDCoupling::DataArrayIdType * polycellIds = nullptr;
           try
             {
-              // Intersection par un plan infini
+              // Intersection with an infinite plane
               MCAuto<MEDCouplingUMesh> interPoly3D(mesh3D->buildSlice3D(origin, vec, 0., polycellIds));
               MCAuto<MEDCoupling::DataArrayIdType> polycellIdsAuto(polycellIds);
               int nbCellsPoly3D = int(interPoly3D->getNumberOfCells());
@@ -556,7 +556,7 @@ void Prepro_IBM_base::computeAire2()
               interCoordonnes3D.resize(NumberOfNodes, dim_esp);
               std::copy(interCoords3D, interCoords3D+interCoordonnes3D.size_array(), interCoordonnes3D.addr());
 
-              // Mesh 2D du polygone d'intersection en 3D interPoly3D
+              // 2D mesh of the intersection polygon in 3D interPoly3D
               numNodes3D.clear();
               interPoly3D->getNodeIdsOfCell(0, numNodes3D);
               int nbNodesCell1 = int(numNodes3D.size());
@@ -565,7 +565,7 @@ void Prepro_IBM_base::computeAire2()
                   Cerr<<"<Nb cells> interPoly3D = "<<nbCellsPoly3D<<" <> 1. Exit"<<finl;
                   Process::exit();
                 }
-              // A priori, les noeuds de mesh3D sont repris dans interPoly3D (en debut de la liste de noeuds)
+              // By assumption, the nodes of mesh3D are included in interPoly3D (at the start of the node list)
               if (idebug)
                 {
                   Cerr << "<Nb cells> interPoly3D = "<<nbCellsPoly3D<<finl;
@@ -617,7 +617,7 @@ void Prepro_IBM_base::computeAire2()
                 }
 
               ////////////////////////////////////////////////////////////////////////////////////
-              // Intersection des polygones 2D de la facette e et de la coupe de l'element my_elem
+              // Intersection of the 2D polygons of facet e and the cross-section of element my_elem
               ////////////////////////////////////////////////////////////////////////////////////
               int status_polypoly = 0;
               DoubleTab finalcoords;
@@ -640,7 +640,7 @@ void Prepro_IBM_base::computeAire2()
               finalMesh->finishInsertingCells();
 
 
-              // Definition 3D des noeuds de finalmesh 2D
+              // 3D definition of the nodes of finalmesh 2D
               DoubleTab interCoordonnes;
               interCoordonnes.resize(int(finalMesh->getNumberOfNodes()), dim_esp);
               for (int node =0; node < interCoordonnes.dimension(0); node++)
@@ -670,7 +670,7 @@ void Prepro_IBM_base::computeAire2()
                 }
 
               /////////////////////////////////////////////////////////////////////////
-              // Exploitation des results d'intersection pour calcul barycentre et aire
+              // Use intersection results to compute barycenter and area
               /////////////////////////////////////////////////////////////////////////
               int nbpts = interCoordonnes.dimension(0);
               double inv_nbpts =1.0 /( double(nbpts));
@@ -719,11 +719,11 @@ void Prepro_IBM_base::computeAire2()
             }
           catch (const std::runtime_error& err)
             {
-              std::cerr << "Erreur : " << err.what() << std::endl;
+              std::cerr << "Error: " << err.what() << std::endl;
             }
         }
 
-      // Bilan AIre element e
+      // Area balance for element e
       aire_tot_calcul += aire_elem_calcul ;
       const auto* arrayskin = measure_aSkinUMesh->getArray();
       if (arrayskin->getNumberOfComponents() != 1)
@@ -737,7 +737,7 @@ void Prepro_IBM_base::computeAire2()
       mesure_sig_aSkinUMesh += val1;
     }
 
-  // Barycentres et Normales moyens ponderes par les aires
+  // Mean barycenters and normals weighted by areas
   DoubleTrav t1EulerArr(nbElemVol, dim_esp), t2EulerArr(nbElemVol, dim_esp);
   for (int elem = 0; elem <nbElemVol; elem++)
     {
@@ -758,7 +758,7 @@ void Prepro_IBM_base::computeAire2()
         }
     }
 
-  // Bilan AIre totale
+  // Total area balance
   Cerr<<" "<<finl;
   Cerr<<"Measure of total surface for Immersed Boundary = "<<mesure_tot_aSkinUMesh<<finl;
   Cerr<<"Measure of sum of elementary surfaces for Immersed Boundary = "<<mesure_sig_aSkinUMesh<<finl;
@@ -806,7 +806,7 @@ void Prepro_IBM_base::intersectPolyPoly2D(MEDCouplingUMesh * polyMesh1, MEDCoupl
       Cerr<<">>> Prepro_IBM_base::intersectPolyPoly2D: Cell and node nb polyEdgeMesh2 = "<<int(polyEdgeMesh2->getNumberOfCells())<<" "<<int(polyEdgeMesh2->getNumberOfNodes())<<finl;
     }
 
-  // Prendre tous les noeuds de polyMesh1 inclus dans polyMesh2
+  // Take all nodes of polyMesh1 included in polyMesh2
   DoubleTrav p_test(dim_esp-1);
   for (int i=0; i<nbNodes1; i++)
     {
@@ -829,7 +829,7 @@ void Prepro_IBM_base::intersectPolyPoly2D(MEDCouplingUMesh * polyMesh1, MEDCoupl
             }
         }
     }
-  // Prendre tous les noeuds de polyMesh2 inclus dans polyMesh1
+  // Take all nodes of polyMesh2 that are contained in polyMesh1
   for (int i=0; i<nbNodes2; i++)
     {
       for (int k=0; k<(dim_esp-1); k++) p_test(k) = coords2(i,k);
@@ -857,7 +857,7 @@ void Prepro_IBM_base::intersectPolyPoly2D(MEDCouplingUMesh * polyMesh1, MEDCoupl
       return;
     }
 
-  // Prendre les points d'intersection
+  // Get the intersection points
   for (int i=0; i<nbEdge1; i++)
     {
       std::vector< mcIdType > numNodes;
@@ -905,7 +905,7 @@ void Prepro_IBM_base::intersectPolyPoly2D(MEDCouplingUMesh * polyMesh1, MEDCoupl
   if (idebug) Cerr<<"             Nb of tuples in finalCoords = "<<finalCoords_len<<finl;
   if (finalCoords_len < 3)
     {
-      status = -3; //seulement une droite intersection
+      status = -3; //only a single line intersection
       return;
     }
 
@@ -931,7 +931,7 @@ void Prepro_IBM_base::intersectPolyPoly2D(MEDCouplingUMesh * polyMesh1, MEDCoupl
   //       }
   //   }
 
-  // Connectivite 2D
+  // 2D connectivity
   std::vector<mcIdType> numNodes2D;
   numNodes2D.clear();
 
@@ -1013,7 +1013,7 @@ void Prepro_IBM_base::intersectPolyPoly2D(MEDCouplingUMesh * polyMesh1, MEDCoupl
   return;
 }
 
-// intersection d'un segment avec un polygone
+// intersection of a segment with a polygon
 void Prepro_IBM_base::intersectSegPoly2D(MEDCouplingUMesh * polyEdgeMesh, DoubleTab& p1, DoubleTab& p2, double eps, MCAuto<MEDCoupling::DataArrayDouble> outputCoords, int& status)
 {
   int idebug = verbose_;
@@ -1076,21 +1076,21 @@ void Prepro_IBM_base::intersectSegSeg2D(DoubleTab& p11, DoubleTab& p12, DoubleTa
   if (status != 0) status = 0 ;
   p = 0.;
 
-  assert(p11.size() == (dim_esp-1)); // p11 : sommet 1 du segment 1
+  assert(p11.size() == (dim_esp-1)); // p11 : vertex 1 of segment 1
   assert(p11.size() == p12.size());
-  assert(p12.size() == p21.size()); // p12 : sommet 2 du segment 1
-  assert(p21.size() == p22.size()); // p21 : sommet 1 du segment 2
-  assert(p22.size() == p.size()); // p22 : sommet 2 du segment 2
+  assert(p12.size() == p21.size()); // p12 : vertex 2 of segment 1
+  assert(p21.size() == p22.size()); // p21 : vertex 1 of segment 2
+  assert(p22.size() == p.size()); // p22 : vertex 2 of segment 2
 
-  DoubleTrav n1(dim_esp-1); //vecteur directeur du premier segment
+  DoubleTrav n1(dim_esp-1); //direction vector of the first segment
   n1(0) = p12(0)-p11(0);
   n1(1) = p12(1)-p11(1);
-  DoubleTrav n2(dim_esp-1); //vecteur directeur du second segment
+  DoubleTrav n2(dim_esp-1); //direction vector of the second segment
   n2(0) = p22(0)-p21(0);
   n2(1) = p22(1)-p21(1);
   double absprodvect = abs(n1(0)*n2(1) - n2(0)*n1(1)); // n1 ^ n2
 
-  if(absprodvect < eps) // n1 et n2 colineaires
+  if(absprodvect < eps) // n1 and n2 are collinear
     {
       status = -2;
       if (idebug) Cerr<<"> Prepro_IBM_base::intersectSegSeg2D status: "<<status<<" ; p: "<<p(0)<<" "<<p(1)<<" n1 and n2 are colinear"<< finl;
@@ -1098,15 +1098,15 @@ void Prepro_IBM_base::intersectSegSeg2D(DoubleTab& p11, DoubleTab& p12, DoubleTa
     }
   else
     {
-      double a = n1(1); // representation en equation de la droite 1
+      double a = n1(1); // line 1 equation representation
       double b = -n1(0);
       double c = - a*p11(0) - b*p11(1);
-      double t1 = - (c + a*p21(0) + b*p21(1)) / (a*n2(0)+b*n2(1)); // representation parametrique de la droite 2
-      a = n2(1); // representation en equation de la droite 2
+      double t1 = - (c + a*p21(0) + b*p21(1)) / (a*n2(0)+b*n2(1)); // parametric representation of line 2
+      a = n2(1); // line 2 equation representation
       b = -n2(0);
       c = - a*p21(0) - b*p21(1);
-      double t2 = - (c + a*p11(0) + b*p11(1)) / (a*n1(0)+b*n1(1)); // representation parametrique de la droite 1
-      if ((t1 < -eps) || (t1 > 1.0 + eps) || (t2 < -eps) || (t2 > 1.0 + eps)) //si le point est en dehors des deux segments
+      double t2 = - (c + a*p11(0) + b*p11(1)) / (a*n1(0)+b*n1(1)); // parametric representation of line 1
+      if ((t1 < -eps) || (t1 > 1.0 + eps) || (t2 < -eps) || (t2 > 1.0 + eps)) //if the point is outside both segments
         {
           status = -1;
           return;
@@ -1224,11 +1224,11 @@ void Prepro_IBM_base::compute_h_max_elem()
   DoubleTab& hmaxNodeArray = h_max_node_->valeurs();
   hmaxNodeArray = 0.;
 
-  const Domaine_dis_base& le_dom_dis = mon_pb_->domaine_dis();// contient maillage TRUST
+  const Domaine_dis_base& le_dom_dis = mon_pb_->domaine_dis();// contains TRUST mesh
   const Domaine& le_dom= le_dom_dis.domaine();
-  int nb_som_elem =le_dom.nb_som_elem(); // number of nodes per elems ( numerotation local)
-  const IntTab& elems = le_dom.les_elems() ; // numerotation global des noeuds d'un element ( les_elems.dimension(0)=>nb_elems, les_elems.dimension(1)=> nb_som_elem)
-  const DoubleTab coordsDom3D=le_dom.les_sommets(); // coordonnées des noeuds TRUST
+  int nb_som_elem =le_dom.nb_som_elem(); // number of nodes per element (local numbering)
+  const IntTab& elems = le_dom.les_elems() ; // global numbering of nodes of an element ( les_elems.dimension(0)=>nb_elems, les_elems.dimension(1)=> nb_som_elem)
+  const DoubleTab coordsDom3D=le_dom.les_sommets(); // coordinates of TRUST nodes
   int nbElemVol = elems.dimension(0);
 
   assert(Objet_U::dimension == 3);
@@ -1316,7 +1316,7 @@ void Prepro_IBM_base::compute_NeighNode(int nb_niveau)
 
   sommets_voisins_ = IntLists(nb_som_tot);
   int nb_nodes_in_list = 0;
-  for (int num_elem = 0; num_elem < nb_elem_tot; num_elem++) // inclus les elem ghost
+  for (int num_elem = 0; num_elem < nb_elem_tot; num_elem++) // includes ghost elements
     {
       if (aireArray(num_elem) > eps_effec_)
         {
@@ -1328,12 +1328,12 @@ void Prepro_IBM_base::compute_NeighNode(int nb_niveau)
                   int num_elem_v = face_voisins(num_fac,voisin);
                   if ( (num_elem_v!=-1) && (num_elem_v!=num_elem) )
                     {
-                      // element num_elem_v, voisin de num_elem par une face
+                      // element num_elem_v, neighbor of num_elem through a face
                       for (int nodf=0; nodf<nb_som_face; nodf++)
                         {
-                          // noeud num_nod, dont on veut trouve les noeuds voisins
+                          // node num_nod, for which we want to find the neighboring nodes
                           int num_nod = faces_som(num_fac, nodf);
-                          // tous les noeuds de num_elem_v sont des neouds voisins de num_nod
+                          // all nodes of num_elem_v are neighboring nodes of num_nod
                           for (int nod_v=0; nod_v<nb_som_elem; nod_v++)
                             {
                               int num_nod_v = elems(num_elem_v, nod_v);
@@ -1343,16 +1343,16 @@ void Prepro_IBM_base::compute_NeighNode(int nb_niveau)
                                   nb_nodes_in_list += 1;
                                 }
                             }
-                          // element num_elem_v_v, voisin de num_elem_v par une face
+                          // element num_elem_v_v, neighbor of num_elem_v through a face
                           for (int fac_v=0; fac_v<nb_faces_elem; fac_v++)
                             {
                               int num_fac_v = elem_face(num_elem_v, fac_v);
                               for (int voisin_v=0; voisin_v<2; voisin_v++)
                                 {
                                   int num_elem_v_v = face_voisins(num_fac_v,voisin_v);
-                                  // boucle sur les noeuds de l'element num_elem_v_v pour savoir
-                                  // s'il contient num_nod. si oui, tous ses noeuds sont des
-                                  // voisins de num_nod
+                                  // loop over the nodes of element num_elem_v_v to determine
+                                  // whether it contains num_nod. If so, all its nodes are
+                                  // neighbors of num_nod
                                   if ( (num_elem_v_v!=-1) && (num_elem_v_v!=num_elem) )
                                     {
                                       int iok = 0 ;

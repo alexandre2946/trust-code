@@ -18,10 +18,10 @@
 Implemente_base(Champ_Uniforme_inst,"Champ_Uniforme_inst",Champ_Uniforme);
 
 
-/*! @brief Simple appel a: Champ_Uniforme::printOn(Sortie& ) Imprime le champ sur un flot de sortie.
+/*! @brief Simple call to: Champ_Uniforme::printOn(Sortie& ) Prints the field to an output stream.
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Champ_Uniforme_inst::printOn(Sortie& os) const
 {
@@ -29,10 +29,10 @@ Sortie& Champ_Uniforme_inst::printOn(Sortie& os) const
 }
 
 
-/*! @brief Simple appel a: Champ_Uniforme::readOn(Entree& ) Lit le champ sur un flot d'entree.
+/*! @brief Simple call to: Champ_Uniforme::readOn(Entree& ) Reads the field from an input stream.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
  */
 Entree& Champ_Uniforme_inst::readOn(Entree& is)
 {

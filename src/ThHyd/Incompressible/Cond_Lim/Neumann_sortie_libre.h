@@ -18,15 +18,15 @@
 
 #include <Neumann_val_ext.h>
 
-/*! @brief classe  Neumann_sortie_libre Cette classe represente une frontiere ouverte sans vitesse imposee
+/*! @brief Neumann_sortie_libre This class represents an open boundary without imposed velocity.
  *
- *     Pour les equations de Navier_Stokes on impose necessairement la pression sur une telle frontiere
- *     Pour traiter l'hydraulique, on derive donc de la classe Neumann_sortie_libre la classe Sortie_libre_pression_imposee
- *     Les conditions aux limites de type Neumann_sortie_libre ou des types derives se traduisent par des flux diffusifs nuls.
- *     En revanche, le traitement des flux convectifs impose de connaitre le champ convecte a l'exterieur de la frontiere en cas de re-entree
- *     de fluide. C'est pourquoi la classe porte un OWN_PTR(Champ_front_base) (membre le_champ_ext).
+ *     For Navier-Stokes equations, pressure must be imposed on such a boundary.
+ *     To handle the hydraulics, the class Sortie_libre_pression_imposee is derived from Neumann_sortie_libre.
+ *     Boundary conditions of type Neumann_sortie_libre or derived types result in zero diffusive fluxes.
+ *     However, the treatment of convective fluxes requires knowing the convected field outside the boundary in case of fluid re-entry.
+ *     This is why the class carries an OWN_PTR(Champ_front_base) (member le_champ_ext).
  *
- *     Dans les operateurs de calcul, les conditions aux limites de type Neumann_sortie_libre et des types derives seront traites de maniere identique
+ *     In the computation operators, boundary conditions of type Neumann_sortie_libre and derived types will be treated identically.
  *
  * @sa Neumann Sortie_libre_pression_imposee
  */
@@ -53,7 +53,7 @@ public:
 
 protected:
   OWN_PTR(Champ_front_base) le_champ_ext;
-  mutable DoubleTab val_ext_; // Stocke toutes les valeurs de la CL sur toutes les faces de la frontiere (pas d'hypothese sur un champ uniforme). Utile pour le GPU.
+  mutable DoubleTab val_ext_; // Stores all boundary condition values on all faces of the boundary (no assumption of a uniform field). Useful for GPU.
 };
 
 #endif

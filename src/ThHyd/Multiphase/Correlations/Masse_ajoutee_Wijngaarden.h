@@ -19,9 +19,9 @@
 #include <Masse_ajoutee_base.h>
 #include <TRUSTTabs_forward.h>
 
-/*! @brief Masse ajoutee de la forme ma(k, l) = +/- beta * alpha_k * alpha_l * rho_m
+/*! @brief Added mass of the form ma(k, l) = +/- beta * alpha_k * alpha_l * rho_m
  *
- *     avec beta un coefficient constant (0.5 par defaut) et rho_m la masse volumique du melange
+ *     where beta is a constant coefficient (0.5 by default) and rho_m is the mixture density
  *
  *
  */

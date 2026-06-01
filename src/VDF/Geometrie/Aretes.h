@@ -22,7 +22,7 @@ class Domaine_VDF;
 
 //////////////////////////////////////////////////////////////////////////////
 //
-// Classe Aretes : represente un ensemble d' aretes
+// Class Aretes: represents a set of edges
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -53,12 +53,12 @@ inline Aretes::Aretes(int n) : faces_(n,4),type1_(n),type2_(n)
 {
 }
 
-/*! @brief retourne le tableau (IntTab) des faces de dimension nb_aretes,4
+/*! @brief Returns the face array (IntTab) of dimension nb_aretes,4.
  *
  *  faces(num_arete,i) 0 <= i <= 3:
- *  numeros des 4 faces qui se partagent l'arete num_arete
- *  Pour une arete interne les 4 faces existent
- *  Pour une arete bord un ou deux des numeros valent -1.
+ *  indices of the 4 faces sharing edge num_arete
+ *  For an internal edge all 4 faces exist.
+ *  For a boundary edge one or two of the indices equal -1.
  *
  */
 inline IntTab& Aretes::faces()

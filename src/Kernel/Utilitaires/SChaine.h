@@ -16,9 +16,9 @@
 #define SChaine_included
 #include <Sortie.h>
 
-/*! @brief Cette classe derivee de Sortie empile ce qu'on lui envoie dans une chaine de caracteres.
+/*! @brief This class, derived from Sortie, accumulates what is sent to it into a character string.
  *
- * On recupere le contenu de la chaine avec get_str().
+ * The content of the string is retrieved with get_str().
  *
  * @sa EChaine
  */

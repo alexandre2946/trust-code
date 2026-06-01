@@ -122,20 +122,20 @@ void Impl_32_64<_SIZE_>::create_listb_from_domaine2(const Domaine_t& dom1, const
 
           ArrsOfInt_t faces_associees(nbfaces2);
 
-          ArrOfDouble xg1(Objet_U::dimension); // centre de gravite face de fr1
-          ArrOfDouble xg2(Objet_U::dimension); // centre de gravite face de fr2
+          ArrOfDouble xg1(Objet_U::dimension); // center of gravity of face fr1
+          ArrOfDouble xg2(Objet_U::dimension); // center of gravity of face fr2
 
           int nb_som_face=sommets_face1.dimension_int(1);
 
-          for (int_t face1=0; face1<nbfaces1; face1++) // Generation de Liste_faces_associees
+          for (int_t face1=0; face1<nbfaces1; face1++) // Build the associated face list
             {
               xg1=0.;
 
               for (int i=0; i<nb_som_face; i++)
                 for (int j=0; j<Objet_U::dimension; j++)
-                  xg1[j]+=xs1(sommets_face1(face1,i),j);  // centre de gravite de la face1 (non divise par nb_som_face)
+                  xg1[j]+=xs1(sommets_face1(face1,i),j);  // center of gravity of face1 (not divided by nb_som_face)
 
-              // recherche de la face de dom2 correspondante
+              // search for the corresponding face in dom2
 
               double dist_min=1.e6;
               int face_min=-1;
@@ -146,7 +146,7 @@ void Impl_32_64<_SIZE_>::create_listb_from_domaine2(const Domaine_t& dom1, const
 
                   for (int i=0; i<nb_som_face; i++)
                     for (int j=0; j<Objet_U::dimension; j++)
-                      xg2[j]+=xs2(sommets_face2(face2,i),j);  //centre de gravite de la face2 (non divise par nb_som_face)
+                      xg2[j]+=xs2(sommets_face2(face2,i),j);  //center of gravity of face2 (not divided by nb_som_face)
 
                   double dist=0.;
 
@@ -163,7 +163,7 @@ void Impl_32_64<_SIZE_>::create_listb_from_domaine2(const Domaine_t& dom1, const
               faces_associees[face_min].append_array(face1);
             }
 
-          for (int face2=0; face2<nbfaces2; face2++) // Ecriture des fichiers de sortie
+          for (int face2=0; face2<nbfaces2; face2++) // Write output files
             {
               Nom nomfic(nomfr1);
               nomfic+="%";
@@ -221,20 +221,20 @@ void Impl_32_64<_SIZE_>::create_listb_from_xyz(const Domaine_t& dom, const Noms&
 
           const IntTab_t& sommets_face1 = (ref_cast(Frontiere_t,fr1)).les_sommets_des_faces();
 
-          ArrsOfInt_t faces_associees(1000); // dimensionnement en dur qui devrait suffire
+          ArrsOfInt_t faces_associees(1000); // hardcoded size which should be sufficient
 
-          ArrOfDouble xg1(Objet_U::dimension); // centre de gravite face de fr1
+          ArrOfDouble xg1(Objet_U::dimension); // center of gravity of face fr1
 
           int nb_som_face=sommets_face1.dimension_int(1);
           int nb=0;
 
-          for (int face1=0; face1<nbfaces1; face1++) // Generation de Liste_faces_associees
+          for (int face1=0; face1<nbfaces1; face1++) // Build the associated face list
             {
               xg1=0.;
 
               for (int i=0; i<nb_som_face; i++)
                 for (int j=0; j<Objet_U::dimension; j++)
-                  xg1[j]+=xs1(sommets_face1(face1,i),j);  // centre de gravite de la face1 (non divise par nb_som_face)
+                  xg1[j]+=xs1(sommets_face1(face1,i),j);  // center of gravity of face1 (not divided by nb_som_face)
               xg1/=nb_som_face;
               parser.setVar("x",xg1[0]);
 
@@ -501,7 +501,7 @@ Entree& DecoupeBord_32_64<_SIZE_>::interpreter_(Entree& is)
   param.ajouter("binaire",&binaire); // XD_ADD_P entier
   // XD_CONT not_set
   param.lire_avec_accolades_depuis(is);
-  // on fait une copie de dom1 pour le modifier
+  // make a copy of dom1 to modify it
   this->associer_domaine(nom_dom1);
   const Domaine_t& dom_1=this->domaine();
   if (nom_fichier_sortie=="")
@@ -561,10 +561,10 @@ void DecoupeBord_32_64<_SIZE_>::decouper(Domaine_t& dom, const Nom& nom_file)
       Process::exit();
     }
 
-  // on ecrit la nvelle geom en sequentiel
+  // write the new geometry in sequential
   int nbtot=0;
   {
-    // on regarde le nombre de lignes de nom_file
+    // count the number of lines in nom_file
     EFichier listb2(nom_file);
     Nom toto;
     listb2>>toto;
@@ -587,7 +587,7 @@ void DecoupeBord_32_64<_SIZE_>::decouper(Domaine_t& dom, const Nom& nom_file)
   int nbbord=dom.nb_bords();
   IntVect decoup(nbfr);  // BoolVect in fact ...
   Noms nomsdesbordsorg(nbfr);
-  // on parcourt toutes les frontieres
+  // iterate over all boundaries
   for (int b=0; b<nbfr; b++)
     {
       Frontiere_t& org=dom.frontiere(b);
@@ -604,7 +604,7 @@ void DecoupeBord_32_64<_SIZE_>::decouper(Domaine_t& dom, const Nom& nom_file)
           if (marq)
             {
               nombord_dec.prefix(marq);
-              // on regarde dans les bords decoupes si ils correspondent a la frontiere courante
+              // check if the split boundaries correspond to the current boundary
               if (nombord==nombord_dec)
                 {
                   decoup(b)=1;
@@ -615,10 +615,10 @@ void DecoupeBord_32_64<_SIZE_>::decouper(Domaine_t& dom, const Nom& nom_file)
                   Nom nombord_dec_bis=nomborddec[nf];
                   toto.nommer(nombord_dec_bis);
                   IntVect_t listfaces;
-                  // on recupere la liste des faces
+                  // retrieve the list of faces
                   EFichier lis(nombord_dec_bis);
                   lis>>listfaces;
-                  // on genere les faces associes a ce nouveau bord
+                  // generate the faces associated with this new boundary
                   Faces_t& Facesorg=org.faces();
                   Faces_t& newfaces=toto.faces();
                   newfaces.typer(Facesorg.type_face());
@@ -645,7 +645,7 @@ void DecoupeBord_32_64<_SIZE_>::decouper(Domaine_t& dom, const Nom& nom_file)
         }
       bord_xv.close();
     }
-  // on supprime les bords decoupes du domaine
+  // remove the split boundaries from the domain
   for (int b2=0; b2<nbbord; b2++)
     if (decoup(b2))
       listbord.suppr(dom.bord(nomsdesbordsorg[b2]));

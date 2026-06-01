@@ -23,13 +23,10 @@
 
 /*! @brief class Op_Conv_Amont_PolyMAC_CDO_Elem
  *
- *   Cette classe represente l'operateur de convection associe a une equation de
- *   transport d'un scalaire.
- *   La discretisation est PolyMAC_CDO
- *   Le champ convecte est scalaire
- *   Le schema de convection est du type Amont
- *   L'iterateur associe est de type Iterateur_PolyMAC_CDO_Elem
- *   L'evaluateur associe est de type Eval_Amont_PolyMAC_CDO_Elem
+ *   Convection operator for a scalar transport equation using the PolyMAC_CDO
+ *   discretization. The convected field is scalar, the convection scheme is
+ *   upwind, the associated iterator is Iterateur_PolyMAC_CDO_Elem, and the
+ *   associated evaluator is Eval_Amont_PolyMAC_CDO_Elem.
  *
  */
 
@@ -53,13 +50,13 @@ protected:
   inline Op_Conv_Amont_PolyMAC_CDO_Elem(const Iterateur_PolyMAC_CDO_base&);
 };
 
-// Ce constructeur permet de creer des classes filles (exemple : front_tracking)
+// This constructor allows creating derived classes (e.g., front_tracking)
 inline Op_Conv_Amont_PolyMAC_CDO_Elem::Op_Conv_Amont_PolyMAC_CDO_Elem(const Iterateur_PolyMAC_CDO_base& it) :
   Op_Conv_PolyMAC_CDO_iterateur_base(it)
 {
 }
 
-/*! @brief on dimensionne notre matrice.
+/*! @brief Sizes the matrix.
  *
  */
 inline void Op_Conv_Amont_PolyMAC_CDO_Elem::dimensionner(Matrice_Morse& matrice) const

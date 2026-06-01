@@ -54,7 +54,7 @@ private :
   Nom nom_frontiere_voisine_;
   int est_initialise_ = 0;
   double e_ = 0.0;
-  // Tableaux de travail:
+  // Working arrays:
   ArrOfInt send_pe_list_;
   ArrOfInt recv_pe_list_;
 };

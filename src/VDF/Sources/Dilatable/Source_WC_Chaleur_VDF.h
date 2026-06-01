@@ -23,10 +23,10 @@ class Domaine_VF;
 
 /*! @brief class  Source_WC_Chaleur_VDF
  *
- *  Cette classe represente un terme source supplementaire
- *  a prendre en compte dans les equations de la chaleur
- *   dans le cas ou le fluide est weakly compressible et pour
- *   une discretisation VDF
+ *  This class represents a supplementary source term
+ *  to be taken into account in the heat equations
+ *  when the fluid is weakly compressible and for
+ *  a VDF discretization
  *
  *
  * @sa Source_base Fluide_Weakly_Compressible Source_WC_Chaleur
@@ -48,7 +48,7 @@ protected:
 
 private:
   void face_to_elem(const Domaine_VF& domaine, const DoubleTab& UgradP,DoubleTab& UgradP_elem) const;
-  // on l'utilise pas pour le moment mais bon pour debug ...
+  // not used for now but useful for debug ...
   void compute_interpolate_gradP_old(DoubleTab& gradP, const DoubleTab& Ptot) const;
 };
 

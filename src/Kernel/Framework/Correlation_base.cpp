@@ -24,12 +24,12 @@ Entree& Correlation_base::readOn(Entree& is) { return is; }
 
 void Correlation_base::typer_lire_correlation(OWN_PTR(Correlation_base)& cor, const Probleme_base& pb, const Nom& type, Entree& is)
 {
-  /* on lit le nom de la correlation : si "type" est renseigne, alors */
+  /* we read the name of the correlation: if "type" is provided, then */
   Nom nom;
   is >> nom;
   cor.typer(type != "??" ? type + "_" + nom : nom);
-  cor->associer_pb(pb); // sinon rien va marcher
-  is >> cor.valeur(); // On lit :-)
+  cor->associer_pb(pb); // otherwise nothing will work
+  is >> cor.valeur(); // Read :-)
 }
 
 void Correlation_base::associer_pb(const Probleme_base& pb)

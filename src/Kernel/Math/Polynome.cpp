@@ -19,10 +19,10 @@ Implemente_instanciable(Polynome,"Polynome",Objet_U);
 
 
 
-/*! @brief Ecriture sur un flot de sortie Ecrit le tableau des coefficients
+/*! @brief Writes the coefficient array to an output stream.
  *
- * @param (Sortie& os) le flot de sortie a utiliser
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) the output stream to use
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Polynome::printOn(Sortie& os) const
 {
@@ -31,10 +31,10 @@ Sortie& Polynome::printOn(Sortie& os) const
 }
 
 
-/*! @brief Lecture dans un flot d'entree Lecture du tableau des coefficients
+/*! @brief Reads the coefficient array from an input stream.
  *
- * @param (Entree& is) le flot d'entree a utiliser
- * @return (Entree& le flot d'entree modifie)
+ * @param (Entree& is) the input stream to use
+ * @return (Entree&) the modified input stream
  */
 Entree& Polynome::readOn(Entree& is)
 {
@@ -43,10 +43,10 @@ Entree& Polynome::readOn(Entree& is)
 }
 
 
-/*! @brief Calcul de la valeur du polynome au point x1
+/*! @brief Evaluates the polynomial at point x1.
  *
- * @param (double x1) point
- * @return (double) valeur du polynome
+ * @param (double x1) evaluation point
+ * @return (double) value of the polynomial
  */
 double Polynome::operator()(double x1) const
 {
@@ -62,11 +62,11 @@ double Polynome::operator()(double x1) const
   return sum;
 }
 
-/*! @brief Calcul de la valeur du polynome au point x1,x2
+/*! @brief Evaluates the polynomial at point (x1, x2).
  *
- * @param (double x1) point
- * @param (double x2) point
- * @return (double) valeur du polynome
+ * @param (double x1) first variable evaluation point
+ * @param (double x2) second variable evaluation point
+ * @return (double) value of the polynomial
  */
 double Polynome::operator()(double x1, double x2) const
 {
@@ -93,12 +93,12 @@ double Polynome::operator()(double x1, double x2) const
   return sum;
 }
 
-/*! @brief Calcul de la valeur du polynome au point x1,x2,x3
+/*! @brief Evaluates the polynomial at point (x1, x2, x3).
  *
- * @param (double x1) point
- * @param (double x2) point
- * @param (double x3) point
- * @return (double) valeur du polynome
+ * @param (double x1) first variable evaluation point
+ * @param (double x2) second variable evaluation point
+ * @param (double x3) third variable evaluation point
+ * @return (double) value of the polynomial
  */
 double Polynome::operator()(double x1, double x2, double x3) const
 {
@@ -136,13 +136,13 @@ double Polynome::operator()(double x1, double x2, double x3) const
   return sum;
 }
 
-/*! @brief Calcul de la valeur du polynome au point x1,x2,x3,x4
+/*! @brief Evaluates the polynomial at point (x1, x2, x3, x4).
  *
- * @param (double x1) point
- * @param (double x2) point
- * @param (double x3) point
- * @param (double x4) point
- * @return (double) valeur du polynome
+ * @param (double x1) first variable evaluation point
+ * @param (double x2) second variable evaluation point
+ * @param (double x3) third variable evaluation point
+ * @param (double x4) fourth variable evaluation point
+ * @return (double) value of the polynomial
  */
 double Polynome::operator()(double x1, double x2, double x3, double x4) const
 {
@@ -192,18 +192,14 @@ double Polynome::operator()(double x1, double x2, double x3, double x4) const
 }
 
 
-/*! @brief Non code.
- *
- * Ne fait rien
+/*! @brief Not implemented. Does nothing.
  *
  */
 void Polynome::derive(int )
 {
 }
 
-/*! @brief Non code.
- *
- * Ne fait rien
+/*! @brief Not implemented. Does nothing.
  *
  */
 void Polynome::integre(int )
@@ -211,9 +207,7 @@ void Polynome::integre(int )
 }
 
 
-/*! @brief Non code.
- *
- * retourne 0.
+/*! @brief Not implemented. Returns 0.
  *
  */
 double Polynome::derive(double ) const
@@ -221,9 +215,7 @@ double Polynome::derive(double ) const
   return 0;
 }
 
-/*! @brief Non code.
- *
- * retourne 0.
+/*! @brief Not implemented. Returns 0.
  *
  */
 double Polynome::derive(double , double ) const
@@ -231,9 +223,7 @@ double Polynome::derive(double , double ) const
   return 0;
 }
 
-/*! @brief Non code.
- *
- * retourne 0.
+/*! @brief Not implemented. Returns 0.
  *
  */
 double Polynome::derive(double , double , double ) const
@@ -241,9 +231,7 @@ double Polynome::derive(double , double , double ) const
   return 0;
 }
 
-/*! @brief Non code.
- *
- * retourne 0.
+/*! @brief Not implemented. Returns 0.
  *
  */
 double Polynome::derive(double , double , double , double ) const
@@ -252,9 +240,7 @@ double Polynome::derive(double , double , double , double ) const
 }
 
 
-/*! @brief Non code.
- *
- * retourne 0.
+/*! @brief Not implemented. Returns 0.
  *
  */
 double Polynome::integre(double ) const
@@ -262,9 +248,7 @@ double Polynome::integre(double ) const
   return 0;
 }
 
-/*! @brief Non code.
- *
- * retourne 0.
+/*! @brief Not implemented. Returns 0.
  *
  */
 double Polynome::integre(double , double ) const
@@ -272,9 +256,7 @@ double Polynome::integre(double , double ) const
   return 0;
 }
 
-/*! @brief Non code.
- *
- * retourne 0.
+/*! @brief Not implemented. Returns 0.
  *
  */
 double Polynome::integre(double , double , double ) const
@@ -282,9 +264,7 @@ double Polynome::integre(double , double , double ) const
   return 0;
 }
 
-/*! @brief Non code.
- *
- * retourne 0.
+/*! @brief Not implemented. Returns 0.
  *
  */
 double Polynome::integre(double , double , double , double ) const
@@ -293,9 +273,7 @@ double Polynome::integre(double , double , double , double ) const
 }
 
 
-/*! @brief Non code.
- *
- * Ne fait rien. Retourne *this.
+/*! @brief Not implemented. Does nothing. Returns *this.
  *
  */
 Polynome& Polynome::operator +=(const Polynome&)
@@ -303,9 +281,7 @@ Polynome& Polynome::operator +=(const Polynome&)
   return *this;
 }
 
-/*! @brief Non code.
- *
- * Ne fait rien. Retourne *this.
+/*! @brief Not implemented. Does nothing. Returns *this.
  *
  */
 Polynome& Polynome::operator -=(const Polynome&)
@@ -313,9 +289,7 @@ Polynome& Polynome::operator -=(const Polynome&)
   return *this;
 }
 
-/*! @brief Non code.
- *
- * Ne fait rien. Retourne *this.
+/*! @brief Not implemented. Does nothing. Returns *this.
  *
  */
 Polynome& Polynome::operator *=(const Polynome&)
@@ -323,9 +297,7 @@ Polynome& Polynome::operator *=(const Polynome&)
   return *this;
 }
 
-/*! @brief Non code.
- *
- * Ne fait rien. Retourne *this.
+/*! @brief Not implemented. Does nothing. Returns *this.
  *
  */
 Polynome& Polynome::operator *=(double)
@@ -333,9 +305,7 @@ Polynome& Polynome::operator *=(double)
   return *this;
 }
 
-/*! @brief Non code.
- *
- * Ne fait rien. Retourne *this.
+/*! @brief Not implemented. Does nothing. Returns *this.
  *
  */
 Polynome& Polynome::operator /=(double)

@@ -53,16 +53,16 @@ Entree& Loi_Etat_Multi_GP_QC::readOn(Entree& is)
   return is;
 }
 
-/*! @brief Associe les proprietes physiques d une espece a la loi d'etat
+/*! @brief Associates the physical properties of a species with the state law.
  *
- * @param (eq)
+ * @param eq The species convection-diffusion equation.
  */
 void Loi_Etat_Multi_GP_QC::associer_espece(const Convection_Diffusion_Espece_Multi_QC& eq)
 {
   liste_especes.add(eq.espece());
 }
 
-/*! @brief Calcule la masse molaire du melange (M) M depend de la mase molaire de chaque espece et de la composition du melange (Yi)
+/*! @brief Computes the molar mass of the mixture (M). M depends on the molar mass of each species and the mixture composition (Yi).
  *
  */
 void Loi_Etat_Multi_GP_QC::calculer_masse_molaire(DoubleTab& tab_masse_mol_mel) const
@@ -97,12 +97,12 @@ void Loi_Etat_Multi_GP_QC::calculer_masse_molaire(DoubleTab& tab_masse_mol_mel) 
       tab_masse_mol_mel(elem,0) = numer_M[elem] / inv_M[elem];
 }
 
-/*! @brief Calcule le Cp du melange Le Cp depend du Cp de chaque espece et de la composition du melange (Yi)
+/*! @brief Computes the Cp of the mixture. Cp depends on the Cp of each species and the mixture composition (Yi).
  *
  */
 void Loi_Etat_Multi_GP_QC::calculer_tab_Cp(DoubleTab& tab_Cp) const
 {
-  // FIXME : Actuellement on suppose que Cp est pris constant pour chacune des especes
+  // FIXME : Currently Cp is assumed constant for each species
   tab_Cp=0;
   for (int i=0; i<liste_Y.size(); i++)
     {
@@ -113,7 +113,7 @@ void Loi_Etat_Multi_GP_QC::calculer_tab_Cp(DoubleTab& tab_Cp) const
     }
 }
 
-/*! @brief Corrections explicites pour les fractions massiques pour forcer la somme a 1 et sans valeurs negatives
+/*! @brief Explicit corrections of mass fractions to force their sum to 1 and avoid negative values.
  *
  */
 void Loi_Etat_Multi_GP_QC::rabot(int futur)
@@ -166,7 +166,7 @@ void Loi_Etat_Multi_GP_QC::rabot(int futur)
     }
 }
 
-/*! @brief Recalcule la masse volumique
+/*! @brief Recomputes the density.
  *
  */
 void Loi_Etat_Multi_GP_QC::calculer_masse_volumique()
@@ -205,7 +205,7 @@ double Loi_Etat_Multi_GP_QC::calculer_masse_volumique(double P, double T) const
   return Loi_Etat_Multi_GP_base::calculer_masse_volumique(P,T);
 }
 
-/*! @brief Calcule la viscosite dynamique de reference (depend des Yi)
+/*! @brief Computes the reference dynamic viscosity (depends on mass fractions Yi).
  *
  * With Wilke formulation: https://aip.scitation.org/doi/pdf/10.1063/1.1747673
  * See also for mass fractions : https://doi.org/10.1016/j.ijheatmasstransfer.2020.120470
@@ -257,7 +257,7 @@ void Loi_Etat_Multi_GP_QC::calculer_mu_wilke()
       const double mu_i = liste_especes(i)->viscosite_dynamique().valeurs()(0, 0);
 
       for (int j = 0; j < list_size; j++)
-        if (j != i) // sinon phi_ii = 1
+        if (j != i) // otherwise phi_ii = 1
           {
             const double M_j = liste_especes(j)->masse_molaire();
             const double mu_j = liste_especes(j)->viscosite_dynamique().valeurs()(0, 0);
@@ -278,7 +278,7 @@ void Loi_Etat_Multi_GP_QC::calculer_mu_wilke()
   calculer_tab_mu(mu, size);
 }
 
-/*! @brief Calcule la viscosite dynamique sur Schmidt
+/*! @brief Computes the dynamic viscosity divided by the Schmidt number.
  *
  */
 void Loi_Etat_Multi_GP_QC::calculer_mu_sur_Sc()

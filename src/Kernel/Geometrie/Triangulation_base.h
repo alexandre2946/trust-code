@@ -18,10 +18,9 @@
 
 #include <Interprete_geometrique_base.h>
 
-/*! @brief Triangulation_base Classe destinee a factoriser l'action de triangulation des interpretes
+/*! @brief Triangulation_base Base class intended to factor out the triangulation action of interpreters
  *
- *      de type Trianguler et Tetraedriser
- *      .
+ *      of type Trianguler and Tetraedriser.
  *
  * @sa .CONTRAINTES, .INVARIANTS, .HTML, .EPS
  */

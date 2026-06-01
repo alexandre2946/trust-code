@@ -52,15 +52,15 @@ protected:
     return os;
   }
 
-  /*! @brief Lecture d'un vecteur sequentiel (comme un ArrOfDouble) Attention: appel invalide si le vecteur a un MD_Vector non nul.
+  /*! @brief Reads a sequential vector (like an ArrOfDouble). Invalid call if the vector has a non-null MD_Vector.
    *
-   * (pour les vecteurs paralleles, utiliser une methode de sauvegarde/reprise)
+   * (For parallel vectors, use a save/restore method instead)
    *
    */
   Entree& readOn(Entree& is) override
   {
 #ifndef LATATOOLS
-    // Que veut-on faire si on lit dans un vecteur ayant deja une structure parallele ?
+    // Reading into a vector that already has a parallel structure is not allowed:
     if (md_vector_)
       Process::exit("Error in TRUSTVect::readOn: vector has a parallel structure");
     TRUSTArray<_TYPE_,_SIZE_>::readOn(is);
@@ -81,20 +81,20 @@ public:
 
   TRUSTVect() : size_reelle_(0), line_size_(1) { }
 
-  /*! @brief construction d'un vecteur de taille n.
+  /*! @brief Constructs a vector of size n.
    *
-   * Les elements du vecteur sont initialises a zero par defaut. Pour ne pas initialiser les valeurs, utiliser ceci: DoubleVect toto;
+   * Elements are initialized to zero by default. To skip initialization, use: DoubleVect toto;
    *    toto.resize(n, RESIZE_OPTIONS::NOCOPY_NOINIT);
    *
    */
   TRUSTVect(_SIZE_ n) :   TRUSTArray<_TYPE_,_SIZE_>(n), size_reelle_(n), line_size_(1) { }
 
-  /*! @brief Constructeur par copie.
+  /*! @brief Copy constructor.
    *
-   * Il s'agit d'un "deep copy" voir ArrOfDouble::ArrOfDouble(const ArrOfDouble &) Remarque: il n'y a pas de constructeur par copie a partir de ArrOfDouble
-   *    Ceci est volontaire, sinon on risque de grosses pertes de performances par creation implicite d'objets, difficile a trouver.
-   *    (exemple: appel d'une methode toto(const IntVect &) avec un ArrOfInt produit une copie du tableau !)
-   *   Utiliser copy() pour copier un ArrOfDouble dans un DoubleVect
+   * This is a deep copy; see ArrOfDouble::ArrOfDouble(const ArrOfDouble &). Note: there is no copy constructor from ArrOfDouble on purpose,
+   *    to avoid large performance losses from implicit object creation that are hard to track down.
+   *    (Example: calling toto(const IntVect &) with an ArrOfInt would silently copy the array!)
+   *   Use copy() to copy an ArrOfDouble into a DoubleVect.
    *
    */
   TRUSTVect(const TRUSTVect& v) : TRUSTArray<_TYPE_,_SIZE_>(v), md_vector_(v.md_vector_), size_reelle_(v.size_reelle_), line_size_(v.line_size_) { }
@@ -128,7 +128,7 @@ public:
   inline void ref_as_big(TRUSTVect<_TYPE_, trustIdType>& out) const;
   inline void ref_as_small(TRUSTVect<_TYPE_, int>& out) const;
 
-  // Options par defaut choisies pour compatibilite avec la version precedente. Attention: il y avait un echange_espace_virtuel avant, ce n'est pas strictement equivalent
+  // Default options chosen for compatibility with the previous version. Note: there was an echange_espace_virtuel call before, which is not strictly equivalent.
   inline void abs(Mp_vect_options opt=VECT_ALL_ITEMS) { operator_abs(*this, opt); }
   inline void carre(Mp_vect_options opt=VECT_ALL_ITEMS) { carre_(*this, opt); }
   inline void racine_carree(Mp_vect_options opt=VECT_ALL_ITEMS) { racine_carree_(*this, opt); }
@@ -150,7 +150,7 @@ public:
   //    All the methods below involve parallelism or are not used in lata_tools
   //
 
-  // par defaut: min et max sur items reels (compat. 1.5.6):
+  // Default: min and max over real items (compat. 1.5.6):
   inline _TYPE_ local_max_vect(Mp_vect_options opt=VECT_REAL_ITEMS) const { return local_max_vect_(*this, opt); }
   inline _TYPE_ local_min_vect(Mp_vect_options opt=VECT_REAL_ITEMS) const { return local_min_vect_(*this, opt); }
   inline _TYPE_ local_max_abs_vect(Mp_vect_options opt=VECT_REAL_ITEMS) const { return local_max_abs_vect_(*this, opt); }
@@ -162,7 +162,7 @@ public:
   inline _TYPE_ mp_norme_vect() const { return mp_norme_vect_(*this); }
 #endif  // LATATOOLS
 
-  // methodes virtuelles
+  // Virtual methods
 
   inline virtual void ref(const TRUSTVect&);
   inline virtual void echange_espace_virtuel(IsExchangeBlocking exchange_type = IsExchangeBlocking::DefaultBlocking, const std::string kernel_name="noname");
@@ -183,7 +183,7 @@ public:
   inline const Span_ get_span() const override { return Span_((_TYPE_*)TRUSTArray<_TYPE_,_SIZE_>::addr(), size_reelle()); }
   inline const Span_ get_span_tot() const override { return Span_((_TYPE_*)TRUSTArray<_TYPE_,_SIZE_>::addr(), TRUSTArray<_TYPE_,_SIZE_>::size_array()); }
 
-  /*! @brief met l'objet dans l'etat obtenu par le constructeur par defaut.
+  /*! @brief Resets the object to the state obtained by the default constructor.
    *
    */
   inline void reset() override
@@ -199,15 +199,15 @@ protected:
   inline void resize_vect_(_SIZE_ n, RESIZE_OPTIONS opt=RESIZE_OPTIONS::COPY_INIT);
   inline void copy_(const TRUSTVect& v, RESIZE_OPTIONS opt=RESIZE_OPTIONS::COPY_INIT);
 
-  // Un DoubleVect est un ArrOfDouble qui possede eventuellement une structure de tableau distribue. Ce pointeur peut etre nul.
+  // A DoubleVect is an ArrOfDouble that optionally carries a distributed array structure. This pointer may be null.
   MD_Vector md_vector_;
 
-  // Propriete size_reelle du tableau (fournie par scattered_vect_data). -1 => l'appel a size_reelle() et size() est invalide pour ce vecteur.
+  // The size_reelle property of the array (provided by scattered_vect_data). -1 => calls to size_reelle() and size() are invalid for this vector.
   _SIZE_ size_reelle_;
 
-  // Facteur multiplicatif a appliquer entre md_vector_.nb_items_tot() et size_array() et entre md_vector_.nb_items_reels() et size_reelle_.
-  // Si l'objet est un tableau, ce facteur est generalement egal au produit des dimension(i) pour i>1 (une ligne du tableau par item geometrique du descripteur)
-  // Attention, line_size_ peut etre nul pour un tableau a zero colonnes mais pas s'il y a un descripteur attache.
+  // Multiplicative factor between md_vector_.nb_items_tot() and size_array(), and between md_vector_.nb_items_reels() and size_reelle_.
+  // For a 2D array, this is typically the product of dimension(i) for i>1 (one array row per geometric item in the descriptor).
+  // Warning: line_size_ may be zero for an array with zero columns, but not if a descriptor is attached.
   // Even in 64b we suppose line_size_ is always sufficiently small to fit in an int.
   int line_size_;
 };
@@ -225,15 +225,15 @@ using BigIntVect = BigTRUSTVect<int>;
 using BigTIDVect = BigTRUSTVect<trustIdType>;
 
 /* ********************************** *
- * FONCTIONS NON MEMBRES DE TRUSTVect *
+ * NON-MEMBER FUNCTIONS OF TRUSTVect  *
  * ********************************** */
 
 #include <TRUSTVect_tools.tpp> // external templates function specializations ici ;)
 
 /* ****************************** *
- * FONCTIONS MEMBRES DE TRUSTVect *
+ * MEMBER FUNCTIONS OF TRUSTVect  *
  * ****************************** */
 
-#include <TRUSTVect.tpp> // templates specializations ici ;)
+#include <TRUSTVect.tpp> // template specializations are here ;)
 
 #endif /* TRUSTVect_included */

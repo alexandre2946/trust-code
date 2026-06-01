@@ -79,21 +79,21 @@ void Domaine_Cl_VEF::associer(const Domaine_dis_base& dom_dis)
     IntVect renum;
     le_dom_VEF.creer_tableau_faces(renum, RESIZE_OPTIONS::NOCOPY_NOINIT);
     renum = -1;
-    // Marquer les faces non standard reelles (premieres faces dans le domaine)
+    // Mark real non-standard faces (first faces in the domain)
     for (int i = 0; i < nb_faces_non_std; i++)
       renum[i] = 0;
-    // Echange espace virtuel => marquer les faces virtuelles non standard
+    // Exchange virtual space => mark virtual non-standard faces
     renum.echange_espace_virtuel();
     MD_Vector md_vect;
     MD_Vector_tools::creer_md_vect_renum_auto(renum, md_vect);
     MD_Vector_tools::creer_tableau_distribue(md_vect, volumes_entrelaces_Cl_, RESIZE_OPTIONS::NOCOPY_NOINIT);
   }
   {
-    // Construction du descripteur pour le tableau des elements "Cl":
+    // Build the descriptor for the "Cl" element array:
     MD_Vector md_vect;
     MD_Vector_tools::creer_md_vect_renum(le_dom_VEF.rang_elem_non_std(), md_vect);
 
-    // Creation de tableaux aux elements "Cl":
+    // Create arrays for "Cl" elements:
     normales_facettes_Cl_.resize(0, nb_fa7_elem, dimension);
     MD_Vector_tools::creer_tableau_distribue(md_vect, normales_facettes_Cl_, RESIZE_OPTIONS::NOCOPY_NOINIT);
 
@@ -104,7 +104,7 @@ void Domaine_Cl_VEF::associer(const Domaine_dis_base& dom_dis)
   }
 }
 
-/*! @brief remplissage des tableaux
+/*! @brief Fill arrays.
  *
  */
 void Domaine_Cl_VEF::completer(const Domaine_dis_base& un_domaine_dis)
@@ -169,7 +169,7 @@ void Domaine_Cl_VEF::remplir_volumes_entrelaces_Cl(const Domaine_VEF& le_dom_VEF
                       type_elem.modif_volumes_entrelaces(j, elem, le_dom_VEF, volumes_entrelaces_Cl(), type_elem_Cl(n_poly));
                     }
                 }
-              // faces virtuelles de bord :
+              // virtual boundary faces:
               const ArrOfInt& faces_virt = front.get_faces_virt();
               int nb_faces_virt = faces_virt.size_array();
               for (int ind_face = 0; ind_face < nb_faces_virt; ind_face++)
@@ -234,7 +234,7 @@ void Domaine_Cl_VEF::remplir_normales_facettes_Cl(const Domaine_VEF& le_dom_VEF)
   //DoubleVect u(dimension);
   //DoubleVect v(dimension);
 
-  // Calcul des valeurs des normales aux facettes modifiees par les C.L:
+  // Compute the facet normals modified by boundary conditions:
 
   for (int elem = 0; elem < nb_elem; elem++)
     {
@@ -243,27 +243,27 @@ void Domaine_Cl_VEF::remplir_normales_facettes_Cl(const Domaine_VEF& le_dom_VEF)
         {
           num_elem = rang_elem(elem);
 
-          // numero des sommets du polyedre:
+          // index of the vertices of the polyhedron:
           for (isom = 0; isom < nsom; isom++)
             num_som[isom] = les_Polys(elem, isom);
 
-          // Calcul des coordonnees des sommets du polyedre:
+          // Compute the coordinates of the polyhedron vertices:
           for (isom = 0; isom < nsom; isom++)
             for (ncomp = 0; ncomp < dimension; ncomp++)
               x(isom, ncomp) = les_coords(num_som[isom], ncomp);
 
-          // Calcul des coordonnees du point G en fonction du type du polyedre
-          // idirichlet= nb de faces de dirichlet de l'elem
-          // pour triangle si idirichlet=2, n1=sommet confondu avec G
-          // pour quadrangle se reporter a Quadri_VEF.cpp
+          // Compute the coordinates of point G based on the polyhedron type
+          // idirichlet = number of Dirichlet faces of the element
+          // for triangle if idirichlet=2, n1=vertex coinciding with G
+          // for quadrilateral refer to Quadri_VEF.cpp
 
           elemvef.calcul_xg(xg, x, type_elem_Cl_[num_elem], idirichlet, n1, n2, n3);
-          // Calcul des valeurs du tableau normales_facettes_Cl:
+          // Compute values of the normales_facettes_Cl array:
 
           for (fa7 = 0; fa7 < nfa7; fa7++)
             {
               elemvef.creer_normales_facettes_Cl(normales_facettes_Cl(), fa7, num_elem, x, xg, z);
-              // Correction des valeurs du tableau normales_facettes_Cl:
+              // Correction of the normales_facettes_Cl array values:
               elemvef.modif_normales_facettes_Cl(normales_facettes_Cl(), fa7, num_elem, idirichlet, n1, n2, n3);
               int num1 = elem_faces(elem, KEL(0, fa7));
               int num2 = elem_faces(elem, KEL(1, fa7));
@@ -307,13 +307,13 @@ int trois_puissance(int n)
     }
 }
 
-/*! @brief appele par remplir_volumes_entrelaces_Cl() : remplissage de type_elem_Cl_
+/*! @brief Called by remplir_volumes_entrelaces_Cl(): fills type_elem_Cl_.
  *
  */
 void Domaine_Cl_VEF::remplir_type_elem_Cl(const Domaine_VEF& le_dom_VEF)
 {
   const Domaine& z = le_dom_VEF.domaine();
-  int nfac = z.type_elem()->nb_faces();   // dans Elem_geom
+  int nfac = z.type_elem()->nb_faces();   // in Elem_geom
   const IntTab& elem_faces = le_dom_VEF.elem_faces();
   const IntTab& face_voisins = le_dom_VEF.face_voisins();
   const IntVect& rang_elem = le_dom_VEF.rang_elem_non_std();
@@ -356,7 +356,7 @@ void Domaine_Cl_VEF::remplir_type_elem_Cl(const Domaine_VEF& le_dom_VEF)
   type_elem_Cl_.echange_espace_virtuel();
 }
 
-/*! @brief Impose les conditions aux limites a la valeur temporelle "temps" du Champ_Inc
+/*! @brief Imposes boundary conditions at the time "temps" of the Champ_Inc.
  *
  */
 void Domaine_Cl_VEF::imposer_cond_lim(Champ_Inc_base& ch, double temps)
@@ -374,8 +374,8 @@ void Domaine_Cl_VEF::imposer_cond_lim(Champ_Inc_base& ch, double temps)
           int nfin = ndeb + le_bord.nb_faces();
           if (sub_type(Periodique, la_cl))
             {
-              // On fait en sorte que le champ ait la meme valeur
-              // sur deux faces de periodicite qui sont en face l'une de l'autre
+              // Ensure the field has the same value
+              // on two periodic faces that are opposite each other
               const Periodique& la_cl_perio = ref_cast(Periodique, la_cl);
               CIntArrView face_associee = la_cl_perio.face_associee().view_ro();
               if (nb_comp==1)
@@ -582,7 +582,7 @@ void Domaine_Cl_VEF::imposer_cond_lim(Champ_Inc_base& ch, double temps)
           tab_surf_loc = 0;
           DoubleTab& tab_pression = ref_cast(Navier_Stokes_std,ch.equation()).pression().valeurs();
           int nb_cond_lims = nb_cond_lim();
-          // On boucle une premiere fois pour mettre a zero la pression aux sommets
+          // First loop: zero out the pressure at vertices
           for (int i = 0; i < nb_cond_lims; i++)
             {
               const Cond_lim_base& la_cl = les_conditions_limites(i).valeur();
@@ -609,7 +609,7 @@ void Domaine_Cl_VEF::imposer_cond_lim(Champ_Inc_base& ch, double temps)
                 }
             }
 
-          // On boucle une deuxieme fois pour ajouter la contribution de chaque face
+          // Second loop: add the contribution of each face
           for (int i = 0; i < nb_cond_lims; i++)
             {
               const Cond_lim_base& la_cl = les_conditions_limites(i).valeur();
@@ -642,7 +642,7 @@ void Domaine_Cl_VEF::imposer_cond_lim(Champ_Inc_base& ch, double temps)
                   end_gpu_timer(__KERNEL_NAME__);
                 }
             }
-          // On boucle une troisieme fois pour diviser par la surface
+          // Third loop: divide by the surface area
           for (int i = 0; i < nb_cond_lims; i++)
             {
               const Cond_lim_base& la_cl = les_conditions_limites(i).valeur();

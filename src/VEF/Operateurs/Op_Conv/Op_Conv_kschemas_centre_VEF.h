@@ -21,11 +21,10 @@
 
 /*! @brief class Op_Conv_kschemas_centre_VEF
  *
- *   Cette classe represente l'operateur de convection associe a une equation de
- *   transport d'un scalaire.
- *   La discretisation est VEF
- *   Le champ convecte est scalaire ou vecteur de type Champ_Inc_Base (P1NC et Q1NC)
- *   Le schema de convection est du type kschemas_centre
+ *   This class represents the convection operator associated with a scalar transport equation.
+ *   The discretization is VEF.
+ *   The convected field is a scalar or vector of type Champ_Inc_Base (P1NC and Q1NC).
+ *   The convection scheme is of kschemas_centre type.
  *
  *
  * @sa Operateur_Conv_base
@@ -40,7 +39,7 @@ public:
   void convkschemas_centre(const double , const int, int , const int ,const int, const int,const int,const int ,const double ,const DoubleTab&,DoubleVect& , DoubleVect& ,const DoubleVect& , const DoubleTab&,DoubleVect&) const ;
 protected:
 
-  double K = -100.;  // int caracterisant les differents schemas
+  double K = -100.;  // integer identifying the different schemes
 
 };
 

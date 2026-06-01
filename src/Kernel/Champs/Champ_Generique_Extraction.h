@@ -19,21 +19,21 @@
 #include <Champ_Gen_de_Champs_Gen.h>
 
 
-/*! @brief Un champ generique qui effctue l extraction d un champ sur une frontiere
+/*! @brief A generic field that performs the extraction of a field on a boundary
  *
  */
 
-//// Syntaxe a respecter pour jdd
+//// Data file syntax to follow
 //
-// "nom_champ" Extraction { domaine "nom_dom" nom_frontiere "nom_fr" [ methode ] "type_methode"
-//                source "type_champ_gen" { ...source ref_Champ { Pb_champ "nom_pb" "nom_champ_discret" } }
+// "field_name" Extraction { domain "domain_name" boundary_name "boundary_name" [ method ] "method_type"
+//                source "generic_field_type" { ...source ref_Champ { Pb_champ "pb_name" "discrete_field_name" } }
 //               }
-// "nom_champ" fixe par utilisateur sera le nom du champ generique
-// "nom_dom" nom du doamine a laquelle appartient la frontiere
-// "nom_fr" nom de la frontiere sur laquelle on veut faire l extraction
-// "type_methode" type de methode pour effectuer l extraction
-//                  ("trace" methode par defaut ou "champ_frontiere" pour extraire le_champ_front)
-// "type_champ_gen" type d'un champ generique
+// "field_name" set by the user will be the name of the generic field
+// "domain_name" name of the domain to which the boundary belongs
+// "boundary_name" name of the boundary on which we want to perform the extraction
+// "method_type" type of method to perform the extraction
+//                  ("trace" default method or "boundary_field" to extract the_boundary_field)
+// "generic_field_type" type of a generic field
 
 class Champ_Generique_Extraction : public Champ_Gen_de_Champs_Gen
 {
@@ -55,11 +55,11 @@ public:
   const  Motcle  get_directive_pour_discr() const override;
 
 protected :
-  Nom dom_extrac_;              // Nom du domaine d extraction
-  Nom nom_fr_;                  // Nom de la frontiere sur laquelle on fait l extraction
-  Nom methode_;                 // Type de methode pour extraire ("trace" ou "champ_frontiere")
-  OBS_PTR(Domaine) domaine_;        // Reference sur le domaine d extraction
-  OBS_PTR(Domaine_dis_base) le_dom_dis;  // Le domaine discretise - real owner is Domaine_dis_cache
+  Nom dom_extrac_;              // Name of the extraction domain
+  Nom nom_fr_;                  // Name of the boundary on which the extraction is performed
+  Nom methode_;                 // Type of method for extraction ("trace" or "champ_frontiere")
+  OBS_PTR(Domaine) domaine_;        // Reference to the extraction domain
+  OBS_PTR(Domaine_dis_base) le_dom_dis;  // The discretized domain - real owner is Domaine_dis_cache
 };
 
 #endif

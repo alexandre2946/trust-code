@@ -24,7 +24,7 @@ Field_base::Field_base() : nb_compo_(0), nature_(scalaire) { }
 Sortie& Field_base::printOn(Sortie& s ) const { return s; }
 Entree& Field_base::readOn(Entree& is ) { return is; }
 
-/*! @brief Renvoie le nom du champ.
+/*! @brief Returns the name of the field.
  *
  */
 const Nom& Field_base::le_nom() const
@@ -32,24 +32,24 @@ const Nom& Field_base::le_nom() const
   return nom_;
 }
 
-/*! @brief Donne un nom au champ
+/*! @brief Gives a name to the field
  *
- * @param (Nom& name) le nom a donner au champ
+ * @param (Nom& name) the name to give to the field
  */
 void Field_base::nommer(const Nom& name)
 {
   nom_ = name ;
 }
 
-/*! @brief Fixe le nombre de composantes du champ.
+/*! @brief Sets the number of components of the field.
  *
- * Le champ est vectoriel s'il est de meme dimension que l'espace.
+ * The field is vectorial if it has the same dimension as the space.
  *
- * @param (int i) le nombre de composantes du champs
+ * @param (int i) the number of components of the field
  */
 void Field_base::fixer_nb_comp(int i)
 {
-  // Interdiction de changer la nature du champ une fois le nb_valeurs_nodales fixe.
+  // Prohibition to change the field nature once the nb_valeurs_nodales is set.
   nb_compo_ = i;
   noms_compo_.dimensionner(i);
 
@@ -57,10 +57,10 @@ void Field_base::fixer_nb_comp(int i)
   else if (i > dimension) fixer_nature_du_champ(multi_scalaire);
 }
 
-/*! @brief Fixe le nom des composantes du champ
+/*! @brief Sets the names of the field components
  *
- * @param (Noms& noms) le tableau des noms a donner aux composantes du champ
- * @return (Noms&) le tableau des noms des composantes du champ
+ * @param (Noms& noms) the array of names to give to the field components
+ * @return (Noms&) the array of names of the field components
  */
 const Noms& Field_base::fixer_noms_compo(const Noms& noms)
 {
@@ -71,7 +71,7 @@ const Noms& Field_base::fixer_noms_compo(const Noms& noms)
   return noms_compo_ = noms;
 }
 
-/*! @brief Renvoie le tableau des noms des composantes du champ
+/*! @brief Returns the array of names of the field components
  *
  */
 const Noms& Field_base::noms_compo() const
@@ -79,12 +79,12 @@ const Noms& Field_base::noms_compo() const
   return noms_compo_;
 }
 
-/*! @brief Fixe le nom de la i-eme composante du champ
+/*! @brief Sets the name of the i-th component of the field
  *
- * @param (int i) l'index de la composante du champ dont on veut specifier le nom
- * @param (Nom& nom) le nom a donner a la i-eme composante du champ
- * @return (Nom&) le nom de i-eme composante du champ
- * @throws index de la composante du champ invalide
+ * @param (int i) the index of the field component whose name we want to specify
+ * @param (Nom& nom) the name to give to the i-th component of the field
+ * @return (Nom&) the name of i-th component of the field
+ * @throws invalid field component index
  */
 const Nom& Field_base::fixer_nom_compo(int i, const Nom& nom)
 {
@@ -92,11 +92,11 @@ const Nom& Field_base::fixer_nom_compo(int i, const Nom& nom)
   return noms_compo_[i] = nom;
 }
 
-/*! @brief Renvoie le nom de la ieme composante du champ
+/*! @brief Returns the name of the i-th component of the field
  *
- * @param (int i) l'index de la composante du champ dont on veut specifier le nom
- * @return (Nom& nom) le nom de i-eme composante du champ
- * @throws index de la composante du champ invalide
+ * @param (int i) the index of the field component whose name we want to specify
+ * @return (Nom& nom) the name of i-th component of the field
+ * @throws invalid field component index
  */
 const Nom& Field_base::nom_compo(int i) const
 {
@@ -110,11 +110,11 @@ const Nom& Field_base::nom_compo(int i) const
   return noms_compo_[i];
 }
 
-/*! @brief Fixe le nom d'un champ scalaire
+/*! @brief Sets the name of a scalar field
  *
- * @param (Nom& nom) le nom a donner au champ (scalaire)
- * @return (Nom&) le nom du champ scalaire
- * @throws le champ n'est pas scalaire
+ * @param (Nom& nom) the name to give to the field (scalar)
+ * @return (Nom&) the name of the scalar field
+ * @throws the field is not scalar
  */
 const Nom& Field_base::fixer_nom_compo(const Nom& nom)
 {
@@ -124,7 +124,7 @@ const Nom& Field_base::fixer_nom_compo(const Nom& nom)
   return noms_compo_[0] = nom;
 }
 
-/*! @brief Renvoie le nom d'un champ scalaire
+/*! @brief Returns the name of a scalar field
  *
  */
 const Nom& Field_base::nom_compo() const
@@ -133,11 +133,11 @@ const Nom& Field_base::nom_compo() const
   return le_nom();
 }
 
-/*! @brief Specifie les unites des composantes du champ.
+/*! @brief Specifies the units of the field components.
  *
- * Ces unites sont specifiees grace a un tableau de Nom et peuvent etre differentes pour chaque composante du champ.
+ * These units are specified through an array of Nom and can be different for each component of the field.
  *
- * @param (Noms& noms) les noms des unites des composantes du champ
+ * @param (Noms& noms) the names of the units of the field components
  */
 const Noms& Field_base::fixer_unites(const Noms& noms)
 {
@@ -146,19 +146,19 @@ const Noms& Field_base::fixer_unites(const Noms& noms)
   return unite_ = noms;
 }
 
-/*! @brief Renvoie les unites des composantes du champ
+/*! @brief Returns the units of the field components
  *
- * @return (Noms&) les noms des unites des composantes du champ
+ * @return (Noms&) the names of the units of the field components
  */
 const Noms& Field_base::unites() const
 {
   return unite_;
 }
 
-/*! @brief Specifie l'unite de la i-eme composante du champ Signification: l'index de la composante du champ dont on veut specifier l'unite
+/*! @brief Specifies the unit of the i-th component of the field Meaning: the index of the field component whose unit we want to specify
  *
- * @param (Nom& nom) le type de l'unite a specifier
- * @return (Nom&) le type de l'unite de la i-eme composante du champ
+ * @param (Nom& nom) the type of unit to specify
+ * @return (Nom&) the type of unit of the i-th component of the field
  */
 const Nom& Field_base::fixer_unite(int i, const Nom& nom)
 {
@@ -166,20 +166,20 @@ const Nom& Field_base::fixer_unite(int i, const Nom& nom)
   return unite_[i] = nom;
 }
 
-/*! @brief Renvoie l'unite de la i-eme composante du champ
+/*! @brief Returns the unit of the i-th component of the field
  *
- * @param (int i) l'index de la composante du champ dont on veut connaitre l'unite
- * @return (Nom&) l'unite de la i-eme composante du champ
+ * @param (int i) the index of the field component whose unit we want to know
+ * @return (Nom&) the unit of the i-th component of the field
  */
 const Nom& Field_base::unite(int i) const
 {
   return unite_[i];
 }
 
-/*! @brief Specifie l'unite d'un champ scalaire ou dont toutes les composantes ont la meme unite
+/*! @brief Specifies the unit of a scalar field or whose all components have the same unit
  *
- * @param (Nom& nom) l'unite a specifier
- * @return (Nom&) l'unite du champ
+ * @param (Nom& nom) the unit to specify
+ * @return (Nom&) the unit of the field
  */
 const Nom& Field_base::fixer_unite(const Nom& nom)
 {
@@ -187,9 +187,9 @@ const Nom& Field_base::fixer_unite(const Nom& nom)
   return unite_[0] = nom;
 }
 
-/*! @brief Renvoie l'unite d'un champ scalaire dont toutes les composantes ont la meme unite
+/*! @brief Returns the unit of a scalar field whose all components have the same unit
  *
- * @return (Nom&) l'unite (commune) des composantes du champ
+ * @return (Nom&) the (common) unit of the field components
  */
 const Nom& Field_base::unite() const
 {
@@ -197,18 +197,18 @@ const Nom& Field_base::unite() const
   return unite_[0];
 }
 
-/*! @brief Fixer la nature d'un champ: scalaire, multiscalaire, vectoriel.
+/*! @brief Sets the nature of a field: scalar, multiscalar, vectorial.
  *
- * Le type (enum) Nature_du_champ est defini dans Ch_base.h.
+ * The type (enum) Nature_du_champ is defined in Ch_base.h.
  *
- * @param (Nature_du_champ n) la nature a donner au champ
+ * @param (Nature_du_champ n) the nature to assign to the field
  */
 Nature_du_champ Field_base::fixer_nature_du_champ(Nature_du_champ n)
 {
   return nature_ = n;
 }
 
-/*! @brief Renvoie l'ordre des fonctions de base
+/*! @brief Returns the order of the basis functions
  *
  */
 int Field_base::order_field() const

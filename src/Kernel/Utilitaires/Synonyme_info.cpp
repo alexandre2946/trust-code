@@ -17,22 +17,22 @@
 #include <Noms.h>
 
 // B.Mathieu, 08/2004
-//  Le processus d'initialisation de ces membres statiques est tres
-//  important : il faut absolument qu'ils soient initialises AVANT
-//  le premier appel au constructeur Synonyme_info::Synonyme_info(...).
-//  Or ce constructeur est appele pour initialiser le membre statique info_obj
-//  de tous les Objet_U.
-//  Risque de "static initialization order fiasco"
-//    (voir http://www.parashift.com/c++-faq-lite/ctors.html   [10.11])
-//  Pour l'instant c'est ok parce qu'on initialise avec une constante...
+//  The initialization process of these static members is very
+//  important: they absolutely must be initialized BEFORE
+//  the first call to the constructor Synonyme_info::Synonyme_info(...).
+//  This constructor is called to initialize the static member info_obj
+//  of all Objet_U objects.
+//  Risk of "static initialization order fiasco"
+//    (see http://www.parashift.com/c++-faq-lite/ctors.html   [10.11])
+//  For now it is ok because we initialize with a constant...
 
-// Tableau de pointeurs sur les synonymes enregistres lors de la construction
-// des Synonyme_info. Si plusieurs synonymes on le meme nom (Synonyme_info::n), alors
-// on n'en enregistre qu'un seul dans Synonyme_info::les_synonymes.
+// Array of pointers to synonyms registered during the construction
+// of Synonyme_info objects. If multiple synonyms share the same name (Synonyme_info::n), then
+// only one is registered in Synonyme_info::les_synonymes.
 const Synonyme_info** Synonyme_info::les_synonymes=0;
-// Pour chaque elements du tableau "les_synonymes", ce nombre vaut 1 si le
-// nom du synonyme est commun a plusieurs synonymes, 0 sinon.
-// Voir "ajouter_synonyme"
+// For each element of the array "les_synonymes", this number is 1 if the
+// synonym name is shared with multiple synonyms, 0 otherwise.
+// See "ajouter_synonyme"
 
 int Synonyme_info::nb_classes=0;
 int Synonyme_info::les_synonymes_memsize=0;
@@ -55,7 +55,7 @@ static inline int strcmp_uppercase(const char *n1, const char *n2)
   return delta;
 }
 
-// GF pour liberer correctement la memoire il faut au moins detruire le nom
+// GF to correctly free the memory we need to at least destroy the name
 Synonyme_info::~Synonyme_info()
 {
   retirer_synonyme(nom());
@@ -66,24 +66,24 @@ Synonyme_info::~Synonyme_info()
     }
 }
 
-/*! @brief Recherche le synonyme de nom "nom" dans la liste de synonymes enregistres par une recherche binaire.
+/*! @brief Searches for the synonym named "nom" in the list of registered synonyms using binary search.
  *
- *   On compare les chaines converties en majuscules.
- *   On range dans "index" l'indice du synonyme, s'il a ete trouve
- *   et sinon l'indice du synonyme juste apres (dans ce cas, on a
+ *   Strings are compared converted to uppercase.
+ *   Stores in "index" the index of the synonym if found,
+ *   otherwise the index of the next synonym after it (in that case,
  *    les_synonymes[index-1]->n < nom < les_synonymes[index]->n )
- *   Si le synonyme a ete trouve on renvoie 1, sinon 0.
+ *   Returns 1 if the synonym was found, 0 otherwise.
  *
  */
 int Synonyme_info::search_synonyme_info_name(const char *nom, int& index)
 {
   assert(nom != 0);
-  // [imin..imax] est l'intervalle ou se trouve l'index recherche
+  // [imin..imax] is the interval where the searched index lies
   int imin = 0;
   int imax = nb_classes;
   while (imax > imin)
     {
-      // On a toujours milieu < imax
+      // We always have milieu < imax
       int milieu = (imin + imax) / 2;
       int comparaison = strcmp_uppercase(nom, les_synonymes[milieu]->n);
       if (comparaison == 0)
@@ -94,25 +94,25 @@ int Synonyme_info::search_synonyme_info_name(const char *nom, int& index)
       if (comparaison < 0)
         {
           // nom < les_synonymes[milieu]
-          // l'index recherche est donc inferieur ou egal a "milieu"
+          // the searched index is therefore less than or equal to "milieu"
           imax = milieu;
         }
       else
         {
           // nom > les_synonymes[milieu]
-          // l'index recherche est donc strictement superieur a "milieu"
+          // the searched index is therefore strictly greater than "milieu"
           imin = milieu + 1;
         }
     }
   index = imax;
   return 0;
 }
-/*! @brief Constructeur par un nom, un tableau de meres.
+/*! @brief Constructor from a name and an array of parent classes.
  *
- * @param (const char* nom) le nom du synonyme a creer
- * @param (int nb_base) le nombre de meres dans le tableau bases[]
- * @param (const Synonyme_info* bases[]) le tableau specifiant les synonymes de bases (meres) du synonyme a creer
- * @throws Sort en erreur si le nom n'est pas defini (null)
+ * @param (const char* nom) the name of the synonym to create
+ * @param (int nb_base) the number of parent classes in the bases[] array
+ * @param (const Synonyme_info* bases[]) the array specifying the base synonyms (parents) of the synonym to create
+ * @throws Exits on error if the name is not defined (null)
  */
 Synonyme_info::Synonyme_info(const char* un_nom, const char* org_name) :
   n(un_nom),org(org_name)
@@ -127,14 +127,14 @@ Synonyme_info::Synonyme_info(const char* un_nom, const char* org_name) :
   ajouter_synonyme(*this);
 }
 
-/*! @brief Methode statique appelee par les constructeurs de Synonyme_info pour ajouter un nouveau synonyme a la liste des synonymes enregistres.
+/*! @brief Static method called by Synonyme_info constructors to remove a synonym from the list of registered synonyms.
  *
- *   Verifie que le nom du synonyme n'existe pas encore.
+ *   Verifies that the synonym name exists.
  *
  */
 void Synonyme_info::retirer_synonyme(const char* nom)
 {
-  // On cherche ou mettre le synonyme dans le tableau :
+  // Search where to find the synonym in the array:
   int index;
   int existe_deja = search_synonyme_info_name(nom, index);
   if (!existe_deja)
@@ -144,25 +144,25 @@ void Synonyme_info::retirer_synonyme(const char* nom)
     }
   else
     {
-      // Ajout du synonyme dans le tableau a l'indice "index":
+      // Remove the synonym from the array at index "index":
       for (int i = index; i < nb_classes-1; i++)
         les_synonymes[i] = les_synonymes[i+1];
       nb_classes--;
     }
 }
 
-/*! @brief Methode statique appelee par les constructeurs de Synonyme_info pour ajouter un nouveau synonyme a la liste des synonymes enregistres.
+/*! @brief Static method called by Synonyme_info constructors to add a new synonym to the list of registered synonyms.
  *
- *   Verifie que le nom du synonyme n'existe pas encore.
+ *   Verifies that the synonym name does not already exist.
  *
  */
 void Synonyme_info::ajouter_synonyme(const Synonyme_info& synonyme_info)
 {
-  // Verifie qu'il y a assez de place dans le tableau :
+  // Check that there is enough room in the array:
   if (les_synonymes_memsize <= nb_classes + 1)
     {
       static const int INCREMENT = 512;
-      // Plus assez de place dans le tableau: on redimensionne.
+      // Not enough room in the array: resize it.
       les_synonymes_memsize += INCREMENT;
       const Synonyme_info** nouveau = new const Synonyme_info*[les_synonymes_memsize];
       for (int i = 0; i < nb_classes; i++)
@@ -171,7 +171,7 @@ void Synonyme_info::ajouter_synonyme(const Synonyme_info& synonyme_info)
       les_synonymes = nouveau;
     }
 
-  // On cherche ou mettre le synonyme dans le tableau :
+  // Search where to insert the synonym in the array:
   int index;
   int existe_deja=Type_info::est_un_type(synonyme_info.n);
   if (existe_deja)
@@ -187,7 +187,7 @@ void Synonyme_info::ajouter_synonyme(const Synonyme_info& synonyme_info)
     }
   else
     {
-      // Ajout du synonyme dans le tableau a l'indice "index":
+      // Add the synonym to the array at index "index":
       for (int i = nb_classes; i > index; i--)
         les_synonymes[i] = les_synonymes[i-1];
       les_synonymes[index] = &synonyme_info;
@@ -196,10 +196,10 @@ void Synonyme_info::ajouter_synonyme(const Synonyme_info& synonyme_info)
     }
 }
 
-/*! @brief Ecriture de toute la hierarchie du synonyme considere sur un flux de sortie
+/*! @brief Writes the entire hierarchy of the considered synonym to an output stream.
  *
- * @param (Sortie& os) flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Synonyme_info::hierarchie(Sortie& os)
 {
@@ -210,13 +210,13 @@ Sortie& Synonyme_info::hierarchie(Sortie& os)
   return os << finl<<flush;
 }
 
-/*! @brief Test d'existence d'une classe du synonyme indique si il existe une classe T dont le Synonyme_info a
+/*! @brief Tests whether a class synonym exists: if there is a class T whose Synonyme_info has
  *
- *      le nom nom, alors est_un_synonyme renvoie 1
- *      renvoie le pointeur nul sinon.
+ *      the name "nom", then est_un_synonyme returns 1,
+ *      returns null pointer otherwise.
  *
- * @param (const char* nom) chaine de caractere associee a un synonyme
- * @return (int) code de retour (0 ou  1)
+ * @param (const char* nom) character string associated with a synonym
+ * @return (int) return code (0 or 1)
  */
 int Synonyme_info::est_un_synonyme(const char* nom)
 {
@@ -224,10 +224,10 @@ int Synonyme_info::est_un_synonyme(const char* nom)
   return (synonyme != 0);
 }
 
-/*! @brief Methode statique qui renvoie un pointeur vers le Synonyme_info dont le nom est "synonyme_name".
+/*! @brief Static method that returns a pointer to the Synonyme_info whose name is "synonyme_name".
  *
- * Si synonyme_name n'est pas un synonyme,
- *   renvoie un pointeur nul.
+ * If synonyme_name is not a synonym,
+ *   returns a null pointer.
  *
  */
 const Synonyme_info * Synonyme_info::synonyme_info_from_name(const char * synonyme_name)

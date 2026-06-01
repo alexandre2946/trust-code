@@ -23,14 +23,13 @@
 class Schema_Temps_base;
 class Milieu_base;
 
-/*! @brief Class Discret_Thermique Cette classe est la classe de base representant une discretisation
+/*! @brief Class Discret_Thermique: base class representing a spatial discretisation applied to thermal problems.
  *
- *     spatiale appliquee aux problemes thermiques.
- *     Les methodes virtuelles pures sont a implementer dans les classes
- *     derivees pour typer et discretiser les champs portes par les
- *     equations liees a la discretisation.
+ *     Pure virtual methods must be implemented in derived classes
+ *     to type and discretise the fields carried by the equations
+ *     linked to the discretisation.
  *
- * @sa Discretisation_base, Classe abstraite, Methodes abstraites, void temperature(const Schema_Temps_base&, Domaine_dis_base&, Champ_Inc_base&) const, void proprietes_physiques_milieu(Domaine_dis_base& ,Milieu_base& ,const Champ_Inc_base& ) const
+ * @sa Discretisation_base, void temperature(const Schema_Temps_base&, Domaine_dis_base&, Champ_Inc_base&) const, void proprietes_physiques_milieu(Domaine_dis_base& ,Milieu_base& ,const Champ_Inc_base& ) const
  */
 class Discret_Thermique : public Discretisation_base
 {

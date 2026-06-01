@@ -63,7 +63,7 @@ void Eval_Puiss_Neutr_VDF_Elem::associer_repartition(const Nom& n, const Nom& no
 
 void Eval_Puiss_Neutr_VDF_Elem::mettre_a_jour( )
 {
-  puissance = la_puissance->valeurs()(0); // on met a jour le tableau de puissance
+  puissance = la_puissance->valeurs()(0); // update the power array
 }
 
 void Eval_Puiss_Neutr_VDF_Elem::completer()

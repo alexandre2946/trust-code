@@ -24,18 +24,18 @@ class Ensemble_Lagrange_base;
 class Probleme_base;
 class Discretisation_base;
 
-/*! @brief classe Marqueur_Lagrange_base La classe Marqueur_Lagange_base est la classe de base des classes de marqueurs
+/*! @brief Marqueur_Lagrange_base The Marqueur_Lagrange_base class is the base class for Lagrangian marker classes.
  *
- *      Actuellement une seule classe instanciable derivant : Marqueur_FT
- *      Un marqueur est destine a suivre le mouvement du fluide en integrant la trajectoire
- *      d un ensemble de particules a partir de la vitesse (interpolee) du fluide.
- *      -l ensemble des points suivis est attribut de Marqueur_FT car de type Maillage_FT_Disc
- *      -le postraitement est realise sur le nombre de particules par maille (densite_particules_)
- *       ou sur le nuage de points
- *      -l integration est demarree a partir d un temps t_debut_integr_ fixe par l utilisateur
- *         ou egal a t_init par defaut
+ *      Currently only one instantiable derived class: Marqueur_FT
+ *      A marker is intended to track the fluid motion by integrating the trajectory
+ *      of a set of particles from the (interpolated) fluid velocity.
+ *      - the set of tracked points is an attribute of Marqueur_FT as it is of type Maillage_FT_Disc
+ *      - post-processing is performed on the number of particles per cell (densite_particules_)
+ *        or on the point cloud
+ *      - integration starts from a time t_debut_integr_ set by the user
+ *          or equal to t_init by default
  *
- * @sa Classe abstraite., Methodes abstraites:, Ensemble_Lagrange_base&  ensemble_points(), void calculer_valeurs_champs()
+ * @sa Abstract class., Abstract methods:, Ensemble_Lagrange_base&  ensemble_points(), void calculer_valeurs_champs()
  */
 class Marqueur_Lagrange_base: public Champs_compris_interface, public Objet_U
 {
@@ -51,7 +51,7 @@ public :
   virtual void discretiser(const Probleme_base& pb, const  Discretisation_base& dis);
   virtual void mettre_a_jour(double temps);
 
-  //Methodes de l interface des champs postraitables
+  // Methods of the post-processable fields interface
   /////////////////////////////////////////////////////
   void creer_champ(const Motcle& motlu) override { }
   const Champ_base& get_champ(const Motcle& nom) const override;
@@ -62,8 +62,8 @@ public :
 
 protected :
 
-  OWN_PTR(Champ_Fonc_base)  densite_particules_; //Exprime le nombre de particules par maille
-  double t_debut_integr_;            //Temps de debut d integration des trajectoires
+  OWN_PTR(Champ_Fonc_base)  densite_particules_; // Expresses the number of particles per cell
+  double t_debut_integr_;            // Start time for trajectory integration
 
 private :
 

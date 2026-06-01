@@ -18,7 +18,7 @@
 
 #include <Champ_Fonc_P1_base.h>
 
-/*! @brief classe Champ_Fonc_P1_VEF
+/*! @brief class Champ_Fonc_P1_VEF
  *
  * @sa Champ_Fonc_P1
  */

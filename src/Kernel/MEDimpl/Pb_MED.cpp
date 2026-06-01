@@ -48,7 +48,7 @@ Entree& Pbc_MED::readOn(Entree& is )
   sch.changer_temps_courant(-1.);
   associer_sch_tps_base(sch);
   //Pb_MED* listpb;
-  // On cree une liste de DerObjU car c'est eux que l'on peut ajouter a l'interprete...
+  // Create a list of DerObjU since those are the objects that can be added to the interpreter...
   DerObjU* listob =new DerObjU[nmax];
   Motcle accouv("{"),accfer("}"),virg(","),motlu;
   is >> motlu;
@@ -92,8 +92,8 @@ Entree& Pbc_MED::readOn(Entree& is )
   for (int i=0; i<nb_problemes(); i++)
     ref_cast(Probleme_base,probleme(i)).init_postraitements();
 
-  // On oublie les axi, car les inconnues ont deja eu le traitement
-  // apres l'init pour ecrire correctement les geom
+  // Reset the axi flags, since unknowns have already been processed
+  // after init to write the geometry correctly
   bidim_axi=0;
   axi=0;
 
@@ -117,14 +117,14 @@ Entree& Pbc_MED::readOn(Entree& is )
   return is;
 }
 
-/*! @brief Simple appel a: Probleme_base::readOn(Entree&)
+/*! @brief Simple call to: Probleme_base::readOn(Entree&)
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
  */
 Entree& Pb_MED::readOn(Entree& is )
 {
-  // On commence par ca car assoscier de Pb_base est jamais appele
+  // Start with this because associer from Pb_base is never called
   save_restart_.assoscier_pb_base(*this);
 
   dis_bidon.typer("VF_inst");
@@ -133,7 +133,7 @@ Entree& Pb_MED::readOn(Entree& is )
   Nom nom_dom;
   is >> nom_dom;
 
-  // on retire _0000 si il existe et on cree le bon fichier
+  // strip _0000 if present and create the proper file name
   traite_nom_fichier_med(nom_fic);
 
   Domaine& dom=ref_cast(Domaine, Interprete::objet(nom_dom));
@@ -156,49 +156,49 @@ Entree& Pb_MED::readOn(Entree& is )
 }
 
 
-/*! @brief Renvoie le nombre d'equations du probleme.
+/*! @brief Returns the number of equations in the problem.
  *
- * Toujours egal a 1 pour un probleme de conduction standart.
+ * Always equal to 1 for a standard conduction problem.
  *
- * @return (int) le nombre d'equations du probleme
+ * @return (int) the number of equations in the problem
  */
 int Pb_MED::nombre_d_equations() const
 {
   return 0;
 }
 
-/*! @brief Renvoie l'equation de type MED si i = 0,
+/*! @brief Returns the MED-type equation if i = 0,
  *
- *     Provoque une erreur sinon car le probleme
- *     n'a qu'une seule equation.
- *     (version const)
+ *     Otherwise triggers an error since the problem
+ *     has only a single equation.
+ *     (const version)
  *
- * @param (int i) l'index de l'equation a renvoyer
- * @return (Equation_base&) l'equation de type MED
+ * @param (int i) the index of the equation to return
+ * @return (Equation_base&) the MED-type equation
  */
 const Equation_base& Pb_MED::equation(int i) const
 {
   assert(0);
   exit();
   assert (i==0);
-  //pour les compilos
+  // for the compiler
 
   return Probleme_base::equation("bidon");
 }
 
-/*! @brief Renvoie l'equation de type MED si i = 0,
+/*! @brief Returns the MED-type equation if i = 0,
  *
- *     Provoque une erreur sinon car le probleme
- *     n'a qu'une seule equation.
+ *     Otherwise triggers an error since the problem
+ *     has only a single equation.
  *
- * @param (int i) l'index de l'equation a renvoyer
- * @return (Equation_base&) l'equation de type MED
+ * @param (int i) the index of the equation to return
+ * @return (Equation_base&) the MED-type equation
  */
 Equation_base& Pb_MED::equation(int i)
 {
   assert(0);
   exit();
-  //pour les compilos
+  // for the compiler
   return Probleme_base::equation("bidon") ;
 }
 
@@ -230,7 +230,7 @@ void Pb_MED::creer_champ(const Motcle& motlu)
   Cerr<<"Pb_MED::creer_champ "<< motlu<<finl;
   Noms liste_noms;
   get_noms_champs_postraitables(liste_noms);
-  OWN_PTR(Champ_Fonc_base)  toto; // on ajoute toto et on le type apres pour eviter des copies qui ne marchent pas ...
+  OWN_PTR(Champ_Fonc_base)  toto; // we add toto and type it afterwards to avoid copies that do not work ...
   auto& le_ch_fonc= champs_fonc_post.add(toto);
   le_ch_fonc.typer("Champ_Fonc_MED");
   int nbchampmed=nomschampmed.size();
@@ -304,7 +304,7 @@ bool Pb_MED::has_champ(const Motcle& un_nom, OBS_PTR(Champ_base) &ref_champ) con
             }
     }
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 bool Pb_MED::has_champ(const Motcle& un_nom) const
@@ -319,7 +319,7 @@ bool Pb_MED::has_champ(const Motcle& un_nom) const
             return true;
     }
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 const Champ_base& Pb_MED::get_champ(const Motcle& un_nom) const
@@ -358,7 +358,7 @@ const Champ_base& Pb_MED::get_champ(const Motcle& un_nom) const
 
 void Pb_MED::get_noms_champs_postraitables(Noms& noms, Option opt) const
 {
-  //La methode surcharge celle de Probleme_base
+  // This method overrides the one in Probleme_base
   if (opt == DESCRIPTION)
     Cerr << "Pb_MED : " << nomschampmed << finl;
   else

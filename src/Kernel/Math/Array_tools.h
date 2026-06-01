@@ -18,41 +18,41 @@
 
 #include <TRUSTTab.h>
 
-/*! @brief Methode outil pour retirer les doublons dans un tableau.
+/*! @brief Utility method to remove duplicates from an array.
  *
  */
 template <typename _TYPE_, typename _SIZE_>
 void array_trier_retirer_doublons(TRUSTArray<_TYPE_,_SIZE_>& array);
 
-/*! @brief Methode outil pour calculer l'intersection entre deux listes d'entiers.
+/*! @brief Utility method to compute the intersection of two integer lists.
  *
  */
 template <typename _TYPE_, typename _SIZE_>
 void array_calculer_intersection(TRUSTArray<_TYPE_,_SIZE_>& liste1, const TRUSTArray<_TYPE_,_SIZE_>& liste2);
 
-/*! @brief Methode outil pour calculer la difference entre deux listes d'entiers triees
+/*! @brief Utility method to compute the difference between two sorted integer lists.
  *
  */
 void array_retirer_elements(ArrOfInt& sorted_array, const ArrOfInt& sorted_elements_list);
 
-/*! @brief Methode outil pour chercher une valeur dans un tableau trie
+/*! @brief Utility method to search for a value in a sorted array.
  *
  */
 int array_bsearch(const ArrOfInt& tab, int valeur);
 
-/*! @brief Tri lexicographique d'un tableau
+/*! @brief Lexicographic sort of an array.
  *
  */
 template <typename _TYPE_, typename _SIZE_>
 int tri_lexicographique_tableau(TRUSTTab<_TYPE_,_SIZE_>& tab);
 
-/*! @brief Tri indirect (on trie le tableau index qui contient des numeros de lignes dans tab)
+/*! @brief Indirect sort (sorts the index array which contains row numbers in tab).
  *
  */
 template <typename _TYPE_, typename _SIZE_>
 int tri_lexicographique_tableau_indirect(const TRUSTTab<_TYPE_,_SIZE_>& tab, ArrOfInt_T<_SIZE_>& index);
 
-/*! @brief Methode outil pour retirer les doublons dans un tableau.
+/*! @brief Utility method to remove duplicates from an array.
  *
  */
 template <typename _SIZE_>
@@ -63,7 +63,7 @@ void tableau_trier_retirer_doublons(IntTab_T<_SIZE_>& tab);
 void tableau_trier_retirer_doublons(BigIntTab& tab);
 #endif
 
-/*! @brief Methode outil pour trouver les doublons (permet de retirer les doublons sans changer l'ordre des elements)
+/*! @brief Utility method to find duplicates (allows removing duplicates without changing the order of elements).
  *
  */
 void calculer_renum_sans_doublons(const IntTab& tab, ArrOfInt& renum, ArrOfInt& items_a_garder);

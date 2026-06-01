@@ -138,7 +138,7 @@ void Raffiner_anisotrope_32_64<_SIZE_>::raffiner_(Domaine_t& domaine)
 
       les_elems.ref(new_elems);
 
-      // Reconstruction de l'octree
+      // Reconstruction of the octree
       if (this->dimension == 2)
         Cerr << "We have split the triangles ..." << finl;
       else

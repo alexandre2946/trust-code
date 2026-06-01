@@ -19,10 +19,10 @@
 
 #include <Traitement_particulier_NS_base.h>
 
-/*! @brief classe Traitement_particulier_VEF Cette classe permet de ne faire aucyun traitement particulier
+/*! @brief class Traitement_particulier_VEF This class performs no special post-processing
  *
- *      (comme avant!!!)
- *      Classe utilisee par defaut??
+ *      (same as before!!!)
+ *      Default class used when no particular treatment is requested.
  *
  *
  * @sa Navier_Stokes_std, Traitement_particulier_base

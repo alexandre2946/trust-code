@@ -18,9 +18,9 @@
 
 Implemente_instanciable_sans_constructeur(Traitement_particulier_NS_EC_VDF,"Traitement_particulier_NS_EC_VDF",Traitement_particulier_NS_EC);
 
-/*! @brief constructeur par defaut.
+/*! @brief Default constructor.
  *
- * On declare que la classe supporte un champ rho variable
+ * Declares that the class supports a variable rho field
  *
  */
 Traitement_particulier_NS_EC_VDF::Traitement_particulier_NS_EC_VDF()

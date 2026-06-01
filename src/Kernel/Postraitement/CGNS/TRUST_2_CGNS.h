@@ -97,7 +97,7 @@ public:
 
   void clear_vectors();
 
-  /* methods statiques utiles */
+  /* useful static methods */
   static inline Nom modify_domaine_name_for_link(const Nom&, const std::string&);
   static inline int get_index_nom_vector(const std::vector<Nom>&, const Nom&);
   static inline void remove_slash_linkfile(std::string&);
@@ -116,7 +116,7 @@ private:
   OBS_PTR(IntTab) elems_;
   Nom discr_type_ = "";
 
-  // specifique maillage dual pour faces
+  // specific to dual mesh for face fields
   OBS_PTR(IntTab) fs_dual_, ef_dual_;
   void get_domaine_dis_vf_if_poly(Domaine_dis_base*& , Domaine_VF*& );
 
@@ -130,14 +130,14 @@ private:
 
   std::vector<int> global_incr_min_som_, global_incr_max_som_; //som
 
-  // pour polyedre
+  // for polyhedra
   int nb_fs_ = -123, nb_ef_ = -123, nb_es_ = -123, nfs_tot_ = -123, nef_tot_ = -123, nfs_offset_tot_ = -123, nef_offset_tot_ = -123, nes_offset_tot_ = -123;
 
   std::vector<int> global_nb_face_som_, global_nb_elem_face_, global_nb_face_som_offset_, global_nb_elem_face_offset_, global_nb_elem_som_offset_;
 
-  std::vector<int> global_incr_min_face_som_, global_incr_max_face_som_; // pour NGON_n - face_som
+  std::vector<int> global_incr_min_face_som_, global_incr_max_face_som_; // for NGON_n - face_som
 
-  std::vector<int> global_incr_min_elem_face_, global_incr_max_elem_face_; // pour NFACE_n - elem_face
+  std::vector<int> global_incr_min_elem_face_, global_incr_max_elem_face_; // for NFACE_n - elem_face
 
   std::vector<cgsize_t> local_fs_, local_fs_offset_, local_ef_, local_ef_offset_, local_es_, local_es_offset_;
 };
@@ -161,7 +161,7 @@ inline int TRUST_2_CGNS::get_index_nom_vector(const std::vector<Nom>& vect, cons
   auto it = find(vect.begin(), vect.end(), nom);
 
   if (it != vect.end()) // element found
-    ind = static_cast<int>(it - vect.begin()); // XXX sinon utilse std::distance ...
+    ind = static_cast<int>(it - vect.begin()); // XXX otherwise use std::distance ...
 
   return ind;
 }

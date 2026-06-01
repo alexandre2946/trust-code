@@ -45,7 +45,7 @@ double Loi_Etat_Binaire_GP_QC::calculer_masse_volumique(double P, double Y1) con
   return Loi_Etat_Binaire_GP_base::calculer_masse_volumique(P,Y1);
 }
 
-/*! @brief Recalcule la masse volumique
+/*! @brief Recomputes the density.
  *
  */
 void Loi_Etat_Binaire_GP_QC::calculer_masse_volumique()

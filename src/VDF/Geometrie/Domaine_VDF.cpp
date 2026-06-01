@@ -65,8 +65,9 @@ Entree& Domaine_VDF::readOn(Entree& is)
   is >> h_x_ >> h_y_ >> h_z_;
   return is;
 }
-/*! @brief renvoie un Faces_VDF* !
+/*! @brief Returns a newly allocated Faces_VDF object.
  *
+ * @return Pointer to the newly created Faces_VDF instance.
  */
 Faces* Domaine_VDF::creer_faces()
 {
@@ -84,21 +85,21 @@ void Domaine_VDF::prepare_elem_non_std(Faces&)
  */
 void Domaine_VDF::compute_sort_key(Faces& les_faces, IntTab& sort_key)
 {
-  // Calcul de l'orientation des faces reeles
+  // Compute the orientation of real faces
   Faces_VDF& les_faces_vdf=ref_cast(Faces_VDF, les_faces);
   les_faces_vdf.calculer_orientation(orientation_, nb_faces_X_, nb_faces_Y_, nb_faces_Z_);
 
   const int nb_faces_front = domaine().nb_faces_frontiere();
 
-  // Construction d'un int selon lequel on va trier les faces:
-  //  orientation * nb_faces + indice_face
-  // Quand on trie par ordre croissant de cet int, on trie selon l'orientation
-  // en preservant l'ordre initial des faces de meme orientation
+  // Build an integer key for sorting the faces:
+  //  orientation * nb_faces + face_index
+  // Sorting by ascending order of this key sorts by orientation
+  // while preserving the original order of faces with the same orientation
   const int nb_faces = les_faces_vdf.nb_faces();
 
   nb_faces_std_ = 0;
   sort_key.resize(nb_faces, 2);
-  // On ne trie pas les faces de bord, qui restent au debut:
+  // Do not sort the boundary faces, which remain at the beginning:
   for (int i = 0; i < nb_faces_front; i++)
     {
       sort_key(i, 0) = i;
@@ -132,14 +133,12 @@ void Domaine_VDF::renumber_faces(Faces& les_faces, IntTab& sort_key)
 }
 
 
-/*! @brief appel a  Domaine_VF::discretiser() calcul des centres de gravite des elements
+/*! @brief Calls Domaine_VF::discretiser(), computes element gravity centers,
  *
- *  remplissage des connectivites elements/faces
- *  on reordonne les connectivites faces/elements
- *  de sorte que el1 est a gauche et el2 a droite.
- *  calcul des porosites volumiques et surfaciques
- *  generation des aretes
- *  calcul des pas du maillage
+ * @brief fills element/face connectivities, reorders face/element connectivities
+ *  so that el1 is on the left and el2 on the right,
+ *  computes volumetric and surface porosities,
+ *  generates edges, and computes mesh steps.
  *
  */
 void Domaine_VDF::discretiser()
@@ -148,7 +147,7 @@ void Domaine_VDF::discretiser()
 
   Domaine& domaine_geom=domaine();
 
-  // Verification de la coherence entre l'element geometrique et la discretisation
+  // Check the consistency between the geometric element and the discretization
 
   const Elem_geom_base& elem_geom = domaine_geom.type_elem().valeur();
 
@@ -190,20 +189,20 @@ void Domaine_VDF::discretiser()
         const int ori = orientation_[i_face];
         const double x_face = xv(i_face, ori);
         double delta = 0.;
-        // L'element 0 doit avoir une coordonnee "ori" plus petite que la face
-        // et l'element 1 doit avoir une coordonnee plus grande.
+        // Element 0 must have an "ori" coordinate smaller than the face
+        // and element 1 must have a larger coordinate.
         if (elem0 >= 0)
           {
             delta = x_face - xp(elem0, ori);
           }
         else
           {
-            assert(elem1 >= 0); // Sinon, grosse erreur: elements voisins non renseignes
+            assert(elem1 >= 0); // Otherwise, critical error: neighboring elements not filled in
             delta = xp(elem1, ori) - x_face;
           }
         if (delta < 0)
           {
-            // On inverse les deux elements
+            // Swap the two elements
             face_voisins_(i_face, 0) = elem1;
             face_voisins_(i_face, 1) = elem0;
           }
@@ -344,11 +343,11 @@ void Domaine_VDF::genere_aretes()
   int bord=0;
   int mixte=1;
   int interne=2;
-  // Detection des plaques (2 faces frontieres se superposent):
+  // Detection of plates (2 boundary faces overlap):
   IntVect est_une_plaque(nb_faces());
   creer_tableau_faces(est_une_plaque);
   est_une_plaque=0;
-  // Boucles sur les faces frontieres
+  // Loop over boundary faces
   ArrOfDouble P1(3), P2(3);
   P1=0;
   P2=0;
@@ -375,7 +374,7 @@ void Domaine_VDF::genere_aretes()
   for(int dir=0; dir<nb_dir; dir++)
     for (el1=0; el1<nb_poly_tot; el1++)
       {
-        // On doit generer l'arete en haut a droite de el1
+        // Generate the edge at the top-right of el1
         face12=elem_faces(el1,droite(dir));
         face13=elem_faces(el1,haut(dir));
 
@@ -408,41 +407,41 @@ void Domaine_VDF::genere_aretes()
           face34=elem_faces(el4,gauche(dir));
 
         const int nb_f = nb_faces();
-        if (el2 > -1 && el3 > -1 && el4 > -1) // arete interne
+        if (el2 > -1 && el3 > -1 && el4 > -1) // internal edge
           les_aretes.affecter(nb_aretes_, dir, interne, nb_f, face13, face24, face12, face34, est_une_plaque);
         else if ( (el3 > -1 && el4 > -1) ||
                   (el2 > -1 && el4 > -1) ||
-                  (el2 > -1 && el3 > -1) ) // arete mixte
+                  (el2 > -1 && el3 > -1) ) // mixed edge
           les_aretes.affecter(nb_aretes_, dir, mixte, nb_f, face13, face24, face12, face34, est_une_plaque);
-        else if (el2 > -1) // arete bord
+        else if (el2 > -1) // boundary edge
           les_aretes.affecter(nb_aretes_, dir, bord, nb_f, face13, face24, face12, 1, est_une_plaque);
-        else if (el3 > -1) // arete bord
+        else if (el3 > -1) // boundary edge
           les_aretes.affecter(nb_aretes_, dir, bord, nb_f, face12, face34, face13, 1, est_une_plaque);
-        else // arete coin
+        else // corner edge
           les_aretes.affecter(nb_aretes_, dir, coin, nb_f, face13, face24, face12, face34, est_une_plaque);
         //Cerr << "elements_haut_droit " << el1 << " " << el2 << " " << el3 << " " << el4 << finl;
         //Journal() << "Provisoire faces arete: " << face12 << " " << face13 << " " << face24 << " " << face34 << finl;
 
-        // Pour les coins ou bords :
+        // For corners or boundaries:
         face13 = elem_faces(el1, bas(dir));
         el3 = face_vois(*this, mon_dom, face13, 0);
-        if (el3 < 0) // On doit generer l'arete en bas a droite de el1
-          // si la maille en bas de el1 n'existe pas
+        if (el3 < 0) // Generate the edge at the bottom-right of el1
+          // if the cell below el1 does not exist
           {
             if (el2 >= 0)
               {
                 face24 = elem_faces(el2, bas(dir));
                 el4 = face_vois(*this, mon_dom, face24, 0);
-                if (el4 < 0) // arete bord
+                if (el4 < 0) // boundary edge
                   les_aretes.affecter(nb_aretes_, dir, bord, nb_f, face13, face24, face12, -1, est_une_plaque);
-                else // arete mixte
+                else // mixed edge
                   {
                     face34 = elem_faces(el4, gauche(dir));
                     if (face_vois(*this, mon_dom, face34, 0) == -1)
                       les_aretes.affecter(nb_aretes_, dir, mixte, nb_f, face13, face24, face34, face12, est_une_plaque);
                   }
               }
-            else   // arete coin
+            else   // corner edge
               les_aretes.affecter(nb_aretes_, dir, coin, nb_f, face13, -1, -1, face12, est_une_plaque);
             //Cerr << "elements_bas_droit " << el1 << " " << el2 << " " << el3 << " " << el4 << finl;
           }
@@ -450,8 +449,8 @@ void Domaine_VDF::genere_aretes()
 
         face13 = elem_faces(el1, gauche(dir));
         el3 = face_vois(*this, mon_dom, face13, 0);
-        if (el3 < 0) // On doit generer l'arete en haut a gauche de el1
-          // si la maille en haut a gauche n'existe pas
+        if (el3 < 0) // Generate the edge at the top-left of el1
+          // if the cell to the top-left of el1 does not exist
           {
             face12 = elem_faces(el1, haut(dir));
             el2 = face_vois(*this, mon_dom, face12, 1);
@@ -459,20 +458,20 @@ void Domaine_VDF::genere_aretes()
               {
                 face24 = elem_faces(el2, gauche(dir));
                 el4 = face_vois(*this, mon_dom, face24, 0);
-                if (el4 < 0) // arete bord
+                if (el4 < 0) // boundary edge
                   les_aretes.affecter(nb_aretes_, dir, bord, nb_f, face13, face24, face12, -1, est_une_plaque);
               }
-            else   // arete coin
+            else   // corner edge
               les_aretes.affecter(nb_aretes_, dir, coin, nb_f, -1, face12, -1, face13, est_une_plaque);
             //Cerr << "elements_haut_gauche " << el1 << " " << el2 << " " << el3 << " " << el4 << finl;
           }
 
-        // On doit generer l'arete en bas a gauche de el1
+        // Generate the edge at the bottom-left of el1
         face12 = elem_faces(el1, gauche(dir));
         el2 = face_vois(*this, mon_dom, face12, 0);
         face13 = elem_faces(el1, bas(dir));
         el3 = face_vois(*this, mon_dom, face13, 0);
-        if ((el2 < 0) && (el3 < 0)) // arete coin
+        if ((el2 < 0) && (el3 < 0)) // corner edge
           {
             les_aretes.affecter(nb_aretes_, dir, coin, nb_f, face13, -1, face12, -1, est_une_plaque);
             //Cerr << "elements_bas_gauche " << el1 << " " << el2 << " " << el3 << " " << el4 << finl;
@@ -497,7 +496,7 @@ void Domaine_VDF::genere_aretes()
          +nb_aretes_internes_+nb_aretes_joint_);
   Qdm_.ref(les_aretes.faces());
   /*
-  // Boucle pour verifier ou sont les parois internes
+  // Loop to verify where the internal walls are
   for (int i=0; i<Qdm_.dimension(0); i++)
     {
       int nb_plaques = 0;
@@ -515,7 +514,7 @@ void Domaine_VDF::genere_aretes()
   //Cerr << "Qdm : " << Qdm_ << finl;
 }
 
-/*! @brief calcul des pas du maillage
+/*! @brief Computes the mesh step sizes h_x_, h_y_, h_z_.
  *
  */
 void Domaine_VDF::calcul_h()
@@ -566,7 +565,7 @@ void Domaine_VDF::modifier_pour_Cl(const Conds_lim& conds_lim)
         {
           // if cl perio
 
-          // Modification du tableau Qdm_ pour les aretes de type periodicite
+          // Modification of the Qdm_ array for periodic edge types
 
           const Domaine_Cl_VDF& domaine_Cl_VDF = ref_cast(Domaine_Cl_VDF,cl.domaine_Cl_dis());
 
@@ -577,7 +576,7 @@ void Domaine_VDF::modifier_pour_Cl(const Conds_lim& conds_lim)
               // for n_arete
               n_type=domaine_Cl_VDF.type_arete_bord(n_arete-ndeb_arete);
 
-              if (n_type == TypeAreteBordVDF::PERIO_PERIO) // arete de type periodicite
+              if (n_type == TypeAreteBordVDF::PERIO_PERIO) // periodic edge type
                 {
                   //if arete perio
                   fac1 = Qdm_(n_arete,0);
@@ -622,7 +621,7 @@ void Domaine_VDF::modifier_pour_Cl(const Conds_lim& conds_lim)
                   fac3 = Qdm_(n_arete,2);
                   fac4 = Qdm_(n_arete,3);
 
-                  // On recupere le numero des faces qui ne sont pas egales a -1
+                  // Retrieve face indices that are not equal to -1
                   IntVect f(2);
                   f = -2;
                   int i=0;
@@ -647,7 +646,7 @@ void Domaine_VDF::modifier_pour_Cl(const Conds_lim& conds_lim)
                       i++;
                     }
 
-                  // On regarde si la face est une face de periodicite
+                  // Check whether the face is a periodic face
 
                   const Front_VF& la_frontiere_dis = ref_cast(Front_VF,cl.frontiere_dis());
                   int ndeb = la_frontiere_dis.num_premiere_face();
@@ -666,7 +665,7 @@ void Domaine_VDF::modifier_pour_Cl(const Conds_lim& conds_lim)
                           indic_f1 = k;
                         }
 
-                  if ((n_type == TypeAreteCoinVDF::PERIO_PAROI) || (n_type == TypeAreteCoinVDF::PERIO_FLUIDE))// arete coin perio-paroi
+                  if ((n_type == TypeAreteCoinVDF::PERIO_PAROI) || (n_type == TypeAreteCoinVDF::PERIO_FLUIDE))// perio-wall corner edge
                     {
                       if ((f(0) >= ndeb)&&(f(0) < nfin))
                         {
@@ -706,7 +705,7 @@ void Domaine_VDF::modifier_pour_Cl(const Conds_lim& conds_lim)
                             }
                         }
                     }
-                  else if (n_type == TypeAreteCoinVDF::PERIO_PERIO) // arete coin perio-perio
+                  else if (n_type == TypeAreteCoinVDF::PERIO_PERIO) // perio-perio corner edge
                     {
                       if ((f(0) >= ndeb)&&(f(0) < nfin))
                         {
@@ -775,7 +774,7 @@ void Domaine_VDF::modifier_pour_Cl(const Conds_lim& conds_lim)
                   fac3 = Qdm_(n_arete,2);
                   fac4 = Qdm_(n_arete,3);
 
-                  // On recupere le numero des faces qui ne sont pas egales a -1
+                  // Retrieve face indices that are not equal to -1
                   IntVect f(2);
                   f = -2;
                   int i=0;
@@ -800,7 +799,7 @@ void Domaine_VDF::modifier_pour_Cl(const Conds_lim& conds_lim)
                       i++;
                     }
 
-                  // On regarde si la face est une face de type paroi
+                  // Check whether the face is a wall-type face
 
                   const Front_VF& la_frontiere_dis = ref_cast(Front_VF,cl.frontiere_dis());
                   int ndeb = la_frontiere_dis.num_premiere_face();
@@ -817,7 +816,7 @@ void Domaine_VDF::modifier_pour_Cl(const Conds_lim& conds_lim)
                           indic_f1 = k;
                         }
 
-                  if ((n_type == TypeAreteCoinVDF::PAROI_FLUIDE) || (n_type == TypeAreteCoinVDF::FLUIDE_PAROI) || (n_type == TypeAreteCoinVDF::FLUIDE_FLUIDE))// arete coin paroi-fluide
+                  if ((n_type == TypeAreteCoinVDF::PAROI_FLUIDE) || (n_type == TypeAreteCoinVDF::FLUIDE_PAROI) || (n_type == TypeAreteCoinVDF::FLUIDE_FLUIDE))// wall-fluid corner edge
                     {
                       if ((f(0) >= ndeb)&&(f(0) < nfin))
                         {

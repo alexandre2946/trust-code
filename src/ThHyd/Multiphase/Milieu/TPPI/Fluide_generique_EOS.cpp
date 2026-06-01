@@ -45,7 +45,7 @@ Entree& Fluide_generique_EOS::readOn(Entree& is)
 
 void Fluide_generique_EOS::set_param(Param& param) const
 {
-  Fluide_reel_base::set_param(param); // T_ref_ et P_ref_ ?? sais pas si utile ...
+  Fluide_reel_base::set_param(param); // T_ref_ and P_ref_ ?? not sure if useful ...
   param.ajouter("model|modele", &model_name_, Param::REQUIRED);
   param.ajouter("fluid|fluide", &fluid_name_, Param::REQUIRED);
 }

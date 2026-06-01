@@ -19,9 +19,9 @@
 #include <Fluide_reel_base.h>
 #include <Lois_sodium.h>
 
-/*! @brief Classe Fluide_sodium_gaz Cette classe represente un milieu reel
+/*! @brief Class Fluide_sodium_gaz representing a real fluid medium
  *
- *     dont les lois viennent de "Lois_Na"
+ *     whose thermodynamic laws come from "Lois_Na"
  *
  */
 class Fluide_sodium_gaz: public Fluide_reel_base
@@ -30,9 +30,9 @@ class Fluide_sodium_gaz: public Fluide_reel_base
 
   std::map<std::string, std::array<double, 2>> unknown_range() const override
   {
-    return { { "temperature", { 371 - 273.15, 2503.7 - 273.15 } }, //de la temperature de solidification au pt tricritique
+    return { { "temperature", { 371 - 273.15, 2503.7 - 273.15 } }, //from solidification temperature to the tricritical point
       { "pression", { 4.127e-6, 260e5 } }
-    };                // Psat() des temperatures ci-dessus
+    };                // Psat() of the temperatures above
   }
 
 protected :
@@ -44,8 +44,8 @@ protected :
   inline void dT_h_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override { DTHV(T,P,res,ncomp,id); }
   inline void cp_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override { DTHV(T,P,res,ncomp,id); }
   inline void beta_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override { BETAV(T,P,res,ncomp,id); }
-  inline void mu_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override { MuV(T,res,ncomp,id); } // passe pas P
-  inline void lambda_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override { LambdaV(T,res,ncomp,id); } // passe pas P
+  inline void mu_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override { MuV(T,res,ncomp,id); } // P not passed
+  inline void lambda_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override { LambdaV(T,res,ncomp,id); } // P not passed
 
   void rho_h_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override { Cerr << "Fluide_sodium_gaz::" << __func__ << " NOT CODED ! " << finl; throw; }
   void dP_rho_h_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override { Cerr << "Fluide_sodium_gaz::" << __func__ << " NOT CODED ! " << finl; throw; }

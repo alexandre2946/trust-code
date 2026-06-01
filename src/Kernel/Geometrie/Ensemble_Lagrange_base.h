@@ -19,14 +19,14 @@
 
 class Equation_base;
 
-/*! @brief classe Ensemble_Lagrange_base Classe de base des classes representant une structure geometrique constituee
+/*! @brief class Ensemble_Lagrange_base Base class for classes representing a geometric structure made up
  *
- *      d'un ensemble de points dont on realise un suivi Lagrangien
- *      Actuellement une seule classe derivant instanciable : Maillage_FT_Disc
- *      -un ensemble Lagrangien est caracterise par les coordonnees de ses points
+ *      of a set of points tracked using Lagrangian tracking.
+ *      Currently only one instantiable derived class: Maillage_FT_Disc.
+ *      A Lagrangian set is characterized by the coordinates of its points.
  *
- * @sa Classe abstraite.
- * @sa Methodes abstraites:
+ * @sa Abstract class.
+ * @sa Abstract methods:
  *       void associer_equation_transport)
  *       Equation_base& equation_associee()
  */
@@ -50,13 +50,13 @@ public :
 
 protected :
 
-  Noms nom_sz;                //nom des sous domaines ou l on genere des particules
-  IntVect nb_marqs_sz;        //nombre de marqueurs par sous domaine
-  IntTab nb_marqs_par_dir;        //nombre de marqueurs dans chacune des directions d un sous domaine
-  //si distribution uniforme sur la sous domaine
-  OBS_PTR(Domaine) mon_dom_;                //REF au Domaine du maillage Eulerien
+  Noms nom_sz;                //name of the sub-domains where particles are generated
+  IntVect nb_marqs_sz;        //number of markers per sub-domain
+  IntTab nb_marqs_par_dir;        //number of markers in each direction of a sub-domain
+  //if uniform distribution over the sub-domain
+  OBS_PTR(Domaine) mon_dom_;                //REF to the Eulerian mesh domain
 
-  DoubleTab sommets_lu_;      //Coordonnees des sommets lus dans le cas d une lecture dans un fichier
+  DoubleTab sommets_lu_;      //coordinates of vertices read in the case of reading from a file
 
 private :
 

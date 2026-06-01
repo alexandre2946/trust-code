@@ -54,7 +54,7 @@ void Champ_Fonc_Tabule_P0_VEF::mettre_a_jour(double t)
       // Ported on GPU. ToDo Kokkos, extend to more than one param or more than one nbcomp
       DoubleTrav val_param_aux_elems(nb_elem_tot, nbcomp);
       les_ch_param[0]->valeur_aux_elems(centres_de_gravites, les_polys, val_param_aux_elems);
-      // Cree un parser specifique ParserView pour Kokkos:
+      // Create a specific ParserView parser for Kokkos:
       ParserView parser(table.parser(0));
       parser.parseString();
       CDoubleTabView val_params_aux_elems_v = val_param_aux_elems.view_ro();

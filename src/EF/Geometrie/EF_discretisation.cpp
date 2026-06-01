@@ -47,17 +47,25 @@ Entree& EF_discretisation::readOn(Entree& s)
 
 Sortie& EF_discretisation::printOn(Sortie& s) const { return s; }
 
-/*! @brief Discretisation d'un champ pour le EF en fonction d'une directive de discretisation.
+/*! @brief Discretises a field for EF based on a discretisation directive.
  *
- * La directive est un Motcle comme "vitesse", "pression",
- *  "temperature", "champ_elem" (cree un champ de type P0), ...
- *  Cette methode determine le type du champ a creer en fonction du type d'element
- *  et de la directive de discretisation. Elle determine ensuite le nombre de ddl
- *  et fixe l'ensemble des parametres du champ (type, nb_compo, nb_ddl, nb_pas_dt,
- *  nom(s), unite(s) et nature du champ) et associe le Domaine_dis au champ.
- *  Voir le code pour avoir la correspondance entre les directives et
- *  le type de champ cree.
- *
+ * @brief The directive is a Motcle such as "vitesse", "pression",
+ *  "temperature", "champ_elem" (creates a P0-type field), etc.
+ *  This method determines the type of field to create based on the element type
+ *  and the discretisation directive. It then determines the number of DOFs
+ *  and sets all field parameters (type, nb_compo, nb_ddl, nb_pas_dt,
+ *  name(s), unit(s) and field nature) and associates the Domaine_dis to the field.
+ *  See the code for the correspondence between directives and the created field type.
+ * @param directive Keyword specifying the type of field to create.
+ * @param z Discretised domain.
+ * @param nature Nature of the field.
+ * @param noms Field name(s).
+ * @param unites Field unit(s).
+ * @param nb_comp Number of components.
+ * @param nb_pas_dt Number of time steps.
+ * @param temps Current time.
+ * @param champ Output field (instationary).
+ * @param sous_type Optional subtype name.
  */
 void EF_discretisation::discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, int nb_pas_dt, double temps,
                                           OWN_PTR(Champ_Inc_base) &champ, const Nom& sous_type) const
@@ -65,15 +73,15 @@ void EF_discretisation::discretiser_champ(const Motcle& directive, const Domaine
   const Domaine_EF& domaine_EF = ref_cast(Domaine_EF, z);
 
   Motcles motcles(7);
-  motcles[0] = "vitesse";     // Choix standard pour la vitesse
-  motcles[1] = "pression";    // Choix standard pour la pression
-  motcles[2] = "temperature"; // Choix standard pour la temperature
-  motcles[3] = "divergence_vitesse"; // Le type de champ obtenu en calculant div v
-  motcles[4] = "gradient_pression";  // Le type de champ obtenu en calculant grad P
-  motcles[5] = "champ_elem";    // Creer un champ aux elements (de type P0)
-  motcles[6] = "champ_sommets"; // Creer un champ aux sommets (type P1)
+  motcles[0] = "vitesse";     // Standard choice for velocity
+  motcles[1] = "pression";    // Standard choice for pressure
+  motcles[2] = "temperature"; // Standard choice for temperature
+  motcles[3] = "divergence_vitesse"; // Field type obtained by computing div v
+  motcles[4] = "gradient_pression";  // Field type obtained by computing grad P
+  motcles[5] = "champ_elem";    // Create an element field (P0 type)
+  motcles[6] = "champ_sommets"; // Create a vertex field (P1 type)
 
-  // Le type de champ de vitesse depend du type d'element :
+  // The velocity field type depends on the element type:
   Nom type_champ_vitesse;
   if (sub_type(Tri_EF, domaine_EF.type_elem()) || sub_type(Segment_EF, domaine_EF.type_elem()) || sub_type(Tetra_EF, domaine_EF.type_elem()))
     type_champ_vitesse = "Champ_P1_EF";
@@ -128,15 +136,15 @@ void EF_discretisation::discretiser_champ(const Motcle& directive, const Domaine
   if (directive == DEMANDE_DESCRIPTION)
     Cerr << "EF_discretisation : " << motcles;
 
-  // Si on n'a pas compris la directive (ou si c'est une demande_description)
-  // alors on appelle l'ancetre :
+  // If the directive was not understood (or it is a description request),
+  // call the parent:
   if (rang < 0)
     {
       Discret_Thyd::discretiser_champ(directive, z, nature, noms, unites, nb_comp, nb_pas_dt, temps, champ);
       return;
     }
 
-  // Calcul du nombre de ddl
+  // Compute the number of DOFs
   int nb_ddl = 0;
   if (type == "Champ_P0_EF")
     nb_ddl = z.nb_elem();
@@ -147,7 +155,7 @@ void EF_discretisation::discretiser_champ(const Motcle& directive, const Domaine
   else
     assert(0);
 
-  // Si c'est un champ multiscalaire, uh !
+  // If it is a multi-scalar field:
   /* if (nature == multi_scalaire) {
    // Pas encore code
    Cerr << "Champ multi_scalaire pas code" << finl;
@@ -165,10 +173,16 @@ void EF_discretisation::discretiser_champ(const Motcle& directive, const Domaine
     }
 }
 
-/*! @brief Idem que EF_discretisation::discretiser_champ(.
+/*! @brief Same as EF_discretisation::discretiser_champ(..., Champ_Inc).
  *
- * .. , Champ_Inc)
- *
+ * @param directive Keyword specifying the type of field to create.
+ * @param z Discretised domain.
+ * @param nature Nature of the field.
+ * @param noms Field name(s).
+ * @param unites Field unit(s).
+ * @param nb_comp Number of components.
+ * @param temps Current time.
+ * @param champ Output functional field.
  */
 void EF_discretisation::discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, double temps,
                                           OWN_PTR(Champ_Fonc_base) &champ) const
@@ -176,10 +190,16 @@ void EF_discretisation::discretiser_champ(const Motcle& directive, const Domaine
   discretiser_champ_fonc_don(directive, z, nature, noms, unites, nb_comp, temps, champ);
 }
 
-/*! @brief Idem que EF_discretisation::discretiser_champ(.
+/*! @brief Same as EF_discretisation::discretiser_champ(..., Champ_Inc).
  *
- * .. , Champ_Inc)
- *
+ * @param directive Keyword specifying the type of field to create.
+ * @param z Discretised domain.
+ * @param nature Nature of the field.
+ * @param noms Field name(s).
+ * @param unites Field unit(s).
+ * @param nb_comp Number of components.
+ * @param temps Current time.
+ * @param champ Output given field.
  */
 void EF_discretisation::discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, double temps,
                                           OWN_PTR(Champ_Don_base)& champ) const
@@ -187,32 +207,38 @@ void EF_discretisation::discretiser_champ(const Motcle& directive, const Domaine
   discretiser_champ_fonc_don(directive, z, nature, noms, unites, nb_comp, temps, champ);
 }
 
-/*! @brief Idem que EF_discretisation::discretiser_champ(.
+/*! @brief Same as EF_discretisation::discretiser_champ(..., Champ_Inc).
  *
- * .. , Champ_Inc) Traitement commun aux champ_fonc et champ_don.
- *  Cette methode est privee (passage d'un Objet_U pas propre vu
- *  de l'exterieur ...)
- *
+ * Common handling for champ_fonc and champ_don.
+ *  This method is private (passing an Objet_U is not clean from outside).
+ * @param directive Keyword specifying the type of field to create.
+ * @param z Discretised domain.
+ * @param nature Nature of the field.
+ * @param noms Field name(s).
+ * @param unites Field unit(s).
+ * @param nb_comp Number of components.
+ * @param temps Current time.
+ * @param champ Output field object (Champ_Fonc_base or Champ_Don_base).
  */
 void EF_discretisation::discretiser_champ_fonc_don(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, double temps,
                                                    Objet_U& champ) const
 {
-  // Deux pointeurs pour acceder facilement au champ_don ou au champ_fonc, suivant le type de l'objet champ.
+  // Two pointers to access champ_don or champ_fonc easily, depending on the type of the champ object.
   OWN_PTR(Champ_Fonc_base) *champ_fonc = dynamic_cast<OWN_PTR(Champ_Fonc_base)*>(&champ);
   OWN_PTR(Champ_Don_base) *champ_don = dynamic_cast<OWN_PTR(Champ_Don_base)*>(&champ);
 
   const Domaine_EF& domaine_EF = ref_cast(Domaine_EF, z);
 
   Motcles motcles(7);
-  motcles[0] = "pression";    // Choix standard pour la pression
-  motcles[1] = "temperature"; // Choix standard pour la temperature
-  motcles[2] = "divergence_vitesse"; // Le type de champ obtenu en calculant div v
-  motcles[3] = "champ_elem";  // Creer un champ aux elements (de type P0)
-  motcles[6] = "champ_sommets";  // Creer un champ aux elements (de type P1)
-  motcles[4] = "vitesse";     // Choix standard pour la vitesse
-  motcles[5] = "gradient_pression";  // Le type de champ obtenu en calculant grad P
+  motcles[0] = "pression";    // Standard choice for pressure
+  motcles[1] = "temperature"; // Standard choice for temperature
+  motcles[2] = "divergence_vitesse"; // Field type obtained by computing div v
+  motcles[3] = "champ_elem";  // Create an element field (P0 type)
+  motcles[6] = "champ_sommets";  // Create a vertex field (P1 type)
+  motcles[4] = "vitesse";     // Standard choice for velocity
+  motcles[5] = "gradient_pression";  // Field type obtained by computing grad P
 
-  // Le type de champ de vitesse depend du type d'element :
+  // The velocity field type depends on the element type:
   Nom type_champ_vitesse;
   {
     const Elem_EF_base& elem_EF = domaine_EF.type_elem();
@@ -269,8 +295,8 @@ void EF_discretisation::discretiser_champ_fonc_don(const Motcle& directive, cons
   if (directive == DEMANDE_DESCRIPTION)
     Cerr << "EF_discretisation : " << motcles;
 
-  // Si on n'a pas compris la directive (ou si c'est une demande_description)
-  // alors on appelle l'ancetre :
+  // If the directive was not understood (or it is a description request),
+  // call the parent:
   if (rang < 0)
     {
       if (champ_fonc)
@@ -280,7 +306,7 @@ void EF_discretisation::discretiser_champ_fonc_don(const Motcle& directive, cons
       return;
     }
 
-  // Calcul du nombre de ddl
+  // Compute the number of DOFs
   int nb_ddl = 0;
   if (type == "Champ_Fonc_P0_EF")
     nb_ddl = z.nb_elem();
@@ -289,10 +315,10 @@ void EF_discretisation::discretiser_champ_fonc_don(const Motcle& directive, cons
   else
     assert(0);
 
-  /* // Si c'est un champ multiscalaire, uh !
+  /* // If it is a multi-scalar field, uh!
    if (nature == multi_scalaire)
    {
-   // Pas encore code
+   // Not yet implemented
    Cerr << "Champ multi_scalaire pas code" << finl;
    assert(0);
    exit();
@@ -443,12 +469,12 @@ void EF_discretisation::creer_champ_vorticite(const Schema_Temps_base& sch, cons
     }
 }
 
-/*! @brief discretise en EF le fluide incompressible, donc  K e N
+/*! @brief Discretises the incompressible Ostwald fluid in EF, i.e. K, N.
  *
- * @param (Domaine_dis_base&) domaine a discretiser
- * @param (Fluide_Ostwald&) fluide a discretiser
- * @param (Champ_Inc_base&) ch_vitesse
- * @param (Champ_Inc_base&) temperature
+ * @param z Domain to discretise.
+ * @param le_fluide Ostwald fluid to discretise.
+ * @param eqn_hydr Hydraulic equation.
+ * @param ch_temper Temperature field.
  */
 void EF_discretisation::proprietes_physiques_fluide_Ostwald(const Domaine_dis_base& z, Fluide_Ostwald& le_fluide, const Navier_Stokes_std& eqn_hydr, const Champ_Inc_base& ch_temper) const
 {
@@ -460,7 +486,7 @@ void EF_discretisation::proprietes_physiques_fluide_Ostwald(const Domaine_dis_ba
   const Champ_P1_EF& vit = ref_cast(Champ_P1_EF,ch_vitesse);
 
   Champ_Don_base& mu = le_fluide.viscosite_dynamique();
-  //  mu est toujours un champ_Ostwald_EF , il faut toujours faire ce qui suit
+  //  mu is always a champ_Ostwald_EF, so the following must always be done
   Champ_Ostwald_EF& ch_mu = ref_cast(Champ_Ostwald_EF,mu);
   Cerr<<"associe domainedisbase EF"<<finl;
   ch_mu.associer_domaine_dis_base(domaine_EF);
@@ -483,8 +509,8 @@ void EF_discretisation::proprietes_physiques_fluide_Ostwald(const Domaine_dis_ba
 void EF_discretisation::critere_Q(const Domaine_dis_base& z, const Domaine_Cl_dis_base& zcl, const Champ_Inc_base& ch_vitesse, OWN_PTR(Champ_Fonc_base) &ch) const
 {
 #ifdef dependance
-  // On passe la zcl, pour qu'il n y ait qu une methode qqsoit la dsicretisation
-  // mais on ne s'en sert pas!!!
+  // We pass zcl so there is only one method regardless of the discretization,
+  // but we do not actually use it!!!
   Cerr << "Discretisation du critere Q " << finl;
   const Champ_P1_EF& vit = ref_cast(Champ_P1_EF,ch_vitesse);
   const Domaine_EF& domaine_EF=ref_cast(Domaine_EF, z);

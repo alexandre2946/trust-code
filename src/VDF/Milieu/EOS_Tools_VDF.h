@@ -24,7 +24,7 @@
 class Fluide_Dilatable_base;
 class Domaine_VDF;
 
-/*! @brief classe EOS_Tools_VDF Cette classe et specifique a discretisation de type VDF.
+/*! @brief class EOS_Tools_VDF This class is specific to VDF-type discretization.
  *
  * @sa Fluide_Dilatable_base EOS_Tools_base
  */

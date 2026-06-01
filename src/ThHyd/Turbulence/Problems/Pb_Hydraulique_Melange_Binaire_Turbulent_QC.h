@@ -21,11 +21,11 @@
 #include <Pb_Dilatable_Proto.h>
 #include <Pb_QC_base.h>
 
-/*! @brief classe Pb_Hydraulique_Melange_Binaire_Turbulent_QC Cette classe represente un probleme de hydraulique binaire en fluide quasi compressible
+/*! @brief Turbulent binary-mixture hydraulics problem for a quasi-compressible fluid.
  *
- *      avec modelisation de la turbulence:
- *       - Equations de Navier_Stokes en regime turbulent
- *       - Equation de conv/diff fraction massique en regime turbulent
+ *      Couples:
+ *       - Turbulent Navier-Stokes equations
+ *       - Turbulent convection-diffusion equation for the mass fraction
  *
  * @sa Probleme_base Pb_QC_base Fluide_Quasi_Compressible
  */

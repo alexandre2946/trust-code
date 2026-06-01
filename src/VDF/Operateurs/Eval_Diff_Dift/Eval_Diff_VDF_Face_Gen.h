@@ -120,7 +120,7 @@ private:
   inline double tau_tan(int i, int j) const { return static_cast<const DERIVED_T *>(this)->tau_tan_impl(i,j); }
   inline bool uses_wall_law() const { return static_cast<const DERIVED_T *>(this)->uses_wall(); }
   inline bool uses_mod_turb() const { return static_cast<const DERIVED_T *>(this)->uses_mod(); }
-  inline const DoubleTab& k_elem() const { return static_cast<const DERIVED_T *>(this)->get_k_elem(); } // pour F5 seulement ...
+  inline const DoubleTab& k_elem() const { return static_cast<const DERIVED_T *>(this)->get_k_elem(); } // for F5 only ...
 
   // methods to check coeffs/flux implementation
   static constexpr double EPS = 1e-6;

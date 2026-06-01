@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -38,7 +38,7 @@ Entree& Loi_horaire::readOn(Entree& is)
   EChaine drdt(dimension==3?"9 0. 0. 0. 0. 0. 0. 0. 0. 0.":"4 0. 0. 0. 0.");
   drdt >> derivee_rotation_;
 
-  // Lecture de jeu de donnees
+  // Reading of dataset
   Param param(que_suis_je());
   param.ajouter("position",&position_);    // XD attr position listchaine position OPT Vecteur position (default: zero
   // XD_CONT vector of length `dimension`)
@@ -50,7 +50,7 @@ Entree& Loi_horaire::readOn(Entree& is)
   param.ajouter("impr",&impr_);            // XD attr impr entier impr OPT Whether to print output
   param.lire_avec_accolades_depuis(is);
 
-  // Verification de ce qui a ete lu: ( pourquoi le_nom() retourne neant ???
+  // Verification of what was read: (why does le_nom() return nothing???
   if (position_.valeurs().size_array()!=dimension)
     {
       Cerr << "The position vector of the schedule law " << le_nom() << " must have " << dimension << " components." << finl;
@@ -78,7 +78,7 @@ Entree& Loi_horaire::readOn(Entree& is)
 
 inline void check(const DoubleTab& mat)
 {
-  // Champ_Fonc_t DoubleTab(1,nb_comp)
+  // Champ_Fonc_t DoubleTab(1, nb_comp)
   if (mat.dimension(0)!=1)
     {
       Cerr << "Problem in Loi_horaire::check" << finl;
@@ -88,7 +88,7 @@ inline void check(const DoubleTab& mat)
     }
 }
 
-// Produit Matrice*Vecteur stockes dans des tableaux
+// Matrix*Vector product stored in arrays
 inline void multiplie(const DoubleTab& matrice, ArrOfDouble& vecteur)
 {
   check(matrice);
@@ -100,7 +100,7 @@ inline void multiplie(const DoubleTab& matrice, ArrOfDouble& vecteur)
       vecteur[i] += matrice(0,i*dimension+j) * x[j];
 }
 
-// Produit Inverse(Matrice)*Vecteur dans des tableaux
+// Product Inverse(Matrix)*Vector in arrays
 inline void inverse(const DoubleTab& mat, ArrOfDouble& x)
 {
   check(mat);
@@ -164,14 +164,14 @@ inline void inverse(const DoubleTab& mat, ArrOfDouble& x)
     }
 }
 
-/* Renvoie un tableau contenant la position xM(t) d'un point M au temps t
-   en fonction du temps t0 et de sa position xM(t0) au temps t0.
-   Pour cela, on utilisera les relations suivantes:
+/* Returns an array containing the position xM(t) of a point M at time t
+   as a function of time t0 and its position xM(t0) at time t0.
+   To do this, we use the following relations:
    xM(t)=xG(t)+R(t)(xM(0)-xG(0))
    xM(t0)=xG(t0)+R(t0)(xM(0)-xG(0))
-   On a:
+   We have:
    xM(0)-xG(0)=R-1(t0)(xM(t0)-xG(t0))
-   Donc:
+   Therefore:
    xM(t) = xG(t)+R(t)R-1(t0)(xM(t0)-xG(t0))
 */
 ArrOfDouble Loi_horaire::position(const double t, const double t0, const ArrOfDouble& xMt0)
@@ -188,14 +188,14 @@ ArrOfDouble Loi_horaire::position(const double t, const double t0, const ArrOfDo
   return xMt;
 }
 
-/* Renvoie un tableau contenant la vitesse vM(t) d'un point M au temps t
-   en fonction de sa position xM(t) au temps t. Pour connaitre cette vitesse du point M,
-   on utilise les relations suivantes:
+/* Returns an array containing the velocity vM(t) of a point M at time t
+   as a function of its position xM(t) at time t. To know this velocity of point M,
+   we use the following relations:
    xM(t)=xG(t)+R(t)(xM(0)-xG(0))
    vM(t)=vG(t)+R'(t)(xM(0)-xG(0))
-   On a:
+   We have:
    xM(0)-xG(0)=R-1(t)(xM(t)-xG(t))
-   Donc:
+   Therefore:
    vM(t) = vG(t)+R'(t)R-1(t)(xM(t)-xG(t))
 */
 ArrOfDouble Loi_horaire::vitesse(const double t, const ArrOfDouble& xMt)
@@ -212,10 +212,10 @@ ArrOfDouble Loi_horaire::vitesse(const double t, const ArrOfDouble& xMt)
   return vMt;
 }
 
-// Verification de la coherence des derivees vitesse et derivee_rotation
-// par rapport a position et rotation. On utilise un developpement limite d'ordre 2
+// Verification of consistency of velocity derivatives and derivee_rotation
+// with respect to position and rotation. We use a limited development of order 2
 // |f(t+dt)-f(t)-dt*f'(t)|=|0.5*f''(t)*dt*dt+O(dt*dt*dt)|>|10*f''(t)*dt*dt|
-// Une erreur sur des expressions de derivee seconde nulle ne sera donc pas detectee...
+// An error on expressions with zero second derivative will therefore not be detected...
 void Loi_horaire::verifier_derivee(const double t)
 {
   if (verification_derivee_)
@@ -228,7 +228,7 @@ void Loi_horaire::verifier_derivee(const double t)
       err_t-=position_.valeurs();                        // xG(t+dt)-xG(t)
       vitesse_.me_calculer(t);                                // vG(t)
       err_t.ajoute(-dt, vitesse_.valeurs());                        // xG(t+dt)-xG(t)-dt*vG(t)
-      // Evaluation d'un seuil avec la derivee seconde xG'' cad vG'
+      // Evaluation of a threshold with the second derivative xG'' i.e. vG'
       ArrOfDouble seuil_t(position_.valeurs());
       vitesse_.me_calculer(t+dt);                        // vG(t+dt)
       seuil_t=vitesse_.valeurs();
@@ -257,7 +257,7 @@ void Loi_horaire::verifier_derivee(const double t)
       err_r-=rotation_.valeurs();                        // R(t+dt)-R(t)
       derivee_rotation_.me_calculer(t);                        // R'(t)
       err_r.ajoute(-dt, derivee_rotation_.valeurs());                // R(t+dt)-R(t)-dt*R'(t)
-      // Evaluation d'un seuil avec la derivee seconde de R cad R''
+      // Evaluation of a threshold with the second derivative of R i.e. R''
       DoubleTab seuil_r(rotation_.valeurs());
       derivee_rotation_.me_calculer(t+dt);                // R'(t+dt)
       seuil_r=derivee_rotation_.valeurs();
@@ -287,19 +287,19 @@ void Loi_horaire::imprimer(const Schema_Temps_base& sch, const ArrOfDouble& coor
 {
   if (Process::je_suis_maitre())
     {
-      // Ouverture du fichier
+      // File opening
       Nom nom_fichier(nom_du_cas());
       nom_fichier+="_loi_horaire_";
       nom_fichier+=le_nom();
       nom_fichier+=".out";
       SFichier fic; // * os=nullptr;
       struct stat f;
-      // On cree le fichier a la premiere impression avec l'en tete ou si le fichier n'existe pas
+      // Create the file on first printing with header or if the file does not exist
       if (stat(nom_fichier,&f) || (sch.nb_impr()==1 && !sch.pb_base().reprise_effectuee()))
         {
           tester(sch);
           fic.ouvrir(nom_fichier);
-          // Ecriture en tete
+          // Writing header
           fic << "# (xG,yG,...):Position du centre de gravite dont le mouvement est defini par la loi horaire " << le_nom() << finl;
           fic << "# (moy(xi),moy(yi),...):Position du barycentre des noeuds du maillage de l'interface." << finl;
           fic << "# Les trajectoires de ces 2 points doivent etre proches." << finl;
@@ -320,24 +320,24 @@ void Loi_horaire::imprimer(const Schema_Temps_base& sch, const ArrOfDouble& coor
 
       fic.precision(sch.precision_impr());
       fic.setf(ios::scientific);
-      // Ecriture de t,xG(t),coord_barycentre
+      // Writing t, xG(t), barycenter_coord
       double t=sch.temps_courant();
       fic << t;
       position_.me_calculer(t);
       for (int i=0; i<dimension; i++)
         fic << " " << position_.valeurs()(0,i);        // xG(t)
       for (int i=0; i<dimension; i++)
-        fic << " " << coord_barycentre[i];                 // Barycentre des noeuds de l'interface
+        fic << " " << coord_barycentre[i];                 // Barycenter of interface nodes
       fic << finl;
-      // Fermeture du fichier
+      // File closing
       fic.close();
     }
 }
 
-// Tests divers de la classe
+// Various tests of the class
 void Loi_horaire::tester(const Schema_Temps_base& sch)
 {
-  // Test de produit et d'inversion de matrice
+  // Matrix product and inversion test
   for (int dim=2; dim<=3; dim++)
     {
       DoubleTab mat(1,dim*dim);
@@ -361,10 +361,10 @@ void Loi_horaire::tester(const Schema_Temps_base& sch)
             Process::exit();
           }
     }
-  // Verification entre tinit et tmax
+  // Verification between tinit and tmax
   double tinit=sch.temps_init();
   double tmax=sch.temps_max();
-  // Test des derivees:
+  // Test of derivatives:
   int n=100;
   for (int i=1; i<n; i++)
     {
@@ -372,7 +372,7 @@ void Loi_horaire::tester(const Schema_Temps_base& sch)
       //Cerr << "Verification a t=" << temps << finl;
       verifier_derivee(temps);
     }
-  // Test de position et vitesse:
+  // Test of position and velocity:
   double t=0.5*(tinit+tmax);
   double eps=1e-8;
   double dt=eps*t;
@@ -380,7 +380,7 @@ void Loi_horaire::tester(const Schema_Temps_base& sch)
   pos[0]=dimension*2;
   pos[1]=dimension*3;
   if (dimension==3) pos[2]=-dimension;
-  // Verification que position(t,t,pos)=pos
+  // Verification that position(t,t,pos)=pos
   ArrOfDouble tmp(position(t,t,pos));
   for (int i=0; i<dimension; i++)
     if (!est_egal(tmp[i],pos[i]))
@@ -391,7 +391,7 @@ void Loi_horaire::tester(const Schema_Temps_base& sch)
         Cerr << "Contact TRUST support." << finl;
         Process::exit();
       }
-  // Verification que vitesse(t,pos)~(position(t+dt,t,pos)-pos)/dt;
+  // Verification that velocity(t,pos)~(position(t+dt,t,pos)-pos)/dt;
   tmp=position(t+dt,t,pos);
   tmp-=pos;
   tmp/=dt;

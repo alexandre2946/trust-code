@@ -19,14 +19,14 @@
 #include <Convection_Diffusion_Concentration.h>
 #include <Pb_Thermohydraulique.h>
 
-/*! @brief classe Pb_Thermohydraulique_Concentration Cette classe represente un probleme de thermohydraulique avec concentrations :
+/*! @brief Pb_Thermohydraulique_Concentration This class represents a thermohydraulic problem with concentrations:
  *
- *      - Equations de Navier_Stokes en regime laminaire pour un fluide incompressible
- *      - Equation d'energie en regime laminaire
- *      - Une equation de convection-diffusion pour un ou plusieurs constituants caracterises par leurs concentrations
- *        En general, on couple les equations d'energie et de concentration aux equations de Navier-Stokes par l'intermediaire du terme source
- *        des forces de volume dans lequel on prend en compte de petites variations de la masse volumique en fonction de la temperature et
- *        de la concentration.
+ *      - Navier-Stokes equations in laminar regime for an incompressible fluid
+ *      - Energy equation in laminar regime
+ *      - A convection-diffusion equation for one or more constituents characterized by their concentrations.
+ *        In general, the energy and concentration equations are coupled to the Navier-Stokes equations through
+ *        the body force source term in which small variations of density as a function of temperature and
+ *        concentration are taken into account.
  *
  * @sa Pb_Fluide_base
  */

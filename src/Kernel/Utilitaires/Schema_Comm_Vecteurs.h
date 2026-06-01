@@ -27,27 +27,27 @@ enum IsExchangeBlocking
 
 class Schema_Comm_Vecteurs_Static_Data;
 
-/*! @brief Classe outil utilisee notamment par les methodes MD_Vector::echange_espace_virtuel()
+/*! @brief Utility class used notably by MD_Vector::echange_espace_virtuel() methods.
  *
- * Permet d'echanger avec d'autres processeurs des blocs d'ints ou de double
- * accessibles par des tableaux dans lesquels on lit et on ecrit directement
- *   (contrairement a Schema_Comm qui utilise readOn et printOn, plus lent).
- *   Pour des raisons de performances, la communication est separee en deux parties
- *   - definition des tailles de buffers (permet d'allouer a l'avance les bufffers
+ * Allows exchanging blocks of ints or doubles with other processors,
+ * accessible via arrays that are read and written directly
+ *   (unlike Schema_Comm which uses readOn and printOn, which is slower).
+ *   For performance reasons, communication is split into two phases:
+ *   - buffer size definition (allows pre-allocating buffers):
  *      begin_init()
- *      add_send/recv_area_int/double(processeur, size)
- *       (declaration des types, tailles et processeurs destinataire des blocs que l'on va envoyer,
- *        on peut envoyer plusieurs blocs de types identiques ou differents a chaque processeur)
+ *      add_send/recv_area_int/double(processor, size)
+ *       (declaration of types, sizes and destination processors for blocks to be sent;
+ *        multiple blocks of identical or different types can be sent to each processor)
  *      end_init()
- *   - echange de donnees (autant de fois qu'on veut):
+ *   - data exchange (as many times as desired):
  *      begin_comm()
- *      for(each bloc to send) {
+ *      for(each block to send) {
  *       ArrOfInt/Double & buf = get_next_area_int/double(pe, size);
  *       for (i=0; i<size; i++)
  *         buf[i] = ...
  *      }
  *      exchange();
- *      for (each bloc to recv) {
+ *      for (each block to recv) {
  *        ... get_next_area_int/double(...)
  *      end_comm();
  *
@@ -81,18 +81,18 @@ protected:
   int check_buffers_full() const;
   int check_next_area(int pe, int byte_size) const;
 
-  // Pour chaque processeur de send_proc ou recv_proc_, taille totale des buffers en "bytes"
-  // Pendant la phase begin_init(), ces deux tableaux sont de taille nproc(), valeur nulle
-  //  pour les processeurs a qui on ne parle pas.
-  // ensuite, il sont de la meme taille que send_procs_ et recv_procs_
+  // For each processor in send_proc or recv_proc_, total buffer size in bytes.
+  // During the begin_init() phase, these two arrays are of size nproc(), with zero value
+  //  for processors we don't communicate with.
+  // Afterwards, they are the same size as send_procs_ and recv_procs_.
   ArrOfInt send_buf_sizes_;
   ArrOfInt recv_buf_sizes_;
-  // Liste des proceseurs a qui on envoie des donnees
+  // List of processors to which we send data
   ArrOfInt send_procs_;
   ArrOfInt recv_procs_;
-  // A l'issue de la phase d'initialisation, les processeurs sont-ils dans l'ordre croissant ?
+  // After the initialization phase, are the processors in ascending order?
   int sorted_ = 1;
-  // Taille du buffer requis pour ce schema
+  // Buffer size required for this schema
   int min_buf_size_ = -1;
   // Buffer packing/uncpacking on device:
   bool bufferOnDevice_ = false;
@@ -102,9 +102,9 @@ protected:
   enum Status { RESET, BEGIN_INIT, END_INIT, BEGIN_COMM, EXCHANGED };
   Status status_;
 
-  // Le buffer global est-il en cours d'utilisation ?
+  // Is the global buffer currently in use?
   static bool buffer_locked_;
-  // Zones temporaires de lecture/ecriture, renvoyees par get_next... et qui pointent dans buffer_
+  // Temporary read/write areas, returned by get_next... and pointing into buffer_
   static ArrOfDouble tmp_area_double_;
   static ArrOfFloat tmp_area_float_;
   static ArrOfInt tmp_area_int_;
@@ -112,11 +112,11 @@ protected:
   static ArrOfTID tmp_area_tid_;
 #endif
 
-  // Classe contenant des tableaux malloc (pour destruction automatique en fin d'execution)
+  // Class containing malloc arrays (for automatic destruction at end of execution)
   static Schema_Comm_Vecteurs_Static_Data sdata_;
 };
 
-/*! @brief Donnees statiques communes a toutes les classes Schema_Comm_Vecteur, avec destructeur pour liberer la memoire en fin d'execution
+/*! @brief Static data shared by all Schema_Comm_Vecteur classes, with destructor to free memory at end of execution.
  *
  */
 class Schema_Comm_Vecteurs_Static_Data
@@ -130,12 +130,12 @@ public:
   int buffer_base_size_;
   int buffer_base_device_size_;
   int buf_pointers_size_;
-  // Pour chaque processeur entre 0 et nproc(), adresse des prochaines donnees a lire/ecrire
-  // de ce proc dans le tableau buffer
+  // For each processor between 0 and nproc(), address of the next data to read/write
+  // from this proc in the buffer array
   char **buf_pointers_;
 };
 
-// Taille en bytes d'un bloc de sz ints, arrondi aux 8 octets superieurs
+// Size in bytes of a block of sz ints, rounded up to the next 8 bytes
 #ifdef INT_is_64_
 #if INT_is_64_ == 1
 #define BLOCSIZE_INT(sz) (sz<<3)   // == sz*8
@@ -225,11 +225,11 @@ inline void Schema_Comm_Vecteurs::add_recv_area_template<trustIdType>(int pe, in
 }
 #endif
 
-/*! @brief renvoie un tableau contenant les "size" valeurs suivantes recues du processeur pe lors de la communication en cours.
+/*! @brief Returns an array containing the next "size" values received from processor pe during the current communication.
  *
- *   Attention:
- *   Le tableau renvoye est une reference a un tableau interne qui n'est valide que
- *   jusqu'au prochain appel a une methode get_next_xxx.
+ *   Warning:
+ *   The returned array is a reference to an internal array that is only valid
+ *   until the next call to a get_next_xxx method.
  *
  */
 template<>
@@ -238,7 +238,7 @@ inline ArrOfInt& Schema_Comm_Vecteurs::get_next_area_template<int>(int pe, int s
   ALIGN_SIZE(sdata_.buf_pointers_[pe], sizeof(int));
   assert(check_next_area(pe, BLOCSIZE_INT(size)));
   int *bufptr = (int *) (sdata_.buf_pointers_[pe]);
-  // attention a l'arithmetique de pointeurs, ajout d'une taille en octets
+  // caution with pointer arithmetic, adding a size in bytes
   sdata_.buf_pointers_[pe] += BLOCSIZE_INT(size);
   tmp_area_int_.ref_data(bufptr, size);
   tmp_area_int_.set_data_location(bufferOnDevice_ ? DataLocation::Device : DataLocation::HostOnly);
@@ -252,7 +252,7 @@ inline ArrOfTID& Schema_Comm_Vecteurs::get_next_area_template<trustIdType>(int p
   ALIGN_SIZE(sdata_.buf_pointers_[pe], sizeof(trustIdType));
   assert(check_next_area(pe, BLOCSIZE_TID(size)));
   trustIdType *bufptr = (trustIdType *) (sdata_.buf_pointers_[pe]);
-  // attention a l'arithmetique de pointeurs, ajout d'une taille en octets
+  // caution with pointer arithmetic, adding a size in bytes
   sdata_.buf_pointers_[pe] += BLOCSIZE_TID(size);
   tmp_area_tid_.ref_data(bufptr, size);
   return tmp_area_tid_;
@@ -265,14 +265,14 @@ inline ArrOfDouble& Schema_Comm_Vecteurs::get_next_area_template<double>(int pe,
   ALIGN_SIZE(sdata_.buf_pointers_[pe], sizeof(double));
   assert(check_next_area(pe, BLOCSIZE_DOUBLE(size)));
   double *bufptr = (double *) (sdata_.buf_pointers_[pe]);
-  // attention a l'arithmetique de pointeurs, ajout d'une taille en octets
+  // caution with pointer arithmetic, adding a size in bytes
   sdata_.buf_pointers_[pe] += BLOCSIZE_DOUBLE(size);
   tmp_area_double_.ref_data(bufptr, size);
   tmp_area_double_.set_data_location(bufferOnDevice_ ? DataLocation::Device : DataLocation::HostOnly);
   if (check_comm_vector)
     {
 #ifndef NDEBUG
-      // en debug, mettre des valeurs bidon dans le tableau
+      // in debug, put dummy values in the array
       if (status_ != EXCHANGED)
         tmp_area_double_ = DMAXFLOAT * 0.999;
 #endif
@@ -286,7 +286,7 @@ inline ArrOfFloat& Schema_Comm_Vecteurs::get_next_area_template<float>(int pe, i
   ALIGN_SIZE(sdata_.buf_pointers_[pe], sizeof(float));
   assert(check_next_area(pe, BLOCSIZE_FLOAT(size)));
   float *bufptr = (float *) (sdata_.buf_pointers_[pe]);
-  // attention a l'arithmetique de pointeurs, ajout d'une taille en octets
+  // caution with pointer arithmetic, adding a size in bytes
   sdata_.buf_pointers_[pe] += BLOCSIZE_FLOAT(size);
   tmp_area_float_.ref_data(bufptr, size);
   tmp_area_float_.set_data_location(bufferOnDevice_ ? DataLocation::Device : DataLocation::HostOnly);

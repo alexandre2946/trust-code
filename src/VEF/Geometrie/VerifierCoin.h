@@ -21,9 +21,9 @@
 
 #include <Interprete_geometrique_base.h>
 
-/*! @brief classe VerifierCoin Interprete qui resoud un probleme:
+/*! @brief VerifierCoin class: interpreter that solves a problem.
  *
- *       [DANS LE JEU DE DONNEES] VerifierCoin pb
+ *       [IN THE DATA FILE] VerifierCoin pb
  *
  * @sa Interprete Probleme
  */

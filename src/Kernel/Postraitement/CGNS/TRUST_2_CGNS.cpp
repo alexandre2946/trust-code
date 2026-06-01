@@ -102,7 +102,7 @@ Motcle TRUST_2_CGNS::modify_field_name_for_post(const Nom& id_du_champ, const No
   (LOC == "SOM") ? fieldId_som++ : ( (LOC == "ELEM") ? fieldId_elem++ : fieldId_faces++);
 
   /*
-   * XXX Elie Saikali : dans CGNS on est limite a char de taille 32 max ! sinon pas supporte (regarde la methode cgi_check_strlen ...)
+   * XXX Elie Saikali : in CGNS we are limited to char size 32 max ! otherwise not supported (see method cgi_check_strlen ...)
    * Go Bricorama !
    */
 
@@ -126,7 +126,7 @@ Motcle TRUST_2_CGNS::modify_field_name_for_post(const Nom& id_du_champ, const No
           }
       };
 
-      // 1. Premier essai : prefixer par le nom du cas si besoin
+      // 1. First attempt: remove case name prefix if needed
       Motcle truncate_try_1(id_du_champ_modifie), nom_du_cas(Objet_U::nom_du_cas());
       truncate_try_1.suffix(nom_du_cas.getChar());
       truncate_try_1.suffix("_");
@@ -135,7 +135,7 @@ Motcle TRUST_2_CGNS::modify_field_name_for_post(const Nom& id_du_champ, const No
         new_id_du_champ_modifie = truncate_try_1.getChar();
 
 
-      // 2. Si toujours trop long, on tente qlqs remplacements
+      // 2. If still too long, try a few abbreviation replacements
       if (new_id_du_champ_modifie.size() > CGNS_STR_SIZE)
         {
           replace_all(new_id_du_champ_modifie, "VITESSE", "VIT");
@@ -148,7 +148,7 @@ Motcle TRUST_2_CGNS::modify_field_name_for_post(const Nom& id_du_champ, const No
           replace_all(new_id_du_champ_modifie, "LIQUIDE", "LIQ");
         }
 
-      // 3. Si encore trop long .. vraiment desole !
+      // 3. If still too long .. truly sorry !
       if (new_id_du_champ_modifie.size() > CGNS_STR_SIZE)
         {
           static constexpr size_t keep_first = 25;
@@ -171,7 +171,7 @@ Motcle TRUST_2_CGNS::modify_field_name_for_post(const Nom& id_du_champ, const No
   return id_du_champ_modifie;
 }
 
-// pour retirer boundaries_ du nom dom (ajoute par TRUST pour les bords ...)
+// to strip boundaries_ from the domain name (added by TRUST for boundary subdomains ...)
 std::string TRUST_2_CGNS::modify_domaine_name_for_post(const Nom& nom_dom)
 {
   std::string nom_dom_modifie = nom_dom.getString();
@@ -248,7 +248,7 @@ void TRUST_2_CGNS::fill_coords(std::vector<double>& xCoords, std::vector<double>
   else
     zCoords.clear();
 
-  if (Objet_U::axi) // au cas ou
+  if (Objet_U::axi) // just in case
     {
       for (int i = 0; i < nb_som; ++i)
         {
@@ -272,11 +272,11 @@ void TRUST_2_CGNS::fill_coords(std::vector<double>& xCoords, std::vector<double>
 }
 
 /*
- * NOTA BENE : postraiter_domaine_ toujours comme PARALLEL_OVER_ZONE, meme si c'est pas active
+ * NOTA BENE : postraiter_domaine_ always behaves like PARALLEL_OVER_ZONE, even when it is not active
  */
 void TRUST_2_CGNS::clear_vectors()
 {
-  if (!Option_CGNS::PARALLEL_OVER_ZONE && !postraiter_domaine_) // XXX a voir plus tard si utile pour garder
+  if (!Option_CGNS::PARALLEL_OVER_ZONE && !postraiter_domaine_) // XXX to be revisited later if still useful to keep
     {
       proc_non_zero_elem_.clear();
       global_nb_elem_.clear();
@@ -323,7 +323,7 @@ void TRUST_2_CGNS::fill_global_infos()
           PE_Groups::exit_group();
         }
     }
-  else /* sinon au cas ou ... */
+  else /* otherwise, just in case ... */
     {
       proc_me_local_comm_ = Process::me();
       nb_proc_local_comm_ = Process::nproc();
@@ -347,11 +347,11 @@ void TRUST_2_CGNS::fill_global_infos()
     }
 
   const auto min_nb_elem = std::min_element(global_nb_elem_.begin(), global_nb_elem_.end());
-  nb_procs_writing_ = nb_procs; // pour le moment
+  nb_procs_writing_ = nb_procs; // for now
 
   if (*min_nb_elem <= 0) // not all procs will write !
     {
-      // remplir proc_non_zero_elem avec le numero de proc si nb_elem > 0 !!
+      // fill proc_non_zero_elem with the proc number if nb_elem > 0 !!
       for (int i = 0; i < static_cast<int>(global_nb_elem_.size()); i++)
         if (global_nb_elem_[i] > 0) proc_non_zero_elem_.push_back(i);
 
@@ -398,7 +398,7 @@ void TRUST_2_CGNS::fill_global_infos_poly(const bool is_polyedre)
 
   const bool by_comm_grp = is_comm_group_mode(postraiter_domaine_);
 
-  int decal = 0; // a modifier plus tard !!!
+  int decal = 0; // to be updated later !!!
   const int nb_procs = by_comm_grp ? nb_proc_local_comm_ : Process::nproc();
 
   par_in_zone_ = (!Option_CGNS::PARALLEL_OVER_ZONE && !postraiter_domaine_) ? true : false;
@@ -437,7 +437,7 @@ void TRUST_2_CGNS::fill_global_infos_poly(const bool is_polyedre)
 
       nb_ef_ = convert_connectivity_nface(local_ef_, local_ef_offset_, decal);
 
-      // finalement : decalage
+      // finally: compute offset shift
       const int nb_fs_offset = static_cast<int>(local_fs_.size()), nb_ef_offset = static_cast<int>(local_ef_.size());
 
       global_nb_face_som_offset_.assign(nb_procs, -123 /* default */);
@@ -448,7 +448,7 @@ void TRUST_2_CGNS::fill_global_infos_poly(const bool is_polyedre)
 
       if (!Option_CGNS::PARALLEL_OVER_ZONE && !postraiter_domaine_)
         {
-          // incr sur nb_faces et nb_elem tot offset
+          // increment on nb_faces and nb_elem total offset
           std::vector<int> global_incr_max_face_som_offset, global_incr_max_elem_face_offset;
           compute_global_max_only(global_nb_face_som_offset_, global_incr_max_face_som_offset, nfs_offset_tot_);
           compute_global_max_only(global_nb_elem_face_offset_, global_incr_max_elem_face_offset, nef_offset_tot_);
@@ -469,7 +469,7 @@ void TRUST_2_CGNS::fill_global_infos_poly(const bool is_polyedre)
 
       const int nb_es_offset = static_cast<int>(local_es_.size());
 
-      // incr sur nb_elem tot offset
+      // increment on nb_elem total offset
       global_nb_elem_som_offset_.assign(nb_procs, -123 /* default */);
 
       allgather_int_on_active_comm(nb_es_offset, global_nb_elem_som_offset_, by_comm_grp);
@@ -498,14 +498,14 @@ int TRUST_2_CGNS::compute_shift(const std::vector<int>& vect_incr_max) const
   int decal = 0;
   if (all_procs_write_)
     {
-      if (proc_me > 0) // pas maitre
+      if (proc_me > 0) // not master
         decal = vect_incr_max[proc_me - 1];
     }
   else
     {
       for (int i = 0; i < nb_procs_writing_; i++)
         if (proc_non_zero_elem_[i] == proc_me)
-          if (i > 0) // pas premier case
+          if (i > 0) // not the first case
             {
               decal = vect_incr_max[proc_non_zero_elem_[i] - 1];
               break;
@@ -647,7 +647,7 @@ int TRUST_2_CGNS::topo_dim_from_elem(CGNS_TYPE etype, bool is_polyedre) const
     return 2; // 2D classiques
 
   if (etype == CGNS_ENUMV(NGON_n))
-    return is_polyedre ? 3 : 2; // NGON_n : 2D si polygone, 3D si polyedre (avec NFACE_n)
+    return is_polyedre ? 3 : 2; // NGON_n : 2D if polygon, 3D if polyhedron (with NFACE_n)
 
   // 3D classiques
   return 3; // TETRA_4, HEXA_8, NFACE_n
@@ -667,8 +667,8 @@ int TRUST_2_CGNS::convert_connectivity_nface(std::vector<cgsize_t>& econ, std::v
 
   econ.clear(), eoff.clear();
 
-  econ.reserve(static_cast<size_t>(nElem) * maxDeg); // chaque elem a au plus maxDeg faces
-  eoff.reserve(static_cast<size_t>(nElem) + 1); // un par elem + 1 pour la fin
+  econ.reserve(static_cast<size_t>(nElem) * maxDeg); // each element has at most maxDeg faces
+  eoff.reserve(static_cast<size_t>(nElem) + 1); // one per element + 1 for the end
 
   eoff.push_back(0); // first index = > 0 !
 
@@ -688,7 +688,7 @@ int TRUST_2_CGNS::convert_connectivity_nface(std::vector<cgsize_t>& econ, std::v
     }
 
   // XXX Elie Saikali ...
-  // on en a besoin pour eviter ce warning
+  // we need this to avoid the following warning
   // reading zone "Zone_0002"
   // reading element set "NGON_n"
   // reading element set "NFACE_n"

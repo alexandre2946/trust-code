@@ -17,9 +17,9 @@
 #define Dispersion_bulles_constante_included
 #include <Dispersion_bulles_base.h>
 
-/*! @brief classe Dispersion_bulles_turbulente_LLB coefficients de dispersion turbulente de bulles slon le modele Lance et Lopez de Bertodano 1994
+/*! @brief Constant turbulent bubble dispersion coefficient (Lance and Lopez de Bertodano 1994 model).
  *
- * Pour une verification analytique de l'equilibre des forces dans un tube
+ * For analytical verification of force equilibrium in a tube.
  *
  */
 class Dispersion_bulles_constante : public Dispersion_bulles_base
@@ -29,7 +29,7 @@ public:
   void coefficient(const input_t& input, output_t& output) const override;
 
 protected:
-  int n_l = -1; //phase liquide
+  int n_l = -1; //liquid phase
   double D_td_star_ = -123.; // Turbulent diffusivity
 };
 

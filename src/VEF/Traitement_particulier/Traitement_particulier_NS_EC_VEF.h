@@ -18,11 +18,11 @@
 
 #include <Traitement_particulier_NS_EC.h>
 
-/*! @brief classe Traitement_particulier_NS_EC_VEF Cette classe permet de faire les traitements particuliers
+/*! @brief class Traitement_particulier_NS_EC_VEF This class performs special post-processing
  *
- *      pour les calculs de  l'energie cinetique totale en VEF
- *      Rien de particulier au VEF. Calculs implementes dans la
- *      classe de base.
+ *      for total kinetic energy computations in VEF.
+ *      Nothing specific to VEF: computations are implemented in the
+ *      base class.
  *
  *
  * @sa Navier_Stokes_Turbulent, Traitement_particulier_base, Traitement_particulier_NS_EC
@@ -31,7 +31,7 @@ class Traitement_particulier_NS_EC_VEF : public Traitement_particulier_NS_EC
 {
   Declare_instanciable_sans_constructeur(Traitement_particulier_NS_EC_VEF);
 public:
-  // On declare que la classe supporte champ_masse_volumique
+  // Declare that the class supports champ_masse_volumique
   inline Traitement_particulier_NS_EC_VEF()
   {
     declare_support_masse_volumique(1);

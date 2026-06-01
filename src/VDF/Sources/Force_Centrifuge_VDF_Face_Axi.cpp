@@ -47,9 +47,9 @@ Entree& Force_Centrifuge_VDF_Face_Axi::readOn(Entree& s )
 
 /////////////////////////////////////////////////////////////////////
 //
-//                    Implementation des fonctions
+//                    Implementation of functions
 //
-//               de la classe Force_Centrifuge_VDF_Face_Axi
+//               of the Force_Centrifuge_VDF_Face_Axi class
 //
 ////////////////////////////////////////////////////////////////////
 
@@ -86,7 +86,7 @@ void Force_Centrifuge_VDF_Face_Axi::ajouter_blocs(matrices_t matrices, DoubleTab
   double U,V,coef;
   int fac0,fac1,fac2,fac3;
 
-  // Boucle sur les elements pour calculer vit_sum
+  // Loop over elements to compute vit_sum
 
   for (int num_elem=0; num_elem<nb_elem; num_elem++)
     {
@@ -105,16 +105,16 @@ void Force_Centrifuge_VDF_Face_Axi::ajouter_blocs(matrices_t matrices, DoubleTab
       vit_sum(fac3) += 0.5*(U*V);
     }
 
-  // Boucle sur les conditions limites pour traiter les faces de bord
+  // Loop over boundary conditions to process boundary faces
 
   int ndeb,nfin,ori,num_face;
 
   for (int n_bord=0; n_bord<zvdf.nb_front_Cl(); n_bord++)
     {
 
-      // pour chaque Condition Limite on regarde son type
-      // Si face de Dirichlet ou de Symetrie on ne fait rien
-      // Si face de Neumann on calcule la contribution au terme source
+      // for each boundary condition, check its type
+      // If Dirichlet or Symmetry face, do nothing
+      // If Neumann face, compute the contribution to the source term
 
       const Cond_lim& la_cl = zclvdf.les_conditions_limites(n_bord);
 
@@ -145,7 +145,7 @@ void Force_Centrifuge_VDF_Face_Axi::ajouter_blocs(matrices_t matrices, DoubleTab
         { /* Do nothing */}
     }
 
-  // Boucle sur les faces internes
+  // Loop over internal faces
 
   ndeb = zvdf.premiere_face_int();
   nfin = zvdf.nb_faces();

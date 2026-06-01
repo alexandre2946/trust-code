@@ -59,7 +59,7 @@ Equation_base::Equation_base()
   has_time_factor_= false;
   Nom expr_equation_non_resolue="0";
   equation_non_resolue_.setNbVar(1);
-  equation_non_resolue_.setString(expr_equation_non_resolue); // Valeur par defaut, equation resolue
+  equation_non_resolue_.setString(expr_equation_non_resolue); // Default value, equation solved
   equation_non_resolue_.addVar("t");
   equation_non_resolue_.parseString();
   set_calculate_time_derivative(0);
@@ -83,11 +83,11 @@ int Equation_base::equation_non_resolue() const
     }
 }
 
-/*! @brief Renvoie le domaine discretise associe a l'equation.
+/*! @brief Returns the discretized domain associated with the equation.
  *
- * @return (Domaine_dis_base&) le domaine discretise asscoie a l'equation
- * @throws l'objet domaine discretise (Domaine_dis) est invalide,
- * probleme associe non discretise.
+ * @return (Domaine_dis_base&) the discretized domain associated with the equation
+ * @throws the discretized domain object (Domaine_dis) is invalid,
+ * associated problem not discretized.
  */
 Domaine_dis_base& Equation_base::domaine_dis()
 {
@@ -101,13 +101,13 @@ Domaine_dis_base& Equation_base::domaine_dis()
   return le_dom_dis.valeur();
 }
 
-/*! @brief Renvoie le domaine discretise associe a l'equation.
+/*! @brief Returns the discretized domain associated with the equation.
  *
- * (version const)
+ * (const version)
  *
- * @return (Domaine_dis_base&) le domaine discretise asssocie a l'equation
- * @throws l'objet domaine discretise (Domaine_dis) est invalide,
- * probleme associe non discretise.
+ * @return (Domaine_dis_base&) the discretized domain associated with the equation
+ * @throws the discretized domain object (Domaine_dis) is invalid,
+ * associated problem not discretized.
  */
 const Domaine_dis_base& Equation_base::domaine_dis() const
 {
@@ -121,11 +121,11 @@ const Domaine_dis_base& Equation_base::domaine_dis() const
   return le_dom_dis.valeur();
 }
 
-/*! @brief Complete la construction (initialisation) des objets associes a l'equation.
+/*! @brief Completes the construction (initialization) of objects associated with the equation.
  *
- *     Complete les sources, associe l'equation a l'inconnue complete les
- *     operateurs, complete les conditions aux limites discretisees.
- *     Voir les methodes Source_base::completer(),
+ *     Completes the sources, associates the equation with the unknown, completes the
+ *     operators, completes the discretized boundary conditions.
+ *     See the methods Source_base::completer(),
  *                       Operateur_base::completer()
  *                       Domaine_Cl_dis_base::completer()
  *                       Domaine_Cl_dis_base::completer(const Domaine_dis_base& )
@@ -171,12 +171,12 @@ void Equation_base::completer()
         exit();
     }
 
-  //Ajout d un element vide qui sera renvoye si pas de modele trouve
+  //Addition of an empty element that will be returned if no model is found
   RefObjU mod;
   if (liste_modeles_.size()==0)
     liste_modeles_.add(mod);
 
-  // pour les eqns n'appelant pas preparer_calcul
+  // for equations not calling preparer_calcul
   initialise_residu();
   int nb_op=nombre_d_operateurs();
   Nom msg="Equation_base::completer(), nb_op = " ;
@@ -203,13 +203,13 @@ void Equation_base::completer()
 }
 
 
-/*! @brief Surcharge Objet_U::printOn Imprime l'equation et ses composants sur un flot de sortie.
+/*! @brief Overrides Objet_U::printOn: prints the equation and its components to an output stream.
  *
- *     Imprime le nom de l'equation, le solveur masse, les termes sources
- *     les conditions aux limites discretisees, les inconnues et les operateurs.
+ *     Prints the equation name, the mass solver, the source terms,
+ *     the discretized boundary conditions, the unknowns, and the operators.
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Equation_base::printOn(Sortie& os) const
 {
@@ -225,20 +225,20 @@ Sortie& Equation_base::printOn(Sortie& os) const
   return os;
 }
 
-/*! @brief Lecture d'une equation sur un flot d'entree.
+/*! @brief Reads an equation from an input stream.
  *
- * Le format est le suivant:
+ * The expected format is:
  *       {
  *         [Source { [sou_1], [sour_2], ...} ]
  *          Conditions_limites { [cl_1] [cl_2] ... }
  *          Conditions_initiales { [cl_init] }
  *       }
  *
- * @param (Entree& is) un flot d'entree pour lire l'equation
- * @return (Entree&) le flot d'entree modifie
- * @throws mauvais format de lecture, accolade ouvrante attendue
- * @throws pas de conditions initiales, il faut initialiser l'inconnue
- * @throws pas de conditions aux limites, il faut donner des conditions aux limites
+ * @param (Entree& is) an input stream to read the equation from
+ * @return (Entree&) the modified input stream
+ * @throws bad read format, opening brace expected
+ * @throws no initial conditions, you must initialize the unknown
+ * @throws no boundary conditions, you must provide boundary conditions
  */
 Entree& Equation_base::readOn(Entree& is)
 {
@@ -319,10 +319,10 @@ int Equation_base::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 }
 
 
-/*! @brief Lecture des termes sources dans un flot d'entree.
+/*! @brief Reading of source terms in an input stream.
  *
- * @param (Entree& is) flot d'entree pour lire les termes sources
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) input stream to read source terms
+ * @return (Entree&) the modified input stream
  */
 Entree& Equation_base::lire_sources(Entree& is)
 {
@@ -341,37 +341,37 @@ Entree& Equation_base::lire_sources(Entree& is)
   return is;
 }
 
-/*! @brief Renvoie les termes sources asssocies a l'equation
+/*! @brief Returns the source terms associated with the equation
  *
- * @return (Sources&) la liste des termes sources associees a l'equation
+ * @return (Sources&) the list of source terms associated with the equation
  */
 Sources& Equation_base::sources()
 {
   return les_sources;
 }
 
-/*! @brief Renvoie les termes sources asssocies a l'equation (version const)
+/*! @brief Returns the source terms associated with the equation (const version)
  *
- * @return (Sources&) la liste des termes sources associees a l'equation
+ * @return (Sources&) the list of source terms associated with the equation
  */
 const Sources& Equation_base::sources() const
 {
   return les_sources;
 }
 
-/*! @brief Lecture des conditions initiales dans un flot d'entree.
+/*! @brief Reading of initial conditions in an input stream.
  *
- * Le format de lecture est le suivant:
+ * The reading format is as follows:
  *      {
- *       Nom [DOIT ETRE LE NOM DE L'INCONNUE]
- *       [LIRE UN CHAMP DONNE]
+ *       Name [MUST BE THE NAME OF THE UNKNOWN]
+ *       [READ A GIVEN FIELD]
  *      }
  *
- * @param (Entree& is) le flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws erreur de format, accolade ouvrante attendue
- * @throws mauvais nom pour l'inconnue
- * @throws erreur de format, accolade fermante attendue
+ * @param (Entree& is) input stream
+ * @return (Entree&) the modified input stream
+ * @throws format error, opening brace expected
+ * @throws bad name for the unknown
+ * @throws format error, closing brace expected
  */
 Entree& Equation_base::lire_cond_init(Entree& is)
 {
@@ -413,13 +413,13 @@ Entree& Equation_base::lire_cond_init(Entree& is)
   return is;
 }
 
-/*! @brief Lecture des conditions limites sur un flot d'entree.
+/*! @brief Reading of boundary conditions in an input stream.
  *
- * voir Domaine_Cl_dis_base::readOn
+ * see Domaine_Cl_dis_base::readOn
  *
- * @param (Entree& is) le flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws le domaine des conditions aux limites discretisee est vide
+ * @param (Entree& is) input stream
+ * @return (Entree&) the modified input stream
+ * @throws the discretized boundary condition domain is empty
  */
 Entree& Equation_base::lire_cl(Entree& is)
 {
@@ -435,10 +435,10 @@ Entree& Equation_base::lire_cl(Entree& is)
   return is;
 }
 
-/*! @brief On sauvegarde l'inconnue, puis les sources sur un flot de sortie.
+/*! @brief We save the unknown, then the source terms to an output stream.
  *
  * @param (Sortie& os)
- * @return (int) le code de retour de Champ_Inc::sauvegarder()
+ * @return (int) the return code of Champ_Inc::sauvegarder()
  */
 int Equation_base::sauvegarder(Sortie& os) const
 {
@@ -463,15 +463,15 @@ std::vector<YAML_data> Equation_base::data_a_sauvegarder() const
   return data;
 }
 
-/*! @brief On reprend l'inconnue a partir d'un flot d'entree.
+/*! @brief We resume the unknown from an input stream.
  *
- * [ON CHERCHE L'INCONNUE PAR SON NOM]
- *      [ON LIT L'INCONNUE]
- *      Voir Champ_Inc::reprendre(Entree&)
+ * [WE SEARCH FOR THE UNKNOWN BY ITS NAME]
+ *      [WE READ THE UNKNOWN]
+ *      See Champ_Inc::reprendre(Entree&)
  *
- * @param (Entree& fich) le flot d'entree (fichier) a lire
- * @return (int) renvoie toujours 1
- * @throws erreur de reprise, fin de fichier atteinte sans trouver l'inconnue
+ * @param (Entree& fich) input stream (file) to read
+ * @return (int) always returns 1
+ * @throws restart error, end of file reached without finding the unknown
  */
 int Equation_base::reprendre(Entree& fich)
 {
@@ -527,39 +527,39 @@ Nom Equation_base::create_polymacfamily_syno(const Nom& field_tag) const
     field_tag_syno=create_syno("PolyMAC_HFV","PolyMAC_P0P1NC");
   return field_tag_syno;
 }
-/*! @brief Demande au schema en temps si il faut effectuer une impression.
+/*! @brief Ask the time scheme if an output is needed.
  *
- * Renvoie 1 si il faut effectuer une impression.
- *      Appel simple a Schema_Temps_base::limpr()
+ * Returns 1 if an output is needed.
+ *      Simple call to Schema_Temps_base::limpr()
  *
- * @return (int) 1 si il faut effectuer une impression, 0 sinon.
+ * @return (int) 1 if an output is needed, 0 otherwise.
  */
 int Equation_base::limpr() const
 {
   return le_schema_en_temps->limpr();
 }
 
-/*! @brief Imprime les operateurs de l'equation sur un flot de sortie, de facon inconditionnelle.
+/*! @brief Prints the equation operators to an output stream, unconditionally.
  *
- *     appelle Operateur_base::impr(os)
+ *     calls Operateur_base::impr(os)
  *
- * @param (Sortie& os) le flot de sortie
- * @return (int) renvoie toujours 1
+ * @param (Sortie& os) output stream
+ * @return (int) always returns 1
  */
 int Equation_base::impr(Sortie& os) const
 {
   for(int i=0; i<nombre_d_operateurs(); i++)
     operateur(i).impr(os);
-  //if (je_suis_maitre() && les_sources.size()>0) os << finl << "Impression des termes sources pour l'equation " << que_suis_je() << " : " << finl;
+  //if (je_suis_maitre() && les_sources.size()>0) os << finl << "Printing source terms for equation " << que_suis_je() << " : " << finl;
   les_sources.impr(os);
   return 1;
 }
 
-/*! @brief Imprime les operateurs de l'equation si le schema en temps indique que c'est necessaire.
+/*! @brief Prints the equation operators if the time scheme indicates it is necessary.
  *
- *      [SI limpr() ALORS impr(os)]
+ *      [IF limpr() THEN impr(os)]
  *
- * @param (Sortie& os) le flot de sortie
+ * @param (Sortie& os) output stream
  */
 void Equation_base::imprimer(Sortie& os) const
 {
@@ -657,7 +657,7 @@ DoubleTab& Equation_base::derivee_en_temps_inco(DoubleTab& derivee)
   else if (implicite_>0)
     {
       // TRUST support notices that this part has never been covered...
-      //implicite
+      //implicit
       // M dU/dt + AU* = f -BUn;
       // U* = Un+dt dU/dt
       // (M/dt + A) U* = f -BUn + M/dt Un
@@ -665,7 +665,7 @@ DoubleTab& Equation_base::derivee_en_temps_inco(DoubleTab& derivee)
       double dt=schema_temps().pas_de_temps();
       for(int i=0; i<nombre_d_operateurs(); i++)
         {
-          //boucle sur les operateurs
+          //loop over operators
           Operateur_base& op=operateur(i).l_op_base();
           if(!op.get_matrice())
             op.set_matrice().typer("Matrice_Morse");
@@ -699,8 +699,8 @@ DoubleTab& Equation_base::derivee_en_temps_inco(DoubleTab& derivee)
         }
       if(implicite_==1)
         {
-          // Un seul operateur implicite.
-          // On suppose que c'est le premier (la diffusion !!)
+          // Single implicit operator.
+          // Assumed to be the first one (diffusion!!)
           Operateur_base& op=operateur(0).l_op_base();
           Matrice_Base& matrice=op.set_matrice().valeur();
           // DoubleTrav secmem(derivee);
@@ -716,14 +716,14 @@ DoubleTab& Equation_base::derivee_en_temps_inco(DoubleTab& derivee)
           derivee-=inconnue().valeurs();
           derivee/=dt;
 
-          //Sert uniquement a calculer les flux sur les bords quand la diffusion est implicitee !
+          //Used only to compute boundary fluxes when diffusion is made implicit!
           DoubleTab resu;
           resu=derivee;
           operateur(0).calculer(inconnue().valeurs(), resu);
         }
       else
         {
-          // plusieurs operateurs implicites ...
+          // multiple implicit operators ...
           Cerr << "Must be coded ... " << finl;
           exit();
         }
@@ -740,27 +740,27 @@ DoubleTab& Equation_base::derivee_en_temps_inco(DoubleTab& derivee)
   return derivee;
 }
 
-/*! @brief Renvoie le probleme associe a l'equation.
+/*! @brief Returns the problem associated with the equation.
  *
- * @return (Probleme_base&) le probleme associe a l'equation
+ * @return (Probleme_base&) the problem associated with the equation
  */
 Probleme_base& Equation_base::probleme()
 {
   return mon_probleme.valeur();
 }
 
-/*! @brief Renvoie le probleme associe a l'equation.
+/*! @brief Returns the problem associated with the equation.
  *
- * (version const)
+ * (const version)
  *
- * @return (Probleme_base&) le probleme associe a l'equation
+ * @return (Probleme_base&) the problem associated with the equation
  */
 const Probleme_base& Equation_base::probleme() const
 {
   return mon_probleme.valeur();
 }
 
-/*! @brief Methode appelee lorsqu'on cree l'instance de l'objet dans le jeu de donnees (Interprete::ajouter)
+/*! @brief Method called when the object instance is created in the data file (Interprete::ajouter)
  *
  */
 void Equation_base::nommer(const Nom& un_nom)
@@ -768,28 +768,28 @@ void Equation_base::nommer(const Nom& un_nom)
   nom_ = un_nom;
 }
 
-/*! @brief S'associe au Probleme passe en parametre.
+/*! @brief Associates with the Problem passed as parameter.
  *
- * Associe egalement les sources, les operateurs et le solveur
- *     de masse a l'equation.
+ * Also associates the sources, operators and mass
+ *     solver with the equation.
  *
- * @param (Probleme_base& pb) le probleme auquel l'equation doit s'associer
+ * @param (Probleme_base& pb) the problem with which the equation must be associated
  */
 void Equation_base::associer_pb_base(const Probleme_base& pb)
 {
   mon_probleme=pb;
-  // Modif B. Mathieu : pour le front_tracking, le nom de l'equation
-  // est donne dans le jeu de donnees lors de l'instanciation de l'objet
-  // (la methode "nommer" est appelee a ce moment).
-  // Si l'equation n'est pas instanciee, le nom est vide, on donne
-  // le nom par defaut qui est defini ci-dessous :
+  // Modif B. Mathieu: for front_tracking, the equation name
+  // is given in the data file during object instantiation
+  // (the "nommer" method is called at that moment).
+  // If the equation is not instantiated, the name is empty, we give
+  // the default name which is defined below:
   Nom nom_vide;
   if (nom_ == nom_vide)
     {
       nom_ = pb.le_nom();
       nom_ += que_suis_je();
     }
-  // fin modif B.M.
+  // end modif B.M.
   les_sources.associer_eqn(*this);
   int nb_op = nombre_d_operateurs();
   for(int i=0; i<nb_op; i++)
@@ -797,11 +797,11 @@ void Equation_base::associer_pb_base(const Probleme_base& pb)
 
 }
 
-/*! @brief Discretise l'equation.
+/*! @brief Discretizes the equation.
  *
- * Type le domaine_Cl_dis, la formatte, l'associe a l'equation.
- *     Type le solveur masse, lui associe le domaine discretise et
- *     le domaine des conditions aux limites discretisees.
+ * Type the domaine_Cl_dis, the format, associate it with the equation.
+ *     Type the mass solver, associate the discretized domain and
+ *     the discretized boundary condition domain with it.
  *
  */
 void Equation_base::discretiser()
@@ -815,7 +815,7 @@ void Equation_base::discretiser()
   le_dom_Cl_dis->associer_inconnue(inconnue());
 
   /*
-   * XXX : Elie Saikali : pour typer correctement le solveur_masse ...
+   * XXX : Elie Saikali : to type correctly the mass solver ...
    */
   Nom typ = discretisation().get_name_of_type_for("Solveur_Masse", "??" /* rien */, *this);
   solveur_masse.typer(typ);
@@ -848,19 +848,19 @@ void Equation_base::associer_milieu_equation()
   milieu().associer_equation(this);
 }
 
-/*! @brief S'associe au schema_en_temps.
+/*! @brief Associates the time scheme with the equation.
  *
- * @param (Schema_Temps_base& un_schema_en_temps) le schema en temps a associer a l'equation
+ * @param (Schema_Temps_base& un_schema_en_temps) the time scheme to associate with the equation
  */
 void Equation_base::associer_sch_tps_base(const Schema_Temps_base& un_schema_en_temps)
 {
   le_schema_en_temps=un_schema_en_temps;
 }
 
-/*! @brief Renvoie le schema en temps associe a l'equation.
+/*! @brief Returns the time scheme associated with the equation.
  *
- * @return (Schema_Temps_base&) le schema en temps associe a l'equation
- * @throws pas de schema en temps associe a l'equation
+ * @return (Schema_Temps_base&) the time scheme associated with the equation
+ * @throws no time scheme associated with the equation
  */
 Schema_Temps_base& Equation_base::schema_temps()
 {
@@ -873,10 +873,10 @@ Schema_Temps_base& Equation_base::schema_temps()
   return le_schema_en_temps.valeur();
 }
 
-/*! @brief Renvoie le schema en temps associe a l'equation.
+/*! @brief Returns the time scheme associated with the equation.
  *
- * @return (Schema_Temps_base&) le schema en temps associe a l'equation
- * @throws pas de schema en temps associe a l'equation
+ * @return (Schema_Temps_base&) the time scheme associated with the equation
+ * @throws no time scheme associated with the equation
  */
 const Schema_Temps_base& Equation_base::schema_temps() const
 {
@@ -889,50 +889,50 @@ const Schema_Temps_base& Equation_base::schema_temps() const
   return le_schema_en_temps.valeur();
 }
 
-/*! @brief Associe le domaine discretise a l'equation.
+/*! @brief Associates the discretized domain with the equation.
  *
- * @param (Domaine_dis_base& z) le domaine discretise a associer
+ * @param (Domaine_dis_base& z) the discretized domain to associate
  */
 void Equation_base::associer_domaine_dis(const Domaine_dis_base& z)
 {
   le_dom_dis=z;
 }
 
-/*! @brief La valeur de l'inconnue sur le pas de temps a ete calculee.
+/*! @brief The value of the unknown at the time step has been calculated.
  *
- * Cette methode avance le present jusqu'au temps passe en parametre.
- *    Elle met aussi a jour les proprietes du milieu.
+ * This method advances the present until the time passed as parameter.
+ *    It also updates the properties of the medium.
  *
- * @param (double temps) le pas de temps de mise a jour
+ * @param (double temps) the time step for update
  */
 void Equation_base::mettre_a_jour(double temps)
 {
-  // On tourne la roue de l'inconnue
+  // We turn the unknown wheel
   // Update the unknown:
   inconnue().mettre_a_jour(temps);
   if (calculate_time_derivative()) derivee_en_temps().mettre_a_jour(temps);
 
   les_sources.mettre_a_jour(temps);
 
-  // On tourne la roue des CLs
+  // We turn the boundary condition wheel
   // Update the boundary condition:
   if (temps > schema_temps().temps_courant()) domaine_Cl_dis().avancer(temps);
 }
 
-//mise a jour de champ_conserve / champ_convecte : appele par Probleme_base::mettre_a_jour() apres avoir mis a jour le milieu
+//update of champ_conserve / champ_convecte : called by Probleme_base::mettre_a_jour() after updating the medium
 void Equation_base::mettre_a_jour_champs_conserves(double temps, int reset)
 {
-  if (reset && champ_conserve_) champ_conserve_->reset_champ_calcule(); //force le calcul de toutes les cases
+  if (reset && champ_conserve_) champ_conserve_->reset_champ_calcule(); //force calculation of all cells
   if (reset && champ_convecte_) champ_convecte_->reset_champ_calcule();
   if (champ_conserve_) champ_conserve_->mettre_a_jour(temps);
   if (champ_convecte_) champ_convecte_->mettre_a_jour(temps);
 }
 
-/*! @brief Reinitialiser ce qui doit l'etre.
+/*! @brief Reinitialize what must be.
  *
- * Cette methode est appelee lorsqu'un pas de temps est abandonne,
- *     par exemple parce que le calcul a diverge.
- *     Il faut donc nettoyer ce qui pourrait polluer la nouvelle resolution.
+ * This method is called when a time step is abandoned,
+ *     for example because the calculation has diverged.
+ *     So you must clean up what could pollute the new resolution.
  *
  * @throws WrongContext
  */
@@ -961,18 +961,18 @@ void Equation_base::resetTime(double time)
 }
 
 
-/*! @brief methode virtuelle permettant de corriger l'onconnue lors d'iterations implicites par exemple K-eps doivent rester positifs
+/*! @brief virtual method to correct the unknown during implicit iterations for example K-eps must remain positive
  *
- *  les fractions massqiues entre 0 et 1
+ *  mass fractions between 0 and 1
  *
  */
 void Equation_base::valider_iteration()
 {
 }
 
-/*! @brief Tout ce qui ne depend pas des autres problemes eventuels.
+/*! @brief Everything that does not depend on other possible problems.
  *
- * @return (int) renvoie toujours 1
+ * @return (int) always returns 1
  */
 int Equation_base::preparer_calcul()
 {
@@ -998,7 +998,7 @@ int Equation_base::preparer_calcul()
   domaine_Cl_dis().imposer_cond_lim(inconnue(),temps);
   inconnue().valeurs().echange_espace_virtuel();
 
-  /* initialisation de parametre_equation() par le schema en temps si celui-ci le permet */
+  /* initialization of parametre_equation() by the time scheme if it allows it */
   if (sub_type(Schema_Implicite_base, schema_temps()))
     ref_cast(Schema_Implicite_base, schema_temps()).solveur()->get_and_set_parametre_equation(*this);
 
@@ -1010,26 +1010,26 @@ int Equation_base::preparer_calcul()
 }
 
 
-/*! @brief Allocation et initialisation de l'inconnue et des CLs jusqu'a present+dt.
+/*! @brief Allocation and initialization of the unknown and boundary conditions until present+dt.
  *
- *   + autres initialisations pour les calculs sur le prochain
- *     pas de temps : operateurs, solveur_masse->
+ *   + other initializations for calculations on the next
+ *     time step : operators, mass solver->
  *
- * @return (0 en cas d'erreur, 1 sinon)
+ * @return (0 in case of error, 1 otherwise)
  */
 bool Equation_base::initTimeStep(double dt)
 {
   Schema_Temps_base& sch=schema_temps();
   double temps_present=sch.temps_courant();
 
-  // Le pas de temps doit etre celui du schema !!
+  // The time step must be that of the scheme !!
   assert(sch.pas_de_temps()==dt);
 
-  // Pour chaque temps futur
+  // For each future time
   for (int i=1; i<=sch.nb_valeurs_futures(); i++)
     {
       double tps=sch.temps_futur(i);
-      // Mise a jour du temps dans l'inconnue
+      // Update of the time in the unknown
       inconnue().changer_temps_futur(tps,i);
       if (champ_conserve_) champ_conserve_->changer_temps_futur(tps,i);
       if (champ_convecte_) champ_convecte_->changer_temps_futur(tps,i);
@@ -1040,18 +1040,18 @@ bool Equation_base::initTimeStep(double dt)
       if (champ_convecte_) champ_convecte_->futur(i) = champ_convecte().valeurs();
       if (calculate_time_derivative()) derivee_en_temps().futur(i)=derivee_en_temps().valeurs();
 
-      // Mise a jour du temps dans les CL
+      // Update of the time in the boundary conditions
       domaine_Cl_dis().changer_temps_futur(tps,i);
     }
 
-  // Mise a jour du temps par defaut des CLs
+  // Update of the default time of the boundary conditions
   domaine_Cl_dis().set_temps_defaut(sch.temps_defaut());
 
-  // Mise a jour des operateurs
+  // Update of the operators
   for(int i=0; i<nombre_d_operateurs(); i++)
     operateur(i).mettre_a_jour(temps_present);
 
-  // Mise a jour du solveur masse au temps present
+  // Update of the mass solver at the present time
   if (solveur_masse)
     solveur_masse->mettre_a_jour(temps_present);
 
@@ -1064,31 +1064,31 @@ bool Equation_base::updateGivenFields()
   double temps_present=sch.temps_courant();
   double temps_futur=temps_present+sch.pas_de_temps();
 
-  // Pour chaque temps futur
+  // For each future time
   for (int i=1; i<=sch.nb_valeurs_futures(); i++)
     {
       double tps=sch.temps_futur(i);
-      // Calcul des CLs a ce temps.
+      // Calculation of boundary conditions at this time.
       domaine_Cl_dis().mettre_a_jour(tps);
     }
-  // Calcul du taux d'accroissement des CLs entre les temps present et futur.
+  // Calculation of the rate of change of boundary conditions between present and future times.
   domaine_Cl_dis().calculer_derivee_en_temps(temps_present,temps_futur);
 
-  //MaJ des operateurs
+  //Update of operators
   for (int i = 0; i < nombre_d_operateurs(); i++)
     if (operateur(i).op_non_nul())
       operateur(i).l_op_base().mettre_a_jour(temps_present);
 
-  // Mise a jour des sources au temps present
+  // Update of source terms at the present time
   les_sources.mettre_a_jour(temps_present);
 
   return true;
 }
 
-/*! @brief Renvoie la discretisation associee a l'equation.
+/*! @brief Returns the discretization associated with the equation.
  *
- * @return (Discretisation_base&) a discretisation associee a l'equation
- * @throws pas de probleme associe
+ * @return (Discretisation_base&) a discretization associated with the equation
+ * @throws no problem associated
  */
 const Discretisation_base& Equation_base::discretisation() const
 {
@@ -1102,7 +1102,7 @@ const Discretisation_base& Equation_base::discretisation() const
 
 void Equation_base::creer_champ(const Motcle& motlu)
 {
-  const Equation_base& me_const = (*this); // pour recuperer une equation const !!!!!
+  const Equation_base& me_const = (*this); // to get a const equation !!!!!
   const Nom& nom_inco = me_const.inconnue().le_nom();
   Nom inco(nom_inco);
   inco += "_residu";
@@ -1156,7 +1156,7 @@ bool Equation_base::has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ)
       if (itr->has_champ(nom, ref_champ))
         return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 bool Equation_base::has_champ(const Motcle& nom) const
@@ -1187,7 +1187,7 @@ bool Equation_base::has_champ(const Motcle& nom) const
       if (itr->has_champ(nom))
         return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 const Champ_base& Equation_base::get_champ(const Motcle& nom) const
@@ -1244,14 +1244,14 @@ void Equation_base::get_noms_champs_postraitables(Noms& noms, Option opt) const
       itr->get_noms_champs_postraitables(noms, opt);
 }
 
-/*! @brief Calcul du prochain pas de temps.
+/*! @brief Calculation of the next time step.
  *
- * Renvoie l'inverse de la somme des inverses des
- *     pas de temps calcules par les operateurs.
- *     Ces pas de temps sont ceux pour le schema d'Euler explicite.
- *     Le pas de temps n'est pas majore par dt_max, ceci est fait dans corriger_dt_calcule
+ * Returns the inverse of the sum of the inverses of the
+ *     time steps calculated by the operators.
+ *     These time steps are those for the explicit Euler scheme.
+ *     The time step is not limited by dt_max, this is done in corriger_dt_calcule
  *
- * @return (double) inverse de la somme des inverses des pas de temps calcules par les operateurs
+ * @return (double) inverse of the sum of the inverses of the time steps calculated by the operators
  */
 double Equation_base::calculer_pas_de_temps() const
 {
@@ -1267,9 +1267,9 @@ double Equation_base::calculer_pas_de_temps() const
       Debog::verifier("Equation_base::calculer_pas_de_temps dt ",dt);
       if (dt_op>0 && !diff_impl)
         {
-          // Une demie-moyenne harmonique est justifiee par le fait que diffusion et convection sont deux phenonomenes qui se cumulent
-          // L'information a chaque pas de temps ne peut traverser plus d'une maille de calcul donc dt*U + dt*vitesse_diffusion(~alpha/dx) < dx
-          // donc dt < dx/(U+alpha/dx) = 1/(1/(dx/U)+1/(dx^2/alpha)) : c'est bien une demie moyenne harmonique...
+          // A half harmonic mean is justified by the fact that diffusion and convection are two phenomena that accumulate
+          // The information at each time step cannot cross more than one computational cell so dt*U + dt*vitesse_diffusion(~alpha/dx) < dx
+          // so dt < dx/(U+alpha/dx) = 1/(1/(dx/U)+1/(dx^2/alpha)) : it is indeed a half harmonic mean...
           dt = dt + 1./dt_op;
         }
       if (sch.limpr())
@@ -1290,26 +1290,26 @@ double Equation_base::calculer_pas_de_temps() const
   else
     dt = 1./dt;
 
-  // Cas implicite
+  // Implicit case
   if (sub_type(Schema_Euler_Implicite,sch) && nb_op>1)
     {
       if (cfl_based)
-        // Cas vitesse initiale nulle par exemple (dt=DMAFLOAT), on utilise le pas de temps de diffusion pour demarrer le calcul:
+        // Case of zero initial velocity for example (dt=DMAFLOAT), we use the diffusion time step to start the calculation:
         if (dt>1e10) dt = dt_op_bak[0];
     }
-  // Cas diffusion implicite et plusieurs operateurs:
+  // Case of implicit diffusion and several operators:
   if (sub_type(Schema_Euler_explicite,sch) && nb_op>1)
     {
       if (sch.diffusion_implicite())
         {
-          // Cas vitesse initiale nulle par exemple (dt=DMAFLOAT), on utilise le pas de temps de diffusion pour demarrer le calcul:
+          // Case of zero initial velocity for example (dt=DMAFLOAT), we use the diffusion time step to start the calculation:
           if (dt>1e10) dt = dt_op_bak[0];
         }
       else
         {
-          // Warning sur les premiers pas de temps si l'implicitation de la diffusion
-          // dans un schema explicite vaut le coup (dt_diff<<min(dt_max,dt_conv))
-          // On fait le test apres les 10 premiers pas de temps en cas de demarrage avec vitesse nulle
+          // Warning on the first time steps if impliciting the diffusion
+          // in an explicit scheme is worth it (dt_diff<<min(dt_max,dt_conv))
+          // We do the test after the first 10 time steps in case of startup with zero velocity
           int nw = 100;
           if (sch.nb_pas_dt() > 10 && sch.nb_pas_dt() < nw && sch.limpr())
             if (dt_op_bak[0] < 0.01 * std::min(sch.pas_temps_max(), dt_op_bak[1]))
@@ -1351,9 +1351,9 @@ void Equation_base::calculer_pas_de_temps_locaux(DoubleTab& dt_op) const
 
 }
 
-/*! @brief Verifie la compatibilite des conditions limites avec l'equation.
+/*! @brief Verifies the compatibility of boundary conditions with the equation.
  *
- * voir Conds_lim::compatible_avec_eqn().
+ * see Conds_lim::compatible_avec_eqn().
  *
  * @return (int)
  */
@@ -1364,11 +1364,11 @@ int Equation_base::verif_Cl() const
   return les_cl.compatible_avec_discr(discretisation());
 }
 
-/*! @brief Renvoie "indetermine" Navier_Stokes_standard par exemple surcharge cette methode
+/*! @brief Returns "indeterminate" Navier_Stokes_standard for example overrides this method
  *
- *     pour renvoyer "Hydraulique"
+ *     to return "Hydraulic"
  *
- * @return (Motcle&) le nom du domaine d'aplication
+ * @return (Motcle&) the name of the application domain
  */
 const Motcle& Equation_base::domaine_application() const
 {
@@ -1376,11 +1376,11 @@ const Motcle& Equation_base::domaine_application() const
   return defaut;
 }
 
-/*! @brief Verification du nombre de composantes lues pour la specification d un champ.
+/*! @brief Verification of the number of components read for the specification of a field.
  *
- * Actuellement utilise pour la lecture d un condition initiale ou limite.
+ * Currently used for reading an initial or boundary condition.
  *
- * @param (ch_ref  : un champ inconnu de l equation consideree)
+ * @param (ch_ref  : an unknown field of the considered equation)
  */
 void Equation_base::verifie_ch_init_nb_comp(const Champ_Inc_base& ch_ref, const int nb_comp) const
 {
@@ -1484,7 +1484,7 @@ DoubleTab& Equation_base::derivee_en_temps_conv(DoubleTab& secmem, const DoubleT
   double dt_convection;
   if (le_schema_en_temps->no_conv_subiteration_diffusion_implicite())
     {
-      // faux mais permet de ne pas sous iterer sur la convection
+      // false but allows not to sub-iterate on the convection
       dt_convection=1e38;
     }
   else
@@ -1511,7 +1511,7 @@ DoubleTab& Equation_base::derivee_en_temps_conv(DoubleTab& secmem, const DoubleT
           derivee.echange_espace_virtuel();
           secmem += derivee ;
 
-          // Si ce n'est pas la derniere iteration:
+          // If it is not the last iteration:
           if (i+1 < nstep)
             {
               solveur_masse->appliquer(derivee);
@@ -1569,7 +1569,7 @@ void Equation_base::Gradient_conjugue_diff_impl(DoubleTrav& secmem, DoubleTab& s
           Process::exit();
         }
       statistics().begin_count(STD_COUNTERS::matrix_assembly,statistics().get_last_opened_counter_level()+1);
-      // On multiplie secmem par M (qui etait divise par M avant l'appel...)
+      // We multiply secmem by M (which was divided by M before the call...)
       {
         // Scope to release Trav quickly
         DoubleTrav copie(secmem);
@@ -1617,20 +1617,20 @@ void Equation_base::Gradient_conjugue_diff_impl(DoubleTrav& secmem, DoubleTab& s
           exit();
         }
 
-      // Le nombre maximal d'iteration peut etre desormais borne par niter_max_diff_impl
+      // The maximum number of iterations can now be limited by niter_max_diff_impl
       int nmax = le_schema_en_temps->niter_max_diffusion_implicite();
 
       double aCKN = 1; // Crank - Nicholson -> 0.5
 
-      // Calcul de la matrice Diagonale
+      // Calculation of the Diagonal matrix
 
       int precond_diag = 0;
-      // On preconditionne par la diagonale si on penalise
-      // car sinon residu initial trop grand
+      // We precondition by the diagonal if we penalize
+      // because otherwise the initial residual is too large
       if (size_terme_mul) precond_diag = 1;
 
       double seuil_diffusion_implicite = le_schema_en_temps->seuil_diffusion_implicite();
-      // Recuperation eventuelle d'options de Parametre_diffusion_implicite
+      // Possible recovery of Parametre_diffusion_implicite options
       if (parametre_equation() && (sub_type(Parametre_diffusion_implicite, parametre_equation().valeur())))
         {
           const Parametre_diffusion_implicite& param = ref_cast(Parametre_diffusion_implicite,
@@ -1645,7 +1645,7 @@ void Equation_base::Gradient_conjugue_diff_impl(DoubleTrav& secmem, DoubleTab& s
         }
       statistics().end_count(STD_COUNTERS::implicit_diffusion,0,0);
       /////////////////////
-      // Preconditionnement
+      // Preconditioning
       /////////////////////
       double dt = le_schema_en_temps->pas_de_temps();
       if (precond_diag)
@@ -1666,8 +1666,8 @@ void Equation_base::Gradient_conjugue_diff_impl(DoubleTrav& secmem, DoubleTab& s
           for (int i = 0; i < size_s; i++)
             if (marq[i])
               sources()(i)->contribuer_a_avec(inconnue().valeurs(), diag_);
-          // La diagonale est proportionnelle au volume de controle....
-          // Il faut appliquer le solveur_masse
+          // The diagonal is proportional to the control volume....
+          // We must apply the mass solver
           DoubleTrav tab_tempo(inconnue().valeurs());
           {
             Matrice_Morse_View matrice; // ToDo Kokkos CMatrice_Morse_View diag = diag_.view_ro();
@@ -1685,8 +1685,8 @@ void Equation_base::Gradient_conjugue_diff_impl(DoubleTrav& secmem, DoubleTab& s
           solveur_masse->appliquer(tab_tempo);
           tab_tempo.echange_espace_virtuel();
           {
-            // On inverse... // Crank - Nicholson
-            // La matrice correspond a - la jacobienne (pour avoir un plus justement, GF)
+            // We invert... // Crank - Nicholson
+            // The matrix corresponds to - the jacobian (to have a plus precisely, GF)
             CDoubleTabView tempo = tab_tempo.view_ro();
             CDoubleTabView terme_mul_v = terme_mul.view_ro();
             Matrice_Morse_View matrice;  // ToDo Kokkos Matrice_Morse_View diag = diag_.view_rw();
@@ -1719,9 +1719,9 @@ void Equation_base::Gradient_conjugue_diff_impl(DoubleTrav& secmem, DoubleTab& s
         output_field*=-1;
       };
       statistics().begin_count(STD_COUNTERS::implicit_diffusion,statistics().get_last_opened_counter_level()+1);
-      // On utilise p pour calculer phiB :
+      // We use p to calculate phiB :
       DoubleTrav p(solution);
-      DoubleTrav moins_phiB(solution); // la partie Bord de l'operateur avec p=0
+      DoubleTrav moins_phiB(solution); // the Boundary part of the operator with p=0
       matvec(p, moins_phiB);
 
       DoubleTrav resu(solution);
@@ -1743,7 +1743,7 @@ void Equation_base::Gradient_conjugue_diff_impl(DoubleTrav& secmem, DoubleTab& s
         else
           sol.ref(solution);
 
-        // on retire les sources dependantes de l inco ; on les rajoutera apres
+        // we remove the source terms depending on the unknown ; we will add them back later
         if (marq_tot)
           {
             DoubleTrav sum_sources(secmem);
@@ -1773,7 +1773,7 @@ void Equation_base::Gradient_conjugue_diff_impl(DoubleTrav& secmem, DoubleTab& s
       p -= z;
 
       double initial_residual = mp_carre_norme_vect(z); // =||Ax(0)-B|| ou ||D-1.(Ax(0)-B)||
-      /* Calcul different de initial_residual:
+      /* Alternative computation of initial_residual:
          DoubleTab tmp(secmem);
          if (precond_diag)
          diag_.multvect(secmem, tmp);
@@ -1783,8 +1783,8 @@ void Equation_base::Gradient_conjugue_diff_impl(DoubleTrav& secmem, DoubleTab& s
 
       if (le_schema_en_temps->impr_diffusion_implicite()) Cout << "Residu(0)=" << initial_residual << finl;
       double seuil = seuil_diffusion_implicite * seuil_diffusion_implicite;
-      // On calcule un seuil relatif (PL: 18/07/12, j'ai l'impression qu'il y'a une erreur, c'est seuil*=initial_residual;
-      // En outre, il serait bon de faire residual = sqrt(mp_carre_norme_vect(tmp)) a plusieurs endroits...
+      // We calculate a relative threshold (PL: 18/07/12, I have the impression there's an error, it's seuil*=initial_residual;
+      // Moreover, it would be good to do residual = sqrt(mp_carre_norme_vect(tmp)) at several places...
       if (initial_residual > seuil)
         seuil = seuil_diffusion_implicite * initial_residual;
 
@@ -1798,7 +1798,7 @@ void Equation_base::Gradient_conjugue_diff_impl(DoubleTrav& secmem, DoubleTab& s
       if (initial_residual != 0)
         while (niter++ <= nmax)
           {
-            resu = moins_phiB; // On retire la contribution des bords.
+            resu = moins_phiB; // We remove the contribution of the boundaries.
             p.echange_espace_virtuel();
             matvec(p, resu);
             solveur_masse->appliquer(resu);
@@ -1813,13 +1813,13 @@ void Equation_base::Gradient_conjugue_diff_impl(DoubleTrav& secmem, DoubleTab& s
             else
               resu.ajoute(1. / dt, p, VECT_REAL_ITEMS);
             double alfa = prodrz_old / mp_prodscal(resu, p);
-            // Inutile de faire un echange espace virtuel:
+            // Pointless to do a virtual space exchange:
             solution.ajoute(alfa, p, VECT_REAL_ITEMS);
             residu.ajoute(alfa, resu, VECT_REAL_ITEMS);
 
             if (precond_diag)
-              diag_.multvect(residu, z); // preconditionnement par diag^(-1)
-            // sinon z=residu
+              diag_.multvect(residu, z); // preconditioning by diag^(-1)
+            // otherwise z=residu
 
             // Optimization: combine 2 MPI reductions into 1
             residual = local_carre_norme_vect(z);
@@ -1835,7 +1835,7 @@ void Equation_base::Gradient_conjugue_diff_impl(DoubleTrav& secmem, DoubleTab& s
                 p *= (prodrz_new / prodrz_old);
                 p -= z;
                 prodrz_old = prodrz_new;
-                // On previent si convergence anormalement longue sur de tres gros cas
+                // We warn if convergence is abnormally long on very large cases
                 if (niter == 100)
                   {
                     Cout
@@ -1896,8 +1896,8 @@ const RefObjU& Equation_base::get_modele(Type_modele type) const
   return liste_modeles_(0);
 
 }
-// MODIF ELI LAUCOIN (22/11/2007) : je rajoute un avancer et un reculer
-// par defaut, cela ne fait qu'avancer ou reculer l'inconnue (et champ_conserve_ si initialise)
+// MODIF ELI LAUCOIN (22/11/2007) : I add an advance and a backward
+// by default, this only advances or goes back the unknown (and champ_conserve_ if initialized)
 void Equation_base::avancer(int i)
 {
   inconnue().avancer(i);
@@ -1911,14 +1911,14 @@ void Equation_base::reculer(int i)
   if (champ_conserve_) champ_conserve_->reculer(i);
   if (champ_convecte_) champ_convecte_->reculer(i);
 }
-// FIN MODIF ELI LAUCOIN (22/11/2007)
+// END MODIF ELI LAUCOIN (22/11/2007)
 
 
 #define BLOQUE Cerr<<__PRETTY_FUNCTION__<< " "<<__FILE__<<":"<<(int)__LINE__<<" not coded, retrieves coding simpler" <<finl;exit()
 
-// methodes pour l'implicite
+// methods for the implicit
 
-/* peut utiliser une memoization (discretisations PolyMAC_HFV)*/
+/* can use a memoization (discretisations PolyMAC_HFV)*/
 void Equation_base::dimensionner_matrice(Matrice_Morse& matrice)
 {
   if (matrice_init)
@@ -2031,23 +2031,23 @@ void Equation_base::contribuer_termes_croises(const DoubleTab& inco, const Probl
     operateur(i).l_op_base().contribuer_termes_croises(inco, autre_pb, autre_inco, matrice);
 }
 
-// ajoute les contributions des operateurs et des sources
+// adds the contributions of operators and sources
 void Equation_base::assembler(Matrice_Morse& matrice, const DoubleTab& inco, DoubleTab& resu)
 {
-  // Test de verification de la methode contribuer_a_avec
+  // Test to verify the contribuer_a_avec method
   for (int op=0; op<nombre_d_operateurs(); op++)
     operateur(op).l_op_base().tester_contribuer_a_avec(inco, matrice);
 
-  // Contribution des operateurs et des sources:
-  // [Vol/dt+A]Inco(n+1)=somme(residu)+Vol/dt*Inco(n)
-  // Typiquement: si Op=flux(Inco) alors la matrice implicite A contient une contribution -dflux/dInco
-  // Exemple: Op flux convectif en VDF:
-  // Op=T*u*S et A=-d(T*u*S)/dT=-u*S
+  // Contribution of operators and sources:
+  // [Vol/dt+A]Inco(n+1)=sum(residual)+Vol/dt*Inco(n)
+  // Typically: if Op=flux(Inco) then the implicit matrix A contains a contribution -dflux/dInco
+  // Example: Op convective flux in VDF:
+  // Op=T*u*S and A=-d(T*u*S)/dT=-u*S
   const Discretisation_base::type_calcul_du_residu& type_codage=probleme().discretisation().codage_du_calcul_du_residu();
   if (type_codage==Discretisation_base::VIA_CONTRIBUER_AU_SECOND_MEMBRE)
     {
-      // On calcule somme(residu) par contribuer_au_second_membre (typiquement CL non implicitees)
-      // Cette approche necessite de coder 3 methodes (contribuer_a_avec, contribuer_au_second_membre et ajouter pour l'explicite)
+      // We calculate sum(residual) by contribuer_au_second_membre (typically non-implicit boundary conditions)
+      // This approach requires coding 3 methods (contribuer_a_avec, contribuer_au_second_membre and add for explicit)
       sources().contribuer_a_avec(inco,matrice);
       statistics().end_count(STD_COUNTERS::matrix_assembly,0,0);
       sources().ajouter(resu);
@@ -2061,9 +2061,9 @@ void Equation_base::assembler(Matrice_Morse& matrice, const DoubleTab& inco, Dou
     }
   else if (type_codage==Discretisation_base::VIA_AJOUTER)
     {
-      // On calcule somme(residu) par somme(operateur)+sources+A*Inco(n)
-      // Cette approche necessite de coder seulement deux methodes (contribuer_a_avec et ajouter)
-      // Donc un peu plus couteux en temps de calcul mais moins de code a ecrire/maintenir
+      // We calculate sum(residual) by sum(operator)+sources+A*Inco(n)
+      // This approach requires coding only two methods (contribuer_a_avec and add)
+      // So a bit more costly in calculation time but less code to write/maintain
 
       /*
        * XXX XXX XXX Elie Saikali, Gauthier Fauchet, aout 2025 :
@@ -2103,10 +2103,10 @@ void Equation_base::assembler(Matrice_Morse& matrice, const DoubleTab& inco, Dou
       statistics().end_count(STD_COUNTERS::matrix_assembly,0,0);
       sources().ajouter(resu);
       statistics().begin_count(STD_COUNTERS::matrix_assembly,statistics().get_last_opened_counter_level()+1);
-      matrice.ajouter_multvect(inco, resu); // Ajout de A*Inco(n)
-      // PL (11/04/2018): On aimerait bien calculer la contribution des sources en premier
-      // comme dans le cas VIA_CONTRIBUER_AU_SECOND_MEMBRE mais le cas Canal_perio_3D (keps
-      // periodique plante: il y'a une erreur de periodicite dans les termes sources du modele KEps...
+      matrice.ajouter_multvect(inco, resu); // Addition of A*Inco(n)
+      // PL (11/04/2018): We would like to calculate the contribution of sources first
+      // as in the VIA_CONTRIBUER_AU_SECOND_MEMBRE case but the Canal_perio_3D case (keps
+      // periodic crashes: there is a periodicity error in the source terms of the KEps model...
     }
   else
     {
@@ -2115,7 +2115,7 @@ void Equation_base::assembler(Matrice_Morse& matrice, const DoubleTab& inco, Dou
     }
 }
 
-// modifie la matrice et le second mmebre en fonction des CL
+// modifies the matrix and the second member according to the boundary conditions
 void Equation_base::modifier_pour_Cl(Matrice_Morse& mat_morse, DoubleTab& secmem) const
 {
   for (int op=0; op<nombre_d_operateurs(); op++)
@@ -2123,7 +2123,7 @@ void Equation_base::modifier_pour_Cl(Matrice_Morse& mat_morse, DoubleTab& secmem
       operateur(op).l_op_base().modifier_pour_Cl(mat_morse,secmem);
     }
 }
-// assemble, ajoute linertie,et modifie_pour_cl.
+// assembles, adds inertia, and modifies for boundary conditions.
 void Equation_base::assembler_avec_inertie( Matrice_Morse& mat_morse,const DoubleTab& present, DoubleTab& secmem)
 {
   statistics().begin_count(STD_COUNTERS::matrix_assembly,statistics().get_last_opened_counter_level()+1);
@@ -2133,21 +2133,21 @@ void Equation_base::assembler_avec_inertie( Matrice_Morse& mat_morse,const Doubl
   statistics().end_count(STD_COUNTERS::matrix_assembly);
 }
 
-/* verifie que tous les termes sont compatibles */
+/* verifies that all terms are compatible */
 int Equation_base::has_interface_blocs() const
 {
   int ok = 1;
-  /* operateurs, masse, sources */
+  /* operators, mass, sources */
   for (int op = 0; op < nombre_d_operateurs(); op++) ok &= operateur(op).l_op_base().has_interface_blocs();
   ok &= solv_masse().has_interface_blocs();
   for (int i = 0; i < les_sources.size(); i++) ok &= les_sources(i)->has_interface_blocs();
   return ok;
 }
 
-/* comme dimmensionner_matrice(), mais sans memoization */
+/* like dimensionner_matrice(), but without memoization */
 void Equation_base::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
-  /* operateurs, masse, sources */
+  /* operators, mass, sources */
   int nb = nombre_d_operateurs();
   for (int op = 0; op < nb; op++) operateur(op).l_op_base().dimensionner_blocs(matrices, semi_impl);
   solv_masse().dimensionner_blocs(matrices);
@@ -2156,10 +2156,10 @@ void Equation_base::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_i
 
 void Equation_base::assembler_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  /* mise a zero */
+  /* setting to zero */
   secmem = 0;
   for (auto && i_m : matrices) i_m.second->get_set_coeff() = 0;
-  /* operateurs, sources, masse */
+  /* operators, sources, mass */
   for (int i = 0; i < nombre_d_operateurs(); i++)
     operateur(i).l_op_base().ajouter_blocs(matrices, secmem, semi_impl);
 
@@ -2197,14 +2197,14 @@ void Equation_base::assembler_blocs_avec_inertie(matrices_t matrices, DoubleTab&
   statistics().end_count(STD_COUNTERS::ajouter_blocs);
 }
 
-/* creation de champ_conserve_, cl_champ_conserve_ */
+/* creation of champ_conserve_, cl_champ_conserve_ */
 void Equation_base::init_champ_conserve() const
 {
-  if (champ_conserve_) return; //deja fait
+  if (champ_conserve_) return; //already done
   int Nt = inconnue().nb_valeurs_temporelles(),
       Nl = inconnue().valeurs().size_reelle_ok() ? inconnue().valeurs().dimension(0) : -1,
       Nc = inconnue().valeurs().line_size();
-  //champ_conserve_ : meme type / support que l'inconnue
+  //champ_conserve_ : same type / support as the unknown
   discretisation().creer_champ(champ_conserve_, domaine_dis(), inconnue().que_suis_je(), "N/A", "N/A", Nc, Nl, Nt, schema_temps().temps_courant());
   champ_conserve_->associer_eqn(*this);
   auto nom_fonc = get_fonc_champ_conserve();
@@ -2212,14 +2212,14 @@ void Equation_base::init_champ_conserve() const
   champ_conserve_->init_champ_calcule(*this, nom_fonc.second);
 }
 
-/* methode de calcul par defaut de champ_conserve : produit coefficient_temporel * inconnue */
+/* default calculation method of champ_conserve : product of coefficient_temporel * unknown */
 void Equation_base::calculer_champ_conserve(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv)
 {
   const Equation_base& eqn = ref_cast(Equation_base, obj);
-  const Champ_base *coeff = eqn.solv_masse().has_coefficient_temporel() ? &eqn.get_champ(eqn.solv_masse().get_name_of_coefficient_temporel()) : nullptr; //coeff temporel
+  const Champ_base *coeff = eqn.solv_masse().has_coefficient_temporel() ? &eqn.get_champ(eqn.solv_masse().get_name_of_coefficient_temporel()) : nullptr; //temporal coeff
   const Champ_Inc_base& inco = eqn.inconnue();
   ConstDoubleTab_parts part(inco.valeurs());
-  //valeur du champ lui-meme
+  //value of the field itself
   val = part[0];
   if (coeff) tab_multiply_any_shape(val, coeff->valeurs(), VECT_ALL_ITEMS);
 
@@ -2231,9 +2231,9 @@ void Equation_base::calculer_champ_conserve(const Objet_U& obj, DoubleTab& val, 
   else der.resize(val.dimension_tot(0), val.line_size()), der = 1;
 }
 
-// Impression du residu dans fic (generalement dt_ev)
-// Cette methode peut etre surchargee par des equations
-// imprimant des residus particuliers (K-Eps, Concentrations,...)
+// Printing of the residual in file (usually dt_ev)
+// This method can be overridden by equations
+// printing particular residuals (K-Eps, Concentrations,...)
 void Equation_base::imprime_residu(SFichier& fic)
 {
   int size = residu_.size_array();
@@ -2252,7 +2252,7 @@ void Equation_base::imprime_residu(SFichier& fic)
           Process::exit();
         }
     }
-  // Affichage min/max
+  // Display min/max
   if (schema_temps().impr_extremums() && limpr())
     {
       double vmax = mp_max_vect(inconnue().valeurs());
@@ -2263,7 +2263,7 @@ void Equation_base::imprime_residu(SFichier& fic)
     }
 }
 
-// Retourne l'expression du residu (de meme peut etre surcharge)
+// Returns the expression of the residual (likewise can be overridden)
 Nom Equation_base::expression_residu()
 {
   int size = residu_.size_array();
@@ -2281,24 +2281,24 @@ Nom Equation_base::expression_residu()
       if(norm != "max") tmp+="-norm";
       tmp+=ajout;
       tmp+="|d";
-      // Comment nommer de facon claire ET concise
-      // le champ de l'expression:
+      // How to name clearly AND concisely
+      // the field of the expression:
       if (size==1)
         {
-          // Champ scalaire
+          // Scalar field
           tmp+=(Motcle)inconnue().le_nom()[0];
         }
       else
         {
-          // Champ multiscalaire
+          // Multi-scalar field
           if (inconnue().nom_compo(0)[0]!=inconnue().nom_compo(size-1)[0])
             {
-              // Exemple, champ K_Eps
+              // Example, K_Eps field
               tmp+=(Motcle)inconnue().nom_compo(i)[0];
             }
           else
             {
-              // Exemple, champ concentration
+              // Example, concentration field
               tmp+=(Motcle)inconnue().le_nom()[0];
               tmp+=(Nom)i;
             }
@@ -2308,7 +2308,7 @@ Nom Equation_base::expression_residu()
   return tmp;
 }
 
-// Dimension les tableaux des residus
+// Dimension the residual arrays
 void Equation_base::initialise_residu(int size)
 {
   if (size==0)
@@ -2319,7 +2319,7 @@ void Equation_base::initialise_residu(int size)
   residu_initial_=0;
 }
 
-// Remplit le champ field_residu_ si existant
+// Fills the field_residu_ field if it exists
 void Equation_base::set_residuals(const DoubleTab& residual)
 {
   if(field_residu_)

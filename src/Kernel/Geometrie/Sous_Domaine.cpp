@@ -77,13 +77,13 @@ Add_synonym(Sous_Domaine, "Sous_Zone");
 // XD attr h floattant h REQ Heigth of the tube.
 
 
-/*! @brief Ecrit la liste des polyedres de la sous-domaine sur un flot de sortie.
+/*! @brief Writes the list of polyhedra of the subdomain to an output stream.
  *
  *     Format:
  *     Liste n1 n2 .. Ni
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 template <typename _SIZE_>
 Sortie& Sous_Domaine_32_64<_SIZE_>::printOn(Sortie& os) const
@@ -96,31 +96,31 @@ Sortie& Sous_Domaine_32_64<_SIZE_>::printOn(Sortie& os) const
 }
 
 
-/*! @brief Lit les specifications d'un sous-domaine dans le jeu de donnee a partir d'un flot d'entree.
+/*! @brief Reads the specifications of a subdomain from the data set via an input stream.
  *
  *     Format:
- *      { Rectangle Origine x0 y0 Cotes lx ly } en dimension 2
- *      { Boite Origine x0 y0 z0 Cotes lx ly lz} en dimension 3
- *       ou
+ *      { Rectangle Origine x0 y0 Cotes lx ly } in dimension 2
+ *      { Boite Origine x0 y0 z0 Cotes lx ly lz} in dimension 3
+ *       or
  *      { Liste n n1  ni   nn }
- *       ou
+ *       or
  *      { Intervalle n1 n2 }
- *       ou
+ *       or
  *      { Polynomes {bloc_lecture_poly1 et bloc_lecture_poly_i
  *                   et bloc_lecture_poly_n}
  *      }
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws accolade ouvrante attendue
- * @throws mot clef non reconnu
- * @throws mot clef "et" ou "}" attendu
- * @throws En dimension 2, il faut utiliser Rectangle
- * @throws mot clef "Origine" attendu
- * @throws mot clef "Cotes" attendu
- * @throws En dimension 3, il faut utiliser Boite
- * @throws Erreur TRUST (mot clef reconnu non prevu)
- * @throws accolade fermante attendue
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
+ * @throws opening brace expected
+ * @throws unrecognized keyword
+ * @throws keyword "et" or "}" expected
+ * @throws In dimension 2, use Rectangle
+ * @throws keyword "Origine" expected
+ * @throws keyword "Cotes" expected
+ * @throws In dimension 3, use Boite
+ * @throws TRUST error (recognized keyword not handled)
+ * @throws closing brace expected
  */
 template <typename _SIZE_>
 Entree& Sous_Domaine_32_64<_SIZE_>::readOn(Entree& is)
@@ -192,7 +192,7 @@ void Sous_Domaine_32_64<_SIZE_>::build(Entree& is)
     }
   else
     {
-      // GF de prendre nb_elem_tot au lieu de nb_elem permet de ne plus avoir besoin de decouper les sous domaines..
+      // GF: using nb_elem_tot instead of nb_elem removes the need to split the subdomains..
       nb_pol_possible=ledomaine.nb_elem_tot();
       les_polys_possibles_.resize_array(nb_pol_possible);
       Int_tArrView les_polys_possibles = les_polys_possibles_.view_wo();
@@ -297,7 +297,7 @@ void Sous_Domaine_32_64<_SIZE_>::build(Entree& is)
         // Boite
         if(dimension!=3)
           {
-            // Une Boite est un volume
+            // A Box is a volume
             Cerr << "In 2 dimensions, you must use \"Rectangle\" " << finl;
             Process::exit();
           }
@@ -373,7 +373,7 @@ void Sous_Domaine_32_64<_SIZE_>::build(Entree& is)
         // Rectangle
         if(dimension!=2)
           {
-            // Un Rectangle est une surface
+            // A Rectangle is a surface
             Cerr << "In 3 dimensions, you must use \"Boite\" " << finl;
             Process::exit();
           }
@@ -448,10 +448,10 @@ void Sous_Domaine_32_64<_SIZE_>::build(Entree& is)
       }
     case 5 :
       {
-        // Lecture de la sous-domaine dans un fichier ascii.
-        // Le fichier contient, pour chaque processeur dans l'ordre croissant,
-        // un IntVect contenant les indices dans le domaine(0) des elements reels
-        // qui constituent la sous-domaine.
+        // Reading the subdomain from an ASCII file.
+        // The file contains, for each processor in ascending order,
+        // an IntVect containing the indices in domaine(0) of the real elements
+        // that make up the subdomain.
         Nom nomfic;
         is >> nomfic;
         if(je_suis_maitre())
@@ -476,9 +476,9 @@ void Sous_Domaine_32_64<_SIZE_>::build(Entree& is)
             recevoir(les_elems_,0,me(),me());
           }
 
-        // Ajout a la liste "les_polys_" des indices des elements virtuels
-        // de la sous-domaine.
-        // On cree un tableau distribue de marqueurs des elements de la sous-domaine
+        // Add to "les_polys_" the indices of the virtual elements
+        // of the subdomain.
+        // Create a distributed array of markers for subdomain elements
         const int_t nb_elem = ledomaine.nb_elem();
         IntVect_t marqueurs;
         dom.creer_tableau_elements(marqueurs);
@@ -490,12 +490,12 @@ void Sous_Domaine_32_64<_SIZE_>::build(Entree& is)
             marqueurs[elem] = 1;
           }
         marqueurs.echange_espace_virtuel();
-        // Compter les elements virtuels dans la sous-domaine:
+        // Count virtual elements in the subdomain:
         const int_t domaine_nb_elem_tot = ledomaine.nb_elem_tot();
         int_t nb_polys = nb_polys_reels;
         for (int_t i = nb_elem; i < domaine_nb_elem_tot; i++)
           nb_polys += marqueurs[i];
-        // Ajouter les indices des elements virtuels a "les_polys_"
+        // Add the virtual element indices to "les_polys_"
         les_elems_.resize(nb_polys);
         nb_polys = nb_polys_reels;
         for (int_t i = nb_elem; i < domaine_nb_elem_tot; i++)
@@ -693,7 +693,7 @@ void Sous_Domaine_32_64<_SIZE_>::build(Entree& is)
         // Couronne
         if(dimension!=2)
           {
-            // Une Couronne en 2D seulement !
+            // A Crown is 2D only!
             Cerr << "A crown is only in 2D : in 3 dimensions it is a tube \"Tube\" "<< finl;
             Process::exit();
           }
@@ -756,7 +756,7 @@ void Sous_Domaine_32_64<_SIZE_>::build(Entree& is)
         // Tube
         if(dimension!=3)
           {
-            // Un tube en 3D seulement !
+            // A tube is 3D only!
             Cerr << "A tube is only in 3D : in 2 dimensions it is a crown \"Couronne\" "<< finl;
             Process::exit();
           }
@@ -873,13 +873,13 @@ void Sous_Domaine_32_64<_SIZE_>::build(Entree& is)
       {
         if(dimension!=3)
           {
-            // Un tube en 3D seulement !
+            // A tube is 3D only!
             Cerr << "An hexagonal tube \"Tube_hexagonal\" is only in 3D "<< finl;
             Process::exit();
           }
 
-        // PQ : 17/09/08 : on suppose le tube hexagonal centre sur l'origine, porte par l'axe z
-        // et pour lequel l'entreplat est entre y=-ep/2 et y=+ep/2
+        // PQ: 17/09/08: the hexagonal tube is assumed centered at the origin, aligned with the z axis,
+        // and with the flat-to-flat distance between y=-ep/2 and y=+ep/2
 
         double ep;
         bool in=true;
@@ -991,8 +991,8 @@ void Sous_Domaine_32_64<_SIZE_>::build(Entree& is)
               parser.setVar(2,x[2],threadId);
             double test=parser.eval(threadId);
             parser.release(threadId);
-            // attention le test absolu est voulu
-            // si on fait une fonction qui vaut 0 ou 1 ....
+            // note: the absolute test is intentional
+            // e.g. for a function that equals 0 or 1 ....
             if (test>0)
               local_compteur++;
             else
@@ -1023,7 +1023,7 @@ void Sous_Domaine_32_64<_SIZE_>::build(Entree& is)
         break;
       }
     case -1:
-      // traite avant
+      // handled above
       break;
     default :
       {
@@ -1060,7 +1060,7 @@ void Sous_Domaine_32_64<_SIZE_>::build(Entree& is)
 }
 
 
-/*! @brief Ajoute un polyedre au sous-domaine.
+/*! @brief Adds a polyhedron to the subdomain.
  *
  * @return (int)
  */
@@ -1081,13 +1081,13 @@ void Sous_Domaine_32_64<_SIZE_>::add_elem(const int_t poly)
 }
 
 
-/*! @brief Associe un Objet_U au sous-domaine.
+/*! @brief Associates an Objet_U with the subdomain.
  *
- * On controle le type de l'objet a associer
- *     dynamiquement.
+ * The type of the object to associate is checked
+ *     dynamically.
  *
- * @param (Objet_U& ob) objet a associer au sous-domaine.
- * @return (int) renvoie 1 si l'association a reussi 0 sinon.
+ * @param (Objet_U& ob) object to associate with the subdomain.
+ * @return (int) returns 1 if the association succeeded, 0 otherwise.
  */
 template <typename _SIZE_>
 int Sous_Domaine_32_64<_SIZE_>::associer_(Objet_U& ob)

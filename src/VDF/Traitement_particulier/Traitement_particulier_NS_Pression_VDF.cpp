@@ -146,7 +146,7 @@ void Traitement_particulier_NS_Pression_VDF::post_traitement_particulier_calcul_
   DoubleTrav secmem(pression);
   gradient.calculer(mon_equation->pression().valeurs(),gradient_P->valeurs());
 
-  //on veut BM-1Bt(spi*Pression)
+  //we want BM-1Bt(spi*Pression)
   DoubleTab& grad=gradient_P->valeurs();
   mon_equation->solv_masse().appliquer(grad);
   DoubleTab& grad_temp = grad;
@@ -155,7 +155,7 @@ void Traitement_particulier_NS_Pression_VDF::post_traitement_particulier_calcul_
       grad_temp(i) /=porosite_face(i);
     }
   divergence.calculer(grad_temp, secmem);
-  secmem *= -1; // car div =-B
+  secmem *= -1; // because div = -B
   solveur_pression_.resoudre_systeme(mon_equation->matrice_pression().valeur(),secmem, inc_pre);
   Cerr <<"inc_pre " << inc_pre << finl;
 }

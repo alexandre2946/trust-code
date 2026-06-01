@@ -22,9 +22,9 @@
 #include <Domaine_forward.h>
 
 
-/*! @brief Partition d'un domaine a partir d'un fichier MED contenant un champ donnant, pour chaque element, le numero du processeur auquel cet element est attache.
+/*! @brief Partition of a domain from a MED file containing a field giving, for each element, the processor number to which that element is assigned.
  *
- *   Le fichier doit contenir un champ au format ArrOfInt
+ *   The file must contain a field in ArrOfInt format.
  *
  */
 
@@ -38,7 +38,7 @@ public:
   void construire_partition(IntVect& elem_part, int& nb_parts_tot) const override;
 
 protected:
-  // Parametres du partitionneur
+  // Partitioner parameters
   OBS_PTR(Domaine) ref_domaine_;
   Nom filename_="";
   Nom fieldname_="partition";

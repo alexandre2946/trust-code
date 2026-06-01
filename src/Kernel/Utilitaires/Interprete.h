@@ -20,19 +20,19 @@
 
 class Interprete;
 
-/*! @brief Classe de base des objets "interprete".
+/*! @brief Base class for "interpreter" objects.
  *
- * Ces objets definissent des actions a realiser lorsqu'on les
- *    rencontre dans le jeu de donnees. L'action est declenchee par
- *    un appel a la methode interpreter().
- *    L'interprete peut ensuite lire des parametres supplementaires
- *    dans l'entree pour realiser sa tache. En general, l'interprete
- *    agit sur d'autres objets declares dans le jeu de donnees. Il peut
- *    y acceder par les methodes objet() et objet_existant().
- *    Voir par exemple la classe Lire ou la classe Associer
+ * These objects define actions to be performed when they are
+ *    encountered in the data set. The action is triggered by
+ *    a call to the interpreter() method.
+ *    The interpreter can then read additional parameters
+ *    from the input to perform its task. In general, the interpreter
+ *    acts on other objects declared in the data set. It can
+ *    access them through the objet() and objet_existant() methods.
+ *    See for example the Lire or Associer class.
  *
- * @sa Interprete_bloc qui lit une serie d'instructions
- *    a executer dans le jeu de donnees.
+ * @sa Interprete_bloc which reads a series of instructions
+ *    to execute in the data set.
  */
 class Interprete : public Objet_U
 {

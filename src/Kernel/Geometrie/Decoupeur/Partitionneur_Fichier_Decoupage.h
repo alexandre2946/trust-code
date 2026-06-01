@@ -22,13 +22,13 @@
 #include <Domaine_forward.h>
 
 
-/*! @brief Partition d'un domaine a partir d'un fichier disque contenant, pour chaque element, le numero du processeur auquel cet element est attache.
+/*! @brief Partition of a domain from a disk file containing, for each element, the processor number to which that element is assigned.
  *
- *   Le fichier doit contenir un tableau au format ArrOfInt
- *    (nombre n de valeurs suivi des valeurs).
- *   La taille du tableau doit etre egale au nombre d'elements
- *   du domaine a decouper et chaque valeur du tableau indique
- *   sur quel processeur cet element doit etre place.
+ *   The file must contain an array in ArrOfInt format
+ *    (number n of values followed by the values).
+ *   The size of the array must equal the number of elements
+ *   in the domain to be split, and each value indicates
+ *   on which processor that element is to be placed.
  *
  */
 
@@ -42,7 +42,7 @@ public:
   void construire_partition(IntVect& elem_part, int& nb_parts_tot) const override;
 
 protected:
-  // Parametres du partitionneur
+  // Partitioner parameters
   OBS_PTR(Domaine) ref_domaine_;
   Nom filename_ = "";
   bool corriger_partition_ = false;

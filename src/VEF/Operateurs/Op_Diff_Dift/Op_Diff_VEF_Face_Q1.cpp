@@ -33,7 +33,7 @@ Entree& Op_Diff_VEF_Face_Q1::readOn(Entree& s )
   return s ;
 }
 
-/*! @brief associe le champ de diffusivite
+/*! @brief Associate the diffusivity field.
  *
  */
 void Op_Diff_VEF_Face_Q1::associer_diffusivite(const Champ_base& diffu)
@@ -54,7 +54,7 @@ const Champ_base& Op_Diff_VEF_Face_Q1::diffusivite() const
 
 double Op_Diff_VEF_Face_Q1::calculer_dt_stab() const
 {
-  // La diffusivite est constante dans le domaine donc
+  // The diffusivity is constant in the domain, so
   //
   //          dt_diff = h*h/diffusivite
   remplir_nu(nu_);
@@ -115,7 +115,7 @@ DoubleTab& Op_Diff_VEF_Face_Q1::ajouter(const DoubleTab& inconnue, DoubleTab& re
   int nb_faces_elem = domaine_VEF.domaine().nb_faces_elem();
   double val;
 
-  // On traite les faces bord
+  // Process boundary faces
   for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -187,7 +187,7 @@ DoubleTab& Op_Diff_VEF_Face_Q1::ajouter(const DoubleTab& inconnue, DoubleTab& re
         }
     }
 
-  // On traite les faces internes
+  // Process internal faces
   for (num_face=domaine_VEF.premiere_face_int(); num_face<n1; num_face++)
     {
       elem1 = face_voisins(num_face,0);
@@ -262,7 +262,7 @@ DoubleTab& Op_Diff_VEF_Face_Q1::calculer(const DoubleTab& inconnue, DoubleTab& r
 
 
 /////////////////////////////////////////
-// Methode pour l'implicite
+// Method for implicit scheme
 /////////////////////////////////////////
 
 void Op_Diff_VEF_Face_Q1::ajouter_contribution(const DoubleTab& transporte, Matrice_Morse& matrice ) const
@@ -283,7 +283,7 @@ void Op_Diff_VEF_Face_Q1::ajouter_contribution(const DoubleTab& transporte, Matr
   auto& tab2 = matrice.get_set_tab2();
   auto& coeff = matrice.get_set_coeff();
 
-  // On traite les faces bord
+  // Process boundary faces
   for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -385,7 +385,7 @@ void Op_Diff_VEF_Face_Q1::ajouter_contribution(const DoubleTab& transporte, Matr
         }
     }
 
-  // On traite les faces internes
+  // Process internal faces
   for (num_face=domaine_VEF.premiere_face_int(); num_face<n1; num_face++)
     {
       elem1 = face_voisins(num_face,0);

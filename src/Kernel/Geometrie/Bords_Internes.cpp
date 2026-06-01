@@ -23,9 +23,9 @@ Sortie& Bords_Internes_32_64<_SIZE_>::printOn(Sortie& os) const { return LIST(Bo
 template <typename _SIZE_>
 Entree& Bords_Internes_32_64<_SIZE_>::readOn(Entree& is) { return LIST(Bord_Interne_32_64<_SIZE_>)::readOn(is); }
 
-/*! @brief Associe un domaine a tous les objets Bord_Interne de la liste.
+/*! @brief Associates a domain to all Bord_Interne objects in the list.
  *
- * @param (Domaine& un_domaine) le domaine a associer aux Bord_Interne de la liste
+ * @param (Domaine& un_domaine) the domain to associate to the Bord_Interne objects in the list
  */
 template <typename _SIZE_>
 void Bords_Internes_32_64<_SIZE_>::associer_domaine(const Domaine_t& un_domaine)
@@ -33,13 +33,13 @@ void Bords_Internes_32_64<_SIZE_>::associer_domaine(const Domaine_t& un_domaine)
   for (auto& itr : *this) itr.associer_domaine(un_domaine);
 }
 
-/*! @brief Renvoie le nombre total de faces contenues dans la liste des Bord_Interne, i.
+/*! @brief Returns the total number of faces contained in the list of Bord_Interne, i.
  *
- * e. la somme de toutes
- *     les faces de tous les objet Bords_Interne contenu dans
- *     la liste.
+ * e. the sum of all
+ *     the faces of all Bords_Interne objects contained in
+ *     the list.
  *
- * @return (int) le nombre total de faces contenues dans la liste des Bord_Interne
+ * @return (int) the total number of faces contained in the list of Bord_Interne
  */
 template <typename _SIZE_>
 typename Bords_Internes_32_64<_SIZE_>::int_t Bords_Internes_32_64<_SIZE_>::nb_faces() const
@@ -50,14 +50,14 @@ typename Bords_Internes_32_64<_SIZE_>::int_t Bords_Internes_32_64<_SIZE_>::nb_fa
   return nombre;
 }
 
-/*! @brief Renvoie le nombre total de faces de type specifie contenues dans la liste des Bord_Interne
+/*! @brief Returns the total number of faces of the specified type contained in the list of Bord_Interne
  *
- *     i.e. la somme de toutes les faces de type specifie
- *     de tous les objet Bord_Interne contenu dans
- *     la liste.
+ *     i.e. the sum of all faces of the specified type
+ *     of all Bord_Interne objects contained in
+ *     the list.
  *
- * @param (Type_Face type) le type des faces a compter
- * @return (int) le nombre total de faces contenues dans la liste des Bord_Interne
+ * @param (Type_Face type) the type of faces to count
+ * @return (int) the total number of faces contained in the list of Bord_Interne
  */
 template <typename _SIZE_>
 typename Bords_Internes_32_64<_SIZE_>::int_t Bords_Internes_32_64<_SIZE_>::nb_faces(Type_Face type) const

@@ -18,20 +18,15 @@
 
 #include <Navier_Stokes_Fluide_Dilatable_base.h>
 
-/*! @brief classe Navier_Stokes_WC Cette classe porte les termes de l'equation de la dynamique
+/*! @brief @brief Carries the terms of the momentum equation for a weakly compressible fluid without turbulence modelling.
  *
- *     pour un fluide sans modelisation de la turbulence.
- *     On suppose l'hypothese de fluide quasi compressible.
- *     Sous ces hypotheses, on utilise la forme suivante des equations de
- *     Navier_Stokes:
- *        DU/dt = div(terme visqueux) - gradP/rho + sources/rho
+ *     The weakly compressible fluid assumption is used.
+ *     Under these assumptions, the following form of the Navier-Stokes equations is used:
+ *        DU/dt = div(viscous term) - gradP/rho + sources/rho
  *        div U = W
- *     avec DU/dt : derivee particulaire de la vitesse
- *          rho   : masse volumique
- *     Rq : l'implementation de la classe permet bien sur de negliger
- *          certains termes de l'equation (le terme visqueux, le terme
- *          convectif, tel ou tel terme source).
- *     L'inconnue est le champ de vitesse.
+ *     where DU/dt is the material derivative of velocity and rho is the density.
+ *     The implementation allows individual terms (viscous, convective, source) to be neglected.
+ *     The unknown is the velocity field.
  *
  * @sa Navier_Stokes_Fluide_Dilatable_base
  */

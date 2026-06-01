@@ -18,11 +18,11 @@
 
 #include <Champ_val_tot_sur_vol_base.h>
 
-/*! @brief classe Champ_val_tot_sur_vol_VDF derivee de Champ_val_tot_sur_vol_base Evaluation de Somme_vol_poro_loc :
+/*! @brief class Champ_val_tot_sur_vol_VDF
  *
- *      sommation de vol_element*poro_volumique pour les elements contenus dans la localisation loc
- *
- *
+ * @brief Derived from Champ_val_tot_sur_vol_base. Evaluates Somme_vol_poro_loc:
+ *        summation of vol_element * poro_volumique for elements contained in
+ *        the localization loc.
  *
  */
 class Champ_val_tot_sur_vol_VDF : public Champ_val_tot_sur_vol_base

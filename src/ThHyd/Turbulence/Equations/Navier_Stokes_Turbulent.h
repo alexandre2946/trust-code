@@ -21,11 +21,9 @@
 #include <YAML_data.h>
 
 
-/*! @brief classe Navier_Stokes_Turbulent Cette classe represente l'equation de la dynamique pour un fluide
+/*! @brief Navier-Stokes equation for a viscous incompressible fluid (div U = 0) with turbulence modelling.
  *
- *      visqueux verifiant la condition d'incompressibilite div U = 0 avec
- *      modelisation de la turbulence.
- *      Un membre de type OWN_PTR(Modele_turbulence_hyd_base)  representera le modele de turbulence.
+ *      Contains an OWN_PTR(Modele_turbulence_hyd_base) member representing the turbulence model.
  *
  * @sa Navier_Stokes_std OWN_PTR(Modele_turbulence_hyd_base)  Pb_Hydraulique_Turbulent, Pb_Thermohydraulique_Turbulent
  */

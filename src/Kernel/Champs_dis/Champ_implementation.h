@@ -34,7 +34,7 @@ public:
   virtual DoubleTab& remplir_coord_noeuds(DoubleTab& positions) const =0;
   virtual int remplir_coord_noeuds_et_polys(DoubleTab& positions, IntVect& polys) const =0;
 
-  // pas pure ...
+  // not pure ...
   virtual DoubleTab& valeur_aux_sommets(const Domaine& domain, DoubleTab& result) const;
   virtual DoubleVect& valeur_aux_sommets_compo(const Domaine& domain, DoubleVect& result, int ncomp) const;
 

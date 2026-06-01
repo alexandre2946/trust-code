@@ -34,7 +34,7 @@ protected:
 };
 
 /*
- * CRTP PATTERN SUITE AU BRICOLAGE POUR QUE CHECK_SOURCES ET VERIFIE_PERE MARCHENT ... DESOLEE ...
+ * CRTP PATTERN due to workaround so that CHECK_SOURCES and VERIFIE_PERE work ... sorry ...
  */
 
 template <typename DERIVED_T>
@@ -64,7 +64,7 @@ template <typename DERIVED_T>
 void Source_Fluide_Dilatable_Face<DERIVED_T>::contribuer_a_avec_impl(const DoubleTab& present, Matrice_Morse& matrice) const
 {
 
-  return; /* on ne fait rien pour l'instant ... */
+  return; /* nothing done for now ... */
   /*
     DoubleTrav toto(present);
     ajouter_impl(toto);

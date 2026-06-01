@@ -35,17 +35,16 @@ Entree& Loi_Etat_GR_base::readOn(Entree& is)
   return is;
 }
 
-/*! @brief Renvoie le type de fluide associe.
+/*! @brief Returns the type of fluid associated.
  *
- * @param (Sortie& os) le flot de sortie pour l'impression
- * @return (Sortie&) le flot de sortie modifie
+ * @return The fluid type name ("Gaz_Reel").
  */
 const Nom Loi_Etat_GR_base::type_fluide() const
 {
   return "Gaz_Reel";
 }
 
-/*! @brief Initialise la loi d'etat : calcul Pth
+/*! @brief Initialises the state law by computing Pth.
  *
  */
 void Loi_Etat_GR_base::initialiser()
@@ -68,17 +67,17 @@ void Loi_Etat_GR_base::initialiser()
   calculer_Cp();
 }
 
-/*! @brief Initialise l'enthalpie
+/*! @brief Initialises the enthalpy unknown.
  *
  */
 void Loi_Etat_GR_base::initialiser_inco_ch()
 {
   /*
    * XXX XXX XXX
-   * l'inconnue inco_chaleur est d'abord remplie avec la temperature initiale.
-   * il faut la transfomer en enthalpie ;
-   * les donnes sont la masse volumique et la temperature
-   * on doit donc calculer l'enthalpie et la pression
+   * The heat unknown inco_chaleur is first filled with the initial temperature.
+   * It must be converted to enthalpy;
+   * the data are the density and the temperature,
+   * so enthalpy and pressure must be computed.
    */
 
   DoubleTab& tab_TH = le_fluide->inco_chaleur().valeurs();
@@ -103,9 +102,7 @@ void Loi_Etat_GR_base::initialiser_inco_ch()
   Cerr<<"FIN Loi_Etat_GR_base::initialiser_H Pth = "<<Pth<<"  H = "<<tab_TH(0,0)<<finl;
 }
 
-/*! @brief Remplit le tableau de la temperature : T=temp+273.
- *
- * 15
+/*! @brief Fills the temperature array from the enthalpy unknown.
  *
  */
 void Loi_Etat_GR_base::remplir_T()
@@ -121,9 +118,12 @@ void Loi_Etat_GR_base::remplir_T()
     }
 }
 
-/*! @brief Calcule le Cp en fonction des grandeurs physiques P, T, rho Cp = dh/dT = de/dT - 1/rho^2*drho/dT
+/*! @brief Computes Cp as a function of physical quantities P and h.
+ *         Cp = dh/dT = de/dT - 1/rho^2 * drho/dT
  *
- * @param (double Tmp) temperature
+ * @param P Pressure.
+ * @param h Enthalpy.
+ * @return Computed Cp value.
  */
 double Loi_Etat_GR_base::Cp_calc(double P, double h) const
 {
@@ -134,7 +134,7 @@ double Loi_Etat_GR_base::Cp_calc(double P, double h) const
   return res;
 }
 
-/*! @brief Calcule le Cp avec le polynome PolyCp_
+/*! @brief Computes Cp using the PolyCp_ polynomial.
  *
  */
 void Loi_Etat_GR_base::calculer_Cp()
@@ -144,7 +144,7 @@ void Loi_Etat_GR_base::calculer_Cp()
   for (int i=0; i<tab_Cp.size(); i++) tab_Cp(i) = Cp_calc(Pth,tab_h(i,0));
 }
 
-/*! @brief Calcule la conductivite /Cp : equivlent a k*dT/dh pour utiliser l'enthalpie dans l'operatur de diffusion
+/*! @brief Computes the conductivity divided by Cp: equivalent to k*dT/dh for using enthalpy in the diffusion operator.
  *
  */
 void Loi_Etat_GR_base::calculer_lambda()
@@ -183,8 +183,11 @@ double Loi_Etat_GR_base::De_DT(double P, double T) const
   return res;
 }
 
-/*! @brief Calcule la pression avec la temperature et la masse volumique
+/*! @brief Computes the thermodynamic pressure from enthalpy and density by Newton iteration.
  *
+ * @param H Enthalpy.
+ * @param rho Density.
+ * @return Thermodynamic pressure Pth.
  */
 double Loi_Etat_GR_base::inverser_Pth(double H, double rho)
 {

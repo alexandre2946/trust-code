@@ -125,7 +125,7 @@ void Perte_Charge_Gen::completer()
       bilan().resize(3); //K deb cible
       identifiant_ = sous_domaine ? nom_sous_domaine : le_dom_vf_->domaine().le_nom();
       set_fichier(Nom("DP_") + identifiant_);
-      set_description(Nom("Regulation du Ksing de la surface ") + identifiant_);
+      set_description(Nom("Regulation of the Ksing of surface ") + identifiant_);
       Noms col_names;
       col_names.add("K");
       col_names.add("Flow_rate");

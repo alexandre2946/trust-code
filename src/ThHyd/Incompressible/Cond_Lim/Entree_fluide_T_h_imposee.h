@@ -18,10 +18,10 @@
 
 #include <Dirichlet_entree_fluide_leaves.h>
 
-/*! @brief classe Entree_fluide_temperature_imposee Cas particulier de la classe Dirichlet_entree_fluide
+/*! @brief Entree_fluide_temperature_imposee Special case of the Dirichlet_entree_fluide class
  *
- *     pour la temperature imposee: impose la temperature d'entree du fluide
- *     dans une equation de type Convection_Diffusion_Temperature
+ *     for imposed temperature: imposes the inlet temperature of the fluid
+ *     in a Convection_Diffusion_Temperature type equation.
  *
  * @sa Dirichlet_entree_fluide Convection_Diffusion_Temperature
  */

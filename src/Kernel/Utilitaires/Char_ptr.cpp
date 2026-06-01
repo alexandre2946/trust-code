@@ -20,9 +20,9 @@
 
 
 
-/*! @brief Constructeur par defaut.
+/*! @brief Default constructor.
  *
- * Cree la chaine "??"
+ * Creates the string "??"
  *
  */
 Char_ptr::Char_ptr()
@@ -35,9 +35,9 @@ Char_ptr::Char_ptr()
 
 
 
-/*! @brief Construction d'un nom a partir d'une chaine de caracteres La chaine est copiee
+/*! @brief Constructs a name from a character string. The string is copied.
  *
- * @param (const char* nom) la chaine de caracteres a utiliser
+ * @param (const char* nom) the character string to use
  */
 Char_ptr::Char_ptr(const char* nom)
 {
@@ -45,9 +45,9 @@ Char_ptr::Char_ptr(const char* nom)
   operator=(nom);
 }
 
-/*! @brief Constructeur par copie d'un nom
+/*! @brief Copy constructor of a name.
  *
- * @param (const Char_ptr& nom) le nom a utiliser
+ * @param (const Char_ptr& nom) the name to use
  */
 Char_ptr::Char_ptr(const Char_ptr& nom)
 {
@@ -55,7 +55,7 @@ Char_ptr::Char_ptr(const Char_ptr& nom)
   operator=(nom);
 }
 
-/*! @brief Destructeur
+/*! @brief Destructor.
  *
  */
 Char_ptr::~Char_ptr()
@@ -65,9 +65,9 @@ Char_ptr::~Char_ptr()
 }
 
 
-/*! @brief Renvoie le nombre de caracteres de la chaine du Char_ptr y compris le caractere zero de fin de chaine.
+/*! @brief Returns the number of characters in the Char_ptr string including the terminating null character.
  *
- *     Exemple : Char_ptr("hello").longueur() == 6
+ *     Example: Char_ptr("hello").longueur() == 6
  *
  */
 int Char_ptr::longueur() const
@@ -75,9 +75,9 @@ int Char_ptr::longueur() const
   return ((int)strlen(nom_)+1);
 }
 
-/*! @brief Copie la chaine nom.
+/*! @brief Copies the string nom.
  *
- * Modif BM pour que nom puisse pointer sur une sous-partie de nom_
+ * Modified by BM so that nom can point to a sub-part of nom_
  *
  */
 Char_ptr& Char_ptr::operator=(const char* const nom)
@@ -90,15 +90,15 @@ Char_ptr& Char_ptr::operator=(const char* const nom)
     n = "??";
   nom_ = new char[strlen(n)+1];
   strcpy(nom_, n);
-  // On efface l'ancien apres avoir copie le nouveau au cas ou nom est une partie de nom_
+  // Delete the old after copying the new one, in case nom is a part of nom_
   delete [] old;
   return *this;
 }
 
-/*! @brief Copie le Char_ptr nom
+/*! @brief Copies the Char_ptr nom.
  *
- * @param (const Char_ptr& nom) le nom a copier
- * @return (Char_ptr&) reference sur this qui represente la chaine du Char_ptr nom
+ * @param (const Char_ptr& nom) the name to copy
+ * @return (Char_ptr&) reference to this, representing the string of Char_ptr nom
  */
 Char_ptr& Char_ptr::operator=(const Char_ptr& nom)
 {
@@ -106,9 +106,9 @@ Char_ptr& Char_ptr::operator=(const Char_ptr& nom)
   return *this;
 }
 
-/*! @brief Retourne un pointeur sur la chaine de caractere du nom
+/*! @brief Returns a pointer to the character string of the name.
  *
- * @return (char*) pointeur sur la chaine de caractere du nom
+ * @return (char*) pointer to the character string of the name
  */
 Char_ptr::operator char*() const
 {

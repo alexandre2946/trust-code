@@ -70,16 +70,16 @@ void Op_Evanescence_Homogene_PolyMAC_MPFA_Face::ajouter_blocs_aux(IntTrav& maj, 
 
   const DoubleVect& dh_e = milc.diametre_hydraulique_elem();
   int e, k, l, n, m, N = inco.line_size(), Nk = (k_turb) ? (*k_turb).line_size() : 0, D = dimension, nf_tot = domaine.nb_faces_tot(), cR = (rho.dimension_tot(0) == 1), cM = (mu.dimension_tot(0) == 1), Np = press.line_size();
-  double a_eps = alpha_res_, a_eps_min = alpha_res_min_, a_m, a_max; //seuil de declenchement du traitement de l'evanescence
+  double a_eps = alpha_res_, a_eps_min = alpha_res_min_, a_m, a_max; //threshold for triggering the evanescence treatment
   Matrice_Morse& mat_diag = *matrices.at(ch.le_nom().getString());
 
-  if (N == 1) return; //pas d'evanescence en simple phase!
+  if (N == 1) return; //no evanescence in single-phase flow!
 
-  DoubleTab dvr_elem(domaine.nb_elem_tot()*dimension, N, N, N); // Derivee de vr(n,k) en e par rapport a la phase l selon d ; pour l'instant toujours selon d2=d
-  // On se le trimballe parce que quelqu'un a separe la boucle sur les matrices de celle sur le secmem
+  DoubleTab dvr_elem(domaine.nb_elem_tot()*dimension, N, N, N); // Derivative of vr(n,k) at element e with respect to phase l along direction d; currently always along d2=d
+  // We carry this around because the loop over matrices was separated from the loop over secmem
 
 
-  /* calcul de la vitesse de derive : on va chercher les quantites intermediaires requises */
+  /* computation of the drift velocity: we fetch the required intermediate quantities */
   Vitesse_relative_base::input_t in;
   Vitesse_relative_base::output_t out;
   out.vr.resize(N, N, D), out.dvr.resize(N, N, D, N*D);
@@ -104,19 +104,19 @@ void Op_Evanescence_Homogene_PolyMAC_MPFA_Face::ajouter_blocs_aux(IntTrav& maj, 
       if (is_turb)
         {
           nut.resize(domaine.nb_elem_tot(), N);
-          ref_cast(Viscosite_turbulente_base, (*ref_cast(Operateur_Diff_base, equation().operateur(0).l_op_base()).correlation_viscosite_turbulente())).eddy_viscosity(nut); //remplissage par la correlation
+          ref_cast(Viscosite_turbulente_base, (*ref_cast(Operateur_Diff_base, equation().operateur(0).l_op_base()).correlation_viscosite_turbulente())).eddy_viscosity(nut); //filled by the correlation
         }
     }
-  for (e = 0; e < domaine.nb_elem_tot(); e++) /* elements : a faire D fois par element */
+  for (e = 0; e < domaine.nb_elem_tot(); e++) /* elements: must be done D times per element */
     {
-      /* phase majoritaire : directement dans l'element */
+      /* majority phase: directly in the element */
       for (a_max = 0, k = -1, n = 0; n < N; n++)
         if ((a_m = alpha(e, n)) > a_max) k = n, a_max = a_m;
       if (k >= 0)
         for (int i = nf_tot + D * e, d = 0; d < D; d++, i++) maj(i) = k;
       else abort();
 
-      /* calcul de la vitesse de derive */
+      /* computation of the drift velocity */
       if (correlation_vd)
         {
           in.dh = dh_e(e) ;
@@ -130,7 +130,7 @@ void Op_Evanescence_Homogene_PolyMAC_MPFA_Face::ajouter_blocs_aux(IntTrav& maj, 
               for (m = n+1; m < N; m++)
                 if (milc.has_interface(n, m))
                   {
-                    const int ind_trav = (n*(N-1)-(n-1)*(n)/2) + (m-n-1); // Et oui ! matrice triang sup !
+                    const int ind_trav = (n*(N-1)-(n-1)*(n)/2) + (m-n-1); // yes !! upper triangular matrix !
                     Interface_base& sat = milc.get_interface(n, m);
                     in.sigma(ind_trav) = res_en_T ? sat.sigma(temp_ou_enth(e, n), press(e, n * (Np > 1))) : sat.sigma_h(temp_ou_enth(e, n), press(e, n * (Np > 1)));
                   }
@@ -147,7 +147,7 @@ void Op_Evanescence_Homogene_PolyMAC_MPFA_Face::ajouter_blocs_aux(IntTrav& maj, 
           correlation_vd->vitesse_relative(in, out);
         }
 
-      /* coeff d'evanescence */
+      /* evanescence coefficient */
       int i,d;
       for (i = nf_tot + D * e, d = 0; d < D; d++, i++)
         for (n = 0; n < N; n++)
@@ -160,14 +160,14 @@ void Op_Evanescence_Homogene_PolyMAC_MPFA_Face::ajouter_blocs_aux(IntTrav& maj, 
             }
     }
 
-  /* lignes de matrices */
+  /* matrix rows */
   for (auto &&n_m: matrices)
     if (n_m.second->nb_colonnes())
       {
-        int diag = (n_m.first == ch.le_nom().getString()); //est-on sur le bloc diagonal?
+        int diag = (n_m.first == ch.le_nom().getString()); //are we on the diagonal block?
         Matrice_Morse& mat = *n_m.second;
         auto type(mat.get_tab1()(0));
-        for (e = 0, l = nf_tot; e < domaine.nb_elem_tot(); e++) /* elements : l est l'indice de ligne */
+        for (e = 0, l = nf_tot; e < domaine.nb_elem_tot(); e++) /* elements: l is the row index */
           for (int d = 0; d < D; d++, l++)
             for (n = 0; n < N; n++)
               if (coeff(l, n, 0))
@@ -179,7 +179,7 @@ void Op_Evanescence_Homogene_PolyMAC_MPFA_Face::ajouter_blocs_aux(IntTrav& maj, 
                     {
                       assert(mat.get_tab2()(i) == mat.get_tab2()(j));
                       int c = diag * mat.get_tab2()(i) -
-                              1; //indice de colonne (commun aux deux lignes grace au dimensionner_blocs())
+                              1; //column index (shared by both rows thanks to dimensionner_blocs())
                       mat.get_set_coeff()(j) += coeff(l, n, 0) * mat.get_set_coeff()(i) -
                                                 coeff(l, n, 1) * ((c == N * l + n) - (c == N * l + k));
                       mat.get_set_coeff()(i) += -coeff(l, n, 0) * mat.get_set_coeff()(i) +
@@ -207,14 +207,14 @@ void Op_Evanescence_Homogene_PolyMAC_MPFA_Face::calc_grad_alpha_elem(DoubleTab& 
 
   int N = alpha.line_size(), D = dimension, nf_tot = domaine.nb_faces_tot(), ne_tot = domaine.nb_elem_tot();;
 
-  /* calculaiton of the gradient of alpha at the face */
+  /* calculation of the gradient of alpha at the face */
   const Champ_Elem_PolyMAC_MPFA& ch_a = ref_cast(Champ_Elem_PolyMAC_MPFA, pbm.equation_masse().inconnue());
   DoubleTrav grad_f_a(nf_tot, N);
   ch_a.init_grad(0);
-  const IntTab& fg_d = ch_a.fgrad_d, &fg_e = ch_a.fgrad_e;  // Tables utilisees dans domaine_PolyMAC_MPFA::fgrad pour le calcul du gradient
+  const IntTab& fg_d = ch_a.fgrad_d, &fg_e = ch_a.fgrad_e;  // Tables used in domaine_PolyMAC_MPFA::fgrad for gradient computation
   const DoubleTab&  fg_w = ch_a.fgrad_w;
-  const Conds_lim& cls_a = ch_a.domaine_Cl_dis().les_conditions_limites(); 		// conditions aux limites du champ alpha
-  const IntTab&    fcl_a = ch_a.fcl();	// tableaux utilitaires sur les CLs : fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
+  const Conds_lim& cls_a = ch_a.domaine_Cl_dis().les_conditions_limites(); 		// boundary conditions of the alpha field
+  const IntTab&    fcl_a = ch_a.fcl();	// utility arrays for BCs: fcl(f, .) = (BC type, BC index, index within BC)
 
   for (int n = 0; n < N; n++)
     for (int f = 0; f < nf_tot; f++)
@@ -224,18 +224,18 @@ void Op_Evanescence_Homogene_PolyMAC_MPFA_Face::calc_grad_alpha_elem(DoubleTab& 
           {
             int e = fg_e(j);
             int f_bord;
-            if ( (f_bord = e-ne_tot) < 0) //contribution d'un element
+            if ( (f_bord = e-ne_tot) < 0) //element contribution
               grad_f_a(f, n) += fg_w(j) * alpha(e, n);
             else if (fcl_a(f_bord, 0) == 1 || fcl_a(f_bord, 0) == 2) //Echange_impose_base
               grad_f_a(f, n) += fg_w(j) ? fg_w(j) * ref_cast(Echange_impose_base, cls_a[fcl_a(f_bord, 1)].valeur()).T_ext(fcl_a(f_bord, 2), n) : 0;
-            else if (fcl_a(f_bord, 0) == 4) //Neumann non homogene
+            else if (fcl_a(f_bord, 0) == 4) //non-homogeneous Neumann
               grad_f_a(f, n) += fg_w(j) ? fg_w(j) * ref_cast(Neumann_paroi      , cls_a[fcl_a(f_bord, 1)].valeur()).flux_impose(fcl_a(f_bord, 2), n) : 0;
             else if (fcl_a(f_bord, 0) == 6) // Dirichlet
               grad_f_a(f, n) += fg_w(j) * ref_cast(Dirichlet, cls_a[fcl_a(f_bord, 1)].valeur()).val_imp(fcl_a(f_bord, 2), n);
           }
       }
 
-  /* Calcul du grad aux elems */
+  /* Compute the gradient at elements */
   for (int n = 0; n < N; n++)
     for (int e = 0; e < ne_tot; e++)
       for (int d = 0; d < D; d++)
@@ -260,14 +260,14 @@ void Op_Evanescence_Homogene_PolyMAC_MPFA_Face::calc_grad_alpha_faces(DoubleTab&
 
   DoubleTrav gradAlphaElem(ne_tot, D, N);
 
-  /* calculaiton of the gradient of alpha at the face */
+  /* calculation of the gradient of alpha at the face */
   const Champ_Elem_PolyMAC_MPFA& ch_a = ref_cast(Champ_Elem_PolyMAC_MPFA, pbm.equation_masse().inconnue());
   DoubleTrav grad_f_a(nf_tot, N);
   ch_a.init_grad(0);
-  const IntTab& fg_d = ch_a.fgrad_d, &fg_e = ch_a.fgrad_e;  // Tables utilisees dans domaine_PolyMAC_MPFA::fgrad pour le calcul du gradient
+  const IntTab& fg_d = ch_a.fgrad_d, &fg_e = ch_a.fgrad_e;  // Tables used in domaine_PolyMAC_MPFA::fgrad for gradient computation
   const DoubleTab&  fg_w = ch_a.fgrad_w;
-  const Conds_lim& cls_a = ch_a.domaine_Cl_dis().les_conditions_limites(); 		// conditions aux limites du champ alpha
-  const IntTab&    fcl_a = ch_a.fcl();	// tableaux utilitaires sur les CLs : fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
+  const Conds_lim& cls_a = ch_a.domaine_Cl_dis().les_conditions_limites(); 		// boundary conditions of the alpha field
+  const IntTab&    fcl_a = ch_a.fcl();	// utility arrays for BCs: fcl(f, .) = (BC type, BC index, index within BC)
 
   for (int n = 0; n < N; n++)
     for (int f = 0; f < nf_tot; f++)
@@ -277,25 +277,25 @@ void Op_Evanescence_Homogene_PolyMAC_MPFA_Face::calc_grad_alpha_faces(DoubleTab&
           {
             int e = fg_e(j);
             int f_bord;
-            if ( (f_bord = e-ne_tot) < 0) //contribution d'un element
+            if ( (f_bord = e-ne_tot) < 0) //element contribution
               grad_f_a(f, n) += fg_w(j) * alpha(e, n);
             else if (fcl_a(f_bord, 0) == 1 || fcl_a(f_bord, 0) == 2) //Echange_impose_base
               grad_f_a(f, n) += fg_w(j) ? fg_w(j) * ref_cast(Echange_impose_base, cls_a[fcl_a(f_bord, 1)].valeur()).T_ext(fcl_a(f_bord, 2), n) : 0;
-            else if (fcl_a(f_bord, 0) == 4) //Neumann non homogene
+            else if (fcl_a(f_bord, 0) == 4) //non-homogeneous Neumann
               grad_f_a(f, n) += fg_w(j) ? fg_w(j) * ref_cast(Neumann_paroi      , cls_a[fcl_a(f_bord, 1)].valeur()).flux_impose(fcl_a(f_bord, 2), n) : 0;
             else if (fcl_a(f_bord, 0) == 6) // Dirichlet
               grad_f_a(f, n) += fg_w(j) * ref_cast(Dirichlet, cls_a[fcl_a(f_bord, 1)].valeur()).val_imp(fcl_a(f_bord, 2), n);
           }
       }
 
-  /* Calcul du grad aux elems */
+  /* Compute the gradient at elements */
   for (int n = 0; n < N; n++)
     for (int e = 0; e < ne_tot; e++)
       for (int d = 0; d < D; d++)
         for (int j = 0, f; j < e_f.dimension(1) && (f = e_f(e, j)) >= 0; j++)
           gradAlphaElem(e, d, n) += (e == f_e(f, 0) ? 1 : -1) * fs(f) * (xv(f, d) - xp(e, d)) / ve(e) * grad_f_a(f, n);
 
-  /* Calcul du grad vectoriel aux faces */
+  /* Compute the vector gradient at faces */
   double scalGradElem=0.;
   int c, e;
   for (int n = 0; n < N; n++)

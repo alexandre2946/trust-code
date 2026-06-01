@@ -67,8 +67,8 @@ void Op_Grad_VDF_Face::calculer_flux_bords() const
               int elem1 = face_voisins(face,1);
               flux_bords_(face,ori) = -(pression_P0(elem1))*n0 ;
             }
-        } // fin for face
-    } // fin for n_bord
+        } // end for face
+    } // end for n_bord
 }
 
 int Op_Grad_VDF_Face::impr(Sortie& os) const
@@ -128,8 +128,8 @@ int Op_Grad_VDF_Face::impr(Sortie& os) const
                   tab_flux_bords(1, n_bord, 2) += flux_bords_(face,2) ;
                 }
             }
-        } // fin for face
-    } // fin for n_bord
+        } // end for face
+    } // end for n_bord
 
   // Sum on all process:
   mp_sum_for_each_item(tab_flux_bords);
@@ -217,7 +217,7 @@ int Op_Grad_VDF_Face::impr(Sortie& os) const
 
 void Op_Grad_VDF_Face::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
-  if (!matrices.count("pression")) return; //rien a faire
+  if (!matrices.count("pression")) return; //nothing to do
 
   const Domaine_VDF& zvdf = le_dom_vdf.valeur();
   Stencil sten(0, 2);
@@ -253,7 +253,7 @@ void Op_Grad_VDF_Face::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, con
   const DoubleTab& vfd = zvdf.volumes_entrelaces_dir();
   const int M = inco.line_size(), N = secmem.line_size();
 
-  // Boucle sur les bords pour traiter les conditions aux limites
+  // Loop over boundaries to process boundary conditions
   for (int n_bord = 0; n_bord < zvdf.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = zclvdf.les_conditions_limites(n_bord);
@@ -299,12 +299,12 @@ void Op_Grad_VDF_Face::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, con
       else if ( (sub_type(Dirichlet,la_cl.valeur())) || (sub_type(Dirichlet_homogene,la_cl.valeur())) ) { /* Do nothing */ }
     }
 
-  // Boucle sur les faces internes
+  // Loop over internal faces
   for (int f = zvdf.premiere_face_int(); f < zvdf.nb_faces(); f++)
     for (int n = 0, m = 0; n < N; n++, m += (M > 1))
       {
         const int n0 = face_voisins(f, 0), n1 = face_voisins(f, 1);
-        // XXX : Elie Saikali : attention : on code alpha grad(P) et pas grad(alpha.P) !! Sinon on manque des termes ... (voir avec Antoine sinon)
+        // XXX : Elie Saikali : note: we code alpha grad(P) and not grad(alpha.P)!! Otherwise terms are missing ... (check with Antoine if needed)
         const double alpha_face = alp ? (vfd(f, 0) * (*alp)(n0, n) + vfd(f, 1) * (*alp)(n1, n)) / vf(f) : 1.0;
         const double coef = face_surfaces(f) * porosite_surf(f) * alpha_face;
         if(mat)

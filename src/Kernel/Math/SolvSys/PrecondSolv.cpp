@@ -21,7 +21,7 @@ Implemente_instanciable(PrecondSolv,"PrecondSolv",Precond_base);
 // XD attr solveur solveur_sys_base solveur REQ Solver type.
 
 //
-// printOn et readOn
+// printOn and readOn
 
 Sortie& PrecondSolv::printOn(Sortie& s ) const
 {
@@ -32,7 +32,7 @@ Entree& PrecondSolv::readOn(Entree& is )
 {
   is >> solveur;
   solveur.nommer("PrecondSolv");
-  // Pour eviter trop d'affichage (Convergence)
+  // To avoid excessive output (Convergence)
   if (!solveur->limpr())
     solveur->fixer_limpr(-1);
   return is;
@@ -55,8 +55,8 @@ int PrecondSolv::preconditionner_(const Matrice_Base& matrice,
   if (norme > 0.)
     {
       DoubleVect b2(b);
-      // Certains solveurs peuvent avoir besoin de l'espace virtuel,
-      // on calcule tout le vecteur:
+      // Some solvers may need the virtual space,
+      // we compute the entire vector:
       assert_espace_virtuel_vect(b2);
       operator_multiply(b2, 1. / norme, VECT_ALL_ITEMS);
 
@@ -64,9 +64,9 @@ int PrecondSolv::preconditionner_(const Matrice_Base& matrice,
 
       if (echange_ev_solution_)
         {
-          // On veut renvoyer un vecteur avec espace virtuel a jour
-          // Plutot que de refaire un echange on multiplie tous les elements
-          // mais il faut que l'espace virtuel soit deja a jour avant:
+          // We want to return a vector with an up-to-date virtual space
+          // Rather than redoing an exchange we multiply all elements
+          // but the virtual space must already be up to date beforehand:
           assert_espace_virtuel_vect(solution);
           operator_multiply(solution, norme, VECT_ALL_ITEMS);
         }

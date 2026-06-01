@@ -18,9 +18,9 @@
 
 #include <TRUST_Deriv.h>
 
-/*! @brief classe Modele_Permeabilite_base Cette classe de base represente un modele de permeabilite
+/*! @brief Modele_Permeabilite_base Base class representing a permeability model
  *
- *     pour les equations des milieux poreux (termes sources de Darcy,vForchheinmer).
+ *     for porous medium equations (Darcy, Forchheimer source terms).
  *
  */
 class Modele_Permeabilite_base : public Objet_U
@@ -28,8 +28,8 @@ class Modele_Permeabilite_base : public Objet_U
   Declare_base(Modele_Permeabilite_base);
 public:
   /**
-   * Renvoie la valeur de la permeabilite en fonction de la porosite (d'une face par exemple).
-   * @param porosite la porosite
+   * @brief Returns the permeability value as a function of porosity (of a face, for example).
+   * @param porosite the porosity
    */
   virtual double getK(double porosite) const = 0;
 };

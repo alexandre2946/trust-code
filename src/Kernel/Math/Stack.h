@@ -23,7 +23,7 @@
 #define STACK(_TYPE_) name2(stack,_TYPE_)
 #define PSTACK(_TYPE_) name2(pstack,_TYPE_)
 #ifdef Template_Version
-// On utilise les templates
+// Using templates
 #include <TpltStack.h>
 #define declare_stack(_TYPE_)                        \
   typedef Stack<_TYPE_> STACK(_TYPE_);
@@ -32,7 +32,7 @@
 #define implemente_stack(_TYPE_)
 #define implemente_pstack(_TYPE_)
 #else
-// On utilise les Macros
+// Using macros
 #include <MacStack.h>
 #endif
 declare_stack(int)

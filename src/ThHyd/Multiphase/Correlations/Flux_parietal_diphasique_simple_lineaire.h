@@ -29,8 +29,8 @@ public:
 
 private:
   double h_mono_ = -123., coeff_ = -123.;
-  int n_l = -1, n_g = -1; // indice des phases d'injection du flux
-  const Saturation_base *sat = nullptr; //saturation entre liquide et gas (si elle existe)
+  int n_l = -1, n_g = -1; // index of the heat flux injection phases
+  const Saturation_base *sat = nullptr; //saturation between liquid and gas (if it exists)
 };
 
 #endif /* Flux_parietal_diphasique_simple_lineaire_included */

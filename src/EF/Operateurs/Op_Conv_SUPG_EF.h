@@ -20,9 +20,9 @@
 
 /*! @brief : class Op_Conv_SUPG_EF
  *
- *  <Description of class Op_Conv_SUPG_EF>
- *
- *
+ *  Convection operator using the SUPG (Streamline-Upwind Petrov-Galerkin)
+ *  scheme for EF discretization. Inherits from Op_Conv_BTD_EF and
+ *  overrides the BTD coefficient with a SUPG-specific formula.
  *
  */
 

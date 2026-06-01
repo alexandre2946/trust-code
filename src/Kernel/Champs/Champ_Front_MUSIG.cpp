@@ -26,7 +26,7 @@ Sortie& Champ_Front_MUSIG::printOn(Sortie& os) const { return Champ_Front_Compos
 
 Entree& Champ_Front_MUSIG::readOn( Entree& is )
 {
-  nommer(que_suis_je()); // pour printOn
+  nommer(que_suis_je()); // for printOn
 
   Motcle motlu, acc_ouv("{"), acc_fer("}");
   dim_ = 0;
@@ -57,7 +57,7 @@ Entree& Champ_Front_MUSIG::readOn( Entree& is )
       dim_ += nbSubPhases;
     }
 
-  // XXX : On verifie qu'on a lu les memes types de champs ...
+  // XXX : We verify that we have read the same field types ...
   for (int i = 1; i < dim_ ; i++)
     if (z_fld_[i]->que_suis_je() != z_fld_[0]->que_suis_je())
       {
@@ -65,7 +65,7 @@ Entree& Champ_Front_MUSIG::readOn( Entree& is )
         Process::exit();
       }
 
-  // pour la methode valeurs()
+  // for the valeurs() method
   const int ncompo = z_fld_[0]->nb_comp() * dim_, nnodes = z_fld_[0]->valeurs().dimension_tot(0);
   fixer_nb_comp(ncompo);
   les_valeurs->valeurs().resize(nnodes, nb_compo_);

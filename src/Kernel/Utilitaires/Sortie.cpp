@@ -60,7 +60,7 @@ Sortie::Sortie(const Sortie& os) : Sortie()
     }
 }
 
-// Operateurs d'affectation
+// Assignment operators
 Sortie& Sortie::operator=(ostream& os)
 {
   // Make a new ostream_:
@@ -115,8 +115,8 @@ Sortie& Sortie::operator<<(const unsigned long ob) { return operator_template<un
 
 Sortie& Sortie::operator <<(ostream& (*f)(ostream&))
 {
-  // Ca c'est pas genial, c'est pour permettre  "<< endl"
-  // Probleme: ca ne marche pas si ostream_ == 0.
+  // This is not ideal, but it is needed to allow "<< endl"
+  // Problem: it does not work if ostream_ == 0.
   if(ostream_ && !bin_)
     (*f)(*ostream_);
   return *this;
@@ -145,7 +145,7 @@ Sortie& Sortie::operator<<(const Separateur& ob)
 {
   if (bin_)
     {
-      // En binaire on n'ecrit pas les separateurs
+      // In binary mode, separators are not written
     }
   else
     {
@@ -154,12 +154,12 @@ Sortie& Sortie::operator<<(const Separateur& ob)
         case Separateur::ENDL:
           // endl = '\n' + flush
 #if defined(__CYGWIN__) || defined(MICROSOFT)
-          // GF pb sous windows avec ancienne ligne
+          // GF issue under Windows with old line
           (*ostream_)<<endl;
 #else
           (*ostream_) << '\n';
 #endif
-          // Flush eventuel (surcharge possible par Sortie_Fichier_base::flush())
+          // Optional flush (can be overridden by Sortie_Fichier_base::flush())
           flush();
           break;
         case Separateur::SPACE:
@@ -191,12 +191,11 @@ Sortie& Sortie::syncfile()
   return *this;
 }
 
-/*! @brief Ecriture d'un objet ou d'une variable.
+/*! @brief Writes an object or variable.
  *
- * Dans cette implementation (et dans la plupart des classes derivees)
- *   on appelle simplement ob.printOn (a l'exception de Sortie_Nulle)
- *   Attention, si on veut que le flux puisse etre indifferemment ASCII ou BINAIRE,
- *   il faut inserer "<< space <<"  ou "<< finl <<" pour separer les objets.
+ * In this implementation (and in most derived classes), ob.printOn is simply called
+ *   (except in Sortie_Nulle). Note: if the stream must be usable in either ASCII or BINARY mode,
+ *   "<< space <<" or "<< finl <<" must be inserted between objects.
  *
  */
 Sortie& Sortie::operator<<(const Objet_U& ob)
@@ -205,20 +204,19 @@ Sortie& Sortie::operator<<(const Objet_U& ob)
   return *this;
 }
 
-/*! @brief Ecriture d'une chaine de caracteres.
+/*! @brief Writes a character string.
  *
- * Attention, pour pouvoir relire correctement la chaine en mode ascii, celle-ci ne doit
- *  pas contenir de separateur (ni espace, ni retour a la ligne, ...)
+ * Note: to correctly re-read the string in ASCII mode, it must not contain
+ *  any separator (neither space nor newline, ...).
  *
  */
 Sortie& Sortie::operator <<(const char* ob)
 {
   if(bin_)
     {
-      // Ca c'est dommage : dans LIST, il y a "<< blanc <<"
-      // qui oblige a mettre ce test :
-      // Il faudrait mettre "<< space <<"  mais cela change les fichiers
-      // .Zones binaires...
+      // This is unfortunate: in LIST there is "<< blanc <<"
+      // which forces this test:
+      // One should use "<< space <<" but that would change the binary .Zones files...
       if (strcmp(ob, " "))
         {
           const int n = (int)strlen(ob) + 1;
@@ -229,10 +227,10 @@ Sortie& Sortie::operator <<(const char* ob)
     {
       (*ostream_) << ob;
     }
-  // B.Mathieu, 7/10/2004 : je supprime l'espace apres ecrire(ob).
-  // Attention, maintenant, il faut faire
+  // B.Mathieu, 7/10/2004: removing the space after ecrire(ob).
+  // Warning, now one must do
   //  fichier << "chaine" << space << nombre;
-  // pour pouvoir relire le fichier de facon transparente avec
+  // to be able to re-read the file transparently with
   //  fichier >> motcle >> nombre;
   // Ancien code:
   //   if(!bin_)
@@ -243,13 +241,12 @@ Sortie& Sortie::operator <<(const char* ob)
 Sortie& Sortie::operator <<(const std::string& str) { return (*this) << str.c_str(); }
 
 
-/*! @brief Change le mode d'ecriture du fichier.
+/*! @brief Changes the write mode of the file.
  *
- * Cette methode peut etre appelee n'importe quand. Attention
- *   cependant pour les fichiers Ecrire_Fichier_Partage :
- *   il faut faire le changement uniquement au debut de l'ecriture
- *   d'un bloc, juste apres syncfile() (sinon, mauvaise traduction
- *   des retours a la ligne lors du syncfile suivant).
+ * This method can be called at any time. However, for Ecrire_Fichier_Partage files,
+ *   the change must be made only at the beginning of a block write,
+ *   immediately after syncfile() (otherwise, newlines are incorrectly translated
+ *   during the next syncfile() call).
  *
  */
 void Sortie::set_bin(bool bin)
@@ -263,12 +260,12 @@ void Sortie::set_bin(bool bin)
     }
 }
 
-/*! @brief Methode de bas niveau pour ecrire un tableau d'ints ou reels dans le stream.
+/*! @brief Low-level method to write an array of ints or floats to the stream.
  *
- * Dans l'implementation de la classe de base, on ecrit dans ostream_.
- *   En binaire on utilise ostream::write(), en ascii ostream::operato<<()
- *   En ascii, on revient a la ligne chaque fois qu'on a ecrit "nb_col" valeurs et a la fin du tableau.
- *   Valeur de retour : ostream_->good()
+ * In the base class implementation, writes to ostream_.
+ *   In binary mode uses ostream::write(); in ASCII mode uses ostream::operator<<().
+ *   In ASCII mode, a newline is inserted after every "nb_col" values and at the end of the array.
+ *   Return value: ostream_->good().
  *
  */
 template<typename _TYPE_>
@@ -303,7 +300,7 @@ int Sortie::put_template(const _TYPE_ *ob, std::streamsize n, std::streamsize nb
               j = nb_col;
             }
         }
-      // Si on n'a pas fini pas un retour a la ligne, en ajouter un
+      // If we did not end with a newline, add one
       if (j != nb_col && n > 0) (*ostream_) << (endl);
 
       ostream_->flush();
@@ -319,10 +316,10 @@ template int Sortie::put_template(const long long *ob, std::streamsize n, std::s
 template int Sortie::put_template(const float *ob, std::streamsize n, std::streamsize nb_col);
 template int Sortie::put_template(const double *ob, std::streamsize n, std::streamsize nb_col);
 
-/*! @brief Methode de bas niveau pour ecrire un int ou flottant dans le stream.
+/*! @brief Low-level method to write an int or float to the stream.
  *
- * Dans l'implementation de la classe de base, on ecrit dans ostream_.
- *   En binaire on utilise ostream::write(), en ascii ostream::operator<<()
+ * In the base class implementation, writes to ostream_.
+ *   In binary mode uses ostream::write(); in ASCII mode uses ostream::operator<<().
  *
  */
 template<typename _TYPE_>

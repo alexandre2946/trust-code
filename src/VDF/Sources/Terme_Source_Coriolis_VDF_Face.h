@@ -26,7 +26,7 @@ class Probleme_base;
 class Domaine_Cl_VDF;
 class Domaine_VDF;
 
-/*! @brief class Terme_Source_Coriolis_VDF_Face Cette classe permet de calculer la force de Coriolis en VDF
+/*! @brief class Terme_Source_Coriolis_VDF_Face This class computes the Coriolis force in VDF.
  *
  * @sa Terme_Source_Coriolis
  */
@@ -60,14 +60,14 @@ protected :
 
 };
 
-// Ajoute pour compatibilite avec Quasi-Compressible
+// Added for compatibility with Quasi-Compressible
 class Terme_Source_Coriolis_QC_VDF_Face : public Terme_Source_Coriolis_VDF_Face
 {
   Declare_instanciable(Terme_Source_Coriolis_QC_VDF_Face);
 };
 
 
-// Fonctions inline de la classe Terme_Source_Coriolis_VDF_Face
+// Inline functions of the class Terme_Source_Coriolis_VDF_Face
 
 inline const DoubleVect& Terme_Source_Coriolis_VDF_Face::omega() const
 {

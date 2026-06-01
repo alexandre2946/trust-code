@@ -20,17 +20,17 @@
 #include <TRUST_Ref.h>
 
 class Comm_Group;
-//GF comm_incl inclu mpi.h mais il est plus facile de faire un atelier
-// ou l on change le mpi si on passe par ce fichier intermediaire
+//GF comm_incl includes mpi.h but it is easier to create a workshop
+// where one can change the MPI implementation by going through this intermediate file
 
 #include <comm_incl.h>
 
-/*! @brief : Classe Comm_Group_MPI, derivee de la classe abstraite Comm_Group.
+/*! @brief : Class Comm_Group_MPI, derived from the abstract class Comm_Group.
  *
- *   Cette classe represente un groupe de communication qui repose sur MPI.
+ *   This class represents a communication group based on MPI.
  *
- *   Construction de l'objet : voir init_group_trio() pour le groupe_TRUST
- *    et init_group() pour les autres.
+ *   Object construction: see init_group_trio() for groupe_TRUST
+ *    and init_group() for the others.
  *
  */
 class Comm_Group_MPI : public Comm_Group
@@ -61,8 +61,8 @@ public:
                        char * const * const recv_buffers,
                        TypeHint typehint = CHAR) const override;
   void send_recv_finish() const override;
-  void send(int pe, const void *buffer, int size, int tag) const override; // Envoi bloquant
-  void recv(int pe, void *buffer, int size, int tag) const override; // Reception bloquante
+  void send(int pe, const void *buffer, int size, int tag) const override; // Blocking send
+  void recv(int pe, void *buffer, int size, int tag) const override; // Blocking receive
   void broadcast(void *buffer, int size, int pe_source) const override;
   void all_to_all(const void *src_buffer, void *dest_buffer, int data_size) const override;
   void all_gather(const void *src_buffer, void *dest_buffer, int data_size) const override;
@@ -102,21 +102,21 @@ private:
   void mp_collective_op_template(const _TYPE_ *x, _TYPE_ *resu, int n, Comm_Group::Collective_Op op) const;
   trustIdType mppartial_sum_impl(trustIdType x) const;
 
-  // Voir set_must_mpi_initialize() et init_group_trio()
+  // See set_must_mpi_initialize() and init_group_trio()
   static bool must_mpi_initialize_;
-  // Le groupe trio_u global est associe a ce communicateur
-  //  (different de MPI_COMM_WORLD pour du couplage par exemple)
+  // The global trio_u group is associated with this communicator
+  //  (different from MPI_COMM_WORLD for coupling for example)
   static MPI_Comm trio_u_world_;
   static MPI_Status * mpi_status_;
   static MPI_Request * mpi_requests_;
   static int mpi_nrequests_;
   static int mpi_maxrequests_;
-  static int current_msg_size_; // La taille des donnees envoyees/recues pour le send_recv_start courant
+  static int current_msg_size_; // The size of data sent/received for the current send_recv_start
 
-  MPI_Group mpi_group_;// Handle sur le groupe mpi
-  MPI_Comm  mpi_comm_; // Handle sur le communicateur mpi
+  MPI_Group mpi_group_;// Handle on the MPI group
+  MPI_Comm  mpi_comm_; // Handle on the MPI communicator
 
-  int must_finalize_; // Faut-il le faire dans le destructeur ?
+  int must_finalize_; // Should it be done in the destructor?
   OBS_PTR(Comm_Group) groupe_pere_;
 #endif
 };

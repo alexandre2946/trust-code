@@ -18,12 +18,12 @@
 
 #include <Faces.h>
 
-/*! @brief Classe Frontiere.
+/*! @brief Class Frontiere.
  *
- * Une Frontiere decrit une partie de la frontiere d'un Domaine,
- *     elle possede un Nom, elle porte des Faces et a un Domaine associe.
- *     Une Frontiere peut etre specialisee en un Bord, un Joint un
- *     Raccord ou une Face Interne.
+ * A Frontiere describes a part of the boundary of a Domain,
+ *     it has a Name, it carries Faces and has an associated Domain.
+ *     A Frontiere can be specialized into an Edge, a Joint,
+ *     a Connection or an Internal Face.
  *
  * @sa Domaine Bord Joint Raccord Faces_Interne
  */
@@ -55,9 +55,9 @@ public:
   inline Faces_t& faces() {  return les_faces; }
   IntTab_t& les_sommets_des_faces();
   const IntTab_t& les_sommets_des_faces() const;
-  /// Renvoie le nombre de faces de la frontiere.
+  /// Returns the number of faces of the boundary.
   inline int_t nb_faces() const  {  return les_faces.nb_faces(); }
-  /// Dimensionne la frontiere, i.e. fixe son nombre de faces.
+  /// Sizes the boundary, i.e. sets its number of faces.
   inline void dimensionner(int_t i) {  les_faces.dimensionner(i); }
   void renum(const IntVect_t&);
   void add(const Frontiere_32_64& );

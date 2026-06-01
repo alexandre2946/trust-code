@@ -18,9 +18,9 @@
 
 #include <Modele_turbulence_hyd_LES_VDF_base.h>
 
-/*! @brief classe Modele_turbulence_hyd_LES_Smago_VDF Cette classe correspond a la mise en oeuvre du modele sous
+/*! @brief Modele_turbulence_hyd_LES_Smago_VDF class
  *
- *  maille Smagorinsky en VDF
+ *  @brief This class implements the Smagorinsky sub-grid scale model in VDF.
  *
  */
 class Modele_turbulence_hyd_LES_Smago_VDF: public Modele_turbulence_hyd_LES_VDF_base

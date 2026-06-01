@@ -18,7 +18,7 @@
 
 Implemente_instanciable_sans_constructeur(Hexa_poly,"Hexa_poly",Elem_poly_base);
 
-// printOn et readOn
+// printOn and readOn
 
 Sortie& Hexa_poly::printOn(Sortie& s ) const
 {
@@ -30,16 +30,16 @@ Entree& Hexa_poly::readOn(Entree& s )
   return s ;
 }
 
-/*! @brief KEL_(0,fa7),KEL_(1,fa7) sont  les numeros locaux des 2 faces qui entourent la facette de numero local fa7
+/*! @brief KEL_(0,fa7), KEL_(1,fa7) are the local indices of the 2 faces surrounding the facet with local index fa7.
  *
- *  le numero local de la fa7 est celui du sommet qui la porte
+ *  The local index of fa7 is the index of the vertex that carries it.
  *
  */
 Hexa_poly::Hexa_poly()
 {
 }
 
-/*! @brief remplit le tableau face_normales dans le Domaine_poly
+/*! @brief Fills in the face_normales array in the Domaine_poly.
  *
  */
 
@@ -56,20 +56,20 @@ void Hexa_poly::normale(int num_Face,DoubleTab& Face_normales,
   int f0,no4;
   int elem1;
 
-  // on a les 4 sommets de la face
+  // we have the 4 vertices of the face
   int n0 = Face_sommets(num_Face,0);
   int n1 = Face_sommets(num_Face,1);
   int n2 = Face_sommets(num_Face,2);
   int n3 = Face_sommets(num_Face,3);
 
-  // on va decouper la face en deux triangles
-  // on initialise Face_normales(num_face,dimension) a 0
-  // car on va sommer les deux face_normale des triangles
+  // split the face into two triangles
+  // initialise Face_normales(num_face,dimension) to 0
+  // because we will sum the two face_normales of the triangles
   Face_normales(num_Face,0) =  0;
   Face_normales(num_Face,1) =  0;
   Face_normales(num_Face,2) =  0;
 
-  // on prend les sommet S1,S2 et S4
+  // take vertices S1, S2 and S4
 
   x1 = les_coords(n0,0) - les_coords(n1,0);
   y1 = les_coords(n0,1) - les_coords(n1,1);
@@ -83,8 +83,8 @@ void Hexa_poly::normale(int num_Face,DoubleTab& Face_normales,
   ny = (-x1*z2 + x2*z1)/2;
   nz = (x1*y2 - x2*y1)/2;
 
-  // Orientation de la normale de elem1 vers elem2
-  // pour cela recherche du sommet de elem1 qui n'est pas sur la Face
+  // Orient the normal from elem1 to elem2
+  // by searching for the vertex of elem1 that is not on the Face
 
   elem1=Face_voisins(num_Face,0);
 
@@ -120,7 +120,7 @@ void Hexa_poly::normale(int num_Face,DoubleTab& Face_normales,
       Face_normales(num_Face,2) += nz;
     }
 
-  // on prend les sommet S1,S4 et S3
+  // take vertices S1, S4 and S3
 
   x1 = les_coords(n0,0) - les_coords(n2,0);
   y1 = les_coords(n0,1) - les_coords(n2,1);
@@ -134,8 +134,8 @@ void Hexa_poly::normale(int num_Face,DoubleTab& Face_normales,
   ny = (-x1*z2 + x2*z1)/2;
   nz = (x1*y2 - x2*y1)/2;
 
-  // Orientation de la normale de elem1 vers elem2
-  // pour cela recherche du sommet de elem1 qui n'est pas sur la Face
+  // Orient the normal from elem1 to elem2
+  // by searching for the vertex of elem1 that is not on the Face
 
   elem1=Face_voisins(num_Face,0);
 
@@ -187,9 +187,10 @@ void Hexa_poly::calcul_vc(const ArrOfInt& Face,ArrOfDouble& vc,
   vc[2] = vs[2]/6;
 }
 
-/*! @brief calcule les coord xg du centre d'un element non standard calcule aussi idirichlet=nb de faces de Dirichlet de l'element
+/*! @brief Computes the coordinates xg of the centre of a non-standard element;
+ *   also computes idirichlet = number of Dirichlet faces of the element.
  *
- *  si idirichlet=2, n1 est le numero du sommet confondu avec G
+ *  If idirichlet=2, n1 is the index of the vertex coinciding with G.
  *
  */
 void Hexa_poly::calcul_xg(DoubleVect& xg, const DoubleTab& x,

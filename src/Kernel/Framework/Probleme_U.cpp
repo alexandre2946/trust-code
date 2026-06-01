@@ -171,21 +171,21 @@ bool Probleme_U::iterateTimeStep(bool& converged)
   return false;
 }
 
-/*! @brief Demande au probleme de postraiter ses champs, sondes,.
+/*! @brief Asks the problem to post-process its fields, probes, etc.
  *
- * .. Dans Probleme_U::run(), postraiter() est appele a chaque pas de
- *  temps avec force=0 et au debut et a la fin du calcul avec force=1.
- *  WEC : il serait bon que, un jour, postraiter soit const
+ * In Probleme_U::run(), postraiter() is called at each time step with force=0
+ * and at the beginning and end of the computation with force=1.
+ * WEC: it would be good if, one day, postraiter were const.
  *
- * @param (force) 1=postraiter absolument, 0=postraiter si c'est necessaire.
- * @return (0 en cas d'erreur, 1 sinon.)
+ * @param (force) 1=post-process unconditionally, 0=post-process if necessary.
+ * @return (0 on error, 1 otherwise.)
  */
 int Probleme_U::postraiter(int force)
 {
   return 0;
 }
 
-/*! @brief Doit-on imprimer les statistiques d'execution maintenant ?
+/*! @brief Should we print the execution statistics now?
  *
  */
 int Probleme_U::limpr() const
@@ -193,7 +193,7 @@ int Probleme_U::limpr() const
   return 0;
 }
 
-/*! @brief Doit-on sauvegarder l'etat du probleme sur disque maintenant ?
+/*! @brief Should we save the problem state to disk now?
  *
  */
 int Probleme_U::lsauv() const
@@ -201,7 +201,7 @@ int Probleme_U::lsauv() const
   return 0;
 }
 
-/*! @brief Sauvegarder l'etat du probleme sur disque
+/*! @brief Save the problem state to disk.
  *
  */
 void Probleme_U::sauver() const
@@ -210,19 +210,17 @@ void Probleme_U::sauver() const
 }
 
 
-/*! @brief ATTENTION :
+/*! @brief WARNING:
  *
- *  Rentre ici tout ce qui ne correspond pas a l'API normale de Problem.
+ *  Everything that does not fit the normal Problem API goes here.
  *
- *  Actuellement on y met a jour les CLs et les termes sources, sachant
- *  que certains vont chercher eux-memes des informations dans les
- *  problemes voisins...
+ *  Currently it updates boundary conditions and source terms, knowing
+ *  that some of them fetch information from neighboring problems themselves...
  *
- *  Programme de travail : tout ce qui est dans cette methode doit etre
- *  rendu independant de l'exterieur, et peut du coup rejoindre
- *  initTimeStep.
- *  Le reste passe dans l'interface d'echange de champs.
- *  Ce travail sera fini quand updateGivenFields sera vide et supprime !
+ *  Work plan: everything in this method must be made independent of external
+ *  state, and can then be merged into initTimeStep.
+ *  The rest moves into the field exchange interface.
+ *  This work will be done when updateGivenFields is empty and removed!
  *
  *
  * @return (true=OK, false=error)
@@ -233,9 +231,9 @@ bool  Probleme_U::updateGivenFields()
 }
 
 
-/*! @brief Cette methode est une sorte de main() du Problem Elle peut etre utilisee si le probleme n'est couple a aucun autre.
+/*! @brief This method is a sort of main() for the Problem. It can be used if the problem is not coupled with any other.
  *
- *  (s'il n'a besoin d'aucun champ d'entree).
+ *  (if it does not need any input field).
  *
  * @return (bool) true=OK, false=error
  */
@@ -369,7 +367,7 @@ bool Probleme_U::runUntil(double time)
   double dt=computeTimeStep(stop);
   statistics().start_timeloop();
 
-  // Boucle sur les pas de temps
+  // Loop over time steps
   while(!stop)
     {
       statistics().start_time_step();
@@ -424,7 +422,7 @@ bool Probleme_U::runUntil(double time)
   return ok;
 }
 
-/*! @brief pour recodage eventuel et appel unifie en python
+/*! @brief For possible re-implementation and unified call from python.
  *
  */
 bool Probleme_U::solveTimeStep()
@@ -505,7 +503,7 @@ void Probleme_U::getInputFieldTemplate(const Nom& name, TrioField& afield) const
   if (!ch)
     throw WrongArgument(le_nom().getChar(),"getInputFieldTemplate",name.getString(),"no input field of that name");
 
-  // Du au fait qu'on ne peut pas faire une ref sur Champ_Input_Proto qui n'est pas un Objet_U...
+  // Due to the fact that we cannot make a reference to Champ_Input_Proto which is not an Objet_U...
   Champ_Input_Proto * chip = dynamic_cast<Champ_Input_Proto *>(ch.operator->());
   if (!chip)
     throw WrongArgument(le_nom().getChar(),"getInputFieldTemplate",name.getString(),"field of this name is not an input field");
@@ -528,7 +526,7 @@ void Probleme_U::setInputField(const Nom& name, const TrioField& afield)
   if (strcmp(name.getChar(),afield.getCharName()))
     throw WrongArgument(le_nom().getChar(),"setInputField","afield","Should have the same name as the argument name ");
 
-  // Du au fait qu'on ne peut pas faire une ref sur Champ_Input_Proto qui n'est pas un Objet_U...
+  // Due to the fact that we cannot make a reference to Champ_Input_Proto which is not an Objet_U...
   Champ_Input_Proto * chip = dynamic_cast<Champ_Input_Proto *>(ch.operator->());
   if (!chip)
     throw WrongArgument(le_nom().getChar(),"setInputField",name.getString(),"field of this name is not an input field");

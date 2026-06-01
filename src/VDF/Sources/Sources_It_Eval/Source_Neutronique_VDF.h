@@ -23,9 +23,9 @@
 
 class Domaine_VDF;
 
-/*! @brief class Source_Neutronique_VDF Cette classe constitue l'implementation en VDF du terme source
+/*! @brief class Source_Neutronique_VDF This class is the VDF implementation of the source term
  *
- *   Source_Neutronique dans ThSol/.
+ *   Source_Neutronique in ThSol/.
  *
  */
 class Source_Neutronique_VDF : public Source_Neutronique

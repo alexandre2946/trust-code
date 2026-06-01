@@ -38,17 +38,17 @@ class Front_VF : public Frontiere_dis_base
 
 public :
 
-  inline int nb_faces() const;                 // Nombre de faces reelles du bord
-  inline int nb_faces_tot() const;                // Nombre de faces reelles et virtuelles du bord
-  inline int num_premiere_face() const;        // Numero de la premiere face du bord dans la liste des faces
-  inline int num_face(const int) const;        // Renvoie le numero de face de la ieme face du bord
-  inline int num_local_face(const int) const; //Renvoie le numero local de la face (inverse de num_face())
+  inline int nb_faces() const;                 // Number of real faces of the boundary
+  inline int nb_faces_tot() const;                // Number of real and virtual faces of the boundary
+  inline int num_premiere_face() const;        // Index of the first face of the boundary in the global face list
+  inline int num_face(const int) const;        // Returns the global face index of the i-th boundary face
+  inline int num_local_face(const int) const; //Returns the local face index (inverse of num_face())
   inline const ArrOfInt& num_face() const;
 protected:
   mutable ArrOfInt num_face_;
 };
 
-// Fonctions inline
+// Inline functions
 
 inline int Front_VF::nb_faces() const
 {
@@ -67,9 +67,9 @@ inline int Front_VF::num_premiere_face() const
 
 inline int Front_VF::num_face(const int ind_face) const
 {
-  if (ind_face<nb_faces())                 // Face de bord reelle
+  if (ind_face<nb_faces())                 // Real boundary face
     return num_premiere_face()+ind_face;
-  else                                        // Face de bord virtuelle
+  else                                        // Virtual boundary face
     return frontiere().get_faces_virt()[ind_face-nb_faces()];
 }
 

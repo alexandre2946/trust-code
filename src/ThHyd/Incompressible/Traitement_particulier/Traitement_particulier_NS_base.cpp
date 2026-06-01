@@ -25,12 +25,12 @@ Implemente_base(Traitement_particulier_NS_base,"Traitement_particulier_NS_base",
 // XD attr trait_part traitement_particulier_base trait_part REQ Type of traitement_particulier.
 // XD attr acof chaine(into=["}"]) acof REQ Closing curly bracket.
 
-/*! @brief Impression de l'equation sur un flot de sortie.
+/*! @brief Prints the equation to an output stream.
  *
- * Simple appel a Equation_base::printOn(Sortie&).
+ * Simple call to Equation_base::printOn(Sortie&).
  *
- * @param (Sortie& is) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param is an output stream
+ * @return the modified output stream
  */
 Sortie& Traitement_particulier_NS_base::printOn(Sortie& is) const
 {
@@ -38,13 +38,13 @@ Sortie& Traitement_particulier_NS_base::printOn(Sortie& is) const
 }
 
 
-/*! @brief Lit les specifications de l'equation de Navier Stokes a partir d'un flot d'entree.
+/*! @brief Reads the Navier-Stokes equation specifications from an input stream.
  *
- *     Simple appel a Navier_Stokes_std::readOn(Entree&)
+ *     Simple call to Navier_Stokes_std::readOn(Entree&).
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws pas de modele de turbulence speficie
+ * @param is an input stream
+ * @return the modified input stream
+ * @throws no turbulence model specified
  */
 Entree& Traitement_particulier_NS_base::readOn(Entree& is)
 {

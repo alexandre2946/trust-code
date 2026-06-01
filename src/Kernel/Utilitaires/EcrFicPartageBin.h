@@ -20,13 +20,13 @@
 
 class Objet_U;
 
-/*! @brief Ecriture dans un fichier partage Cette classe derive de Ecr_Fic_Par, en utilisant une sortie en binaire.
+/*! @brief Writing to a shared file. This class derives from Ecr_Fic_Par, using binary output.
  *
- *     Ce type de fichier est notamment utilise pour la creation d'un fichier de post-traitement unique.
+ *     This type of file is notably used for the creation of a single post-processing file.
  *
  */
 
-// Chaque PE ecrit dans le meme() fichier
+// Each PE writes to the same() file
 class EcrFicPartageBin : public EcrFicPartage
 {
   Declare_instanciable_sans_constructeur_ni_destructeur(EcrFicPartageBin);

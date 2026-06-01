@@ -23,8 +23,8 @@
 
 /*! @brief class Ch_front_input_uniforme
  *
- *      Cette classe represente un champ accessible par setInputField
- *      uniforme sur une frontiere.
+ *      This class represents a field accessible via setInputField
+ *      that is uniform on a boundary.
  *
  *
  * @sa Champ_Input_Proto

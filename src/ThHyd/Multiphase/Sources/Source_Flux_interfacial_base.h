@@ -20,12 +20,10 @@
 #include <Correlation_base.h>
 #include <TRUST_Ref.h>
 
-/*! @brief Classe Source_Flux_interfacial_base
+/*! @brief Interfacial flux source term (implemented in PolyMAC_HFV) of the form:
  *
- *    Cette classe implemente dans PolyMAC_HFV un operateur de frottement interfacial
- *
- *     de la forme F_{kl} = - F_{lk} = - C_{kl} (u_k - u_l)
- *     le calcul de C_{kl} est realise par la hierarchie Coefficient_Flux_interfacial_base
+ *     F_{kl} = - F_{lk} = - C_{kl} (u_k - u_l).
+ *     The coefficient C_{kl} is computed by the Coefficient_Flux_interfacial_base hierarchy.
  *
  * @sa Source_base
  */
@@ -38,17 +36,17 @@ public :
   void mettre_a_jour(double temps) override;
   void completer() override;
 
-  /* flux paroi-interface (par maille) et ses derivees */
-  /* ces tableaux ne sont appelables que dans le terme associe a l'equation d'energie et sont utilises par les autres */
-  /* ils peuvent etre remplis par l'operateur de diffusion (flux en paroi), un module de thermique crayon, etc */
-  DoubleTab& qpi() const;    //qpi(e, k, l) : puissance deposee dans l'element e de la phase k vers l'interface (k, l) ; unite : W
-  DoubleTab& dT_qpi() const; //dT_qpi(e, k, l, n) : sa derivee en T[n]
-  DoubleTab& da_qpi() const; //da_qpi(e, k, l, n) : sa derivee en alpha[n]
-  DoubleTab& dp_qpi() const; //da_qpi(e, k, l)    : sa derivee en p
+  /* wall-to-interface flux (per cell) and its derivatives */
+  /* these arrays are only accessible in the energy equation term and are used by others */
+  /* they can be filled by the diffusion operator (wall flux), a fuel rod thermal module, etc. */
+  DoubleTab& qpi() const;    // qpi(e, k, l) : power deposited in element e from phase k to interface (k, l); unit: W
+  DoubleTab& dT_qpi() const; // dT_qpi(e, k, l, n) : its derivative w.r.t. T[n]
+  DoubleTab& da_qpi() const; // da_qpi(e, k, l, n) : its derivative w.r.t. alpha[n]
+  DoubleTab& dp_qpi() const; // dp_qpi(e, k, l)    : its derivative w.r.t. p
 
 private:
   mutable DoubleTab qpi_, dT_qpi_, da_qpi_, dp_qpi_;
-  OBS_PTR(Correlation_base) correlation_; //correlation donnant le coeff de flux interfacial
+  OBS_PTR(Correlation_base) correlation_; // correlation providing the interfacial flux coefficient
   int is_turb_ = 0;
   double dv_min = -1.;
   double mod2grp = -1. ;

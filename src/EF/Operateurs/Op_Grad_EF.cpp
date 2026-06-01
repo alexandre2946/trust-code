@@ -241,9 +241,9 @@ DoubleTab& Op_Grad_EF::ajouter(const DoubleTab& pression, DoubleTab& grad) const
 {
 
   test(pression,grad,(*this));
-  // Gradient d'un champ scalaire localise aux centres des elements
+  // Gradient of a scalar field located at element centers
 
-  // On initialise grad a zero
+  // Initialize grad to zero
   grad = 0;
   assert_espace_virtuel_vect(pression);
   Debog::verifier("pression dans Op_Grad_EF",pression);
@@ -280,7 +280,7 @@ DoubleTab& Op_Grad_EF::ajouter(const DoubleTab& pression, DoubleTab& grad) const
 
 
 
-  // prise en compte des " cl " ajout du temr - int P sur le bord
+  // account for BCs: add term - int P on the boundary
   // test ...
   for (int n_bord=0; n_bord<domaine_ef.nb_front_Cl()*1; n_bord++)
     {
@@ -292,7 +292,7 @@ DoubleTab& Op_Grad_EF::ajouter(const DoubleTab& pression, DoubleTab& grad) const
       int num1 = 0;
       int num2 = + le_bord.nb_faces_tot();
       if (sub_type(Dirichlet,la_cl.valeur()) )
-        // ca ne sert a rien
+        // this does nothing
         for (int ind_face=num1; ind_face<num2; ind_face++)
           {
             int face=le_bord.num_face(ind_face);
@@ -316,7 +316,7 @@ DoubleTab& Op_Grad_EF::ajouter(const DoubleTab& pression, DoubleTab& grad) const
             for (int s=0; s<nb_som_face; s++)
               {
                 int som=faces_sommets(face,s);
-                // on calcule grad.S /S2
+                // compute grad.S /S2
                 double grad_n=0;
                 for (int comp=0; comp<dimension; comp++)
                   grad_n+=grad(som,comp)*face_normales(face,comp);
@@ -412,7 +412,7 @@ int Op_Grad_EF::impr(Sortie& os) const
               fluxx_s += flux_bords_(face,0) ;
               fluxy_s += flux_bords_(face,1) ;
 
-              // Calcul du moment exerce par le fluide sur le bord (OM/\F)
+              // Compute the moment exerted by the fluid on the boundary (OM/\F)
               if (impr_mom) moment_z+=flux_bords_(face,1)*c_grav[0]-flux_bords_(face,0)*c_grav[1];
 
               if (domaine_EF.domaine().bords_a_imprimer_sum().contient(le_bord.le_nom()))
@@ -427,7 +427,7 @@ int Op_Grad_EF::impr(Sortie& os) const
               fluxy_s += flux_bords_(face,1) ;
               fluxz_s += flux_bords_(face,2) ;
 
-              // Calcul du moment exerce par le fluide sur le bord (OM/\F)
+              // Compute the moment exerted by the fluid on the boundary (OM/\F)
               moment_x+=flux_bords_(face,2)*c_grav[1]-flux_bords_(face,1)*c_grav[2];
               moment_y+=flux_bords_(face,0)*c_grav[2]-flux_bords_(face,2)*c_grav[0];
               moment_z+=flux_bords_(face,1)*c_grav[0]-flux_bords_(face,0)*c_grav[1];

@@ -39,7 +39,7 @@ public:
 
 protected:
 
-  //! Implemente le calcul effectif de la perte de charge pour un lieu donne
+  //! Implements the effective pressure loss computation for a given location
   void coeffs_perte_charge(const DoubleVect& u, const DoubleVect& pos, double t, double norme_u, double dh, double nu, double reynolds, double& coeff_ortho, double& coeff_long, double& u_l,
                            DoubleVect& v_valeur) const override;
 };

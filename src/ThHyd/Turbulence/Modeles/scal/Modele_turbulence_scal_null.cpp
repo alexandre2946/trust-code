@@ -31,10 +31,10 @@ Sortie& Modele_turbulence_scal_null::printOn(Sortie& s) const
 
 Entree& Modele_turbulence_scal_null::readOn(Entree& is)
 {
-  // Creation d'une loi de paroi nulle:
+  // Creation of a null wall law:
   const Nom& discr = mon_equation_->discretisation().que_suis_je();
   const Probleme_base& le_pb = mon_equation_->probleme();
-  // lp loi de paroi du modele de turbulence de l'hydraulique
+  // lp wall law of the hydraulic turbulence model
   const RefObjU& modele_turbulence = le_pb.equation(0).get_modele(TURBULENCE);
   const Modele_turbulence_hyd_base& mod_turb_hydr = ref_cast(Modele_turbulence_hyd_base, modele_turbulence.valeur());
   if (!sub_type(Modele_turbulence_hyd_null, mod_turb_hydr))

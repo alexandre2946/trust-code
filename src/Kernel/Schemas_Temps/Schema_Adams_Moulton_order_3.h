@@ -16,9 +16,9 @@
 #ifndef Schema_Adams_Moulton_order_3_included
 #define Schema_Adams_Moulton_order_3_included
 
-/*! @brief class Schema_Adams_Moulton_order_3 Il herite de schema implicite base et porte un solveur par exemple
+/*! @brief class Schema_Adams_Moulton_order_3 It inherits from the implicit base scheme and carries a solver, for example
  *
- *   le Simpler pour effectuer les Faire_un_pas_de_temps..
+ *   the Simpler solver, to perform the time-stepping operations.
  *
  */
 

@@ -21,7 +21,7 @@
 
 class Fluide_Dilatable_base;
 
-/*! @brief classe Entree_fluide_temperature_imposee_H Cas particulier de la classe Dirichlet_entree_fluide pour une equation ayant l'enthalpie en inconnue
+/*! @brief @brief Particular case of the Dirichlet_entree_fluide class for an equation with enthalpy as unknown.
  *
  * @sa Dirichlet_entree_fluide
  */

@@ -25,16 +25,16 @@
 
 Implemente_instanciable_sans_constructeur(Champ_Generique_Interpolation,"Champ_Post_Interpolation|Interpolation",Champ_Gen_de_Champs_Gen);
 
-/*! @brief voir reset()
+/*! @brief see reset()
  *
  */
 Champ_Generique_Interpolation::Champ_Generique_Interpolation()
 {
-  // valeurs par defaut
+  // default values
   reset();
 }
 
-//cf Champ_Gen_de_Champs_Gen::readOn
+//see Champ_Gen_de_Champs_Gen::readOn
 Entree& Champ_Generique_Interpolation::readOn(Entree& is)
 {
   Champ_Gen_de_Champs_Gen::readOn(is);
@@ -44,7 +44,7 @@ Entree& Champ_Generique_Interpolation::readOn(Entree& is)
   return is;
 }
 
-/*! @brief appel invalide
+/*! @brief invalid call
  *
  */
 Sortie& Champ_Generique_Interpolation::printOn(Sortie& os) const
@@ -53,9 +53,9 @@ Sortie& Champ_Generique_Interpolation::printOn(Sortie& os) const
   return os;
 }
 
-//  localisation : localisation de l interpolation (elem ou som)
-//  domaine          : domaine d interpolation (optionnel)
-//  methode          : type de methode de calcul "calculer_champ_post" (optionnel, une seule methode disponible)
+//  localisation : interpolation localisation (elem or som)
+//  domaine          : interpolation domain (optional)
+//  methode          : type of calculation method "calculer_champ_post" (optional, only one method available)
 void Champ_Generique_Interpolation::set_param(Param& param) const
 {
 // XD interpolation champ_post_de_champs_post interpolation INHERITS_BRACE To create a field which is an interpolation
@@ -74,7 +74,7 @@ void Champ_Generique_Interpolation::set_param(Param& param) const
   param.dictionnaire("no",0); // XD_ADD_DICO not_set
 
 }
-/*! @brief restore la configuration initiale de l'objet localisation non specifiee, source non specifiee, methode=calculer_champ_post, domaine natif
+/*! @brief Restore the initial configuration of the object: localisation not specified, source not specified, methode=calculer_champ_post, native domain
  *
  */
 void Champ_Generique_Interpolation::reset()
@@ -88,9 +88,9 @@ void Champ_Generique_Interpolation::reset()
   optimisation_demande_=-1;
 }
 
-/*! @brief Initialisation de la classe: initialisation de la localisation demandee.
+/*! @brief Class initialization: initialization of the requested localisation.
  *
- * Parametres valides : elem, som, faces, elem_dg.
+ * Valid parameters: elem, som, faces, elem_dg.
  *
  */
 int Champ_Generique_Interpolation::set_localisation(const Motcle& loc, int exit_on_error)
@@ -118,9 +118,9 @@ int Champ_Generique_Interpolation::set_localisation(const Motcle& loc, int exit_
   return ok;
 }
 
-/*! @brief Initialisation de la classe: initialisation de la methode d'interpolation Parametres valides : calculer_champ_post
+/*! @brief Class initialization: initialization of the interpolation method. Valid parameters: calculer_champ_post
  *
- *   (Idees pour la suite: affecter, affecter avec integrale...)
+ *   (Ideas for the future: assign, assign with integral...)
  *
  */
 int Champ_Generique_Interpolation::set_methode(const Motcle& methode, int exit_on_error)
@@ -145,7 +145,7 @@ int Champ_Generique_Interpolation::set_methode(const Motcle& methode, int exit_o
   return ok;
 }
 
-/*! @brief Initialisation de la classe: initialisation du domaine d'interpolation Parametres valides : "" => domaine natif, ou le nom d'un objet Domaine connu de l'interprete
+/*! @brief Class initialization: initialization of the interpolation domain. Valid parameters: "" => native domain, or the name of a Domaine object known to the interpreter
  *
  */
 int Champ_Generique_Interpolation::set_domaine(const Nom& nom_domaine, int exit_on_error)
@@ -153,7 +153,7 @@ int Champ_Generique_Interpolation::set_domaine(const Nom& nom_domaine, int exit_
   int ok = 0;
   if (nom_domaine == "")
     {
-      domaine_.reset(); // reference nulle => domaine natif du champ
+      domaine_.reset(); // null reference => native domain of the field
       ok = 1;
     }
   else
@@ -176,7 +176,7 @@ int Champ_Generique_Interpolation::set_domaine(const Nom& nom_domaine, int exit_
   return ok;
 }
 
-/*! @brief Interpolation du champ source en fonction de la methode, localisation et domaine demandes.
+/*! @brief Interpolation of the source field based on the requested method, localisation, and domain.
  *
  */
 const Champ_base& Champ_Generique_Interpolation::get_champ(OWN_PTR(Champ_base)&) const
@@ -221,15 +221,15 @@ const Champ_base& Champ_Generique_Interpolation::get_champ_without_evaluation(OW
 
   OWN_PTR(Champ_base) espace_stockage_source_tmp;
   const Champ_base& source = get_source(0).get_champ_without_evaluation(espace_stockage_source_tmp);
-  // Domaine sur lequel on interpole le champ :
-  //  si domaine_ est une ref nulle, on prend le domaine natif du champ.
+  // Domain on which we interpolate the field:
+  //  if domaine_ is a null reference, we take the native domain of the field.
 
   const Noms compo = get_property("composantes");
   const Noms nom_champ = get_property("nom");
   const Noms syno = get_property("synonyms");
 
   int ncomp;
-  //On fixe identifiant_appel_ a nom_champ[0] dans le cas ou il est egal a ??
+  //We set identifiant_appel_ to nom_champ[0] in the case where it equals ??
   if (identifiant_appel_=="??")
     {
       ncomp = -1;
@@ -239,7 +239,7 @@ const Champ_base& Champ_Generique_Interpolation::get_champ_without_evaluation(OW
       ncomp = Champ_Generique_base::composante(identifiant_appel_,nom_champ[0],compo,syno);
     }
 
-  //Creation du champ espace_stockage
+  //Creation of the storage space field
   Nature_du_champ nature_source = (ncomp==-1)?source.nature_du_champ():scalaire;
   nature_source = source.nature_du_champ();
   int nb_comp = source.nb_comp();
@@ -248,7 +248,7 @@ const Champ_base& Champ_Generique_Interpolation::get_champ_without_evaluation(OW
   espace_stockage = creer_espace_stockage(nature_source,nb_comp,es_tmp);
   return espace_stockage;
 }
-/*! @brief Interpolation du champ source a l'aide de Champ_base::calculer_champ_xxx_post
+/*! @brief Interpolation of the source field using Champ_base::calculer_champ_xxx_post
  *
  */
 const Champ_base& Champ_Generique_Interpolation::get_champ_with_calculer_champ_post() const
@@ -265,15 +265,15 @@ const Champ_base& Champ_Generique_Interpolation::get_champ_with_calculer_champ_p
   const Champ_base& source  = ((optimisation_sous_maillage_==-1)?source_bis.valeur():source0);
   Nom nom_champ_interpole;
 
-  // Domaine sur lequel on interpole le champ :
-  //  si domaine_ est une ref nulle, on prend le domaine natif du champ.
+  // Domain on which we interpolate the field:
+  //  if domaine_ is a null reference, we take the native domain of the field.
   const Domaine& domaine = get_ref_domain();
   const Noms compo = get_property("composantes");
   const Noms nom_champ = get_property("nom");
   const Noms syno = get_property("synonyms");
 
   int ncomp;
-  //On fixe identifiant_appel_ a nom_champ[0] dans le cas ou il est egal a ??
+  //We set identifiant_appel_ to nom_champ[0] in the case where it equals ??
   if (identifiant_appel_=="??")
     {
       ncomp = -1;
@@ -283,7 +283,7 @@ const Champ_base& Champ_Generique_Interpolation::get_champ_with_calculer_champ_p
       ncomp = Champ_Generique_base::composante(identifiant_appel_,nom_champ[0],compo,syno);
     }
 
-  //Creation du champ espace_stockage
+  //Creation of the storage space field
   Nature_du_champ nature_source = (ncomp==-1)?source.nature_du_champ():scalaire;
   nature_source = source.nature_du_champ();
   int nb_comp = source.nb_comp();
@@ -297,8 +297,8 @@ const Champ_base& Champ_Generique_Interpolation::get_champ_with_calculer_champ_p
   if (optimisation_sous_maillage_==-1)
     {
       espace_stockage_->valeurs()=0;
-      // premier appel avec maillage different (ou on a force) , on essaye de voir si on peut optimiser
-      // on champ la source on y met val(i)=i, pour recuperer le numero de la maille apres
+      // first call with different mesh (or forced), we try to see if we can optimize
+      // we set the source field values to val(i)=i, to recover the cell number afterwards
       DoubleTab& val=source_bis->valeurs();
 
       int dim0 = val.dimension_tot(0);
@@ -307,7 +307,7 @@ const Champ_base& Champ_Generique_Interpolation::get_champ_with_calculer_champ_p
           val(i,j) = i+decal;
     }
 
-  //Evaluation des valeurs du champ espace_stockage
+  //Evaluation of the storage space field values
   DoubleTab& espace_valeurs = espace_stockage_->valeurs();
 
   if (optimisation_sous_maillage_==1)
@@ -362,7 +362,7 @@ const Champ_base& Champ_Generique_Interpolation::get_champ_with_calculer_champ_p
             }
         }
       else
-        //On construit un tableau de valeurs a nb_comp composantes meme si ncomp!=-1
+        //We build a value array with nb_comp components even if ncomp!=-1
         {
           DoubleTrav val_temp;
           source.calculer_valeurs_elem_compo_post(val_temp,
@@ -398,7 +398,7 @@ const Champ_base& Champ_Generique_Interpolation::get_champ_with_calculer_champ_p
   else if (localisation_=="som")
     {
       const int nb_sommets = domaine.nb_som();
-      // PL: mise a jour de l'espace virtuel de la source:
+      // PL: update the virtual space of the source:
       OWN_PTR(Champ_base) copie_source;
       copie_source = source;
       copie_source->valeurs().echange_espace_virtuel();
@@ -431,7 +431,7 @@ const Champ_base& Champ_Generique_Interpolation::get_champ_with_calculer_champ_p
             }
         }
       else
-        //On construit un tableau de valeurs a nb_comp composantes meme si ncomp!=-1
+        //We build a value array with nb_comp components even if ncomp!=-1
         {
           DoubleTrav val_temp;
           copie_source->calculer_valeurs_som_compo_post(val_temp,
@@ -471,7 +471,7 @@ const Champ_base& Champ_Generique_Interpolation::get_champ_with_calculer_champ_p
 
   if (optimisation_sous_maillage_==-1)
     {
-      // on recalcule le bon champ
+      // we recompute the correct field
 
       DoubleTab& val=espace_valeurs;
       int dim0 = val.dimension_tot(0);
@@ -487,7 +487,7 @@ const Champ_base& Champ_Generique_Interpolation::get_champ_with_calculer_champ_p
           int iproche=-1;
           if (v>0)
             {
-              iproche=int(v+0.1); // on ajoute 0.1 pour le cas ou v vaut i-epsilon
+              iproche=int(v+0.1); // we add 0.1 for the case where v equals i-epsilon
               if (std::fabs(iproche-v)>1e-5)
                 {
                   ok=0;
@@ -544,7 +544,7 @@ const DoubleTab& Champ_Generique_Interpolation::get_ref_values() const
 void Champ_Generique_Interpolation::get_copy_values(DoubleTab& values) const
 {
   const DoubleTab& val = get_ref_values();
-  // Cree une copie du tableau
+  // Create a copy of the array
   values = val;
 }
 
@@ -613,8 +613,8 @@ const Noms Champ_Generique_Interpolation::get_property(const Motcle& query) cons
 
         if (compo_.size()>1)
           {
-            //Le champ a ete cree par macro et on a rempli l attribut compo_ du Champ_Generique_base
-            //Cela permet de reproduire les noms de composantes dans les lml
+            //The field was created by a macro and the compo_ attribute of Champ_Generique_base was filled
+            //This allows reproducing the component names in the lml files
             compo=compo_;
           }
         else
@@ -641,7 +641,7 @@ const Noms Champ_Generique_Interpolation::get_property(const Motcle& query) cons
   return Champ_Gen_de_Champs_Gen::get_property(query);
 
 }
-//Nomme le champ en tant que source par defaut
+//Name the field as a source by default
 //nom_champ_source + "_" + localisation_ + "_" +nom_dom_interp;
 void Champ_Generique_Interpolation::nommer_source()
 {
@@ -675,7 +675,7 @@ void Champ_Generique_Interpolation::completer(const Postraitement_base& post)
            << " You must specify exactly 1 \"Source\"." << finl;
       exit();
     }
-  // Si le domaine lu n'est pas le domaine de calcul, on fixe le domaine
+  // If the read domain is not the calculation domain, we set the domain
   const Domaine& domaine_calcul = get_source(0).get_ref_domain();
   if (optimisation_demande_!=1)
     optimisation_sous_maillage_=0;
@@ -685,7 +685,7 @@ void Champ_Generique_Interpolation::completer(const Postraitement_base& post)
     }
   else
     {
-      // optimisation sous maillage inutile
+      // sub-mesh optimization not needed
       if (optimisation_demande_==-1)
         optimisation_sous_maillage_=0;
     }
@@ -735,9 +735,9 @@ const Motcle Champ_Generique_Interpolation::get_directive_pour_discr() const
   return directive;
 }
 
-//Discretisation du domaine d interpolation si celui-ci n est pas le domaine de calcul
-//Cette discretisation est necessaire pour associer un domaine discretise a l espace de
-//stockage dans la methode get_champ()
+//Discretisation of the interpolation domain if it is not the calculation domain
+//This discretisation is necessary to associate a discretized domain to the storage space
+//in the get_champ() method
 void Champ_Generique_Interpolation::discretiser_domaine()
 {
   if (domaine_)
@@ -746,13 +746,13 @@ void Champ_Generique_Interpolation::discretiser_domaine()
       const Discretisation_base& discr = Pb.discretisation();
       Nom type_discr = discr.que_suis_je();
       if (type_discr == "VEFPreP1B") type_discr = "VEF";
-      // on ne cree pas les faces sauf si on veut une interpolation aux faces ou si on a des polyedres
+      // we do not create faces unless we want a face interpolation or we have polyhedra
       // Nom type = sub_type(Poly_geom_base, domaine_->type_elem().valeur()) ? "Domaine_" : "NO_FACE_Domaine_";
       Nom type = "NO_FACE_Domaine_";
       if (localisation_=="faces")
         {
           type="Domaine_";
-          // On verifie que la localisation aux faces est possible sur le domaine (sinon elem ou som)
+          // We verify that face localisation is possible on the domain (otherwise elem or som)
           if (domaine_->type_elem()->nb_som_face()<=2 && dimension==3)
             {
               Cerr << "'localisation faces' is not possible in 3D on the 2D surface mesh " << domaine_->le_nom() << " with the field: " << get_property("NOM")[0] << finl;

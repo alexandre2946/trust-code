@@ -33,7 +33,7 @@ private:
   void modifier_pour_Cl_(const int , const int , const int ,  Matrice_Morse& ) const;
 };
 
-// methode interne pour la classe Op_VDF_Face !
+// Internal method for the Op_VDF_Face class!
 inline int face_bord_amont2(const Domaine_VDF& le_dom , const int num_face , const int k , const int i)
 {
   const int ori = le_dom.orientation(num_face);

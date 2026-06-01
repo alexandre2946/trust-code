@@ -17,7 +17,7 @@
 #define Discretisation_base_included
 
 #include <Domaine_forward.h>
-#include <Champ_base.h> // Pour Nature_du_champ
+#include <Champ_base.h> // For Nature_du_champ
 
 #include <TRUST_Ref.h>
 #include <Reorder_Mesh.h>
@@ -33,13 +33,13 @@ class Equation_base;
 class Champ_base;
 class Motcle;
 
-/*! @brief classe Discretisation_base Cette classe represente un schema de discretisation en espace, qui
+/*! @brief class Discretisation_base This class represents a spatial discretization scheme, which
  *
- *      sera associe a un probleme. Discretisation_base est la classe
- *      abstraite qui est a la base de la hierarchie des discretisations
- *      en espace.
+ *      will be associated with a problem. Discretisation_base is the
+ *      abstract class that is the basis of the hierarchy of
+ *      spatial discretizations.
  *
- * @sa Probleme_base, Classe abstraite dont toutes les discretisations en espace doivent, deriver., Methode abstraite:, void domaine_Cl_dis(Domaine_dis_base& , Domaine_Cl_dis_base& ) const
+ * @sa Probleme_base, Abstract class from which all spatial discretizations must derive., Abstract method:, void domaine_Cl_dis(Domaine_dis_base& , Domaine_Cl_dis_base& ) const
  */
 class Discretisation_base : public Objet_U
 {
@@ -47,13 +47,13 @@ class Discretisation_base : public Objet_U
 
 public :
 
-  // MODIF ELI LAUCOIN (7/06/2007) :
-  // J'ajoute une methode virtuelle pure qui precise le mode d'assemblage des contributions au residu des operateurs et des sources.
+  // MODIF ELI LAUCOIN (7/06/2007):
+  // Adding a pure virtual method that specifies the mode of assembling contributions to the residual of operators and sources.
   //
-  // Par defaut, dans TRUST, on passe par contribuer_a_avec, puis par ajouter. Dans les modules poreux MTMS (et EF ?), on passe plutot par contribuer_a_avec et
-  // contribuer_au_second_membre, car on n'utilise pas a priori de schema de convection (comme Quick) pour lequel la jacobienne n'est pas exacte.
+  // By default, in TRUST, we go through contribuer_a_avec, then through ajouter. In the porous modules MTMS (and EF?), we rather go through contribuer_a_avec and
+  // contribuer_au_second_membre, because we do not use a priori a convection scheme (like Quick) for which the Jacobian is not exact.
   //
-  // La valeur retournee par defaut est VIA_AJOUTER, pour ne pas perturber le comportement normal des classes de Trio-U en dehors du noyau.
+  // The default value returned is VIA_AJOUTER, so as not to disturb the normal behavior of Trio-U classes outside the kernel.
   //
   enum type_calcul_du_residu { VIA_CONTRIBUER_AU_SECOND_MEMBRE = 0, VIA_AJOUTER = 1 };
   inline virtual type_calcul_du_residu codage_du_calcul_du_residu() const { return VIA_AJOUTER; }
@@ -65,16 +65,16 @@ public :
   virtual void discretiser_variables() const;
   virtual Domaine_dis_base& discretiser() const;
 
-  // Creation de champs scalaires ou vectoriels (essentiellement appel a la methode generale, ne pas surcharger ces methodes, elles ne sont la que par commodite)
+  // Creation of scalar or vector fields (essentially call to the general method, do not overload these methods, they are only here for convenience)
   void discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, const Nom& nom, const Nom& unite, int nb_comp, int nb_pas_dt, double temps, OWN_PTR(Champ_Inc_base)& champ,
                          const Nom& sous_type=NOM_VIDE) const;
   void discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, const Nom& nom, const Nom& unite, int nb_comp, double temps, OWN_PTR(Champ_Fonc_base)& champ) const;
   void discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, const Nom& nom, const Nom& unite, int nb_comp, double temps, OWN_PTR(Champ_Don_base)& champ) const;
 
-  // Creation de champs generaux (eventuellement multiscalaires) :
-  // * Ces methodes doivent etre surchargees.
-  // * Chaque methode comprend le motcle demande_description, qui provoque l'affichage de l'ensembldes des directives comprises (et appelle a l'ancetre avec le meme motcle).
-  // * Si champ scalaire ou vectoriel, le premier nom et la premiere unite sont utilises
+  // Creation of general fields (possibly multiscalar):
+  // * These methods must be overloaded.
+  // * Each method includes the demande_description keyword, which causes the display of all understood directives (and calls the ancestor with the same keyword).
+  // * If scalar or vector field, the first name and first unit are used
   virtual void discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& nom, const Noms& unite, int nb_comp, int nb_pas_dt, double temps,
                                  OWN_PTR(Champ_Inc_base)& champ, const Nom& sous_type=NOM_VIDE) const;
   virtual void discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& nom, const Noms& unite, int nb_comp, double temps, OWN_PTR(Champ_Fonc_base)& champ) const;

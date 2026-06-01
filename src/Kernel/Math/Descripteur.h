@@ -28,8 +28,8 @@ class Descripteur : public Objet_U
 public:
   Descripteur();
 private:
-  trustIdType deb_;    // Indice de debut dans le tableau des donnees
-  trustIdType nb_;     // Nombre d'elements dans le tableau des donnees
+  trustIdType deb_;    // Start index in the data array
+  trustIdType nb_;     // Number of elements in the data array
   int stride_;
 };
 #endif

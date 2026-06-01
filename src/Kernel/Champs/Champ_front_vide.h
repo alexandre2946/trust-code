@@ -21,10 +21,10 @@
 
 
 
-/*! @brief classe Champ_front_vide Classe derivee de Champ_front_base qui permet d'avoir un objet champ_front defini pour que le calcul tourne car il y a beaucoup d'appels a cond_lim_base.
+/*! @brief class Champ_front_vide Class derived from Champ_front_base which allows having a defined champ_front object so that the calculation runs because there are many calls to cond_lim_base.
  *
- * champ_front() dans les classes du dessus mais qui pese pas lourd
- *      Classe inspiree de Champ_front_uniforme
+ * champ_front() in the classes above but which is lightweight
+ *      Class inspired by Champ_front_uniforme
  *
  * @sa Champ_front_base Champ_Uniforme
  */
@@ -34,8 +34,8 @@ class Champ_front_vide : public Champ_front_base
 
 public:
   bool has_valeurs_au_temps(double temps) const override { return false; }
-  DoubleTab& valeurs_au_temps(double temps) override { Process::exit("Impossible d'appeler les valeurs d'un champ_fronc_vide"); return les_valeurs->valeurs();};
-  const DoubleTab& valeurs_au_temps(double temps) const override { Process::exit("Impossible d'appeler les valeurs d'un champ_fronc_vide"); return les_valeurs->valeurs();};
+  DoubleTab& valeurs_au_temps(double temps) override { Process::exit("Cannot call the values of an empty champ_front"); return les_valeurs->valeurs();};
+  const DoubleTab& valeurs_au_temps(double temps) const override { Process::exit("Cannot call the values of an empty champ_front"); return les_valeurs->valeurs();};
   int avancer(double temps) override {return 1;};
   int reculer(double temps) override {return 1;};
   Champ_front_base& affecter_(const Champ_front_base& ch) override {return *this;};

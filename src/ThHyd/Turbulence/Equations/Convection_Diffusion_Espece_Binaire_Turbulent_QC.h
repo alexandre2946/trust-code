@@ -19,15 +19,12 @@
 #include <Convection_Diffusion_Espece_Binaire_QC.h>
 #include <Convection_Diffusion_Turbulent.h>
 
-/*! @brief classe Convection_Diffusion_Espece_Binaire_Turbulent_QC Cette classe represente le cas particulier de
+/*! @brief Turbulent convection-diffusion of a binary species for a quasi-compressible fluid.
  *
- *      convection diffusion turbulente lorsque
- *      le fluide est quasi compressible. L'inconnue est
- *        la fraction massique
- *      Cette classe herite de Convection_Diffusion_Turbulent qui contient
- *      le modele de turbulence et de Convection_Diffusion_Espece_Binaire_QC
- *      qui modelise l'equation non turbulente associe a un fluide quasi compressible
- *      iso-therme et iso-bar
+ *      The unknown is the mass fraction. Inherits from Convection_Diffusion_Turbulent
+ *      (which contains the turbulence model) and from Convection_Diffusion_Espece_Binaire_QC
+ *      (which models the non-turbulent equation for a quasi-compressible,
+ *      iso-thermal and iso-baric fluid).
  *
  * @sa Convection_Diffusion_Turbulent Convection_Diffusion_Espece_Binaire_QC
  */

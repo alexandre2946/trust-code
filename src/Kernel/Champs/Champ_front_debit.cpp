@@ -39,7 +39,7 @@ Entree& Champ_front_debit::readOn(Entree& is)
   return is;
 }
 
-/*! @brief Mise a jour du temps
+/*! @brief Time update
  *
  */
 int Champ_front_debit::initialiser(double tps, const Champ_Inc_base& inco)

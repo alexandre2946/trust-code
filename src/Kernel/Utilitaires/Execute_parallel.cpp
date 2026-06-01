@@ -73,7 +73,7 @@ Entree& Execute_parallel::interpreter(Entree& is)
   // XD_CONT computations are sequential.
   param.ajouter_flag("disable_journal", &disable_journal);
   param.lire_avec_accolades_depuis(is);
-  // Si on n'a pas donne nb_procs, on suppose que ca vaut 1
+  // If nb_procs was not given, assume it is 1
   const int n_calculs = liste_cas.size();
   if (nb_procs.size_array() == 0)
     {
@@ -82,7 +82,7 @@ Entree& Execute_parallel::interpreter(Entree& is)
       nb_procs.resize_array(n_calculs);
       nb_procs = 1;
     }
-  // Verification de la taille des tableaux
+  // Verify array sizes
   if (nb_procs.size_array() != n_calculs)
     {
       Cerr << "Error : nb_procs array must have " << n_calculs
@@ -93,7 +93,7 @@ Entree& Execute_parallel::interpreter(Entree& is)
   if (n_calculs == 0)
     return is;
 
-  // Verification du contenu :
+  // Verify the content:
   if (min_array(nb_procs) < 1)
     {
       Cerr << "Error : processor numbers must be >= 1" << finl;
@@ -111,8 +111,8 @@ Entree& Execute_parallel::interpreter(Entree& is)
       exit();
     }
 
-  // Creation des N groupes de processeurs
-  // (les groupes sont detruits quand le VECT est detruit)
+  // Create the N processor groups
+  // (groups are destroyed when the VECT is destroyed)
   VECT(OWN_PTR(Comm_Group)) groupes(n_calculs);
   count = 0;
   Nom log_courant("");
@@ -145,7 +145,7 @@ Entree& Execute_parallel::interpreter(Entree& is)
           log+=log2;
         }
       Cerr << "Error and standard outputs are redirected into " << log << " for case " << liste_cas[i] << finl;
-      // On stocke dans log_courant car reutilise plus loin
+      // Store in log_courant as it is reused later
       if (Process::me()>=count && Process::me()<=count+n-1)
         log_courant=log;
 
@@ -154,11 +154,11 @@ Entree& Execute_parallel::interpreter(Entree& is)
         tab[j] = count++;
       PE_Groups::create_group(tab, groupes[i]);
     }
-  // On lancer une exception si un calcul s'arrete donc
-  // on change le comportement de Process par defaut (MPI_Abort)
+  // Throw an exception if a computation stops, so
+  // change the default Process behaviour (MPI_Abort)
   Process::exception_sur_exit=1;
   Cerr << n_calculs << " cases are running..." << finl;
-  // Chaque processeur entre dans son groupe et interprete le jeu de donnees
+  // Each processor enters its group and interprets the data set
   Nom ancien_nom_du_cas(nom_du_cas());
   const int old_journal_level = get_journal_level();
   for (int i = 0; i < n_calculs; i++)
@@ -175,19 +175,19 @@ Entree& Execute_parallel::interpreter(Entree& is)
 
           nom_fichier += ".data";
           {
-            // Ouverture du fichier (on cree l'objet LecFicDiffuse a l'interieur
-            // de l'accolade pour detruire le fichier avant de sortir du groupe)
+            // Open the file (the LecFicDiffuse object is created inside
+            // the braces so it is destroyed before exiting the group)
             LecFicDiffuse_JDD data_file(nom_fichier);
             data_file.set_check_types(1);
-            // On cree un nouvel interprete. A la fin de la lecture du cas
-            // les objets seront detruits.
+            // Create a new interpreter. At the end of reading the case,
+            // the objects will be destroyed.
             Interprete_bloc interp;
-            // On utilise les exceptions pour des calculs qui s'arretent
+            // Use exceptions for computations that stop
             int ok=1;
             try
               {
                 interp.interpreter_bloc(data_file,
-                                        Interprete_bloc::FIN /* on attend FIN a la fin du fichier */,
+                                        Interprete_bloc::FIN /* we expect FIN at the end of the file */,
                                         0 /* verifie_sans_interpreter=0 */);
               }
             catch (TRUST_Error& err)
@@ -209,10 +209,10 @@ Entree& Execute_parallel::interpreter(Entree& is)
           PE_Groups::exit_group();
         }
     }
-  // on revient au comportement standard de trio
+  // return to the standard behaviour
   Process::exception_sur_exit=0;
   change_journal_level(old_journal_level);
-  // On attend que tous les processeurs aient fini d'executer leur calcul.
+  // Wait for all processors to finish executing their computation.
   barrier();
   get_set_nom_du_cas() = ancien_nom_du_cas;
   Cerr << finl << "End of Execute_parallel::interpreter" << finl;

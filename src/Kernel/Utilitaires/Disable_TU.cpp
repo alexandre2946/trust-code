@@ -18,10 +18,10 @@
 Implemente_instanciable(Disable_TU,"Disable_TU",Interprete);
 // XD disable_TU interprete disable_TU INHERITS_BRACE Flag to disable the writing of the .TU files
 
-/*! @brief Simple appel a: Interprete::printOn(Sortie&)
+/*! @brief Simple call to: Interprete::printOn(Sortie&)
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Disable_TU::printOn(Sortie& os) const
 {
@@ -29,10 +29,10 @@ Sortie& Disable_TU::printOn(Sortie& os) const
 }
 
 
-/*! @brief Simple appel a: Interprete::readOn(Entree&)
+/*! @brief Simple call to: Interprete::readOn(Entree&)
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
  */
 Entree& Disable_TU::readOn(Entree& is)
 {
@@ -41,8 +41,8 @@ Entree& Disable_TU::readOn(Entree& is)
 
 /*! @brief Main function of the Disable_TU interpreter Set the disable_TU variable to 1.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the input stream
  */
 Entree& Disable_TU::interpreter(Entree& is)
 {

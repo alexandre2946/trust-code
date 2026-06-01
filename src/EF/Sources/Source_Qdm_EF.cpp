@@ -52,7 +52,7 @@ Entree& Source_Qdm_EF::readOn(Entree& s )
 
   for (int n = 0; n < nb_comp; n++) la_source_lu->fixer_nom_compo(n, ch_source_lu.le_nom() + (nb_comp > 1 ? Nom(n) :""));
   for (int n = 0; n < nb_comp; n++) la_source->fixer_nom_compo(n, ch_source_lu.le_nom() + (nb_comp > 1 ? Nom(n) :""));
-  // PL: Il faut faire nommer_completer_champ_physique les 2 champs (plantage sinon pour une source de type Champ_fonc_tabule)
+  // PL: nommer_completer_champ_physique must be called for both fields (crash otherwise for a Champ_fonc_tabule source type)
   equation().discretisation().nommer_completer_champ_physique(equation().domaine_dis(),ch_source_lu.le_nom(),"N/m3",la_source_lu,equation().probleme());
   equation().discretisation().nommer_completer_champ_physique(equation().domaine_dis(),ch_source_lu.le_nom(),"N/m3",la_source,equation().probleme());
   la_source->valeurs() = 0.;
@@ -96,7 +96,7 @@ DoubleTab& Source_Qdm_EF::ajouter(DoubleTab& resu) const
         sourcel=tab_source(cc,comp);
         for (int i=0; i<nb_som_elem; i++)
           {
-            // assert faux si on a des porosites
+            // assert is wrong if porosities are present
             //	assert(est_egal(domaine_EF.volumes(num_elem)/nb_som_elem,IPhi_thilde(num_elem,i)));
             resu(elems(num_elem,i),comp)+=sourcel*IPhi_thilde(num_elem,i);
           }
@@ -148,7 +148,7 @@ bool Source_Qdm_EF::has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ)
       return true;
     }
   else
-    return false; /* rien trouve */
+    return false; /* nothing found */
 }
 
 bool Source_Qdm_EF::has_champ(const Motcle& nom) const
@@ -158,7 +158,7 @@ bool Source_Qdm_EF::has_champ(const Motcle& nom) const
   if (nom == "source_qdm" && champ_source_qdm_)
     return true;
   else
-    return false; /* rien trouve */
+    return false; /* nothing found */
 }
 
 const Champ_base& Source_Qdm_EF::get_champ(const Motcle& nom) const
@@ -172,7 +172,7 @@ const Champ_base& Source_Qdm_EF::get_champ(const Motcle& nom) const
       if (sub_type(Champ_Uniforme,la_source.valeur()))
         is_source_unif=1;
 
-      // Initialisation a 0 du champ postraitement
+      // Initialize the post-processing field to 0
       DoubleTab& valeurs = champ_source_qdm_->valeurs();
       valeurs=0.;
       const DoubleTab& tab_source=la_source->valeurs();

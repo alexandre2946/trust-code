@@ -22,10 +22,10 @@
 
 
 
-/*! @brief classe Champ_front_Tabule Classe derivee de Champ_front_instationnaire_base qui
+/*! @brief class Champ_front_Tabule Derived class of Champ_front_instationnaire_base
  *
- *      represente les champs aux frontieres uniformes en espace,
- *      calcules par tabulation en fonction du temps.
+ *      representing spatially uniform boundary fields
+ *      computed by tabulation as a function of time.
  *
  * @sa Champ_front_base
  */

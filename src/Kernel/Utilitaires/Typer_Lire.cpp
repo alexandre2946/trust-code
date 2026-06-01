@@ -19,7 +19,7 @@
 
 Implemente_instanciable(Typer_Lire,"Typer_Lire|Type_Read",Lire);
 
-/*! @brief appel a la methode printOn de la classe Interprete
+/*! @brief Calls the printOn method of the Interprete class.
  *
  */
 Sortie& Typer_Lire::printOn(Sortie& os) const
@@ -27,7 +27,7 @@ Sortie& Typer_Lire::printOn(Sortie& os) const
   return Lire::printOn(os);
 }
 
-/*! @brief appel a la methode readOn de la classe Interprete
+/*! @brief Calls the readOn method of the Interprete class.
  *
  */
 Entree& Typer_Lire::readOn(Entree& is)
@@ -45,12 +45,12 @@ Entree& Typer_Lire::interpreter(Entree& is)
   Nom name;
   is >> name; // The object name is read from the input stream is
 
-  if (objet_existant(name)) //nom d'un objet existant -> on le lit
+  if (objet_existant(name)) //name of an existing object -> read it
     {
       Objet_U& object=objet(name);
       return is >> object; // Then "{ ... }" is read by the object readOn
     }
-  else //pas le nom d'un objet existant -> on lit le type, on cree l'objet, puis on le lit
+  else //not the name of an existing object -> read the type, create the object, then read it
     {
       // Lire name type { ... }
       DerObjU ref;
@@ -58,13 +58,13 @@ Entree& Typer_Lire::interpreter(Entree& is)
       is >> type;
       if (type=="{")
         {
-          Objet_U& object=objet(name); // Pour faire planter avec le message d'erreur habituel
+          Objet_U& object=objet(name); // To crash with the usual error message
           return is >> object;
         }
       ref.typer(type);
-      //on ajoute l'objet a l'interprete courant...
+      //add the object to the current interpreter...
       Objet_U& obj = Interprete_bloc::interprete_courant().ajouter(name, ref);
-      return is >> obj;           //et on lit
+      return is >> obj;           //and read it
     }
 }
 

@@ -92,7 +92,7 @@ void Remove_elem::recreer_faces(Domaine& domaine, Faces& faces, IntTab& som_face
 {
   IntTab& sommets = faces.les_sommets();
   int nb_faces = sommets.dimension(0);
-  int nbs = (dimension == 2) ? 2 : 4;  // nombre de sommets par face
+  int nbs = (dimension == 2) ? 2 : 4;  // number of vertices per face
   IntTab faces_recreees(nb_faces, nbs);
 
   int ii = 0;
@@ -104,7 +104,7 @@ void Remove_elem::recreer_faces(Domaine& domaine, Faces& faces, IntTab& som_face
       ind[1] = sommets(i, 1);
       ind[2] = (dimension == 3) ? sommets(i, 2) : -1;
       ind[3] = (dimension == 3) ? sommets(i, 3) : -1;
-      ind.ordonne_array(); // ordonnancement des indices pour eviter les mauvaises surprises de numerotations d'indices
+      ind.ordonne_array(); // sort indices to avoid unexpected index ordering surprises
 
       int trouve = 0;
 
@@ -118,7 +118,7 @@ void Remove_elem::recreer_faces(Domaine& domaine, Faces& faces, IntTab& som_face
             }
         }
 
-      if (trouve == 1) // on "supprime" la face en reinitialisant a -1 les indices
+      if (trouve == 1) // "remove" the face by resetting the indices to -1
         {
           som_face(ind[3], 0, j) = -1;
           som_face(ind[3], 1, j) = -1;
@@ -148,7 +148,7 @@ void Remove_elem::creer_faces(Domaine& dom, Faces& faces, IntTab& som_face) cons
   faces.dimensionner(1);
   IntTab& sommets = faces.les_sommets();
   int nbsom = domaine().les_sommets().dimension(0);
-  int nbs = (dimension == 2) ? 2 : 4;  // nombre de sommets par face
+  int nbs = (dimension == 2) ? 2 : 4;  // number of vertices per face
   IntTab faces_recreees(1, nbs);
 
   int ii = 0;
@@ -183,7 +183,7 @@ void Remove_elem::remplir_liste(IntTab& som_face, int ind1, int ind2, int ind3, 
   ind[1] = ind2;
   ind[2] = ind3;
   ind[3] = ind4;
-  ind.ordonne_array(); // ordonnancement des indices pour eviter les mauvaises surprises de numerotations d'indices (rencontrees prealablement)
+  ind.ordonne_array(); // sort indices to avoid unexpected index ordering surprises (previously encountered)
 
   int trouve = 0;
 
@@ -197,13 +197,13 @@ void Remove_elem::remplir_liste(IntTab& som_face, int ind1, int ind2, int ind3, 
         }
     }
 
-  if (trouve == 1) // on "supprime" la face en reinitialisant a -1 les indices concernes
+  if (trouve == 1) // "remove" the face by resetting the relevant indices to -1
     {
       som_face(ind[3], 0, j) = -1;
       som_face(ind[3], 1, j) = -1;
       som_face(ind[3], 2, j) = -1;
     }
-  else // on "ajoute" la face en affectant les indices aux premieres cases "libres" (=-1)
+  else // "add" the face by assigning indices to the first "free" slots (=-1)
     {
       for (j = 0; j < som_face.dimension(2); j++)
         {
@@ -226,10 +226,10 @@ void Remove_elem::remove_elem_(Domaine& dom)
       ArrOfInt marq_remove(oldsz);
       int nbsom = domaine().les_sommets().dimension(0);
 
-      int nbs = (dimension == 2) ? 4 : 8;  // nombre de sommets par element
+      int nbs = (dimension == 2) ? 4 : 8;  // number of vertices per element
       IntTab new_elems(oldsz, nbs);
 
-      int nbfacesom = (dimension == 2) ? 4 : 4 * 3; // nbre de faces connectees a un sommet
+      int nbfacesom = (dimension == 2) ? 4 : 4 * 3; // number of faces connected to a vertex
       IntTab som_face(nbsom, 3, nbfacesom);
       som_face = -1;
 
@@ -245,7 +245,7 @@ void Remove_elem::remove_elem_(Domaine& dom)
                 f.setVar(2, xg(i, 2));
               //if(f.eval()) listelem.add(i);
               if ((int) (f.eval() + 0.5))
-                marq_remove[i] = 1; //listelem.add(i); // pour etre conforme a ce qui est fait dans DecoupeBord
+                marq_remove[i] = 1; //listelem.add(i); // to be consistent with what is done in DecoupeBord
             }
         }
       else
@@ -310,7 +310,7 @@ void Remove_elem::remove_elem_(Domaine& dom)
       new_elems.resize(j, nbs);
       les_elems.ref(new_elems);
 
-      // Reconstruction de l'octree
+      // Rebuild the octree
       dom.invalide_octree();
       dom.construit_octree();
       dom.reordonner();
@@ -338,7 +338,7 @@ void Remove_elem::remove_elem_(Domaine& dom)
       }
 
       {
-        // Les Bords internes
+        // Internal boundaries
         Cerr << "Regeneration of internal faces" << finl;
         for (auto &itr : dom.bords_int())
           {

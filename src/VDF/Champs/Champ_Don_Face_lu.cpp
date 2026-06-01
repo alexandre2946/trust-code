@@ -19,7 +19,7 @@
 #include <ArrOfBit.h>
 #include <EFichier.h>
 
-// Fonction utilisee par le readOn
+// Function used by readOn
 int meme_point(const ArrOfInt& x, const DoubleTab& tab, int rang_tab)
 {
   int dime = x.size_array();
@@ -80,7 +80,7 @@ Entree& Champ_Don_Face_lu::readOn(Entree& is)
       for (k = 0; k < dim; k++)
         fic >> val_lu[k];
 
-      // On cherche la face correspondante en partant de la derniere trouvee.
+      // Search for the corresponding face starting from the last one found.
       for (int j = 0; j < nb_faces; j++)
         {
           num_face++;

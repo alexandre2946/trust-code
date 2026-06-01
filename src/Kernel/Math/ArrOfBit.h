@@ -33,15 +33,15 @@ public:
   using int_t = _SIZE_;
 
   ArrOfBit_32_64(int_t n=0);
-  ArrOfBit_32_64(const ArrOfBit_32_64& array);              // Constructeur par copie
-  ~ArrOfBit_32_64() override;                                  // Destructeur
-  ArrOfBit_32_64& operator=(const ArrOfBit_32_64& array);   // Operateur copie
+  ArrOfBit_32_64(const ArrOfBit_32_64& array);              // Copy constructor
+  ~ArrOfBit_32_64() override;                                  // Destructor
+  ArrOfBit_32_64& operator=(const ArrOfBit_32_64& array);   // Copy operator
   ArrOfBit_32_64& operator=(int_t i);
   inline int operator[](int_t i) const;
   inline void setbit(int_t i) const;
   inline int testsetbit(int_t i) const;
   inline void clearbit(int_t i) const;
-  /// Renvoie la taille du tableau en bits
+  /// Returns the size of the array in bits
   inline int_t size_array() const { return taille; }
   ArrOfBit_32_64& resize_array(int_t n);
 protected:
@@ -52,7 +52,7 @@ protected:
   static constexpr unsigned int DRAPEAUX_INT = 31;
 };
 
-/*! @brief Renvoie 1 si le bit e est mis, 0 sinon.
+/*! @brief Returns 1 if bit e is set, 0 otherwise.
  *
  */
 template <typename _SIZE_>
@@ -66,7 +66,7 @@ inline int ArrOfBit_32_64<_SIZE_>::operator[](int_t e) const
   return resultat;
 }
 
-/*! @brief Met le bit e a 1.
+/*! @brief Set bit e to 1.
  *
  */
 template <typename _SIZE_>
@@ -78,7 +78,7 @@ inline void ArrOfBit_32_64<_SIZE_>::setbit(int_t e) const
   data[i >> SIZE_OF_INT_BITS] |= flag;
 }
 
-/*! @brief Renvoie la valeur du bit e, puis met le bit e a 1.
+/*! @brief Returns the value of bit e, then sets bit e to 1.
  *
  */
 template <typename _SIZE_>
@@ -93,7 +93,7 @@ inline int ArrOfBit_32_64<_SIZE_>::testsetbit(int_t e) const
   return ((old & flag) != 0) ? 1 : 0;
 }
 
-/*! @brief Met le bit e a 0.
+/*! @brief Set bit e to 0.
  *
  */
 template <typename _SIZE_>

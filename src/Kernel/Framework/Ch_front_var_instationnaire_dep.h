@@ -19,15 +19,14 @@
 #include <Champ_front_var_instationnaire.h>
 
 
-/*! @brief classe Ch_front_var_instationnaire_dep Cette classe abstraite represente un champ sur une frontiere,
+/*! @brief class Ch_front_var_instationnaire_dep This abstract class represents a field on a boundary,
  *
- *      variable en espace, instationnaire en temps, et pouvant
- *      dependre de donnees exterieures au champ.
- *      De ce fait, la methode mettre_a_jour utilise des donnees
- *      externes, et la methode initialiser ne peut pas appeler la
- *      methode mettre_a_jour.  Elle peut en revanche utiliser
- *      l'inconnue qui lui est passee en parametre comme une premiere
- *      estimation (c'est ce qui est code par defaut).
+ *      variable in space, unsteady in time, and potentially
+ *      dependent on data external to the field.
+ *      For this reason, the update method uses external data,
+ *      and the initialize method cannot call the update method.
+ *      It can however use the unknown passed as a parameter as a
+ *      first estimate (this is what is coded by default).
  *
  *
  */

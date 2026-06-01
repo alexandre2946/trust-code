@@ -128,7 +128,7 @@ double Op_Diff_PolyMAC_MPFA_Elem::calculer_dt_stab() const
         }
 
       for (int n = 0; n < N; n++)
-        if ((!alp || (*alp)(e, n) > 1e-3) && flux(n)) /* sous 0.5e-6, on suppose que l'evanescence fait le job */
+        if ((!alp || (*alp)(e, n) > 1e-3) && flux(n)) /* below 0.5e-6, assume evanescence handles it */
           dt = std::min(dt, pe(e) * ve(e) * (alp ? (*alp)(e, n) : 1) * (lambda(!cL * e, n) / diffu(!cD * e, n)) / flux(n));
 
       if (dt < 0)
@@ -157,7 +157,7 @@ const DoubleTab& Op_Diff_PolyMAC_MPFA_Elem::d_nucleation() const
 void Op_Diff_PolyMAC_MPFA_Elem::init_op_ext() const
 {
   if (som_ext_init_)
-    return; //deja fait
+    return; //already done
 
   if (has_echange_contact_ || has_flux_par_)
     couplage_parietal_helper_.init_op_ext();
@@ -181,11 +181,11 @@ void Op_Diff_PolyMAC_MPFA_Elem::init_op_ext() const
 void Op_Diff_PolyMAC_MPFA_Elem::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   init_op_ext();
-  update_phif(!nu_constant_ or equation().domaine_dis().domaine().deformable()); //calcul de (nf.nu.grad T) : si nu variable, stencil complet
+  update_phif(!nu_constant_ or equation().domaine_dis().domaine().deformable()); //compute (nf.nu.grad T): if nu is variable, full stencil
 
   const std::string nom_inco = equation().inconnue().le_nom().getString();
   if (semi_impl.count(nom_inco))
-    return; //semi-implicite -> rien a dimensionner
+    return; //semi-implicit -> nothing to size
 
   if (has_echange_contact_ || has_flux_par_)
     {
@@ -199,26 +199,26 @@ void Op_Diff_PolyMAC_MPFA_Elem::dimensionner_blocs(matrices_t matrices, const ta
 
   Matrice_Morse* mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr;
 
-  const int N = equation().inconnue().valeurs().line_size(); //nombre de composantes
+  const int N = equation().inconnue().valeurs().line_size(); //number of components
 
-  Stencil stencil; //stencils par matrice
+  Stencil stencil; //stencils per matrix
   stencil.resize(0, 2);
 
 
-  IntTrav tpfa(0, N); //pour suivre quels flux sont a deux points
+  IntTrav tpfa(0, N); //to track which fluxes are two-point
   domaine.creer_tableau_faces(tpfa);
   tpfa = 1;
 
   Cerr << "Op_Diff_PolyMAC_MPFA_Elem::dimensionner() : ";
 
-  //avec fgrad : parties hors Echange_contact (ne melange ni les problemes, ni les composantes)
+  //with fgrad: parts outside Echange_contact (mixes neither problems nor components)
   for (int f = 0; f < domaine.nb_faces(); f++)
     for (int i = 0; i < 2; i++)
       {
         const int e = f_e(f, i);
         if (e < 0) continue;
 
-        if (e < domaine.nb_elem()) //stencil a l'element e
+        if (e < domaine.nb_elem()) //stencil at element e
           for (int j = phif_d(f); j < phif_d(f + 1); j++)
             {
               const int e_s = phif_e(j);
@@ -298,7 +298,7 @@ void Op_Diff_PolyMAC_MPFA_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& se
 
   Matrice_Morse* mat = !semi_impl.count(nom_inco) && matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr;
 
-  /* avec phif : flux hors Echange_contact -> mat[0] seulement */
+  /* using phif: fluxes excluding Echange_contact -> mat[0] only */
   DoubleTrav flux(N);
 
   for (int f = 0; f < domaine.nb_faces(); f++)
@@ -332,7 +332,7 @@ void Op_Diff_PolyMAC_MPFA_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& se
                 flux(n) += (phif_c(i, n) ? phif_c(i, n) * fs(f) *
                             ref_cast(Echange_impose_base, cls[fcl(fb, 1)].valeur()).T_ext(fcl(fb, 2), n) : 0);
             }
-          else if (fcl(fb, 0) == 4) //Neumann non homogene
+          else if (fcl(fb, 0) == 4) //non-homogeneous Neumann
             {
               for (int n = 0; n < N; n++)
                 flux(n) += (phif_c(i, n) ? phif_c(i, n) * fs(f) *
@@ -352,13 +352,13 @@ void Op_Diff_PolyMAC_MPFA_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& se
           if (e < 0) continue;
 
           if (e < domaine.nb_elem())
-            for (int n = 0; n < N; n++) //second membre -> amont/aval
+            for (int n = 0; n < N; n++) //right-hand side -> upwind/downwind
               secmem(e, n) += (j ? -1 : 1) * flux(n);
         }
 
       if (f < domaine.premiere_face_int())
         for (int n = 0; n < N; n++)
-          flux_bords_(f, n) = flux(n); //flux aux bords
+          flux_bords_(f, n) = flux(n); //boundary fluxes
     }
 #endif
 }

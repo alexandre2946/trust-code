@@ -45,7 +45,7 @@ int Assembleur_P_VDF_Q4::assembler(Matrice& la_matrice)
   const DoubleTab& CoordSom = le_dom_VDF->domaine().coord_sommets();
   double surf,vol,por,val, r;
   int ori, elem0,elem1;
-  //construction matrice
+  //matrix construction
   la_matrice.typer("Matrice_Morse");
   Matrice_Morse& mat = ref_cast(Matrice_Morse,la_matrice.valeur());
   mat.dimensionner(nbsom,0);
@@ -72,7 +72,7 @@ int Assembleur_P_VDF_Q4::assembler(Matrice& la_matrice)
     }
   rang_voisins = 1;
   mat.dimensionner(nbsom,tab1(nbsom)-1);
-  //calcul coefficient matrice
+  //compute matrix coefficients
   for (face=0 ; face<nbfaces ; face++)
     {
       ori = Orientation(face);

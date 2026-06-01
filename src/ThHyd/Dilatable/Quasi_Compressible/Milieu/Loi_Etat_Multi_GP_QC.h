@@ -23,9 +23,7 @@
 
 class Espece;
 
-/*! @brief classe Loi_Etat_Multi_GP_QC Cette classe represente la loi d'etat pour un melange de gaz parfaits.
- *
- *
+/*! @brief @brief State law class for a mixture of ideal gases in the quasi-compressible (QC) framework.
  *
  * @sa Fluide_Dilatable_base Loi_Etat_base Loi_Etat_Multi_GP_base
  */

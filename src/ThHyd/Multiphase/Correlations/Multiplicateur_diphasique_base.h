@@ -19,21 +19,21 @@
 #include <TRUSTTabs_forward.h>
 #include <Correlation_base.h>
 
-/*! @brief classe Multiplicateur_diphasique_base correlations de multiplicateurs diphasiques de la forme
+/*! @brief Two-phase multiplier correlations of the form:
  *
- *       F_{kp} = - C_{kp} F_{p, k seul} - C'_{kp} F_{p,melange}
- *     entrees :
- *       alpha : taux de presence
- *       rho   : masses volumique
- *         v   : vitesses (pour calcul du titre)
- *         f   : facteurs de Darcy qu'aurait l'ecoulement si tout le debit etait dans la phase k
- *        mu   : viscosites cinematiques
- *        Dh   : diametre hydraulique
- *     gamma   : tension superficielle
- *       F_k   : F_{p, k seul}
- *       F_m   : F_{p, melange}
- *     sortie :
- *         coeff(k, 0/1) -> coefficients C_{kp} et C'_{kp}
+ *       F_{kp} = - C_{kp} F_{p, k alone} - C'_{kp} F_{p, mixture}
+ *     inputs:
+ *       alpha : volume fractions
+ *       rho   : densities
+ *         v   : velocities (used to compute the quality)
+ *         f   : Darcy friction factors assuming all flow is in phase k
+ *        mu   : dynamic viscosities
+ *        Dh   : hydraulic diameter
+ *     gamma   : surface tension
+ *       F_k   : F_{p, k alone}
+ *       F_m   : F_{p, mixture}
+ *     output:
+ *         coeff(k, 0/1) -> coefficients C_{kp} and C'_{kp}
  *
  *
  */

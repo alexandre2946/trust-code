@@ -19,9 +19,9 @@
 #include <Cond_lim_rayo_semi_transp.h>
 #include <Temperature_imposee_paroi.h>
 
-/*! @brief classe Temperature_imposee_paroi_rayo_semi_transp cette classe est utilisee pour imposer une temperature de paroi imposee
+/*! @brief Temperature_imposee_paroi_rayo_semi_transp class: used to impose a wall temperature
  *
- *    uniquement pour une discretisation VEF.
+ *    only for a VEF discretization.
  *
  *
  */

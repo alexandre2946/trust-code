@@ -29,13 +29,13 @@ Sortie& Octree_32_64<_SIZE_>::printOn(Sortie& is) const
   int nb_octrees=Octree_32_64::nombre_d_octrees();
   int i;
   is << finl << "--------------------------------" << finl;
-  is << "niveau : " << niveau() << " taille : " << taille() << finl;
+  is << "level: " << niveau() << " size: " << taille() << finl;
   for(i=0; i<nb_octrees; i++)
     {
       if(les_octrees[i]!=0)
         les_octrees[i]->printOn(is);
       else
-        is << "vide" << " ";
+        is << "empty" << " ";
     }
   return is << finl;
 }
@@ -444,7 +444,7 @@ void Octree_32_64<_SIZE_>::ranger_elem_2D(ArrOfInt& ok, int_t elem, int_t idx, i
     {
       int_t sommet=elems(idx,som);
 //      assert(sommet>=0);
-// GF dans le cas dde polyedre le tableau elem est surdimensionne et peut contenir des -1
+// GF in the case of polyhedra, the elem array is oversized and may contain -1
       if (sommet>=0)
         {
           xmin=std::min(xmin, coord(sommet,0));
@@ -471,7 +471,7 @@ void Octree_32_64<_SIZE_>::ranger_elem_3D(ArrOfInt& ok, int_t elem, int_t idx, i
     {
       int_t sommet=elems(idx,som);
 //      assert(sommet>=0);
-// GF dans le cas dde polyedre le tableau elem est surdimensionne et peut contenir des -1
+// GF in the case of polyhedra, the elem array is oversized and may contain -1
       if (sommet>=0)
         {
           xmin=std::min(xmin, coord(sommet,0))-epsilon;
@@ -579,9 +579,9 @@ void Octree_32_64<_SIZE_>::construire(int nb_octrees, const ArrOfInt_t& Tab, con
 }
 
 
-/*! @brief Detruit l'octree.
+/*! @brief Destroys the octree.
  *
- * Methode appelee par le destructeur
+ * Method called by the destructor.
  *
  */
 template <typename _SIZE_>
@@ -607,9 +607,9 @@ int Octree_32_64<_SIZE_>::niveau() const
 }
 
 
-/*! @brief Renvoie la taille de l'octree.
+/*! @brief Returns the size of the octree.
  *
- * @return (unsigned) la taille de l'octree
+ * @return (unsigned) the size of the octree
  */
 template <typename _SIZE_>
 typename Octree_32_64<_SIZE_>::int_t Octree_32_64<_SIZE_>::taille() const
@@ -633,12 +633,12 @@ void OctreeRoot_32_64<_SIZE_>::construire(int reel_prec)
   const Domaine_t& dom = domaine();
 
   {
-    // Calcul du min et du max des coordonnees dans chaque direction
+    // Compute the min and max of the coordinates in each direction
     double min[3] = { 1e30, 1e30, 1e30 };
     double max[3] = {-1e30,-1e30,-1e30 };
     const DoubleTab_t& tab = dom.coord_sommets();
-    //  tot sinon bouding box trop petite
-    //  peut etre teste reel_ ...
+    //  tot otherwise bounding box too small
+    //  could be tested with reel_ ...
     const int_t n = tab.dimension_tot(0);
     const int dim = tab.dimension_int(1);
     assert(dim <= 3);
@@ -695,8 +695,8 @@ void OctreeRoot_32_64<_SIZE_>::construire(int reel_prec)
  * @param (double y)
  * @param (double z)
  * @return (int)
- * @throws Erreur dans OctreeRoot_32_64<_SIZE_>::rang_sommet
- * @throws On a pas trouve de sommet a ces coordonnees
+ * @throws Error in OctreeRoot_32_64<_SIZE_>::rang_sommet
+ * @throws No vertex found at these coordinates
  */
 template <typename _SIZE_>
 typename OctreeRoot_32_64<_SIZE_>::int_t OctreeRoot_32_64<_SIZE_>::rang_sommet(double x, double y, double z) const
@@ -753,27 +753,27 @@ typename OctreeRoot_32_64<_SIZE_>::int_t OctreeRoot_32_64<_SIZE_>::rang_sommet(d
  * @param (double y)
  * @param (double z)
  * @return (int)
- * @throws Erreur dans OctreeRoot_32_64<_SIZE_>::rang_arete
- * @throws On a pas trouve d'arete a ces coordonnees
+ * @throws Error in OctreeRoot_32_64<_SIZE_>::rang_arete
+ * @throws No edge found at these coordinates
  */
 template <typename _SIZE_>
 typename OctreeRoot_32_64<_SIZE_>::int_t OctreeRoot_32_64<_SIZE_>::rang_arete(double x, double y, double z) const
 {
-  // Recherche l'element contenant le point x,y,z:
+  // Search for the element containing the point x,y,z:
   int_t elem=rang_elem(x, y, z);
   const IntTab_t& elem_aretes=domaine().elem_aretes();
   if (elem>=elem_aretes.dimension(0)) return -2;
   if (elem != -1 && elem<elem_aretes.dimension(0))
     {
-      // Boucle sur les aretes de l'element
+      // Loop over the edges of the element
       double epsilon=this->get_epsilon();
       const IntTab_t& aretes_som=domaine().aretes_som();
       const DoubleTab_t& coord=domaine().coord_sommets();
       int nb_aretes_elem = elem_aretes.dimension_int(1);
       for(int i=0; i<nb_aretes_elem; i++)
         {
-          // On boucle sur les aretes de l'element pour trouver celle
-          // dont le centre de gravite coincide avec le point x,y,z
+          // Loop over the edges of the element to find the one
+          // whose center of gravity coincides with the point x,y,z
           int_t arete=elem_aretes(elem,i);
           int_t s0=aretes_som(arete,0);
           int_t s1=aretes_som(arete,1);
@@ -838,7 +838,7 @@ typename OctreeRoot_32_64<_SIZE_>::int_t OctreeRoot_32_64<_SIZE_>::rang_elem_dep
  * @param (DoubleTab& positions)
  * @param (ArrOfInt& sommets)
  * @return (int)
- * @throws dimension d'espace non prevue
+ * @throws space dimension not handled
  */
 template <typename _SIZE_>
 typename OctreeRoot_32_64<_SIZE_>::int_t OctreeRoot_32_64<_SIZE_>::rang_sommet(const DoubleTab& positions, SmallArrOfTID_t& sommets) const
@@ -874,11 +874,11 @@ typename OctreeRoot_32_64<_SIZE_>::int_t OctreeRoot_32_64<_SIZE_>::rang_sommet(c
 
 /*! @brief
  *
- * @param (IntTab& elem_aretes) Definition des aretes par leur sommet
+ * @param (IntTab& elem_aretes) Definition of edges by their vertex
  * @param (DoubleTab& positions)
- * @param (ArrOfInt& aretes) Les aretes trouvees
+ * @param (ArrOfInt& aretes) The found edges
  * @return (int)
- * @throws dimension d'espace non prevue
+ * @throws space dimension not handled
  */
 template <typename _SIZE_>
 typename OctreeRoot_32_64<_SIZE_>::int_t OctreeRoot_32_64<_SIZE_>::rang_arete(const DoubleTab& positions, SmallArrOfTID_t& aretes) const
@@ -917,7 +917,7 @@ typename OctreeRoot_32_64<_SIZE_>::int_t OctreeRoot_32_64<_SIZE_>::rang_arete(co
  * @param (DoubleTab& positions)
  * @param (ArrOfInt& elems)
  * @return (int)
- * @throws dimension d'espace non prevue
+ * @throws space dimension not handled
  */
 template <typename _SIZE_>
 typename OctreeRoot_32_64<_SIZE_>::int_t OctreeRoot_32_64<_SIZE_>::rang_elem(const DoubleTab& positions, SmallArrOfTID_t& elems) const
@@ -957,7 +957,7 @@ typename OctreeRoot_32_64<_SIZE_>::int_t OctreeRoot_32_64<_SIZE_>::rang_elem(con
  * @param (DoubleTab& positions)
  * @param (ArrOfInt& prems)
  * @param (ArrOfInt& elems)
- * @throws dimension d'espace non prevue
+ * @throws space dimension not handled
  */
 template <typename _SIZE_>
 typename OctreeRoot_32_64<_SIZE_>::int_t OctreeRoot_32_64<_SIZE_>::rang_elem_depuis(const DoubleTab& positions, const SmallArrOfTID_t& prems, SmallArrOfTID_t& elems) const
@@ -1024,15 +1024,15 @@ void OctreeRoot_32_64<_SIZE_>::rang_elems_sommet(SmallArrOfTID_t& elements, doub
 }
 
 
-/*! @brief Renvoie vrai si le domaine associe a l'octree est non nulle.
+/*! @brief Returns true if the domain associated with the octree is non-null.
  *
- * @return (int) code de retour propage
+ * @return (int) propagated return code
  */
 template <typename _SIZE_>
 int OctreeRoot_32_64<_SIZE_>::construit() const
 {
   if((!le_dom)||(valid_!=1))
-    // L'Octree n'est pas construit ou le domaine est nulle
+    // The Octree is not built or the domain is null
     return 0;
   else
     return 1;
@@ -1135,16 +1135,16 @@ void OctreeFloor_32_64<_SIZE_>::construire(Octree_t* pe, const ArrOfInt_t& Tab, 
   pere=pe;
   les_octrees=0;
   num_elem=Tab;
-  // Ajout B.M: tri des elements dans l'ordre croissant de l'indice local.
-  // Ainsi, lors des recherches de sommets ou faces de joint, on tombe
-  //  sur l'element reel, pas l'element virtuel
+  // B.M addition: sort elements in ascending order of local index.
+  // This way, when searching for vertices or joint faces, we encounter
+  //  the real element, not the virtual one
   num_elem.ordonne_array();
 }
 
 
-/*! @brief Renvoie la taille de l'octree.
+/*! @brief Returns the size of the octree.
  *
- * @return (unsigned) la taille de l'octree
+ * @return (unsigned) the size of the octree
  */
 template <typename _SIZE_>
 typename OctreeFloor_32_64<_SIZE_>::int_t OctreeFloor_32_64<_SIZE_>::taille() const

@@ -47,7 +47,7 @@ void PlaqThVDF::mettre_a_jour(double )
   const Milieu_base& le_milieu=eqn.probleme().milieu();
   h/=(le_milieu.masse_volumique().valeurs()(0,0)*le_milieu.capacite_calorifique().valeurs()(0,0));
 
-  // Calcul de himp :
+  // Compute himp:
   const RefObjU& modele_turbulence = eqn.get_modele(TURBULENCE);
   if (modele_turbulence && sub_type(Modele_turbulence_scal_base,modele_turbulence.valeur()))
     {
@@ -97,7 +97,7 @@ void PlaqThVDF::mettre_a_jour(double )
                      +e2/le_milieu.diffusivite().valeurs()(0,0));
     }
 
-  //Calcul de T_ext :
+  //Compute T_ext:
   const DoubleTab& Temp= eqn.inconnue().valeurs();
   DoubleTab& tab= T_ext().valeurs();
   tab.resize(front.nb_faces(),1);

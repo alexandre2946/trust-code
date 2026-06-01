@@ -19,7 +19,7 @@
 #include <petsc_for_kernel.h>
 #include <EChaine.h>
 #include <Nom.h>
-#undef setbit // Sinon conflit de ArrOfBit.h avec Petsc
+#undef setbit // Otherwise conflict between ArrOfBit.h and PETSc
 #include <Solv_Externe.h>
 #include <ArrOfBit.h>
 #ifdef PETSCKSP_H
@@ -75,7 +75,7 @@ public :
   // To switch between solver definitions in one Solv_Petsc instance:
   void reset_solver(const Nom& name)
   {
-    // ToDo: regler option_prefix_ et numero_solveur dans create_solver et initialize...
+    // ToDo: fix option_prefix_ and numero_solveur in create_solver and initialize...
     reset();
     Cout << "Setting PETSc solver: " << name << finl;
     EChaine ech(name);
@@ -129,8 +129,8 @@ public :
   virtual void Update_matrix(Mat& MatricePetsc, const Matrice_Morse& mat_morse); // Fill the (previously allocated) PETSc matrix with mat_morse coefficients
 #endif
 
-  static int instance;               // Nombre d'instances en cours de la classe
-  static int numero_solveur;         // Compte les solveurs crees et utilises pour le prefix des options
+  static int instance;               // Number of active instances of the class
+  static int numero_solveur;         // Counts the solvers created and used for the option prefix
 
 protected :
 #ifdef PETSCKSP_H
@@ -139,11 +139,11 @@ protected :
   bool isViennaCLVector();
   bool isKokkosVector();
   void check_aij(const Matrice_Morse&);
-  void Create_DM(const DoubleVect& ); // Construit un DM (Distributed Mesh)
-  virtual void Create_objects(const Matrice_Morse&, int); // Construit differents objets PETSC dont matrice
-  virtual void Create_vectors(const DoubleVect&); // Construit les vecteurs Petsc x et b
-  virtual void Update_vectors(const DoubleVect& secmem, DoubleVect& solution); // Remplit les vecteurs Petsc x et b
-  void Create_MatricePetsc(Mat&, int, const Matrice_Morse&); // Construit et remplit une matrice Petsc depuis la matrice_morse
+  void Create_DM(const DoubleVect& ); // Builds a DM (Distributed Mesh)
+  virtual void Create_objects(const Matrice_Morse&, int); // Builds various PETSc objects including the matrix
+  virtual void Create_vectors(const DoubleVect&); // Builds the PETSc vectors x and b
+  virtual void Update_vectors(const DoubleVect& secmem, DoubleVect& solution); // Fills the PETSc vectors x and b
+  void Create_MatricePetsc(Mat&, int, const Matrice_Morse&); // Builds and fills a PETSc matrix from the Matrice_Morse
   virtual void Update_solution(DoubleVect& solution);
   virtual int solve(ArrOfDouble& residual); // Solve Ax=b and return residual
   virtual void finalize() {};
@@ -151,7 +151,7 @@ protected :
   bool nouveau_stencil()
   {
     return nouveau_stencil_;
-  }; // ToDo: Remonter dans Solveur_Sys avec nouvelle_matrice
+  }; // ToDo: move up into Solveur_Sys alongside nouvelle_matrice
   bool enable_ksp_view();
   bool has_option(const Nom& option, Nom& current_value);
   int add_option(const Nom& option, const double& value, int cli = 0);
@@ -175,18 +175,18 @@ protected :
   KSP SolveurPetsc_;
   PC PreconditionneurPetsc_;
   PCstruct pc_user_;   /* user-defined preconditioner context */
-  DM dm_;                       //description de champs PETSC
-  int preconditionnement_non_symetrique_; // Drapeau sur la symetrie de la matrice de preconditionnement
+  DM dm_;                       //description of PETSc fields
+  int preconditionnement_non_symetrique_; // Flag for the symmetry of the preconditioning matrix
   int nb_it_max_;		// Maximal number of iterations
   int convergence_with_nb_it_max_; 	// Convergence decided with nb_it_max_ specified and not by seuil threshold
   int ignore_nb_it_max_;
-  int controle_residu_;         // Verification si le residu ||Ax-B||<seuil
+  int controle_residu_;         // Check whether the residual ||Ax-B||<seuil
   int block_size_;              // Block size for SBAIJ matrix
   Nom factored_matrix_;		// Deal with the A=LU factorization on disk
   int mataij_;			// Force the use of a Mataij matrix
   Nom type_pc_;			// Preconditioner type
   Nom type_ksp_;		// KSP type
-  Nom option_prefix_;		// Prefix des options CLI (permet de faire plusieurs solveurs en CLI)
+  Nom option_prefix_;		// CLI option prefix (allows multiple solvers in CLI mode)
   Nom amgx_options_;
 
   int petsc_nb_cpus_;		// Number of CPUs used to solve the PETSc matrix
@@ -198,11 +198,11 @@ protected :
 #endif
 
 
-  int solveur_direct_ = no;          // Pour savoir si l'on manipule un solveur direct et non iteratif
-  bool gpu_ = false;                    // Utilisation des solveurs GPU de PETSc
-  bool amgx_ = false;			// Utilisation des solveurs GPU de AMGX
-  const Nom config();    // Nom du fichier de config eventuel
-  bool amgx_initialized_ = false;	// Amgx initialise
+  int solveur_direct_ = no;          // Whether we are using a direct (non-iterative) solver
+  bool gpu_ = false;                    // Use PETSc GPU solvers
+  bool amgx_ = false;			// Use AmgX GPU solvers
+  const Nom config();    // Name of the optional config file
+  bool amgx_initialized_ = false;	// AmgX initialised
   // Options dev:
   bool ignore_new_nonzero_ = false;
   bool rebuild_matrix_ = false;
@@ -247,7 +247,7 @@ inline void Solv_Petsc::reset()
     }
   if (MatricePetsc_!=nullptr)
     {
-      // Destruction des vecteurs
+      // Destroy vectors
       VecDestroy(&SecondMembrePetsc_);
       VecDestroy(&SolutionPetsc_);
       if (LocalSolutionPetsc_!=nullptr)
@@ -255,7 +255,7 @@ inline void Solv_Petsc::reset()
           VecDestroy(&LocalSolutionPetsc_);
           VecScatterDestroy(&VecScatter_);
         }
-      // Destruction matrice
+      // Destroy matrix
       MatDestroy(&MatricePetsc_);
       // Destruction DM
       if (dm_!=nullptr)
@@ -337,12 +337,12 @@ inline Solv_Petsc::Solv_Petsc(const Solv_Petsc& org):Solv_Externe::Solv_Externe(
 {
   initialize();
   instance++;
-  // Journal()<<"copie solv_petsc "<<instance<<finl;
+  // Journal()<<"copy solv_petsc "<<instance<<finl;
   set_read_matrix(org.read_matrix());
   gpu_=org.gpu();
   amgx_=org.amgx();
   option_prefix_=org.option_prefix_;
-  // on relance la lecture ....
+  // re-trigger the reading ....
   EChaine recup(org.get_chaine_lue());
   readOn(recup);
 }

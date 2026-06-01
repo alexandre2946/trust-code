@@ -24,15 +24,15 @@
  *
  */
 
-// Champ destine a encapsuler un champ generique dont l'expression est predefinie
-// pour que les utilisateurs disposent de raccourci en terme de syntaxe
+// Field intended to encapsulate a generic field whose expression is predefined
+// so that users have shortcuts in terms of syntax
 //
-//// Syntaxe a respecter pour jdd
+//// Data file syntax to follow
 //
-// "nom_champ" Predefini { Pb_champ "nom_pb" "nom_champ_a_creer" }
+// "field_name" Predefini { Pb_champ "pb_name" "field_name_to_create" }
 //
-// "nom_champ" fixe par utilisateur sera le nom du champ generique construit (champ_)
-// "nom_champ_a_creer" type de champ generique a creer (ex : energie_cinetique)
+// "field_name" set by the user will be the name of the constructed generic field (field_)
+// "field_name_to_create" type of generic field to create (ex: kinetic_energy)
 
 
 class Champ_Generique_Predefini : public Champ_Gen_de_Champs_Gen
@@ -56,9 +56,9 @@ public:
 
 protected:
 
-  Nom type_champ_;         //Type de champ predefini a lire (ex : energie_cinetique)
+  Nom type_champ_;         //Type of predefined field to read (ex: energie_cinetique)
   Nom nom_pb_;
-  OWN_PTR(Champ_Generique_base) champ_;  //Le champ generique predefini par type_champ_
+  OWN_PTR(Champ_Generique_base) champ_;  //The generic field predefined by type_champ_
 
 };
 

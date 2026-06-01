@@ -17,7 +17,7 @@
 #define Portance_interfaciale_Constante_included
 #include <Portance_interfaciale_base.h>
 
-/*! @brief classe Portance_interfaciale_Constante coefficients de portance interfaciale d'un ecoulement a bulles pour validation analytique
+/*! @brief Constant interfacial lift coefficient for bubbly flows for analytical validation.
  *
  *
  *
@@ -30,7 +30,7 @@ public:
   void coefficient(const input_t& input, output_t& output) const override;
 protected:
   double Cl_ = -123.;
-  int n_l = -1; //phase liquide
+  int n_l = -1; //liquid phase
 };
 
 #endif

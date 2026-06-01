@@ -20,9 +20,9 @@
 
 class Nom;
 
-/*! @brief Pointeur sur un Objet_U.
+/*! @brief Pointer to an Objet_U.
  *
- * Le constructeur par defaut construit un pointeur "nul".
+ * The default constructor builds a "null" pointer.
  *
  *
  * @sa TRUST_Deriv
@@ -69,23 +69,23 @@ protected:
 
   void recopie(const Objet_U&);
 #ifndef LATATOOLS
-  int change_num(const int* const) override; // renumerotation des objets
+  int change_num(const int* const) override; // renumbering of objects
 #endif
 
   Objet_U* get_Objet_U_ptr_check() const;
   int check_Objet_U_ptr_type(const Objet_U *ptr) const;
 
-  // Renvoie le Type_info du type de base accepte par le pointeur (l'objet pointe derive obligatoirement de ce type).
+  // Returns the Type_info of the base type accepted by the pointer (the pointed object must necessarily derive from this type).
   virtual const Type_info& get_info_ptr() const = 0;
 
 private:
-  // cle_ est le numero de cle de l'objet en reference.
-  // Si cle_ == -1, le pointeur est "nul".
-  // L'objet peut etre recupere par la_memoire().objet_u(cle_)
-  // Attention, la cle_ peut changer au cours du deroulement du programme (voir Memoire::comprimer())
+  // cle_ is the key number of the referenced object.
+  // If cle_ == -1, the pointer is "null".
+  // The object can be retrieved via la_memoire().objet_u(cle_)
+  // Warning, cle_ may change during program execution (see Memoire::comprimer())
   int cle_ = -1;
-  // ptr_object_id_ est l'object_id_ de l'objet en reference.
-  // Permet de tester facilement si on pointe sur l'objet que l'on croit.
+  // ptr_object_id_ is the object_id_ of the referenced object.
+  // Allows easy verification that we are pointing to the expected object.
   int ptr_object_id_ = -1;
 };
 

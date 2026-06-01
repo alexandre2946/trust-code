@@ -22,10 +22,10 @@ Implemente_instanciable(Trianguler,"Trianguler",Triangulation_base);
 // XD_CONT \includeimage{{trianguler.jpeg}}
 // XD attr domain_name ref_domaine domain_name REQ Name of domain.
 
-/*! @brief Simple appel a: Interprete::printOn(Sortie&)
+/*! @brief Simple call to: Interprete::printOn(Sortie&)
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param os Output stream.
+ * @return The modified output stream.
  */
 Sortie& Trianguler::printOn(Sortie& os) const
 {
@@ -33,22 +33,22 @@ Sortie& Trianguler::printOn(Sortie& os) const
 }
 
 
-/*! @brief Simple appel a: Interprete::readOn(Entree&)
+/*! @brief Simple call to: Interprete::readOn(Entree&)
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param is Input stream.
+ * @return The modified input stream.
  */
 Entree& Trianguler::readOn(Entree& is)
 {
   return Interprete::readOn(is);
 }
 
-/*! @brief Triangule tous les element d'un domaine: transforme les elements goemetriques du domaine en triangles.
+/*! @brief @brief Triangulates all elements of a domain: transforms the geometric elements of the domain into triangles.
  *
- *     Pour l'instant on ne sait trianguler que des Rectangles
- *     (on les coupe en 2).
+ *     Currently only Rectangles can be triangulated
+ *     (they are split into 2).
  *
- * @param (Domaine& domaine) le domaine dont on veut trianguler les elements
+ * @param domaine The domain whose elements are to be triangulated.
  */
 void Trianguler::trianguler(Domaine& domaine) const
 {
@@ -66,7 +66,7 @@ void Trianguler::trianguler(Domaine& domaine) const
           int i2=les_elems(i,2);
           int i3=les_elems(i,3);
 
-          // NEW on coupe par la petite diagonale si elles n'ont pas meme longueur
+          // NEW: cut along the shorter diagonal if they are not the same length
           double d1=0,d2=0;
           for (int dir=0; dir<dimension; dir++)
             {

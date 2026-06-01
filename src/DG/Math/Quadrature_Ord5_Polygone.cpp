@@ -16,7 +16,7 @@
 #include <Quadrature_Ord5_Polygone.h>
 #include <cmath>
 /****************************************************************/
-/* Formule de quadrature 1D/2D : Formule Gauss-Lobatto Aide-memoire elements finis Ern p.220  */
+/* 1D/2D quadrature rule: Gauss-Lobatto formula, reference: Finite Element Handbook, Ern p.220  */
 /****************************************************************/
 namespace
 {
@@ -146,7 +146,7 @@ void Quadrature_Ord5_Polygone::compute_integ_points()
 
   for (int e = 0; e < dom_->nb_elem_tot(); e++)
     {
-      int nsom = nfaces_elem(e); // Récupération du nombre de faces de l'élément
+      int nsom = nfaces_elem(e); // Retrieve the number of faces of the element
       switch (nsom)
         {
         case 3: // triangle
@@ -197,7 +197,7 @@ void Quadrature_Ord5_Polygone::compute_integ_points()
   for (int e = 0; e < nb_elem_tot; e++)
     {
       int ind_elem_e = ind_pts_integ_(e); // It may be faster to recalculate this with GPU
-      int nsom = nfaces_elem(e);          // Récupération du nombre de faces de l'élément
+      int nsom = nfaces_elem(e);          // Retrieve the number of faces of the element
       switch (nsom)
         {
         case 3: // triangle

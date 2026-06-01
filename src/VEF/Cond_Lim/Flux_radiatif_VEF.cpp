@@ -41,7 +41,7 @@ void Flux_radiatif_VEF::evaluer_cl_rayonnement(Champ_front_base& Tb, const Champ
   const DoubleTab& epsilon = emissivite().valeurs();
   const Front_VF& le_bord = ref_cast(Front_VF, frontiere_dis());
 
-  // On dimensionne le DoubleTab associe a le_champ_front
+  // Size the DoubleTab associated with le_champ_front
   assert(le_champ_front->nb_comp() == 1);
   DoubleTab& tab = le_champ_front->valeurs_au_temps(temps);
 
@@ -53,7 +53,7 @@ void Flux_radiatif_VEF::evaluer_cl_rayonnement(Champ_front_base& Tb, const Champ
   const int nfin = ndeb + le_bord.nb_faces();
   double epsi = -123., nn = -123., T = -123.;
 
-  // Boucle sur les faces de le_bord
+  // Loop over the faces of le_bord
   for (int face = ndeb; face < nfin; face++)
     {
       if (sub_type(Champ_front_uniforme, emissivite()))
@@ -82,7 +82,7 @@ void Flux_radiatif_VEF::evaluer_cl_rayonnement(Champ_front_base& Tb, const Champ
 
 void Flux_radiatif_VEF::calculer_flux_radiatif(const Equation_base& eq_temp)
 {
-  // On doit recuperer la temperature de bord
+  // We need to retrieve the wall temperature
   const Front_VF& le_bord = ref_cast(Front_VF, frontiere_dis());
   const int nb_faces = le_bord.nb_faces();
   const Conds_lim& les_cl_temp = eq_temp.domaine_Cl_dis().les_conditions_limites();
@@ -150,7 +150,7 @@ void Flux_radiatif_VEF::calculer_flux_radiatif(const Equation_base& eq_temp)
   const int ndeb = le_bord.num_premiere_face();
   double epsi = -123., Tbord = -123., n = -123.;
 
-  // On fait une boucle sur les faces
+  // Loop over the faces
   for (int face = 0; face < nb_faces; face++)
     {
       if (sub_type(Champ_front_uniforme, emissivite()))
@@ -174,7 +174,7 @@ void Flux_radiatif_VEF::calculer_flux_radiatif(const Equation_base& eq_temp)
       const double numer = epsi * (irra - 4 * n * n * sigma * pow(Tbord, 4));
       Flux(face, 0) = -numer / denum;
 
-      // Calcul des bilans
+      // Compute the balance
       double surface = 0.;
       for (int i = 0; i < dimension; i++)
         surface += (face_normales(face + ndeb, i) * face_normales(face + ndeb, i));

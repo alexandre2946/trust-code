@@ -24,7 +24,7 @@ Sortie& Op_Diff_Turbulent_PolyMAC_MPFA_Face::printOn(Sortie& os) const { return 
 
 Entree& Op_Diff_Turbulent_PolyMAC_MPFA_Face::readOn(Entree& is)
 {
-  //lecture de la correlation de viscosite turbulente
+  //reading the turbulent viscosity correlation
   Correlation_base::typer_lire_correlation(corr_, equation().probleme(), "viscosite_turbulente", is);
   associer_proto(equation().probleme(), champs_compris_);
   ajout_champs_proto_face();
@@ -67,20 +67,20 @@ void Op_Diff_Turbulent_PolyMAC_MPFA_Face::mettre_a_jour(double temps)
 
 void Op_Diff_Turbulent_PolyMAC_MPFA_Face::modifier_mu(DoubleTab& mu) const
 {
-  if (!corr_) return; //rien a faire
+  if (!corr_) return; //nothing to do
   const DoubleTab& rho = equation().milieu().masse_volumique().passe(),
                    *alpha = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()).equation_masse().inconnue().passe() : nullptr;
   int i, nl = mu.dimension(0), n, N = equation().inconnue().valeurs().line_size(), cR = rho.dimension(0) == 1, d, D = dimension;
-  if (mu.nb_dim() == 2) //nu scalaire
+  if (mu.nb_dim() == 2) //scalar nu
     for (i = 0; i < nl; i++)
       for (n = 0; n < N; n++)
         mu(i, n) += (alpha ? (*alpha)(i, n) * rho(!cR * i, n) : 1.0) * nu_ou_lambda_turb_(i, n);
-  else if (mu.nb_dim() == 3) //nu anisotrope diagonal
+  else if (mu.nb_dim() == 3) //diagonal anisotropic nu
     for (i = 0; i < nl; i++)
       for (n = 0; n < N; n++)
         for (d = 0; d < D; d++)
           mu(i, n, d) += (alpha ? (*alpha)(i, n) * rho(!cR * i, n) : 1.0) * nu_ou_lambda_turb_(i, n);
-  else if (mu.nb_dim() == 4) //nu anisotrope complet
+  else if (mu.nb_dim() == 4) //full anisotropic nu
     for (i = 0; i < nl; i++)
       for (n = 0; n < N; n++)
         for (d = 0; d < D; d++)

@@ -23,9 +23,9 @@ class Dirichlet_entree_fluide_leaves
 { };
 /// \endcond
 
-/*! @brief classe Dirichlet_entree_fluide Cette classe represente une condition aux limite imposant une grandeur
+/*! @brief Dirichlet_entree_fluide This class represents a boundary condition imposing a quantity
  *
- *     sur l'entree du fluide. Des classes derivees specialiseront la grandeur imposee: vitesse, temperature, concentration, fraction_massique ...
+ *     at the fluid inlet. Derived classes will specialise the imposed quantity: velocity, temperature, concentration, fraction_massique ...
  *
  * @sa Dirichlet Entree_fluide_vitesse_imposee Entree_fluide_vitesse_imposee_libre, Entree_fluide_temperature_imposee Entree_fluide_T_h_imposee, Entree_fluide_Fluctu_Temperature_imposee Entree_fluide_Flux_Chaleur_Turbulente_imposee, Entree_fluide_K_Eps_impose Entree_fluide_V2_impose, Entree_fluide_concentration_imposee Entree_fluide_fraction_massique_imposee
  */
@@ -36,9 +36,9 @@ class Dirichlet_entree_fluide: public Dirichlet
 
 /* ========================================================================================= */
 
-/*! @brief classe Entree_fluide_vitesse_imposee Cas particulier de la classe Dirichlet_entree_fluide
+/*! @brief Entree_fluide_vitesse_imposee Special case of the class Dirichlet_entree_fluide
  *
- *     pour la vitesse imposee: impose la vitesse d'entree du fluide dans une equation de type Navier_Stokes
+ *     for imposed velocity: imposes the inlet velocity of the fluid in an equation of type Navier_Stokes
  *
  * @sa Dirichlet_entree_fluide Navier_Stokes_std
  */
@@ -49,9 +49,9 @@ class Entree_fluide_vitesse_imposee: public Dirichlet_entree_fluide
 
 /* ========================================================================================= */
 
-/*! @brief classe Entree_fluide_vitesse_imposee_libre Cas particulier de la classe Entree_fluide_vitesse_imposee pour la vitesse imposee:
+/*! @brief Entree_fluide_vitesse_imposee_libre Special case of the class Entree_fluide_vitesse_imposee for imposed velocity:
  *
- *   impose la vitesse du fluide dans une equation de type Navier_Stokes en laissant libre les autres champs sur cette frontiere ouverte
+ *   imposes the fluid velocity in an equation of type Navier_Stokes while leaving the other fields free on this open boundary
  *
  * @sa Dirichlet_entree_fluide Navier_Stokes_std
  */
@@ -62,12 +62,12 @@ class Entree_fluide_vitesse_imposee_libre: public Entree_fluide_vitesse_imposee
 
 /* ========================================================================================= */
 
-/*! @brief classe Entree_fluide_concentration_imposee Cas particulier de la classe Dirichlet_entree_fluide
+/*! @brief Entree_fluide_concentration_imposee Special case of the class Dirichlet_entree_fluide
  *
- *     pour la concentration imposee: impose la concentration d'entree du
- *     fluide dans une equation de type Convection_Diffusion_Concentration
+ *     for imposed concentration: imposes the inlet concentration of the
+ *     fluid in an equation of type Convection_Diffusion_Concentration
  *
- * @sa Dirichlet_entree_fluide Convection_Diffusion_Concentration, CLASS: Entree_fluide_Fluctu_temperature_imposee :, Cas particulier de la classe Dirichlet_entree_fluide, pour le taux de disspation et la variance de temperature imposee
+ * @sa Dirichlet_entree_fluide Convection_Diffusion_Concentration, CLASS: Entree_fluide_Fluctu_temperature_imposee :, Special case of the class Dirichlet_entree_fluide, for the imposed dissipation rate and temperature variance
  */
 class Entree_fluide_Fluctu_Temperature_imposee: public Dirichlet_entree_fluide
 {
@@ -76,9 +76,9 @@ class Entree_fluide_Fluctu_Temperature_imposee: public Dirichlet_entree_fluide
 
 /* ========================================================================================= */
 
-/*! @brief classe Entree_fluide_temperature_imposee Cas particulier de la classe Dirichlet_entree_fluide pour la temperature imposee
+/*! @brief Entree_fluide_temperature_imposee Special case of the class Dirichlet_entree_fluide for imposed temperature
  *
- *   impose la temperature d'entree du fluide dans une equation de type Convection_Diffusion_Temperature
+ *   imposes the inlet temperature of the fluid in an equation of type Convection_Diffusion_Temperature
  *
  * @sa Dirichlet_entree_fluide Convection_Diffusion_Temperature
  */
@@ -88,10 +88,10 @@ class Entree_fluide_temperature_imposee: public Dirichlet_entree_fluide
 };
 
 /* ========================================================================================= */
-/*! @brief classe Entree_fluide_V2_impose Cas particulier de la classe Dirichlet_entree_fluide pour les fluctuation de vitesse du modele K_Eps_V2 imposee.
+/*! @brief Entree_fluide_V2_impose Special case of the class Dirichlet_entree_fluide for the imposed velocity fluctuations of the K_Eps_V2 model.
  *
- *     C'est le meme type de classe que Entree_fluide_concentration_imposee en imposant des grandeurs turbulentes.
- *     Impose les valeurs de V2  d'entree du fluide dans une equation de type Transport_V2
+ *     This is the same type of class as Entree_fluide_concentration_imposee, imposing turbulent quantities.
+ *     Imposes the V2 inlet values of the fluid in an equation of type Transport_V2
  *
  * @sa Dirichlet_entree_fluide Entree_fluide_concentration_imposee, Transport_V2
  */

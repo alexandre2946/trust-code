@@ -36,7 +36,7 @@ Entree& Pb_Couple_Optimisation_IBM::readOn(Entree& is)
       exit();
     }
   is >> motlu;
-  while (motlu!=Motcle("}"))   // fin du readOn
+  while (motlu!=Motcle("}"))   // end of readOn
     {
       if (motlu=="groupes")
         {
@@ -217,8 +217,8 @@ void Pb_Couple_Optimisation_IBM::initialize( )
               Cerr<<"Model_PDF with bilan_PDF <> 0. Exit."<<finl;
               exit();
             }
-          pdf_mod_st.set_PDF_mobile(mobile); // on declare l'IB mobile
-          pdf_mod_st.discretiser_vitesse_shape_IBM(pb_etat_opt_); // on discretise vitesse_shape_IBM_ (PDF_mobile)
+          pdf_mod_st.set_PDF_mobile(mobile); // declare the IB mobile
+          pdf_mod_st.discretiser_vitesse_shape_IBM(pb_etat_opt_); // discretize vitesse_shape_IBM_ (PDF_mobile)
           Numero_eq_optimis_ = i;
           nb_source_pdf++;
         }
@@ -326,17 +326,17 @@ void Pb_Couple_Optimisation_IBM::initialize( )
 
   const Domaine_dis_base& le_dom_dis = pb_projection_opt_->domaine_dis();
 
-  // source_derivee_forme : scalaire par element
+  // source_derivee_forme : scalar per element
   pb_projection_opt_->discretisation().discretiser_champ("champ_elem",le_dom_dis,"source_derivee_forme","",1,0., source_derivee_forme_);
   DoubleTab& sourceArray = source_derivee_forme_->valeurs();
   sourceArray = 0.;
 
-  // normal_derivee_forme : normal par element
+  // normal_derivee_forme : normal per element
   pb_projection_opt_->discretisation().discretiser_champ("champ_elem",le_dom_dis,"normal_derivee_forme","",3,0., normal_derivee_forme_);
   DoubleTab& normSourceArray = normal_derivee_forme_->valeurs();
   normSourceArray = 0.;
 
-  // Fonction cout scalaire par element
+  // Cost function scalar per element
 
   if (fonction_cout_lu_)
     {
@@ -344,7 +344,7 @@ void Pb_Couple_Optimisation_IBM::initialize( )
       const int nb_comp = ch_fonction_cout_lu.nb_comp();
       pb_projection_opt_->discretisation().discretiser_champ("champ_elem",le_dom_dis,"fonction_cout","",nb_comp,0., fonction_cout_);
       for (int n = 0; n < nb_comp; n++) fonction_cout_->fixer_nom_compo(n, ch_fonction_cout_lu.le_nom() + (nb_comp > 1 ? Nom(n) :""));
-      // PL: Il faut faire nommer_completer_champ_physique les 2 champs (plantage sinon pour une fonction de type Champ_fonc_tabule)
+      // PL: nommer_completer_champ_physique must be called for both fields (crash otherwise for a function of type Champ_fonc_tabule)
       eqn_proj.discretisation().nommer_completer_champ_physique(eqn_proj.domaine_dis(),ch_fonction_cout_lu.le_nom(),"",fonction_cout_lu_,eqn_proj.probleme());
       eqn_proj.discretisation().nommer_completer_champ_physique(eqn_proj.domaine_dis(),ch_fonction_cout_lu.le_nom(),"",fonction_cout_,eqn_proj.probleme());
       fonction_cout_->valeurs() = 0.;
@@ -391,7 +391,7 @@ bool Pb_Couple_Optimisation_IBM::initTimeStep(double dt)
     }
   const IntTab& elems = (pb_projection_opt_->equation(0).discretisation().is_ef() ? dom.les_elems() : the_dom_VF.elem_faces());
 
-  // Mise a jour de la fonction cout (quantité élémentaire)
+  // Update the cost function (elementary quantity)
   if (fonction_cout_lu_)
     {
       fonction_cout_lu_->mettre_a_jour(temps);
@@ -399,22 +399,22 @@ bool Pb_Couple_Optimisation_IBM::initTimeStep(double dt)
     }
   if (visu_cout_) Save_Med_File_fonction_cout(fonction_cout_->valeurs());
 
-  // Mise a jour de la frontiere IBM (quantité élémentaire): barycentre, normale et aire
-  DoubleTab& normSourceArray = normal_derivee_forme_->valeurs(); //vecteur normalise par element donnant le sens
+  // Update the IBM boundary (elementary quantity): barycenter, normal and area
+  DoubleTab& normSourceArray = normal_derivee_forme_->valeurs(); //normalized vector per element giving the direction
   const DoubleTab& deplacement_scalaire = pb_projection_opt_->equation(0).inconnue().valeurs();
   int dim0 = (level_set ? deplacement_scalaire.dimension(0) : normSourceArray.dimension(0));
   DoubleTab vecteur_deplacement(dim0, normSourceArray.dimension(1));
-  if (level_set)  // <vecteur deplacement pour approche pseudo level set (par dof)
+  if (level_set)  // <displacement vector for pseudo level set approach (per dof)
     {
-      int relev_vois_e = 0; // copie ou non normSourceArray pour elements voisins par une face
-      // on boucle sur les cellules ayant normSourceArray non nul
+      int relev_vois_e = 0; // whether to copy normSourceArray for neighboring elements sharing a face
+      // loop over cells with non-zero normSourceArray
       vecteur_deplacement = 0.;
       DoubleTrav contrib_i(dim0);
       for (int e=0; e<normSourceArray.dimension(0); e++)
         {
           double norm = 0.;
           for (int k=0; k<normSourceArray.dimension(1); k++) norm += normSourceArray(e,k)*normSourceArray(e,k);
-          if (norm > 1.e-10) // Existe normSourceArray non nul pour l element e
+          if (norm > 1.e-10) // non-zero normSourceArray exists for element e
             {
               for (int il=0; il<nb_dof_elem; il++)
                 {
@@ -424,18 +424,18 @@ bool Pb_Couple_Optimisation_IBM::initTimeStep(double dt)
                 }
               if (relev_vois_e)
                 {
-                  // copie normSourceArray pour elements voisins par une face
+                  // copy normSourceArray for neighboring elements sharing a face
                   for (int fac=0; fac<nb_faces_elem; fac++)
                     {
                       int num_fac = elem_face(e, fac);
-                      for (int voisin=0; voisin<2; voisin++) // Deux voisins seulement
+                      for (int voisin=0; voisin<2; voisin++) // Only two neighbors
                         {
                           int elem_voi = face_voisins(num_fac,voisin);
                           if ( (elem_voi!=-1) && (elem_voi!=e) )
                             {
                               norm = 0.;
                               for (int k=0; k<normSourceArray.dimension(1); k++) norm += normSourceArray(elem_voi,k)*normSourceArray(elem_voi,k);
-                              if (norm < 1.e-10) // N'existe pas normSourceArray chez le voisin elem_voi
+                              if (norm < 1.e-10) // normSourceArray does not exist for neighbor elem_voi
                                 {
                                   for (int il_v=0; il_v<nb_dof_elem; il_v++)
                                     {
@@ -462,7 +462,7 @@ bool Pb_Couple_Optimisation_IBM::initTimeStep(double dt)
         }
 
     }
-  else // <vecteur deplacement pour approche particulaire sous-contrainte (par elem)
+  else // <displacement vector for constrained particle approach (per elem)
     {
       for (int e=0; e<dim0; e++)
         {
@@ -482,21 +482,21 @@ bool Pb_Couple_Optimisation_IBM::initTimeStep(double dt)
         if (aire(e)>0.) bilan += aire(e);
       Cerr<<"(IBM) Area balance before shape moving = "<<bilan<<finl;
 
-      // Appel au prepro IBM pour le champ h_max_elem (limitation du deplacement scalaire a une maille voisine si alpha_ = 1)
+      // Call to IBM prepro for the h_max_elem field (limiting scalar displacement to one neighboring cell if alpha_ = 1)
       const DoubleTab& h_max_elem = (level_set ? my_prepro_opt_->get_h_max_node() : my_prepro_opt_->get_h_max_elem());
 
-      // Definition du vecteur deplacement elementaire suivant le sens de normal_derivee_forme_ (sens du deplacement)
+      // Definition of the elementary displacement vector along the direction of normal_derivee_forme_ (direction of displacement)
       double deplacement_scalaire_e;
       for (int e=0; e<vecteur_deplacement.dimension(0); e++)
         {
-          if (level_set)  // deplacement pour approche pseudo level set
+          if (level_set)  // displacement for pseudo level set approach
             {
-              //on est aux dof de la projection (e = dof)
+              //we are at the dofs of the projection (e = dof)
               deplacement_scalaire_e = deplacement_scalaire(e);
             }
-          else // deplacement pour approche particulaire sous-contrainte
+          else // displacement for constrained particle approach
             {
-              //on est aux elements (e = elem)
+              //we are at the elements (e = elem)
               deplacement_scalaire_e =0.;
               for (int il=0; il<nb_dof_elem; il++)
                 {
@@ -514,9 +514,9 @@ bool Pb_Couple_Optimisation_IBM::initTimeStep(double dt)
     }
   else vecteur_deplacement *= 0.;
 
-  // Vitesse deplacement IB pour postraitement
+  // IB displacement velocity for post-processing
   DoubleTrav vitesse_deplacement(normSourceArray);
-  if (level_set)  // projection aux elements
+  if (level_set)  // projection onto elements
     {
       const DoubleTab& aire = my_source_PDF_opt_->get_champ_aire().valeurs();
       for (int e=0; e<normSourceArray.dimension(0); e++)
@@ -539,7 +539,7 @@ bool Pb_Couple_Optimisation_IBM::initTimeStep(double dt)
   PDF_model& pdf_mod_etat = ref_cast_non_const(PDF_model, my_source_PDF_opt_->get_modele());
   pdf_mod_etat.set_vitesse_shape_IBM(vitesse_deplacement);
 
-  // Deplacement vectoriel elementaire des barycentres des faces IBM et maj prepro_IBM et interpolation de l'eq. etat
+  // Elementary vector displacement of IBM face barycenters and update of prepro_IBM and interpolation of the state eq.
   if (iShapDeplOK)
     {
       double raid = my_source_PDF_opt_->get_modele().raid();
@@ -562,13 +562,13 @@ bool Pb_Couple_Optimisation_IBM::initTimeStep(double dt)
           Cerr<<"(IBM) Area balance after shape moving = "<<bilan<<finl;
           if ( (bilan <= area_ref_ * (modif_aire_pc_low_)) || (bilan >= area_ref_ * (modif_aire_pc_high_)) )
             {
-              alpha_ =-1.0; // Bloquage de la modification de la geometrie
+              alpha_ =-1.0; // Prevent further geometry modification
               Cerr<<"(IBM) Area constraint: shape moving is stopped. Percent =  "<<(bilan/area_ref_ )<<finl;
             }
         }
 
 
-      // Appel au prepro IBM pour generer la nouvelle description discrete de la frontiere
+      // Call IBM prepro to generate the new discrete description of the boundary
       // Eq. adjointe
       my_source_PDF_opt_adjt_->get_fields_from_prepro(my_prepro_opt_);
       if(my_source_PDF_opt_adjt_->getInterpolationBool() == true)
@@ -599,14 +599,14 @@ bool Pb_Couple_Optimisation_IBM::solveTimeStep()
   double pdtps = sch.pas_de_temps();
   if (temps > pdtps)
     {
-      // Calcul terme derivee de forme
+      // Compute shape derivative term
       Cerr<<"(IBM) Pb_Couple_Optimisation_IBM : update of shape derivative term in projection eq." <<finl;
       DoubleVect my_bilan;
       my_source_PDF_opt_->compute_source_term_PDF(my_bilan);
       my_source_PDF_opt_adjt_->compute_source_term_PDF(my_bilan);
       calcul_derivee_forme_IBM();
 
-      // derivee de forme dans le terme source de equation de projection
+      // shape derivative in the source term of the projection equation
       Source_base& ma_source = (pb_projection_opt_->equation(0).sources())(Numero_src_deriv_form_).valeur();
       Terme_Derivee_Forme_base& ma_source_DF_eq = ref_cast(Terme_Derivee_Forme_base, ma_source);
       DoubleTab& sourceEqArray = ref_cast_non_const(DoubleTab, ma_source_DF_eq.get_source_derivee_forme());
@@ -633,7 +633,7 @@ bool Pb_Couple_Optimisation_IBM::solveTimeStep()
 void Pb_Couple_Optimisation_IBM::calcul_derivee_forme_IBM()
 {
 
-  // Calcul terme derivee de forme à partir du source_pdf de pb_etat + pb_adjoint
+  // Compute shape derivative term from the source_pdf of pb_etat + pb_adjoint
   DoubleTab& sourceArray = source_derivee_forme_->valeurs();
   DoubleTab& normSourceArray = normal_derivee_forme_->valeurs();
   DoubleTab& fonctCout = fonction_cout_->valeurs();
@@ -761,23 +761,23 @@ void Pb_Couple_Optimisation_IBM::calcul_derivee_forme_IBM()
 
           // Elementary cost function contribution
 
-          // boucle sur les voisin vois de e :
+          // loop over the neighbors of e:
           int nb_elem_voi = elem_voisins[e].size();
-          int ps_pos = 0; // nb element voisin ayant une contribution positive a prendre en compte
-          int ps_neg = 0; // nb element voisin ayant une contribution  negative a prendre en compte
+          int ps_pos = 0; // number of neighboring elements with a positive contribution to consider
+          int ps_neg = 0; // number of neighboring elements with a negative contribution to consider
           double meanCout_pos = 0.;
           double meanCout_neg = 0.;
           if (nb_elem_voi != 0)
             {
               for (int voi=0; voi<nb_elem_voi; voi++)
                 {
-                  // Le voisin doit avoir aire() = 0
+                  // The neighbor must have aire() = 0
                   // Cerr<<"voisin = "<<(elem_voisins[e])[voi]<<" aire_voisin = "<<aire((elem_voisins[e])[voi])<<finl;
                   if (aire((elem_voisins[e])[voi]) <= 0.)
                     {
                       int elem_voi = (elem_voisins[e])[voi];
-                      // pour les noeuds i de chaque voisin: ps nor(i, k) * normSourceArray(e,k) donne le signe
-                      // de la contribution qui doit etre la meme pour tous les noeuds i de chaque voisin
+                      // for the nodes i of each neighbor: dot product nor(i, k) * normSourceArray(e,k) gives the sign
+                      // of the contribution, which must be the same for all nodes i of each neighbor
                       double ps_voi_ref = 0.;
                       int iok = 0;
                       for (int il=0; il<nb_dof_elem; il++)
@@ -787,7 +787,7 @@ void Pb_Couple_Optimisation_IBM::calcul_derivee_forme_IBM()
                           for (int k=0; k<dim_esp; k++) ps_voi_i += nor(i, k) * normSourceArray(e,k) ;
                           if (iok == 0 && ps_voi_i != 0.)
                             {
-                              ps_voi_ref = ps_voi_i; // premier ps non nul
+                              ps_voi_ref = ps_voi_i; // first non-zero dot product
                               iok = 1;
                             }
                           if (ps_voi_ref*ps_voi_i < 0)
@@ -797,7 +797,7 @@ void Pb_Couple_Optimisation_IBM::calcul_derivee_forme_IBM()
                             }
                           // Cerr<<"Element voisin = "<<elem_voi<<" , ps_voi_i = "<<ps_voi_i<<" , iok, ps_voi_ref = "<<iok<<" "<<ps_voi_ref<<finl;
                         }
-                      // recuperer le signe du ps et faire une moyenne sur l'element voisin elem_voi
+                      // retrieve the sign of ps and compute an average over neighbor element elem_voi
                       if (iok == 1 && ps_voi_ref > 0.)
                         {
                           ps_pos += 1;
@@ -810,7 +810,7 @@ void Pb_Couple_Optimisation_IBM::calcul_derivee_forme_IBM()
                         }
                     }
                 }
-              // Moyenne fct cout pour les contributions + et -
+              // Average cost function for + and - contributions
               if (ps_pos != 0 && ps_neg != 0)
                 coutArray(e,0) = std::max(std::min(meanCout_pos/ps_pos - meanCout_neg/ps_neg, lim_p), lim_n);
               else coutArray(e,0) = 0.;
@@ -825,7 +825,7 @@ void Pb_Couple_Optimisation_IBM::calcul_derivee_forme_IBM()
         }
     }
 
-  //Normalisation eventuelle contribution PDF et cout entre 0 et +1
+  //Optional normalization of PDF and cost contributions between 0 and +1
   double bilan = 0.;
   for (int e=0; e<nb_elem; e++)
     {

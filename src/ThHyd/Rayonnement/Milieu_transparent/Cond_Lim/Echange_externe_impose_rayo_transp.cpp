@@ -80,9 +80,9 @@ int Echange_externe_impose_rayo_transp::initialiser(double temps)
 {
   assert(!le_modele_rayo_);
 
-  // on recupere le modele rayo ... !
+  // retrieve the radiation model ... !
   const Probleme_base& this_pb = domaine_Cl_dis().equation().probleme();
-  if (sub_type(Pb_Fluide_base, this_pb)) // sinon Pb_conduction par exemple ;)
+  if (sub_type(Pb_Fluide_base, this_pb)) // otherwise Pb_conduction for instance ;)
     {
       if (this_pb.milieu().is_rayo_transp())
         {

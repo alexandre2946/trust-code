@@ -62,7 +62,7 @@ void Loi_paroi_log::calc_y_plus(const DoubleTab& vit, const DoubleTab& nu_visc)
       ch.get_elem_vector_field(pvit_elem, true);
     }
 
-  int n = 0; // pour l'instant, turbulence dans seulement une phase
+  int n = 0; // for now, turbulence in one phase only
 
   for (int f = 0; f < nf_tot; f++)
     if (Faces_a_calculer_(f, 0) == 1)
@@ -75,19 +75,19 @@ void Loi_paroi_log::calc_y_plus(const DoubleTab& vit, const DoubleTab& nu_visc)
         double u_orth = 0.;
         const double yloc = y_loc(f, n);
         DoubleTrav u_parallel(D);
-        if (is_VDF) // VDF case : vitesse au centre de l'element
+        if (is_VDF) // VDF case: velocity at the element center
           {
             for (int d = 0; d < D; d++)
-              u_orth -= pvit_elem(e, N * d + n) * n_f(f, d) / fs(f); // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
+              u_orth -= pvit_elem(e, N * d + n) * n_f(f, d) / fs(f); // ! n_f points toward face 1, i.e. outward from the element, hence the -
             for (int d = 0; d < D; d++)
-              u_parallel(d) = pvit_elem(e, N * d + n) - u_orth * (-n_f(f, d)) / fs(f); // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
+              u_parallel(d) = pvit_elem(e, N * d + n) - u_orth * (-n_f(f, d)) / fs(f); // ! n_f points toward face 1, i.e. outward from the element, hence the -
           }
         else // PolyMAC_CDO case
           {
             for (int d = 0; d < D; d++)
-              u_orth -= vit(nf_tot + e * D + d, n) * n_f(f, d) / fs(f); // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
+              u_orth -= vit(nf_tot + e * D + d, n) * n_f(f, d) / fs(f); // ! n_f points toward face 1, i.e. outward from the element, hence the -
             for (int d = 0; d < D; d++)
-              u_parallel(d) = vit(nf_tot + e * D + d, n) - u_orth * (-n_f(f, d)) / fs(f); // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
+              u_parallel(d) = vit(nf_tot + e * D + d, n) - u_orth * (-n_f(f, d)) / fs(f); // ! n_f points toward face 1, i.e. outward from the element, hence the -
           }
 
         double norm_u_parallel = std::sqrt(domaine.dot(&u_parallel(0), &u_parallel(0)));

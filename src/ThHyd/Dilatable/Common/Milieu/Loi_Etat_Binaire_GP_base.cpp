@@ -49,9 +49,9 @@ void Loi_Etat_Binaire_GP_base::calculer_lambda()
   /* Do nothing */
 }
 
-/*! @brief Calcule la viscosite dynamique de melange (depend des fraction massique) Voir Wilke  https://aip.
+/*! @brief Computes the mixture dynamic viscosity (depends on mass fractions). See Wilke https://aip.
  *
- * scitation.org/doi/pdf/10.1063/1.1747673
+ * @brief scitation.org/doi/pdf/10.1063/1.1747673
  *
  */
 void Loi_Etat_Binaire_GP_base::calculer_mu_wilke()
@@ -86,7 +86,7 @@ void Loi_Etat_Binaire_GP_base::calculer_mu_wilke()
   Debog::verifier("calculer_mu_wilke",tab_mu);
 }
 
-/*! @brief Calcule la viscosite dynamique
+/*! @brief Computes the dynamic viscosity.
  *
  */
 void Loi_Etat_Binaire_GP_base::calculer_mu()
@@ -114,7 +114,7 @@ void Loi_Etat_Binaire_GP_base::calculer_alpha()
   /* Do nothing */
 }
 
-/*! @brief Calcule la viscosite dynamique sur Schmidt
+/*! @brief Computes the dynamic viscosity divided by the Schmidt number (rho*D).
  *
  */
 void Loi_Etat_Binaire_GP_base::calculer_mu_sur_Sc()
@@ -154,7 +154,7 @@ void Loi_Etat_Binaire_GP_base::calculer_mu_sur_Sc()
   tab_mu_sur_Sc.echange_espace_virtuel();
 }
 
-/*! @brief Calcule la viscosite dynamique sur Schmidt
+/*! @brief Computes the kinematic viscosity divided by the Schmidt number (D).
  *
  */
 void Loi_Etat_Binaire_GP_base::calculer_nu_sur_Sc()
@@ -177,7 +177,7 @@ void Loi_Etat_Binaire_GP_base::calculer_nu_sur_Sc()
   tab_nu_sur_Sc.echange_espace_virtuel();
 }
 
-/*! @brief Calcule le Cp NE FAIT RIEN : le Cp est constant
+/*! @brief Computes Cp. Does nothing: Cp is constant.
  *
  */
 void Loi_Etat_Binaire_GP_base::calculer_Cp()
@@ -185,17 +185,16 @@ void Loi_Etat_Binaire_GP_base::calculer_Cp()
   /* Do nothing */
 }
 
-/*! @brief Renvoie le type de fluide associe.
+/*! @brief Returns the type of fluid associated.
  *
- * @param (Sortie& os) le flot de sortie pour l'impression
- * @return (Sortie&) le flot de sortie modifie
+ * @return The fluid type name ("Melange_Binaire").
  */
 const Nom Loi_Etat_Binaire_GP_base::type_fluide() const
 {
   return "Melange_Binaire";
 }
 
-/*! @brief Calcule la pression avec la temperature et la masse volumique
+/*! @brief Computes the thermodynamic pressure from temperature and density.
  *
  */
 double Loi_Etat_Binaire_GP_base::inverser_Pth(double Y1, double rho)

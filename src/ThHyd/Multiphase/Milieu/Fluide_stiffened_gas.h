@@ -18,7 +18,7 @@
 
 #include <Fluide_reel_base.h>
 
-/*! @brief : Classe Fluide_stiffened_gas Cette classe represente un milieu reel
+/*! @brief Class Fluide_stiffened_gas representing a real fluid medium.
  *
  */
 class Fluide_stiffened_gas: public Fluide_reel_base
@@ -32,7 +32,7 @@ private:
   double pinf_, Cv_, q_, q_prim_, gamma_, R_, mu__, lambda__;
 
 protected :
-  /* Lois en T */
+  /* Laws in T */
   void rho_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
   void dP_rho_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
   void dT_rho_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
@@ -44,7 +44,7 @@ protected :
   void mu_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
   void lambda_(const SpanD T, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
 
-  /* Lois en h */
+  /* Laws in h */
   void rho_h_(const SpanD H, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
   void dP_rho_h_(const SpanD H, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
   void dh_rho_h_(const SpanD H, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
@@ -56,7 +56,7 @@ protected :
   void mu_h_(const SpanD H, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
   void lambda_h_(const SpanD H, const SpanD P, SpanD res, int ncomp = 1, int id = 0) const override;
 
-  // Methodes utilisees uniquement dans Pb_Euler
+  // Methods used only in Pb_Euler
   inline double init_energie_tot(const double& rho, const double& norm_U, const double& p) const override
   {
     return 0.5*rho*norm_U + (p+gamma_*pinf_)/(gamma_-1);

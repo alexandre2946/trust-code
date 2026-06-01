@@ -96,7 +96,7 @@ void Masse_DG_base::appliquer_coef(DoubleVect& coef) const
 void Masse_DG_base::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   const Nom& nom_inco = equation().inconnue().le_nom();
-  if (!matrices.count(nom_inco.getString())) return; //rien a faire
+  if (!matrices.count(nom_inco.getString())) return; //nothing to do
 
   int order = Option_DG::Get_order_for(nom_inco);
   int dim = nom_inco.debute_par("vitesse") ? Objet_U::dimension : 1;
@@ -244,7 +244,7 @@ void Masse_DG_base::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, double
             {
               bfunc.eval_bfunc(quad, e, fbase);
               /****************************************************************/
-              /* Formule de quadrature : Ern, Finite Elements II, 2021, p 71  */
+              /* Quadrature formula: Ern, Finite Elements II, 2021, p 71      */
               /****************************************************************/
               for (int i=0; i<nb_bfunc; i++)
                 {

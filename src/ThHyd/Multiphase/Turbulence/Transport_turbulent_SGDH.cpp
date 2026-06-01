@@ -46,18 +46,18 @@ Entree& Transport_turbulent_SGDH::readOn(Entree& is)
   return is;
 }
 
-// Modifier_nu modifie mu : alpha et rho font partie du terme
+// Modifier_nu modifies mu: alpha and rho are part of the term
 void Transport_turbulent_SGDH::modifier_mu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const
 {
   const DoubleTab& mu0 = eq.diffusivite_pour_transport().passe(),
-                   &nu0 = eq.diffusivite_pour_pas_de_temps().passe(), //viscosites moleculaires
-                    *alp = (sub_type(Pb_Multiphase, pb_.valeur()) && !no_alpha_) ? &pb_->get_champ("alpha").passe() : nullptr; //produit par alpha si Pb_Multiphase
+                   &nu0 = eq.diffusivite_pour_pas_de_temps().passe(), //molecular viscosities
+                    *alp = (sub_type(Pb_Multiphase, pb_.valeur()) && !no_alpha_) ? &pb_->get_champ("alpha").passe() : nullptr; //multiplied by alpha if Pb_Multiphase
   const int cnu = nu0.dimension(0) == 1, cmu = mu0.dimension(0) == 1;
   int i, nl = nu.dimension(0), n, N = nu.dimension(1), d, D = dimension;
-  //viscosite cinematique turbulente
+  //turbulent kinematic viscosity
   DoubleTrav nu_t(nl, N);
   visc_turb.eddy_viscosity(nu_t);
-  //formule pour passer de nu a mu : mu0 * sigma_ * nu_t / nu0
+  //formula to convert nu to mu: mu0 * sigma_ * nu_t / nu0
   if (nu.nb_dim() == 2)
     for (i = 0; i < nl; i++)
       {

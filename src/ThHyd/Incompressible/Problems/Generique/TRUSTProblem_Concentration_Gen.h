@@ -88,13 +88,13 @@ public:
   {
     _DERIVED_TYPE_::milieu_vect().resize(2);
     for (int i = 0; i < 2; i++) is >> _DERIVED_TYPE_::milieu_vect()[i];
-    _DERIVED_TYPE_::associer_milieu_base(_DERIVED_TYPE_::milieu_vect().front().valeur()); // NS : On l'associe a chaque equations (methode virtuelle pour chaque pb ...)
+    _DERIVED_TYPE_::associer_milieu_base(_DERIVED_TYPE_::milieu_vect().front().valeur()); // NS: associates to each equation (virtual method for each problem ...)
 
     /*
      * XXX : Elie Saikali :
-     *  - le_milieu_[0] => Fluide incompressible et le_milieu_[1] => constituants (n compos).
-     *  - le_milieu_[1] pas associe a l'equation car n compos
-     *  - this->mil_constituants_ contient le milieu associe a chaque equation
+     *  - le_milieu_[0] => Incompressible fluid and le_milieu_[1] => constituents (n components).
+     *  - le_milieu_[1] not associated to the equation because n components
+     *  - this->mil_constituants_ contains the medium associated with each equation
      */
     const Constituant& les_consts = ref_cast(_MEDIUM_TYPE_, _DERIVED_TYPE_::milieu_vect().back().valeur());
     nb_consts_ = les_consts.nb_constituants();

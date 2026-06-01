@@ -21,8 +21,8 @@
 
 /*! @brief class Ch_front_input
  *
- *      Cette classe represente un champ accessible par setInputField
- *      defini sur une frontiere avec une valeur par face.
+ *      This class represents a field accessible via setInputField,
+ *      defined on a boundary with one value per face.
  *
  *
  * @sa Champ_Input_Proto

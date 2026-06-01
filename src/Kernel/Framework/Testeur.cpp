@@ -30,7 +30,7 @@ Sortie& Testeur::printOn(Sortie& s ) const
 Entree& Testeur::readOn(Entree& is )
 {
   //
-  // VERIFIER ICI QU'ON A BIEN TOUT LU;
+  // CHECK HERE THAT EVERYTHING HAS BEEN READ;
   //
   return is;
 }

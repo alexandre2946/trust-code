@@ -53,7 +53,7 @@ const TRUST_Deriv_Objet_U& TRUST_Deriv_Objet_U::operator=(const TRUST_Deriv_Obje
 const Type_info& TRUST_Deriv_Objet_U::get_info_ptr() const
 {
   const Type_info *type_info = Objet_U::info();
-  return *type_info; /* type de base accepte par la ref */
+  return *type_info; /* base type accepted by the reference */
 }
 
 void TRUST_Deriv_Objet_U::set_Objet_U_ptr(Objet_U *objet)

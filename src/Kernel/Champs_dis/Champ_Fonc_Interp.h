@@ -39,7 +39,7 @@ protected:
   void update_fields();
   OBS_PTR(Probleme_base) pb_loc_, pb_dist_;
   OBS_PTR(Domaine) dom_loc_, dom_dist_;
-  bool is_initialized_ = false, is_elem_trgt_ = true /* par default aux elems */;
+  bool is_initialized_ = false, is_elem_trgt_ = true /* default: at elements */;
   int use_dec_ = -123;
   double default_value_ = DMAXFLOAT;
   DoubleTab valeurs_elem_, valeurs_faces_elem_;

@@ -19,38 +19,37 @@
 #include <Objet_U_ptr.h>
 #include <Nom.h>
 
-/*! @brief classe TRUST_Deriv
+/*! @brief Template ownership pointer class TRUST_Deriv.
  *
- *   Soit une classe Type_base qui derive de Objet_U.
+ *   Given a class Type_base deriving from Objet_U, TRUST_Deriv<Type_base> is a small template class
+ *   containing a pointer to an instance of Type_base, or any class deriving from Type_base,
+ *   created dynamically at runtime.
  *
- *   TRUST_Deriv<Type_base> est une petite classe template contenant un pointeur vers une instance de Type_base,
- *   ou de n'importe quelle classe derivee de Type_base qui est creee dynamiquement lors a l'execution.
- *
- *   Definition de la DERIV:
+ *   Definition of the DERIV:
  *
  *   #include <TRUST_Deriv.h>
  *   #include <Type_base.h>
  *   TRUST_Deriv<Type_base>
  *
- *   Creation d'un objet de type OWN_PTR(Type_base) :
- *    OWN_PTR(Type_base) deriv_type; // deriv_type est encore un pointeur nul
+ *   Creating an object of type OWN_PTR(Type_base):
+ *    OWN_PTR(Type_base) deriv_type; // deriv_type is still a null pointer
  *
- *   On suppose que la classe Type_Derive derive de Type_base et est instanciable:
+ *   Assuming class Type_Derive derives from Type_base and is instantiable:
  *    class Type_Derive : Type_base
  *    {
  *        Declare_instanciable(Type_Derive);;
  *      ...
  *    };
  *
- *   Creation d'une instance de la classe Type_Derive qui derive de Type_base:
+ *   Creating an instance of Type_Derive:
  *    deriv_type.typer("Type_Derive");
  *
- *   Acces a l'instance de Type_Derive:
+ *   Accessing the Type_Derive instance:
  *    Type_Derive & objet_derive = deriv_type.valeur();
  *    const Type_Derive & objet_derive = deriv_type.valeur();
  *
- *   L'instance de Type_Derive est detruite si on appelle a nouveau "typer()"
- *   ou si l'objet deriv_type est detruit.
+ *   The Type_Derive instance is destroyed when typer() is called again,
+ *   or when the deriv_type object itself is destroyed.
  *
  */
 
@@ -82,7 +81,7 @@ protected:
   void set_Objet_U_ptr(Objet_U *objet) override
   {
     Objet_U_ptr::set_Objet_U_ptr(objet);
-    /* Attention: cette conversion de type est non triviale. si le _TYPE_ est issu d'un heritage multiple. */
+    /* Note: this type conversion is non-trivial if _TYPE_ comes from multiple inheritance. */
     if (objet) pointeur_ = (_CLASSE_*) objet;
     else pointeur_ = nullptr;
   }
@@ -90,8 +89,8 @@ protected:
 private:
   _CLASSE_ *pointeur_ = nullptr;
 
-  int reprendre(Entree&) override { return -100; /* NON PAS POSSIBLE */ }
-  int sauvegarder(Sortie&) const override { return -100; /* NON PAS POSSIBLE */ }
+  int reprendre(Entree&) override { return -100; /* NOT POSSIBLE */ }
+  int sauvegarder(Sortie&) const override { return -100; /* NOT POSSIBLE */ }
 
 public:
   ~TRUST_Deriv() { detach(); }
@@ -164,7 +163,7 @@ public:
   const Type_info& get_info_ptr() const override
   {
     const Type_info * type_info = _CLASSE_::info();
-    return *type_info; /* type de base accepte par la ref */
+    return *type_info; /* base type accepted by the ref */
   }
 
   Entree& typer_lire_simple(Entree& is, const char* msg = "??")
@@ -182,17 +181,17 @@ public:
     if (strcmp(b, "??") != 0)
       base = b;
 
-    is >> type; // On lit le type :-)
+    is >> type; // Read the type
 
     if (base != "??")
       type = base + type;
 
-    typer(type); // on type :-)
+    typer(type); // Instantiate the type
 
     if (strcmp(msg, "??") != 0)
       Cerr << valeur().que_suis_je() << finl;
 
-    is >> valeur(); // et on lit la classe :-)
+    is >> valeur(); // Read the class instance
 
     return is;
   }
@@ -202,18 +201,18 @@ public:
  * ======================================================= *
  * ======================================================= */
 
-/*! @brief classe TRUST_Deriv_Objet_U est quasiment identique a TRUST_Deriv<Objet_U>
- *  sauf qu'elle ne contient pas les operateurs de conversion de OWN_PTR(Objet_U) en Objet_U.
+/*! @brief Class TRUST_Deriv_Objet_U is almost identical to TRUST_Deriv<Objet_U>,
+ *  except that it does not contain the implicit conversion operators from OWN_PTR(Objet_U) to Objet_U.
  *
- *  Il existe 3 methodes supplementaires :
+ *  It provides 3 additional methods:
  *
  *   - deplace(TRUST_Deriv_Objet_U& )
  *   - reprendre
  *   - sauvegarder
  *
- *   Utilisation :
+ *   Usage:
  *   - TRUST_Deriv_Objet_U
- *   ou
+ *   or
  *   - DerObjU
  */
 class TRUST_Deriv_Objet_U: public Objet_U_ptr

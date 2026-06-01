@@ -49,14 +49,14 @@ Entree& Op_Conv_Centre_EF_VEF_Face::readOn(Entree& s )
   return s ;
 }
 
-// ATTENTION!!!!!! les modifs concernant fluent_ et autre_num_face_loc sont faites qu en 3D!!!!
+// WARNING!!!!!!! modifications regarding fluent_ and autre_num_face_loc are made only in 3D!!!!
 // C.A. 30/06/99
 
 ////////////////////////////////////////////////////////////////////
 //
-//                      Implementation des fonctions
+//                      Implementation of functions
 //
-//                   de la classe Op_Conv_Centre_EF_VEF_Face
+//                   of class Op_Conv_Centre_EF_VEF_Face
 //
 ////////////////////////////////////////////////////////////////////
 
@@ -85,15 +85,13 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
   //int nsom = domaine.nb_som_elem();
 
 
-  // Pour le traitement de la convection on distingue les polyedres
-  // standard qui ne "voient" pas les conditions aux limites et les
-  // polyedres non standard qui ont au moins une face sur le bord.
-  // Un polyedre standard a n facettes sur lesquelles on applique le
-  // schema de convection.
-  // Pour un polyedre non standard qui porte des conditions aux limites
-  // de Dirichlet, une partie des facettes sont portees par les faces.
-  // En bref pour un polyedre le traitement de la convection depend
-  // du type (triangle, tetraedre ...) et du nombre de faces de Dirichlet.
+  // For the convection treatment, standard polyhedra (not "seeing" boundary conditions)
+  // are distinguished from non-standard polyhedra (having at least one boundary face).
+  // A standard polyhedron has n facets on which the convection scheme is applied.
+  // For a non-standard polyhedron with Dirichlet boundary conditions, part of its
+  // facets are carried by the boundary faces.
+  // In short, for a polyhedron the convection treatment depends on the type
+  // (triangle, tetrahedron ...) and the number of Dirichlet faces.
 
   double flux;
   int poly,face_adj,fa7,i,j,comp0,n_bord;
@@ -124,11 +122,11 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
   //DoubleVect vc(dimension);
   //DoubleTab vsom(nsom,dimension);
 
-  // On remet a zero le tableau qui sert pour
-  // le calcul du pas de temps de stabilite
+  // Reset to zero the array used for
+  // the stability time step computation
   fluent_ = 0;
 
-  // Traitement particulier pour les faces de periodicite
+  // Special treatment for periodic faces
 
   int nb_faces_perio = 0;
   for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
@@ -173,13 +171,13 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
     }
 
 
-  // Les polyedres non standard sont ranges en 2 groupes dans le Domaine_VEF:
-  //  - polyedres bords et joints
-  //  - polyedres bords et non joints
-  // On traite les polyedres en suivant l'ordre dans lequel ils figurent
-  // dans le domaine
+  // Non-standard polyhedra are arranged in 2 groups in Domaine_VEF:
+  //  - boundary and joint polyhedra
+  //  - boundary and non-joint polyhedra
+  // Polyhedra are processed following the order in which they appear
+  // in the domain
 
-  // boucle sur les polys
+  // loop over polyhedra
   const IntTab& KEL=domaine_VEF.type_elem().KEL();
   for (poly=0; poly<nb_elem_tot; poly++)
     {
@@ -190,21 +188,21 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
       else
         itypcl=domaine_Cl_VEF.type_elem_Cl(rang);
 
-      // calcul des numeros des faces du polyedre
+      // compute the face indices of the polyhedron
       for (face_adj=0; face_adj<nfac; face_adj++)
         face[face_adj]= elem_faces(poly,face_adj);
 
-      // On cherche les numeros locaux de tpoutes les faces
+      // Find the local indices of all faces
       for (fa7=0; fa7<nfa7; fa7++)
         {
           nu1=-1;
           nu2=-1;
           num10 = face[KEL(0,fa7)];
           num20 = face[KEL(1,fa7)];
-          // La facette est entouree des faces num1 et num2
+          // The facet is surrounded by faces num1 and num2
           //        Cerr << "num1=" << num1 << "  num2=" << num2 << finl;
 
-          // On cherche le numero des autres faces
+          // Find the indices of the other faces
 
           i=0;
           j=0;
@@ -242,7 +240,7 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
             for (i=0; i<dimension; i++)
               cc[i] = normales_facettes_Cl(rang,fa7,i);
 
-          // On calcule les produits scalaires u(xi).n.S
+          // Compute the dot products u(xi).n.S
           for (i=0; i<nfac; i ++)
             {
               psc[i] = 0.;
@@ -257,7 +255,7 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
             }
 
           //                assert(ncomp_ch_transporte==dimension);
-          // Ce schema est valable (enfin je crois...) uniquement quand ch_transporte = ch_tranportant = vitesse??
+          // This scheme is valid (at least I think...) only when ch_transporte = ch_tranportant = velocity??
 
 
           if (dimension == 2)
@@ -290,7 +288,7 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
                             resu(num20, comp0) += flux;
                           }
                       }
-                    // Pour la calcul du pas de temps de stabilite
+                    // For the stability time step computation
                     fluent_[num10] += 2.*((psc[nu1]+psc[nu2])- psc[autre_num_face_loc(0)])/3.;
                     fluent_[num10] -= 2.*((psc[nu1]+psc[nu2])- psc[autre_num_face_loc(0)])/3.;
                     break;
@@ -298,8 +296,8 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
                 default :
                   {
                     int numfa7;
-                    //  !!!!!! on a traite que le cas ou le champ transporte est vecteur!!!
-                    if ((itypcl==1)||(itypcl==2)||(itypcl==4))     // 1 face de Dirichlet!!
+                    //  !!!!!! only the case where the transported field is a vector has been handled!!!
+                    if ((itypcl==1)||(itypcl==2)||(itypcl==4))     // 1 Dirichlet face!!
                       {
                         switch(itypcl)
                           {
@@ -344,14 +342,14 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
                                 resu(num10, comp0) -= flux;
                                 resu(num20, comp0) += flux;
                               }
-                            // Pour la calcul du pas de temps de stabilite
+                            // For the stability time step computation
                             fluent_[num10] += 0.5*(psc[nu1]+psc[nu2]);
                             fluent_[num20] -= 0.5*(psc[nu1]+psc[nu2]);
                             //                            fluent_[num1] = ( fluent_[num1] > f_int) ? fluent_[num1] : f_int ;
                           }
                         else
                           {
-                            // Pour les fa7 confondus
+                            // For coinciding fa7
                             if (fa7 == nu2)
                               {
                                 coef1  = 2.*( psc[nu1]-psc[nu2] ) ;
@@ -366,11 +364,11 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
                                     flux  = (transporte(face[nu1],comp0)-transporte(face[nu2],comp0))*coef1;
                                     flux +=  transporte(face[numfa7],comp0)*coef2;
                                     flux /= 6.;
-                                    resu(face[nu1],comp0) -= flux;  // est ce le bon signe??????????????????????
+                                    resu(face[nu1],comp0) -= flux;  // is this the right sign??????????????????????
                                     // Cerr << "num1=" << num1 << "  num2=" << num2 << finl;
                                   }
-                                // Pour la calcul du pas de temps de stabilite
-                                fluent_[face[nu1]] -=  0.5*(psc[nu1]-psc[nu2])+psc[numfa7]; // signe????????
+                                // For the stability time step computation
+                                fluent_[face[nu1]] -=  0.5*(psc[nu1]-psc[nu2])+psc[numfa7]; // sign????????
 
                                 //////////////////////////////////////////////
                               }
@@ -381,7 +379,7 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
                                 coef1 += 3.*psc[numfa7];
 
                                 coef2  =  3.*(psc[nu2]-psc[nu1]) ;
-                                coef2 +=  6.*psc[numfa7];  // est ce la bonne numerotation?
+                                coef2 +=  6.*psc[numfa7];  // is this the right numbering?
 
 
                                 for (comp0=0; comp0<ncomp_ch_transporte; comp0++)
@@ -389,11 +387,11 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
                                     flux  = (transporte(face[nu2],comp0)-transporte(face[nu1],comp0))*coef1;
                                     flux +=  transporte(face[numfa7],comp0)*coef2;
                                     flux /= 6.;
-                                    resu(face[nu1],comp0) -= flux;  // est ce le bon signe?????????????????
+                                    resu(face[nu1],comp0) -= flux;  // is this the right sign?????????????????
                                     // Cerr << "num1=" << num1 << "  num2=" << num2 << finl;
                                   }
-                                // Pour la calcul du pas de temps de stabilite
-                                fluent_[face[nu1]] -=  0.5*(psc[nu2]-psc[nu1])+psc[numfa7];   // signe?????????????????
+                                // For the stability time step computation
+                                fluent_[face[nu1]] -=  0.5*(psc[nu2]-psc[nu1])+psc[numfa7];   // sign?????????????????
 
                                 //////////////////////////////////////////////
                               }
@@ -401,11 +399,11 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
                       }
                     else
                       {
-                        // 2 faces de Dirichlet!!!!!
-                        // meme expression pour les 3 fa7 (confondues avec les faces de bord)
-                        // On suppose que la num fa7 = num face
+                        // 2 Dirichlet faces!!!!!
+                        // same expression for the 3 fa7 (coinciding with boundary faces)
+                        // Assuming num fa7 = num face
 
-                        // Recuperation des numeros des autres faces
+                        // Retrieve the indices of the other faces
                         switch(fa7)
                           {
                           case 0 :
@@ -443,9 +441,9 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
                             flux  = transporte(face[fa7],comp0)*coef1;
                             flux += (transporte(face[nu1],comp0)-transporte(face[nu2],comp0))*coef2;
                             flux /= 6.;
-                            resu(face[nu1],comp0) -= flux;  // est ce le bon signe?
+                            resu(face[nu1],comp0) -= flux;  // is this the right sign?
                           }
-                        // Pour la calcul du pas de temps de stabilite
+                        // For the stability time step computation
                         fluent_[face[fa7]] -=  psc[fa7];
                         //                             f_int =  psc[fa7];
                         //                             fluent_[face[fa7]] = ( fluent_[face[fa7]] > f_int) ? fluent_[face[fa7]]  : f_int ;
@@ -454,7 +452,7 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
                     break;
                   }
                 }
-            }          // FIN de if(dimension == 2)
+            }          // END of if(dimension == 2)
           else if (dimension == 3)
             {
               switch(itypcl)
@@ -488,7 +486,7 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
                         //                           Cerr << "transporte(autre_num_face(0),comp)=" << transporte(autre_num_face(0),comp) << finl;
                         //                           Cerr << "transporte(autre_num_face(1),comp)=" << transporte(autre_num_face(1),comp) << finl;
                         //                           Cerr << "flux=" << flux << finl;
-                        //************Calcul de fluent pour le pas de temps
+                        //************Compute fluent for the time step
                         // f_int = 0.5*cc[comp]*(la_vitesse.valeurs()(num1,comp)+la_vitesse.valeurs()(num2,comp));
 
                         //  if (f_int>=0.)
@@ -521,7 +519,7 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
                     if (fa7 == itypcl)
                       {
                         i=0;
-                        while(i<nfac) // on cherche le 4ieme point!!
+                        while(i<nfac) // search for the 4th point!!
                           {
                             nu3 = i;
                             if (nu3 == fa7)
@@ -552,7 +550,7 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
                             flux /= 12.;
                             resu(num10, comp0) -= flux;
                             resu(num20, comp0) += flux;
-                            // Pour la calcul du pas de temps de stabilite
+                            // For the stability time step computation
                             // SIGNE????????????
                             //                                  f_int = std::fabs(flux/transporte(num1,comp));
                             f_int = 3.*(psc[nu1]+psc[nu2]);
@@ -572,7 +570,7 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
                       }
                     else
                       {
-                        // J ai l impression que ce n est pas fini???!!!!!!!!!!
+                        // This appears to be unfinished???!!!!!!!!!!
                       }
                     break;
                   }
@@ -588,15 +586,14 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
   double diff1,diff2;
   double pscav;
 
-  // Dimensionnement du tableau des flux convectifs au bord du domaine
-  // de calcul
+  // Sizing the array of convective fluxes at the domain boundary
   DoubleTab& flux_b = flux_bords_;
   flux_b.resize(domaine_VEF.nb_faces_bord(),ncomp_ch_transporte);
   flux_b = 0.;
 
-  // Boucle sur les bords pour traiter les conditions aux limites
-  // il y a prise en compte d'un terme de convection pour les
-  // conditions aux limites de Neumann_sortie_libre seulement
+  // Loop over boundaries to handle boundary conditions
+  // a convection term is taken into account only for
+  // Neumann_sortie_libre boundary conditions
 
   for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
@@ -605,7 +602,7 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
 
       if (sub_type(Neumann_sortie_libre,la_cl.valeur()))
         {
-          ////////////ATTENTION!!!!!!!!!!! Cela correspond a l ancien schema et pas au EF!!
+          ////////////WARNING!!!!!!!!!!! This corresponds to the old schema and not to EF!!
           const Neumann_sortie_libre& la_sortie_libre = ref_cast(Neumann_sortie_libre,la_cl.valeur());
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
           int num1 = le_bord.num_premiere_face();
@@ -667,8 +664,8 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
                       resu(num_face) += diff2;
                       flux_b(voisine,0) += diff1;
                       flux_b(num_face,0) += diff1;
-                      // Pour la calcul du pas de temps de stabilite
-                      // RIEN en periodique ??? (faces deja traites avant??????)
+                      // For the stability time step computation
+                      // NOTHING in periodic ??? (faces already processed before??????)
                       //////////////////////////////////////////////
                     }
                   else
@@ -682,8 +679,8 @@ DoubleTab& Op_Conv_Centre_EF_VEF_Face::ajouter(const DoubleTab& transporte,
                         resu(num_face,comp) += diff2;
                         flux_b(voisine,comp) += diff1;
                         flux_b(num_face,comp) += diff1;
-                        // Pour la calcul du pas de temps de stabilite
-                        // RIEN en periodique ??? (faces deja traites avant??????)
+                        // For the stability time step computation
+                        // NOTHING in periodic ??? (faces already processed before??????)
                         //////////////////////////////////////////////
                       }
 

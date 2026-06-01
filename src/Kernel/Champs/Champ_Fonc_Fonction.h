@@ -18,11 +18,11 @@
 
 #include <Champ_Fonc_Tabule.h>
 
-/*! @brief Classe Champ_Fonc_Fonction Classe derivee de Champ_Fonc_Tabule qui represente les
+/*! @brief Class Champ_Fonc_Fonction Derived class of Champ_Fonc_Tabule representing
  *
- *      champs fonctions d'un autre champ par une fonction
- *      L'objet porte un membre de type OWN_PTR(Champ_Fonc_base)  qui stocke
- *      les valeurs du champ tabule.
+ *      fields that are functions of another field via a function.
+ *      The object carries a member of type OWN_PTR(Champ_Fonc_base) that stores
+ *      the values of the tabulated field.
  *
  * @sa Champ_Fonc_base
  */
@@ -39,7 +39,7 @@ public :
   Sutherland();
   void lire_expression();
 
-  // Methodes inlines
+  // Inline methods
   inline void set_val_params(const Nom& prob,const double A, const double C,const double Tref);
   inline void set_prob(const Nom& prob) { prob_ = prob ;}
   inline void set_A(const double A) { A_ = A; }

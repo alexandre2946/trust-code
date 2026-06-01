@@ -20,10 +20,10 @@ Implemente_instanciable(Bidim_Axi,"Bidim_Axi",Interprete);
 // XD_CONT coordinates (R, Z). If this instruction is not included, calculations are carried out using Cartesian
 // XD_CONT coordinates.
 
-/*! @brief Simple appel a: Interprete::printOn(Sortie&)
+/*! @brief Simple call to: Interprete::printOn(Sortie&)
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Bidim_Axi::printOn(Sortie& os) const
 {
@@ -33,10 +33,10 @@ Sortie& Bidim_Axi::printOn(Sortie& os) const
 }
 
 
-/*! @brief Simple appel a: Interprete::readOn(Entree&)
+/*! @brief Simple call to: Interprete::readOn(Entree&)
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
  */
 Entree& Bidim_Axi::readOn(Entree& is)
 {
@@ -47,10 +47,10 @@ Entree& Bidim_Axi::readOn(Entree& is)
   return Interprete::readOn(is);
 }
 
-/*! @brief Fonction principale de l'interprete Axi Positionne la variable 2D_axi a 1.
+/*! @brief Main function of the Axi interpreter Sets the 2D_axi variable to 1.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the input stream
  */
 Entree& Bidim_Axi::interpreter(Entree& is)
 {

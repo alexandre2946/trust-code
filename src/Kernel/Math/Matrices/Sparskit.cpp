@@ -17,8 +17,8 @@
 
 extern "C"
 {
-  // distdot renomme distdot2 dans SPARSKIT car conflit avec distdot
-  // livre avec la librairie PARMS ($TRUST_ROOT/lib/src/LIBNP)
+  // distdot renamed to distdot2 in SPARSKIT due to conflict with distdot
+  // shipped with the PARMS library ($TRUST_ROOT/lib/src/LIBNP)
 #ifndef F77_Majuscule
   double F77NAME(distdot2)(const integer* const n, const double* const x,
                            const integer* const ix, const double* const y,

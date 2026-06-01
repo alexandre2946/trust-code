@@ -73,7 +73,7 @@ protected:
   void ajouter_contribution_bords_vitesse(const DoubleTab&, Matrice_Morse& ) const;
   const Milieu_base& milieu() const;
   IntTab elem;
-  mutable SFichier Flux; // Impression .out
+  mutable SFichier Flux; // Output .out file
 };
 
 template <class _TYPE_> inline Iterateur_PolyMAC_CDO_Elem<_TYPE_>::Iterateur_PolyMAC_CDO_Elem(const Iterateur_PolyMAC_CDO_Elem<_TYPE_>& iter) :Iterateur_PolyMAC_CDO_base(iter), flux_evaluateur(iter.flux_evaluateur)
@@ -117,8 +117,8 @@ DoubleTab& Iterateur_PolyMAC_CDO_Elem<_TYPE_>::ajouter(const DoubleTab& donne,
   DoubleTab& flux_bords=op_base->flux_bords();
   flux_bords.resize(le_domaine->nb_faces_bord(),ncomp);
   flux_bords=0;
-  /* modif b.m.: on va faire += sur des items virtuels, initialiser les cases */
-  /* sinon risque que les cases soient invalides ou non initialisees */
+  /* modif b.m.: we will do += on virtual items, initialize the entries */
+  /* otherwise there is a risk that entries are invalid or uninitialized */
   // {
   //   int n = resu.size_array() - resu.size();
   //   double *data = resu.addr() + resu.size();
@@ -150,12 +150,12 @@ template <class _TYPE_>  DoubleTab& Iterateur_PolyMAC_CDO_Elem<_TYPE_>::ajouter_
   DoubleTab& flux_bords=op_base->flux_bords();
   for (; num_cl<nb_front_Cl; num_cl++)
     {
-      /* pour chaque Condition Limite on regarde son type */
+      /* for each boundary condition, check its type */
       const Cond_lim& la_cl = la_zcl->les_conditions_limites(num_cl);
       const Front_VF& frontiere_dis = ref_cast(Front_VF,la_cl->frontiere_dis());
       ndeb = frontiere_dis.num_premiere_face();
       nfin = ndeb + frontiere_dis.nb_faces();
-      /* Test en bidim axi */
+      /* Test in 2D axisymmetric */
       if (bidim_axi && !sub_type(Symetrie,la_cl.valeur()))
         {
           if (nfin>ndeb && est_egal(le_domaine->face_surfaces()[ndeb],0))
@@ -274,7 +274,7 @@ template <class _TYPE_>  DoubleTab& Iterateur_PolyMAC_CDO_Elem<_TYPE_>::ajouter_
               const Neumann_paroi_adiabatique& cl =(const Neumann_paroi_adiabatique&) (la_cl.valeur());
               for (face=ndeb; face<nfin; face++)
                 {
-                  /* on initialise elem1 elem2 et on fait planter */
+                  /* initialize elem1 elem2 and force abort */
                   elem1=-1;
                   elem2=-1;
                   assert(0);
@@ -422,12 +422,12 @@ template <class _TYPE_>  void Iterateur_PolyMAC_CDO_Elem<_TYPE_>::calculer_flux_
   int nb_front_Cl=le_domaine->nb_front_Cl();
   for (; num_cl<nb_front_Cl; num_cl++)
     {
-      /* pour chaque Condition Limite on regarde son type */
+      /* for each boundary condition, check its type */
       const Cond_lim& la_cl = la_zcl->les_conditions_limites(num_cl);
       const Front_VF& frontiere_dis = ref_cast(Front_VF,la_cl->frontiere_dis());
       ndeb = frontiere_dis.num_premiere_face();
       nfin = ndeb + frontiere_dis.nb_faces();
-      /* Test en bidim axi */
+      /* Test in 2D axisymmetric */
       if (bidim_axi && !sub_type(Symetrie,la_cl.valeur()))
         {
           if (nfin>ndeb && est_egal(le_domaine->face_surfaces()[ndeb],0))
@@ -665,7 +665,7 @@ template <class _TYPE_>  DoubleTab& Iterateur_PolyMAC_CDO_Elem<_TYPE_>::ajouter_
       const Front_VF& frontiere_dis = ref_cast(Front_VF,la_cl->frontiere_dis());
       ndeb = frontiere_dis.num_premiere_face();
       nfin = ndeb + frontiere_dis.nb_faces();
-      /* Test en bidim axi */
+      /* Test in 2D axisymmetric */
       if (bidim_axi && !sub_type(Symetrie,la_cl.valeur()))
         {
           if (nfin>ndeb && est_egal(le_domaine->face_surfaces()[ndeb],0))
@@ -817,7 +817,7 @@ template <class _TYPE_>  DoubleTab& Iterateur_PolyMAC_CDO_Elem<_TYPE_>::ajouter_
               for (face=ndeb; face<nfin; face++)
                 {
                   flux_evaluateur.flux_face(donnee, face, cl, ndeb, flux);
-                  /* on initialise elem1 elem2 et on fait planter */
+                  /* initialize elem1 elem2 and force abort */
                   elem1=-1;
                   elem2=-1;
                   assert(0);
@@ -1017,8 +1017,8 @@ template <class _TYPE_>  void  Iterateur_PolyMAC_CDO_Elem<_TYPE_>::modifier_flux
             rho_ = rho.valeurs()(num_elem);
           else
             rho_ = rho.valeurs()(num_elem, 0);
-          /* si on est en QC temperature on a calcule div(rhou * T) */
-          /* il ne faut pas remultiplier par rho */
+          /* if in QC temperature mode, div(rhou * T) has been computed */
+          /* do not multiply by rho again */
           if (is_rho_u)
             rho_ = 1;
           flux_bords(face, 0) *= (rho_ * Cp_);
@@ -1133,8 +1133,8 @@ template <class _TYPE_>  void Iterateur_PolyMAC_CDO_Elem<_TYPE_>::contribuer_au_
   int ncomp=1;
   if (resu.nb_dim() == 2)
     ncomp=resu.dimension(1);
-  assert(op_base->flux_bords().dimension(0)==le_domaine->nb_faces_bord()); /* resize deja fait */
-  if( ncomp == 1) /* cas scalaire */
+  assert(op_base->flux_bords().dimension(0)==le_domaine->nb_faces_bord()); /* resize already done */
+  if( ncomp == 1) /* scalar case */
     {
       contribuer_au_second_membre_bords(resu) ;
       contribuer_au_second_membre_interne(resu) ;
@@ -1156,7 +1156,7 @@ template <class _TYPE_>  void Iterateur_PolyMAC_CDO_Elem<_TYPE_>::contribuer_au_
   DoubleTab& flux_bords=op_base->flux_bords();
   for (; num_cl<nb_front_Cl; num_cl++)
     {
-      /* pour chaque Condition Limite on regarde son type */
+      /* for each boundary condition, check its type */
       const Cond_lim& la_cl = la_zcl->les_conditions_limites(num_cl);
       const Front_VF& frontiere_dis = ref_cast(Front_VF,la_cl->frontiere_dis());
       ndeb = frontiere_dis.num_premiere_face();
@@ -1720,7 +1720,7 @@ template <class _TYPE_>  void Iterateur_PolyMAC_CDO_Elem<_TYPE_>::ajouter_contri
   int nb_front_Cl=le_domaine->nb_front_Cl();
   for (; num_cl<nb_front_Cl; num_cl++)
     {
-      /* pour chaque Condition Limite on regarde son type */
+      /* for each boundary condition, check its type */
       const Cond_lim& la_cl = la_zcl->les_conditions_limites(num_cl);
       const Front_VF& frontiere_dis = ref_cast(Front_VF,la_cl->frontiere_dis());
       ndeb = frontiere_dis.num_premiere_face();
@@ -1901,7 +1901,7 @@ template <class _TYPE_>  void Iterateur_PolyMAC_CDO_Elem<_TYPE_>::ajouter_contri
               const Periodique& cl =(const Periodique&) (la_cl.valeur());
               for (face=ndeb; face<nfin; face++)
                 {
-                  /* GF Qui a mis l'appel au coeffs faces_internes ??? . Cest faux ...*/
+                  /* GF Who added the call to coeffs faces_internes ??? . That is wrong ...*/
                   /* flux_evaluateur.coeffs_faces_interne(face, aii, ajj); */
                   flux_evaluateur.coeffs_face(face,ndeb, cl, aii, ajj);
                   elem1 = elem(face,0);
@@ -2313,7 +2313,7 @@ template <class _TYPE_>  void Iterateur_PolyMAC_CDO_Elem<_TYPE_>::ajouter_contri
   int nb_front_Cl=le_domaine->nb_front_Cl();
   for (int num_cl = 0; num_cl<nb_front_Cl; num_cl++)
     {
-      /* pour chaque Condition Limite on regarde son type */
+      /* for each boundary condition, check its type */
       const Cond_lim& la_cl = la_zcl->les_conditions_limites(num_cl);
       const Front_VF& frontiere_dis = ref_cast(Front_VF,la_cl->frontiere_dis());
       ndeb = frontiere_dis.num_premiere_face();

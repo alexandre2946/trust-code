@@ -143,7 +143,7 @@ void Discretisation_tools::cells_to_faces(const Champ_base& He, Champ_base& Hf)
   assert_espace_virtuel_vect(tabHe);
   const Domaine_dis_base& domaine_dis_base=He.domaine_dis_base();
   const Domaine_VF& domaine_vf= ref_cast(Domaine_VF,domaine_dis_base);
-  // en realite on fait P1B vers face
+  // in practice we do P1B to face
   //assert(tabHe.dimension_tot(0)==domaine_dis_base.nb_elem_tot());
   assert(tabHf.dimension_tot(0)==domaine_vf.nb_faces_tot());
   const DoubleVect& volumes_entrelaces=domaine_vf.volumes_entrelaces();
@@ -151,11 +151,11 @@ void Discretisation_tools::cells_to_faces(const Champ_base& He, Champ_base& Hf)
   tabHf=0;
 
   // TODO : FIXME
-  // XXX : codage pas coherent... a voir : volumes ou volumes_entrelaces ???
+  // XXX : inconsistent coding... to check: volumes ou volumes_entrelaces ???
   if (tabHe.line_size() == 1)
     {
       DoubleTrav tab_vol_tot(tabHf);
-      // Lancement de ce kernel multi-discretisation et copie de donnees selon conditions (les deux tableaux doivent etre deja sur le device)
+      // Launch this multi-discretization kernel and copy data according to conditions (both arrays must already be on the device)
       bool kernelOnDevice = tabHf.checkDataOnDevice(tabHe);
       if (kernelOnDevice)
         cells_to_faces_kernel<Kokkos::DefaultExecutionSpace>(domaine_vf, tabHe, tab_vol_tot, tabHf);
@@ -253,7 +253,7 @@ void Discretisation_tools::cells_to_faces(const Domaine_VF& domaine_vf, const Do
   end_gpu_timer(__KERNEL_NAME__);
 
   // tab_face /= volumes_entrelaces * nb_face_elem :
-  // PL: comprends pas, ecarts sur les cas thermal_coupling_on_coincident_domain_jddX avec:
+  // PL: does not understand, discrepancies on thermal_coupling_on_coincident_domain_jddX cases with:
   // tab_face*=nb_face_elem;
   // tab_divide_any_shape(tab_face, volumes_entrelaces, VECT_REAL_ITEMS);
   tab_face.echange_espace_virtuel();

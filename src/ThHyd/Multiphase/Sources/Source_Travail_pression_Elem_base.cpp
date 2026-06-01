@@ -75,7 +75,7 @@ void Source_Travail_pression_Elem_base::ajouter_blocs(matrices_t matrices, Doubl
                         &ch_v = pbm.equation_qdm().inconnue(),
                          &ch_p = ref_cast(QDM_Multiphase, pbm.equation_qdm()).pression();
 
-  /* trois tableaux de alpha : present / passe et champ convecte (peut etre semi-implicite) */
+  /* three alpha arrays: current / past and convected field (may be semi-implicit) */
   const DoubleTab& alpha = ch_a.valeurs(), &c_alpha = semi_impl.count("alpha") ? semi_impl.at("alpha") : alpha,
                    &p_alpha = ch_a.passe(), &press = ch_p.valeurs(), &vit = ch_v.valeurs();
 
@@ -90,7 +90,7 @@ void Source_Travail_pression_Elem_base::ajouter_blocs(matrices_t matrices, Doubl
   int i, j, e, eb, f, n, N = alpha.line_size(), m, M = press.line_size();
   double dt = equation().schema_temps().pas_de_temps();
 
-  //partie -p d alpha_k / dt et ses derivees
+  // term -p d alpha_k / dt and its derivatives
   for (e = 0; e < domaine.nb_elem(); e++)
     {
       for (n = 0, m = 0; n < N; n++, m += (M > 1))
@@ -103,9 +103,9 @@ void Source_Travail_pression_Elem_base::ajouter_blocs(matrices_t matrices, Doubl
           (*Ma)(N * e + n, N * e + n) += pe(e) * ve(e) * press(e, m) / dt;
     }
 
-  //partie -p div (alpha_k v_k)
-  DoubleTrav dv_flux(N), dc_flux(2, N); //derivees du flux convectif a la face par rapport a la vitesse / au champ convecte amont / aval
-  /* convection aux faces internes (fcl(f, 0) == 0), de Neumann_val_ext ou de Dirichlet */
+  // term -p div (alpha_k v_k)
+  DoubleTrav dv_flux(N), dc_flux(2, N); // derivatives of the face convective flux w.r.t. velocity / upwind or downwind convected field
+  /* convection at internal faces (fcl(f, 0) == 0), Neumann_val_ext or Dirichlet */
   for (f = 0; f < domaine.nb_faces(); f++)
     if (!fcl(f, 0) || (fcl(f, 0) > 4 && fcl(f, 0) < 7))
       {
@@ -115,31 +115,31 @@ void Source_Travail_pression_Elem_base::ajouter_blocs(matrices_t matrices, Doubl
               const double v = vit(f, n) ? vit(f, n) : DBL_MIN,
                            fac = pf(f) * fs(f) * (1. + (v * (i ? -1 : 1) > 0 ? 1. : -1) * alp) / 2;
 
-              dv_flux(n) += fac * (e >= 0 ? c_alpha(e, n) - pbm.alpha_inf_phase(n) : b_alpha(f, n) - pbm.alpha_inf_phase(n)); //f est reelle -> indice trivial dans b_alpha
+              dv_flux(n) += fac * (e >= 0 ? c_alpha(e, n) - pbm.alpha_inf_phase(n) : b_alpha(f, n) - pbm.alpha_inf_phase(n)); //f is a real face -> trivial index in b_alpha
               dc_flux(i, n) = e >= 0 ? fac * vit(f, n) : 0;
             }
 
-        //second membre
+        // right-hand side
         for (i = 0; i < 2; i++)
           if ((e = f_e(f, i)) >= 0)
             if (e < domaine.nb_elem())
               for (n = 0, m = 0; n < N; n++, m += (M > 1))
                 secmem(e, n) -= (i ? -1 : 1) * press(e, m) * dv_flux(n) * vit(f, n);
-        //derivees : vitesse
-        if (Mv && (fcl_v(f, 0) < 2 || fcl_v(f, 0) == 5)) // XXX : pas pour CL Dirichlet !
+        // derivatives: velocity
+        if (Mv && (fcl_v(f, 0) < 2 || fcl_v(f, 0) == 5)) // XXX : not for Dirichlet BC!
           for (i = 0; i < 2; i++)
             if ((e = f_e(f, i)) >= 0)
               if (e < domaine.nb_elem())
                 for (n = 0, m = 0; n < N; n++, m += (M > 1))
                   (*Mv)(N * e + n, N * f + n) += (i ? -1 : 1) * press(e, m) * dv_flux(n);
-        //derivees : pression
+        // derivatives: pressure
         if (Mp)
           for (i = 0; i < 2; i++)
             if ((e = f_e(f, i)) >= 0)
               if (e < domaine.nb_elem())
                 for (n = 0, m = 0; n < N; n++, m += (M > 1))
                   (*Mp)(N * e + n, M * e + m) += (i ? -1 : 1) * dv_flux(n) * vit(f, n);
-        //derivees : alpha
+        // derivatives: alpha
         if (Ma)
           for (i = 0; i < 2; i++)
             if ((e = f_e(f, i)) >= 0)

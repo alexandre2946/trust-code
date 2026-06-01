@@ -16,8 +16,8 @@
 #include <TRUSTTab.h>
 #include <Roue.h>
 
-// NOTE : OF 19/6/98
-// Pas de commentaires pour Roue_Ptr, ce n'est pas une classe...
+// NOTE: OF 19/6/98
+// No Doxygen comments for Roue_Ptr — it is not a class.
 
 /*! @brief
  *
@@ -27,22 +27,25 @@ Roue_ptr::Roue_ptr() : ptr(new(Roue))
 }
 
 
-/*! @brief Constructeur par recopie.
+/*! @brief Copy constructor.
  *
- * Copie de l'ensemble de la roue. Utile pour les constructeurs par recopie des champs.
- *  (ce constructeur est appele quand on fait un OWN_PTR(Champ_base) = un autre Champ,
- *   la version precedente copie la reference, d'ou plantage a la destruction)
+ * Copies the entire wheel. Useful for copy constructors of fields.
+ * (This constructor is called when doing OWN_PTR(Champ_base) = another field;
+ *  the previous version copied the reference, leading to a crash at destruction.)
  *
+ * @param x The Roue_ptr to copy.
  */
 Roue_ptr::Roue_ptr(const Roue_ptr& x)
 {
   ptr=new Roue(x.valeur());
 }
 
-/*! @brief Constructeur par recopie.
+/*! @brief Copy assignment operator.
  *
- * Copie de l'ensemble de la roue.
+ * Copies the entire wheel.
  *
+ * @param x The Roue_ptr to copy.
+ * @return Reference to the modified Roue_ptr.
  */
 Roue_ptr& Roue_ptr::operator=(const Roue_ptr& x)
 {
@@ -89,7 +92,7 @@ const Roue& Roue_ptr::operator[](int i) const
 }
 
 
-/*! @brief Constructeur Construit une roue avec une seule case, au temps t=0
+/*! @brief Default constructor. Builds a wheel with a single slot at time t=0.
  *
  */
 Roue::Roue() : temps_(0), nb_cases_(1), valeurs_(), passe_(this), futur_(this)
@@ -97,8 +100,9 @@ Roue::Roue() : temps_(0), nb_cases_(1), valeurs_(), passe_(this), futur_(this)
 }
 
 
-/*! @brief Constructeur par copie Le temps, les valeurs et les valeurs des Roues futures sont copies
+/*! @brief Copy constructor. Copies the time, values, and values of future wheels.
  *
+ * @param roue The Roue to copy.
  */
 Roue::Roue(const Roue& roue) : temps_(roue.temps_), nb_cases_(1), valeurs_(roue.valeurs_), passe_(this), futur_(this)
 {
@@ -111,7 +115,7 @@ Roue::Roue(const Roue& roue) : temps_(roue.temps_), nb_cases_(1), valeurs_(roue.
 }
 
 
-/*! @brief Desctructeur
+/*! @brief Destructor.
  *
  */
 Roue::~Roue()
@@ -124,10 +128,10 @@ Roue::~Roue()
   futur_.ptr=passe_.ptr=0;
 }
 
-/*! @brief Retourne la Roue correspondant a la ieme case future
+/*! @brief Returns the Roue corresponding to the i-th future slot.
  *
- * @param (int i) l'indice i de la ieme case future
- * @return (const Roue&) reference sur la ieme Roue future
+ * @param i Index of the future slot.
+ * @return Reference to the i-th future Roue.
  */
 const Roue& Roue::futur(int i) const
 {
@@ -140,10 +144,10 @@ const Roue& Roue::futur(int i) const
 }
 
 
-/*! @brief Retourne la Roue correspondant a la ieme case future
+/*! @brief Returns the Roue corresponding to the i-th future slot.
  *
- * @param (int i) l'indice i de la ieme case future
- * @return (const Roue&) la ieme Roue future
+ * @param i Index of the future slot.
+ * @return Reference to the i-th future Roue.
  */
 Roue& Roue::futur(int i)
 {
@@ -156,10 +160,10 @@ Roue& Roue::futur(int i)
 }
 
 
-/*! @brief Retourne la Roue correspondant a la ieme case passee
+/*! @brief Returns the Roue corresponding to the i-th past slot.
  *
- * @param (int i) l'indice i de la ieme case passee
- * @return (const Roue&) reference sur la ieme Roue passee
+ * @param i Index of the past slot.
+ * @return Reference to the i-th past Roue.
  */
 const Roue& Roue::passe(int i) const
 {
@@ -172,10 +176,10 @@ const Roue& Roue::passe(int i) const
 }
 
 
-/*! @brief Retourne la Roue correspondant a la ieme case passee
+/*! @brief Returns the Roue corresponding to the i-th past slot.
  *
- * @param (int i) l'indice i de la ieme case passee
- * @return (const Roue&) la ieme Roue passee
+ * @param i Index of the past slot.
+ * @return Reference to the i-th past Roue.
  */
 Roue& Roue::passe(int i)
 {
@@ -194,9 +198,9 @@ Roue& Roue::passe(int i)
 //    }
 
 
-/*! @brief Dimensionne (1D) les valeurs de la Roue et des ses roues futures
+/*! @brief Resizes (1D) the values of the Roue and its future wheels.
  *
- * @param (int nb_val) nombre de valeurs
+ * @param nb_val Number of values.
  */
 void Roue::dimensionner(int nb_val)
 {
@@ -209,10 +213,10 @@ void Roue::dimensionner(int nb_val)
 }
 
 
-/*! @brief Dimensionne (2D) les valeurs de la Roue et des ses roues futures
+/*! @brief Resizes (2D) the values of the Roue and its future wheels.
  *
- * @param (int nb_val) dimension 1 des valeurs
- * @param (int nb_ncomp) dimension 2 des valeurs
+ * @param nb_val First dimension of the values.
+ * @param nb_comp Second dimension (number of components) of the values.
  */
 void Roue::dimensionner(int nb_val, int nb_comp)
 {
@@ -225,10 +229,10 @@ void Roue::dimensionner(int nb_val, int nb_comp)
 }
 
 
-/*! @brief Change le nombre de cases de la Roue
+/*! @brief Changes the number of slots in the Roue.
  *
- * @param (int nb_case) le nouveau nombre de cases
- * @return (int) le nouveau nombre de cases
+ * @param nb_case The new number of slots.
+ * @return The new number of slots.
  */
 int Roue::fixer_nb_cases(int nb_case)
 {
@@ -243,9 +247,9 @@ int Roue::fixer_nb_cases(int nb_case)
 }
 
 
-/*! @brief Ajoute n cases a la Roue
+/*! @brief Adds n slots to the Roue.
  *
- * @param (int n) le nombre de cases a ajouter
+ * @param n Number of slots to add.
  */
 void Roue::ajouter_case(int n)
 {
@@ -257,7 +261,7 @@ void Roue::ajouter_case(int n)
       old_futur->passe_.ptr = new_futur;
       new_futur->futur_.ptr = old_futur;
       new_futur->passe_.ptr = this;
-      // On met a jour nb_cases_ de toutes les cases:
+      // Update nb_cases_ for all slots:
       {
         const int new_nb_cases = nb_cases_ + 1;
         Roue * ptr_roue = this;
@@ -267,9 +271,9 @@ void Roue::ajouter_case(int n)
     }
 }
 
-/*! @brief Supprime n cases de la Roue
+/*! @brief Removes n slots from the Roue.
  *
- * @param (int n) nombre de cases a supprimer
+ * @param n Number of slots to remove.
  */
 void Roue::supprimer_case(int n)
 {
@@ -284,16 +288,16 @@ void Roue::supprimer_case(int n)
         }
       else
         {
-          // Sauvegarde du futur du futur:
+          // Save the future-of-future:
           Roue * new_futur = futur_->futur_.ptr;
-          // Destruction du futur:
+          // Destroy the future slot:
           {
             Roue * to_kill = futur_.ptr;
             to_kill->nb_cases_ = 1;
             to_kill->futur_.ptr = to_kill->passe_.ptr = to_kill;
             delete to_kill;
           }
-          // On referme la liste chainee:
+          // Close the linked list:
           new_futur->passe_.ptr = this;
           futur_.ptr = new_futur;
 
@@ -301,7 +305,7 @@ void Roue::supprimer_case(int n)
           if(new_nb_cases == 1)
             passe_.ptr=this;
 
-          // On met a jour nb_cases_ de toutes les cases:
+          // Update nb_cases_ for all slots:
           {
             Roue * ptr_roue = this;
             for(int i = 0; i < new_nb_cases; i++, ptr_roue = ptr_roue->futur_.ptr)
@@ -312,10 +316,10 @@ void Roue::supprimer_case(int n)
 }
 
 
-/*! @brief Affectation d'une Roue Les attibuts modifies sont le temps, les valeurs, le nombre de cases et les valeurs des cases futures
+/*! @brief Assignment operator for a Roue. Copies the time, values, number of slots, and future slot values.
  *
- * @param (const Roue& roue) la Roue a copier
- * @return (Roue&) la Roue modifiee
+ * @param roue The Roue to copy.
+ * @return Reference to the modified Roue.
  */
 Roue& Roue::operator=(const Roue& roue)
 {

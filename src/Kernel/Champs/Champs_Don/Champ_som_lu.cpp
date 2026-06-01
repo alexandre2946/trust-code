@@ -28,9 +28,9 @@ Entree& Champ_som_lu::readOn(Entree& is)
   Nom nom;
   is >> nom;
   mon_domaine = ref_cast(Domaine, Interprete::objet(nom));
-  is >> nbcomp; // nombre de composantes du champ
-  is >> tolerance; // tolerance en metres pour la recherche des coordonnees
-  is >> nom; // nom du fichier a lire
+  is >> nbcomp; // number of field components
+  is >> tolerance; // tolerance in meters for coordinate search
+  is >> nom; // name of the file to read
   LecFicDiffuse file(nom);
   fixer_nb_comp(nbcomp);
   Champ_implementation_P1::init_from_file(valeurs_, mon_domaine.valeur(), nbcomp, tolerance, file);

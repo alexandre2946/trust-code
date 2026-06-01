@@ -18,7 +18,7 @@
 
 #include <Champ_Fonc_P1_base.h>
 
-/*! @brief classe Champ_Fonc_P1_MED permet de faire un champ P1 pour le post med
+/*! @brief class Champ_Fonc_P1_MED Provides a P1 field for MED post-processing.
  *
  */
 class Champ_Fonc_P1_MED: public Champ_Fonc_P1_base

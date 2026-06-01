@@ -19,28 +19,28 @@
 #include <Schema_Temps_base.h>
 #include <TRUSTTabs_forward.h>
 
-/*! @brief classe Sch_CN_iteratif Schema en temps alternant un demi-pas de temps d'Euler implicite et un demi-pas de temps de LeapFrog.
+/*! @brief Time scheme alternating a half implicit Euler step and a half LeapFrog step.
  *
- *      La resolution implicite est iterative (point fixe).
- *      Le pas de temps est calcule comme le produit du pas de temps de stabilite explicite par un facsec.
- *      Le facsec est ajuste automatiquement pour que la resolution converge en un nombre d'iterations predefini.
- *      Les caracteristiques de chaque iteration sont ecrites dans le fichier dt_CN.
+ *      The implicit solve is iterative (fixed-point).
+ *      The time step is computed as the product of the explicit stability time step by a facsec.
+ *      The facsec is adjusted automatically so that the solve converges in a predefined number of iterations.
+ *      Characteristics of each iteration are written to the file dt_CN.
  *
- *      La resolution est gouvernee par 4 parametres (valeurs par defauts entre parentheses) :
- *      * seuil (1e-3) : le seuil de convergence. Plus il est bas, plus la resolution est precise.
- *      * facsec_max (2) : la valeur du facsec que l'on ne veut pas depasser (eviter les instabilites et capter les phenomenes physiques)
- *      * niter_min (2) : le nombre minimum d'iterations. En deca, on continue a iterer meme si on semble avoir atteint la convergence.
- *      * niter_avg (3) : le nombre d'iterations que l'on souhaite faire pour arriver a convergence.
- *      * niter_max (6) : le nombre d'iteration au-dela duquel on reessaye avec un facsec plus petit.
+ *      The solve is governed by 4 parameters (default values in parentheses):
+ *      * seuil (1e-3) : convergence threshold. The lower, the more accurate the solve.
+ *      * facsec_max (2) : maximum facsec value (to avoid instabilities and capture physical phenomena).
+ *      * niter_min (2) : minimum number of iterations. Below this, iteration continues even if convergence seems reached.
+ *      * niter_avg (3) : target number of iterations to reach convergence.
+ *      * niter_max (6) : number of iterations beyond which a smaller facsec is retried.
  *
- *      Conseil pour le choix des parametres d'ajustement du facsec :
- *      * Choisir seuil en fonction de la precision desiree.
- *      * Choisir niter_min : 2 garantit un schema d'ordre 2 en temps.
- *      * Si on cherche un stationnaire, choisir seuil_statio >= seuil.
- *      * Choisir facsec_max en fonction des phenomenes physiques a capter.
- *      * Commencer par tester avec une grande valeur de niter_avg. Observer le comportement du nombre d'iterations.
- *        Il bute sur une valeur maximum avant de retomber.
- *      * Choisir niter_avg aux 2/3 de cette valeur maximum, et niter_max aux 4/3 ou au double environ.
+ *      Advice for choosing facsec adjustment parameters:
+ *      * Choose seuil based on desired precision.
+ *      * Choose niter_min: 2 guarantees a second-order time scheme.
+ *      * If seeking a steady state, choose seuil_statio >= seuil.
+ *      * Choose facsec_max based on the physical phenomena to capture.
+ *      * Start by testing with a large value of niter_avg. Observe the number of iterations.
+ *        It will plateau at a maximum before dropping back.
+ *      * Choose niter_avg at 2/3 of this maximum, and niter_max at approximately 4/3 or double.
  *
  *
  * @sa Schema_Temps_base
@@ -53,7 +53,7 @@ public :
 
   ////////////////////////////////
   //                            //
-  // Caracteristiques du schema //
+  // Scheme characteristics     //
   //                            //
   ////////////////////////////////
 
@@ -64,7 +64,7 @@ public :
 
   /////////////////////////////////////////
   //                                     //
-  // Fin des caracteristiques du schema  //
+  // End of scheme characteristics       //
   //                                     //
   /////////////////////////////////////////
 
@@ -78,7 +78,7 @@ public :
 
 protected :
 
-  enum type_convergence {DIVERGENCE, NON_CONVERGENCE, CONVERGENCE_LENTE, CONVERGENCE_RAPIDE, CONVERGENCE_OK};
+  enum type_convergence {DIVERGENCE, NON_CONVERGENCE, CONVERGENCE_LENTE, CONVERGENCE_RAPIDE, CONVERGENCE_OK}; // slow/fast convergence
 
   virtual bool convergence(const DoubleTab& u0, const DoubleTab& up1, const DoubleTab& delta, int p) const;
   virtual bool divergence(const DoubleTab& u0, const DoubleTab& up1, const DoubleTab& delta, int p) const;

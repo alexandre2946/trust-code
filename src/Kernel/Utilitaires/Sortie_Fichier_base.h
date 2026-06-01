@@ -45,7 +45,7 @@ public:
   static std::string root;
 
 protected:
-  /*! This pointer is just a (typed) view on the smart ptr hold by the base class (Sortie).
+  /*! @brief This pointer is just a (typed) view on the smart ptr hold by the base class (Sortie).
    * The base class is managing the memory.
    */
   ofstream * ofstream_ = nullptr;

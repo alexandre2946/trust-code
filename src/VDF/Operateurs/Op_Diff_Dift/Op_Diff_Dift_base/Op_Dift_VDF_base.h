@@ -32,7 +32,7 @@ public:
     Process::exit();
   }
 
-  // Methodes utiles pour l'heritage V
+  // Useful methods for V-inheritance
   inline void associer_diffusivite_turbulente_base(const Champ_Fonc_base& diff_turb) { Op_Diff_Turbulent_base::associer_diffusivite_turbulente(diff_turb); }
   inline void completer_Op_Dift_VDF_base() { Op_Diff_VDF_base::completer(); }
 

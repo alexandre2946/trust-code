@@ -19,7 +19,7 @@
 #include <Correlation_base.h>
 #include <Champ_Fonc_base.h>
 
-/*! @brief classe Diametre_bulles_champ Contient un champ de bulles de diametre defini dans un champ par l'utilisateur
+/*! @brief Bubble diameter defined as a user-provided field.
  *
  *
  *

@@ -36,7 +36,7 @@ class Champ_Inc_base;
 class Domaine_VF;
 class Domaine_dis_base;
 
-/*! @brief Classe Ecrire_MED Ecrit un fichier MED.
+/*! @brief Class Ecrire_MED. Writes a MED file.
  *
  * Warning: fields and everything related to discretised domains can only be invoked with the 32 bit version.
  */

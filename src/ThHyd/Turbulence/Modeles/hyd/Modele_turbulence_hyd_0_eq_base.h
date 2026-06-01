@@ -24,7 +24,7 @@
 class Domaine_Cl_dis_base;
 class Domaine_VF;
 
-/*! @brief Classe Modele_turbulence_hyd_0_eq_base Classe de base des modeles a 0 equation
+/*! @brief Base class for zero-equation (algebraic) hydraulic turbulence models.
  *
  * @sa Modele_turbulence_hyd_base
  */

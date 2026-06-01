@@ -20,21 +20,21 @@
 #include <Champ_Generique_Operateur_base.h>
 #include <Operateur_Grad.h>
 
-/*! @brief class Champ_Generique_Gradient OWN_PTR(Champ_base) destine a post-traiter le gradient d un champ generique
+/*! @brief class Champ_Generique_Gradient OWN_PTR(Champ_base) intended to post-process the gradient of a generic field
  *
- *  La classe porte un operateur statistique "gradient"
+ *  The class carries a statistical operator "gradient"
  *
  */
 
-//// Syntaxe a respecter pour jdd
+//// Data file syntax to follow
 //
-// "nom_champ" Gradient {
-//                source "type_champ_gen" { ...source ref_Champ { Pb_champ "nom_pb" "nom_champ_discret" } }
+// "field_name" Gradient {
+//                source "generic_field_type" { ...source ref_Champ { Pb_champ "pb_name" "discrete_field_name" } }
 //               }
-// "nom_champ" fixe par utilisateur sera le nom du champ generique
-// "type_champ_gen" type d'un champ generique
-//Ce type de champ implique que le champ source possede des conditions limites
-//Son application est restreinte a certains champs discrets (pression VDF et VEF ou temperature en VEF)
+// "field_name" set by the user will be the name of the generic field
+// "generic_field_type" type of a generic field
+// This type of field implies that the source field has boundary conditions
+// Its application is restricted to certain discrete fields (pressure VDF and VEF or temperature in VEF)
 
 class Champ_Generique_Gradient : public Champ_Generique_Operateur_base
 {

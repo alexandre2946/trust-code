@@ -16,9 +16,9 @@
 #ifndef Discr_inst_included
 #define Discr_inst_included
 
-/*! @brief class Discr_inst Cette classe ne sait rien faire, on en a besoin pour le Pb_MED
+/*! @brief class Discr_inst This class does nothing; it is needed for Pb_MED,
  *
- *  on a besoin d'avoir associe une discretisation
+ *  which requires an associated discretisation.
  *
  */
 

@@ -16,9 +16,9 @@
 #ifndef Schema_Implicite_Multi_TimeStep_base_included
 #define Schema_Implicite_Multi_TimeStep_base_included
 
-/*! @brief class Schema_Implicite_Multi_TimeStep_base Il herite de schema implicite base et porte un solveur par exemple
+/*! @brief class Schema_Implicite_Multi_TimeStep_base It inherits from the implicit base scheme and carries a solver, for example
  *
- *   le Simpler pour effectuer les Faire_un_pas_de_temps..
+ *   the Simpler solver, to perform the time-stepping operations.
  *
  */
 
@@ -37,7 +37,7 @@ public :
 
   ////////////////////////////////
   //                            //
-  // Caracteristiques du schema //
+  // Schema characteristics     //
   //                            //
   ////////////////////////////////
 
@@ -48,7 +48,7 @@ public :
 
   /////////////////////////////////////////
   //                                     //
-  // Fin des caracteristiques du schema  //
+  // End of schema characteristics       //
   //                                     //
   /////////////////////////////////////////
 
@@ -83,7 +83,7 @@ public :
 
   void ajouter_inertie(Matrice_Base& mat_morse,DoubleTab& secmem,const Equation_base& eqn) const override;
 
-  //pour les schemas en temps a pas multiples
+  // for multi-timestep schemes
   virtual void modifier_second_membre_full_impl(const Equation_base& eqn, DoubleTab& secmem);
   void modifier_second_membre(const Equation_base& eqn, DoubleTab& secmem) override;
 

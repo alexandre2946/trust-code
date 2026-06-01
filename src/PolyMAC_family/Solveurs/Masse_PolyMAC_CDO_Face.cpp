@@ -70,7 +70,7 @@ void Masse_PolyMAC_CDO_Face::dimensionner(Matrice_Morse& matrix) const
   domaine.init_m1(), domaine.init_m2(), ch.init_ra();
   Stencil indice(0, 2);
 
-  //partie vitesses : matrice de masse des vitesses si la face n'est pas a vitesse imposee, diagonale sinon
+  //velocity part: velocity mass matrix if the face does not have an imposed velocity, diagonal otherwise
   for (e = 0; e < domaine.nb_elem_tot(); e++)
     for (i = 0, j = domaine.m2d(e); j < domaine.m2d(e + 1); i++, j++)
       if (ch.fcl()(f = e_f(e, i), 0) > 1 && f < domaine.nb_faces())
@@ -80,7 +80,7 @@ void Masse_PolyMAC_CDO_Face::dimensionner(Matrice_Morse& matrix) const
           if (ch.fcl()(fb = e_f(e, domaine.m2j(k)), 0) < 2)
             indice.append_line(f, fb);
 
-  //partie vorticites : diagonale si pas de diffusion
+  //vorticity part: diagonal if no diffusion
   if (!only_m2)
     for (a = 0; no_diff_ && a < (dimension < 3 ? domaine.nb_som() : domaine.domaine().nb_aretes()); a++)
       indice.append_line(nf_tot + a, nf_tot + a);
@@ -110,22 +110,22 @@ DoubleTab& Masse_PolyMAC_CDO_Face::ajouter_masse(double dt, DoubleTab& secmem, c
 
   domaine.init_m1(), domaine.init_m2(), ch.init_ra();
 
-  //partie vitesses : vitesses imposees par CLs
+  //velocity part: velocities imposed by BCs
   for (f = 0; f < domaine.premiere_face_int(); f++)
     if (ch.fcl()(f, 0) == 3 && (!polymac_flica5 || sub_type(Dirichlet, cls[ch.fcl()(f, 1)].valeur())))
-      for (k = 0, secmem(f) = 0; k < dimension; k++) //valeur imposee par une CL de type Dirichlet
+      for (k = 0, secmem(f) = 0; k < dimension; k++) //value imposed by a Dirichlet BC
         secmem(f) += nf(f, k) * ref_cast(Dirichlet, cls[ch.fcl()(f, 1)].valeur()).val_imp(ch.fcl()(f, 2), k) / fs(f);
     else if (ch.fcl()(f, 0) > 1)
-      secmem(f) = 0; //Dirichlet homogene ou Symetrie
+      secmem(f) = 0; //homogeneous Dirichlet or Symmetry
 
-  //partie vitesses : m2 / dt
+  //velocity part: m2 / dt
   for (e = 0; e < domaine.nb_elem_tot(); e++)
     for (i = 0, j = domaine.m2d(e); j < domaine.m2d(e + 1); i++, j++)
       for (f = e_f(e, i), k = domaine.m2i(j); ch.fcl()(f, 0) < 2 && f < domaine.nb_faces() && k < domaine.m2i(j + 1); k++)
-        if (ch.fcl()(fb = e_f(e, domaine.m2j(k)), 0) < 2) //vfb calcule
+        if (ch.fcl()(fb = e_f(e, domaine.m2j(k)), 0) < 2) //vfb computed
           secmem(f) += ve(e) * pe(e) * domaine.m2c(k) * (e == f_e(f, 0) ? 1 : -1) * (e == f_e(fb, 0) ? 1 : -1) * coef(f) * inco(fb) / dt;
         else if (ch.fcl()(fb, 0) == 3 && (!polymac_flica5 || sub_type(Dirichlet, cls[ch.fcl()(f, 1)].valeur())))
-          for (l = 0; l < dimension; l++) //vfb impose par Dirichlet
+          for (l = 0; l < dimension; l++) //vfb imposed by Dirichlet
             secmem(f) += ve(e) * pe(e) * domaine.m2c(k) * (e == f_e(f, 0) ? 1 : -1) * (e == f_e(fb, 0) ? 1 : -1) * coef(f)
                          * ref_cast(Dirichlet, cls[ch.fcl()(fb, 1)].valeur()).val_imp(ch.fcl()(fb, 2), l) * nf(fb, l) / (fs(fb) * dt);
 
@@ -147,19 +147,19 @@ Matrice_Base& Masse_PolyMAC_CDO_Face::ajouter_masse(double dt, Matrice_Base& mat
 
   domaine.init_m1(), domaine.init_m2(), ch.init_ra();
 
-  //partie vitesses : vitesses imposees par CLs
+  //velocity part: velocities imposed by BCs
   for (f = 0; f < domaine.premiere_face_int(); f++)
     if (ch.fcl()(f, 0) > 1)
       mat(f, f) = 1;
 
-  //partie vitesses : m2 / dt
+  //velocity part: m2 / dt
   for (e = 0; e < domaine.nb_elem_tot(); e++)
     for (i = 0, j = domaine.m2d(e); j < domaine.m2d(e + 1); i++, j++)
       for (f = e_f(e, i), k = domaine.m2i(j); ch.fcl()(f, 0) < 2 && f < domaine.nb_faces() && k < domaine.m2i(j + 1); k++)
-        if (ch.fcl()(fb = e_f(e, domaine.m2j(k)), 0) < 2) //vfb calcule
+        if (ch.fcl()(fb = e_f(e, domaine.m2j(k)), 0) < 2) //vfb computed
           mat(f, fb) += ve(e) * pe(e) * domaine.m2c(k) * (e == f_e(f, 0) ? 1 : -1) * (e == f_e(fb, 0) ? 1 : -1) * coef(f) / dt;
 
-  //partie vorticites : diagonale si Op_Diff_negligeable
+  //vorticity part: diagonal if Op_Diff_negligeable
   if (mat.nb_lignes() > nf_tot)
     for (a = 0; no_diff_ && a < (dimension < 3 ? domaine.nb_som() : domaine.domaine().nb_aretes()); a++)
       mat(nf_tot + a, nf_tot + a) = 1;

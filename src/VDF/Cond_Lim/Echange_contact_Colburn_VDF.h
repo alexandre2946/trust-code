@@ -24,7 +24,7 @@ class Domaine_VDF;
 
 ////////////////////////////////////////////////////////////////
 
-/*! @brief classe : Echange_contact_VDF_Colburn
+/*! @brief class: Echange_contact_VDF_Colburn
  *
  *
  *

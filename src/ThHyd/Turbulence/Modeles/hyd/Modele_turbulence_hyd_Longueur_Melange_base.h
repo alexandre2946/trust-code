@@ -19,9 +19,7 @@
 #include <Modele_turbulence_hyd_0_eq_base.h>
 
 
-/*! @brief Classe Modele_turbulence_hyd_Longueur_Melange_base Classe representant le modele de turbulence Longueur Melange pour les
- *
- *     equations de Navier-Stokes.
+/*! @brief Mixing-length turbulence model for the Navier-Stokes equations.
  *
  * @sa Modele_turbulence_hyd_0_eq_base
  */

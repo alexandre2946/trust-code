@@ -16,15 +16,15 @@
 #ifndef Modifier_pour_fluide_dilatable
 #define Modifier_pour_fluide_dilatable
 
-/*! @brief Fonctions destinees a multiplier ou diviser un tableau de valeurs par un vecteur.
+/*! @brief Functions intended to multiply or divide an array of values by a vector.
  *
- * Ces fonctions sont utilisees ici pour multiplier ou diviser un tableau par rho pour le cas ou le milieu est un Fluide_Dilatable_base
+ * These functions are used here to multiply or divide an array by rho when the medium is a Fluide_Dilatable_base.
  *
- * correction_nut_et_cisaillement_paroi_si_qc permet de faire la conversion de la viscosite cinematique turbulente nu_t en
- *    viscosite dynamique turbulente mu_t dans le cas des equations compressibles.
- *      - Cette conversion ne doit etre faite que dans le cas ou l'on utilise un modele sous-maille type LES puisque dans ce cas on renvoit un nu_t.
- *      - Par contre en simulation RANS, puisque l'on rentre les bonnes grandeurs turbulentes multipliee par rho, on obtient bien au final un mu_t et
- *         l'on n'a pas besoin de faire de conversion.
+ * correction_nut_et_cisaillement_paroi_si_qc performs the conversion of the turbulent kinematic viscosity nu_t to
+ *    the turbulent dynamic viscosity mu_t for compressible equations.
+ *      - This conversion should only be done when using a subgrid-scale model of LES type, since in that case nu_t is returned.
+ *      - In RANS simulations, since the correct turbulent quantities are entered multiplied by rho, a mu_t is already obtained
+ *         and no conversion is needed.
  *
  */
 

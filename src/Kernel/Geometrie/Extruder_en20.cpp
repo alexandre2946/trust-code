@@ -32,17 +32,15 @@ Sortie& Extruder_en20::printOn(Sortie& os) const { return Interprete::printOn(os
 
 Entree& Extruder_en20::readOn(Entree& is) { return Interprete::readOn(is); }
 
-/*! @brief Fonction principale de l'interprete Extruder_en20 Triangule tout le domaine
+/*! @brief Main function of the Extruder_en20 interpreter. Extrudes the domain specified by the directive.
  *
- *     specifie par la directive.
- *     On triangule le domaine grace a la methode:
+ * Extrusion is performed by calling:
  *       void Extruder_en20::extruder(Domaine& domaine) const
- *     Extruder signifie ici transformer en triangle des
- *     elements geometrique d'un domaine.
+ * Here, extrusion means transforming the geometric elements of a domain into triangles.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree
- * @throws l'objet a mailler n'est pas du type Domaine
+ * @param is An input stream.
+ * @return The input stream.
+ * @throws Error if the object to mesh is not of type Domaine.
  */
 Entree& Extruder_en20::interpreter_(Entree& is)
 {
@@ -61,12 +59,11 @@ Entree& Extruder_en20::interpreter_(Entree& is)
   return is;
 }
 
-/*! @brief Triangule tous les element d'un domaine: transforme les elements goemetriques du domaine en triangles.
+/*! @brief Extrudes all elements of a domain: transforms the geometric elements of the domain.
  *
- *     Pour l'instant on ne sait raffiner que des Rectangles
- *     (on les coupe en 4).
+ * Currently only Rectangles can be extruded (they are cut into 4 sub-elements).
  *
- * @param (Domaine& domaine) le domaine dont on veut raffiner les elements
+ * @param dom The domain whose elements are to be extruded.
  */
 void Extruder_en20::extruder(Domaine& dom)
 {
@@ -87,7 +84,7 @@ void Extruder_en20::extruder(Domaine& dom)
       Faces les_faces;
       //domaine.creer_faces(les_faces);
       {
-        // bloc a factoriser avec Domaine_VF.cpp :
+        // block to be factored out with Domaine_VF.cpp:
         Type_Face type_face = dom.type_elem()->type_face(0);
         les_faces.typer(type_face);
         les_faces.associer_domaine(dom);
@@ -102,7 +99,7 @@ void Extruder_en20::extruder(Domaine& dom)
                                          1 /* include virtual elements */);
 
         Faces_builder faces_builder;
-        IntTab elem_faces; // Tableau dont on aura pas besoin
+        IntTab elem_faces; // Array that will not be needed
         faces_builder.creer_faces_reeles(dom,
                                          connectivite_som_elem,
                                          les_faces,
@@ -117,7 +114,7 @@ void Extruder_en20::extruder(Domaine& dom)
       Objet_U::dimension=3;
 
 
-      // les sommets du maillage 2D sont translates en premier
+      // vertices of the 2D mesh are translated first
       for (int i=0; i<oldnbsom; i++)
         {
           double x = coord_sommets(i,0);
@@ -138,7 +135,7 @@ void Extruder_en20::extruder(Domaine& dom)
         }
 
 
-      // creation des centres de gravite des elements 2D puis translation de ces points
+      // compute centroids of 2D elements then translate these points
       for (int i=0; i<oldsz; i++)
         {
           int i0=les_elems(i,0);
@@ -164,7 +161,7 @@ void Extruder_en20::extruder(Domaine& dom)
         }
 
 
-      // creation des centres des faces du maillage 2D puis translation de ces points
+      // compute face centers of the 2D mesh then translate these points
       for (int i=0; i<nbfaces2D; i++)
         {
           int i0=les_faces.sommet(i,0);
@@ -186,7 +183,7 @@ void Extruder_en20::extruder(Domaine& dom)
             }
         }
 
-      // creation des centres des aretes du maillage 2D puis translation de ces points
+      // compute edge midpoints of the 2D mesh then translate these points
       for (int i=0; i<oldnbsom; i++)
         {
           double x = coord_sommets(i,0)+0.5*dx;
@@ -210,11 +207,11 @@ void Extruder_en20::extruder(Domaine& dom)
       dom.ajouter(new_soms);
 
       int newnbelem = 20*NZ*oldsz;
-      IntTab new_elems(newnbelem, 4); // les nouveaux elements
+      IntTab new_elems(newnbelem, 4); // the new elements
       int cpt=0;
 
 
-      // en premier, on stocke les tetra du haut et du bas : NZ*nb_triangle*2 tetra
+      // first, store the top and bottom tetrahedra: NZ*nb_triangle*2 tetrahedra
       for (int i=0; i<oldsz; i++)
         {
           int i0=les_elems(i,0);
@@ -248,7 +245,7 @@ void Extruder_en20::extruder(Domaine& dom)
 
 
 
-      // puis les autres tetras
+      // then the remaining tetrahedra
       for (int i=0; i<nbfaces2D; i++)
         {
           for (int ivois=0; ivois<2; ivois++)
@@ -312,7 +309,7 @@ void Extruder_en20::extruder(Domaine& dom)
 
       les_elems.ref(new_elems);
 
-      // Reconstruction de l'octree
+      // Rebuild the octree
       dom.invalide_octree();
       dom.typer("Tetraedre");
 
@@ -343,7 +340,7 @@ void Extruder_en20::traiter_faces_dvt(Faces& les_faces_bord, Faces& les_faces, i
       //double x01 = 0.5*(coord_sommets(i0,0)+coord_sommets(i1,0));
       //double y01 = 0.5*(coord_sommets(i0,1)+coord_sommets(i1,1));
 
-      // on recherche le numero de cette face de bord: pas top!
+      // find the index of this boundary face: not optimal!
       int jface=-1;
       for (int iface=0; iface<nbfaces2D; iface++)
         {

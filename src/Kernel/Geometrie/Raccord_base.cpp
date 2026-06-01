@@ -78,7 +78,7 @@ Entree& Raccord_local_homogene_32_64<_SIZE_>::readOn(Entree& s)
 template <>
 void Raccord_local_homogene_32_64<int>::trace_elem_distant(const DoubleTab& x, DoubleTab& y) const
 {
-  // en suppposant les numerotations des faces identiques sur le raccord des deux cotes
+  // assuming face numbering is identical on both sides of the connector
   return this->trace_elem_local(x,y);
 }
 

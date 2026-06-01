@@ -88,12 +88,12 @@ void VEF_discretisation::set_param(Param& param) const
 
 void VEF_discretisation::check_param()
 {
-  // Quelques verifications
+  // A few checks
   if (dimension != 3 && alphaA_)
     Process::exit("Pa support is only available in 3D.");
   if (!alphaE_ && !alphaS_ && !alphaA_)
     {
-      // P0P1Bulle par defaut avec CL pression forte
+      // P0P1Bulle by default with strong pressure BC
       alphaE_ = true;
       alphaS_ = true;
       P1Bulle_ = true;
@@ -128,27 +128,27 @@ Sortie& VEF_discretisation::printOn(Sortie& s) const
   return s;
 }
 
-/*! @brief Discretisation d'un champ pour le VEFP1B en fonction d'une directive de discretisation.
+/*! @brief Discretizes a field for VEFP1B according to a discretization directive.
  *
- * La directive est un Motcle comme "pression",
- *  "divergence_vitesse" (cree un champ de type P1_isoP1Bulle).
- *  Cette methode determine le type du champ a creer en fonction du type d'element
- *  et de la directive de discretisation. Elle determine ensuite le nombre de ddl
- *  et fixe l'ensemble des parametres du champ (type, nb_compo, nb_ddl, nb_pas_dt,
- *  nom(s), unite(s), nature du champ et attribue un temps) et associe le Domaine_dis au champ.
- *  Voir le code pour avoir la correspondance entre les directives et
- *  le type de champ cree.
+ * @brief The directive is a Motcle such as "pression",
+ *  "divergence_vitesse" (creates a field of type P1_isoP1Bulle).
+ *  This method determines the field type to create based on element type
+ *  and the discretization directive. It then determines the number of degrees of freedom
+ *  and sets all field parameters (type, nb_compo, nb_ddl, nb_pas_dt,
+ *  name(s), unit(s), field nature, and assigns a time) and associates the Domaine_dis to the field.
+ *  See the code for the correspondence between directives and
+ *  the field type created.
  *
  */
 void VEF_discretisation::discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, int nb_pas_dt, double temps,
                                            OWN_PTR(Champ_Inc_base)& champ, const Nom& sous_type) const
 {
   Motcles motcles(2);
-  motcles[0] = "pression";    // Choix standard pour la pression
-  motcles[1] = "divergence_vitesse"; // Le type de champ obtenu en calculant div v
+  motcles[0] = "pression";    // Standard choice for pressure
+  motcles[1] = "divergence_vitesse"; // Field type obtained by computing div v
 
   Nom type;
-  int default_nb_comp = 0; // Valeur par defaut du nombre de composantes
+  int default_nb_comp = 0; // Default number of components
   int rang = motcles.search(directive);
   switch(rang)
     {
@@ -168,15 +168,15 @@ void VEF_discretisation::discretiser_champ(const Motcle& directive, const Domain
   if (directive == DEMANDE_DESCRIPTION)
     Cerr << "VEF_discretisation : " << motcles;
 
-  // Si on n'a pas compris la directive (ou si c'est une demande_description)
-  // alors on appelle l'ancetre :
+  // If the directive is not recognized (or if it is a description request)
+  // then call the ancestor:
   if (rang < 0)
     {
       VEF_discretisation::discretiser_champ_(directive, z, nature, noms, unites, nb_comp, nb_pas_dt, temps, champ);
       return;
     }
 
-  const int nb_ddl = -1; // c'est le descripteur p1b qui donnera le chiffre
+  const int nb_ddl = -1; // the p1b descriptor will provide the actual number
   if (nb_comp < 0)
     nb_comp = default_nb_comp;
   assert(nb_comp > 0);
@@ -196,15 +196,15 @@ void VEF_discretisation::discretiser_champ_(const Motcle& directive, const Domai
   const Domaine_VEF& domaine_vef = ref_cast(Domaine_VEF, z);
 
   Motcles motcles(7);
-  motcles[0] = "vitesse";     // Choix standard pour la vitesse
-  motcles[1] = "pression";    // Choix standard pour la pression
-  motcles[2] = "temperature"; // Choix standard pour la temperature
-  motcles[3] = "divergence_vitesse"; // Le type de champ obtenu en calculant div v
-  motcles[4] = "gradient_pression";  // Le type de champ obtenu en calculant grad P
-  motcles[5] = "champ_elem";    // Creer un champ aux elements (de type P0)
-  motcles[6] = "champ_sommets"; // Creer un champ aux sommets (type P1)
+  motcles[0] = "vitesse";     // Standard choice for velocity
+  motcles[1] = "pression";    // Standard choice for pressure
+  motcles[2] = "temperature"; // Standard choice for temperature
+  motcles[3] = "divergence_vitesse"; // Field type obtained by computing div v
+  motcles[4] = "gradient_pression";  // Field type obtained by computing grad P
+  motcles[5] = "champ_elem";    // Create a field at elements (type P0)
+  motcles[6] = "champ_sommets"; // Create a field at vertices (type P1)
 
-  // Le type de champ de vitesse depend du type d'element :
+  // The velocity field type depends on element type:
   Nom type_champ_vitesse;
   if (sub_type(Tri_VEF, domaine_vef.type_elem()) || sub_type(Tetra_VEF, domaine_vef.type_elem()))
     type_champ_vitesse = "Champ_P1NC";
@@ -259,15 +259,15 @@ void VEF_discretisation::discretiser_champ_(const Motcle& directive, const Domai
   if (directive == DEMANDE_DESCRIPTION)
     Cerr << "VEF_discretisation : " << motcles;
 
-  // Si on n'a pas compris la directive (ou si c'est une demande_description)
-  // alors on appelle l'ancetre :
+  // If the directive is not recognized (or if it is a description request)
+  // then call the ancestor:
   if (rang < 0)
     {
       Discret_Thyd::discretiser_champ(directive, z, nature, noms, unites, nb_comp, nb_pas_dt, temps, champ);
       return;
     }
 
-  // Calcul du nombre de ddl
+  // Compute the number of degrees of freedom
   int nb_ddl = 0;
   if (type == "Champ_P0_VEF")
     nb_ddl = z.nb_elem();
@@ -291,9 +291,7 @@ void VEF_discretisation::discretiser_champ_(const Motcle& directive, const Domai
 
 }
 
-/*! @brief Idem que VEF_discretisation::discretiser_champ(.
- *
- * .. , Champ_Inc)
+/*! @brief Same as VEF_discretisation::discretiser_champ(..., Champ_Inc).
  *
  */
 void VEF_discretisation::discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, double temps,
@@ -302,9 +300,7 @@ void VEF_discretisation::discretiser_champ(const Motcle& directive, const Domain
   discretiser_champ_fonc_don(directive, z, nature, noms, unites, nb_comp, temps, champ);
 }
 
-/*! @brief Idem que VEF_discretisation::discretiser_champ(.
- *
- * .. , Champ_Inc)
+/*! @brief Same as VEF_discretisation::discretiser_champ(..., Champ_Inc).
  *
  */
 void VEF_discretisation::discretiser_champ(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, double temps,
@@ -313,26 +309,23 @@ void VEF_discretisation::discretiser_champ(const Motcle& directive, const Domain
   discretiser_champ_fonc_don(directive, z, nature, noms, unites, nb_comp, temps, champ);
 }
 
-/*! @brief Idem que VEF_discretisation::discretiser_champ(.
- *
- * .. , Champ_Inc) Traitement commun aux champ_fonc et champ_don.
- *  Cette methode est privee (passage d'un Objet_U pas propre vu
- *  de l'exterieur ...)
+/*! @brief Same as VEF_discretisation::discretiser_champ(..., Champ_Inc). Common processing for champ_fonc and champ_don.
+ *  This method is private (passing an Objet_U is not clean from the outside).
  *
  */
 void VEF_discretisation::discretiser_champ_fonc_don(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, double temps,
                                                     Objet_U& champ) const
 {
-  // Deux pointeurs pour acceder facilement au champ_don ou au champ_fonc, suivant le type de l'objet champ.
+  // Two pointers for easy access to champ_don or champ_fonc depending on the type of the champ object.
   OWN_PTR(Champ_Fonc_base)  * champ_fonc = dynamic_cast<OWN_PTR(Champ_Fonc_base)*>(&champ);
   OWN_PTR(Champ_Don_base) * champ_don = dynamic_cast<OWN_PTR(Champ_Don_base)*>(&champ);
 
   Motcles motcles(2);
-  motcles[0] = "pression";    // Choix standard pour la pression
-  motcles[1] = "divergence_vitesse"; // Le type de champ obtenu en calculant div v
+  motcles[0] = "pression";    // Standard choice for pressure
+  motcles[1] = "divergence_vitesse"; // Field type obtained by computing div v
 
   Nom type;
-  int default_nb_comp = 0; // Valeur par defaut du nombre de composantes
+  int default_nb_comp = 0; // Default number of components
   int rang = motcles.search(directive);
   switch(rang)
     {
@@ -352,8 +345,8 @@ void VEF_discretisation::discretiser_champ_fonc_don(const Motcle& directive, con
   if (directive == DEMANDE_DESCRIPTION)
     Cerr << "VEF_discretisation : " << motcles;
 
-  // Si on n'a pas compris la directive (ou si c'est une demande_description)
-  // alors on appelle l'ancetre :
+  // If the directive is not recognized (or if it is a description request)
+  // then call the ancestor:
   if (rang < 0)
     {
       if (champ_fonc)
@@ -363,7 +356,7 @@ void VEF_discretisation::discretiser_champ_fonc_don(const Motcle& directive, con
       return;
     }
 
-  int nb_ddl = -1; // c'est le descripteur p1b qui donnera le chiffre
+  int nb_ddl = -1; // the p1b descriptor will provide the actual number
 
   if (nb_comp < 0)
     nb_comp = default_nb_comp;
@@ -384,23 +377,23 @@ void VEF_discretisation::discretiser_champ_fonc_don(const Motcle& directive, con
 void VEF_discretisation::discretiser_champ_fonc_don_(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, double temps,
                                                      Objet_U& champ) const
 {
-  // Deux pointeurs pour acceder facilement au champ_don ou au champ_fonc, suivant le type de l'objet champ.
+  // Two pointers for easy access to champ_don or champ_fonc depending on the type of the champ object.
   OWN_PTR(Champ_Fonc_base)  * champ_fonc = dynamic_cast<OWN_PTR(Champ_Fonc_base)*>(&champ);
   OWN_PTR(Champ_Don_base) * champ_don = dynamic_cast<OWN_PTR(Champ_Don_base)*>(&champ);
 
   const Domaine_VEF& domaine_vef = ref_cast(Domaine_VEF, z);
 
   Motcles motcles(8);
-  motcles[0] = "pression";    // Choix standard pour la pression
-  motcles[1] = "temperature"; // Choix standard pour la temperature
-  motcles[2] = "divergence_vitesse"; // Le type de champ obtenu en calculant div v
-  motcles[3] = "champ_elem";  // Creer un champ aux elements (de type P0)
-  motcles[4] = "vitesse";     // Choix standard pour la vitesse
-  motcles[5] = "gradient_pression";  // Le type de champ obtenu en calculant grad P
-  motcles[6] = "champ_sommets"; // Creer un champ aux sommets
-  motcles[7] = "champ_face"; // Creer un champ aux faces
+  motcles[0] = "pression";    // Standard choice for pressure
+  motcles[1] = "temperature"; // Standard choice for temperature
+  motcles[2] = "divergence_vitesse"; // Field type obtained by computing div v
+  motcles[3] = "champ_elem";  // Create a field at elements (type P0)
+  motcles[4] = "vitesse";     // Standard choice for velocity
+  motcles[5] = "gradient_pression";  // Field type obtained by computing grad P
+  motcles[6] = "champ_sommets"; // Create a field at vertices
+  motcles[7] = "champ_face"; // Create a field at faces
 
-  // Le type de champ de vitesse depend du type d'element :
+  // The velocity field type depends on the element type:
   Nom type_champ_vitesse, type_champ_sommets;
   Nom type_elem_domaine = domaine_vef.domaine().type_elem()->que_suis_je();
   if (Motcle(type_elem_domaine) != "Segment")
@@ -471,8 +464,8 @@ void VEF_discretisation::discretiser_champ_fonc_don_(const Motcle& directive, co
   if (directive == DEMANDE_DESCRIPTION)
     Cerr << "VEF_discretisation : " << motcles;
 
-  // Si on n'a pas compris la directive (ou si c'est une demande_description)
-  // alors on appelle l'ancetre :
+  // If the directive is not recognized (or if it is a description request)
+  // then call the ancestor:
   if (rang < 0)
     {
       if (champ_fonc)
@@ -482,7 +475,7 @@ void VEF_discretisation::discretiser_champ_fonc_don_(const Motcle& directive, co
       return;
     }
 
-  // Calcul du nombre de ddl
+  // Compute the number of degrees of freedom
   int nb_ddl = 0;
   if (type == "Champ_Fonc_P0_VEF")
     nb_ddl = z.nb_elem();

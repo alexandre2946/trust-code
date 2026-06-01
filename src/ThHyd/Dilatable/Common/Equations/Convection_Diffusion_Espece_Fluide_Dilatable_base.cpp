@@ -34,15 +34,15 @@ int Convection_Diffusion_Espece_Fluide_Dilatable_base::preparer_calcul()
 {
   Convection_Diffusion_Fluide_Dilatable_base::preparer_calcul();
 
-  // remplissage du domaine cl modifiee avec 1 partout au bord...
+  // fill the modified boundary condition domain with 1 everywhere on the boundary...
   zcl_modif_=(domaine_Cl_dis());
 
   Conds_lim& condlims=zcl_modif_->les_conditions_limites();
   int nb=condlims.size();
   for (int i=0; i<nb; i++)
     {
-      // pour chaque condlim on recupere le champ_front et on met 1
-      // meme si la cond lim est un flux (dans ce cas la convection restera nullle.)
+      // for each boundary condition, retrieve the front field and set it to 1
+      // even if the boundary condition is a flux (in that case convection will remain zero)
       DoubleTab& T=condlims[i]->champ_front().valeurs();
       T=1.;
       if (sub_type(Neumann_sortie_libre,condlims[i].valeur()))
@@ -58,7 +58,7 @@ void Convection_Diffusion_Espece_Fluide_Dilatable_base::discretiser()
   double temps = schema_temps().temps_courant();
   const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
   Cerr << "Massic fraction equation discretization ..." << finl;
-  //On utilise temperature pour la directive car discretisation identique
+  // Use temperature directive since the discretization is identical
   dis.discretiser_champ("temperature",domaine_dis(),"fraction_massique","sans_dimension",
                         1 /* nb_composantes */,nb_valeurs_temp,temps,l_inco_ch);
   Equation_base::discretiser();
@@ -88,11 +88,11 @@ int Convection_Diffusion_Espece_Fluide_Dilatable_base::reprendre(Entree& is)
   return 1;
 }
 
-/*! @brief Renvoie le nom du domaine d'application de l'equation.
+/*! @brief Returns the name of the equation's application domain.
  *
- * Ici "Thermique".
+ * Here "Fraction_massique".
  *
- * @return (Motcle&) le nom du domaine d'application de l'equation
+ * @return Name of the equation's application domain.
  */
 const Motcle& Convection_Diffusion_Espece_Fluide_Dilatable_base::domaine_application() const
 {

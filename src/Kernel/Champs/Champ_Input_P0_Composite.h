@@ -24,11 +24,11 @@ class Champ_Input_P0_Composite : public Champ_Fonc_P0_base
 {
   Declare_instanciable(Champ_Input_P0_Composite);
 public:
-  // champ utilise pour l'initialisation
+  // field used for initialization
   bool is_initialized() { return bool(champ_initial_); }
   const DoubleTab& initial_values() { return champ_initial_->valeurs(); }
 
-  // champ input classique (faut plus des methodes pt etre ?)
+  // classic input field (maybe no more methods needed?)
   using Champ_Proto::valeurs;
 
   Champ_input_P0& input_field() { return champ_input_; }

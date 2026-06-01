@@ -24,7 +24,7 @@ class Terme_Source_Qdm_Face_PolyMAC_HFV : public Terme_Source_Qdm_Face_PolyMAC_C
 public:
   int initialiser(double temps) override;
   int has_interface_blocs() const override { return 1; }
-  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override { } //rien
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override { } //nothing
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
   void check_multiphase_compatibility() const override { } //ok
 };

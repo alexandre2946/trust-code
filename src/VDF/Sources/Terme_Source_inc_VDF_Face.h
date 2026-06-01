@@ -26,9 +26,9 @@ class Probleme_base;
 class Domaine_Cl_VDF;
 class Domaine_VDF;
 
-/*! @brief class Terme_Source_inc_VDF_Face Cette classe permet de conserver le debit dans une simulation
+/*! @brief class Terme_Source_inc_VDF_Face This class conserves the flow rate in a transient
  *
- *   temporelle de inc
+ *   incompressible simulation
  *
  *
  * @sa Terme_Source_inc

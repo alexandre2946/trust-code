@@ -21,16 +21,16 @@
 #include <TRUST_Ref.h>
 #include <Domaine.h>
 #ifdef MICROSOFT
-// necessaire pour visual
+// needed for Visual Studio
 #include <Octree.h>
 #endif
 
 #include <Domaine_forward.h>
 
-/*! @brief classe Interprete_geometrique_base .
+/*! @brief Class Interprete_geometrique_base.
  *
- * @sa Classe abstraite dont les interpretes geometriques qui modifient un ou plusieurs domaines doivent deriver., Une reference est faite a chaque domaine. L'invalidation de l'octree apres modification
- * du domaine, (par interpreter_(is)) est factorisee dans la methode interpreter(), Methodes abstraites:, int nombre_d_operateurs() const
+ * @sa Abstract class from which geometric interpreters that modify one or more domains must derive. A reference is made to each domain. The invalidation of the octree after modification
+ * of the domain (by interpreter_(is)) is factored into the interpreter() method. Abstract methods: int nombre_d_operateurs() const
  */
 template <typename _SIZE_>
 class Interprete_geometrique_base_32_64 : public Interprete

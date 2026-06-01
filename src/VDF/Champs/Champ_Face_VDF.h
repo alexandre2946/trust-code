@@ -23,18 +23,19 @@
 
 class Domaine_Cl_VDF;
 
-/*! @brief class Champ_Face_VDF Cette classe sert a representer un champ vectoriel dont on ne calcule
+/*! @brief class Champ_Face_VDF
  *
- *   que les composantes normales aux faces en VDF.Il n'y a donc qu'un degre de
- *   liberte par face et l'attribut nb_comp_ d'un objet de type Champ_Face
- *   vaut 1. On peut neammoins imposer toutes les composantes du champ sur
- *   le bord. Si n est le nombre de faces total du domaine et nb_faces_bord
- *   le nombre de faces de bord le tableau de valeurs associe au champ
- *   est construit comme suit:
- *       - n valeurs pour representer les composantes normales aux faces
- *       - nb_faces_bord*dimension pour stocker les valeurs imposees
- *         sur les faces de bord
- *  Rq : cette classe est specifique au module VDF
+ * @brief This class represents a vector field for which only the normal components
+ *   to the faces are computed in VDF. There is therefore only one degree of
+ *   freedom per face and the nb_comp_ attribute of a Champ_Face object
+ *   equals 1. All components of the field can nevertheless be imposed on
+ *   the boundary. If n is the total number of faces in the domain and nb_faces_bord
+ *   is the number of boundary faces, the value array associated with the field
+ *   is built as follows:
+ *       - n values to represent the normal components at faces
+ *       - nb_faces_bord*dimension to store the imposed values
+ *         on the boundary faces
+ *  Note: this class is specific to the VDF module.
  *
  * @sa Champ_Inc_base
  */
@@ -76,7 +77,7 @@ public:
   DoubleVect& calcul_S_barre_sans_contrib_paroi(const DoubleTab&, DoubleVect&, const Domaine_Cl_VDF&) const;
   void calculer_dercov_axi(const Domaine_Cl_VDF&);
 
-  // methodes inlines
+  // inline methods
   inline DoubleTab& valeur_aux_faces_post(DoubleTab& result) const override
   {
     return Champ_Face_VDF_implementation::valeur_aux_faces_post_impl(domaine_vdf(), result);
@@ -127,8 +128,8 @@ public:
     return Champ_Face_VDF_implementation::remplir_coord_noeuds_et_polys(positions, polys);
   }
 
-  /* utilitaire pour le calcul des termes sources : calcule le vecteur v_e + n_f (v_f - v_e. n_f)
-     retour : le vecteur, sa norme et les derivees de celle-ci selon v_e et v_f
+  /* utility for computing source terms: computes the vector v_e + n_f (v_f - v_e. n_f)
+     returns: the vector, its norm and the derivatives of the latter with respect to v_e and v_f
   */
   inline double v_norm(const DoubleTab& val, const DoubleTab& val_f, int e, int f, int k, int l, double *v_ext, double *dnv) const
   {
@@ -163,8 +164,8 @@ private:
   inline const Champ_base& le_champ() const override { return *this; }
   inline Champ_base& le_champ() override { return *this; }
 
-  DoubleTab tau_diag_;       // termes diagonaux du tenseur Grad
-  DoubleTab tau_croises_;    // termes extradiagonaux du tenseur Grad
+  DoubleTab tau_diag_;       // diagonal terms of the Grad tensor
+  DoubleTab tau_croises_;    // off-diagonal terms of the Grad tensor
 };
 
 double Champ_Face_coeff_frottement_face_bord(const int, const int , const Domaine_Cl_VDF& zclo);

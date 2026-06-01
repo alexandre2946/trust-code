@@ -49,9 +49,9 @@ void Loi_Etat_Multi_GP_base::calculer_masse_molaire()
   Debog::verifier("Masse_mol_mel",masse_mol_mel);
 }
 
-/*! @brief Associe l inconnue de chaque equation de fraction massique a la loi d'etat
+/*! @brief Associates the unknown of each mass fraction equation with the state law.
  *
- * @param (inconnue) l inconnue associee
+ * @param inconnue The associated unknown field.
  */
 void Loi_Etat_Multi_GP_base::associer_inconnue(const Champ_Inc_base& inconnue)
 {
@@ -69,7 +69,7 @@ void Loi_Etat_Multi_GP_base::calculer_Cp()
   Debog::verifier("tab_Cp",tab_Cp);
 }
 
-/*! @brief Calcule la conductivite
+/*! @brief Computes the thermal conductivity.
  *
  */
 void Loi_Etat_Multi_GP_base::calculer_lambda()
@@ -81,7 +81,7 @@ void Loi_Etat_Multi_GP_base::calculer_lambda()
   const DoubleTab& tab_Cp = le_fluide->capacite_calorifique().valeurs();
   int i, n = tab_lambda.size();
 
-  //La conductivite est soit un champ uniforme soit calculee a partir de la viscosite dynamique et du Pr
+  //The conductivity is either a uniform field or computed from the dynamic viscosity and Pr
   if (sub_type(Champ_Fonc_Tabule,lambda))
     {
       lambda.mettre_a_jour(temperature_->temps());
@@ -101,7 +101,7 @@ void Loi_Etat_Multi_GP_base::calculer_lambda()
   Debog::verifier("tab_lambda",tab_lambda);
 }
 
-/*! @brief Calcule la diffusivite
+/*! @brief Computes the thermal diffusivity.
  *
  */
 void Loi_Etat_Multi_GP_base::calculer_alpha()
@@ -189,7 +189,7 @@ double Loi_Etat_Multi_GP_base::calculer_masse_volumique(double P, double T) cons
   return -1000.;
 }
 
-/*! @brief Calcule la viscosite dynamique
+/*! @brief Computes the dynamic viscosity.
  *
  */
 void Loi_Etat_Multi_GP_base::calculer_mu()

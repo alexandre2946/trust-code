@@ -32,7 +32,7 @@ public:
   void put_val(int i_offset, const _TYPE_ & val)
   {
     assert(this->i_ + i_offset >= this->i_min_ && this->i_ + i_offset < this->i_max_);
-    // cast en non const ok car on avait un IJK_Field non const au depart
+    // const_cast is valid here because the original IJK_Field was non-const
     const _TYPE_ *ptr = this->ptr_;
     ((_TYPE_*)ptr)[i_offset] = val;
   }

@@ -52,7 +52,7 @@ void Source_Fluide_Dilatable_VEF_Proto::ajouter_impl(const Equation_base& eqn,co
       const DoubleTab& xp = le_dom->xp();
       const DoubleTab& xv = le_dom->xv();
       ToDo_Kokkos("critical in VEF P0");
-      // Boucle faces bord
+      // Boundary face loop
       for (int num_cl=0 ; num_cl<le_dom->nb_front_Cl() ; num_cl++)
         {
           const Cond_lim& la_cl = le_dom_Cl->les_conditions_limites(num_cl);
@@ -87,7 +87,7 @@ void Source_Fluide_Dilatable_VEF_Proto::ajouter_impl(const Equation_base& eqn,co
                 }
             }
         }
-      // Boucle faces internes
+      // Internal face loop
       for (int face=premiere_face_interne ; face<nb_faces; face++)
         {
           int elem1 = face_voisins(face,0), elem2 = face_voisins(face,1);
@@ -106,7 +106,7 @@ void Source_Fluide_Dilatable_VEF_Proto::ajouter_impl(const Equation_base& eqn,co
       CDoubleArrView volumes_entrelaces_v = le_dom->volumes_entrelaces().view_ro();
       CDoubleArrView tab_rho_v = static_cast<const DoubleVect&>(tab_rho).view_ro();
       DoubleTabView resu_v = resu.view_rw();
-      // Boucle faces bord
+      // Boundary face loop
       for (int num_cl=0 ; num_cl<le_dom->nb_front_Cl() ; num_cl++)
         {
           const Cond_lim& la_cl = le_dom_Cl->les_conditions_limites(num_cl);
@@ -122,7 +122,7 @@ void Source_Fluide_Dilatable_VEF_Proto::ajouter_impl(const Equation_base& eqn,co
               end_gpu_timer(__KERNEL_NAME__);
             }
         }
-      // Boucle faces internes
+      // Internal face loop
       Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), Kokkos::MDRangePolicy<Kokkos::Rank<2>>({premiere_face_interne,0}, {nb_faces,dimension}), KOKKOS_LAMBDA(
                              const int face, const int comp)
       {

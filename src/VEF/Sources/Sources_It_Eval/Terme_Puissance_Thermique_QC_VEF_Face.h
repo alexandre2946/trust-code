@@ -22,7 +22,7 @@
 
 /*! @brief class Terme_Puissance_Thermique_QC_VEF_Face
  *
- *  Cette classe represente un terme source de l'equation de la thermique du type degagement volumique de puissance thermique
+ *  This class represents a volumetric thermal power source term for the heat equation (quasi-compressible case).
  *
  * @sa Terme_Puissance_Thermique, Terme_Source_VEF_base
  */

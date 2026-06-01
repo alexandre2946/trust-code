@@ -24,10 +24,10 @@ Implemente_instanciable(Champ_front_Tabule,"Champ_front_Tabule",Champ_front_inst
 // XD_CONT } NL2 Values are entered into a table based on n couples (ti, ui) if nb_comp value is 1. The value of a field
 // XD_CONT at a given time is calculated by linear interpolation from this table.
 
-/*! @brief Imprime les valeurs du champ sur un flot de sortie.
+/*! @brief Print the field values to an output stream.
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Champ_front_Tabule::printOn(Sortie& os) const
 {
@@ -35,15 +35,15 @@ Sortie& Champ_front_Tabule::printOn(Sortie& os) const
 }
 
 
-/*! @brief Lit les valeurs du champ tabule a partir d'un flot d'entree.
+/*! @brief Read the tabulated field values from an input stream.
  *
  * Format:
  *      Champ_front_Tabule nb_comp { nval tps_1...tps_nval vrel_1...vrel_nval }
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws accolade ouvrante attendue
- * @throws accolade fermante attendue
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
+ * @throws opening brace expected
+ * @throws closing brace expected
  */
 Entree& Champ_front_Tabule::readOn(Entree& is)
 {
@@ -87,10 +87,10 @@ Entree& Champ_front_Tabule::readOn(Entree& is)
 
 
 
-/*! @brief Renvoie l'objet Champ_front_Tabule upcaste en Champ_front_base
+/*! @brief Returns the Champ_front_Tabule object upcast to Champ_front_base
  *
  * @param (Champ_front_base& ch)
- * @return (Champ_front_base&) (*this) upcaste en Champ_front_base
+ * @return (Champ_front_base&) (*this) upcast to Champ_front_base
  */
 Champ_front_base& Champ_front_Tabule::affecter_(const Champ_front_base& )
 {
@@ -106,11 +106,11 @@ int Champ_front_Tabule::initialiser(double temps, const Champ_Inc_base& inco)
   return 1;
 }
 
-/*! @brief Mise a jour en temps du champ.
+/*! @brief Time update of the field.
  *
- * Calcul du gradient Gpoint.
+ * Compute the gradient Gpoint.
  *
- * @param (double tps) le temps de mise a jour
+ * @param (double tps) the update time
  */
 void Champ_front_Tabule::mettre_a_jour(double temps)
 {

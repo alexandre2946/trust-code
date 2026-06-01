@@ -18,7 +18,7 @@
 
 Implemente_instanciable_sans_constructeur(Quadri_EF,"Quadri_EF",Elem_EF_base);
 
-// printOn et readOn
+// printOn and readOn
 
 Sortie& Quadri_EF::printOn(Sortie& s ) const
 {
@@ -30,17 +30,23 @@ Entree& Quadri_EF::readOn(Entree& s )
   return s ;
 }
 
-/*! @brief KEL_(0,fa7),KEL_(1,fa7) sont  les numeros locaux des 2 faces qui entourent la facette de numero local fa7
+/*! @brief KEL_(0,fa7), KEL_(1,fa7) are the local indices of the 2 faces surrounding facet with local index fa7.
  *
- *  le numero local de la fa7 est celui du sommet qui la porte
+ * @brief The local index of fa7 is that of the vertex that carries it.
  *
  */
 Quadri_EF::Quadri_EF()
 {
 }
 
-/*! @brief remplit le tableau face_normales dans le Domaine_EF
+/*! @brief Fills the face_normales array in the Domaine_EF.
  *
+ * @param num_Face Local face index.
+ * @param Face_normales Array of face normals to fill.
+ * @param Face_sommets Face-to-vertex connectivity table.
+ * @param Face_voisins Face neighbour element table.
+ * @param elem_faces Element-to-face connectivity table.
+ * @param domaine_geom Geometric domain.
  */
 void Quadri_EF::normale(int num_Face,DoubleTab& Face_normales,
                         const  IntTab& Face_sommets,
@@ -64,12 +70,12 @@ void Quadri_EF::normale(int num_Face,DoubleTab& Face_normales,
   int elem1=Face_voisins(num_Face,0);
   int elem2=Face_voisins(num_Face,1);
 
-  //Orientation de la normale vers le plus grand numero d'elem
-  //pour cela on teste d'abord si l'on est sur le bord
+  // Orient the normal toward the element with the highest index.
+  // First check whether we are on a boundary.
   if (elem2!=-1)
     {
-      //on oriente a partir du centre de gravite
-      //calcul du centre de gravite de chaque element
+      // orient from the centre of gravity
+      // compute the centre of gravity of each element
       for(i=0; i<4; i++)
         {
           x1g+=les_coords(Face_sommets(elem_faces(elem1,i),0),0);
@@ -85,7 +91,7 @@ void Quadri_EF::normale(int num_Face,DoubleTab& Face_normales,
       grx=(x2g-x1g)*0.125;
       gry=(y2g-y1g)*0.125;
 
-      //on regarde le signe du produit scalaire
+      // check the sign of the dot product
       psc=grx*nx+gry*ny;
       if(psc<0)
         {
@@ -97,8 +103,8 @@ void Quadri_EF::normale(int num_Face,DoubleTab& Face_normales,
     }
   else
     {
-      //on oriente a partir du centre de gravite et du milieu de la
-      //face courante
+      // orient from the centre of gravity and the midpoint of the
+      // current face
 
       for(i=0; i<4; i++)
         {
@@ -115,7 +121,7 @@ void Quadri_EF::normale(int num_Face,DoubleTab& Face_normales,
       gry=y2g*0.5-y1g*0.125;
 
       //   Cerr << "grx et gry : " << grx << " " << gry << finl;
-      //on regarde le signe du produit scalaire
+      // check the sign of the dot product
       psc=grx*nx+gry*ny;
       if(psc<0)
         sign=-1;
@@ -143,63 +149,63 @@ void Quadri_EF::calcul_vc(const ArrOfInt& Face,ArrOfDouble& vc,
   //Cerr << "vs " << vs << " et vsom " << vsom << " et vitesse " << vitesse << finl;
 
 //   switch(type_cl) {
-//   case 0: //  pas de Face de Dirichlet
+//   case 0: //  no Dirichlet face
 //     {
   vc[0] = vs[0]*0.25;
   vc[1] = vs[1]*0.25;
 //       break;
 //     }
 
-//   case 1: // une Face de Dirichlet : Face 3
+//   case 1: // one Dirichlet face: Face 3
 //     {
 //       vc[0] = vitesse.valeurs()(Face[3],0);
 //       vc[1] = vitesse.valeurs()(Face[3],1);
 //       break;
 //     }
 
-//   case 3: // une Face de Dirichlet : Face 2
+//   case 3: // one Dirichlet face: Face 2
 //     {
 //       vc[0] = vitesse.valeurs()(Face[2],0);
 //       vc[1] = vitesse.valeurs()(Face[2],1);
 //       break;
 //     }
 
-//   case 9: // une Face de Dirichlet : Face 1
+//   case 9: // one Dirichlet face: Face 1
 //     {
 //       vc[0] = vitesse.valeurs()(Face[1],0);
 //       vc[1] = vitesse.valeurs()(Face[1],1);
 //       break;
 //     }
 
-//   case 27: // une Faces de Dirichlet :Face 0
+//   case 27: // one Dirichlet face: Face 0
 //     {
 //       vc[0] = vitesse.valeurs()(Face[0],0);
 //       vc[1] = vitesse.valeurs()(Face[0],1);
 //       break;
 //     }
 
-//   case 4: // deux Faces de Dirichlet : Faces 2,3
+//   case 4: // two Dirichlet faces: Faces 2,3
 //     {
 //       vc[0]= vsom(3,0);
 //       vc[1]= vsom(3,1);
 //       break;
 //     }
 
-//   case 28: // deux Faces de Dirichlet : Faces 0,3
+//   case 28: // two Dirichlet faces: Faces 0,3
 //     {
 //       vc[0]= vsom(2,0);
 //       vc[1]= vsom(2,1);
 //       break;
 //     }
 
-//   case 12: // deux Faces de Dirichlet : Faces 1,2
+//   case 12: // two Dirichlet faces: Faces 1,2
 //     {
 //       vc[0]= vsom(1,0);
 //       vc[1]= vsom(1,1);
 //       break;
 //     }
 
-//   case 36: // deux Faces de Dirichlet : Faces 0,1
+//   case 36: // two Dirichlet faces: Faces 0,1
 //     {
 //       vc[0]= vsom(0,0);
 //       vc[1]= vsom(0,1);
@@ -207,42 +213,42 @@ void Quadri_EF::calcul_vc(const ArrOfInt& Face,ArrOfDouble& vc,
 //     }
 
 
-//   case 10: // deux Faces de Dirichlet : Faces 1,3
+//   case 10: // two Dirichlet faces: Faces 1,3
 //     {
 //       vc[0] = vs[0]*0.25;
 //       vc[1] = vs[1]*0.25;
 //       break;
 //     }
 
-//   case 30: // deux Faces de Dirichlet : Faces 0,2
+//   case 30: // two Dirichlet faces: Faces 0,2
 //     {
 //       vc[0] = vs[0]*0.25;
 //       vc[1] = vs[1]*0.25;
 //       break;
 //     }
 
-//   case 13: //trois Faces de Dirichlet : Faces 3,2,1
+//   case 13: //three Dirichlet faces: Faces 3,2,1
 //     {
 //       vc[0]= vitesse.valeurs()(Face[2],0);
 //       vc[1]= vitesse.valeurs()(Face[2],1);
 //       break;
 //     }
 
-//   case 31: //trois Faces de Dirichlet : Faces 0,3,2
+//   case 31: //three Dirichlet faces: Faces 0,3,2
 //     {
 //       vc[0]= vitesse.valeurs()(Face[3],0);
 //       vc[1]= vitesse.valeurs()(Face[3],1);
 //       break;
 //     }
 
-//   case 37: //trois Faces de Dirichlet : Faces 1,0,3
+//   case 37: //three Dirichlet faces: Faces 1,0,3
 //     {
 //       vc[0]= vitesse.valeurs()(Face[0],0);
 //       vc[1]= vitesse.valeurs()(Face[0],1);
 //       break;
 //     }
 
-//   case 39: //trois Faces de Dirichlet : Faces 2,1,0
+//   case 39: //three Dirichlet faces: Faces 2,1,0
 //     {
 //       vc[0]= vitesse.valeurs()(Face[1],0);
 //       vc[1]= vitesse.valeurs()(Face[1],1);
@@ -255,14 +261,19 @@ void Quadri_EF::calcul_vc(const ArrOfInt& Face,ArrOfDouble& vc,
 //       exit();
 //     }
 
-//   } // fin du switch
+//   } // end of switch
 
 }
 
-/*! @brief calcule les coord xg du centre d'un element non standard calcule aussi idirichlet=nb de faces de Dirichlet de l'element
+/*! @brief Computes the coordinates xg of the centre of a non-standard element.
  *
- *  si idirichlet=2, n1 est le numero du sommet confondu avec G
- *
+ * @brief Also computes idirichlet = number of Dirichlet faces of the element.
+ *  If idirichlet=2, n1 is the index of the vertex coinciding with G.
+ * @param xg Output centre coordinates.
+ * @param x Vertex coordinate table for the element.
+ * @param type_elem_Cl Element boundary condition type.
+ * @param idirichlet Output number of Dirichlet faces.
+ * @param n1 Output index of the vertex coinciding with G (when idirichlet=2).
  */
 void Quadri_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
                           const int type_elem_Cl,int& idirichlet,int& n1,int& ,int& ) const
@@ -270,8 +281,8 @@ void Quadri_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
   int j,dim=xg.size();
 //   switch(type_elem_Cl) {
 
-//   case 0:  //  pas de Face de dirichlet: il a 4 Facettes
-//     //  le point G est le barycentre des sommets du triangle
+//   case 0:  //  no Dirichlet face: it has 4 facets
+//     //  point G is the barycenter of the element vertices
 //     {
   for (j=0; j<dim; j++)
     xg[j]=(x(0,j)+x(1,j)+x(2,j)+x(3,j))*0.25;
@@ -279,8 +290,8 @@ void Quadri_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
 //       break;
 //     }
 
-//   case 1: // une Face de Dirichlet : Face 3
-//     // le point G est le centre de la face 3
+//   case 1: // one Dirichlet face: Face 3
+//     // point G is the center of face 3
 //     {
 //       for (j=0; j<dim; j++)
 // 	xg[j]=(x(2,j)+x(3,j))*0.5;
@@ -288,8 +299,8 @@ void Quadri_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
 //       break;
 //     }
 
-//   case 3: // une Face de Dirichlet : Face 2
-//     // le point G est le centre de la face 2
+//   case 3: // one Dirichlet face: Face 2
+//     // point G is the center of face 2
 //     {
 //       for (j=0; j<dim; j++)
 // 	xg[j]=(x(1,j)+x(3,j))*0.5;
@@ -297,8 +308,8 @@ void Quadri_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
 //       break;
 //     }
 
-//   case 9: // une Face de Dirichlet : Face 1
-//     // le point G est le centre de la face 1
+//   case 9: // one Dirichlet face: Face 1
+//     // point G is the center of face 1
 //     {
 //       for (j=0; j<dim; j++)
 // 	xg[j]=(x(0,j)+x(1,j))*0.5;
@@ -306,8 +317,8 @@ void Quadri_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
 //       break;
 //     }
 
-//   case 27: // une Faces de Dirichlet :Face 0
-//     // le point G est le centre de la face 0
+//   case 27: // one Dirichlet face: Face 0
+//     // point G is the center of face 0
 //     {
 //       for (j=0; j<dim; j++)
 // 	xg[j]=(x(0,j)+x(2,j))*0.5;
@@ -315,8 +326,8 @@ void Quadri_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
 //       break;
 //     }
 
-//   case 4: // deux Faces de Dirichlet : Faces 2,3
-//     //le point G est le sommet commun au deux faces de dirichlet
+//   case 4: // two Dirichlet faces: Faces 2,3
+//     // point G is the vertex common to the two Dirichlet faces
 //     {
 //       for (j=0; j<dim; j++)
 // 	xg[j]=x(3,j);
@@ -324,8 +335,8 @@ void Quadri_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
 //       break;
 //     }
 
-//   case 28: // deux Faces de Dirichlet : Faces 0,3
-//     //le point G est le sommet commun au deux faces de dirichlet
+//   case 28: // two Dirichlet faces: Faces 0,3
+//     // point G is the vertex common to the two Dirichlet faces
 //      {
 //       for (j=0; j<dim; j++)
 // 	xg[j]=x(2,j);
@@ -333,8 +344,8 @@ void Quadri_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
 //       break;
 //     }
 
-//   case 12: // deux Faces de Dirichlet : Faces 1,2
-//     //le point G est le sommet commun au deux faces de dirichlet
+//   case 12: // two Dirichlet faces: Faces 1,2
+//     // point G is the vertex common to the two Dirichlet faces
 //      {
 //       for (j=0; j<dim; j++)
 // 	xg[j]=x(1,j);
@@ -342,8 +353,8 @@ void Quadri_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
 //       break;
 //     }
 
-//   case 36: // deux Faces de Dirichlet : Faces 0,1
-//     //le point G est le sommet commun au deux faces de dirichlet
+//   case 36: // two Dirichlet faces: Faces 0,1
+//     // point G is the vertex common to the two Dirichlet faces
 //      {
 //       for (j=0; j<dim; j++)
 // 	xg[j]=x(0,j);
@@ -351,8 +362,8 @@ void Quadri_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
 //       break;
 //     }
 
-//   case 10: // deux Faces de Dirichlet : Faces 1,3
-//      // on garde les memes volumes de controles que pour des faces internes
+//   case 10: // two Dirichlet faces: Faces 1,3
+//      // keep the same control volumes as for internal faces
 //     {
 //       for (j=0; j<dim; j++)
 // 	xg[j]=(x(0,j)+x(1,j)+x(2,j)+x(3,j))*0.25;
@@ -360,8 +371,8 @@ void Quadri_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
 //       break;
 //     }
 
-//   case 30: // deux Faces de Dirichlet : Faces 0,2
-//      // on garde les memes volumes de controles que pour des faces internes
+//   case 30: // two Dirichlet faces: Faces 0,2
+//      // keep the same control volumes as for internal faces
 //     {
 //       for (j=0; j<dim; j++)
 // 	xg[j]=(x(0,j)+x(1,j)+x(2,j)+x(3,j))*0.25;
@@ -369,8 +380,8 @@ void Quadri_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
 //       break;
 //     }
 
-//   case 13: //trois Faces de Dirichlet : Faces 3,2,1
-//     // le point G est le centre de la face de dirichlet opposee a la face non-dirichlet
+//   case 13: //three Dirichlet faces: Faces 3,2,1
+//     // point G is the center of the Dirichlet face opposite to the non-Dirichlet face
 //     {
 //       for (j=0; j<dim; j++)
 // 	xg[j]=(x(1,j)+x(3,j))*0.5;
@@ -378,8 +389,8 @@ void Quadri_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
 //       break;
 //     }
 
-//   case 31: //trois Faces de Dirichlet : Faces 0,3,2
-//     // le point G est le centre de la face de dirichlet opposee a la face non-dirichlet
+//   case 31: //three Dirichlet faces: Faces 0,3,2
+//     // point G is the center of the Dirichlet face opposite to the non-Dirichlet face
 //     {
 //       for (j=0; j<dim; j++)
 // 	xg[j]=(x(2,j)+x(3,j))*0.5;
@@ -387,8 +398,8 @@ void Quadri_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
 //       break;
 //     }
 
-//   case 37: //trois Faces de Dirichlet : Faces 1,0,3
-//     // le point G est le centre de la face de dirichlet opposee a la face non-dirichlet
+//   case 37: //three Dirichlet faces: Faces 1,0,3
+//     // point G is the center of the Dirichlet face opposite to the non-Dirichlet face
 //     {
 //       for (j=0; j<dim; j++)
 // 	xg[j]=(x(0,j)+x(2,j))*0.5;
@@ -396,8 +407,8 @@ void Quadri_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
 //       break;
 //     }
 
-//   case 39: //trois Faces de Dirichlet : Faces 2,1,0
-//     // le point G est le centre de la face de dirichlet opposee a la face non-dirichlet
+//   case 39: //three Dirichlet faces: Faces 2,1,0
+//     // point G is the center of the Dirichlet face opposite to the non-Dirichlet face
 //     {
 //       for (j=0; j<dim; j++)
 // 	xg[j]=(x(0,j)+x(1,j))*0.5;
@@ -405,6 +416,6 @@ void Quadri_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
 //       break;
 //     }
 
-//   } // fin du switch
+//   } // end of switch
 
 }

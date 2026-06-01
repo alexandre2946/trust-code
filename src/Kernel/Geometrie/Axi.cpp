@@ -20,10 +20,10 @@ Implemente_instanciable(Axi,"Axi",Interprete);
 // XD_CONT coordinates (R,$\jolitheta$,Z). If this instruction is not included, calculations are carried out using
 // XD_CONT Cartesian coordinates.
 
-/*! @brief Simple appel a: Interprete::printOn(Sortie&)
+/*! @brief Simple call to: Interprete::printOn(Sortie&)
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Axi::printOn(Sortie& os) const
 {
@@ -31,20 +31,20 @@ Sortie& Axi::printOn(Sortie& os) const
 }
 
 
-/*! @brief Simple appel a: Interprete::readOn(Entree&)
+/*! @brief Simple call to: Interprete::readOn(Entree&)
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
  */
 Entree& Axi::readOn(Entree& is)
 {
   return Interprete::readOn(is);
 }
 
-/*! @brief Fonction principale de l'interprete Axi Positionne la variable axi a 1.
+/*! @brief Main function of the Axi interpreter Sets the axi variable to 1.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the input stream
  */
 Entree& Axi::interpreter(Entree& is)
 {

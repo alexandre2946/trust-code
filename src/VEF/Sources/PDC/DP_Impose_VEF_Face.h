@@ -45,7 +45,7 @@ public:
 
 protected:
   IntVect sgn;
-  double surf = -123.;//surface totale
+  double surf = -123.;//total surface
 };
 
 #endif

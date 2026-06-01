@@ -34,14 +34,14 @@ const Domaine_PolyMAC_HFV& Champ_Elem_PolyMAC_HFV::domaine_PolyMAC_HFV() const
 
 int Champ_Elem_PolyMAC_HFV::fixer_nb_valeurs_nodales(int n)
 {
-  assert (n == domaine_dis_base().domaine().nb_elem() || n < 0); //on accepte a la fois les conventions VEF et VDF
+  assert (n == domaine_dis_base().domaine().nb_elem() || n < 0); //accept both VEF and VDF conventions
   creer_tableau_distribue(domaine_dis_base().domaine().md_vector_elements());
   return n;
 }
 
 int Champ_Elem_PolyMAC_HFV::nb_valeurs_nodales() const
 {
-  return le_dom_VF->nb_elem(); //on ignore les variables auxiliaires
+  return le_dom_VF->nb_elem(); //ignore auxiliary variables
 }
 
 void Champ_Elem_PolyMAC_HFV::init_auxiliary_variables()
@@ -52,10 +52,10 @@ void Champ_Elem_PolyMAC_HFV::init_auxiliary_variables()
     if (futur(n).size_reelle_ok())
       {
         DoubleTab& vals = futur(n);
-        vals.set_md_vector(MD_Vector()); //on enleve le MD_Vector...
-        vals.resize_dim0(domaine.mdv_elems_faces->get_nb_items_tot()); //...on dimensionne a la bonne taille...
-        vals.set_md_vector(domaine.mdv_elems_faces); //...et on remet le bon MD_Vector
-        /* initialisation des variables aux faces : par celle de l'elem amont */
+        vals.set_md_vector(MD_Vector()); //remove the MD_Vector...
+        vals.resize_dim0(domaine.mdv_elems_faces->get_nb_items_tot()); //...resize to the correct size...
+        vals.set_md_vector(domaine.mdv_elems_faces); //...and restore the correct MD_Vector
+        /* initialize face variables: using the value of the upstream element */
         for (int f = 0, ne_tot = domaine.nb_elem_tot(); f < domaine.nb_faces(); f++)
           for (int m = 0, e = f_e(f, 0); m < vals.dimension(1); m++)
             vals(ne_tot + f, m) = vals(e, m);
@@ -70,7 +70,7 @@ int Champ_Elem_PolyMAC_HFV::reprendre(Entree& fich)
   const Pb_Multiphase * pbm = mon_equation_non_nul() ? (sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()) : nullptr) : nullptr;
   if (pbm) return Champ_Inc_base::reprendre(fich);
 
-  // sinon on fait ca ...
+  // otherwise do this ...
   init_auxiliary_variables();
   return Champ_Inc_base::reprendre(fich);
 }

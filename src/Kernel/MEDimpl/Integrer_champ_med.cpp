@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -26,20 +26,20 @@ Implemente_instanciable(Integrer_champ_med,"Integrer_champ_med",Interprete);
 // XD_CONT z, the surface average value, the surface area and the flow rate. For the debit_total method, only one
 // XD_CONT tranche is considered.NL2 file :z Sum(u.dS)/Sum(dS) Sum(dS) Sum(u.dS)
 
-/*! @brief Simple appel a: Interprete::printOn(Sortie&)
+/*! @brief Simple call to: Interprete::printOn(Sortie&)
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Integrer_champ_med::printOn(Sortie& os) const
 {
   return Interprete::printOn(os);
 }
 
-/*! @brief Simple appel a: Interprete::readOn(Entree&)
+/*! @brief Simple call to: Interprete::readOn(Entree&)
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
  */
 Entree& Integrer_champ_med::readOn(Entree& is)
 {
@@ -63,15 +63,15 @@ double  portion_surface_elem(const ArrOfDouble& pointA,const ArrOfDouble& pointB
   if (z<=pointA[2]) return 0;
   if (z>pointC[2]) return calcul_surface_triangle(pointA,pointB,pointC);
   ArrOfDouble pointD(3);
-  // le point D est sur AC a hauteur de B.
+  // point D lies on AC at the height of B.
   pointD[2]=pointB[2];
   double lambda=(pointB[2]-pointA[2])/(pointC[2]-pointA[2]);
   for (int i=0; i<2; i++)
     pointD[i]=pointA[i]+lambda*(pointC[i]-pointA[i]);
   if (z<=pointB[2])
     {
-      // on calcul la surface du triangle inferieur
-      // et on prend la proportion...
+      // compute the area of the lower triangle
+      // and take the proportion...
       double surf_inf=calcul_surface_triangle(pointA,pointB,pointD);
       double rap=1;
       if (pointB[2]!=pointA[2])
@@ -80,9 +80,9 @@ double  portion_surface_elem(const ArrOfDouble& pointA,const ArrOfDouble& pointB
     }
   else
     {
-      // on calcul la surface du triangle inferieur
-      // et on prend la proportion...
-      // et on retire a la surface totale
+      // compute the area of the lower triangle
+      // take the proportion...
+      // and subtract from the total area
       double surf_sup=calcul_surface_triangle(pointB,pointD,pointC);
       double rap=(z-pointC[2])/(pointB[2]-pointC[2]);
       double surf_tot=calcul_surface_triangle(pointA,pointB,pointC);
@@ -96,10 +96,10 @@ double portion_surface(const ArrOfDouble& point0,const ArrOfDouble& point1, cons
   return portion_surface_elem(point0,point1,point2,zmax)- portion_surface_elem(point0,point1,point2,zmin);
 }
 
-/*! @brief Fonction principale de l'interprete.
+/*! @brief Main function of the interpreter.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the input stream
  */
 Entree& Integrer_champ_med::interpreter(Entree& is)
 {
@@ -123,7 +123,7 @@ Entree& Integrer_champ_med::interpreter(Entree& is)
     {
       Cerr<<"method "<<nom_methode <<" not coded yet "<<finl;
     }
-  // on recupere le domaine
+  // retrieve the domain
   if(! sub_type(Champ_Fonc_MED, objet(nom_champ_fonc_med)))
     {
       Cerr << nom_champ_fonc_med << " type is " << objet(nom_champ_fonc_med).que_suis_je() << finl;
@@ -133,7 +133,7 @@ Entree& Integrer_champ_med::interpreter(Entree& is)
   Champ_Fonc_MED& champ=ref_cast(Champ_Fonc_MED, objet(nom_champ_fonc_med));
   const Domaine& domaine=champ.domaine_dis_base().domaine();
   const DoubleTab& coord=domaine.les_sommets();
-  // on fait une coie pour les modifier
+  // make a copy to modify it
   IntTab les_elems_mod=domaine.les_elems();
   const IntTab&  les_elems=domaine.les_elems();
 
@@ -158,7 +158,7 @@ Entree& Integrer_champ_med::interpreter(Entree& is)
     }
   //if (nom_methode=="integrale_en_z")
   {
-    // Etape 1 on reordonne les triangles pour classeren z les sommets
+    // Step 1: reorder triangles to sort vertices by z
 
     for (int elem=0; elem<nb_elem; elem++)
       {

@@ -17,18 +17,18 @@
 #define Perte_Charge_included
 
 
-/*! @brief Classe Perte_Charge Cette classe represente un terme de perte de charge quiest introduit
+/*! @brief Classe Perte_Charge This class represents a pressure drop term that is introduced
  *
- *     dans les equations de Navier-Stokes pour modeliser la presence d'un
- *     certain type d'obstacle dans l'ecoulement.
- *     On utilise la notion de perte de charge pour des obstacles sur lesquels
- *     on ne calcule pas le frottement (obstacles internes aux mailles, ou
- *     grilles par exemple)
- *     Un objet de type Perte_Charge s'applique sur
- *     une seule direction d'espace (direction_perte_charge() >= 0 )
- *     ou sur toutes (direction_perte_charge() == -1)
+ *     in the Navier-Stokes equations to model the presence of a
+ *     certain type of obstacle in the flow.
+ *     The notion of pressure drop is used for obstacles on which
+ *     friction is not computed (obstacles internal to cells, or
+ *     grids for example).
+ *     An object of type Perte_Charge applies in
+ *     a single spatial direction (direction_perte_charge() >= 0)
+ *     or in all directions (direction_perte_charge() == -1).
  *
- * @sa Ne derive pas d'Objet_U
+ * @sa Does not derive from Objet_U
  */
 class Perte_Charge
 {
@@ -43,11 +43,10 @@ protected :
 };
 
 
-/*! @brief Renvoie la direction de perte de charge.
+/*! @brief Returns the pressure drop direction.
  *
- * (X,Y ou Z), ou -1 si toutes les directions
- *
- * @return (int) la direction de perte de charge
+ * @brief Returns the pressure drop direction (X, Y or Z), or -1 for all directions.
+ * @return (int) the pressure drop direction
  */
 inline int Perte_Charge::direction_perte_charge() const
 {

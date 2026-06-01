@@ -23,10 +23,7 @@
 #include <map>
 #include <string>
 
-/*! @brief classe Loi_paroi_adaptative correlation pour une loi de paroi adaptative qui calcule u_tau et du y_plus
- *
- *     Methodes implementees :
- *
+/*! @brief Adaptive wall-law correlation computing u_tau and y_plus (blended Reichardt model).
  *
  */
 class Loi_paroi_log : public Loi_paroi_base

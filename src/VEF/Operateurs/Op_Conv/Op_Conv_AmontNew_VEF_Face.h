@@ -23,12 +23,11 @@
 
 /*! @brief class Op_Conv_AmontNew_VEF_Face
  *
- *   Cette classe represente l'operateur de convection associe a une equation de
- *   transport d'un scalaire.
- *   La discretisation est VEF
- *   Le champ convecte est scalaire ou vecteur de type Champ_P1NC
- *   Le schema de convection est du type AmontNew
- *   Les methodes pour l'implicite sont codees.
+ *   This class represents the convection operator associated with a scalar transport equation.
+ *   The discretization is VEF.
+ *   The convected field is a scalar or vector of type Champ_P1NC.
+ *   The convection scheme is of AmontNew type.
+ *   Methods for the implicit scheme are implemented.
  *
  *
  * @sa Operateur_Conv_base

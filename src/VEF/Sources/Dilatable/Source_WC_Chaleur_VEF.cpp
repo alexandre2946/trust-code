@@ -40,23 +40,23 @@ void Source_WC_Chaleur_VEF::associer_domaines(const Domaine_dis_base& domaine,co
 void Source_WC_Chaleur_VEF::compute_interpolate_gradP(DoubleTab& UgradP_face, const DoubleTab& Ptot) const
 {
   /*
-   * NOTA BENE :
-   * On a discretise P_EOS avec une directive = temperature qui donne en VEF :
-   * Ptot => aux faces
-   * la_vitesse => faces car vef
-   * grad_Ptot => elem
+   * NOTE:
+   * P_EOS is discretized with a 'temperature' directive, giving in VEF:
+   * Ptot => on faces
+   * la_vitesse => on faces (VEF)
+   * grad_Ptot => on elements
    *
-   * L'equation est une equation de scalaire => aux faces car vef
-   * On a d P_tot / d t = del P / del t + u.grad(P_tot)
+   * The equation is a scalar equation => on faces (VEF)
+   * d P_tot / d t = del P / del t + u.grad(P_tot)
    *
-   * del P / del t => aux faces
-   * u.grad(P_tot) !!! faut interpoler grad(P_tot) aux faces
+   * del P / del t => on faces
+   * u.grad(P_tot) !!! grad(P_tot) must be interpolated to faces
    */
 
   const Navier_Stokes_WC& eqHyd = ref_cast(Navier_Stokes_WC,mon_equation->probleme().equation(0));
   const DoubleTab& la_vitesse = eqHyd.vitesse().valeurs();
 
-  // On sait que grad_Ptot est un champ elem => on pense a la conductivite (elem en vef !! )
+  // grad_Ptot is an element field => think of conductivity (element field in VEF!!)
   DoubleTab grad_Ptot;
   const DoubleTab& lambda = eqHyd.milieu().conductivite().valeurs();
   const int nb = lambda.size_totale(), nbcomp = la_vitesse.line_size();
@@ -75,7 +75,7 @@ void Source_WC_Chaleur_VEF::compute_interpolate_gradP(DoubleTab& UgradP_face, co
   correct_grad_boundary(domaine,grad_Ptot);
 
   // We compute u*grad(P_tot) on each face
-  DoubleTab grad_Ptot_face(la_vitesse); // champs sur les faces
+  DoubleTab grad_Ptot_face(la_vitesse); // face fields
 
   // get grad_Ptot on faces
   elem_to_face(domaine,grad_Ptot,grad_Ptot_face);
@@ -90,7 +90,7 @@ void Source_WC_Chaleur_VEF::compute_interpolate_gradP(DoubleTab& UgradP_face, co
     }
 }
 
-// On peut utiliser les methodes statics de Discretisation_tools... mais faut creer de Champ_base ...
+// Static methods of Discretisation_tools could be used here... but it requires creating a Champ_base ...
 void Source_WC_Chaleur_VEF::elem_to_face(const Domaine_VF& domaine, const DoubleTab& grad_Ptot,DoubleTab& grad_Ptot_face) const
 {
   const DoubleVect& vol = domaine.volumes();

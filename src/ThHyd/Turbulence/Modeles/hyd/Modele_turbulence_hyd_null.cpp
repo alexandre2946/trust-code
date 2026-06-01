@@ -33,7 +33,7 @@ Modele_turbulence_hyd_null::Modele_turbulence_hyd_null()
 
 Entree& Modele_turbulence_hyd_null::readOn(Entree& is)
 {
-  // Creation d'une loi de paroi nulle:
+  // Creation of a null wall law:
   const Equation_base& eqn = equation();
   const Nom& discr = eqn.discretisation().que_suis_je();
 
@@ -63,7 +63,7 @@ Sortie& Modele_turbulence_hyd_null::printOn(Sortie& os) const
 
 int Modele_turbulence_hyd_null::sauvegarder(Sortie& os) const
 {
-  // en mode ecriture special seul le maitre ecrit l'entete
+  // in special write mode only the master writes the header
   int write, special;
   EcritureLectureSpecial::is_ecriture_special(special, write);
   if (write)

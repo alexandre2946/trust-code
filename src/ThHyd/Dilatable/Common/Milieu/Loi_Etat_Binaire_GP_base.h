@@ -20,10 +20,8 @@
 
 class Fluide_Dilatable_base;
 
-/*! @brief classe Loi_Etat_Binaire_GP_base Cette classe represente la loi d'etat pour les melanges binaires.
- *
- *      Elle definit un fluide binaire dilatable dont la loi d'eata est :
- *         Pth = rho*R*T*(Y1/M1+Y2/M2)
+/*! @brief Base state law class for binary ideal-gas mixtures, defining a dilatable binary fluid with the equation of state:
+ *           Pth = rho*R*T*(Y1/M1 + Y2/M2)
  *
  * @sa Loi_Etat_Melange_GP_base
  */
@@ -43,7 +41,7 @@ public:
   const Nom type_fluide() const override;
   double inverser_Pth(double,double) override;
   double calculer_masse_volumique(double P,double Y1) const override;
-  // Methode virtuelle pure
+  // Pure virtual method
   void calculer_masse_volumique() override =0;
 
 protected:

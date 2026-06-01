@@ -44,7 +44,7 @@ void Conduction::set_param(Param& param) const
   param.ajouter_non_std("Traitement_particulier",(this));
 }
 
-//  Modification par rapport a Conduction::lire_motcle_non_standard()!
+//  Overrides the base Conduction::lire_motcle_non_standard()!
 int Conduction::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {
   //Motcle motlu;
@@ -54,8 +54,8 @@ int Conduction::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 
       terme_diffusif.associer_diffusivite(diffusivite_pour_transport());
       is >> terme_diffusif;
-      // le champ pour le dt_stab est le meme que celui de l'operateur. On prend toujours la diffusivite()
-      // comme dans le cas de Conduction
+      // the dt_stab field is the same as the operator field. We always use diffusivite()
+      // as in the Conduction case
       terme_diffusif.associer_diffusivite_pour_pas_de_temps(milieu().diffusivite());
       solveur_masse->set_name_of_coefficient_temporel("rho_cp_comme_T");
 
@@ -101,7 +101,7 @@ int Conduction::lire_motcle_non_standard(const Motcle& mot, Entree& is)
     return Equation_base::lire_motcle_non_standard(mot,is);
 }
 
-// retourne la *conductivite* et non la diffusivite comme dans Conduction
+// returns the *conductivity* rather than the diffusivity as in Conduction
 const Champ_Don_base& Conduction::diffusivite_pour_transport() const
 {
   return milieu().conductivite();
@@ -112,43 +112,40 @@ const Champ_base& Conduction::diffusivite_pour_pas_de_temps() const
   return terme_diffusif.diffusivite();
 }
 
-/*! @brief Associe un milieu physique a l'equation, le milieu est en fait caste en Solide.
+/*! @brief Associates a physical medium with the equation; the medium is cast to Solide.
  *
- * @param (Milieu_base& un_milieu)
+ * @param le_milieu Reference to the physical medium (cast to Solide internally).
  */
 void Conduction::associer_milieu_base(const Milieu_base& le_milieu)
 {
   associer_solide(ref_cast(Solide,le_milieu));
 }
 
-/*! @brief Associe le milieu solide a l'equation.
+/*! @brief Associates the solid medium with the equation.
  *
- * @param (Solide& un_solide) le milieu solide a associer a l'equation
+ * @param un_solide The solid medium to associate with the equation.
  */
 void Conduction::associer_solide(const Solide& un_solide)
 {
   le_solide = un_solide;
 }
 
-/*! @brief Renvoie le nombre d'operateurs de l'equation pour l'equation de conduction standart renvoie toujours 1.
+/*! @brief Returns the number of operators in the equation. For the standard conduction equation this is always 1.
  *
- * @return (int) le nombre d'operateurs de l'equation
+ * @return Number of operators in the equation.
  */
 int Conduction::nombre_d_operateurs() const
 {
   return 1;
 }
 
-/*! @brief Renvoie l'operateur d'index specifie de l'equation.
+/*! @brief Returns the operator at the given index in the equation (const version).
  *
- * Renvoie terme_diffusif si i=0
- *      exit si i>0
- *     (version const)
+ * Returns terme_diffusif when i=0; exits when i>0.
  *
- * @param (int i) index de l'operateur a renvoyer
- * @return (Operateur&) l'operateur d'index specifie (uniquement terme_diffusif)
- * @throws l'equation de conduction standard ne contient
- * qu'un operateur
+ * @param i Index of the operator to return.
+ * @return The operator at the given index (only terme_diffusif is available).
+ * @throws The standard conduction equation contains only one operator.
  */
 const Operateur& Conduction::operateur(int i) const
 {
@@ -160,19 +157,17 @@ const Operateur& Conduction::operateur(int i) const
       Cerr << "Equation Conduction has only one operator." << finl;
       exit();
     }
-  // Pour les compilos!!
+  // Required to satisfy compilers!!
   return terme_diffusif;
 }
 
-/*! @brief Renvoie l'operateur d'index specifie de l'equation.
+/*! @brief Returns the operator at the given index in the equation.
  *
- * Renvoie terme_diffusif si i=0
- *      exit si i>0
+ * Returns terme_diffusif when i=0; exits when i>0.
  *
- * @param (int i) index de l'operateur a renvoyer
- * @return (Operateur&) l'operateur d'index specifie (uniquement terme_diffusif)
- * @throws l'equation de conduction standard ne contient
- * qu'un operateur
+ * @param i Index of the operator to return.
+ * @return The operator at the given index (only terme_diffusif is available).
+ * @throws The standard conduction equation contains only one operator.
  */
 Operateur& Conduction::operateur(int i)
 {
@@ -184,11 +179,11 @@ Operateur& Conduction::operateur(int i)
       Cerr << "Equation Conduction has only one operator." << finl;
       exit();
     }
-  // Pour les compilos!!
+  // Required to satisfy compilers!!
   return terme_diffusif;
 }
 
-/*! @brief Discretise l'equation
+/*! @brief Discretises the equation.
  *
  */
 void Conduction::discretiser()
@@ -201,35 +196,32 @@ void Conduction::discretiser()
 }
 
 
-/*! @brief Renvoie le milieu physique associe a l'equation.
+/*! @brief Returns the physical medium associated with the equation (const version).
  *
- * Ici Solide upcaste en Milieu_base.
- *     (version const)
+ * Here Solide is upcast to Milieu_base.
  *
- * @return (Milieu_base&) le milieu physique associe a l'equation (Solide upcaste en Milieu_base)
+ * @return The physical medium associated with the equation (Solide upcast to Milieu_base).
  */
 const Milieu_base& Conduction::milieu() const
 {
   return solide();
 }
 
-/*! @brief Renvoie le milieu physique associe a l'equation.
+/*! @brief Returns the physical medium associated with the equation.
  *
- * Ici Solide upcaste en Milieu_base.
+ * Here Solide is upcast to Milieu_base.
  *
- * @return (Milieu_base&) le milieu physique associe a l'equation (Solide upcaste en Milieu_base)
+ * @return The physical medium associated with the equation (Solide upcast to Milieu_base).
  */
 Milieu_base& Conduction::milieu()
 {
   return solide();
 }
 
-/*! @brief Renvoie le milieu solide associe a l'equation.
+/*! @brief Returns the solid medium associated with the equation (const version).
  *
- * (version const)
- *
- * @return (Solide&) le milieu solide associe a l'equation
- * @throws pas de milieu solide associe a l'equation
+ * @return The solid medium associated with the equation.
+ * @throws No solid medium has been associated with the equation.
  */
 const Solide& Conduction::solide() const
 {
@@ -271,7 +263,7 @@ bool Conduction::has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) co
     if (le_traitement_particulier->has_champ(nom, ref_champ))
       return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 bool Conduction::has_champ(const Motcle& nom) const
@@ -286,7 +278,7 @@ bool Conduction::has_champ(const Motcle& nom) const
     if (le_traitement_particulier->has_champ(nom))
       return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 const Champ_base& Conduction::get_champ(const Motcle& nom) const
@@ -329,10 +321,10 @@ void Conduction::get_noms_champs_postraitables(Noms& nom, Option opt) const
     le_traitement_particulier->get_noms_champs_postraitables(nom, opt);
 }
 
-/*! @brief Renvoie le milieu solide associe a l'equation.
+/*! @brief Returns the solid medium associated with the equation.
  *
- * @return (Solide&) le milieu solide associe a l'equation
- * @throws pas de milieu solide associe a l'equation
+ * @return The solid medium associated with the equation.
+ * @throws No solid medium has been associated with the equation.
  */
 Solide& Conduction::solide()
 {
@@ -344,21 +336,21 @@ Solide& Conduction::solide()
   return le_solide.valeur();
 }
 
-/*! @brief Imprime le terme diffusif sur un flot de sortie.
+/*! @brief Prints the diffusive term to an output stream.
  *
- * @param (Sortie& os) un flot de sortie
- * @return (int) renvoie toujours 1
+ * @param os An output stream.
+ * @return Always returns 1.
  */
 int Conduction::impr(Sortie& os) const
 {
   return Equation_base::impr(os);
 }
 
-/*! @brief Renvoie le nom du domaine d'application de l'equation.
+/*! @brief Returns the application domain name of the equation.
  *
- * Ici "Thermique".
+ * Here "Thermique".
  *
- * @return (Motcle&) le nom du domaine d'application de l'equation
+ * @return The application domain name of the equation.
  */
 const Motcle& Conduction::domaine_application() const
 {

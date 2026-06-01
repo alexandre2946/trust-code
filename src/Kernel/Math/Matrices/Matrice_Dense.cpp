@@ -207,7 +207,7 @@ int Matrice_Dense::ordre( ) const
     }
 }
 
-/*! @brief Operation de multiplication-accumulation (saxpy) matrice vecteur.
+/*! @brief Matrix-vector multiply-accumulate (saxpy) operation.
  *
  * Operation: resu = resu + Matrix_ * x
  *
@@ -291,7 +291,7 @@ bool Matrice_Dense::is_the_same( const Matrice_Dense& other_matrix , const doubl
   return same;
 }
 
-/*! @brief Operation de multiplication-accumulation (saxpy) matrice vecteur, par la matrice transposee.
+/*! @brief Matrix-vector multiply-accumulate (saxpy) operation using the transposed matrix.
  *
  *     Operation: resu = resu + A^{T}*x
  *

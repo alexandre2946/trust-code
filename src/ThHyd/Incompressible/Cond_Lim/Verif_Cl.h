@@ -19,18 +19,18 @@
 
 #include <Cond_lim.h>
 
-/*! @brief Interface du module ThHyd.
+/*! @brief Interface of the ThHyd module.
  *
- * Contient 3 fonctions:
+ * Contains 3 functions:
  *       int tester_compatibilite_hydr_thermique(const Domaine_Cl_dis_base& , const Domaine_Cl_dis_base& )
  *       int tester_compatibilite_hydr_concentration(const Domaine_Cl_dis_base& , const Domaine_Cl_dis_base& )
  *       int tester_compatibilite_hydr_fraction_massique(const Domaine_Cl_dis_base& , const Domaine_Cl_dis_base& )
- *     qui servent a tester la coherence des conditions aux limites
- *     et les 3 fonctions
+ *     which test the consistency of boundary conditions,
+ *     and 3 functions:
  *       int message_erreur_[therm|conc|fraction_massique](const Cond_lim& , const Cond_lim& , int& )
- *     qui affiche un message d'erreur pour la compatibilite hyd/[therm|conc]
+ *     which display an error message for hyd/[therm|conc] compatibility
  *
- * @sa Fonction de librairie hors classe
+ * @sa Non-class library function
  */
 
 int tester_compatibilite_hydr_thermique(const Domaine_Cl_dis_base& , const Domaine_Cl_dis_base& );

@@ -24,7 +24,7 @@
 
 /*! @brief class Champ_P1NC
  *
- *  Rq : cette classe est specifique au module VEF
+ *  @brief Note: this class is specific to the VEF module.
  *
  * @sa Champ_Inc_base
  */
@@ -62,7 +62,7 @@ public:
   virtual double norme_L2_H1(const Domaine& dom) const;
   static double calculer_integrale_volumique(const Domaine_VEF&, const DoubleVect&, Ok_Perio ok);
 
-  // Methodes inlines
+  // Inline methods
   inline const Domaine_VEF& domaine_vef() const override { return ref_cast(Domaine_VEF, le_dom_VF.valeur()); }
   inline DoubleVect& valeur_a_elem(const DoubleVect& position, DoubleVect& val, int le_poly) const override
   {

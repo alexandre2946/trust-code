@@ -75,7 +75,7 @@ void Density_Euler::discretiser()
   Cerr << "Density_Euler discretization ==> ok" << finl;
 }
 
-// on surcharge pour effecter rho pas inconnue !!
+// overridden to affect rho, not the unknown !!
 Entree& Density_Euler::lire_cond_init(Entree& is)
 {
   Cerr << "Reading of initial conditions\n";

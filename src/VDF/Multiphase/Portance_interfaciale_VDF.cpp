@@ -49,34 +49,34 @@ void Portance_interfaciale_VDF::ajouter_blocs(matrices_t matrices, DoubleTab& se
 
   int e, f, c, d, i, k, l, n, N = ch.valeurs().line_size(), Np = press.line_size(), D = dimension, Nk = (k_turb) ? (*k_turb).dimension(1) : 1 ,
                               cR = (rho.dimension_tot(0) == 1), cM = (mu.dimension_tot(0) == 1);
-  DoubleTrav vr_l(N,D), scal_ur(N), scal_u(N), pvit_l(N, D), vort_l( D==2 ? 1 :D); // Requis pour corrections vort et u_l-u-g
+  DoubleTrav vr_l(N,D), scal_ur(N), scal_u(N), pvit_l(N, D), vort_l( D==2 ? 1 :D); // Required for vorticity and u_l-u_g corrections
   double fac_f, vl_norm;
   const Portance_interfaciale_base& correlation_pi = ref_cast(Portance_interfaciale_base, correlation_.valeur());
 
-  // Vitesse passee aux elems
+  // Past velocity at elements
   DoubleTab pvit_elem(0, N * dimension);
   domaine.domaine().creer_tableau_elements(pvit_elem);
   ch.get_elem_vector_field(pvit_elem, true);
 
-  // in/out pour correlation
+  // in/out for correlation
   Portance_interfaciale_base::input_t in;
   Portance_interfaciale_base::output_t out;
   in.alpha.resize(N), in.T.resize(N), in.p.resize(N), in.rho.resize(N), in.mu.resize(N), in.sigma.resize(N*(N-1)/2), in.k_turb.resize(N), in.d_bulles.resize(N), in.nv.resize(N, N);
   out.Cl.resize(N, N);
 
-  // Et pour les methodes span de la classe Interface pour choper la tension de surface
-  const int nbelem_tot = domaine.nb_elem_tot(), nb_max_sat =  N * (N-1) /2; // oui !! suite arithmetique !!
+  // For the span methods of the Interface class to retrieve the surface tension
+  const int nbelem_tot = domaine.nb_elem_tot(), nb_max_sat =  N * (N-1) /2; // yes!! arithmetic sequence!!
   DoubleTrav Sigma_tab(nbelem_tot,nb_max_sat);
 
-  // remplir les tabs ...
+  // fill the arrays ...
   for (k = 0; k < N; k++)
     for (l = k + 1; l < N; l++)
       {
         if (milc.has_saturation(k, l))
           {
             Saturation_base& z_sat = milc.get_saturation(k, l);
-            const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Et oui ! matrice triang sup !
-            // recuperer sigma ...
+            const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Yes! upper triangular matrix!
+            // retrieve sigma ...
             const DoubleTab& sig = z_sat.get_sigma_tab();
             // fill in the good case
             for (int ii = 0; ii < nbelem_tot; ii++) Sigma_tab(ii, ind_trav) = sig(ii);
@@ -84,7 +84,7 @@ void Portance_interfaciale_VDF::ajouter_blocs(matrices_t matrices, DoubleTab& se
         else if (milc.has_interface(k, l))
           {
             Interface_base& sat = milc.get_interface(k,l);
-            const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Et oui ! matrice triang sup !
+            const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Yes! upper triangular matrix!
             for (i = 0 ; i<nbelem_tot ; i++)
               Sigma_tab(i,ind_trav) = res_en_T ? sat.sigma(temp(i,k),press(i,k * (Np > 1))) : sat.sigma_h(temp(i,k),press(i,k * (Np > 1)));
           }
@@ -120,7 +120,7 @@ void Portance_interfaciale_VDF::ajouter_blocs(matrices_t matrices, DoubleTab& se
 
         correlation_pi.coefficient(in, out);
 
-        // Quid de n_l != 0 ?
+        // What about n_l != 0?
         vort_l = 0;
 
         if ( (f_e(f, 0)<0) || (f_e(f,1)<0) ) vort_l(0) = f_e(f, 0)>=0 ? vort(f_e(f, 0), n_l) : vort(f_e(f, 1), n_l) ;

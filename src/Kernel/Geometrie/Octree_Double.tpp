@@ -16,14 +16,14 @@
 #ifndef Octree_Double_TPP_included
 #define Octree_Double_TPP_included
 
-/*! @brief Construit un octree a partir d'elements volumiques decrits par des ensembles de sommets.
+/*! @brief Builds an octree from volumetric elements described by sets of vertices.
  *
- * On stocke dans l'octree les parallelipipdes englobant chaque
- *   element (contenant tous les sommets de l'element) plus une marge de epsilon.
- *   Si include_virtual=1, on stocke elements.dimension_tot(0) elements, sinon on en
- *   stocke elements.dimension(0)
+ * Stores in the octree the bounding parallelepipeds of each
+ *   element (containing all vertices of the element) plus a margin of epsilon.
+ *   If include_virtual=1, stores elements.dimension_tot(0) elements, otherwise
+ *   stores elements.dimension(0).
  *
- * Template car on a besoin de la version float pour lata tools.
+ * Templated because the float version is needed for lata tools.
  *
  */
 template<typename _SIZE_>
@@ -66,11 +66,11 @@ void Octree_Double_32_64<_SIZE_>::build_elements(const _TAB_TYPE_& coords, const
   octree_int_.build(dim, elements_boxes);
 }
 
-/*! @brief methode outil pour build_nodes et build_elements (calcul des facteurs de conversion entre reels et entiers pour Octree_Int
+/*! @brief Helper method for build_nodes and build_elements: computes the conversion factors from real to integer coordinates for Octree_Int.
  *
- *   epsilon est ajoute aux coordonnees min et max pour la bounding box de l'octree.
+ *   epsilon is added to the min and max coordinates for the octree bounding box.
  *
- * Template car on a besoin de la version float pour lata tools.
+ * Templated because the float version is needed for lata tools.
  */
 template<typename _SIZE_>
 template<class _TAB_TYPE_>
@@ -78,9 +78,9 @@ void Octree_Double_32_64<_SIZE_>::compute_origin_factors(const _TAB_TYPE_& coord
                                                          const double epsilon,
                                                          const int include_virtual)
 {
-  // Recherche des coordonnees min et max du domaine
+  // Search for the min and max coordinates of the domain
   const int_t nb_som = include_virtual ? coords.dimension_tot(0) : coords.dimension(0);
-  if (nb_som == 0) return; // octree vide
+  if (nb_som == 0) return; // empty octree
 
   dim_ = coords.dimension_int(1);
   origin_.resize_array(3);

@@ -35,8 +35,8 @@ class Domaine_Cl_dis_base;
 
 /*! @brief class Domaine_VF
  *
- *  Cette classe abstraite contient les informations geometriques
- *  communes aux methodes de Volumes Finis (methodes VDF et VEF par exemple)
+ *  This abstract class contains the geometric information
+ *  common to Finite Volume methods (VDF and VEF methods for example)
  *
  * @sa Domaine_dis_base
  */
@@ -100,7 +100,7 @@ public :
   inline const DoubleVect& volumes_entrelaces() const { return volumes_entrelaces_; }
   inline double volumes_entrelaces(int num_face) const { return volumes_entrelaces_[num_face]; }
   inline const DoubleTab& volumes_entrelaces_dir() const { return volumes_entrelaces_dir_; }
-  inline DoubleTab& volumes_entrelaces_dir() { return volumes_entrelaces_dir_; } // renvoie le tableau des volumes entrelaces par cote.
+  inline DoubleTab& volumes_entrelaces_dir() { return volumes_entrelaces_dir_; } // returns the array of interlaced volumes per side.
 
   inline const Joint& joint(int i) const { return domaine().joint(i); }
   inline Joint& joint(int i) { return domaine().joint(i); }
@@ -109,7 +109,7 @@ public :
   inline const Frontiere_dis_base& frontiere_dis(int ) const override;
 
   inline int nb_frontiere_dis() const { return les_bords_.size(); }
-  inline const Front_VF& front_VF(int i) const { return les_bords_[i]; } // renvoie la ieme frontiere_discrete.
+  inline const Front_VF& front_VF(int i) const { return les_bords_[i]; } // returns the i-th discrete boundary.
   inline double volumes(int i) const { return volumes_[i]; }
   inline double inverse_volumes(int i) const { return inverse_volumes_[i]; }
   inline int face_voisins(int num_face,int i) const;
@@ -117,9 +117,9 @@ public :
   inline int face_sommets(int i,int j) const;
 
   inline DoubleVect& volumes() { return volumes_; }
-  inline DoubleVect& inverse_volumes() { return inverse_volumes_; } // Tableau pour optimiser le code
+  inline DoubleVect& inverse_volumes() { return inverse_volumes_; } // Array to optimize the code
   inline const DoubleVect& volumes() const { return volumes_; }
-  inline const DoubleVect& inverse_volumes() const { return inverse_volumes_; } // Tableau pour optimiser le code
+  inline const DoubleVect& inverse_volumes() const { return inverse_volumes_; } // Array to optimize the code
   inline IntTab& face_voisins() override;
   inline const IntTab& face_voisins() const override;
   inline const IntTab& face_voisins_fictifs() const { return face_voisins_fictifs_; }
@@ -143,7 +143,7 @@ public :
 
   inline const ArrOfInt& ind_faces_virt_bord() const { return domaine().ind_faces_virt_bord(); }
   inline int est_une_face_virt_bord(int) const;
-  inline int fbord(int f) const //renvoie l'indice de face de bord de f si f est de bord, -1 sinon
+  inline int fbord(int f) const //returns the boundary face index of f if f is a boundary face, -1 otherwise
   {
     return f < premiere_face_int() ? f : f < nb_faces() ? -1 : ind_faces_virt_bord()[f - nb_faces()];
   }
@@ -156,7 +156,7 @@ public :
   void creer_tableau_faces_bord(Array_base&, RESIZE_OPTIONS opt = RESIZE_OPTIONS::COPY_INIT) const;
   const MD_Vector& md_vector_faces_bord() const { return md_vector_faces_front_; }
   const MD_Vector& md_vector_faces() const { return md_vector_faces_; }
-  // Attention, si les aretes ne sont pas remplies, le md_vector_ est nul
+  // Warning: if edges are not filled, md_vector_ is null
   const MD_Vector& md_vector_aretes() const { return md_vector_aretes_; }
 
   virtual const DoubleTab& xv_bord() const;
@@ -171,10 +171,10 @@ public :
   virtual void get_ind_integ_points(IntTab& nelem) const;
   virtual int get_max_nb_integ_points() const;
 
-  //produit scalaire (a - ma).(b - mb)
+  //dot product (a - ma).(b - mb)
   inline double dot (const double *a, const double *b, const double *ma = nullptr, const double *mb = nullptr) const;
 
-  //produit vectoriel
+  //cross product
   inline std::array<double, 3> cross(int dima, int dimb, const double *a, const double *b, const double *ma = nullptr, const double *mb = nullptr) const;
 
   inline virtual double dist_norm(int ) const { Cerr << __func__ << " method should be overrided in a derived class !! " << finl; throw; }
@@ -184,7 +184,7 @@ public :
   inline virtual double dist_face_elem0_period(int ,int ,double ) const { Cerr << __func__ << " method should be overrided in a derived class !! " << finl; throw; }
   inline virtual double dist_face_elem1_period(int ,int ,double ) const { Cerr << __func__ << " method should be overrided in a derived class !! " << finl; throw; }
 
-// Methodes pour le calcul et l'appel de la distance au bord solide le plus proche ; en entree on met le tableau des CL de la QDM
+// Methods for computing and calling the distance to the nearest solid boundary; the input is the array of momentum equation BCs
   void init_dist_paroi_globale(const Conds_lim& conds_lim) override;
   const DoubleTab& normale_paroi_elem()  const {return n_y_elem_;}
   const DoubleTab& normale_paroi_faces() const {return n_y_faces_;}
@@ -201,57 +201,57 @@ public :
 #endif
 
 private:
-  DoubleVect face_surfaces_;                // surface des faces
+  DoubleVect face_surfaces_;                // face surfaces
 
 protected:
 
-  DoubleVect volumes_;                          // volumes des elements
-  DoubleVect inverse_volumes_;                  // inverse du volumes des elements
-  DoubleVect volumes_entrelaces_;            // volumes entrelaces pour l'integration des Qdm
-  DoubleTab volumes_entrelaces_dir_;        // volumes entrelaces par cote
-  DoubleTab face_normales_;             // normales aux faces
+  DoubleVect volumes_;                          // element volumes
+  DoubleVect inverse_volumes_;                  // inverse of element volumes
+  DoubleVect volumes_entrelaces_;            // interlaced volumes for momentum integration
+  DoubleTab volumes_entrelaces_dir_;        // interlaced volumes per side
+  DoubleTab face_normales_;             // face normals
 
   inline double volume_entrelace_axi(double r_face, double r_elem, double axis_length) const;
 
-  IntTab face_voisins_;                          // connectivite face/elements
-  IntTab face_voisins_fictifs_;           // connectivite face/elements fictifs
-  DoubleTab xp_;                            // centres de gravite des elements
-  DoubleTab xv_;                            // centres de gravite des faces
-  mutable DoubleTab xv_bord_;                       //xv_, mais faces de bord seulement (creation sur demande)
+  IntTab face_voisins_;                          // face/element connectivity
+  IntTab face_voisins_fictifs_;           // face/fictitious element connectivity
+  DoubleTab xp_;                            // element centres of gravity
+  DoubleTab xv_;                            // face centres of gravity
+  mutable DoubleTab xv_bord_;                       //xv_, but boundary faces only (created on demand)
 
-  IntTab elem_faces_;                           // connectivite element/faces
-  IntTab face_sommets_;                           // sommets des faces
-  IntTab face_aretes_;                           // aretes des faces
-  DoubleTab xa_;                            // centres de gravite des aretes
-  IntTab face_numero_bord_;                     // connectivite face/numero_bord
+  IntTab elem_faces_;                           // element/face connectivity
+  IntTab face_sommets_;                           // face vertices
+  IntTab face_aretes_;                           // face edges
+  DoubleTab xa_;                            // edge centres of gravity
+  IntTab face_numero_bord_;                     // face/boundary_number connectivity
 
-  // Descripteur parallele pour les tableaux aux faces (size() == nb_faces())
+  // Parallel descriptor for face arrays (size() == nb_faces())
   MD_Vector md_vector_faces_;
-  // Idem pour les faces frontiere (size() == nb_faces_front())
+  // Same for boundary faces (size() == nb_faces_front())
   MD_Vector md_vector_faces_front_;
-  // Celui pour les aretes
+  // The one for edges
   MD_Vector md_vector_aretes_;
 
   VECT(Front_VF) les_bords_;
 
-  IntTab num_fac_loc_;     // renvoie pour une face son numero local dans l'element
-  //ArrOfInt faces_perio_;   // faces periodiques (utile si on boucle de 0 a nb_faces_tot)
-  ArrOfInt faces_doubles_; // faces a double contribution (faces periodiques et items communs). Utile si on boucle de 0 a nb_faces pour une reduction ensuite
-  ArrOfInt est_face_bord_; // renvoie pour une face reelle ou virtuelle: 0 si interne, 1 si face de bord non periodique, 2 si face de bord periodique
+  IntTab num_fac_loc_;     // returns for a face its local number within the element
+  //ArrOfInt faces_perio_;   // periodic faces (useful when looping from 0 to nb_faces_tot)
+  ArrOfInt faces_doubles_; // faces with double contribution (periodic faces and shared items). Useful when looping from 0 to nb_faces for a subsequent reduction
+  ArrOfInt est_face_bord_; // returns for a real or virtual face: 0 if internal, 1 if non-periodic boundary face, 2 if periodic boundary face
 
-  // Pour chaque face virtuelle i avec nb_faces_<=i<nb_faces_tot on a :
-  // face_virt_pe_num_(i-nb_faces_,0) = numero du PE qui possede la face
-  // face_virt_pe_num_(i-nb_faces_,1) = numero local de cette face sur le PE qui le possede
+  // For each virtual face i with nb_faces_<=i<nb_faces_tot:
+  // face_virt_pe_num_(i-nb_faces_,0) = number of the PE that owns the face
+  // face_virt_pe_num_(i-nb_faces_,1) = local number of this face on the PE that owns it
   IntTab face_virt_pe_num_;
 
-  DoubleTab n_y_elem_ ; // vecteur normal entre le bord le plus proche et l'element
-  DoubleTab n_y_faces_; // vecteur normal entre le bord le plus proche et la face
+  DoubleTab n_y_elem_ ; // normal vector between the nearest boundary and the element
+  DoubleTab n_y_faces_; // normal vector between the nearest boundary and the face
 
-  int nb_elem_std_=-10;                     // nombre d'elements standard
-  int nb_faces_std_=-10;                    // nombre de faces standard
-  IntVect rang_elem_non_std_;    // rang_elem_non_std_= -1 si l'element est standard
-  // rang_elem_non_std_= rang de l'element dans les tableaux
-  // relatifs aux elements non standards
+  int nb_elem_std_=-10;                     // number of standard elements
+  int nb_faces_std_=-10;                    // number of standard faces
+  IntVect rang_elem_non_std_;    // rang_elem_non_std_= -1 if the element is standard
+  // rang_elem_non_std_= rank of the element in the arrays
+  // relating to non-standard elements
 
   //
   // Dual mesh management:
@@ -275,7 +275,7 @@ protected:
   /*
    * XXX Elie Saikali
    *
-   *  Si demande, on construit un maillage structure de type MEDCouplingCMesh et les maps elems/faces/noeuds qui vont avec (CART -> TRUST) !
+   *  If requested, build a structured mesh of type MEDCouplingCMesh and the associated elem/face/node maps (CART -> TRUST) !
    *
    */
 public:
@@ -359,21 +359,21 @@ public:
     else return Cmesh_error<std::vector<double>&>(__func__);
   }
 
-  // Attention : n_som i pas elem !
+  // Note: n_som i, not elem!
   int get_mc_Cmesh_ni() const
   {
     if (mc_Cmesh_ready_) return static_cast<int>(mc_Cmesh_x_coords_.size());
     else return Cmesh_error<int>(__func__);
   }
 
-  // Attention : n_som j pas elem !
+  // Note: n_som j, not elem!
   int get_mc_Cmesh_nj() const
   {
     if (mc_Cmesh_ready_) return static_cast<int>(mc_Cmesh_y_coords_.size());
     else return Cmesh_error<int>(__func__);
   }
 
-  // Attention : n_som k pas elem !
+  // Note: n_som k, not elem!
   int get_mc_Cmesh_nk() const
   {
     if (mc_Cmesh_ready_) return static_cast<int>(mc_Cmesh_z_coords_.size());
@@ -384,8 +384,8 @@ public:
 
 };
 
-// Renvoie le numero local de face a partir d'un numero de face global et de elem local (0 ou 1)
-// Methode beaucoup plus rapide que Domaine_VF::numero_face_local(face,elem)
+// Returns the local face number from a global face number and a local element index (0 or 1)
+// Much faster method than Domaine_VF::numero_face_local(face,elem)
 inline int Domaine_VF::get_num_fac_loc(int face,int voisin) const
 {
   assert(voisin==0 || voisin==1);
@@ -404,15 +404,15 @@ inline int Domaine_VF::numero_sommet_local(int som, int elem) const
   return -1;
 }
 
-/*! @brief renvoie l'element voisin de numface dans la direction i.
+/*! @brief Returns the neighbouring element of num_face in direction i.
  *
- * i=0 : dans le sens oppose de l'axe orthogonal a la face numface.
- *  i=1 : dans le sens de l'axe orthogonal a la face numface.
- *  exemple :
+ * i=0 : in the direction opposite to the axis orthogonal to face num_face.
+ *  i=1 : in the direction of the axis orthogonal to face num_face.
+ *  example:
  *
  *                 |   0     |     1    |
  *                       numface
- *  renvoie -1 si l'element n'existe pas (au bord).
+ *  Returns -1 if the element does not exist (at the boundary).
  *
  */
 inline int Domaine_VF::face_voisins(int num_face,int i) const
@@ -420,7 +420,7 @@ inline int Domaine_VF::face_voisins(int num_face,int i) const
   return face_voisins_(num_face,i);
 }
 
-/*! @brief renvoie le tableaux des volumes des connectivites face elements cf au dessus.
+/*! @brief Returns the face-element connectivity array; see above.
  *
  */
 inline IntTab& Domaine_VF::face_voisins()
@@ -428,7 +428,7 @@ inline IntTab& Domaine_VF::face_voisins()
   return face_voisins_;
 }
 
-/*! @brief cf au dessus.
+/*! @brief See above.
  *
  */
 inline const IntTab& Domaine_VF::face_voisins() const
@@ -436,7 +436,7 @@ inline const IntTab& Domaine_VF::face_voisins() const
   return face_voisins_;
 }
 
-/*! @brief renvoie dans el0 le numero de l'elt a l'interieur renvoie dans elf le numero de l'elt  fictif (-1 si il n'existe pas)
+/*! @brief Returns in el0 the index of the interior element; returns in elf the index of the fictitious element (-1 if it does not exist).
  *
  *
  *
@@ -455,9 +455,9 @@ inline void  Domaine_VF::face_voisins_reel_fictif(int face,int& el0,int& elf) co
 
 }
 
-/*! @brief une face est interne ssi elle separe deux elements.
+/*! @brief A face is internal if and only if it separates two elements.
  *
- * renvoie le numero de la premiere face interne.
+ * Returns the index of the first internal face.
  *
  */
 inline int Domaine_VF::premiere_face_int() const
@@ -465,7 +465,7 @@ inline int Domaine_VF::premiere_face_int() const
   return nb_faces_bord();
 }
 
-/*! @brief renvoie le nombre global de faces.
+/*! @brief Returns the total number of faces.
  *
  */
 inline int Domaine_VF::nb_faces() const
@@ -473,9 +473,9 @@ inline int Domaine_VF::nb_faces() const
   return face_sommets_.dimension(0);
 }
 
-/*! @brief renvoie le nombre total de faces.
+/*! @brief Returns the total number of faces.
  *
- * C'est-a-dire faces reelles + faces virtuelles
+ * That is, real faces + virtual faces.
  *
  */
 inline int Domaine_VF::nb_faces_tot() const
@@ -484,11 +484,10 @@ inline int Domaine_VF::nb_faces_tot() const
 }
 
 
-/*! @brief renvoie le nombre de sommets par face.
+/*! @brief Returns the number of vertices per face.
  *
- * Rque : on a suppose que toutes les faces avait
- *  le meme nombre de sommet ce qui exclue des elements
- *  comme le prisme.
+ * Note: it is assumed that all faces have the same number of vertices,
+ *  which excludes elements such as prisms.
  *
  */
 inline int Domaine_VF::nb_som_face() const
@@ -496,7 +495,7 @@ inline int Domaine_VF::nb_som_face() const
   return face_sommets_.dimension(1);
 }
 
-/*! @brief renvoie le nombre d'aretes par face.
+/*! @brief Returns the number of edges per face.
  *
  *
  */
@@ -505,9 +504,9 @@ inline int Domaine_VF::nb_arete_face() const
   return face_aretes_.dimension(1);
 }
 
-/*! @brief renvoie le nombre de faces sur lesquelles sont appliquees les conditions limites :
+/*! @brief Returns the number of faces on which boundary conditions are applied:
  *
- *  bords, raccords, plaques.
+ *  boundaries, connectors, plates.
  *
  */
 inline int Domaine_VF::nb_faces_bord() const
@@ -515,9 +514,9 @@ inline int Domaine_VF::nb_faces_bord() const
   return domaine().nb_faces_frontiere();
 }
 
-/*! @brief renvoie le numero de la premiere des faces sur lesquelles sont appliquees les conditions limites :
+/*! @brief Returns the index of the first face on which boundary conditions are applied:
  *
- *  bords, raccords, plaques.
+ *  boundaries, connectors, plates.
  *
  */
 inline int Domaine_VF::premiere_face_bord() const
@@ -525,9 +524,9 @@ inline int Domaine_VF::premiere_face_bord() const
   return 0;
 }
 
-/*! @brief une face est interne ssi elle separe deux elements.
+/*! @brief A face is internal if and only if it separates two elements.
  *
- * renvoie le nombre de faces internes.
+ * Returns the number of internal faces.
  *
  */
 inline int Domaine_VF::nb_faces_internes() const
@@ -535,9 +534,9 @@ inline int Domaine_VF::nb_faces_internes() const
   return nb_faces()- nb_faces_bord();
 }
 
-/*! @brief renvoie le numero de le ieme face de la maille num_elem la facon dont ces faces sont numerotees est
+/*! @brief Returns the index of the i-th face of element num_elem; the face numbering convention is
  *
- *  laisse a la responsabilite des classes derivees
+ *  left to the responsibility of derived classes.
  *
  */
 inline int Domaine_VF::elem_faces(int num_elem, int i) const
@@ -545,7 +544,7 @@ inline int Domaine_VF::elem_faces(int num_elem, int i) const
   return elem_faces_(num_elem, i);
 }
 
-/*! @brief renvoie le tableau de connectivite element/faces
+/*! @brief Returns the element/face connectivity array.
  *
  */
 inline IntTab& Domaine_VF::elem_faces()
@@ -553,7 +552,7 @@ inline IntTab& Domaine_VF::elem_faces()
   return elem_faces_;
 }
 
-/*! @brief cf au dessus.
+/*! @brief See above.
  *
  */
 inline const IntTab& Domaine_VF::elem_faces() const
@@ -561,7 +560,7 @@ inline const IntTab& Domaine_VF::elem_faces() const
   return elem_faces_;
 }
 
-/*! @brief renvoie 1 pour les faces appartenant a un bord perio ou un item commun, 0 par defaut
+/*! @brief Returns 1 for faces belonging to a periodic boundary or a shared item, 0 by default.
  *
  */
 inline ArrOfInt& Domaine_VF::faces_doubles()
@@ -569,7 +568,7 @@ inline ArrOfInt& Domaine_VF::faces_doubles()
   return faces_doubles_;
 }
 
-/*! @brief cf au dessus
+/*! @brief See above.
  *
  */
 inline const ArrOfInt& Domaine_VF::faces_doubles() const
@@ -577,7 +576,7 @@ inline const ArrOfInt& Domaine_VF::faces_doubles() const
   return faces_doubles_;
 }
 
-/*! @brief renvoie le numero du ieme sommet de la face num_face.
+/*! @brief Returns the index of the i-th vertex of face num_face.
  *
  */
 inline int Domaine_VF::face_sommets(int num_face, int i) const
@@ -585,7 +584,7 @@ inline int Domaine_VF::face_sommets(int num_face, int i) const
   return face_sommets_(num_face, i);
 }
 
-/*! @brief renvoie le tableau de connectivite faces/sommets.
+/*! @brief Returns the face/vertex connectivity array.
  *
  */
 inline IntTab& Domaine_VF::face_sommets()
@@ -593,7 +592,7 @@ inline IntTab& Domaine_VF::face_sommets()
   return face_sommets_;
 }
 
-/*! @brief cf au dessus.
+/*! @brief See above.
  *
  */
 inline const IntTab& Domaine_VF::face_sommets() const
@@ -601,7 +600,7 @@ inline const IntTab& Domaine_VF::face_sommets() const
   return face_sommets_;
 }
 
-/*! @brief renvoie le tableau de connectivite faces/aretes.
+/*! @brief Returns the face/edge connectivity array.
  *
  */
 inline IntTab& Domaine_VF::face_aretes()
@@ -609,7 +608,7 @@ inline IntTab& Domaine_VF::face_aretes()
   return face_aretes_;
 }
 
-/*! @brief cf au dessus.
+/*! @brief See above.
  *
  */
 inline const IntTab& Domaine_VF::face_aretes() const
@@ -617,7 +616,7 @@ inline const IntTab& Domaine_VF::face_aretes() const
   return face_aretes_;
 }
 
-/*! @brief renvoie la ieme frontiere_discrete.
+/*! @brief Returns the i-th discrete boundary.
  *
  */
 inline const Frontiere_dis_base& Domaine_VF::frontiere_dis(int i) const
@@ -625,7 +624,7 @@ inline const Frontiere_dis_base& Domaine_VF::frontiere_dis(int i) const
   return les_bords_[i];
 }
 
-/*! @brief renvoie la ieme frontiere_discrete.
+/*! @brief Returns the i-th discrete boundary.
  *
  */
 inline Frontiere_dis_base& Domaine_VF::frontiere_dis(int i)
@@ -633,9 +632,9 @@ inline Frontiere_dis_base& Domaine_VF::frontiere_dis(int i)
   return les_bords_[i];
 }
 
-/*! @brief renvoie le nombre total de faces sur lesquelles sont appliquees les conditions limites :
+/*! @brief Returns the total number of faces (real + virtual) on which boundary conditions are applied:
  *
- *  bords, raccords, plaques.
+ *  boundaries, connectors, plates.
  *
  */
 inline int Domaine_VF::nb_faces_bord_tot() const
@@ -675,7 +674,7 @@ inline int Domaine_VF::orientation(int num_face) const
   return -1;
 }
 
-/*! @brief renvoie 1 si face est une face virtuelle de bord, 0 sinon
+/*! @brief Returns 1 if face is a virtual boundary face, 0 otherwise.
  *
  */
 inline int Domaine_VF::est_une_face_virt_bord(int face) const
@@ -692,7 +691,7 @@ inline int Domaine_VF::face_numero_bord(int num_face) const
   return face_numero_bord_(num_face);
 }
 
-/* produit scalaire de deux vecteurs */
+/* dot product of two vectors */
 inline double Domaine_VF::dot(const double *a, const double *b, const double *ma, const double *mb) const
 {
   double res = 0;
@@ -707,7 +706,7 @@ inline double Domaine_VF::volume_entrelace_axi(double r_face, double r_elem, dou
   return 2. * M_PI * (r * dr + 0.5 * dr * dr) * axis_length;
 }
 
-/* produit vectoriel de deux vecteurs (toujours 3D, meme en 2D) */
+/* cross product of two vectors (always 3D, even in 2D) */
 inline std::array<double, 3> Domaine_VF::cross(int dima, int dimb, const double *a, const double *b, const double *ma, const double *mb) const
 {
   std::array<double, 3> va = {{ 0, 0, 0 }}, vb = {{ 0, 0, 0 }}, res;

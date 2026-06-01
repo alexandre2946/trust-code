@@ -17,7 +17,7 @@
 #include <EcrFicCollecte.h>
 #include <communications.h>
 #include <Probleme_base.h>
-#include <Matrice_Morse.h> // necessaire pour visual
+#include <Matrice_Morse.h> // necessary for visual
 #include <LecFicDiffuse.h>
 #include <Equation_base.h>
 #include <TRUST_2_PDI.h>
@@ -44,9 +44,9 @@ Implemente_base_sans_constructeur(Schema_Temps_base,"Schema_Temps_base",Objet_U)
 // XD_CONT associated with a problem and the equations of this problem.
 /* Attributes further down in the cpp: */
 
-/*! @brief Constructeur par defaut d'un schema en temps.
+/*! @brief Default constructor of a time scheme.
  *
- * Initialise differents membres de la classe.
+ * Initializes different class members.
  *
  */
 Schema_Temps_base::Schema_Temps_base() :
@@ -59,20 +59,20 @@ void Schema_Temps_base::initialize()
   nb_impr_= 0;
   nb_pas_dt_ = 0;
 
-  // GF je remets le calculer_pas_de_temps car des schemas en temps implicites s'en servent pour dimensionner (en particulier ovap)
+  // GF re-calling calculer_pas_de_temps because some implicit time schemes use it for dimensioning (in particular ovap)
   pb_base().calculer_pas_de_temps();
-  // je le mets une deuxieme fois pour alternant....
+  // calling it a second time for alternating schemes....
   pb_base().calculer_pas_de_temps();
 
-  // Ecritures:
+  // Outputs:
   bool init = true;
   write_dt_ev(init);
   write_progress(init);
 
   if ( nb_pas_dt_ == 0 && ( ( mode_dt_start_ == 0. && est_egal(tinit_,0.)) || mode_dt_start_ == -1.) )
     {
-      //On divise par facsec_ car multiplication par facsec_ dans corriger_dt_calcule()
-      //quel que soit le mode d initialisation de dt_
+      //We divide by facsec_ because multiplication by facsec_ is done in corriger_dt_calcule()
+      //regardless of the dt_ initialization mode
       dt_=dt_min_/facsec_;
     }
   else if (mode_dt_start_ > 0.)
@@ -90,20 +90,20 @@ void Schema_Temps_base::initialize()
 
 double Schema_Temps_base::computeTimeStep(bool& is_stop) const
 {
-  //reevaluation de dt_max_ si fonction du temps
+  //re-evaluation of dt_max_ if it is a function of time
   if (dt_max_str_ != Nom())
     {
       dt_max_fn_.setVar(0, temps_courant());
       dt_max_ = dt_max_fn_.eval();
     }
   is_stop=false;
-  // Correction en premier du pas de temps
+  // First correct the time step
   double dt = dt_stab_;
   if (!corriger_dt_calcule(dt)) // Change le contenu de dt
     is_stop=true;
-  dt = std::min(dt, dt_failed_ / sqrt(2)); //pour provoquer une baisse de dt en cas d'echec a la resolution precedente
+  dt = std::min(dt, dt_failed_ / sqrt(2)); //to force a dt decrease in case of failure at the previous resolution
   if (temps_courant_ > temps_precedent_)
-    dt = std::min(dt, (temps_courant_ - temps_precedent_) * dt_gf_); //pour ne pas remonter dt trop vite (comme facsec)
+    dt = std::min(dt, (temps_courant_ - temps_precedent_) * dt_gf_); //to avoid increasing dt too fast (like facsec)
 
   if (limpr() || (nb_pas_dt_ == 0))
     Cout << "Time step finally used to solve the next time step (taking into account facsec) : " << dt << " s." << finl;
@@ -122,10 +122,10 @@ double Schema_Temps_base::computeTimeStep(bool& is_stop) const
       Process::exit();
     }
 
-  // Mise a jour immediate de l'attribut dt_ afin que pas_de_temps()
-  // soit a jour tout le temps (en particulier au moment du postraitement)
-  // Ce n'etait pas le cas pour les versions <= 1.6.3 et les champs dependant
-  // de dt n'etaient pas juste si facsec<>1
+  // Immediate update of dt_ attribute so that pas_de_temps()
+  // is always up to date (especially at post-processing time)
+  // This was not the case for versions <= 1.6.3 and fields depending
+  // on dt were not correct if facsec<>1
   //  dt_ = dt;
 
   if (this->stop())
@@ -166,7 +166,7 @@ bool Schema_Temps_base::iterateTimeStep(bool& converged)
           Cout<< "====================================================" << finl;
           Cout<< equation.que_suis_je()<<" equation is not solved."<<finl;
           Cout<< "====================================================" << finl;
-          // On calcule une fois la derivee pour avoir les flux bord
+          // Compute the derivative once to obtain the boundary fluxes
           if (equation.schema_temps().nb_pas_dt()==0)
             {
               DoubleTab inconnue_valeurs(equation.inconnue().valeurs());
@@ -178,9 +178,9 @@ bool Schema_Temps_base::iterateTimeStep(bool& converged)
   return true;
 }
 
-/*! @brief Renvoie 1 s'il y a lieu d'effectuer une impression (cf dt_impr) Renvoie 0 sinon
+/*! @brief Returns 1 if there is a need to perform a print (cf dt_impr) Returns 0 otherwise
  *
- * @return (int) 1 si il y lieu d'effectuer une impression 0 sinon
+ * @return (int) 1 if there is a need to perform a print 0 otherwise
  */
 int Schema_Temps_base::limpr() const
 {
@@ -195,15 +195,15 @@ int Schema_Temps_base::limpr() const
   if (tmax_<=temps_courant_ || nb_pas_dt_max_<=nb_pas_dt_ || stationnaires_atteints_)
     return 1; // We print the last time step
 
-  // 26/01/2010 : On utilise desormais la fonction "modf(operation , & partie entiere)" de math.h
-  // Cette fonction decompose le resultat de "operation" en une partie entiere et une partie decimale.
-  // Ainsi, on ne transforme plus un double en int avec tout les risques que cela comporte.
-  // ex : modf(9/7,&i) donne 1.000000 pour la partie entiere et 0.285714 pour le partie decimale
+  // 26/01/2010: We now use the function "modf(operation, &integer_part)" from math.h
+  // This function decomposes the result of "operation" into an integer part and a decimal part.
+  // This avoids converting a double to int with all the associated risks.
+  // ex: modf(9/7,&i) gives 1.000000 for the integer part and 0.285714 for the decimal part
   //
-  // epsilon permet d'assurer que le resultat de l'operation est independant de la precision machine :
-  // ex : 0.99999999/1.00000000 peut donner 0.99999999 ou 1.00000000 suivant les machines
-  // alors que
-  // ex : 0.99999999/1.00000000 + 1.e-8 donne tjrs 1.00000000.
+  // epsilon ensures that the result of the operation is independent of machine precision:
+  // ex: 0.99999999/1.00000000 can give 0.99999999 or 1.00000000 depending on the machine
+  // whereas
+  // ex: 0.99999999/1.00000000 + 1.e-8 always gives 1.00000000.
   double i, j, epsilon = 1.e-8;
   modf(temps_courant_/dt_impr_ + epsilon, &i);
   modf(temps_precedent_/dt_impr_ + epsilon, &j);
@@ -217,7 +217,7 @@ void Schema_Temps_base::validateTimeStep()
   Probleme_base& problem=pb_base();
   problem.mettre_a_jour(temps_courant_+dt_);
 
-  // Ecritures
+  // Outputs
   bool init=false;
   write_dt_ev(init);
   write_progress(init);
@@ -233,10 +233,10 @@ void Schema_Temps_base::terminate()
     progress_<< (int)100<< finl;
 }
 
-/*! @brief Retourne 1 si lors du dernier pas de temps, le probleme n'a pas evolue.
+/*! @brief Returns 1 if during the last time step, the problem has not evolved.
  *
- * @param (temps) le temps a atteindre
- * @return (1 si le probleme n'a pas evolue, 0 sinon.)
+ * @param (temps) the time to reach
+ * @return (1 if the problem has not evolved, 0 otherwise.)
  */
 bool Schema_Temps_base::isStationary() const
 {
@@ -367,13 +367,13 @@ void Schema_Temps_base::set_param(Param& param) const
 // XD_CONT if set to 2, residual will be computed as R/(max-min).
 }
 
-/*! @brief Surcharge Objet_U::printOn(Sortie&) Imprime le schema en temps sur un flot de sortie.
+/*! @brief Overrides Objet_U::printOn(Sortie&): prints the time scheme to an output stream.
  *
- *     !! Attention n'est pas symetrique de la lecture !!
- *     On ecrit les differents parametres du schema en temps.
+ *     !! Note: this is not symmetric with reading !!
+ *     Writes the various parameters of the time scheme.
  *
- * @param (Sortie& os) le flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) the output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Schema_Temps_base::printOn(Sortie& os) const
 {
@@ -410,20 +410,20 @@ Sortie& Schema_Temps_base::printOn(Sortie& os) const
 }
 
 
-/*! @brief Lecture d'un schema en temps a partir d'un flot d'entree.
+/*! @brief Reads a time scheme from an input stream.
  *
- * Le format de lecture attendu est le suivant:
+ * The expected read format is:
  *      {
  *       [Motcle valeur_reelle]
  *      }
- *      Les mots clefs peuvent etre:
+ *      The keywords can be:
  *      tinit, tmax, nb_pas_dt_max, dt_min, dt_max,
  *      dt_sauv, dt_impr, facsec, seuil_statio,
  *
- * @param (Entree& is) le flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws accolade ouvrante attendue
- * @throws motclef inconnu a cet endroit
+ * @param (Entree& is) the input stream
+ * @return (Entree&) the modified input stream
+ * @throws opening brace expected
+ * @throws unknown keyword at this location
  */
 Entree& Schema_Temps_base::readOn(Entree& is)
 {
@@ -510,7 +510,7 @@ int Schema_Temps_base::lire_motcle_non_standard(const Motcle& mot, Entree& is)
   return retval;
 }
 
-/*! @brief Lecture du nombre de pas de temps maximal
+/*! @brief Reads the maximum number of time steps.
  *
  */
 Entree& Schema_Temps_base::lire_nb_pas_dt_max(Entree& is)
@@ -524,7 +524,7 @@ Entree& Schema_Temps_base::lire_periode_sauvegarde_securite_en_heures(Entree& is
 {
   Cerr << "Reading of the safety backup period in hours"  << finl;
   is >> periode_cpu_sans_sauvegarde_;
-  periode_cpu_sans_sauvegarde_*=3600; // Conversion en secondes
+  periode_cpu_sans_sauvegarde_*=3600; // Conversion to seconds
   limite_cpu_sans_sauvegarde_ = periode_cpu_sans_sauvegarde_;
   return is;
 }
@@ -533,7 +533,7 @@ Entree& Schema_Temps_base::lire_temps_cpu_max(Entree& is)
 {
   Cerr << "Reading the max cpu time allowed"  << finl;
   is >> tcpumax_;
-  tcpumax_*=3600; // Conversion en secondes
+  tcpumax_*=3600; // Conversion to seconds
   return is;
 }
 
@@ -571,29 +571,25 @@ Entree& Schema_Temps_base::lire_residuals(Entree& is)
 }
 
 
-/*! @brief Impression du numero du pas de temps, la valeur du pas de temps.
+/*! @brief Prints the time step number, the time step value, and the current time.
  *
- * et du temps courant.
- *
- * @param (Sortie& os) le flot de sortie
- * @return (int) renvoie toujours 0
+ * @param (Sortie& os) the output stream
+ * @return (int) always returns 0
  */
 int Schema_Temps_base::impr(Sortie& os) const
 {
   os << finl;
   os << "-------------------------------------------------------------------" << finl;
   os << "We finished treating the time step number "<< nb_pas_dt_ << " , for the time scheme ..." << finl
-     << "   stable dt used = " << dt_ << finl /* dt_stab_ peut etre ? c'est pareil je pense */
+     << "   stable dt used = " << dt_ << finl /* dt_stab_ perhaps? it is the same I think */
      << "   time achieved (in seconds) = " << temps_courant_ << finl;
   return 0;
 }
 
-/*! @brief Impression du numero du pas de temps, la valeur du pas de temps.
+/*! @brief Prints the time step number, the time step value, and the current time.
  *
- * et du temps courant.
- *
- * @param (Sortie& os) le flot de sortie
- * @return (int) renvoie toujours 0
+ * @param (Sortie& os) the output stream
+ * @return (int) always returns 0
  */
 int Schema_Temps_base::impr(Sortie& os,Probleme_base& pb) const
 {
@@ -619,9 +615,9 @@ int Schema_Temps_base::impr(Sortie& os,const Probleme_base& pb) const
 extern "C" {
   int ccc_tremain(double*);
 }
-/*! @brief Mise a jour du temps courant (t+=dt) et du nombre de pas de temps effectue (nb_pas_dt_++).
+/*! @brief Updates the current time (t+=dt) and the number of time steps performed (nb_pas_dt_++).
  *
- * @return (int) retourne toujours 1
+ * @return (int) always returns 1
  */
 int Schema_Temps_base::mettre_a_jour()
 {
@@ -643,18 +639,18 @@ int Schema_Temps_base::mettre_a_jour()
   if (!ind_temps_cpu_max_atteint)
     ind_temps_cpu_max_atteint = (temps_cpu_ecoule_ >= tcpumax_);
 
-  // On incremente limite_cpu_sans_sauvegarde_
+  // Increment limite_cpu_sans_sauvegarde_
   if ( temps_cpu_ecoule_ > limite_cpu_sans_sauvegarde_ )
     {
       limite_cpu_sans_sauvegarde_ += periode_cpu_sans_sauvegarde_;
-      //Finalement, on double la limite, ainsi par defaut sauvegarde de securite 10h, 20h, 40h, 80h, 160h,....
+      //Finally, we double the limit, so by default security backup at 10h, 20h, 40h, 80h, 160h, ...
       //limite_cpu_sans_sauvegarde_ = 2 * limite_cpu_sans_sauvegarde_;
       if (dt_sauv_ <= 0.)
         Cerr << "NO next backup, by security, because dt_sauv = " << dt_sauv_ << finl;
       else
         Cerr << "The next backup, by security, will take place after " << limite_cpu_sans_sauvegarde_/3600 << " hours of calculation." << finl;
     }
-// GF pour etre sur que tous les proc aient le meme temps ecoule
+// GF to ensure that all processes have the same elapsed time
   if (je_suis_maitre())
     {
       temps_cpu_ecoule_ = statistics().get_time_since_last_open(STD_COUNTERS::total_execution_time);
@@ -683,7 +679,7 @@ int Schema_Temps_base::mettre_a_jour()
 #endif
   return 1;
 }
-// Fait une sauvegarde de protection sur des runs de 24h sur machines du CCRT
+// Makes a protection backup on 24h runs on CCRT machines
 int Schema_Temps_base::lsauv() const
 {
   if (dt_sauv_ <= 0.)
@@ -703,7 +699,7 @@ int Schema_Temps_base::lsauv() const
             return 1;
           else
             {
-              // Voir Schema_Temps_base::limpr pour information sur epsilon et modf
+              // See Schema_Temps_base::limpr for information on epsilon and modf
               double i, j, epsilon = 1.e-8;
               modf(temps_courant_/dt_sauv_ + epsilon, &i);
               modf(temps_precedent_/dt_sauv_ + epsilon, &j);
@@ -719,9 +715,9 @@ void Schema_Temps_base::mettre_a_jour_dt_stab()
   imprimer(Cout);
   dt_stab_=pb_base().calculer_pas_de_temps();
 }
-/*! @brief Imprime le pas de temps sur un flot de sortie s'il y a lieu.
+/*! @brief Prints the time step to an output stream if appropriate.
  *
- * @param (Sortie& os) le flot de sortie
+ * @param (Sortie& os) the output stream
  */
 void Schema_Temps_base::imprimer(Sortie& os) const
 {
@@ -735,9 +731,9 @@ void Schema_Temps_base::imprimer(Sortie& os) const
     }
 }
 
-/*! @brief Imprime le pas de temps sur un flot de sortie s'il y a lieu.
+/*! @brief Prints the time step to an output stream if appropriate.
  *
- * @param (Sortie& os) le flot de sortie
+ * @param (Sortie& os) the output stream
  */
 void Schema_Temps_base::imprimer(Sortie& os, Probleme_base& pb) const
 {
@@ -750,9 +746,9 @@ void Schema_Temps_base::imprimer(Sortie& os, const Probleme_base& pb) const
     impr(os,pb);
 }
 
-/*! @brief Sauvegarde le temps courant et le nombre de pas de temps sur un flot de sortie.
+/*! @brief Saves the current time and the number of time steps to an output stream.
  *
- * @param (Sortie& os) le flot de sortie pour la sauvegarde
+ * @param (Sortie& os) the output stream for the backup
  */
 int Schema_Temps_base::sauvegarder(Sortie& os) const
 {
@@ -785,21 +781,19 @@ int Schema_Temps_base::sauvegarder(Sortie& os) const
   return bytes;
 }
 
-/*! @brief Reprise (lecture) du temps courant et du nombre de pas de temps effectues a partir d'un flot d'entree.
+/*! @brief Restarts (reads) the current time and the number of time steps performed from an input stream.
  *
- * @param (Entree& is) le flot d'entree
- * @return (int) renvoie toujours 1
+ * @param (Entree& is) the input stream
+ * @return (int) always returns 1
  */
 int Schema_Temps_base::reprendre(Entree& is)
 {
   return 1;
 }
 
-/*! @brief Renvoie 1 si le fichier (d'extension) .
+/*! @brief Returns 1 if the .stop file contains a 1, returns 0 otherwise.
  *
- * stop contient un 1 Renvoie 0 sinon
- *
- * @return (int) 1 si le fichier (d'extension) .stop contient 1, 0 sinon
+ * @return (int) 1 if the .stop file contains 1, 0 otherwise
  */
 int Schema_Temps_base::stop_lu() const
 {
@@ -825,14 +819,14 @@ int Schema_Temps_base::stop_lu() const
   return stop_lu_l;
 }
 
-/*! @brief Corrige le pas de temps calcule que l'on passe en parametre et verifie qu'il n'est pas "trop" petit (< dt-min_).
+/*! @brief Corrects the computed time step passed as parameter and verifies it is not "too" small (< dt_min_).
  *
- *     La correction est la suivante:
- *        delta_t = min((facteur de securite * dt_calc), dt_max)
- *     Et on verifie que delta_t est "suffisamment" plus grand que dt_min_.
+ *     The correction is:
+ *        delta_t = min((security factor * dt_calc), dt_max)
+ *     And verifies that delta_t is "sufficiently" larger than dt_min_.
  *
- * @param (double& dt_calc) le pas de temps calcule a verifier
- * @throws le pas de temps calcule est inferieur a dt_min
+ * @param (double& dt_calc) the computed time step to verify
+ * @throws if the computed time step is less than dt_min
  */
 bool Schema_Temps_base::corriger_dt_calcule(double& dt_calc) const
 {
@@ -849,7 +843,7 @@ bool Schema_Temps_base::corriger_dt_calcule(double& dt_calc) const
   // Compute the time step dt as the minimal value between dt_max_ and proposed time step
   double dt = std::min(dt_max_, dt_propose);
 
-  // si option adapt_dt_tmax active ... a la cathare
+  // if adapt_dt_tmax option is active ... cathare-style
   bool adapt_dt_tmax = false;
   if (adapt_dt_tmax_)
     {
@@ -885,14 +879,15 @@ bool Schema_Temps_base::corriger_dt_calcule(double& dt_calc) const
 }
 
 
-/*! @brief Renvoie 1 si il y lieu de stopper le calcul pour differente raisons: - le temps final est atteint
+/*! @brief Returns 1 if it is necessary to stop the computation for various reasons:
  *
- *         - le nombre de pas de temps maximum est depasse
- *         - l'etat stationnaire est atteint
- *         - indicateur d'arret fichier (voir int Schema_Temps_base::stop_lu())
- *     Renvoie 0 sinon
+ *         - the final time has been reached
+ *         - the maximum number of time steps has been exceeded
+ *         - the steady state has been reached
+ *         - file-based stop indicator (see int Schema_Temps_base::stop_lu())
+ *     Returns 0 otherwise.
  *
- * @return (int) 1 si il y a lieu de stopper le calcul 0 sinon.
+ * @return (int) 1 if the computation should stop, 0 otherwise.
  */
 int Schema_Temps_base::stop() const
 {
@@ -954,12 +949,12 @@ const Probleme_base& Schema_Temps_base::pb_base() const
 
 void Schema_Temps_base::ajouter_inertie(Matrice_Base& mat_morse,DoubleTab& secmem,const Equation_base& eqn) const
 {
-  // codage pour euler_implicite
+  // implementation for euler_implicite
   double dt=pas_de_temps();
-  // On ne penalise pas les matrices et les secmems meme dans les cas
-  // dirichlet , symetrie
+  // We do not penalize the matrices and the right-hand sides even in the
+  // Dirichlet, symmetry cases
   int pen=0;
-  eqn.solv_masse().ajouter_masse(dt,mat_morse,pen); //ordre important pour PolyMAC_MPFA
+  eqn.solv_masse().ajouter_masse(dt,mat_morse,pen); //important order for PolyMAC_MPFA
   const bool use_old_volumes = eqn.domaine_dis().domaine().deformable();
   eqn.solv_masse().ajouter_masse(dt, secmem, eqn.inconnue().passe(), pen, use_old_volumes);
 }
@@ -969,15 +964,15 @@ void Schema_Temps_base::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, co
   eqn.solv_masse().ajouter_blocs(matrices, secmem, pas_de_temps(), semi_impl, 1);
 }
 
-/*! @brief //Actualisation de stationnaire_atteint_ et residu_ (critere residu_<seuil_statio_)
+/*! @brief Updates stationnaire_atteint_ and residu_ (criterion: residu_ < seuil_statio_).
  *
- * @param (double& t) le nouveau temps courant
+ * @param (double& t) the new current time
  */
 void Schema_Temps_base::update_critere_statio(const DoubleTab& tab_critere, Equation_base& equation)
 {
   DoubleVect& residu_equation = equation.get_residu();
-  // En fonction de la taille du tableau residu_equation
-  // on prend le max de tab_critere sur tout le tableau ou par colonne
+  // Depending on the size of the residu_equation array
+  // we take the max of tab_critere over the whole array or by column
   int size = residu_equation.size_array();
   if (size==0)
     {
@@ -1018,7 +1013,7 @@ void Schema_Temps_base::update_critere_statio(const DoubleTab& tab_critere, Equa
         }
     }
   equation.set_residuals(tab_critere);
-  // On calcule le residu_initial_equation sur les 5 premiers pas de temps
+  // Compute residu_initial_equation over the first 5 time steps
   if (seuil_statio_relatif_deconseille_ == 1)
     {
       DoubleVect& residu_initial_equation = equation.residu_initial();
@@ -1026,10 +1021,10 @@ void Schema_Temps_base::update_critere_statio(const DoubleTab& tab_critere, Equa
         {
           for (int i=0; i<size; i++)
             residu_initial_equation(i) = residu_equation(i);
-          // On ne prend plus le max car celui ci est parfois grand au premier pas de temps:
+          // We no longer take the max since it can be large at the first time step:
           // residu_initial_equation(i) = std::max(residu_initial_equation(i), residu_equation(i));
         }
-      // On normalise residu_equation par residu_initial_equation
+      // Normalize residu_equation by residu_initial_equation
       for (int i=0; i<size; i++)
         if (residu_initial_equation(i)>0)
           residu_equation(i) /= residu_initial_equation(i);
@@ -1049,8 +1044,8 @@ void Schema_Temps_base::update_critere_statio(const DoubleTab& tab_critere, Equa
     }
 }
 
-// Impression du temps courant en tenant compte du dt
-// pour la precision de l'impression (utilise dans les operateurs)
+// Print the current time taking into account dt
+// for the precision of the output (used in operators)
 void Schema_Temps_base::imprimer_temps_courant(SFichier& os) const
 {
   int precision_actuelle=os.get_precision();
@@ -1064,7 +1059,7 @@ void Schema_Temps_base::imprimer_temps_courant(SFichier& os) const
   os.precision(precision_actuelle);
 }
 
-/*! @brief Ecriture du fichier .progress (temps CPU estime restant)
+/*! @brief Writes the .progress file (estimated remaining CPU time).
  *
  */
 void Schema_Temps_base::write_progress(bool init)
@@ -1086,19 +1081,19 @@ void Schema_Temps_base::write_progress(bool init)
             }
           if (schema_impr() && (nb_pas_dt() > 0 && pas_de_temps() > 0))
             {
-              // On calcule le temps CPU moyen par pas de temps, inconvenient il peut varier fortement au cours du temps si divergence du calcul ou au contraire acceleration
-              // Mais Statistiques ne permet pas d'avoir le temps CPU du dernier pas de temps (last_time appele ici renverrait le temps CPU depuis le debut du pas de temps)
+              // Compute the average CPU time per time step; drawback: it can vary strongly over time in case of divergence or acceleration
+              // But Statistiques does not allow retrieving the CPU time of the last time step (last_time called here would return the CPU time since the start of the time step)
               double nb_pas_selon_tmax = (temps_max() - temps_courant()) / pas_de_temps();
               double nb_pas_selon_nb_pas_dt_max = nb_pas_dt_max() - nb_pas_dt();
               double nb_pas_avant_fin = std::min(nb_pas_selon_tmax, nb_pas_selon_nb_pas_dt_max);
               //double seconds_to_finish  = nb_pas_avant_fin * cpu_per_timestep;
               double dpercent = (1. - nb_pas_avant_fin /
                                  (nb_pas_avant_fin +
-                                  nb_pas_dt()));    // marche meme si c'est ltemps max qui limite
-              // si la pente est >0 on diverge ....
+                                  nb_pas_dt()));    // works even if it is tmax that limits
+              // if the slope is >0 we are diverging ....
               if ((seuil_statio_ > 0) && (cumul_slope_ < -1e-20) &&
                   seuil_statio_ <
-                  residu_) // dans un pb_couple on peut avoir (seuil_statio_ > residu) pour un des problemes
+                  residu_) // in a pb_couple one of the problems may have (seuil_statio_ > residu)
                 {
                   double distance = (-log(residu_ + 1e-20) + log(seuil_statio_)) / (cumul_slope_) * nb_pas_dt();
 
@@ -1117,6 +1112,7 @@ void Schema_Temps_base::write_progress(bool init)
                       int h = int(seconds_to_finish / 3600);
                       int mn = int((seconds_to_finish - 3600 * h) / 60);
                       int s = int(seconds_to_finish - 3600 * h - 60 * mn);
+
                       Cout << finl << "Estimated CPU time to finish the run (according to "
                            << (nb_pas_selon_tmax < nb_pas_selon_nb_pas_dt_max ? "tmax" : "nb_pas_dt_max")
                            << " value) : ";
@@ -1135,7 +1131,7 @@ void Schema_Temps_base::write_progress(bool init)
     }
 }
 
-/*! @brief Ecriture du fichier .dt_ev
+/*! @brief Writes the .dt_ev file.
  *
  */
 static SFichier dt_ev_;
@@ -1157,7 +1153,7 @@ void Schema_Temps_base::write_dt_ev(bool init)
         {
           Nom fichier(nom_du_cas() + ".dt_ev");
           struct stat f;
-          // On initialise le fichier .dt_ev s'il n'existe pas ou si c'est un demarrage de calcul sans reprise
+          // Initialize the .dt_ev file if it does not exist or if this is a fresh computation without restart
           if ((nb_pas_dt_ == 0) && ((stat(fichier, &f)) || !(pb_base().reprise_effectuee() == 1)))
             {
               if (schema_impr())
@@ -1190,7 +1186,7 @@ void Schema_Temps_base::write_dt_ev(bool init)
     }
 }
 
-/*! @brief Fermeture du fichier .dt_ev
+/*! @brief Closes the .dt_ev file.
  *
  */
 void Schema_Temps_base::finir() const

@@ -17,9 +17,9 @@
 #define Multiplicateur_diphasique_homogene_included
 #include <Multiplicateur_diphasique_base.h>
 
-/*! @brief classe Multiplicateur_diphasique_homogene multiplicateur diphasique homogene : Phi^2 = 1 + x (rho_l / rho_g - 1)
+/*! @brief Homogeneous two-phase multiplier: Phi^2 = 1 + x (rho_l / rho_g - 1).
  *
- *     raccord vers la phase vapeur a partir de alpha_min et jusqu'a alpha_max
+ *     Blending towards the vapor phase from alpha_min up to alpha_max.
  *
  *
  */
@@ -33,7 +33,7 @@ public:
                    const double Fm, DoubleTab& coeff) const override;
 protected:
   double alpha_min_ = 0.9995, alpha_max_ = 1;
-  int n_l = -1, n_g = -1; //indices des phases frottantes (liquide/gaz)
+  int n_l = -1, n_g = -1; //indices of the friction phases (liquid/gas)
 };
 
 #endif

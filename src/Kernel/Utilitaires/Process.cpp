@@ -25,7 +25,7 @@
 #include <comm_incl.h>
 #include <TRUST_Error.h>
 #include <Comm_Group_MPI.h>
-#include <unistd.h> // sleep() pour certaines machines
+#include <unistd.h> // sleep() on some machines
 #include <SChaine.h>
 #include <FichierHDFPar.h>
 #include <EChaineJDD.h>
@@ -78,10 +78,9 @@ bool Process::force_single_file(const int ranks, const Nom& filename)
     return false;
 }
 
-/*! @brief renvoie 1 si on est sur le processeur maitre du groupe courant (c'est a dire me() == 0), 0 sinon.
+/*! @brief Returns 1 if on the master processor of the current group (i.e. me() == 0), 0 otherwise.
  *
- * Voir Comm_Group::rank()
- *
+ * @return 1 if master processor, 0 otherwise.
  */
 int Process::je_suis_maitre()
 {
@@ -89,8 +88,9 @@ int Process::je_suis_maitre()
   return r == 0;
 }
 
-/*! @brief renvoie 1 si on est sur le processeur maitre du noeud numa, 0 sinon.
+/*! @brief Returns 1 if on the NUMA node master processor, 0 otherwise.
  *
+ * @return 1 if node master processor, 0 otherwise.
  */
 int Process::node_master()
 {
@@ -98,8 +98,9 @@ int Process::node_master()
   return r == 0;
 }
 
-/*! @brief renvoie le nombre de processeurs dans le groupe courant Voir Comm_Group::nproc() et PE_Groups::current_group()
+/*! @brief Returns the number of processors in the current group. See Comm_Group::nproc() and PE_Groups::current_group().
  *
+ * @return Number of processors in the current group.
  */
 int Process::nproc()
 {
@@ -117,10 +118,9 @@ bool Process::is_sequential()
   return Process::nproc() == 1;
 }
 
-/*! @brief renvoie mon rang dans le groupe de communication courant.
+/*! @brief Returns the rank of the local processor in the current communication group. See Comm_Group::rank() and PE_Groups::current_group().
  *
- * Voir Comm_Group::rank() et PE_Groups::current_group()
- *
+ * @return Rank in the current group.
  */
 int Process::me()
 {
@@ -128,9 +128,9 @@ int Process::me()
   return r;
 }
 
-/*! @brief Synchronise tous les processeurs du groupe courant (attend que tous les processeurs soient arrives a la barriere)
+/*! @brief Synchronizes all processors in the current group (waits until all processors have reached the barrier).
  *
- *    Instruction a executer sur tous les processeurs du groupe.
+ * Must be executed on all processors in the group.
  *
  */
 void Process::barrier()
@@ -139,8 +139,10 @@ void Process::barrier()
 }
 
 
-/*! @brief Calcule la somme de x sur tous les processeurs du groupe courant.
+/*! @brief Computes the sum of x over all processors in the current group.
  *
+ * @param x Value to sum across all processors.
+ * @return Sum of x over all processors in the current group.
  * @sa mp_max()
  */
 double Process::mp_sum(double x)
@@ -159,10 +161,12 @@ float Process::mp_sum(float x)
   return y;
 }
 
-/*! @brief Calcule la somme de x sur tous les processeurs du groupe courant.
+/*! @brief Computes the sum of x over all processors in the current group.
  *
  * !!! Note that the sum of many int might result in a long !!!
  *
+ * @param x Value to sum across all processors.
+ * @return Sum of x over all processors in the current group.
  * @sa mp_max()
  */
 trustIdType Process::mp_sum(trustIdType x)
@@ -369,8 +373,10 @@ T mp_operations_commun_(T x, Comm_Group::Collective_Op op)
 }
 }
 
-/*! @brief renvoie le plus grand int i sur l'ensemble des processeurs du groupe courant.
+/*! @brief Returns the maximum value of x across all processors in the current group.
  *
+ * @param x Value to reduce with max operation.
+ * @return Maximum value of x across all processors.
  */
 int Process::mp_max(int x) { return mp_operations_commun_(x,Comm_Group::COLL_MAX); }
 double Process::mp_max(double x) { return mp_operations_commun_(x,Comm_Group::COLL_MAX); }
@@ -379,8 +385,10 @@ trustIdType Process::mp_max(trustIdType x) { return mp_operations_commun_(x,Comm
 #endif
 
 
-/*! @brief renvoie le plus petit int i sur l'ensemble des processeurs du groupe courant.
+/*! @brief Returns the minimum value of x across all processors in the current group.
  *
+ * @param x Value to reduce with min operation.
+ * @return Minimum value of x across all processors.
  */
 int Process::mp_min(int x) { return mp_operations_commun_(x,Comm_Group::COLL_MIN); }
 double Process::mp_min(double x) { return mp_operations_commun_(x,Comm_Group::COLL_MIN); }
@@ -388,9 +396,11 @@ double Process::mp_min(double x) { return mp_operations_commun_(x,Comm_Group::CO
 trustIdType Process::mp_min(trustIdType x) { return mp_operations_commun_(x,Comm_Group::COLL_MIN); }
 #endif
 
-/*! @brief Calul de la somme partielle de i sur les processeurs 0 a me()-1 (renvoie 0 sur le processeur 0).
+/*! @brief Computes the partial sum of x over processors 0 to me()-1 (returns 0 on processor 0).
  *
- * Voir Comm_Group::mppartial_sum()
+ * @param x Value to include in the partial sum.
+ * @return Partial sum of x over processors 0 to me()-1.
+ * @sa Comm_Group::mppartial_sum()
  *
  */
 trustIdType Process::mppartial_sum(trustIdType x)
@@ -403,8 +413,10 @@ trustIdType Process::mppartial_sum(trustIdType x)
   return y;
 }
 
-/*! @brief Calcule le 'et' logique de b sur tous les processeurs du groupe courant.
+/*! @brief Computes the logical AND of b across all processors in the current group.
  *
+ * @param b Boolean value to reduce with AND operation.
+ * @return True if b is true on all processors, false otherwise.
  */
 bool Process::mp_and(bool b)
 {
@@ -432,7 +444,7 @@ int Process::check_int_overflow(trustIdType v)
   return static_cast<int>(v);
 }
 
-/*! @brief Routine de sortie de TRUST dans une region Kokkos
+/*! @brief Exit routine for TRUST within a Kokkos region.
  *
  */
 /*
@@ -448,9 +460,11 @@ void Process::Kokkos_exit(const char* str)
 #endif
 }*/
 
-/*! @brief Routine de sortie de TRUST sur une erreur.
+/*! @brief Exit routine for TRUST on error.
  *
- * Sauvegarde la memoire et de la hierarchie dans les fichiers "memoire.dump" et "hierarchie.dump"
+ * Saves memory and hierarchy information to files "memoire.dump" and "hierarchie.dump".
+ *
+ * @param i Exit code (forced to -1 if 0).
  */
 void Process::exit(int i)
 {
@@ -463,7 +477,7 @@ void Process::exit(const Nom& message ,int i)
 {
   if (exception_sur_exit == 2)
     {
-      ::exit(-1); // ND 11/01/23 utilisation d'un second ::exit(-1) dans TRUST car si pas droits d'ecriture appel recursif a Process::exit()
+      ::exit(-1); // ND 11/01/23 a second ::exit(-1) is used in TRUST because if write permissions are missing, Process::exit() would be called recursively
     }
 
   if(je_suis_maitre())
@@ -484,7 +498,7 @@ void Process::exit(const Nom& message ,int i)
 
   if (exception_sur_exit)
     {
-      // Lancement d'une exception (utilise par Execute_parallel)
+      // Throw an exception (used by Execute_parallel)
       throw TRUST_Error("Error in trust ",Process::me());
     }
   else
@@ -506,18 +520,18 @@ void Process::exit(const Nom& message ,int i)
           int buffer[1]= {1};
           MPI_Request request;
 
-          // Envoi non bloquant vers me()+1
+          // Non-blocking send to me()+1
           int to_pe = (me()==nproc()-1?0:me()+1);
           MPI_Isend(buffer, 1, MPI_ENTIER, to_pe, tag, mpi_comm, &request);
 
-          // Reception non bloquante depuis me()-1
+          // Non-blocking receive from me()-1
           int from_pe = (me()==0?nproc()-1:me()-1);
           MPI_Irecv(buffer, 1, MPI_ENTIER, from_pe, tag, mpi_comm, &request);
 
-          // Attente
+          // Wait
           sleep(1);
 
-          // Test si me() a recu de me()-1
+          // Check if me() received from me()-1
           int ok;
           MPI_Status status;
           MPI_Test(&request,&ok,&status);
@@ -550,31 +564,33 @@ void Process::exit(const Nom& message ,int i)
         }
     }
   Kokkos::finalize();
-  // On force exit();
+  // Force exit
   if (i==0) i=-1;
-  ::exit(i); //Seul ::exit utilise dans le code jusqu'a 01/23. second ajoute car appel recursif a Process::exit si droits ecriture dossier etude manquants
+  ::exit(i); // Only ::exit used in the code until 01/23. A second one was added because Process::exit is called recursively if the study directory write permissions are missing.
 }
 
-/*! @brief Routine de sortie de Trio-U sur une erreur abort()
+/*! @brief Abort routine for TRUST on a fatal error.
  *
+ * In optimized mode, exits cleanly. In debug mode, aborts abruptly to allow debugger inspection.
  */
 void Process::abort()
 {
 #ifdef NDEBUG
-  // En optimise on sort proprement.
+  // In optimized mode, exit cleanly.
   exit();
 #else
-  // En debug, on sort brutal pour avoir des infos avec le debugger ?
-  ::abort(); //Seul ::abort() utilise dans le code
+  // In debug mode, abort abruptly to capture debugger info.
+  ::abort(); // Only ::abort() used in the code
 #endif
 }
 
-/*! @brief Renvoie un objet statique de type Sortie qui sert de journal d'evenements.
+/*! @brief Returns a static Sortie object used as an event journal.
  *
- * Si message_level <= verbose_level_, on ecrit le message, sinon
- *   on l'envoie sur une Sortie_Nulle.
- *   Si le fichier journal est ouvert, on ecrit dans le fichier, sinon dans stderr.
+ * If message_level <= verbose_level_, the message is written; otherwise it is discarded to a Sortie_Nulle.
+ * If the journal file is open, messages are written to the file; otherwise to stderr.
  *
+ * @param message_level Level of the message. Written only if <= verbose_level_.
+ * @return Reference to the appropriate Sortie output stream.
  */
 Sortie& Process::Journal(int message_level)
 {
@@ -588,7 +604,7 @@ Sortie& Process::Journal(int message_level)
   return journal_zero_;
 }
 
-// Renvoie la ram occupee par un processeur
+// Returns the RAM used by the current processor.
 double Process::ram_processeur()
 {
 #ifdef PETSCKSP_H
@@ -672,8 +688,8 @@ void Process::imprimer_ram_totale(int all_process)
 #endif
 #endif /* ndef __APPLE__ */
       }
-#ifdef TRUST_USE_ROCM /* Seulement sur adastra */
-      // sUnreclaim sur chaque process:
+#ifdef TRUST_USE_ROCM /* Only on adastra */
+      // SUnreclaim on each process:
       std::ifstream meminfo("/proc/meminfo");
       std::string line;
       size_t sunreclaim_kb = 0;
@@ -703,11 +719,11 @@ void Process::imprimer_ram_totale(int all_process)
     }
 }
 
-/*! @brief Initialisation du journal
+/*! @brief Initializes the journal file.
  *
- * @param (verbose_level) les messages de niveau <= verbose_level seront affiches, les autres seront mis a la poubelle.
- * @param (file_name) si pointeur nul, tout le monde ecrit dans cerr, sinon c'est le nom du fichier (doit etre different sur chaque processeur)
- * @param (append) indique si on ouvre le fichier en mode append ou pas.
+ * @param verbose_level Messages at level <= verbose_level will be printed; others are discarded.
+ * @param file_name If null pointer, everyone writes to cerr; otherwise the name of the file (must be different on each processor).
+ * @param append Indicates whether the file is opened in append mode or not.
  */
 void init_journal_file(int verbose_level, const char * file_name, int append)
 {
@@ -752,11 +768,11 @@ Sortie& get_Cerr()
     return journal_file_;
   else
     {
-      // dans le cas ou on a pas initialise les groupes
-      // on ne peut pas tester si on est maitre
+      // If groups have not been initialized yet,
+      // we cannot test whether we are the master.
       if (PE_Groups::get_nb_groups()==0)
         return std_err_;
-      // Seul le processeur maitre ecrit sur std_err_, les autres ecrivent sur journal_file_
+      // Only the master processor writes to std_err_; others write to journal_file_
       if (Process::je_suis_maitre())
         return std_err_;
       else if (verbose_level_)

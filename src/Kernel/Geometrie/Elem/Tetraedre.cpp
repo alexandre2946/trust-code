@@ -42,9 +42,9 @@ Entree& Tetraedre_32_64<_SIZE_>::readOn(Entree& s )
 }
 
 
-/*! @brief Renvoie le nom LML d'un tetraedre = "TETRA4".
+/*! @brief Returns the LML name of a tetrahedron = "TETRA4".
  *
- * @return (Nom&) toujours egal a "TETRA4"
+ * @return Always equal to "TETRA4".
  */
 template <typename _SIZE_>
 const Nom& Tetraedre_32_64<_SIZE_>::nom_lml() const
@@ -73,7 +73,7 @@ namespace
 *
 *
 *
-* @return (int) 1 si le point de coordonnees specifiees appartient a l'element ielem 0 sinon
+* @return 1 if the point belongs to the tetrahedron, 0 otherwise.
 */
 inline bool is_on_same_side_of_plane(const double& X0, const double& Y0, const double& Z0,
                                      const double& X1, const double& Y1, const double& Z1,
@@ -105,17 +105,16 @@ inline bool is_on_same_side_of_plane(const double& X0, const double& Y0, const d
 }
 }
 
-/*! @brief Renvoie 1 si l'element ielem du domaine associe a l'element geometrique contient le point
- *  de coordonnees specifiees par le parametre "pos". Renvoie 0 sinon.
+/*! @brief Returns 1 if element "ielem" of the domain associated with this geometric element contains the point with coordinates "pos". Returns 0 otherwise.
  *
- * @param (DoubleVect& pos) coordonnees du point que l'on cherche a localiser
- * @param (int ielem) le numero de l'element du domaine dans lequel on cherche le point.
- * @return (int) 1 si le point de coordonnees specifiees appartient a l'element ielem 0 sinon
+ * @param pos Coordinates of the point to locate.
+ * @param ielem Index of the domain element in which to search for the point.
+ * @return 1 if the point belongs to element "ielem", 0 otherwise.
  */
 template <typename _SIZE_>
 int Tetraedre_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t ielem) const
 {
-  // 29/01/2010 Optimisation CPU de la methode (50% plus rapide) par PL
+  // 29/01/2010 CPU optimisation of this method (50% faster) by PL
   assert(pos.size_array()==3);
   const Domaine_t& domaine=mon_dom.valeur();
   const DoubleTab_t& coord=domaine.coord_sommets();
@@ -181,13 +180,13 @@ int Tetraedre_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t ielem) const
 }
 
 
-/*! @brief Renvoie 1 si les sommets specifies par le parametre "pos" sont les sommets de l'element "element" du domaine associe a
+/*! @brief Returns 1 if the vertices specified by "som" are the vertices of element "element"
  *
- *     l'element geometrique.
+ * in the domain associated with this geometric element. Returns 0 otherwise.
  *
- * @param (IntVect& pos) les numeros des sommets a comparer avec ceux de l'elements "element"
- * @param (int element) le numero de l'element du domaine dont on veut comparer les sommets
- * @return (int) 1 si les sommets passes en parametre sont ceux de l'element specifie, 0 sinon
+ * @param som Vertex indices to compare with those of element "element".
+ * @param element Index of the domain element whose vertices are to be compared.
+ * @return 1 if the specified vertices are those of the given element, 0 otherwise.
  */
 template <typename _SIZE_>
 int Tetraedre_32_64<_SIZE_>::contient(const SmallArrOfTID_t& som, int_t element ) const
@@ -202,9 +201,9 @@ int Tetraedre_32_64<_SIZE_>::contient(const SmallArrOfTID_t& som, int_t element 
     return 0;
 }
 
-/*! @brief Calcule les volumes des elements du domaine associe.
+/*! @brief Computes the volumes of the elements of the associated domain.
  *
- * @param (DoubleVect& volumes) le vecteur contenant les valeurs  des des volumes des elements du domaine
+ * @param tab_volumes Vector to fill with the volumes of domain elements.
  */
 template <typename _SIZE_>
 void Tetraedre_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& tab_volumes) const
@@ -234,10 +233,10 @@ void Tetraedre_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& tab_volumes) const
 }
 
 
-/*! @brief Calcule les normales aux faces des elements du domaine associe.
+/*! @brief Computes the face normals of the elements of the associated domain.
  *
- * @param (IntTab& face_sommets) les numeros des sommets des faces dans la liste des sommets du domaine associe
- * @param (DoubleTab& face_normales)
+ * @param Face_sommets Vertex indices of the faces in the domain vertex list.
+ * @param face_normales Output array to fill with face normals.
  */
 template <typename _SIZE_>
 void Tetraedre_32_64<_SIZE_>::calculer_normales(const IntTab_t& Face_sommets, DoubleTab_t& face_normales) const
@@ -266,12 +265,12 @@ void Tetraedre_32_64<_SIZE_>::calculer_normales(const IntTab_t& Face_sommets, Do
     }
 }
 
-/*! @brief voir ElemGeomBase::get_tab_faces_sommets_locaux
+/*! @brief See ElemGeomBase::get_tab_faces_sommets_locaux.
  */
 template <typename _SIZE_>
 int Tetraedre_32_64<_SIZE_>::get_tab_faces_sommets_locaux(IntTab& faces_som_local) const
 {
-  // un tetraedre a quatre faces de trois sommets
+  // a tetrahedron has four faces of three vertices each
   faces_som_local.resize(4,3);
   for (int i=0; i<4; i++)
     for (int j=0; j<3; j++)
@@ -282,10 +281,10 @@ int Tetraedre_32_64<_SIZE_>::get_tab_faces_sommets_locaux(IntTab& faces_som_loca
 template <typename _SIZE_>
 void Tetraedre_32_64<_SIZE_>::get_tab_aretes_sommets_locaux(IntTab& tab) const
 {
-  // un tetraedre a six aretes de deux sommets
+  // a tetrahedron has six edges of two vertices each
   tab.resize(6, 2);
   int count = 0;
-  // Une arete entre chaque couple de sommet du tetra: n * (n-1) / 2 aretes avec n=4
+  // one edge between each pair of tetra vertices: n * (n-1) / 2 edges with n=4
   for (int i = 0; i < 3; i++)
     {
       for (int j = i + 1; j < 4; j++)
@@ -299,18 +298,18 @@ void Tetraedre_32_64<_SIZE_>::get_tab_aretes_sommets_locaux(IntTab& tab) const
 }
 
 
-///*! Calcul de la coordonnee baryrentrique dans un tetra correspondant a une coordonnee
-// * cartesienne "point". Attention, si "point" est en dehors du tetra, une ou plusieurs
-// * coordonnees barycentriques seront negatives !
-// * polys est le tableau des tetraedres (indices de sommets),
-// * coords est le tableau des coordonnees des sommets,
-// * le_poly est le numero du tetraetre point la coordonnees du point a transformer
+///*! Computes the barycentric coordinate in a tetrahedron corresponding to a
+// * Cartesian coordinate "point". Note: if "point" is outside the tetra, one or more
+// * barycentric coordinates will be negative.
+// * polys is the tetrahedron connectivity table (vertex indices),
+// * coords is the vertex coordinate table,
+// * le_poly is the tetrahedron index whose barycentric coordinates are to be computed.
 // *
-// * On stocke le resultat dans coord_bary (poids des trois premiers sommets,
-// * le quatrieme etant implicitement 1 moins la somme des trois autres)
-// * Si epsilon est non nul, la valeur de retour est l'incertitude sur les coordonnees
-// * barycentriques, pour une incertitude epsilon sur les coordonnees carthesiennes.
-// * (calcul en norme Linfini, c'est a dire le max des erreurs sur chaque composantes)
+// * The result is stored in coord_bary (weights of the first three vertices,
+// * the fourth being implicitly 1 minus the sum of the other three).
+// * If epsilon is non-zero, the return value is the uncertainty on the barycentric
+// * coordinates for an uncertainty epsilon on the Cartesian coordinates.
+// * (computed in Linfini norm, i.e. the max error over each component)
 // */
 //template <typename _SIZE_>
 //double Tetraedre_32_64<_SIZE_>::coord_bary(const IntTab& polys, const DoubleTab& coords,
@@ -327,7 +326,7 @@ void Tetraedre_32_64<_SIZE_>::get_tab_aretes_sommets_locaux(IntTab& tab) const
 //  double resu;
 //  if (epsilon > 0.)
 //    {
-//      // Une erreur epsilon sur la coordonnee "point" entraine une erreur sur coord_bary:
+//      // An error epsilon on the "point" coordinate results in an error on coord_bary:
 //      double norm = inverse_m.norme_Linfini();
 //      resu = norm * epsilon;
 //    }

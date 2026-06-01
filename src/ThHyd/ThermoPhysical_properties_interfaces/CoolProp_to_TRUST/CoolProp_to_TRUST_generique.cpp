@@ -53,7 +53,7 @@ int CoolProp_to_TRUST_generique::tppi_get_single_property_T__(Loi_en_T enum_prop
 {
 #ifdef HAS_COOLPROP
   const int sz = (int )R.size();
-  // derivees qui manquent ...
+  // missing derivatives ...
   if (enum_prop == Loi_en_T::MU_DP || enum_prop == Loi_en_T::LAMBDA_DP || enum_prop == Loi_en_T::SIGMA_DP)
     return FD_derivative_pT__(enum_prop,P, T, R);
 
@@ -81,7 +81,7 @@ int CoolProp_to_TRUST_generique::tppi_get_single_property_T__(Loi_en_T enum_prop
       if (enum_prop == Loi_en_T::BETA) R[i] = fluide->isobaric_expansion_coefficient();
       if (enum_prop == Loi_en_T::SIGMA) R[i] = fluide->surface_tension();
     }
-  return 0; // FIXME : on suppose que tout OK
+  return 0; // FIXME : assuming everything is OK
 #else
   Cerr << "CoolProp_to_TRUST_generique::" <<  __func__ << " should not be called since TRUST is not compiled with the CoolProp library !!! " << finl;
   throw;
@@ -110,7 +110,7 @@ int CoolProp_to_TRUST_generique::FD_derivative_pT__(Loi_en_T enum_prop, const Sp
 
       R[i] = wrt_p ? ((plus_ - minus_) / ( 2 * EPS * P[i])) : ((plus_ - minus_) / ( 2 * EPS * T[i]));
     }
-  return 0; // FIXME : on suppose que tout OK
+  return 0; // FIXME : assuming everything is OK
 #else
   Cerr << "CoolProp_to_TRUST_generique::" <<  __func__ << " should not be called since TRUST is not compiled with the CoolProp library !!! " << finl;
   throw;
@@ -129,7 +129,7 @@ int CoolProp_to_TRUST_generique::tppi_get_single_property_h_(Loi_en_h enum_prop,
       for (auto& val : TT) val = H[i_it * ncomp + ind];
       return tppi_get_single_property_h__(enum_prop, P, TT, R);
     }
-  return 0; // FIXME : on suppose que tout OK
+  return 0; // FIXME : assuming everything is OK
 #else
   Cerr << "CoolProp_to_TRUST_generique::" <<  __func__ << " should not be called since TRUST is not compiled with the CoolProp library !!! " << finl;
   throw;
@@ -140,7 +140,7 @@ int CoolProp_to_TRUST_generique::tppi_get_single_property_h__(Loi_en_h enum_prop
 {
 #ifdef HAS_COOLPROP
   const int sz = (int )R.size();
-  // derivees qui manquent ...
+  // missing derivatives ...
   if (enum_prop == Loi_en_h::MU_DP || enum_prop == Loi_en_h::LAMBDA_DP || enum_prop == Loi_en_h::SIGMA_DP)
     return FD_derivative_ph__(enum_prop,P, H, R);
 
@@ -168,7 +168,7 @@ int CoolProp_to_TRUST_generique::tppi_get_single_property_h__(Loi_en_h enum_prop
       if (enum_prop == Loi_en_h::BETA) R[i] = fluide->isobaric_expansion_coefficient();
       if (enum_prop == Loi_en_h::SIGMA) R[i] = fluide->surface_tension();
     }
-  return 0; // FIXME : on suppose que tout OK
+  return 0; // FIXME : assuming everything is OK
 #else
   Cerr << "CoolProp_to_TRUST_generique::" <<  __func__ << " should not be called since TRUST is not compiled with the CoolProp library !!! " << finl;
   throw;
@@ -197,7 +197,7 @@ int CoolProp_to_TRUST_generique::FD_derivative_ph__(Loi_en_h enum_prop, const Sp
 
       R[i] = wrt_p ? ((plus_ - minus_) / ( 2 * EPS * P[i])) : ((plus_ - minus_) / ( 2 * EPS * H[i]));
     }
-  return 0; // FIXME : on suppose que tout OK
+  return 0; // FIXME : assuming everything is OK
 #else
   Cerr << "CoolProp_to_TRUST_generique::" <<  __func__ << " should not be called since TRUST is not compiled with the CoolProp library !!! " << finl;
   throw;
@@ -233,7 +233,7 @@ int CoolProp_to_TRUST_generique::tppi_get_all_properties_T__(const MSpanD input,
           else Process::exit("Derivative requested is not coded !");
         }
     }
-  return 0; // FIXME : on suppose que tout OK
+  return 0; // FIXME : assuming everything is OK
 #else
   Cerr << "CoolProp_to_TRUST_generique::" <<  __func__ << " should not be called since TRUST is not compiled with the CoolProp library !!! " << finl;
   throw;
@@ -279,7 +279,7 @@ int CoolProp_to_TRUST_generique::tppi_get_all_properties_T_IF97__(const MSpanD i
             if (prop_ == Loi_en_T::LAMBDA) span_[i] = fluide->conductivity();
             if (prop_ == Loi_en_T::SIGMA) span_[i] = fluide->surface_tension();
 
-            // XXX : Elie Saikali : Attention, pas possible d'appeler beta directement car implementee en derivee dans coolprop ... on fait a la main !
+            // XXX : Elie Saikali : Note, cannot call beta directly since it is implemented as a derivative in coolprop ... do it manually!
 //            if (prop_ == Loi_en_T::BETA) span_[i] = fluide->isobaric_expansion_coefficient();
             if (prop_ == Loi_en_T::BETA && has_beta)
               {
@@ -294,7 +294,7 @@ int CoolProp_to_TRUST_generique::tppi_get_all_properties_T_IF97__(const MSpanD i
           }
       }
 
-  // derivees qui manquent ...
+  // missing derivatives ...
   bool has_DP_DH = false;
   for (auto &itr : prop)
     if (itr.first == Loi_en_T::RHO_DP || itr.first == Loi_en_T::H_DP || itr.first == Loi_en_T::CP_DP ||
@@ -307,7 +307,7 @@ int CoolProp_to_TRUST_generique::tppi_get_all_properties_T_IF97__(const MSpanD i
   if (has_DP_DH)
     for (int i = 0; i < sz; i++)
       {
-        // en P
+        // in P
         double plus_rho_ = EPS, plus_H_ = EPS, plus_cp_ = EPS;
         fluide->update(CoolProp::PT_INPUTS, P[i] * (1. + EPS), T[i]);
         for (auto &itr : prop)
@@ -338,7 +338,7 @@ int CoolProp_to_TRUST_generique::tppi_get_all_properties_T_IF97__(const MSpanD i
             if (prop_ == Loi_en_T::CP_DP) span_[i] = (plus_cp_ - minus_cp_) / ( 2 * EPS * P[i]);
           }
 
-        // en T
+        // in T
         plus_rho_ = EPS, plus_H_ = EPS, plus_cp_ = EPS;
         fluide->update(CoolProp::PT_INPUTS, P[i], T[i] * (1. + EPS));
         for (auto &itr : prop)
@@ -370,14 +370,14 @@ int CoolProp_to_TRUST_generique::tppi_get_all_properties_T_IF97__(const MSpanD i
           }
       }
 
-  return 0; // FIXME : on suppose que tout OK
+  return 0; // FIXME : assuming everything is OK
 #else
   Cerr << "CoolProp_to_TRUST_generique::" <<  __func__ << " should not be called since TRUST is not compiled with the CoolProp library !!! " << finl;
   throw;
 #endif
 }
 
-// methodes particulieres par application pour gagner en performance : utilisees dans Pb_Multiphase (pour le moment !)
+// application-specific methods for performance gain: used in Pb_Multiphase (for now!)
 int CoolProp_to_TRUST_generique::tppi_get_CPMLB_pb_multiphase_pT(const MSpanD input, MLoiSpanD prop, int ncomp, int ind) const
 {
 #ifdef HAS_COOLPROP
@@ -405,7 +405,7 @@ int CoolProp_to_TRUST_generique::tppi_get_CPMLB_pb_multiphase_pT(const MSpanD in
 
   Tc_(T); // XXX : ATTENTION : need to put back T in C
 
-  return 0; // FIXME : on suppose que tout OK
+  return 0; // FIXME : assuming everything is OK
 #else
   Cerr << "CoolProp_to_TRUST_generique::" <<  __func__ << " should not be called since TRUST is not compiled with the CoolProp library !!! " << finl;
   throw;
@@ -464,7 +464,7 @@ int CoolProp_to_TRUST_generique::tppi_get_all_pb_multiphase_pT(const MSpanD inpu
 
   Tc_(T), Tc_(bT); // XXX : ATTENTION : need to put back T in C
 
-  return 0; // FIXME : on suppose que tout OK
+  return 0; // FIXME : assuming everything is OK
 #else
   Cerr << "CoolProp_to_TRUST_generique::" <<  __func__ << " should not be called since TRUST is not compiled with the CoolProp library !!! " << finl;
   throw;
@@ -505,7 +505,7 @@ int CoolProp_to_TRUST_generique::tppi_get_all_properties_h_IF97__(const MSpanD i
           }
       }
 
-  // derivees qui manquent ...
+  // missing derivatives ...
   bool has_DP = false, has_DH = false;
   for (auto &itr : prop)
     if (itr.first == Loi_en_h::RHO_DP || itr.first == Loi_en_h::T_DP || itr.first == Loi_en_h::CP_DP ||
@@ -609,7 +609,7 @@ int CoolProp_to_TRUST_generique::tppi_get_all_properties_h_IF97__(const MSpanD i
           }
       }
 
-  return 0; // FIXME : on suppose que tout OK
+  return 0; // FIXME : assuming everything is OK
 #else
   Cerr << "CoolProp_to_TRUST_generique::" <<  __func__ << " should not be called since TRUST is not compiled with the CoolProp library !!! " << finl;
   throw;
@@ -658,7 +658,7 @@ int CoolProp_to_TRUST_generique::tppi_get_all_properties_h__(const MSpanD input,
           }
       }
 
-  // derivees qui manquent ...
+  // missing derivatives ...
   bool has_DP = false, has_DH = false;
   for (auto &itr : prop)
     if (itr.first == Loi_en_h::MU_DP || itr.first == Loi_en_h::LAMBDA_DP || itr.first == Loi_en_h::SIGMA_DP)
@@ -742,14 +742,14 @@ int CoolProp_to_TRUST_generique::tppi_get_all_properties_h__(const MSpanD input,
           }
       }
 
-  return 0; // FIXME : on suppose que tout OK
+  return 0; // FIXME : assuming everything is OK
 #else
   Cerr << "CoolProp_to_TRUST_generique::" <<  __func__ << " should not be called since TRUST is not compiled with the CoolProp library !!! " << finl;
   throw;
 #endif
 }
 
-// methodes particulieres par application pour gagner en performance : utilisees dans F5 (pour le moment !)
+// application-specific methods for performance gain: used in F5 (for now!)
 int CoolProp_to_TRUST_generique::tppi_get_all_prop_loi_F5(const MSpanD input, MLoiSpanD_h  inter, int ncomp, int ind, bool is_liq) const
 {
 #ifdef HAS_COOLPROP

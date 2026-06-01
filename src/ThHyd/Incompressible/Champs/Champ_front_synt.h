@@ -21,7 +21,7 @@
 
 class Champ_Inc_base;
 
-/*! @brief classe Champ_front_synt Classe derivee de Champ_front_base
+/*! @brief Champ_front_synt Derived from Champ_front_base.
  *
  * @sa Champ_front_base
  */
@@ -48,12 +48,12 @@ protected :
   DoubleVect dir_fluct;
 
   int nbModes = -10;
-  double lenghtScale= 0.; // echelle integrale en espace
-  double timeScale= 0.; // echelle integrale en temps
-  double turbKinEn= 0.; // energie cinetique turbulente (k)
-  double turbDissRate= 0.; // taux de dissipation turbulente (epsilon)
+  double lenghtScale= 0.; // integral length scale in space
+  double timeScale= 0.; // integral length scale in time
+  double turbKinEn= 0.; // turbulent kinetic energy (k)
+  double turbDissRate= 0.; // turbulent dissipation rate (epsilon)
   double KeOverKmin= 0.;
-  double ratioCutoffWavenumber= 0.; // au lieu de prendre kappa_mesh comme plus grand nombre d'onde, on prend kappa_mesh/ratioCutoffWavenumber (ratioCutoffWavenumber>1 permet de mieux discretiser les fluctuations => aspect plus lisse)
+  double ratioCutoffWavenumber= 0.; // instead of using kappa_mesh as the largest wavenumber, kappa_mesh/ratioCutoffWavenumber is used (ratioCutoffWavenumber>1 yields a better discretisation of the fluctuations => smoother result)
   double temps_d_avant_= 0.;
 };
 

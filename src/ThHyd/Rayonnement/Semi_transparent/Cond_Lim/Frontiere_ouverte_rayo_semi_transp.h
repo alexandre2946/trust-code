@@ -27,7 +27,7 @@ public :
   const Cond_lim_base& la_cl() const override;
   void completer() override;
 
-  // Cette methode ne fait rien car la temperature de paroi est directement donnee par T_ext()
+  // This method does nothing because the wall temperature is directly given by T_ext()
   void calculer_temperature_bord(double temps) { }
 
   inline int compatible_avec_eqn(const Equation_base&) const override { return 1; }

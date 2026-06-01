@@ -45,13 +45,13 @@ void Op_Ecart_type::completer(const Probleme_base& Pb, const Nom& prefix)
   if (la_moyenne_)
     integrale_champ_ = moyenne().integrale();
 
-  // Dimensionnement du champ integrale_champ a la meme taille que mon_champ
+  // Sizing the integrale_champ field to the same size as mon_champ
   OWN_PTR(Champ_base) espace_stockage_source;
   const Champ_base& source = mon_champ->get_champ(espace_stockage_source);
   const DoubleTab& tab1 = source.valeurs();
 
-  // Initialisation de la structure du tableau val.
-  //  Est-bien le bon endroit pour faire ca ? (plutot dans integrale_carre_champ ?)
+  // Initialization of the val array structure.
+  //  Is this the right place to do it? (rather in integrale_carre_champ?)
   integrale_carre_champ_.le_champ_calcule().associer_domaine_dis_base(Pb.domaine_dis());
   int nb_comp = source.nb_comp();
   integrale_carre_champ_.le_champ_calcule().fixer_nb_comp(nb_comp);

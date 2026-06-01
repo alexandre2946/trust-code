@@ -25,7 +25,7 @@ class Cond_lim_base;
 
 /*! @brief class Champ_front_fonc_gradient
  *
- *  Classe derivee de Champ_front_base
+ *  Derived class of Champ_front_base
  *
  */
 class Champ_front_fonc_gradient : public Champ_front_tangentiel

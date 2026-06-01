@@ -149,9 +149,9 @@ int& Traitement_particulier_NS_THI_new::calcul_nb_som_dir(const Domaine& domaine
 {
   const char* methode_actuelle="Traitement_particulier_NS_THI_new::calcul_nb_som_dir";
 
-  // Sert a calculer le nombre de sommet commun en parallele
+  // Used to compute the number of common vertices in parallel
   double nb_som = static_cast<double>(domaine.md_vector_sommets()->nb_items_seq_tot());
-  // Somme sur tous les processeurs
+  // Sum over all processors
 
   double nb=pow(nb_som*1.,1./3.);
   nb_som_dir = (int)(nb);

@@ -20,9 +20,9 @@
 #include <TRUST_Vector.h>
 #include <Parser_U.h>
 
-/*! @brief Classe Champ_Fonc_t Cette classe derivee de Champ_Uniforme_inst qui represente
+/*! @brief Classe Champ_Fonc_t Derived class of Champ_Uniforme_inst that represents
  *
- *     un champ constant dans l'espace et fonction de la variable temps t.
+ *     a field that is constant in space and a function of the time variable t.
  *
  * @sa Champ_Fonc_t
  */

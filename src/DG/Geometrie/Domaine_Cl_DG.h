@@ -20,8 +20,8 @@
 
 class Domaine_VF;
 
-//  Cette classe porte les tableaux qui servent a mettre en oeuvre
-//  les condition aux limites dans la formulation DG
+//  This class holds the arrays needed to enforce
+//  the boundary conditions in the DG formulation
 class Domaine_Cl_DG : public Domaine_Cl_dis_base
 {
 

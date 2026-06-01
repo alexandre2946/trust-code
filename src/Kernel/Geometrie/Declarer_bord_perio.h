@@ -22,16 +22,16 @@
 #include <Octree_Double.h>
 #include <ArrOfBit.h>
 
-/*! @brief Cet interprete doit etre utilise en sequentiel (avant decoupage) si les sommets opposes d'un bord periodique ne sont pas parfaitement alignes.
+/*! @brief This interpreter must be used in sequential (before mesh splitting) if the opposite vertices of a periodic boundary are not perfectly aligned.
  *
- *   (cas de certains maillages tetra si le mailleur est trop contraint par la CAO).
- *   Il tente de deplacer les sommets pour les aligner.
+ *   (case of certain tetrahedral meshes where the mesher is overly constrained by the CAD geometry).
+ *   It attempts to move the vertices to align them.
  *
- *  Cet interprete permet de corriger les frontieres periodiques pour etre conformes aux besoins de TRUST:
- *    - reordonner les faces du bord periodique pour que la face i+n/2 soit en face de la face i,
- *      et toutes les faces [0 .. n/2-1] du meme cote et [n/2 .. n-1] de l'autre cote
- *    - deplacer les sommets des faces periodiques si besoin (si la CAO est fausse)
- *  Syntaxe:
+ *  This interpreter corrects periodic boundaries to conform to TRUST requirements:
+ *    - reorder the faces of the periodic boundary so that face i+n/2 is opposite to face i,
+ *      with all faces [0 .. n/2-1] on one side and [n/2 .. n-1] on the other side
+ *    - move the vertices of periodic faces if needed (if the CAD geometry is incorrect)
+ *  Syntax:
  *   Declarer_bord_perio {
  *      domaine NOMDOMAINE
  *      bord    NOMBORDPERIO

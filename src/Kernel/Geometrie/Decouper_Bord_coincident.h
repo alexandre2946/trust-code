@@ -18,10 +18,10 @@
 
 
 
-/*! @brief class Decouper_Bord_coincident Realise un maillage en decoupant chaque triangle en 4 nouveaux triangles
+/*! @brief class Decouper_Bord_coincident Generates a mesh by splitting each triangle into 4 new triangles,
  *
- *  ou bien chaque tetraedre en 8 nouveaux tetraedres
- *  Le maillage obtenu n'a pas de directions preferentielles
+ *  or each tetrahedron into 8 new tetrahedra.
+ *  The resulting mesh has no preferential directions.
  *
  *
  * @sa Interprete

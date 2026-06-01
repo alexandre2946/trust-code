@@ -18,11 +18,11 @@
 
 #include <Milieu_base.h>
 
-/*! @brief classe Constituant Cette classe represente le(s) constituant(s) d'un fluide.
+/*! @brief Represents the constituent(s) of a fluid.
  *
- *     Elle contient un champ alpha representant le coefficient de diffusion du constituant.
- *     Lorsqu'un objet de type Constituant represente plusieurs constituant
- *     le champ alpha est vectoriel avec autant de composantes qu'il y a de constituants.
+ *  @brief Contains a field alpha representing the diffusion coefficient of the constituent.
+ *     When a Constituant object represents multiple constituents, the field alpha is vectorial
+ *     with as many components as there are constituents.
  *
  * @sa Milieu_base
  */
@@ -61,7 +61,7 @@ public :
   int lire_motcle_non_standard(const Motcle& mot, Entree& is) override;
 
 protected :
-  OWN_PTR(Champ_Don_base) D_; // Coefficient de diffusion du constituant dans un milieu
+  OWN_PTR(Champ_Don_base) D_; // Diffusion coefficient of the constituent in a medium
   bool diffusion_multi_scalaire_ = false;
 };
 

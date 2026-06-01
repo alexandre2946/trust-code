@@ -15,13 +15,12 @@
 
 #ifndef Separateur_included
 #define Separateur_included
-/*! @brief Separateur pour les fichiers.
+/*! @brief Separator for output streams.
  *
- * Ce sont des objets speciaux que l'on peut inserer dans une sortie
- *     comme ceci:
- *       sortie << "coucou" << space << x << finl;
- *     et qui sont traites differemment en fonction du type de fichier
- *     (binaire ou ascii).
+ * These are special objects that can be inserted into an output stream as follows:
+ *     sortie << "hello" << space << x << finl;
+ *     and are handled differently depending on the file type
+ *     (binary or ASCII).
  *
  * @sa Sortie
  */

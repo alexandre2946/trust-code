@@ -31,10 +31,10 @@ class Domaine_dis_base;
 class Domaine_Cl_dis_base;
 class Champ_Don_base;
 
-/*! @brief classe Source_base Un objet Source_base est un terme apparaissant au second membre d'une
+/*! @brief Source_base A Source_base object is a term appearing on the right-hand side of an
  *
- *      equation. Cette classe est la base de la hierarchie des Sources, une
- *      source est un morceau d'equation donc Source_base herite de MorEqn.
+ *      equation. This class is the base of the Sources hierarchy; a
+ *      source is a piece of an equation, so Source_base inherits from MorEqn.
  *
  */
 
@@ -54,7 +54,7 @@ public:
   virtual void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const;
   virtual void contribuer_au_second_membre(DoubleTab&) const;
   virtual int impr(Sortie& os) const;
-  // temporaire : associer_domaines sera rendue publique
+  // temporary: associer_domaines will be made public
   inline void associer_domaines_public(const Domaine_dis_base& zdis, const Domaine_Cl_dis_base& zcldis) { associer_domaines(zdis,zcldis); }
   virtual int initialiser(double temps);
   virtual void discretiser() {}
@@ -69,7 +69,7 @@ public:
   virtual void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = { }) const;
   virtual void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = { }) const;
 
-  //Methodes de l interface des champs postraitables
+  // Methods of the post-processable fields interface
   /////////////////////////////////////////////////////
   void creer_champ(const Motcle& motlu) override { }
   const Champ_base& get_champ(const Motcle& nom) const override;
@@ -97,10 +97,10 @@ protected:
   virtual void associer_domaines(const Domaine_dis_base&, const Domaine_Cl_dis_base&) =0;
   virtual void associer_pb(const Probleme_base&) =0;
   int col_width_ = 0;
-  Nom out_;                  // Nom du fichier .out pour l'impression
+  Nom out_;                  // Name of the .out file for output
   Nom description_;
-  Noms col_names_;            //nom des colonnes (optionnel)
-  mutable DoubleVect bilan_; // Vecteur contenant les valeurs du terme source dans le domaine
+  Noms col_names_;            // column names (optional)
+  mutable DoubleVect bilan_; // Vector containing the source term values in the domain
   mutable SFichier Flux;
   Champs_compris champs_compris_;
   LIST(OBS_PTR(Champ_Don_base)) champs_don_;

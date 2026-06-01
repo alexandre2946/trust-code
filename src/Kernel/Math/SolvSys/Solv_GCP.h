@@ -46,44 +46,44 @@ protected:
 
   bool optimized_ = false;
   OWN_PTR(Precond_base) le_precond_;
-  // Parametre du jdd: veut-on appliquer un preconditionnement diagonal global ?
-  // Dans ce cas, on copie la matrice, on multiplie la matrice a gauche et a droite par 1/sqrt(diagonale)
-  // et on multiplie second membre avant et solution apres par la meme chose.
-  // (attention, cela change la metrique du produit scalaire, donc l'interpretation du seuil):
+  // Data file parameter: should we apply global diagonal preconditioning?
+  // In that case, the matrix is copied and multiplied on the left and right by 1/sqrt(diagonal)
+  // and the right-hand side and solution are similarly scaled.
+  // (Warning: this changes the inner product metric and thus the interpretation of the threshold):
   //     A * X = B
-  // <=> D * A * X = D * B    (avec D = 1 / sqrt(diagonale))
-  // <=> (D * A * D) * Y = D * B, et X = D * Y
-  // Propriete: les termes diagonaux de D * A * D sont egaux a 1
+  // <=> D * A * X = D * B    (with D = 1 / sqrt(diagonal))
+  // <=> (D * A * D) * Y = D * B, and X = D * Y
+  // Property: the diagonal entries of D * A * D are equal to 1
   bool precond_diag_ = false;
-  // Un tableau avec items virtuels
+  // A vector with virtual items
   DoubleVect tmp_p_avec_items_virt_;
-  // Quatre tableaux sans items virtuels (on pourrait mettre des espaces virtuels a tous les vecteurs,
-  // mais cela economise de la place dans le cache).
+  // Four vectors without virtual items (one could add virtual spaces to all vectors,
+  // but this saves space in the cache).
   DoubleVect resu_;
   DoubleVect residu_;
-  // tmp_p_ pointe sur la meme domaine que tmp_p_avec_items_virt_
-  // (on cree cet alias car les operations entre vecteurs verifient que
-  //  les tailles et structures paralleles sont identiques,
-  //  par exemple le preconditionneur...)
+  // tmp_p_ points to the same memory region as tmp_p_avec_items_virt_
+  // (this alias is created because vector operations check that
+  //  sizes and parallel structures are identical,
+  //  e.g. for the preconditioner...)
   DoubleVect tmp_p_;
   DoubleVect tmp_solution_;
-  // Matrice des coefficients reels-reels
+  // Matrix of real-real coefficients
   Matrice_Morse_Sym tmp_mat_;
-  // Matrice des coefficients reels-virtuels (stockage sans les lignes vides)
+  // Matrix of real-virtual coefficients (storage without empty rows)
   Matrice_SuperMorse tmp_mat_virt_;
-  // le Domaine de memoire dans lequel on stocke les vecteurs temporaires et eventuellement
-  // les matrices (ne pas lire dedans, il y a aussi des entiers !)
-  // Je prends des double pour etre certain que le domaine alloueee est correctement alignee en memoire
+  // Memory block holding temporary vectors and possibly matrices
+  // (do not read from it directly: it also contains integers!)
+  // Using double to ensure correct memory alignment
   ArrOfDouble tmp_data_block_;
-  // Tableau de renumerotation entre le second membre et les vecteurs temporaires
-  // (suppression des items communs et virtuels non utilises)
+  // Renumbering table between the RHS and the temporary vectors
+  // (removal of shared and unused virtual items)
   IntVect renum_;
-  // Si on veut appliquer le preconditionnement diagonal,
-  // inverse de la racine carree des termes diagonaux de la matrice
-  // Attention, on met l'espace virtuel de ce vecteur a jour car on en a besoin
-  // pour D*A*D
+  // If diagonal preconditioning is to be applied,
+  // inverse of the square root of the diagonal coefficients of the matrix
+  // Warning: the virtual space of this vector is updated because it is needed
+  // for D*A*D
   DoubleVect inv_sqrt_diag_;
-  int reinit_ = 0; // 0=> rien n'est pret 1=> memoire allouee, coeffs matrice a copier, 2=> ok
+  int reinit_ = 0; // 0=> nothing ready, 1=> memory allocated, matrix coeffs to copy, 2=> ok
   int nb_it_max_ = -1;
 };
 

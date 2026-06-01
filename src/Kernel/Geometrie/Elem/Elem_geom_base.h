@@ -21,14 +21,14 @@
 
 template<class _SIZE_> class Domaine_32_64;
 
-/*! @brief Classe Elem_geom_base Cette classe est la classe de base pour la definition d'elements
+/*! @brief Class Elem_geom_base This class is the base class for the definition of elements
  *
- *     geometriques constituant un maillage (i.e. un Domaine geometrique)
- *     Un element geometrique a un Domaine associe auquel il fournit
- *     les routines de base pour la manipulation des ses elements.
- *     (Un domaine n'a qu'un seul type d'element geometrique)
+ *     geometric constituting a mesh (i.e. a geometric Domain)
+ *     A geometric element has an associated Domain to which it provides
+ *     the basic routines for manipulating its elements.
+ *     (A domain has only one type of geometric element)
  *
- * @sa Hexaedre Prisme Rectangle Segment Tetraedre Triangle, Domaine, Classe abstraite, Methodes abstraites:, int face_sommet(int i, int j) const, int nb_som() const, int nb_faces(int=0) const, int nb_som_face(int=0) const, int est_structure() const, const Nom& nom_lml() const, int contient(const ArrOfDouble&, int ) const, int contient(const ArrOfInt&, int ) const, Type_Face type_face(int=0) const, void calculer_volumes(DoubleVect& ) const, void calculer_normales(const IntTab& , DoubleTab& ) const
+ * @sa Hexaedre Prisme Rectangle Segment Tetraedre Triangle, Domaine, Abstract class, Abstract methods:, int face_sommet(int i, int j) const, int nb_som() const, int nb_faces(int=0) const, int nb_som_face(int=0) const, int est_structure() const, const Nom& nom_lml() const, int contient(const ArrOfDouble&, int ) const, int contient(const ArrOfInt&, int ) const, Type_Face type_face(int=0) const, void calculer_volumes(DoubleVect& ) const, void calculer_normales(const IntTab& , DoubleTab& ) const
  */
 template <typename _SIZE_>
 class Elem_geom_base_32_64 : public Objet_U
@@ -52,7 +52,7 @@ public:
 
   virtual void creer_faces_elem(Faces_t& ,int_t ,Type_Face ) const;
   inline void creer_faces_elem(Faces_t& ,int_t ) const;
-  /// Renvoie le numero du j-ieme sommet de la i-ieme face de l'element
+  /// Returns the number of the j-th vertex of the i-th face of the element
   virtual int face_sommet(int i, int j) const=0;
   inline void associer_domaine(const Domaine_32_64<int_t>& dom) { mon_dom = dom; }
   /// Nb of vertices for the element
@@ -65,7 +65,7 @@ public:
   virtual const Nom& nom_lml() const=0;
   /// DOes the element 'elem' contains the point 'pos'
   virtual int contient(const ArrOfDouble& pos, int_t elem) const=0;
-  /// Renvoie 1 si les sommets specifies par le parametre "pos" sont les sommets de l'element "element" du domaine associe
+  /// Returns 1 if the vertices specified by the parameter "pos" are the vertices of the element "element" of the associated domain
   virtual int contient(const SmallArrOfTID_t& soms, int_t elem) const=0;
   /// Nb of face types of the elemnt (for example 2 for a prism)
   virtual int nb_type_face() const;
@@ -85,10 +85,10 @@ protected:
   OBS_PTR(Domaine_t) mon_dom;
 };
 
-/*! @brief Cree les faces de l'element du domaine specifie.
+/*! @brief Create the faces of the element of the specified domain.
  *
- * @param (Faces_t& faces) les faces de l'elements a creer
- * @param (int elem) le numero de element du domaine dont veut creer les faces
+ * @param (Faces_t& faces) the faces of the elements to create
+ * @param (int elem) the number of the element of the domain whose faces we want to create
  */
 template <typename _SIZE_>
 inline void Elem_geom_base_32_64<_SIZE_>::creer_faces_elem(Faces_t& faces, _SIZE_ elem) const

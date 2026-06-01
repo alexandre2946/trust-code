@@ -25,27 +25,27 @@ class Discretisation_base;
 class Schema_Temps_base;
 class Champ_base;
 
-/*! @brief classe Probleme_Couple C'est la classe historique de couplage de TRUST.
+/*! @brief Probleme_Couple This is the historical coupling class of TRUST.
  *
- *      Il s'agit d'un Couplage_U particulier.
- *      Le Probleme_Couple ne couple que des Probleme_base, tous
- *      associes au meme schema en temps.
- *      Il possede son propre mecanisme d'echange de champs par "raccords".
- *      Les problemes sont groupes. Chaque groupe fait un iteration, puis les
- *      nouveaux champs sont disponibles pour les groupes suivants. A l'interieur
- *      d'un groupe, ce sont les anciens champs qui sont echanges.
+ *      It is a particular Couplage_U.
+ *      Probleme_Couple only couples Probleme_base objects, all
+ *      associated with the same time scheme.
+ *      It has its own field exchange mechanism via "raccords".
+ *      Problems are grouped. Each group performs one iteration, then the
+ *      new fields become available for subsequent groups. Within a
+ *      group, the old fields are exchanged.
  *
  *
  * @sa Probleme_base Probleme
  */
 
 //  WEC :
-//  Le schema en temps est clone autant de fois qu'il y a de problemes
-//  Ce clonage n'est pas tres propre :
-//  * ils ont tous le meme nom
-//  Pour eviter ca :
-//  changer la syntaxe des .data et avoir vraiment un schema par
-//  probleme
+//  The time scheme is cloned as many times as there are problems.
+//  This cloning is not very clean:
+//  * they all have the same name
+//  To avoid this:
+//  change the syntax of the .data files to have truly one scheme per
+//  problem
 
 class Probleme_Couple : public Couplage_U
 {
@@ -54,7 +54,7 @@ public :
 
   ///////////////////////////////////////////////
   //                                           //
-  // Implementation de l'interface de Problem  //
+  // Implementation of the Problem interface  //
   //                                           //
   ///////////////////////////////////////////////
 
@@ -69,7 +69,7 @@ public :
 
   ////////////////////////////////////////////////////////
   //                                                    //
-  // Fin de l'implementation de l'interface de Problem  //
+  // End of Problem interface implementation  //
   //                                                    //
   ////////////////////////////////////////////////////////
 
@@ -88,12 +88,12 @@ public :
 
 protected:
 
-  // Definitions des groupes de problemes.
-  // Vecteur d'entiers specifiant chacun la taille d'un groupe.
-  // Vecteur vide = un seul groupe.
+  // Definitions of problem groups.
+  // Integer vector where each entry specifies the size of a group.
+  // Empty vector = single group.
   ArrOfInt groupes;
 
-  // Liste des schemas clones
+  // List of cloned time schemes
   VECT(OWN_PTR(Schema_Temps_base)) sch_clones;
 };
 

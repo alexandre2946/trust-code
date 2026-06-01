@@ -48,7 +48,7 @@ DoubleTab& Terme_Derivee_Forme_EF::ajouter(DoubleTab& resu) const
   int nb_som_elem=domaine_EF.domaine().nb_som_elem();
   int nb_elems=domaine_EF.domaine().nb_elem_tot();
 
-  // Attention calcul IPhi *S(e)
+  // Note: computation is IPhi *S(e)
   //  const DoubleTab& IPhi_thilde=domaine_EF.IPhi_thilde();
 
   const DoubleTab& IPhi=domaine_EF.IPhi();

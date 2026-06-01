@@ -21,11 +21,11 @@
 #include <Navier_Stokes_WC.h>
 #include <Pb_WC_base.h>
 
-/*! @brief classe Pb_Thermohydraulique_WC Cette classe represente un probleme de thermohydraulique en fluide weakly compressible:
+/*! @brief Pb_Thermohydraulique_WC class This class represents a thermohydraulic problem for a weakly compressible fluid:
  *
- *       - Equations de Navier_Stokes en regime laminaire
- *       - Equation d'energie exprimee en temperature (gaz parfait) ou enthalpie (gaz reel)
- *         en regime laminaire
+ *       - Navier-Stokes equations in laminar regime
+ *       - Energy equation expressed as temperature (perfect gas) or enthalpy (real gas)
+ *         in laminar regime
  *
  * @sa Probleme_base Navier_Stokes_WC Convection_Diffusion_Chaleur_WC
  */

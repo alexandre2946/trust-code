@@ -18,7 +18,7 @@
 
 Implemente_instanciable_sans_constructeur(Hexa_EF,"Hexa_EF",Elem_EF_base);
 
-// printOn et readOn
+// printOn and readOn
 
 Sortie& Hexa_EF::printOn(Sortie& s ) const
 {
@@ -30,17 +30,23 @@ Entree& Hexa_EF::readOn(Entree& s )
   return s ;
 }
 
-/*! @brief KEL_(0,fa7),KEL_(1,fa7) sont  les numeros locaux des 2 faces qui entourent la facette de numero local fa7
+/*! @brief KEL_(0,fa7), KEL_(1,fa7) are the local indices of the 2 faces surrounding facet with local index fa7.
  *
- *  le numero local de la fa7 est celui du sommet qui la porte
+ * @brief The local index of fa7 is that of the vertex that carries it.
  *
  */
 Hexa_EF::Hexa_EF()
 {
 }
 
-/*! @brief remplit le tableau face_normales dans le Domaine_EF
+/*! @brief Fills the face_normales array in the Domaine_EF.
  *
+ * @param num_Face Local face index.
+ * @param Face_normales Array of face normals to fill.
+ * @param Face_sommets Face-to-vertex connectivity table.
+ * @param Face_voisins Face neighbour element table.
+ * @param elem_faces Element-to-face connectivity table.
+ * @param domaine_geom Geometric domain.
  */
 
 void Hexa_EF::normale(int num_Face,DoubleTab& Face_normales,
@@ -56,20 +62,20 @@ void Hexa_EF::normale(int num_Face,DoubleTab& Face_normales,
   int f0,no4;
   int elem1;
 
-  // on a les 4 sommets de la face
+  // the 4 vertices of the face
   int n0 = Face_sommets(num_Face,0);
   int n1 = Face_sommets(num_Face,1);
   int n2 = Face_sommets(num_Face,2);
   int n3 = Face_sommets(num_Face,3);
 
-  // on va decouper la face en deux triangles
-  // on initialise Face_normales(num_face,dimension) a 0
-  // car on va sommer les deux face_normale des triangles
+  // split the face into two triangles
+  // initialise Face_normales(num_face,dimension) to 0
+  // because the two triangle face normals will be summed
   Face_normales(num_Face,0) =  0;
   Face_normales(num_Face,1) =  0;
   Face_normales(num_Face,2) =  0;
 
-  // on prend les sommet S1,S2 et S4
+  // take vertices S1, S2 and S4
 
   x1 = les_coords(n0,0) - les_coords(n1,0);
   y1 = les_coords(n0,1) - les_coords(n1,1);
@@ -83,8 +89,8 @@ void Hexa_EF::normale(int num_Face,DoubleTab& Face_normales,
   ny = (-x1*z2 + x2*z1)/2;
   nz = (x1*y2 - x2*y1)/2;
 
-  // Orientation de la normale de elem1 vers elem2
-  // pour cela recherche du sommet de elem1 qui n'est pas sur la Face
+  // Orient the normal from elem1 toward elem2
+  // by searching for the vertex of elem1 that is not on the Face
 
   elem1=Face_voisins(num_Face,0);
 
@@ -120,7 +126,7 @@ void Hexa_EF::normale(int num_Face,DoubleTab& Face_normales,
       Face_normales(num_Face,2) += nz;
     }
 
-  // on prend les sommet S1,S4 et S3
+  // take vertices S1, S4 and S3
 
   x1 = les_coords(n0,0) - les_coords(n2,0);
   y1 = les_coords(n0,1) - les_coords(n2,1);
@@ -134,8 +140,8 @@ void Hexa_EF::normale(int num_Face,DoubleTab& Face_normales,
   ny = (-x1*z2 + x2*z1)/2;
   nz = (x1*y2 - x2*y1)/2;
 
-  // Orientation de la normale de elem1 vers elem2
-  // pour cela recherche du sommet de elem1 qui n'est pas sur la Face
+  // Orient the normal from elem1 toward elem2
+  // by searching for the vertex of elem1 that is not on the Face
 
   elem1=Face_voisins(num_Face,0);
 
@@ -187,10 +193,15 @@ void Hexa_EF::calcul_vc(const ArrOfInt& Face,ArrOfDouble& vc,
   vc[2] = vs[2]/6;
 }
 
-/*! @brief calcule les coord xg du centre d'un element non standard calcule aussi idirichlet=nb de faces de Dirichlet de l'element
+/*! @brief Computes the coordinates xg of the centre of a non-standard element.
  *
- *  si idirichlet=2, n1 est le numero du sommet confondu avec G
- *
+ * @brief Also computes idirichlet = number of Dirichlet faces of the element.
+ *  If idirichlet=2, n1 is the index of the vertex coinciding with G.
+ * @param xg Output centre coordinates.
+ * @param x Vertex coordinate table for the element.
+ * @param type_elem_Cl Element boundary condition type.
+ * @param idirichlet Output number of Dirichlet faces.
+ * @param n1 Output index of the vertex coinciding with G (when idirichlet=2).
  */
 void Hexa_EF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
                         const int type_elem_Cl,int& idirichlet,int& n1,int& ,int& ) const

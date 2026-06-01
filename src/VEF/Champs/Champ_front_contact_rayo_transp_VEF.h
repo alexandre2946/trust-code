@@ -28,7 +28,7 @@ public:
   int initialiser(double temps, const Champ_Inc_base& inco) override;
   void calculer_temperature_bord(double temps);
   void mettre_a_jour(double temps) override;
-  void mettre_a_jour_flux_radiatif(); // Le fait calculer par le modele et le stocke
+  void mettre_a_jour_flux_radiatif(); // Computes it via the model and stores it
   void calcul_grads_locaux(double temps) override;
   void modifie_gradients_pour_rayonnement(DoubleVect& gradient_num_transf, DoubleVect& gradient_num_transf_autre_pb);
   void calculer_coeffs_echange(double temps) override;

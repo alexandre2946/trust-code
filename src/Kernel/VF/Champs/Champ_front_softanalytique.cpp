@@ -21,13 +21,13 @@ Implemente_instanciable(Champ_front_softanalytique,"Champ_front_fonc_xyz",Ch_fro
 // XD champ_front_fonc_xyz front_field_base champ_front_fonc_xyz NO_BRACE Boundary field which is not constant in space.
 // XD attr val listchaine val REQ Values of field components (mathematical expressions).
 
-/*! @brief Imprime le champ sur flot de sortie.
+/*! @brief Prints the field to the output stream.
  *
- * Imprime la taille du champ et la valeur (constante) sur
- *     la frontiere.
+ * Prints the size of the field and the (constant) value on
+ *     the boundary.
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Champ_front_softanalytique::printOn(Sortie& os) const
 {
@@ -47,13 +47,13 @@ Sortie& Champ_front_softanalytique::printOn(Sortie& os) const
 }
 
 
-/*! @brief Lit le champ a partir d'un flot d'entree.
+/*! @brief Reads the field from an input stream.
  *
  * Format:
  *       Champ_front_softanalytique nb_compo vrel_1 ... [vrel_i]
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree& is) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree& is) the modified input stream
  */
 Entree& Champ_front_softanalytique::readOn(Entree& is)
 {

@@ -32,13 +32,13 @@ Entree& Schema_Adams_Bashforth_order_3::readOn(Entree& s)
 
 ////////////////////////////////
 //                            //
-// Caracteristiques du schema //
+// Schema characteristics     //
 //                            //
 ////////////////////////////////
 
-/*! @brief Renvoie le nombre de valeurs temporelles a conserver.
+/*! @brief Returns the number of temporal values to keep.
  *
- * Ici : n-2, n-1, n et n+1 donc 4.
+ * Here: n-2, n-1, n and n+1, so 4.
  *
  */
 int Schema_Adams_Bashforth_order_3::nb_valeurs_temporelles() const
@@ -46,9 +46,9 @@ int Schema_Adams_Bashforth_order_3::nb_valeurs_temporelles() const
   return 4 ;
 }
 
-/*! @brief Renvoie le nombre de pas de temps strictement au dela duquel on applique le schema d Adams-Bahshforth.
+/*! @brief Returns the number of time steps strictly beyond which the Adams-Bashforth scheme is applied.
  *
- * Ici : on a besoin d'au moins 2 temps du passe donc 1
+ * Here: we need at least 2 past times, so 1.
  *
  */
 inline int Schema_Adams_Bashforth_order_3::nb_pas_dt_seuil() const
@@ -56,9 +56,9 @@ inline int Schema_Adams_Bashforth_order_3::nb_pas_dt_seuil() const
   return 1 ;
 }
 
-/*! @brief Renvoie le nombre de valeurs temporelles du passe.
+/*! @brief Returns the number of past temporal values.
  *
- * Ici : n-2 et n-1 donc 1.
+ * Here: n-2 and n-1, so 2.
  *
  */
 inline int Schema_Adams_Bashforth_order_3::nb_valeurs_passees() const
@@ -68,7 +68,7 @@ inline int Schema_Adams_Bashforth_order_3::nb_valeurs_passees() const
 
 /////////////////////////////////////////
 //                                     //
-// Fin des caracteristiques du schema  //
+// End of schema characteristics       //
 //                                     //
 /////////////////////////////////////////
 

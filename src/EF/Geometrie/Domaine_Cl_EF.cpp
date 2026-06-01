@@ -49,7 +49,7 @@ Entree& Domaine_Cl_EF::readOn(Entree& is )
   return Domaine_Cl_dis_base::readOn(is) ;
 }
 
-/*! @brief remplissage des tableaux
+/*! @brief Fill the internal arrays.
  *
  */
 void Domaine_Cl_EF::completer(const Domaine_dis_base& un_domaine_dis)
@@ -101,11 +101,11 @@ void construit_connectivite_sommet(int type_cl,Static_Int_Lists& som_face_bord,c
         }
     }
 
-  //On exploite is_sommet_sur_bord pour fixer la taille des List que va repertorier som_face_bord
-  //-som_face_bord contient nb_som_tot List
-  //-chaque List est dimensionnee par le nombre de faces de bord (portant une CL de Dirichlet)
-  // connectees au sommet considere
-  //-une List donnee pour un sommet repertorie le numero des faces qui lui sont connectees
+  // Use is_sommet_sur_bord to set the size of the lists stored in som_face_bord.
+  // - som_face_bord contains nb_som_tot lists
+  // - each list is sized by the number of boundary faces (bearing a Dirichlet BC)
+  //   connected to the considered vertex
+  // - a given list for a vertex stores the indices of the faces connected to it
 
   som_face_bord.set_list_sizes(is_sommet_sur_bord);
   is_sommet_sur_bord=0;
@@ -149,7 +149,7 @@ static void construire_normale_locale_face(const DoubleTab& face_normales,
   normale_locale[1] = dx;
 }
 
-/*! @brief appele par remplir_volumes_entrelaces_Cl() : remplissage de type_elem_Cl_
+/*! @brief Called by remplir_volumes_entrelaces_Cl(): fills type_elem_Cl_.
  *
  */
 void Domaine_Cl_EF::remplir_type_elem_Cl(const Domaine_EF& le_dom_EF)
@@ -178,7 +178,7 @@ void Domaine_Cl_EF::remplir_type_elem_Cl(const Domaine_EF& le_dom_EF)
               for (int s=0; s<nb_som_face; s++)
                 {
                   int som=faces_sommets(face,s);
-//	Si on a Dirichlet_paroi_fixe_iso_Genepi2 on ne prend pas en compte le 0 pour la moyenne
+// If we have Dirichlet_paroi_fixe_iso_Genepi2, the 0 is not taken into account for the average
                   if (!sub_type(Dirichlet_paroi_fixe_iso_Genepi2,la_cl))
                     titi(som)++;
                   if ((type_sommet_[som]!=1)&& (type_sommet_[som]!=3))
@@ -222,7 +222,7 @@ void Domaine_Cl_EF::remplir_type_elem_Cl(const Domaine_EF& le_dom_EF)
         }
 
     }
-  // si on a un dirichet on stocke 2*nb participant + 1 si sommet aussi de sym
+  // if we have a Dirichlet, store 2*nb_participant + 1 if the vertex also belongs to a symmetry boundary
   for (int som=0; som<nb_som_tot; som++)
     {
       if (type_sommet_[som]>1)
@@ -231,7 +231,7 @@ void Domaine_Cl_EF::remplir_type_elem_Cl(const Domaine_EF& le_dom_EF)
           type_sommet_[som]+=2*(titi(som));
         }
     }
-  // On cree la connectivite sommet -> face de bord symetrie
+  // Build the vertex -> symmetry boundary face connectivity
   if (equation().inconnue().nature_du_champ()==vectoriel)
     {
       equation().probleme().discretisation().discretiser_champ("VITESSE",le_dom_EF,"normales_nodales","1",dimension,0.,normales_symetrie_);
@@ -239,7 +239,7 @@ void Domaine_Cl_EF::remplir_type_elem_Cl(const Domaine_EF& le_dom_EF)
       Static_Int_Lists sommet_face_symetrie;
       int type_cl=1;
       construit_connectivite_sommet(type_cl,sommet_face_symetrie,les_conditions_limites_,le_dom_EF);
-      // sommet_face_symetrie contient le nombre de face de symetrie associe a chaque sommet
+      // sommet_face_symetrie contains the number of symmetry faces associated with each vertex
       const DoubleTab& face_normales = le_dom_EF.face_normales();
       ArrOfDouble n(dimension),t1(dimension),t2(dimension),normale_locale(dimension);
       for (int som=0; som<nb_som_tot; som++)
@@ -251,7 +251,7 @@ void Domaine_Cl_EF::remplir_type_elem_Cl(const Domaine_EF& le_dom_EF)
               n=0;
               t1=0;
               t2=0;
-              // on determine la normale sommet
+              // determine the vertex normal
               //int nbf= sommet_face_symetrie.get_list_size(som);
               for (int f=0; f<nbf; f++)
                 {
@@ -322,7 +322,7 @@ void Domaine_Cl_EF::remplir_type_elem_Cl(const Domaine_EF& le_dom_EF)
 
                   if (norme_array(t2)>(1e-4*sqrt(s)))
                     {
-                      // facilite le debugage
+                      // ease debugging
                       if (std::fabs(min_array(t2))>max_array(t2))
                         t2*=-1;
                       t2/=norme_array(t2);
@@ -344,11 +344,11 @@ void Domaine_Cl_EF::remplir_type_elem_Cl(const Domaine_EF& le_dom_EF)
       //exit();
     }
 }
-/*! @brief Impose les conditions de symetrie c.
+/*! @brief Imposes symmetry conditions, i.e. cancels the field components along the normal(s).
  *
- * a.d annules les composantes  du champ sur la ou les normales
- *  si tous_les_sommets_sym =1 alors meme les sommets appartenant aussi a un dirichlet sont mis a zero.
- *
+ * If tous_les_sommets_sym = 1, even vertices that also belong to a Dirichlet boundary are zeroed.
+ * @param values Field values array to modify.
+ * @param tous_les_sommets_sym If 1, apply symmetry to all symmetry vertices including Dirichlet ones.
  */
 void Domaine_Cl_EF::imposer_symetrie(DoubleTab& values,int tous_les_sommets_sym) const
 {
@@ -473,8 +473,10 @@ void Domaine_Cl_EF::modifie_gradient(ArrOfDouble& grad_mod, const ArrOfDouble& g
 }
 
 
-/*! @brief On transforme la_matrice et le secmem pour avoir un secmem normal aux bords , plus la matrice pour assurer que la solution sera correcte
- *
+/*! @brief Transforms la_matrice and secmem to produce a secmem normal to boundaries,
+ *  plus the matrix needed to ensure that the solution is correct.
+ * @param la_matrice Morse matrix to modify.
+ * @param secmem Right-hand side vector to modify.
  */
 void  Domaine_Cl_EF::imposer_symetrie_matrice_secmem(Matrice_Morse& la_matrice, DoubleTab& secmem) const
 {
@@ -501,7 +503,7 @@ void  Domaine_Cl_EF::imposer_symetrie_matrice_secmem(Matrice_Morse& la_matrice, 
           {
             const DoubleTab& nn=(dir==0?n:(dir==1?n_bis:normales_symetrie_ter_->valeurs()));
             for (int d=0; d<dimension; d++) normale[d]=nn(som,d);
-            // On commence par recalculer secmem=secmem-A *present pour pouvoir modifier A (on en profite pour projeter)
+            // First recompute secmem = secmem - A*present in order to be able to modify A (and project at the same time)
             auto nb_coeff_ligne=tab1[som*nb_comp+1] - tab1[som*nb_comp];
             for (int k=0; k<nb_coeff_ligne; k++)
               {
@@ -522,13 +524,13 @@ void  Domaine_Cl_EF::imposer_symetrie_matrice_secmem(Matrice_Morse& la_matrice, 
             for (int comp=0; comp<nb_comp; comp++)
               somme_b+=secmem(som,comp)*normale[comp];
             //Cerr<<som<<" sommet " <<somme_b<<" "<<secmem(som,0)<<" "<<secmem(som,1)<<finl;
-            // on retire secmem.n n
+            // subtract secmem.n * n
             for (int comp=0; comp<nb_comp; comp++)
               secmem(som,comp)-=somme_b*normale[comp];
 
             if (1)
               {
-                // on doit remettre la meme diagonale partout on prend la moyenne
+                // restore the same diagonal everywhere, using the average
                 double ref=0;
                 for (int comp=0; comp<nb_comp; comp++)
                   {
@@ -554,9 +556,9 @@ void  Domaine_Cl_EF::imposer_symetrie_matrice_secmem(Matrice_Morse& la_matrice, 
               }
             if (1)
               {
-                // on annule tous les coef extra diagonaux du bloc
-                // sur les lignes i pour lesquelles normale(d) !=0
-                // c.a.d dasb(normale(d)>tol)
+                // cancel all off-diagonal block coefficients
+                // on rows i for which normale(d) != 0
+                // i.e. fabs(normale(d)) > tol
                 const double tol = 1e-12;
                 for (int k=0; k<nb_coeff_ligne; k++)
                   {
@@ -574,7 +576,7 @@ void  Domaine_Cl_EF::imposer_symetrie_matrice_secmem(Matrice_Morse& la_matrice, 
                   }
               }
             {
-              // pour les blocs extra diagonaux on assure que Aij.ni=0
+              // for off-diagonal blocks, ensure that Aij.ni = 0
 
               ArrOfDouble somme((int)nb_coeff_ligne);
               for (int k=0; k<nb_coeff_ligne; k++)
@@ -584,7 +586,7 @@ void  Domaine_Cl_EF::imposer_symetrie_matrice_secmem(Matrice_Morse& la_matrice, 
                   for (int comp=0; comp<nb_comp; comp++)
                     somme[k]+=la_matrice(som*nb_comp+comp,j)*normale[comp];
                 }
-              // on retire somme ni
+              // subtract somme * ni
               for (int k=0; k<nb_coeff_ligne; k++)
                 {
 
@@ -594,7 +596,7 @@ void  Domaine_Cl_EF::imposer_symetrie_matrice_secmem(Matrice_Morse& la_matrice, 
                       la_matrice(som*nb_comp+comp,j)-=(somme[k])*normale[comp];
                 }
             }
-            // Finalement on recalule secmem=secmem+A*champ_inconnue (A a ete beaucoup modiife)
+            // Finally recompute secmem = secmem + A*champ_inconnue (A has been heavily modified)
             for (int k=0; k<nb_coeff_ligne; k++)
               {
                 for (int comp=0; comp<nb_comp; comp++)
@@ -618,7 +620,7 @@ void  Domaine_Cl_EF::imposer_symetrie_matrice_secmem(Matrice_Morse& la_matrice, 
               if (std::fabs(somme_b2) >= 1e-8)
                 Cerr << "Domaine_Cl_EF::imposer_symetrie_matrice_secmem: secmem.n != 0 ("
                      << somme_b2 << ") au sommet " << som << ", projection appliquee." << finl;
-              // on retire secmem.n n
+              // subtract secmem.n * n
               for (int comp=0; comp<nb_comp; comp++)
                 secmem(som,comp)-=somme_b2*normale[comp];
 
@@ -628,8 +630,9 @@ void  Domaine_Cl_EF::imposer_symetrie_matrice_secmem(Matrice_Morse& la_matrice, 
   //  exit();
 }
 
-/*! @brief Impose les conditions aux limites a la valeur temporelle "temps" du Champ_Inc
- *
+/*! @brief Imposes boundary conditions at time "temps" of the Champ_Inc.
+ * @param ch Instationary field to apply boundary conditions to.
+ * @param temps Current time value.
  */
 void Domaine_Cl_EF::imposer_cond_lim(Champ_Inc_base& ch, double temps)
 {
@@ -640,8 +643,8 @@ void Domaine_Cl_EF::imposer_cond_lim(Champ_Inc_base& ch, double temps)
   int nb_som_face=faces_sommets.dimension(1);
   const DoubleTab& coords= domaineEF.domaine().coord_sommets();
 
-  // dans un premier temps on annule le champ sur les dirichlets
-  // puis on ajoute 1/nb_cl*val_imp
+  // first zero the field on Dirichlet boundaries
+  // then add 1/nb_cl * val_imp
 
   for (int n_bord=0; n_bord<nb_cond_lim(); n_bord++)
     {
@@ -693,7 +696,7 @@ void Domaine_Cl_EF::imposer_cond_lim(Champ_Inc_base& ch, double temps)
               const Champ_front_var_instationnaire& ch_txyz=ref_cast(Champ_front_var_instationnaire,la_cl_diri.champ_front());
               avec_valeur_aux_sommets=ch_txyz.valeur_au_temps_et_au_point_disponible();
             }
-          // Pour les faces de Dirichlet on impose l'inconnue au sommet
+          // For Dirichlet faces, impose the unknown at the vertex
           if (avec_valeur_aux_sommets)
             {
               const Champ_front_var_instationnaire& ch_txyz=ref_cast(Champ_front_var_instationnaire,la_cl_diri.champ_front());
@@ -741,7 +744,7 @@ void Domaine_Cl_EF::imposer_cond_lim(Champ_Inc_base& ch, double temps)
       /*
       else if (sub_type(Dirichlet_homogene,la_cl))
       {
-        // Pour les faces de Dirichlet on impose l'inconnue au sommet
+        // For Dirichlet faces, the unknown is imposed at the vertex
         for (int ind_face=0; ind_face<num2; ind_face++)
       {
       int face=le_bord.num_face(ind_face);
@@ -758,7 +761,7 @@ void Domaine_Cl_EF::imposer_cond_lim(Champ_Inc_base& ch, double temps)
       }
       }
       */
-      // provsoire a fair equ'une fois
+      // provisional: to be done only once
       else if ( (sub_type(Symetrie,la_cl) ) &&
                 (ch.nature_du_champ()==vectoriel) )
         {

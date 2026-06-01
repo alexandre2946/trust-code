@@ -27,12 +27,12 @@
 class Milieu_base;
 class Solide;
 
-/*! @brief Classe Conduction Cette classe represente l'equation d'evolution
+/*! @brief Class Conduction: represents the temperature evolution equation
  *
- *     de la temperature dans un solide de conductivite k et de masse volumique rho et chaleur specifique Cp
+ *     in a solid with conductivity k, density rho, and specific heat Cp:
  *         (rho.Cp) . dT/dt - div (k grad T) = (rho.Cp) . f
- *     Les termes rho et Cp peuvent etre non uniformes car cette classe
- *     ne fait pas le raccourci de calculer la diffusivite k/(rho*Cp).
+ *     The rho and Cp terms may be non-uniform because this class does not
+ *     take the shortcut of computing the diffusivity k/(rho*Cp).
  *
  *
  * @sa Equation_base, Conduction
@@ -63,9 +63,9 @@ public:
   virtual const Champ_Don_base& diffusivite_pour_transport() const;
   virtual const Champ_base& diffusivite_pour_pas_de_temps() const;
 
-  //Methodes de l interface des champs postraitables
+  // Methods of the post-processable field interface
   /////////////////////////////////////////////////////
-  //Methode creer_champ pas codee a surcharger si necessaire
+  // creer_champ method not implemented; override if needed
   void creer_champ(const Motcle& motlu) override;
   const Champ_base& get_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
@@ -83,18 +83,18 @@ protected :
   OWN_PTR(Traitement_particulier_Solide_base) le_traitement_particulier;
 };
 
-/*! @brief Renvoie le champ inconnue de l'equation, i. e. la temperature.
+/*! @brief Returns the unknown field of the equation, i.e. the temperature.
  *
- * @return (Champ_Inc_base&) le champ inconnue de l'equation: la temperature
+ * @return (Champ_Inc_base&) the unknown field of the equation: the temperature
  */
 inline Champ_Inc_base& Conduction::inconnue()
 {
   return la_temperature;
 }
 
-/*! @brief Renvoie le champ inconnue de l'equation, i. e. la temperature. (version const)
+/*! @brief Returns the unknown field of the equation, i.e. the temperature (const version).
  *
- * @return (Champ_Inc_base&) le champ inconnue de l'equation: la temperature
+ * @return (Champ_Inc_base&) the unknown field of the equation: the temperature
  */
 inline const Champ_Inc_base& Conduction::inconnue() const
 {

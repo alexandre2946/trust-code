@@ -48,9 +48,9 @@ int Rayo_semi_transp_solver_VEF::nb_colonnes()
   return domaine_VF.nb_faces();
 }
 
-/*! @brief modifie la matrice pour prendre en compte la presence de faces rayonnantes au voisinage des elements de bord
+/*! @brief Modify the matrix to account for the presence of radiating faces near boundary elements.
  *
- * @return le flot d'entree modifie
+ * @return the modified input stream
  */
 void Rayo_semi_transp_solver_VEF::modifier_matrice()
 {
@@ -62,7 +62,7 @@ void Rayo_semi_transp_solver_VEF::modifier_matrice()
   const IntTab& face_voisins = zvef.face_voisins();
   const DoubleTab& face_normales = zvef.face_normales();
 
-  // On fait une boucle sur les conditions aux limites associees a l'equations
+  // Loop over the boundary conditions associated with the equation
   for (int num_cl = 0; num_cl < les_cl.size(); num_cl++)
     {
       Cond_lim& la_cl = eq_rayo.domaine_Cl_dis().les_conditions_limites(num_cl);
@@ -115,7 +115,7 @@ void Rayo_semi_transp_solver_VEF::modifier_matrice()
           /* Do nothing */
         }
       else
-        Process::exit("La condition a la limite utilisee n'est pas connue pour l'equation de rayonnement !");
+        Process::exit("The boundary condition used is not recognized for the radiation equation!");
     }
 }
 
@@ -133,13 +133,13 @@ void Rayo_semi_transp_solver_VEF::assembler_matrice()
 
   matrice.clean();
 
-  // Prise en compte de la partie div((1/3K)grad(irradiance)) dans la matrice de discretisation.
+  // Account for the div((1/3K)grad(irradiance)) part in the discretization matrix.
   terme_diffusif->contribuer_a_avec(irradi, matrice);
 
-  // Modification de la matrice pour prendre en compte le second membre en K*irradiance
+  // Modify the matrix to account for the right-hand side term in K*irradiance
   const DoubleTab& kappa = fluide.kappa().valeurs();
 
-  // on verifie
+  // verify
   if (matrice.ordre() != domaine_VF.nb_faces_tot())
     Process::exit();
 
@@ -158,7 +158,7 @@ void Rayo_semi_transp_solver_VEF::assembler_matrice()
       matrice(i, i) = matrice(i, i) + k * vol;
     }
 
-  // On modifie la matrice pour prendre en compte l'effet des parois rayonnantes sur les elements de bord
+  // Modify the matrix to account for the effect of radiating walls on boundary elements
   modifier_matrice();
 }
 
@@ -175,15 +175,15 @@ void Rayo_semi_transp_solver_VEF::resoudre(double temps)
   const int nb_faces = domaine_VF.nb_faces();
 
   /*
-   * Remarque : l'assemblage de la matrice est realise une fois pour toute au debut du
-   * calcul, ce qui n'est valable que pour les cas ou kappa ne depend pas du temps
+   * Note: the matrix assembly is performed once at the beginning of
+   * the computation, which is only valid for cases where kappa does not depend on time
    */
 
-  //calcul du second membre
+  //compute the right-hand side
   DoubleTrav secmem(eq_rayo.inconnue().valeurs());
   secmem = 0.;
 
-  // recuper T du pb fluide ....
+  // retrieve T from the fluid problem ....
   Probleme_base& pb_fluide = eq_rayo.pb_rayo_semi_transp().probleme_fluide();
 
   assert(pb_fluide.equation(1).inconnue().le_nom() == "temperature");
@@ -213,8 +213,8 @@ void Rayo_semi_transp_solver_VEF::resoudre(double temps)
       secmem(face) += +4 * n * n * sigma * pow(T, 4) * k * vol;
     }
 
-  // On met a jour les champs associes aux conditions aux limites
-  // avant d'evaluer leur contribution dans la matrice de discretisation
+  // Update the fields associated with the boundary conditions
+  // before evaluating their contribution in the discretization matrix
   evaluer_cl_rayonnement(temps);
   terme_diffusif->contribuer_au_second_membre(secmem);
   secmem.echange_espace_virtuel();
@@ -258,12 +258,12 @@ void Rayo_semi_transp_solver_VEF::evaluer_cl_rayonnement(double temps)
   Eq_rayo_semi_transp& eq_rayo = eq_rayo_semi_transp_.valeur();
   const auto& fluide = eq_rayo.fluide();
 
-  // recherche des conditions aux limites associes au l'equation de temperature
+  // find the boundary conditions associated with the temperature equation
   Conds_lim& les_cl_rayo = eq_rayo.domaine_Cl_dis().les_conditions_limites();
   Equation_base& eq_temp = eq_rayo.pb_rayo_semi_transp().probleme_fluide().equation(1);
   assert(eq_temp.inconnue().le_nom() == "temperature");
 
-  // Boucle sur les conditions aux limites de l'equation de rayonnement
+  // Loop over the boundary conditions of the radiation equation
   Conds_lim& les_cl_temp = eq_temp.domaine_Cl_dis().les_conditions_limites();
   for (int num_cl_rayo = 0; num_cl_rayo < les_cl_rayo.size(); num_cl_rayo++)
     {
@@ -271,7 +271,7 @@ void Rayo_semi_transp_solver_VEF::evaluer_cl_rayonnement(double temps)
       if (sub_type(Flux_radiatif_VEF, la_cl_rayo.valeur()))
         {
           Flux_radiatif_VEF& la_cl_rayon = ref_cast(Flux_radiatif_VEF, la_cl_rayo.valeur());
-          // Recherche des temperatures de bord pour cette frontiere
+          // Find boundary temperatures for this boundary
           Nom nom_cl_rayo = la_cl_rayo->frontiere_dis().le_nom();
 
           OBS_PTR(Champ_front_base) Tb;

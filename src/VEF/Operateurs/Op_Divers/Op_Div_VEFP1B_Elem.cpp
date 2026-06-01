@@ -169,7 +169,6 @@ int find_cl_face(const Domaine& domaine, const int face)
   return -1;
 }
 
-// Passage int -> int car plantage au run avec nvc++ avec type long
 KOKKOS_FUNCTION
 double calculer_coef_som(int type_elem, int dimension, int& nb_face_diri, int* indice_diri)
 {
@@ -318,7 +317,7 @@ DoubleTab& Op_Div_VEFP1B_Elem::ajouter_som(const DoubleTab& tab_vit, DoubleTab& 
   int nb_elem_tot = domaine.nb_elem_tot();
   int nps = domaine_VEF.numero_premier_sommet();
 
-  // Initialisation tableaux constants
+  // Initialize constant arrays
   if (!som_initialized_)
     {
       som_initialized_ = true;
@@ -372,7 +371,7 @@ DoubleTab& Op_Div_VEFP1B_Elem::ajouter_som(const DoubleTab& tab_vit, DoubleTab& 
         int rang_elem = (int)rang_elem_non_std(elem);
         int type_elem = rang_elem < 0 ? 0 : (int)type_elem_Cl(rang_elem);
         coeff_som = calculer_coef_som(type_elem, dim, nb_face_diri, indice_diri);
-        // on retire la contribution des faces dirichlets
+        // subtract the contribution from Dirichlet faces
         for (int fdiri = 0; fdiri < nb_face_diri; fdiri++)
           {
             int indice = indice_diri[fdiri];
@@ -421,7 +420,7 @@ DoubleTab& Op_Div_VEFP1B_Elem::ajouter_som(const DoubleTab& tab_vit, DoubleTab& 
           CIntTabView face_sommets = domaine_VEF.face_sommets().view_ro();
           CIntArrView renum_som_perio = domaine.get_renum_som_perio().view_ro();
 
-          // On boucle sur les faces de bord reelles et virtuelles
+          // Loop over real and virtual boundary faces
           Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__),
                                range_1D(0, nb_faces_bord_tot), KOKKOS_LAMBDA(
                                  const int ind_face)
@@ -447,7 +446,7 @@ DoubleTab& Op_Div_VEFP1B_Elem::ajouter_som(const DoubleTab& tab_vit, DoubleTab& 
         {
           const Periodique& la_cl_perio = ref_cast(Periodique, la_cl.valeur());
           CIntArrView face_associee = la_cl_perio.face_associee().view_ro();
-          // On boucle sur les faces de bord reelles et virtuelles
+          // Loop over real and virtual boundary faces
           Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__),
                                range_1D(0, nb_faces_bord_tot), KOKKOS_LAMBDA(
                                  const int ind_face)
@@ -553,14 +552,14 @@ DoubleTab& Op_Div_VEFP1B_Elem::ajouter(const DoubleTab& tab_velocity_tab, Double
 {
   const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_vef.valeur());
   const Domaine_Cl_VEF& domaine_Cl_VEF = la_zcl_vef.valeur();
-  // Quelques verifications:
-  // L'espace virtuel de velocity_tab doit etre a jour (Le test est fait si check_enabled==1)
+  // Some checks:
+  // The virtual space of velocity_tab must be up to date (test is done if check_enabled==1)
   assert_espace_virtuel_vect(tab_velocity_tab);
-  // On s'en fiche de l'espace virtuel de div a l'entree, mais on fait += dessus.
+  // We don't care about the virtual space of div at input, but we do += on it.
   assert_invalide_items_non_calcules(tab_div, 0.);
 
 #ifndef NDEBUG
-  // On s'assure que la periodicite est respectee sur velocity_tab (Voir FA814)
+  // Ensure periodicity is enforced on velocity_tab (see FA814)
   int nb_comp = tab_velocity_tab.dimension(1);
   for (int n_bord = 0; n_bord < domaine_VEF.nb_front_Cl(); n_bord++)
     {
@@ -578,7 +577,7 @@ DoubleTab& Op_Div_VEFP1B_Elem::ajouter(const DoubleTab& tab_velocity_tab, Double
             int ind_face_associee = face_associee(ind_face);
             int face = num_face(ind_face);
             int face_ass = num_face(ind_face_associee);
-            // PL : test a 1.e-4 car certains cas ne respectent pas strictement (lente derive?)
+            // PL: tolerance 1.e-4 because some cases do not satisfy this strictly (slow drift?)
             for (int comp = 0; comp < nb_comp; comp++)
               if (!est_egal(velocity_tab(face, comp), velocity_tab(face_ass, comp), 1.e-4))
                 {
@@ -614,7 +613,7 @@ DoubleTab& Op_Div_VEFP1B_Elem::ajouter(const DoubleTab& tab_velocity_tab, Double
   if (domaine_VEF.get_alphaA())
     ajouter_aretes(vit, tab_div);
 
-  // correction de de div u si pression sommet imposee de maniere forte
+  // correction of div u if vertex pressure is strongly imposed
   if ((domaine_VEF.get_alphaS()) && ((domaine_VEF.get_cl_pression_sommet_faible() == 0)))
     {
       const Conds_lim& les_cl = domaine_Cl_VEF.les_conditions_limites();
@@ -649,7 +648,7 @@ DoubleTab& Op_Div_VEFP1B_Elem::ajouter(const DoubleTab& tab_velocity_tab, Double
     }
   if (domaine_VEF.get_alphaS() && corrige_sommets_sans_degre_liberte_)
     degres_liberte();
-  //Optimisation, pas necessaire:
+  //Optimization, not necessary:
   //tab_div.echange_espace_virtuel();
   return tab_div;
 }
@@ -690,7 +689,7 @@ for(int isom=0; isom<3; isom++)
 #else
 #endif
 
-// Divise par le volume
+// Divide by the volume
 void Op_Div_VEFP1B_Elem::volumique_P0(DoubleTab& tab_div) const
 {
   const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
@@ -731,8 +730,8 @@ void Op_Div_VEFP1B_Elem::volumique(DoubleTab& tab_div) const
 
 void Op_Div_VEFP1B_Elem::degres_liberte() const
 {
-  // On annulle la divergence aux sommets sans degre de liberte
-  // (sommet uniquement commun a des faces avec des CL Diriclet)
+  // Set to zero the divergence at vertices with no degree of freedom
+  // (vertex only shared by faces with Dirichlet boundary conditions)
   const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_vef.valeur());
   const Domaine& domaine = domaine_VEF.domaine();
   const IntTab& elem_faces = domaine_VEF.elem_faces();
@@ -746,8 +745,8 @@ void Op_Div_VEFP1B_Elem::degres_liberte() const
 
   int ecrire_decoupage_som = 0;
   int decoupage_som = 0;
-  // On n'ecrit qu'une seule fois le fichier decoupage_som
-  // et uniquement en sequentiel
+  // Write the decoupage_som file only once
+  // and only in sequential mode
   if ((Process::is_sequential()) && equation().schema_temps().nb_pas_dt() == 0)
     decoupage_som = 1;
 
@@ -771,8 +770,8 @@ void Op_Div_VEFP1B_Elem::degres_liberte() const
       const double z = (Objet_U::dimension == 3) ? domaine.coord(sommet, 2) : 0.;
 
       journal << "Error node " << sommet << " ( " << x << " " << y << " " << z << " )\n";
-      // On affiche la liste des indices d'elements reels et virtuels qui contiennent
-      // ce sommet. On affiche la lettre "v" pour les elements virtuels.
+      // Display the list of indices of real and virtual elements containing
+      // this vertex. Display the letter "v" for virtual elements.
       journal << "Elements ";
       const int nb_elem_tot = domaine.nb_elem_tot();
       const int nb_elem = domaine.nb_elem();
@@ -783,7 +782,7 @@ void Op_Div_VEFP1B_Elem::degres_liberte() const
             {
               journal << elem << ((elem >= nb_elem) ? "v " : " ");
 
-              // Ecriture dans le fichier decoupage_som
+              // Write to the decoupage_som file
               int face_opp = elem_faces(elem, som);
               int elem_opp;
               somm = -1;
@@ -798,17 +797,17 @@ void Op_Div_VEFP1B_Elem::degres_liberte() const
                 elem_opp = elem1;
 
               int i = 2;
-              for (int som1 = 0; som1 < nse; som1++)  // on parcourt les sommets de elem_opp
+              for (int som1 = 0; som1 < nse; som1++)  // iterate over vertices of elem_opp
                 {
                   int ok = 1;
-                  for (int som2 = 0; som2 < nse; som2++)  // on parcourt les sommets de elem
+                  for (int som2 = 0; som2 < nse; som2++)  // iterate over vertices of elem
                     if (som_elem(elem, som2) == som_elem(elem_opp, som1))
                       ok = 0;
                   if (ok)
                     somm(1) = som_elem(elem_opp, som1);
                   else
                     {
-                      somm(i) = som_elem(elem_opp, som1);  // sommets de la face commune
+                      somm(i) = som_elem(elem_opp, som1);  // vertices of the shared face
                       i++;
                     }
                 }
@@ -821,9 +820,9 @@ void Op_Div_VEFP1B_Elem::degres_liberte() const
                 }
             }
       journal << "\n";
-      // On affiche la liste des faces qui contiennent ce sommet.
-      // Pour les faces de bord, on affiche la condlim,
-      // pour les faces virtuelles, la lettre "v"
+      // Display the list of faces containing this vertex.
+      // For boundary faces, display the boundary condition,
+      // for virtual faces, the letter "v"
       journal << "\nFaces ";
       const int nb_faces = domaine_VEF.nb_faces();
       const int nb_som_face = domaine_VEF.face_sommets().dimension(1);
@@ -834,10 +833,10 @@ void Op_Div_VEFP1B_Elem::degres_liberte() const
               if (domaine_VEF.face_sommets(face, som) == sommet)
                 {
                   journal << face;
-                  if (face >= nb_faces) // Face virtuelle
+                  if (face >= nb_faces) // Virtual face
                     journal << "v";
                   const int cl = find_cl_face(domaine, face);
-                  // Face de bord reelle:
+                  // Real boundary face:
                   if (cl >= 0)
                     {
                       const Nom& nom_bord = domaine.frontiere(cl).le_nom();
@@ -893,7 +892,7 @@ int Op_Div_VEFP1B_Elem::impr(Sortie& os) const
   double temps = sch.temps_courant();
 
   int nb_compo = flux_bords_.dimension(1);
-  // On parcours les frontieres pour sommer les flux par frontiere dans le tableau flux_bord
+  // Loop over boundaries to sum the fluxes per boundary into the flux_bord array
   DoubleVect bilan(nb_compo);
   bilan = 0;
   int nb_cl = le_dom_vef->nb_front_Cl();

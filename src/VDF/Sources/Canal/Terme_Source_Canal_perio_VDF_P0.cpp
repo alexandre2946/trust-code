@@ -66,7 +66,7 @@ void Terme_Source_Canal_perio_VDF_P0::ajouter_blocs(matrices_t matrices, DoubleT
   const DoubleVect& volumes = domaine_VF.volumes();
   ArrOfDouble s(source());
 
-  // Boucle sur les elements internes
+  // Loop over internal elements
   int nb_elem = domaine_VF.nb_elem();
   for (int num_elem = 0; num_elem < nb_elem; num_elem++)
     {

@@ -18,7 +18,7 @@
 
 #include <Interprete.h>
 
-/*! @brief Ecriture d'un fichier
+/*! @brief Writing a file.
  *
  */
 class Ecrire_Fichier : public Interprete

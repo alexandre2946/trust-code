@@ -66,23 +66,18 @@ int Navier_Stokes_Fluide_Dilatable_base::lire_motcle_non_standard(const Motcle& 
   return 1;
 }
 
-/*! @brief Appel Equation_base::preparer_calcul() Assemblage du solveur pression et
+/*! @brief @brief Calls Equation_base::preparer_calcul(), assembles the pressure solver and initialises the pressure.
  *
- *      initialisation de la pression.
- *
- * @return (int) renvoie toujours 1
+ * @return Always returns 1.
  */
 int Navier_Stokes_Fluide_Dilatable_base::preparer_calcul()
 {
   return Navier_Stokes_std::preparer_calcul();
 }
 
-/*! @brief Complete l'equation base, associe la pression a l'equation,
+/*! @brief @brief Completes the base equation: associates the pressure, completes the divergence, gradient and pressure solver.
  *
- *     complete la divergence, le gradient et le solveur pression.
- *     Ajout de 2 termes sources: l'un representant la force centrifuge
- *     dans le cas axi-symetrique,l'autre intervenant dans la resolution
- *     en 2D axisymetrique
+ * Adds two source terms: one representing the centrifugal force in the axisymmetric case, the other involved in the 2D axisymmetric resolution.
  *
  */
 void Navier_Stokes_Fluide_Dilatable_base::completer()
@@ -163,7 +158,7 @@ bool Navier_Stokes_Fluide_Dilatable_base::has_champ(const Motcle& nom, OBS_PTR(C
   if (milieu().has_champ(nom, ref_champ))
     return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 bool Navier_Stokes_Fluide_Dilatable_base::has_champ(const Motcle& nom) const
@@ -177,7 +172,7 @@ bool Navier_Stokes_Fluide_Dilatable_base::has_champ(const Motcle& nom) const
   if (milieu().has_champ(nom))
     return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 const Champ_base& Navier_Stokes_Fluide_Dilatable_base::get_champ(const Motcle& nom) const
@@ -207,16 +202,16 @@ bool Navier_Stokes_Fluide_Dilatable_base::initTimeStep(double dt)
   if (has_source_masse())
     {
       const Schema_Temps_base& sch = schema_temps();
-      // XXX : on a besoin de temps courant...
+      // XXX: we need the current time...
       source_masse_->changer_temps_futur(sch.temps_courant(), 0);
-      // Pour chaque temps futur
+      // For each future time level
       for (int i = 1; i <= sch.nb_valeurs_futures(); i++)
         {
           double tps = sch.temps_futur(i);
           source_masse_->changer_temps_futur(tps, i);
         }
 
-      // Mise a jour du temps par defaut de la source de masse
+      // Update the default time of the mass source term
       source_masse_->set_temps_defaut(sch.temps_defaut());
     }
 

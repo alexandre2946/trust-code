@@ -20,7 +20,7 @@
 
 #include <Interprete.h>
 
-/*! @brief classe PrecisionGeom Cette classe est un interprete qui lit la dimension d'espace.
+/*! @brief class PrecisionGeom This class is an interpreter that reads the space dimension.
  *
  *     Directive:
  *           PrecisionGeom dim

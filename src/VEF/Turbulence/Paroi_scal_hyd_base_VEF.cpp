@@ -40,7 +40,7 @@ void Paroi_scal_hyd_base_VEF::associer(const Domaine_dis_base& domaine_dis, cons
 {
   le_dom_dis_ = ref_cast(Domaine_VF, domaine_dis);
   le_dom_Cl_dis_ = domaine_Cl_dis;
-  // On initialise tout de suite la loi de paroi
+  // Initialize the wall law immediately
   Paroi_scal_hyd_base_VEF::init_lois_paroi();
 }
 
@@ -69,8 +69,8 @@ int Paroi_scal_hyd_base_VEF::init_lois_paroi()
   //  positions_Pf_.resize(nb_faces_bord_reelles,dimension);
   // elems_plus_.resize(nb_faces_bord_reelles);
 
-  // Initialisations de equivalent_distance_, tab_d_reel, positions_Pf, elems_plus
-  // On initialise les distances equivalentes avec les distances geometriques
+  // Initialize equivalent_distance_, tab_d_reel, positions_Pf, elems_plus
+  // Initialize the equivalent distances with the geometric distances
   const DoubleTab& face_normales = le_dom_dis_->face_normales();
   //  const DoubleTab& xv = le_dom_dis_->xv();
   const IntTab& elem_faces = le_dom_dis_->elem_faces();
@@ -94,9 +94,9 @@ int Paroi_scal_hyd_base_VEF::init_lois_paroi()
 
           int size = le_bord.nb_faces();
           DoubleVect& dist_equiv = equivalent_distance_[n_bord];
-          // Note B.M.: on passe ici deux fois: une fois au readOn (par Paroi_scal_hyd_base_VEF::associer())
-          //  et une fois par Modele_turbulence_scal_base::preparer_calcul())
-          // donc tester si pas deja fait:
+          // Note B.M.: this is called twice: once at readOn (by Paroi_scal_hyd_base_VEF::associer())
+          //  and once by Modele_turbulence_scal_base::preparer_calcul())
+          // therefore check if it has already been done:
           if (!dist_equiv.get_md_vector())
             le_bord.frontiere().creer_tableau_faces(dist_equiv, RESIZE_OPTIONS::NOCOPY_NOINIT);
           //assert(dist_equiv.get_md_vector() == le_bord.frontiere().md_vector_faces());
@@ -109,7 +109,7 @@ int Paroi_scal_hyd_base_VEF::init_lois_paroi()
               if (elem == -1)
                 elem = face_voisins(num_face, 1);
 
-              // Recherche d'une face autre que la face de paroi appartenant a l'element
+              // Find a face other than the wall face belonging to element
               // elem.
               autre_face = elem_faces(elem, 0);
               if (autre_face == num_face)
@@ -127,7 +127,7 @@ int Paroi_scal_hyd_base_VEF::init_lois_paroi()
                 ratio += (face_normales(num_face, i) * face_normales(num_face, i));
               ratio = sqrt(ratio);
               /*
-               // Les tableaux positions_Pf_, elems_plus_ ne sont calcules que sur les faces reelles
+               // The arrays positions_Pf_, elems_plus_ are computed only on real faces
                for (i=0; i<dimension; i++)
                positions_Pf_(num_face,i)=xv(num_face,i) - tab_d_reel_[num_face]*(face_normales(num_face,i)/ratio);
 
@@ -201,7 +201,7 @@ void Paroi_scal_hyd_base_VEF::compute_nusselt() const
             lambda_v(ind_face) = conductivite(unif ? 0 : elem);
             lambda_t_v(ind_face) = conductivite_turbulente(elem);
 
-            // on doit calculer Tfluide premiere maille sans prendre en compte Tparoi
+            // compute Tfluide of the first cell without including Tparoi
             double surface_face = face_surfaces(num_face);
             for (int i = 0; i < nb_faces_elem; i++)
               {
@@ -230,7 +230,7 @@ void Paroi_scal_hyd_base_VEF::compute_nusselt() const
               tab_(num_face, 3) = tfluide(ind_face);
               if ((sub_type(Neumann_paroi, la_cl_th.valeur())))
                 {
-                  // Et on ajoute Tface et on Tparoi recalcule avec d_equiv
+                  // And we add Tface and recompute Tparoi with d_equiv
                   const Neumann_paroi& la_cl_neum = ref_cast(Neumann_paroi, la_cl_th.valeur());
                   double tparoi = temperature(num_face);
                   double flux = la_cl_neum.flux_impose(num_face - ndeb);

@@ -100,8 +100,8 @@ Implemente_base_sans_destructeur(Probleme_base,"Probleme_base",Probleme_U);
 // XD pdi_expert format_file_base pdi_expert BRACE Format of the file - PDI expert version
 // XD attr yaml_fname chaine yaml_fname REQ YAML file name
 
-// Variables globales pour initialiser est_le_premier_postraitement_pour_nom_fic
-// et est_le_dernier_postraitement_pour_nom_fic en une seule passe.
+// Global variables to initialize est_le_premier_postraitement_pour_nom_fic
+// and est_le_dernier_postraitement_pour_nom_fic in a single pass.
 LIST(Nom) glob_noms_fichiers;
 LIST(OBS_PTR(Postraitement)) glob_derniers_posts;
 
@@ -114,26 +114,26 @@ Sortie& Probleme_base::printOn(Sortie& os) const
   return os;
 }
 
-/*! @brief Lecture d'un probleme dans un flot d'entree, et ouverture du flot de sauvegarde.
+/*! @brief Reading of a problem in an input stream, and opening of the save stream.
  *
  *     Format:
  *      {
- *      nom_milieu bloc de lecture d'un milieu
- *      nom_equation bloc de lecture d'une equation
- *      Postraitement bloc de lecture postraitement
+ *      medium_name block to read a medium
+ *      equation_name block to read an equation
+ *      Postraitement block to read postraitement
  *      reprise | sauvegarde | sauvegarde_simple
  *      formatte | binaire | pdi
- *      nom_de_fichier
+ *      file_name
  *      }
- *  L'option sauvegarde_simple permet de sauver le probleme dans le fichier choisi
- *  en ecrasant a chaque fois les sauvegardes precedentes : cela permet d'economiser de la place disque.
+ *  The sauvegarde_simple option allows saving the problem in the chosen file
+ *  by overwriting each time the previous saves : this allows saving disk space.
  *
- * @param (Entree& is) flot d'entree
- * @return (Entree&) le flot d'entre modifie
- * @throws pas d'accolade ouvrante en debut de format
- * @throws mot clef "Postraitement" n'est pas la
- * @throws format de sauvegarde doit etre "binaire" ou "formatte"
- * @throws pas d'accolade fermante en fin de jeu de donnee
+ * @param (Entree& is) input stream
+ * @return (Entree&) the modified input stream
+ * @throws no opening brace at the beginning of the format
+ * @throws keyword "Postraitement" is not there
+ * @throws save format must be "binary" or "formatted"
+ * @throws no closing brace at the end of the data file
  */
 Entree& Probleme_base::readOn(Entree& is)
 {
@@ -147,25 +147,25 @@ Entree& Probleme_base::readOn(Entree& is)
   lire_solved_equations(is);
   typer_lire_milieu(is);
 
-  /* 2 : On lit les equations */
-  lire_equations(is, motlu); //"motlu" contient le premier mot apres la lecture des equations
+  /* 2 : We read the equations */
+  lire_equations(is, motlu); //"motlu" contains the first word after reading the equations
 
-  /* 3 : Les postraitements */
-  // Si le postraitement comprend le mot, on en lit un autre...
+  /* 3 : Post-processing */
+  // If the postraitement contains the word, we read another one...
   while (les_postraitements_.lire_postraitements(is, motlu, *this))
     {
       is >> motlu;
     }
 
-  /* 4 : On complete ... */
+  /* 4 : We complete ... */
   completer();
   Cerr << "Step verification of data being read in progress..." << finl;
 
-  /* 5 : On verifie ... */
+  /* 5 : We verify ... */
   verifier();
   Cerr << "The read data are coherent" << finl;
 
-  /* 6 : gestion sauvegarde/reprise ... */
+  /* 6 : save/restart management ... */
   save_restart_.lire_sauvegarde_reprise(is, motlu);
 
   return is ;
@@ -174,33 +174,33 @@ Entree& Probleme_base::readOn(Entree& is)
 void Probleme_base::typer_lire_milieu(Entree& is)
 {
   // NOTA BENE :
-  // Normalement on a un milieu par probleme, sauf si le problem contient une equation de concentration
-  // Dans ce cas, on a un milieu supplementaire : constituant (faut pas demander pourquoi 2 milieu ... car je sais pas !). a voir si on peut faire mieux ...
+  // Normally we have one medium per problem, except if the problem contains a concentration equation
+  // In that case, we have an additional medium : constituent (don't ask why 2 media ... because I don't know !). to see if we can do better ...
   int nb_milieu = 1;
 
-  // On cherche si c'est un pb avec concentration => avec constituant
+  // We search if it's a problem with concentration => with constituent
   const std::string conc = "Concentration", scal_pass = "Scalaires_Passifs", nom_pb = que_suis_je().getString();
-  if (nom_pb.find(conc) != std::string::npos) nb_milieu = 2; // pb contient concentration !
+  if (nom_pb.find(conc) != std::string::npos) nb_milieu = 2; // problem contains concentration !
 
   le_milieu_.resize(nb_milieu);
 
   for (int i = 0; i < nb_milieu; i++)
     {
-      le_milieu_[i].typer_lire_simple(is, "Typing the medium ..."); // On commence par la lecture du milieu
-      associer_milieu_base(le_milieu_[i].valeur()); // On l'associe a chaque equations (methode virtuelle pour chaque pb ...)
+      le_milieu_[i].typer_lire_simple(is, "Typing the medium ..."); // We start with reading the medium
+      associer_milieu_base(le_milieu_[i].valeur()); // We associate it with each equation (virtual method for each problem ...)
     }
 
-  // Milieu(x) lu(s) ... Lets go ! On discretise les equations
+  // Medium(s) read ... Lets go ! We discretize the equations
   discretiser_equations();
 
-  // remontee de l'inconnue vers le milieu
+  // uplifting of the unknown to the medium
   for (int i = 0; i < nombre_d_equations(); i++) equation(i).associer_milieu_equation();
 
   const bool is_constituant = nb_milieu == 1 ? false : true, is_scal_pass = (nom_pb.find(scal_pass) != std::string::npos) ? true : false;
   const int ns_ou_cond_eq = 0;
-  int conc_eq = 1; // pas const !
+  int conc_eq = 1; // not const !
 
-  // On discretise le/les milieu/x ... Et l'eq de concentration !
+  // We discretize the medium/media ... And the concentration equation !
   if (is_constituant)
     {
       assert (nombre_d_equations() > 1);
@@ -208,28 +208,28 @@ void Probleme_base::typer_lire_milieu(Entree& is)
         for (int i = 0; i < nombre_d_equations(); i++) equation(i).milieu().discretiser((*this), la_discretisation_.valeur());
       else if (nombre_d_equations() == 3)
         {
-          // On a 2 Cas :
-          // - Pb_Thermohydraulique_Concentration (NS, Thermique, Conc)
-          // - Pb_Hydraulique_Concentration_Scalaires_Passifs (NS, Conc + Equations_Scalaires_Passifs (la lise) !)
+          // We have 2 Cases :
+          // - Pb_Thermohydraulique_Concentration (NS, Thermal, Conc)
+          // - Pb_Hydraulique_Concentration_Scalaires_Passifs (NS, Conc + Equations_Scalaires_Passifs (the list) !)
           conc_eq = is_scal_pass ? 1 /* conc_eq */ : 2;
           equation(ns_ou_cond_eq).milieu().discretiser((*this), la_discretisation_.valeur()); // NS
           equation(conc_eq).milieu().discretiser((*this), la_discretisation_.valeur()); // Conc
         }
       else
         {
-          // Cas rare : Pb_Thermohydraulique_Concentration_Scalaires_Passifs
-          // Ici on a NS, Thermique, Conc + Equations_Scalaires_Passifs (la lise) !
+          // Rare case : Pb_Thermohydraulique_Concentration_Scalaires_Passifs
+          // Here we have NS, Thermal, Conc + Equations_Scalaires_Passifs (the list) !
           assert (nombre_d_equations() == 4);
           conc_eq = 2;
           equation(ns_ou_cond_eq).milieu().discretiser((*this), la_discretisation_.valeur()); // NS
           equation(conc_eq).milieu().discretiser((*this), la_discretisation_.valeur()); // Conc
         }
     }
-  else /* On discretise le milieu de l'eq 1 et c'est tout :-) :-) */
+  else /* We discretize the medium of eq 1 and that's all :-) :-) */
     equation(ns_ou_cond_eq).milieu().discretiser((*this), la_discretisation_.valeur());
 }
 
-/*! @brief Lecture des equations du probleme.
+/*! @brief Reading of the equations of the problem.
  *
  */
 Entree& Probleme_base::lire_equations(Entree& is, Motcle& mot)
@@ -279,7 +279,7 @@ Entree& Probleme_base::lire_radiation_models(Entree& is, Motcle& mot)
   return is;
 }
 
-/*! @brief Associe le probleme a toutes ses equations.
+/*! @brief Associates the problem with all its equations.
  *
  */
 void Probleme_base::associer()
@@ -290,15 +290,15 @@ void Probleme_base::associer()
     equation(i).associer_pb_base(*this);
 }
 
-/*! @brief surcharge Objet_U::associer_(Objet_U& ob) Associe differents objets au probleme en controlant
+/*! @brief override Objet_U::associer_(Objet_U& ob) Associates different objects with the problem by checking
  *
- *      le type de l'objet a associer a l'execution.
- *      On peut ainsi associer: un schema en temps, un domaine de calcul.
- *      Utilise les routine de la classe Type_Info (Utilitaires)
+ *      the type of the object to be associated at execution.
+ *      We can thus associate: a time scheme, a calculation domain.
+ *      Uses the routine of the Type_Info class (Utilities)
  *
- * @param (Objet_U& ob) l'objet a associer
- * @return (int) 1 si association reussie 0 sinon 2 si le milieu est deja associe a un autre probleme
- * @throws Objet_U de type inconnu (non prevu)
+ * @param (Objet_U& ob) the object to associate
+ * @return (int) 1 if association succeeded 0 otherwise 2 if the medium is already associated with another problem
+ * @throws Unknown Objet_U type (not provided)
  */
 int Probleme_base::associer_(Objet_U& ob)
 {
@@ -338,9 +338,9 @@ int Probleme_base::associer_(Objet_U& ob)
   return 0;
 }
 
-/*! @brief Complete les equations associees au probleme.
+/*! @brief Completes the equations associated with the problem.
  *
- * Remplissage des references, deleguee aux equations.
+ * Filling of references, delegated to the equations.
  *
  */
 void Probleme_base::completer()
@@ -358,23 +358,23 @@ void Probleme_base::completer()
     corr.second->completer();
 }
 
-/*! @brief Verifie que l'objet est complet, coherent, .
+/*! @brief Verifies that the object is complete, coherent, .
  *
- * .. NON DEVELOPPE RENVOIE TOUJOURS 1
+ * .. NOT DEVELOPED ALWAYS RETURNS 1
  *
- * @return (int) 1 si l'objet est correct
+ * @return (int) 1 if the object is correct
  */
 int Probleme_base::verifier()
 {
   return 1;
 }
 
-/*! @brief Associe un domaine au probleme.
+/*! @brief Associates a domain with the problem.
  *
- * Prend un_domaine comme support.
- *      apelle Domaine_dis::associer_dom(const Domaine& )
+ * Takes un_domaine as support.
+ *      calls Domaine_dis::associer_dom(const Domaine& )
  *
- * @param (Domaine& un_domaine) le domaine
+ * @param (Domaine& un_domaine) the domain
  */
 void Probleme_base::associer_domaine(const Domaine& un_domaine)
 {
@@ -392,12 +392,12 @@ void Probleme_base::discretiser_equations()
     }
 }
 
-/*! @brief Affecte une discretisation au probleme Discretise le Domaine associe au probleme avec la discretisation
+/*! @brief Assigns a discretization to the problem Discretizes the Domain associated with the problem with the discretization
  *
- *      Associe le premier Domaine aux equations du probleme
- *      Discretise les equations associees au probleme
+ *      Associates the first Domain with the problem's equations
+ *      Discretizes the equations associated with the problem
  *
- * @param (Discretisation_base& discretisation) une discretisation pour le probleme
+ * @param (Discretisation_base& discretisation) a discretization for the problem
  */
 void Probleme_base::discretiser(Discretisation_base& une_discretisation)
 {
@@ -408,7 +408,7 @@ void Probleme_base::discretiser(Discretisation_base& une_discretisation)
   if (!le_domaine_)
     Process::exit("ERROR: Discretize - You're trying to discretize a problem without having associated a Domain to it!!! Fix your dataset.");
 
-  // Initialisation du tableau renum_som_perio
+  // Initialization of the renum_som_perio array
   le_domaine_->init_renum_perio();
 
   une_discretisation.associer_domaine(le_domaine_.valeur());
@@ -420,16 +420,16 @@ void Probleme_base::discretiser(Discretisation_base& une_discretisation)
     itr->discretiser(une_discretisation);
 }
 
-/*! @brief Flag le premier et le dernier postraitement pour chaque fichier Et initialise les postraitements
+/*! @brief Flags the first and last post-processing for each file And initializes the post-processing
  *
  */
 void Probleme_base::init_postraitements()
 {
-  for (auto& itr : les_postraitements_) // Pour chaque postraitement
+  for (auto& itr : les_postraitements_) // For each post-processing
     {
       OWN_PTR(Postraitement_base) &der_post = itr;
 
-      // S'il est de type Postraitement, initialiser premier/dernier _pour_nom_fich
+      // If it is of type Postraitement, initialize premier/dernier _pour_nom_fich
       if (sub_type(Postraitement, der_post.valeur()))
         {
 
@@ -438,22 +438,21 @@ void Probleme_base::init_postraitements()
           Nom nom_fichier = Sortie_Fichier_base::root;
           nom_fichier+=post.nom_fich();
           int rg = glob_noms_fichiers.rang(nom_fichier);
-          if (rg == -1)   // C'est la premiere fois qu'on rencontre ce nom
+          if (rg == -1)   // This is the first time we encounter this name
             {
               glob_noms_fichiers.add(nom_fichier);
               glob_derniers_posts.add(post);
               post.est_le_premier_postraitement_pour_nom_fich() = 1;
             }
-          else   // On a deja vu ce nom
+          else   // We have already seen this name
             {
               post.est_le_premier_postraitement_pour_nom_fich() = 0;
               Postraitement& autre_post = glob_derniers_posts[rg];
               autre_post.est_le_dernier_postraitement_pour_nom_fich() = 0;
               glob_derniers_posts[rg] = post;
 
-              // On verifie au passage que les intervalles de postraitements
-              // sont bien les memes pour tout ce qui ecrit dans le meme
-              // fichier  .
+              // Verify that the post-processing intervals are the same
+              // for everything writing to the same file.
               if (post.champs_demande() && autre_post.dt_post() != post.dt_post())
                 {
                   Cerr << "Error, the values of dt_post (" << autre_post.dt_post() << " and " << post.dt_post() << ") of two postprocessing blocks writing in the same file" << nom_fichier
@@ -475,12 +474,12 @@ int Probleme_base::expression_predefini(const Motcle& motlu, Nom& expression)
   return 0;
 }
 
-/*! @brief Ecriture du probleme sur fichier en vue d'une reprise.
+/*! @brief Writing of the problem to file for restart.
  *
- * Ecrit le nom du probleme et sauvegarde les equations.
+ * Writes the name of the problem and saves the equations.
  *
- * @param (Sortie& os) flot de sortie pour sauvegarde
- * @return (int) renvoie toujours 1
+ * @param (Sortie& os) output stream for backup
+ * @return (int) always returns 1
  */
 int Probleme_base::sauvegarder(Sortie& os) const
 {
@@ -499,10 +498,10 @@ int Probleme_base::sauvegarder(Sortie& os) const
   return bytes;
 }
 
-/*! @brief Lecture d'un flot d'entree (fichier) pour reprise apres une sauvegarde avec Probleme_base::sauvegarder(Sortie& os).
+/*! @brief Reading of an input stream (file) for restart after a backup with Probleme_base::sauvegarder(Sortie& os).
  *
- * @param (Entree& is) le flot d'entree sur lequel on lit la reprise
- * @return (int) renvoie toujours 1
+ * @param (Entree& is) the input stream from which we read the restart
+ * @return (int) always returns 1
  */
 int Probleme_base::reprendre(Entree& is)
 {
@@ -519,27 +518,27 @@ int Probleme_base::reprendre(Entree& is)
   return 1;
 }
 
-/*! @brief Demande au schema en temps s'il faut faire une impression
+/*! @brief Asks the time scheme if a print is needed
  *
- * @return (int) 1 il faut faire une impression, 0 il ne faut pas.
+ * @return (int) 1 a print is needed, 0 it's not.
  */
 int Probleme_base::limpr() const
 {
   return schema_temps().limpr();
 }
 
-/*! @brief Demande au schema en temps s'il faut faire une sauvegarde
+/*! @brief Asks the time scheme if a backup is needed
  *
- * @return (int) 1 il faut faire une sauvegarde, 0 il ne faut pas.
+ * @return (int) 1 a backup is needed, 0 it's not.
  */
 int Probleme_base::lsauv() const
 {
   return schema_temps().lsauv();
 }
 
-/*! @brief Imprime les equations associees au probleme si le schema en temps associe indique que c'est necessaire.
+/*! @brief Prints the equations associated with the problem if the associated time scheme indicates that it is necessary.
  *
- * @param (Sortie& os) le flot de sortie
+ * @param (Sortie& os) output stream
  */
 void Probleme_base::imprimer(Sortie& os) const
 {
@@ -547,12 +546,12 @@ void Probleme_base::imprimer(Sortie& os) const
     equation(i).imprimer(os);
 }
 
-/*! @brief Associe un schema en temps au probleme.
+/*! @brief Associates a time scheme with the problem.
  *
- * Associe ensuite le schema en temps a toutes
- *     les equations du probleme.
+ * Then associates the time scheme with all
+ *     the equations of the problem.
  *
- * @param (Schema_Temps_base& un_schema_en_temps) le schema en temps a associer
+ * @param (Schema_Temps_base& un_schema_en_temps) the time scheme to associate
  */
 void Probleme_base::associer_sch_tps_base(const Schema_Temps_base& un_schema_en_temps)
 {
@@ -568,12 +567,12 @@ void Probleme_base::associer_sch_tps_base(const Schema_Temps_base& un_schema_en_
     equation(i).associer_sch_tps_base(un_schema_en_temps);
 }
 
-/*! @brief Renvoie le schema en temps associe au probleme.
+/*! @brief Returns the time scheme associated with the problem.
  *
- * (si il est non nul) (version const)
+ * (if it is not null) (const version)
  *
- * @return (Schema_Temps_base&) le schema en temps associe au probleme
- * @throws le schema en temps n'est pas associe au probleme, la reference est nulle
+ * @return (Schema_Temps_base&) the time scheme associated with the problem
+ * @throws the time scheme is not associated with the problem, the reference is null
  */
 const Schema_Temps_base& Probleme_base::schema_temps() const
 {
@@ -586,12 +585,12 @@ const Schema_Temps_base& Probleme_base::schema_temps() const
 }
 
 
-/*! @brief Renvoie le schema en temps associe au probleme.
+/*! @brief Returns the time scheme associated with the problem.
  *
- * (si il est non nul)
+ * (if it is not null)
  *
- * @return (Schema_Temps_base&) le schema en temps associe au probleme
- * @throws le schema en temps n'est pas associe au probleme, la reference est nulle
+ * @return (Schema_Temps_base&) the time scheme associated with the problem
+ * @throws if the time scheme is not associated with the problem, the reference is null
  */
 Schema_Temps_base& Probleme_base::schema_temps()
 {
@@ -604,51 +603,49 @@ Schema_Temps_base& Probleme_base::schema_temps()
 }
 
 
-/*! @brief Renvoie le domaine associe au probleme.
+/*! @brief Returns the domain associated with the problem.
  *
- * (version const)
+ * (const version)
  *
- * @return (Domaine&) un domaine
+ * @return (Domaine&) a domain
  */
 const Domaine& Probleme_base::domaine() const
 {
   return le_domaine_.valeur();
 }
 
-/*! @brief Renvoie le domaine associe au probleme.
+/*! @brief Returns the domain associated with the problem.
  *
- * @return (Domaine&) un domaine
+ * @return (Domaine&) a domain
  */
 Domaine& Probleme_base::domaine()
 {
   return le_domaine_.valeur();
 }
 
-/*! @brief Renvoie le domaine discretise associe au probleme.
+/*! @brief Returns the discretized domain associated with the problem (const version).
  *
- * (version const)
- *
- * @return (Domaine_dis_base&) un domaine discretise
+ * @return (Domaine_dis_base&) a discretized domain
  */
 const Domaine_dis_base& Probleme_base::domaine_dis() const
 {
   return le_domaine_dis_.valeur();
 }
 
-/*! @brief Renvoie le domaine discretise associe au probleme.
+/*! @brief Returns the discretized domain associated with the problem.
  *
- * @return (Domaine_dis_base&) un domaine discretise
+ * @return (Domaine_dis_base&) a discretized domain
  */
 Domaine_dis_base& Probleme_base::domaine_dis()
 {
   return le_domaine_dis_.valeur();
 }
 
-/*! @brief Associe un milieu physique aux equations du probleme.
+/*! @brief Associates a physical medium with the problem equations.
  *
- * Choix du milieu physique.
+ * Choice of the physical medium.
  *
- * @param (Milieu_base& mil) le milieu a associer (Solide, Fluide Incompressible ...)
+ * @param (Milieu_base& mil) the medium to associate (Solide, Fluide Incompressible ...)
  */
 void Probleme_base::associer_milieu_base(const Milieu_base& mil)
 {
@@ -656,39 +653,37 @@ void Probleme_base::associer_milieu_base(const Milieu_base& mil)
     equation(i).associer_milieu_base(mil);
 }
 
-/*! @brief Renvoie le milieu physique associe au probleme.
+/*! @brief Returns the physical medium associated with the problem (const version).
  *
- * (version const)
- *     On renvoie le milieu associe a la premiere equation.
+ * Returns the medium associated with the first equation.
  *
- * @return (Milieu_base&) un milieu physique
+ * @return (Milieu_base&) a physical medium
  */
 const Milieu_base& Probleme_base::milieu() const
 {
   return equation(0).milieu();
 }
 
-/*! @brief Renvoie le milieu physique associe au probleme.
+/*! @brief Returns the physical medium associated with the problem.
  *
- * On renvoie le milieu associe a la premiere equation.
+ * Returns the medium associated with the first equation.
  *
- * @return (Milieu_base&) un milieu physique
+ * @return (Milieu_base&) a physical medium
  */
 Milieu_base& Probleme_base::milieu()
 {
   return equation(0).milieu();
 }
 
-/*! @brief Renvoie l'equation dont le nom est specifie.
+/*! @brief Returns the equation whose name is specified (const version).
  *
- * On indexe les equations avec leur nom associe.
- *     On cherche dans toutes les equations du probleme celle
- *     qui porte le nom specifie.
- *     (version const)
+ * Equations are indexed by their associated name.
+ *     Searches through all equations of the problem for the one
+ *     carrying the specified name.
  *
- * @param (Nom& type) le nom de l'equation a renvoyer
- * @return (Equation_base&) une equation
- * @throws pas d'equation du nom specifie
+ * @param (Nom& type) the name of the equation to return
+ * @return (Equation_base&) an equation
+ * @throws if no equation with the specified name exists
  */
 const Equation_base& Probleme_base::equation(const Nom& type) const
 {
@@ -699,7 +694,7 @@ const Equation_base& Probleme_base::equation(const Nom& type) const
       if (Type_eqn == Type)
         return equation(i);
 
-      // on teste si synonyme ...
+      // test if synonym ...
       const Synonyme_info *syn_info = Synonyme_info::synonyme_info_from_name(type);
       if (syn_info != 0)
         if (Motcle(syn_info->org_name_()) == Type_eqn)
@@ -710,13 +705,13 @@ const Equation_base& Probleme_base::equation(const Nom& type) const
   for (int i = 0; i < nombre_d_equations(); i++)
     Cerr << "\t- " << equation(i).que_suis_je() << finl;
   Process::exit();
-  // Pour les compilos;
+  // For the compiler;
   return equation(0);
 }
 
-/*! @brief (B. Math): Methode virtuelle ajoutee pour les problemes ayant plusieurs equations
- *   de meme type (Probleme_FT_Disc_gen). Dans ce cas, le nom de l'equation
- *   n'est pas son type...
+/*! @brief (B. Math): Virtual method added for problems having several equations
+ *   of the same type (Probleme_FT_Disc_gen). In that case, the name of the equation
+ *   is not its type...
  *
  */
 const Equation_base& Probleme_base::get_equation_by_name(const Nom& un_nom) const
@@ -724,10 +719,10 @@ const Equation_base& Probleme_base::get_equation_by_name(const Nom& un_nom) cons
   return equation(un_nom);
 }
 
-/*! @brief (B. Math): Methode virtuelle ajoutee pour les problemes ayant plusieurs equations
- *   de meme type (Probleme_FT_Disc_gen). Dans ce cas, le nom de l'equation
- *   n'est pas son type...
- *   Version non const. Cette methode est notamment appelee a la lecture du probleme.
+/*! @brief (B. Math): Virtual method added for problems having several equations
+ *   of the same type (Probleme_FT_Disc_gen). In that case, the name of the equation
+ *   is not its type...
+ *   Non-const version. This method is notably called when reading the problem.
  *
  */
 Equation_base& Probleme_base::getset_equation_by_name(const Nom& un_nom)
@@ -735,15 +730,15 @@ Equation_base& Probleme_base::getset_equation_by_name(const Nom& un_nom)
   return equation(un_nom);
 }
 
-/*! @brief Renvoie l'equation dont le nom est specifie.
+/*! @brief Returns the equation whose name is specified.
  *
- * On indexe les equations avec leur nom associe.
- *     On cherche dans toutes les equations du probleme celle
- *     qui porte le nom specifie.
+ * Equations are indexed by their associated name.
+ *     Searches through all equations of the problem for the one
+ *     carrying the specified name.
  *
- * @param (Nom& type) le nom de l'equation a renvoyer
- * @return (Equation_base&) une equation
- * @throws pas d'equation du nom specifie
+ * @param (Nom& type) the name of the equation to return
+ * @return (Equation_base&) an equation
+ * @throws if no equation with the specified name exists
  */
 Equation_base& Probleme_base::equation(const Nom& type)
 {
@@ -754,7 +749,7 @@ Equation_base& Probleme_base::equation(const Nom& type)
       if (Type_eqn == Type)
         return equation(i);
 
-      // on teste si synonyme ...
+      // test if synonym ...
       const Synonyme_info *syn_info = Synonyme_info::synonyme_info_from_name(type);
       if (syn_info != 0)
         if (Motcle(syn_info->org_name_()) == Type_eqn)
@@ -765,7 +760,7 @@ Equation_base& Probleme_base::equation(const Nom& type)
   for (int i = 0; i < nombre_d_equations(); i++)
     Cerr << "\t- " << equation(i).que_suis_je() << finl;
   Process::exit();
-  // Pour les compilos;
+  // For the compiler;
   return equation(0);
 }
 
@@ -807,7 +802,7 @@ bool Probleme_base::has_champ(const Motcle& un_nom, OBS_PTR(Champ_base) &ref_cha
     if (itr->has_champ(un_nom, ref_champ))
       return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 bool Probleme_base::has_champ(const Motcle& un_nom) const
@@ -835,7 +830,7 @@ bool Probleme_base::has_champ(const Motcle& un_nom) const
     if (itr->has_champ(un_nom))
       return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 const Champ_base& Probleme_base::get_champ(const Motcle& un_nom) const
@@ -917,7 +912,7 @@ bool Probleme_base::has_champ_post(const Motcle& un_nom) const
           return true;
       }
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 const Champ_Generique_base& Probleme_base::get_champ_post(const Motcle& un_nom) const
@@ -943,11 +938,11 @@ int Probleme_base::a_pour_IntVect(const Motcle&, OBS_PTR(IntVect)& ) const
   return 0;
 }
 
-/*! @brief Effectue une mise a jour en temps du probleme.
+/*! @brief Performs a time update of the problem.
  *
- * Effectue la mise a jour sur toutes les equations du probleme.
+ * Performs the update on all equations of the problem.
  *
- * @param (double temps) le pas de temps de mise a jour
+ * @param (double temps) the time step for the update
  */
 void Probleme_base::mettre_a_jour(double temps)
 {
@@ -983,22 +978,22 @@ void Probleme_base::mettre_a_jour(double temps)
   //statistics().end_count(STD_COUNTERS::update_variables);
 }
 
-/*! @brief Prepare le calcul: initialise les parametres du milieu et prepare le calcul de chacune des equations.
+/*! @brief Prepares the computation: initializes the medium parameters and prepares the computation of each equation.
  *
  */
 void Probleme_base::preparer_calcul()
 {
   const double temps = schema_temps().temps_courant();
-  // Modification du tableau Qdm porte par le domaine_dis() dans le cas
-  // ou il y a des conditions aux limites periodiques.
-  // Rq : Si l'une des equations porte la condition a la limite periodique
-  //      alors les autres doivent forcement la porter.
+  // Modification of the Qdm array held by domaine_dis() in the case
+  // where there are periodic boundary conditions.
+  // Note: if one of the equations has a periodic boundary condition
+  //       then the others must necessarily have it too.
   equation(0).domaine_dis().modifier_pour_Cl(equation(0).domaine_Cl_dis().les_conditions_limites());
   milieu().initialiser(temps);
   for (int i = 0; i < nombre_d_equations(); i++)
     equation(i).preparer_calcul();
   milieu().preparer_calcul();
-  for (int i = 0; i < nombre_d_equations(); i++) /* on peut maintenant remplir les champs conserves */
+  for (int i = 0; i < nombre_d_equations(); i++) /* we can now fill the conserved fields */
     equation(i).mettre_a_jour_champs_conserves(temps);
 
   save_restart_.preparer_calcul();
@@ -1014,12 +1009,12 @@ void Probleme_base::preparer_calcul()
 }
 
 
-/*! @brief Calcul la valeur du prochain pas de temps du probleme.
+/*! @brief Computes the value of the next time step for the problem.
  *
- * On calcule le minimum des pas de temps des equations associees
- *     au probleme.
+ * Computes the minimum of the time steps of the equations associated
+ *     with the problem.
  *
- * @return (double) le pas de temps maximum autorise pour ce probleme
+ * @return (double) the maximum allowed time step for this problem
  */
 double Probleme_base::calculer_pas_de_temps() const
 {
@@ -1048,7 +1043,7 @@ bool Probleme_base::is_dilatable() const
   return milieu().is_dilatable();
 }
 
-/*! @brief Verifie que la place necessaire existe sur le disque dur.
+/*! @brief Verifies that the necessary disk space exists.
  *
  */
 void Probleme_base::allocation() const
@@ -1056,11 +1051,11 @@ void Probleme_base::allocation() const
   save_restart_.allocation();
 }
 
-/*! @brief Si force=1, effectue le postraitement sans tenir compte des frequences de postraitement.
+/*! @brief If force=1, performs post-processing regardless of the post-processing frequencies.
  *
- *     Le postraitement est mis a jour et les traitements eventuels sur
- *     les sondes, champs et statistiques sont effectues.
- *   Si force=0, tient compte des frequences d'impression demandees.
+ *     The post-processing is updated and any treatments on
+ *     probes, fields and statistics are performed.
+ *   If force=0, respects the requested output frequencies.
  *
  */
 int Probleme_base::postraiter(int force)
@@ -1073,10 +1068,10 @@ int Probleme_base::postraiter(int force)
   if (force)
     {
       if (Process::nproc()>=100) Cerr << "[Post] Probleme_base::postraiter... " << finl;
-      //Les sources postraitables (Terme_Source_Acceleration) ne sont pas mis a jour
-      //pour le temps final et ne font pas partie des champs_crees_ du postraitement
-      //qui eux sont mis a jour par les_postraitements.mettre_a_jour.
-      //On les met donc a jour ici
+      //Post-processable sources (Terme_Source_Acceleration) are not updated
+      //for the final time and are not part of the champs_crees_ of the post-processing
+      //which are updated by les_postraitements.mettre_a_jour.
+      //We therefore update them here
 
       const int nb_pas_dt_max = sch.nb_pas_dt_max();
       bool& indice_nb_pas_dt = sch.set_indice_nb_pas_dt_max_atteint();
@@ -1084,8 +1079,8 @@ int Probleme_base::postraiter(int force)
       const double t_init = sch.temps_init();
       const double t_max = sch.temps_max();
 
-      //Test pour eviter de repeter le postraitement a l instant initial
-      //Cela evite un plantage dans le cas d un postraitement au format meshtv
+      //Test to avoid repeating post-processing at the initial time
+      //This avoids a crash in the case of post-processing in meshtv format
 
       if (!(indice_nb_pas_dt && nb_pas_dt_max == 0) && !(indice_tps_final && est_egal(t_init, t_max)))
         {
@@ -1119,7 +1114,7 @@ int Probleme_base::postraiter(int force)
   return 1;
 }
 
-/*! @brief Ecriture sur fichier en vue d'une reprise (sauvegarde)
+/*! @brief Writes to file for restart (backup).
  *
  */
 void Probleme_base::sauver() const
@@ -1131,20 +1126,20 @@ void Probleme_base::sauver() const
   statistics().end_count(STD_COUNTERS::backup_file,1,bytes);
 }
 
-/*! @brief Finit le postraitement et sauve le probleme dans un fichier.
+/*! @brief Finalizes post-processing and saves the problem to a file.
  *
- * Fermeture du fichier associe au postraitement.(Postraitement::finir())
+ * Closes the file associated with post-processing. (Postraitement::finir())
  *
  */
 void Probleme_base::finir()
 {
   Debog::set_nom_pb_actuel(le_nom());
-  schema_temps().finir(); // Fermeture du .dt_ev
-  les_postraitements_.finir(); // Fermeture des fichiers de postraitements
+  schema_temps().finir(); // Close the .dt_ev file
+  les_postraitements_.finir(); // Close post-processing files
   for (auto os : get_set_out_files())
     if (os->is_open())
-      os->close(); // Fermeture des fichiers .out
-  // Vide les variables globales suivantes (utile pour resetTime dans un meme repertoire)
+      os->close(); // Close .out files
+  // Clear the following global variables (useful for resetTime in the same directory)
   glob_noms_fichiers.vide();
   glob_derniers_posts.vide();
 
@@ -1161,13 +1156,13 @@ void Probleme_base::resetTime(double time)
   resetTimeWithDir_impl(*this, time, new_root_dir);
 }
 
-/*! @brief Recherche des champs parametriques, et pour chacun, passage au parametre suivant
+/*! @brief Searches for parametric fields and for each, moves to the next parameter.
  *
  */
 std::string Probleme_base::newCompute()
 {
   std::string dirname="";
-  // Boucle sur les champs des conditions limites:
+  // Loop over fields of boundary conditions:
   for (int i = 0; i < nombre_d_equations(); i++)
     {
       const Equation_base& eq = equation(i);
@@ -1182,7 +1177,7 @@ std::string Probleme_base::newCompute()
             }
         }
     }
-  // Boucles sur les champs des sources:
+  // Loop over source fields:
   if(Champ_Parametrique::enabled)
     {
       for (int i = 0; i < nombre_d_equations(); i++)
@@ -1201,7 +1196,7 @@ std::string Probleme_base::newCompute()
                 }
             }
         }
-      // Boucle sur les champs du Milieu:
+      // Loop over medium fields:
       for (auto const &champ_don: milieu().champs_don())
         {
           if (sub_type(Champ_Parametrique, champ_don.valeur()))
@@ -1216,23 +1211,23 @@ std::string Probleme_base::newCompute()
 
 Entree& Probleme_base::read_optional_equations(Entree& is, Motcle& mot)
 {
-  /* lecture d'equations optionnelles */
-  Noms noms_eq, noms_eq_maj; //noms de toutes les equations possibles!
+  /* reading of optional equations */
+  Noms noms_eq, noms_eq_maj; //names of all possible equations!
   Type_info::les_sous_types(Nom("Equation_base"), noms_eq);
   for (auto& itr : noms_eq) noms_eq_maj.add(Motcle(itr)); //ha ha ha
   for (is >> mot; noms_eq_maj.rang(mot) >= 0; is >> mot)
     {
-      eq_opt_.add(OWN_PTR(Equation_base)()); //une autre equation optionelle
-      eq_opt_.dernier().typer(mot); //on lui donne le bon type
+      eq_opt_.add(OWN_PTR(Equation_base)()); //another optional equation
+      eq_opt_.dernier().typer(mot); //we give it the correct type
       Equation_base& eq = eq_opt_.dernier().valeur();
-      //memes associations que pour les autres equations : probleme, milieu, schema en temps
+      //same associations as for the other equations: problem, medium, time scheme
       eq.associer_pb_base(*this);
       eq.associer_milieu_base(milieu());
       eq.associer_sch_tps_base(le_schema_en_temps_);
       eq.associer_domaine_dis(domaine_dis());
-      eq.discretiser(); //a faire avant de lire l'equation
-      is >> eq; //et c'est parti!
-      eq.associer_milieu_equation(); //remontee vers le milieu
+      eq.discretiser(); //must be done before reading the equation
+      is >> eq; //and off we go!
+      eq.associer_milieu_equation(); //propagate back to the medium
     }
   return is;
 }
@@ -1316,7 +1311,7 @@ void Probleme_base::getOutputPointValues(const Nom& name,
   DoubleTrav valeurs_locales;
   valeurs_locales.resize(size_x, 1);
 
-  // TODO FIXME : reste histoire de som/grav ... a factorizer avec Sonde::initialiser()
+  // TODO FIXME : remaining issue of som/grav ... to refactor with Sonde::initialiser()
   if (has_champ(Motcle(name)))
     {
       OBS_PTR(Champ_base) champ_ref = get_champ(Motcle(name));

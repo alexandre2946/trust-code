@@ -16,9 +16,9 @@
 #define Domaine_bord_included
 #include <Domaine.h>
 
-/*! @brief Cette classe est un domaine dont les sommets et les elements sont extraits d'un bord d'un domaine source.
+/*! @brief This class is a domain whose vertices and elements are extracted from a boundary of a source domain.
  *
- *   On construit ce domaine par la methode construire_domaine_bord()
+ *   This domain is built using the construire_domaine_bord() method.
  *
  */
 template <typename _SIZE_>
@@ -44,11 +44,11 @@ public:
                                     Domaine_t& dest,
                                     ArrOfInt_t& renum_som);
 protected:
-  // Reference au domaine source:
+  // Reference to the source domain:
   OBS_PTR(Domaine_t) domaine_source_;
-  // Nom du bord dans le domaine source:
+  // Name of the boundary in the source domain:
   Nom bord_source_;
-  // Pour chaque sommet de ce domaine, indice du meme sommet dans le domaine source:
+  // For each vertex of this domain, index of the same vertex in the source domain:
   ArrOfInt_t renum_som_;
 };
 

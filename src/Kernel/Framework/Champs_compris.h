@@ -24,9 +24,9 @@
 
 class Champ_base;
 
-/*! @brief classe Champs_compris Represente un champ compris par un objet de type Equation, Milieu,
+/*! @brief class Champs_compris Represents a field understood by an object of type Equation, Medium,
  *
- *      Operateur, Source, Traitement_particulier.
+ *      Operator, Source, SpecialTreatment.
  *
  * Parametrized by the type of field: typically Champ_base or IJK_Field_double
  */

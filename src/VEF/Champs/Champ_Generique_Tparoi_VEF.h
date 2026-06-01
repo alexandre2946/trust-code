@@ -22,8 +22,8 @@
  *
  */
 
-// A preciser
-// Syntaxe a respecter pour jdd
+// To be refined
+// Required syntax for the data file
 
 class Champ_Generique_Tparoi_VEF : public Champ_Gen_de_Champs_Gen
 {

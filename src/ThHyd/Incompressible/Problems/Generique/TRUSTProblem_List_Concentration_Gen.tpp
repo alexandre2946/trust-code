@@ -35,7 +35,7 @@ void TRUSTProblem_List_Concentration_Gen<_DERIVED_TYPE_, _EQUATION_TYPE_, _MEDIU
       ind_list++;
     }
 
-  // Milieux lus ... Lets go ! On discretise les equations
+  // Media read ... Lets go! Discretize the equations
   const int nb_eq_mere = _DERIVED_TYPE_::nombre_d_equations();
   Cerr << "Discretization of the equations of problem " << _DERIVED_TYPE_::que_suis_je() << " ..." <<  finl;
   for (int i = 0; i < this->nombre_d_equations(); i++)
@@ -47,11 +47,11 @@ void TRUSTProblem_List_Concentration_Gen<_DERIVED_TYPE_, _EQUATION_TYPE_, _MEDIU
         this->rename_equation_unknown(i - nb_eq_mere, this->list_eq_concentration_[i - nb_eq_mere]); // Et oui ;)
     }
 
-  // remontee de l'inconnue vers le milieu
+  // propagate the unknown back to the medium
   for (int i = 0; i < this->nombre_d_equations(); i++)
     this->equation(i).associer_milieu_equation();
 
-  // On discretise les milieux !
+  // Discretize the media!
   this->equation(0).milieu().discretiser((*this), _DERIVED_TYPE_::discretisation()); // NS
 
   ind_list = 0;
@@ -101,7 +101,7 @@ Entree& TRUSTProblem_List_Concentration_Gen<_DERIVED_TYPE_, _EQUATION_TYPE_, _ME
       is >> _DERIVED_TYPE_::getset_equation_by_name(un_nom);
     }
 
-  // lecture de la liste
+  // read the list
   is >> un_nom;
   if (un_nom != "LIST_EQUATIONS" && un_nom != "LISTE_EQUATIONS")
     error_read_equation(un_nom, Motcle("LIST_EQUATIONS"));
@@ -112,7 +112,7 @@ Entree& TRUSTProblem_List_Concentration_Gen<_DERIVED_TYPE_, _EQUATION_TYPE_, _ME
 
   for (int i = nb_eq_mere; i < nb_eq; i++)
     {
-      is >> un_nom; /* poubelle */
+      is >> un_nom; /* discard */
       Motcle eq_nom = this->list_eq_concentration_.front().que_suis_je();
       if (un_nom != eq_nom)
         {

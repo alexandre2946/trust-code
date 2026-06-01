@@ -38,18 +38,18 @@ Entree& Associer::readOn(Entree& is)
   return Interprete::readOn(is);
 }
 
-/*! @brief Fonction principale de l'interprete Associer: associer deux objets.
+/*! @brief Main function of the Associer interpreter: associate two objects.
  *
- *     On essaye d'associer 1 a 2 et 2 a 1, provoque une
- *     erreur si cela echoue.
+ *     We try to associate 1 to 2 and 2 to 1, causes an
+ *     error if this fails.
  *
- * @param (Entree& is) un flot d'entree, a partir duquel on lit les noms des objets a associer
- * @return (Entree&) le flot d'entree modifie
- * @throws on ne sait pas associer obj1 et obj2
+ * @param (Entree& is) an input stream, from which the names of the objects to be associated are read
+ * @return (Entree&) the modified input stream
+ * @throws we cannot associate obj1 and obj2
  */
 Entree& Associer::interpreter(Entree& is)
 {
-  // Acquisition des parametres :
+  // Parameter acquisition:
   Nom nom1, nom2;
   is >> nom1 >> nom2;
   if(is.eof())

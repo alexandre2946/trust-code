@@ -32,10 +32,10 @@ using namespace MEDCoupling;
 
 Implemente_instanciable_32_64(Raccord_distant_homogene_32_64,"Raccord_distant_homogene",Raccord_distant_32_64<_T_>);
 
-/*! @brief Simple appel a: Raccord_distant::printOn(Sortie& ) (+ finl)
+/*! @brief Simple call to: Raccord_distant::printOn(Sortie& ) (+ finl)
  *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& s) an output stream
+ * @return (Sortie&) the modified output stream
  */
 template <typename _SIZE_>
 Sortie& Raccord_distant_homogene_32_64<_SIZE_>::printOn(Sortie& s ) const
@@ -50,10 +50,10 @@ Sortie& Raccord_distant_homogene_32_64<_SIZE_>::printOn(Sortie& s ) const
   return s;
 }
 
-/*! @brief Simple appel a: Raccord_distant::readOn(Entree& )
+/*! @brief Simple call to: Raccord_distant::readOn(Entree& )
  *
- * @param (Entree& s) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& s) an input stream
+ * @return (Entree&) the modified input stream
  */
 template <typename _SIZE_>
 Entree& Raccord_distant_homogene_32_64<_SIZE_>::readOn(Entree& s)
@@ -73,7 +73,7 @@ Entree& Raccord_distant_homogene_32_64<_SIZE_>::readOn(Entree& s)
 }
 
 
-/*! @brief Retourne dans le DoubleTab x la trace sur le raccord distant du DoubleTab y localise aux elements du domaine distant
+/*! @brief Returns in DoubleTab x the trace on the distant connector of DoubleTab y located at elements of the distant domain
  */
 template<>
 void Raccord_distant_homogene_32_64<int>::trace_elem_distant(const DoubleTab& y, DoubleTab& x) const
@@ -87,7 +87,7 @@ void Raccord_distant_homogene_32_64<int>::trace_elem_distant(const DoubleTab& y,
   const int n1 = send_data.dimension(0);
   const int n2 = recv_data.size_array();
 
-  // On dimensionne x si ce n'est pas fait
+  // Resize x if not done yet
   if (x.size_array()==0 && n2!=0)
     x.resize(n2, nb_compo_);
   else if (x.dimension(0) != n2)
@@ -121,7 +121,7 @@ void Raccord_distant_homogene_32_64<int>::trace_elem_distant(const DoubleTab& y,
 }
 
 
-/*! @brief Retourne dans le DoubleTab x la trace sur le raccord distant du DoubleTab y localise aux faces
+/*! @brief Returns in DoubleTab x the trace on the distant connector of DoubleTab y located at faces
  *
  */
 template<>
@@ -135,7 +135,7 @@ void Raccord_distant_homogene_32_64<int>::trace_face_distant(const DoubleTab& y,
   const int n1 = send_data.dimension(0);
   const int n2 = recv_data.size_array();
 
-  // On dimensionne x si ce n'est pas fait
+  // Resize x if not done yet
   if (x.size_array()==0 && n2!=0)
     {
       if (y.nb_dim() == 2) x.resize(n2, y.dimension(1));
@@ -162,13 +162,13 @@ void Raccord_distant_homogene_32_64<int>::trace_face_distant(const DoubleTab& y,
 }
 
 
-/*! @brief Retourne dans le DoubleVect x la trace sur le raccord distant du DoubleVect y localise aux faces du raccord distant
+/*! @brief Returns in DoubleVect x the trace on the distant connector of DoubleVect y located at faces of the distant connector
  *
  */
 template<>
 void Raccord_distant_homogene_32_64<int>::trace_face_distant(const DoubleVect& y, DoubleVect& x) const
 {
-  // Verifie que l'on passe bien un tableau aux faces du raccord
+  // Verify that the array is indeed indexed on the connector faces
   assert(y.size()==nb_faces());
   assert(est_initialise());
   const IntTab& send_data = Tab_Envoi();
@@ -176,7 +176,7 @@ void Raccord_distant_homogene_32_64<int>::trace_face_distant(const DoubleVect& y
   const int n1 = send_data.dimension(0);
   const int n2 = recv_data.size_array();
 
-  // On dimensionne x si ce n'est pas fait
+  // Resize x if not done yet
   if (x.size_array()==0 && n2!=0)
     x.resize(n2);
 
@@ -249,7 +249,7 @@ void Raccord_distant_homogene_32_64<_SIZE_>::completer()
   recv_pe_list_.ordonne_array();
 }
 
-/*! @brief Initialise le raccord distant avec la frontiere et le domaine discretise opposes au raccord distant, et le domaine discretise du raccord distant
+/*! @brief Initialises the distant connector with the boundary and the discretised domain opposite to the distant connector, and the discretised domain of the distant connector
  * Only called from Champ_front* instances, so can remain 32 bits only.
  */
 template <>
@@ -266,7 +266,7 @@ void Raccord_distant_homogene_32_64<int>::initialise(const Frontiere& opposed_bo
   int dim=Objet_U::dimension;
   raccord_distant.nom_frontiere_voisine()=opposed_boundary.le_nom();
   const Domaine_VF& domaine_dis_vf = ref_cast(Domaine_VF, domaine_dis);
-  // On va identifier les faces par leur centres de gravite
+  // Identify faces by their centres of gravity
   int parts = Process::nproc();
   DoubleTabs remote_xv(parts);
   int prem_face2 = raccord_distant.num_premiere_face();
@@ -280,16 +280,16 @@ void Raccord_distant_homogene_32_64<int>::initialise(const Frontiere& opposed_bo
         remote_xv[moi](ind_face,j) = domaine_dis_vf.xv(face,j);
     }
 
-  // Puis on echange les tableaux des centres de gravites
-  // envoi des tableaux
+  // Then exchange the arrays of centres of gravity
+  // send the arrays
   for (int p = 0; p < parts; p++)
     envoyer_broadcast(remote_xv[p], p);
 
   ArrsOfInt racc_vois(parts);
 
 #ifdef MEDCOUPLING_
-  // On traite les informations, chaque proc connait tous les XV
-  // Si le proc porte un morceau du raccord_distant
+  // Process the information: each proc knows all XV
+  // If the proc holds a portion of the raccord_distant
   int prem_face1 = opposed_boundary.num_premiere_face();
   int nb_face1   = opposed_boundary.nb_faces();
   if (nb_face1>0)
@@ -302,7 +302,7 @@ void Raccord_distant_homogene_32_64<int>::initialise(const Frontiere& opposed_bo
       //double tolerance = 1e-8; //not very tolerant, are we?
       double tolerance = Objet_U::precision_geom * 100 ; //default value 1e-8 not very tolerant, are we?
 
-      //DataArrayDoubles des xv locaux et de tous les remote_xv (a la suite)
+      //DataArrayDoubles of local xv and all remote_xv (concatenated)
       std::vector<MCAuto<DataArrayDouble> > vxv(parts);
       std::vector<const DataArrayDouble*> cvxv(parts);
       for (int p = 0; p < parts; p++)
@@ -317,15 +317,15 @@ void Raccord_distant_homogene_32_64<int>::initialise(const Frontiere& opposed_bo
         for (int j = 0; j < dim; j++)
           local_xvs->setIJ(ind_face, j, local_xv(prem_face1 + ind_face, j));
 
-      //indices des points de remote_xvs les plus proches de chaque point de local_xv
+      //indices of the closest points in remote_xvs for each point of local_xv
       MCAuto<DataArrayIdType> glob_idx(DataArrayIdType::New());
 
       glob_idx = remote_xvs->findClosestTupleId(local_xvs);
 
-      //pour chaque face de local_xv : controle de la tolerance, remplissage de tableau
+      // for each face of local_xv: tolerance check, fill array
       for (int ind_face = 0, face1 = prem_face1; ind_face<nb_face1; ind_face++, face1++)
         {
-          //retour de l'indice global (glob_idx(ind_face)) au couple (proc, ind_face2)
+          // convert global index (glob_idx(ind_face)) to the pair (proc, ind_face2)
           int proc = 0;
           mcIdType ind_face2_big = glob_idx->getIJ(ind_face, 0);
           while (ind_face2_big >= remote_xv[proc].dimension(0))
@@ -337,7 +337,7 @@ void Raccord_distant_homogene_32_64<int>::initialise(const Frontiere& opposed_bo
           int ind_face2 = (int)ind_face2_big;
           assert(ind_face2 < remote_xv[proc].dimension(0));
 
-          //controle de la tolerance
+          // tolerance check
           double distance2 = 0;
           for (int j=0; j<dim; j++)
             {
@@ -356,7 +356,7 @@ void Raccord_distant_homogene_32_64<int>::initialise(const Frontiere& opposed_bo
               Process::exit();
             }
 
-          //remplissage des tableaux
+          // fill arrays
           Recep[ind_face]=proc;
           racc_vois[proc].append_array(ind_face2);
         }

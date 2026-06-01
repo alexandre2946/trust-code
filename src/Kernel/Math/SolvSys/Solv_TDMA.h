@@ -22,12 +22,12 @@ class Solv_TDMA
 {
 public :
 
-  static void resoudre(const DoubleVect& ma, //la diagonale principale
-                       const DoubleVect& mb, //la sous-diagonale
-                       const DoubleVect& mc, //la sur-diagonale
-                       const DoubleVect& sm, //second membre
-                       DoubleVect& vi, //vecteur solution
-                       int M); //taille de la diagonale (taille du systeme)
+  static void resoudre(const DoubleVect& ma, //the main diagonal
+                       const DoubleVect& mb, //the sub-diagonal
+                       const DoubleVect& mc, //the super-diagonal
+                       const DoubleVect& sm, //right-hand side
+                       DoubleVect& vi, //solution vector
+                       int M); //size of the diagonal (system size)
 };
 
 

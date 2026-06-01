@@ -37,7 +37,7 @@ Entree& Champ_Fonc_Tabule_Morceaux::readOn(Entree& is)
   is >> nom;
   interprete_get_domaine(nom);
   mon_domaine->creer_tableau_elements(i_mor);
-  i_mor = -1; // pour planter si on a oublie un sous-domaine
+  i_mor = -1; // to crash if a sub-domain was forgotten
 
   int nbcomp;
   is >> nbcomp;
@@ -53,11 +53,11 @@ Entree& Champ_Fonc_Tabule_Morceaux::readOn(Entree& is)
   for (is >> nom; nom != "}"; is >> nom)
     {
       CHTAB ch_lu;
-      /* 1. lecture du sous-domaine */
+      /* 1. reading the subdomain */
       OBS_PTR(Sous_Domaine) refssz = les_sous_domaines.add(mon_domaine->ss_domaine(nom));
       Sous_Domaine& ssz = refssz.valeur();
 
-      /* 2. lecture des champs parametres */
+      /* 2. reading the parameter fields */
       is >> nom, m_pb_ch.push_back({});
       if (nom != "{")
         {
@@ -72,7 +72,7 @@ Entree& Champ_Fonc_Tabule_Morceaux::readOn(Entree& is)
             Nom nat = "";
             if (is_interp_) is >> nat;
             std::array<std::string, 3> pb_ch = { nom.getString(), nom_ch.getString(), nat.getString() };
-            s_pb_ch.insert(pb_ch), m_pb_ch.back().push_back(pb_ch); //ajout aux listes pour ce morceau et globale
+            s_pb_ch.insert(pb_ch), m_pb_ch.back().push_back(pb_ch); //add to the lists for this piece and globally
           }
 
       const int nb_param = (int)m_pb_ch.back().size();
@@ -81,7 +81,7 @@ Entree& Champ_Fonc_Tabule_Morceaux::readOn(Entree& is)
       if (nom != "{")
         Process::exit(que_suis_je() + " : { expected instead of " + nom);
 
-      /* 1. lecture de la grille de parametres */
+      /* 1. reading the parameter grid */
       DoubleVects params;
       for (int n = 0; n < nb_param; n++)
         {
@@ -91,12 +91,12 @@ Entree& Champ_Fonc_Tabule_Morceaux::readOn(Entree& is)
           params.add(param);
         }
 
-      /* 2. lecture des valeurs des parametres */
-      // taille totale du tableau de valeurs
+      /* 2. reading the parameter values */
+      // total size of the value array
       int size = nbcomp;
       for (int n = 0; n < nb_param; n++) size *= params[n].size();
 
-      // lecture : tout dans un tableau 1D
+      // reading: everything into a 1D array
       DoubleVect tab_valeurs(size);
       for (int i = 0; i < size; i++) is >> tab_valeurs[i];
       ch_lu.la_table.remplir(params, tab_valeurs);
@@ -115,9 +115,9 @@ Entree& Champ_Fonc_Tabule_Morceaux::readOn(Entree& is)
 
 int Champ_Fonc_Tabule_Morceaux::initialiser(const double tps)
 {
-  /* remplissage de ch_param (pointeurs vers les champs) et des i_ch (champs utilises par chaque morceau) */
+  /* fill ch_param (pointers to the fields) and i_ch (fields used by each piece) */
   std::vector<std::array<std::string, 3>> v_pb_ch(s_pb_ch.begin(), s_pb_ch.end()); //set -> vector
-  for (auto &&pb_ch : v_pb_ch) /* (probleme, champ) -> pointeurs */
+  for (auto &&pb_ch : v_pb_ch) /* (problem, field) -> pointers */
     {
       const Nom pb_nom = Nom(pb_ch[0]);
       const Probleme_base& pb = ref_cast(Probleme_base, Interprete::objet(pb_nom));
@@ -138,16 +138,16 @@ void Champ_Fonc_Tabule_Morceaux::mettre_a_jour(double time)
 {
 
   DoubleTab& tab = valeurs(), vide;
-  std::vector<const DoubleTab* > pval; /* valeurs des parametres */
-  std::vector<DoubleTrav> tval; /* tableaux temporaires */
-  std::vector<bool> is_multi; /* true si le champ correspondant est multi_composantes */
+  std::vector<const DoubleTab* > pval; /* parameter values */
+  std::vector<DoubleTrav> tval; /* temporary arrays */
+  std::vector<bool> is_multi; /* true if the corresponding field is multi-component */
   pval.reserve(ch_param.size()), tval.reserve(ch_param.size()), is_multi.reserve(ch_param.size());
   for (auto &&pch : ch_param)
     {
-      ConstDoubleTab_parts part(pch->valeurs()); //pour ignorer les variables aux de PolyMAC_HFV
-      if (tab.get_md_vector() == part[0].get_md_vector()) /* on est bien aux elements -> utilisation directe */
+      ConstDoubleTab_parts part(pch->valeurs()); //to ignore auxiliary variables of PolyMAC_HFV
+      if (tab.get_md_vector() == part[0].get_md_vector()) /* we are indeed at elements -> direct use */
         pval.push_back(&pch->valeurs());
-      else /* sinon -> calcul des valeurs aux elems et stockage dans un tableau de tval */
+      else /* otherwise -> compute values at elements and store in a tval array */
         {
           IntVect polys(tab.dimension_tot(0));
           for (int i = 0; i < tab.dimension_tot(0); i++) polys[i] = i;
@@ -166,7 +166,7 @@ void Champ_Fonc_Tabule_Morceaux::mettre_a_jour(double time)
         tab(e, 0) = mor.la_table.val_simple((*pval[mor.i_ch[0]])(e, 0));
       else for (int n = 0, m; n < N; n++)
           {
-            for (vals.clear(), m = 0; m < M; m++) vals.push_back((*pval[mor.i_ch[m]])(e, n * is_multi[mor.i_ch[m]])); /* si le champ parametre est multi-compo, on prend la meme que celle du champ */
+            for (vals.clear(), m = 0; m < M; m++) vals.push_back((*pval[mor.i_ch[m]])(e, n * is_multi[mor.i_ch[m]])); /* if the parameter field is multi-component, take the same component as the field */
             tab(e, n) = mor.la_table.val(vals, n);
           }
     }

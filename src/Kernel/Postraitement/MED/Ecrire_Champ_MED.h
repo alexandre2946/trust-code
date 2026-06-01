@@ -21,7 +21,7 @@
 
 #include <Interprete.h>
 
-/*! @brief classe Ecrire_Champ_MED
+/*! @brief Ecrire_Champ_MED
  *
  * @sa Interprete
  */

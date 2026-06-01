@@ -48,14 +48,14 @@ static int nested_solver = 0;
 int SolveurSys::resoudre_systeme(const Matrice_Base& matrice, const DoubleVect& secmem, DoubleVect& solution)
 {
   valeur().save_matrice_secmem_conditionnel(matrice, secmem, solution);
-  // Cas de solveurs emboites: n'afficher que le temps du solveur "exterieur"
-  // temporaire : test issu du baltik IJK_FT en commentaire car sinon erreur dans .TU avec PETSC (solveurs Ax=B => 0%)
+  // Case of nested solvers: only display the time of the "outer" solver
+  // temporary: test from baltik IJK_FT commented out because it causes errors in .TU with PETSC (solvers Ax=B => 0%)
   statistics().begin_count(STD_COUNTERS::system_solver,statistics().get_last_opened_counter_level()+1);
   nested_solver++;
   int nb_iter = valeur().resoudre_systeme(matrice, secmem, solution);
   nested_solver--;
-  // temporaire : test issu du baltik IJK_FT en commentaire car sinon erreur avec script Check_solver.sh pour test PETSC_VEF
-  // Si limpr vaut -1, on n'imprime pas
+  // temporary: test from baltik IJK_FT commented out because it causes errors with the Check_solver.sh script for the PETSC_VEF test
+  // If limpr is -1, no output is printed
   //if (le_nom()=="??")
   //  Process::exit("Solver not named. Fix!");
   if (valeur().limpr() >= 0)

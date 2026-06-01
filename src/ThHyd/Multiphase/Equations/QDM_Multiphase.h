@@ -20,20 +20,16 @@
 #include <Navier_Stokes_std.h>
 #include <vector>
 
-/*! @brief classe QDM_Multiphase Cette classe porte les termes de l'equation de la dynamique
+/*! @brief Carries the terms of the momentum equation for multiphase flow without turbulence modelling.
  *
- *     pour un fluide sans modelisation de la turbulence.
- *     On suppose l'hypothese de fluide quasi compressible.
- *     Sous ces hypotheses, on utilise la forme suivante des equations de
- *     Navier_Stokes:
- *        DU/dt = div(terme visqueux) - gradP/rho + sources/rho
+ *     The quasi-compressible fluid assumption is used.
+ *     Under these assumptions, the following form of the Navier-Stokes equations is used:
+ *        DU/dt = div(viscous term) - gradP/rho + sources/rho
  *        div U = W
- *     avec DU/dt : derivee particulaire de la vitesse
- *          rho   : masse volumique
- *     Rq : l'implementation de la classe permet bien sur de negliger
- *          certains termes de l'equation (le terme visqueux, le terme
- *          convectif, tel ou tel terme source).
- *     L'inconnue est le champ de vitesse.
+ *     where DU/dt : material derivative of velocity
+ *           rho   : density
+ *     Note: the implementation allows individual terms (viscous, convective, source) to be neglected.
+ *     The unknown is the velocity field.
  *
  * @sa Equation_base Pb_Thermohydraulique_QC Navier_Stokes_std
  */
@@ -60,7 +56,7 @@ public :
 
   /*
     interface {dimensionner,assembler}_blocs
-    specificites : prend en compte l'evanescence (en dernier)
+    specifics: evanescence is taken into account (last)
   */
   int has_interface_blocs() const override;
   void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
@@ -74,14 +70,14 @@ public :
   double alpha_res() const ;
 
 protected:
-  Entree& lire_cond_init(Entree&) override; //pour lire la pression
-  int preparer_calcul() override; //appelle la methode de Equation_base
+  Entree& lire_cond_init(Entree&) override; // to read the pressure
+  int preparer_calcul() override; // calls Equation_base method
 
-  std::vector<OWN_PTR(Champ_Inc_base)> vit_phases_; //vitesses de chaque phase
-  Motcles noms_vit_phases_; //leurs noms
+  std::vector<OWN_PTR(Champ_Inc_base)> vit_phases_; // velocity fields for each phase
+  Motcles noms_vit_phases_; // their names
 
-  std::vector<OWN_PTR(Champ_Fonc_base)> grad_vit_phases_; //gradient des vitesses de chaque phase
-  Motcles noms_grad_vit_phases_; //leurs noms
+  std::vector<OWN_PTR(Champ_Fonc_base)> grad_vit_phases_; // velocity gradients for each phase
+  Motcles noms_grad_vit_phases_; // their names
 
   Operateur_Evanescence evanescence_;
 };

@@ -65,8 +65,8 @@ void Domaine_Cl_PolyMAC_family::imposer_cond_lim(Champ_Inc_base& ch, double temp
 
               if (modif_perio_fait_ == 0)
                 {
-                  // On fait en sorte que le champ ait la meme valeur
-                  // sur deux faces de periodicite qui sont en face l'une de l'autre
+                  // Ensure that the field has the same value
+                  // on two periodic faces that face each other
                   const Periodique& la_cl_perio = ref_cast(Periodique, la_cl);
                   const Front_VF& le_bord = ref_cast(Front_VF, la_cl.frontiere_dis());
                   ndeb = le_bord.num_premiere_face();
@@ -83,7 +83,7 @@ void Domaine_Cl_PolyMAC_family::imposer_cond_lim(Champ_Inc_base& ch, double temp
                           ch_tab[voisine] = moy;
                         }
                     }
-                  // Il ne faut pas le faire a la premiere cl mais une fois toutes les cl faites une fois, cas multi perio avec ci non perio
+                  // Must not be done on the first boundary condition but once all BCs have been processed once, for multi-periodic cases with non-periodic IC
                   // init = 1;
                 }
             }
@@ -106,7 +106,7 @@ void Domaine_Cl_PolyMAC_family::imposer_cond_lim(Champ_Inc_base& ch, double temp
               for (num_face = ndeb; num_face < nfin; num_face++)
                 for (n = 0; n < N; n++)
                   {
-                    // WEC : optimisable (pour chaque face recherche le bon temps !)
+                    // WEC: optimizable (searches for the right time for each face!)
                     // vn
                     double vn = 0;
                     for (int d = 0; d < dimension; d++)

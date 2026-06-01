@@ -20,7 +20,7 @@
 #include <TRUST_Deriv.h>
 #include <TRUST_List.h>
 
-/*! @brief Classe Raccords Cette represente une liste d'objets de type Raccord.
+/*! @brief Class Raccords This represents a list of Raccord type objects.
  *
  * @sa Raccord
  */
@@ -34,7 +34,7 @@ public :
 
   void associer_domaine(const Domaine_t&);
   int_t nb_faces() const;
-  /// Renvoie le nombre de raccords contenus dans la liste.
+  /// Returns the number of connections contained in the list.
   inline int nb_raccords() const { return this->size(); }
   int_t nb_faces(Type_Face type) const;
 };

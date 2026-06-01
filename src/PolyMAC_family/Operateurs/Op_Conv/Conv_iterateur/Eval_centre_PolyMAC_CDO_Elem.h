@@ -23,12 +23,10 @@
 
 /*! @brief class Eval_centre_PolyMAC_CDO_Elem
  *
- *  Evaluateur PolyMAC_CDO pour la convection
- *  Le champ convecte est scalaire (Champ_Elem_PolyMAC_CDO)
- *  Schema de convection Centre
- *  Rq:Les evaluateurs de flux convectifs calculent en fait le terme
- *  convectif qui figure au second membre de l'equation d'evolution
- *  c.a.d l'oppose du flux convectif
+ * @brief PolyMAC_CDO evaluator for convection with a scalar convected field (Champ_Elem_PolyMAC_CDO),
+ *        using a centered convection scheme.
+ *        Note: convective flux evaluators actually compute the convective term that appears on the
+ *        right-hand side of the evolution equation, i.e., the opposite of the convective flux.
  *
  */
 class Eval_centre_PolyMAC_CDO_Elem: public Eval_Conv_PolyMAC_CDO, public Eval_PolyMAC_CDO_Elem
@@ -49,8 +47,8 @@ public:
   inline int calculer_flux_faces_symetrie() const override { return 0; }
   inline int calculer_flux_faces_periodique() const override { return 1; }
 
-  // Fonctions qui servent a calculer le flux de grandeurs scalaires
-  // Elles sont de type double et renvoient le flux
+  // Functions that compute the flux of scalar quantities
+  // They return a double and return the flux
 
   inline double flux_face(const DoubleTab&, int, const Dirichlet_entree_fluide&, int) const override;
   inline double flux_face(const DoubleTab&, int, const Dirichlet_paroi_defilante&, int) const override { return 0; }
@@ -64,8 +62,8 @@ public:
   inline double flux_face(const DoubleTab&, int, const Periodique&, int) const override;
   inline double flux_faces_interne(const DoubleTab&, int) const override;
 
-  // Fonctions qui servent a calculer le flux de grandeurs vectorielles
-  // Elles sont de type void et remplissent le tableau flux
+  // Functions that compute the flux of vector quantities
+  // They are void and fill the flux array
 
   inline void flux_face(const DoubleTab&, int, const Symetrie&, int, DoubleVect& flux) const override { }
   inline void flux_face(const DoubleTab&, int, const Periodique&, int, DoubleVect& flux) const override;
@@ -80,8 +78,7 @@ public:
 
   inline void flux_faces_interne(const DoubleTab&, int, DoubleVect& flux) const override;
 
-  // Fonctions qui servent a calculer les coefficients de la matrice pour des grandeurs
-  // scalaires.
+  // Functions that compute the matrix coefficients for scalar quantities.
 
   inline void coeffs_face(int, int, const Symetrie&, double& aii, double& ajj) const override { }
   inline void coeffs_face(int, int, const Neumann_sortie_libre&, double& aii, double& ajj) const override;
@@ -95,8 +92,8 @@ public:
   inline void coeffs_face(int, int, const Periodique&, double& aii, double& ajj) const override;
   inline void coeffs_faces_interne(int, double& aii, double& ajj) const override;
 
-  // Fonctions qui servent a calculer la contribution des conditions limites
-  // au second membre pour l'implicite pour les grandeurs scalaires.
+  // Functions that compute the boundary condition contribution
+  // to the right-hand side for implicit scalar quantities.
 
   inline double secmem_face(int, const Symetrie&, int) const override { return 0; }
   inline double secmem_face(int, const Neumann_sortie_libre&, int) const override;
@@ -110,8 +107,7 @@ public:
   inline double secmem_face(int, const Periodique&, int) const override { return 0; }
   inline double secmem_faces_interne(int) const override { return 0; }
 
-  // Fonctions qui servent a calculer les coefficients de la matrice pour des grandeurs
-  // vectorielles.
+  // Functions that compute the matrix coefficients for vector quantities.
 
   inline void coeffs_face(int, int, const Symetrie&, DoubleVect& aii, DoubleVect& ajj) const override { }
   inline void coeffs_face(int, int, const Neumann_sortie_libre&, DoubleVect& aii, DoubleVect& ajj) const override;
@@ -126,8 +122,8 @@ public:
 
   inline void coeffs_faces_interne(int, DoubleVect& aii, DoubleVect& ajj) const override;
 
-  // Fonctions qui servent a calculer la contribution des conditions limites
-  // au second membre pour l'implicite pour les grandeurs vectorielles.
+  // Functions that compute the boundary condition contribution
+  // to the right-hand side for implicit vector quantities.
 
   inline void secmem_face(int, const Symetrie&, int, DoubleVect&) const override { }
   inline void secmem_face(int, const Neumann_sortie_libre&, int, DoubleVect&) const override;
@@ -277,14 +273,14 @@ inline double Eval_centre_PolyMAC_CDO_Elem::flux_face(const DoubleTab& inco, int
   int n0_0 = amont_amont(face, 0);
   int n1_1 = amont_amont(face, 1);
 
-  // on applique le schema centre2
+  // apply the centered2 scheme
   flux = qcentre(psc, n0, n1, n0_0, n1_1, face, inco);
   return -flux;
 }
 
 inline void Eval_centre_PolyMAC_CDO_Elem::coeffs_face(int face, int, const Periodique& la_cl, double& aii, double& ajj) const
 {
-  // 30/05/2002 : Codage Periodicite.
+  // 30/05/2002 : Periodicity coding.
   // // ALEX C.
   int i = elem_(face, 0);
   int j = elem_(face, 1);
@@ -292,7 +288,7 @@ inline void Eval_centre_PolyMAC_CDO_Elem::coeffs_face(int face, int, const Perio
   int j1_1 = amont_amont(face, 1);
   double psc = dt_vitesse[face] * surface[face] * porosite[face];
 
-  // on applique le schema centre
+  // apply the centered scheme
   if (psc > 0)
     aii = -qcentre(psc, i, j, i0_0, j1_1, face, inconnue->valeurs());
   else
@@ -320,13 +316,13 @@ inline void Eval_centre_PolyMAC_CDO_Elem::coeffs_faces_interne(int face, double&
   int j1_1 = amont_amont(face, 1);
   double psc = dt_vitesse[face] * surface[face] * porosite[face];
 
-  if ((i0_0 == -1) || (j1_1 == -1)) // on applique le schema amont
+  if ((i0_0 == -1) || (j1_1 == -1)) // apply the upwind scheme
     if (psc > 0)
       aii = -psc;
     else
       ajj = -psc;
 
-  else  // on applique le schema centre
+  else  // apply the centered scheme
     if (psc > 0)
       aii = -qcentre(psc, i, j, i0_0, j1_1, face, inconnue->valeurs());
     else
@@ -471,7 +467,7 @@ inline void Eval_centre_PolyMAC_CDO_Elem::flux_face(const DoubleTab& inco, int f
   int n0_0 = amont_amont(face, 0);
   int n1_1 = amont_amont(face, 1);
 
-  // on applique le schema centre
+  // apply the centered scheme
   qcentre(psc, n0, n1, n0_0, n1_1, face, inco, flux);
   for (k = 0; k < flux.size(); k++)
     flux(k) *= -1;
@@ -487,7 +483,7 @@ inline void Eval_centre_PolyMAC_CDO_Elem::coeffs_face(int face, int, const Perio
   double psc = dt_vitesse[face] * surface[face] * porosite[face];
   ArrOfDouble flux(aii.size());
 
-  // on applique le schema centre2
+  // apply the centered2 scheme
   qcentre(psc, i, j, i0_0, j1_1, face, inconnue->valeurs(), flux);
   if (psc > 0)
     for (k = 0; k < aii.size(); k++)
@@ -532,7 +528,7 @@ inline void Eval_centre_PolyMAC_CDO_Elem::coeffs_faces_interne(int face, DoubleV
 
 inline int Eval_centre_PolyMAC_CDO_Elem::amont_amont(int face, int i) const
 {
-  return 0;   //le_domaine->amont_amont(face, i);
+  return 0;   //le_domaine->upstream_upstream(face, i);
 }
 
 inline double Eval_centre_PolyMAC_CDO_Elem::qcentre(const double psc, const int num0, const int num1, const int num0_0, const int num1_1, const int face, const DoubleTab& transporte) const

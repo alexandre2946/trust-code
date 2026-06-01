@@ -48,7 +48,7 @@ void Frottement_interfacial_VDF::ajouter_blocs(matrices_t matrices, DoubleTab& s
   DoubleTab const *d_bulles = (equation().probleme().has_champ("diametre_bulles")) ? &equation().probleme().get_champ("diametre_bulles").valeurs() : nullptr;
 
   int e, f, c, i, j, k, l, n, N = inco.line_size(), Np = press.line_size(), cR = (rho.dimension_tot(0) == 1), cM = (mu.dimension_tot(0) == 1);
-  DoubleTrav a_l(N), p_l(N), T_l(N), rho_l(N), mu_l(N), sigma_l(N*(N-1)/2), dv(N, N), ddv(N, N, 4), d_bulles_l(N), coeff(N, N, 2); //arguments pour coeff
+  DoubleTrav a_l(N), p_l(N), T_l(N), rho_l(N), mu_l(N), sigma_l(N*(N-1)/2), dv(N, N), ddv(N, N, 4), d_bulles_l(N), coeff(N, N, 2); //arguments for coeff
   double ddv_c[4] = {0., 0., 0., 0. };
   double dh;
   const Frottement_interfacial_base& correlation_fi = ref_cast(Frottement_interfacial_base, correlation_.valeur());
@@ -57,19 +57,19 @@ void Frottement_interfacial_VDF::ajouter_blocs(matrices_t matrices, DoubleTab& s
   domaine.domaine().creer_tableau_elements(pvit_elem);
   ch.get_elem_vector_field(pvit_elem, true);
 
-  // Et pour les methodes span de la classe Saturation
-  const int ne_tot = domaine.nb_elem_tot(), nb_max_sat =  N * (N-1) /2; // oui !! suite arithmetique !!
+  // For the span methods of the Saturation class
+  const int ne_tot = domaine.nb_elem_tot(), nb_max_sat =  N * (N-1) /2; // yes!! arithmetic sequence!!
   DoubleTrav Sigma_tab(ne_tot,nb_max_sat);
 
-  // remplir les tabs ...
+  // fill the arrays ...
   for (k = 0; k < N; k++)
     for (l = k + 1; l < N; l++)
       {
         if (milc.has_saturation(k, l))
           {
             Saturation_base& z_sat = milc.get_saturation(k, l);
-            const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Et oui ! matrice triang sup !
-            // recuperer sigma ...
+            const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Yes! upper triangular matrix!
+            // retrieve sigma ...
             const DoubleTab& sig = z_sat.get_sigma_tab();
             // fill in the good case
             for (int ii = 0; ii < ne_tot; ii++) Sigma_tab(ii, ind_trav) = sig(ii);
@@ -77,7 +77,7 @@ void Frottement_interfacial_VDF::ajouter_blocs(matrices_t matrices, DoubleTab& s
         else if (milc.has_interface(k, l))
           {
             Interface_base& sat = milc.get_interface(k,l);
-            const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Et oui ! matrice triang sup !
+            const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Yes! upper triangular matrix!
             for (i = 0 ; i<ne_tot ; i++)
               Sigma_tab(i,ind_trav) = res_en_T ? sat.sigma(temp(i,k),press(i,k * (Np > 1))) : sat.sigma_h(temp(i,k),press(i,k * (Np > 1)));
           }
@@ -121,13 +121,13 @@ void Frottement_interfacial_VDF::ajouter_blocs(matrices_t matrices, DoubleTab& s
             for (j = 0; j < 2; j++)
               coeff(k, l, j) *= 1 + (a_l(k) > 1e-8 ? std::pow(a_l(k) / a_res_, -exp_res) : 0) + (a_l(l) > 1e-8 ? std::pow(a_l(l) / a_res_, -exp_res) : 0);
 
-        /* contributions : on prend le max entre les deux cotes */
+        /* contributions: take the max between the two sides */
         for (k = 0; k < N; k++)
           for (l = 0; l < N; l++)
             if (k != l)
               {
                 double fac = pf(f) * vf(f);
-                /* on essaie d'impliciter coeff sans ralentir la convergence en en faisant un developpement limite autour de pvit (dans la direction d'interet seulement) */
+                /* attempt to implicitize coeff without slowing convergence by performing a limited expansion around pvit (in the direction of interest only) */
                 secmem(f, k) -= fac * (coeff(k, l, 0) * (inco(f, k) - inco(f, l)) + coeff(k, l, 1) * ddv(k, l, 3) * (pvit(f, k) - pvit(f, l)) * ((inco(f, k) - inco(f, l)) - (pvit(f, k) - pvit(f, l))));
                 if (mat)
                   for (j = 0; j < 2; j++)

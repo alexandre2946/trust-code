@@ -34,7 +34,7 @@ Entree& Perte_Charge_Singuliere_PolyMAC_HFV_Face::readOn(Entree& s) { return Per
 void Perte_Charge_Singuliere_PolyMAC_HFV_Face::completer()
 {
   Perte_Charge_PolyMAC_CDO_Face::completer();
-  // eq_masse besoin de champ_conserve !
+  // eq_masse needs champ_conserve!
   if (sub_type(Pb_Multiphase, mon_equation->probleme())) ref_cast(Pb_Multiphase, mon_equation->probleme()).equation_masse().init_champ_conserve();
 }
 
@@ -46,13 +46,13 @@ void Perte_Charge_Singuliere_PolyMAC_HFV_Face::dimensionner_blocs(matrices_t mat
   if (!matrices.count(nom_inco) || !sub_type(Domaine_PolyMAC_MPFA, domaine)) return;
   Matrice_Morse& mat = *matrices.at(nom_inco), mat2;
   int i, j, e, f, n, N = equation().inconnue().valeurs().line_size(), d, D = dimension, nf_tot = domaine.nb_faces_tot();
-  //DoubleTrav aar_f(N); //alpha * alpha * rho a chaque face
+  //DoubleTrav aar_f(N); //alpha * alpha * rho at each face
   Stencil stencil(0, 2);
 
 
   for (i = 0; i < num_faces.size(); i++)
     if ((f = num_faces(i)) < domaine.nb_faces() && fcl(f, 0) < 2)
-      for (j = 0; j < 2 && (e = f_e(f, j)) >= 0; j++) //elem amont / aval si PolyMAC_HFV V2
+      for (j = 0; j < 2 && (e = f_e(f, j)) >= 0; j++) //upwind / downwind element if PolyMAC_HFV V2
         if (e < domaine.nb_elem())
           for (d = 0; d < D; d++)
             for (n = 0; n < N; n++) stencil.append_line(N * (nf_tot + D * e + d) + n, N * f + n);
@@ -74,7 +74,7 @@ void Perte_Charge_Singuliere_PolyMAC_HFV_Face::ajouter_blocs(matrices_t matrices
   Matrice_Morse *mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr;
   int i, j, e, f, n, N = equation().inconnue().valeurs().line_size();
   int poly_v2 = sub_type(Domaine_PolyMAC_MPFA, domaine), semi = (int)semi_impl.count(nom_inco), d, D = dimension, nf_tot = domaine.nb_faces_tot();
-  DoubleTrav aar_f(N); //alpha * alpha * rho a chaque face
+  DoubleTrav aar_f(N); //alpha * alpha * rho at each face
   for (i = 0; i < num_faces.size(); i++)
     if ((f = num_faces(i)) < domaine.nb_faces())
       {
@@ -84,7 +84,7 @@ void Perte_Charge_Singuliere_PolyMAC_HFV_Face::ajouter_blocs(matrices_t matrices
             for (n = 0; n < N; n++) aar_f(n) += vfd(f, j) / vf(f) * (*a_r)(e, n) * (*alpha)(e, n);
         else aar_f = 1;
 
-        if (!poly_v2 || fcl(f, 0) < 2) //contrib a la face : sauf si face de Dirichlet/Neumann en V2
+        if (!poly_v2 || fcl(f, 0) < 2) //contribution to the face: except for Dirichlet/Neumann faces in V2
           {
             for (n = 0; n < N; n++)  secmem(f, n) -= 0.5 * fac * aar_f(n) * vit(f, n) * std::fabs(vit(f, n));
             if (mat)
@@ -92,14 +92,14 @@ void Perte_Charge_Singuliere_PolyMAC_HFV_Face::ajouter_blocs(matrices_t matrices
           }
         if (poly_v2)
           for (j = 0; j < 2 && (e = f_e(f, j)) >= 0; j++)
-            if (e < domaine.nb_elem()) //elem amont / aval si PolyMAC_HFV V2
+            if (e < domaine.nb_elem()) //upwind / downwind element if PolyMAC_HFV V2
               {
                 for (d = 0; d < D; d++)
-                  for (n = 0; n < N; n++) /* second membre */
+                  for (n = 0; n < N; n++) /* right-hand side */
                     secmem(nf_tot + D * e + d, n) += (j ? -1 : 1) * fs(f) * (xv(f, d) - xp(e, d)) * 0.5 * fac * aar_f(n) * vit(f, n) * std::fabs(vit(f, n));
                 if (mat && !semi && fcl(f, 0) < 2)
                   for (d = 0; d < D; d++)
-                    for (n = 0; n < N; n++) /* derivee (pas possible en semi-implicite) */
+                    for (n = 0; n < N; n++) /* derivative (not possible in semi-implicit) */
                       (*mat)(N * (nf_tot + D * e + d) + n, N * f + n) -= (j ? -1 : 1) * fs(f) * (xv(f, d) - xp(e, d)) * fac * aar_f(n) * std::fabs(vit(f, n));
               }
       }

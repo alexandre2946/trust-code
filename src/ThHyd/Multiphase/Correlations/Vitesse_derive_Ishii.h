@@ -18,10 +18,10 @@
 
 #include <Vitesse_derive_base.h>
 
-/*! @brief classe Vitesse_derive_Ishii
+/*! @brief Ishii drift velocity correlation between a gas phase and a liquid phase.
  *
- *  vitesse de derive entre une phase gaz et une phase liquide
- *      -> correlation de Ishii de la forme : v_g = C0 * (alpha_g * v_g + alpha_l * v_l) + v_g0
+ *  Drift velocity between a gas phase and a liquid phase.
+ *      -> Ishii correlation of the form: v_g = C0 * (alpha_g * v_g + alpha_l * v_l) + v_g0
  *
  */
 

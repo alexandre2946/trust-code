@@ -35,14 +35,14 @@ Entree& Pred_Cor::readOn(Entree& s)
 
 ////////////////////////////////
 //                            //
-// Caracteristiques du schema //
+// Schema characteristics     //
 //                            //
 ////////////////////////////////
 
 
-/*! @brief Renvoie le nombre de valeurs temporelles a conserver.
+/*! @brief Returns the number of temporal values to keep.
  *
- * Ici : n et n+1, donc 2.
+ * Here: n and n+1, so 2.
  *
  */
 int Pred_Cor::nb_valeurs_temporelles() const
@@ -50,9 +50,9 @@ int Pred_Cor::nb_valeurs_temporelles() const
   return 2 ;
 }
 
-/*! @brief Renvoie le nombre de valeurs temporelles futures.
+/*! @brief Returns the number of future temporal values.
  *
- * Ici : n+1, donc 1.
+ * Here: n+1, so 1.
  *
  */
 int Pred_Cor::nb_valeurs_futures() const
@@ -60,9 +60,9 @@ int Pred_Cor::nb_valeurs_futures() const
   return 1 ;
 }
 
-/*! @brief Renvoie le le temps a la i-eme valeur future.
+/*! @brief Returns the time at the i-th future value.
  *
- * Ici : t(n+1)
+ * Here: t(n+1)
  *
  */
 double Pred_Cor::temps_futur(int i) const
@@ -71,9 +71,9 @@ double Pred_Cor::temps_futur(int i) const
   return temps_courant()+pas_de_temps();
 }
 
-/*! @brief Renvoie le le temps le temps que doivent rendre les champs a l'appel de valeurs()
+/*! @brief Returns the time that fields must return when valeurs() is called.
  *
- *     Ici : t(n+1)
+ *     Here: t(n+1)
  *
  */
 double Pred_Cor::temps_defaut() const
@@ -83,7 +83,7 @@ double Pred_Cor::temps_defaut() const
 
 /////////////////////////////////////////
 //                                     //
-// Fin des caracteristiques du schema  //
+// End of schema characteristics       //
 //                                     //
 /////////////////////////////////////////
 
@@ -95,11 +95,11 @@ int Pred_Cor::faire_un_pas_de_temps_eqn_base(Equation_base& eqn)
 
   DoubleTab dudt(xi);
 
-  // Etape PREDICTOR
+  // PREDICTOR step
 
   eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
 
-  // On tourne la roue pour que les operateurs utilisent les champs au temps futur
+  // Advance the wheel so that operators use the fields at the future time
   eqn.inconnue().avancer();
   eqn.derivee_en_temps_inco(dudt);
 
@@ -110,7 +110,7 @@ int Pred_Cor::faire_un_pas_de_temps_eqn_base(Equation_base& eqn)
 
   xipls1.echange_espace_virtuel();
 
-  // Etape CORRECTOR
+  // CORRECTOR step
   DoubleTab dudtpls1(xipls1);
   eqn.derivee_en_temps_inco(dudtpls1);
   eqn.inconnue().reculer();

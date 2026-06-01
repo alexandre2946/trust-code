@@ -20,7 +20,7 @@
 #include <Champ_front_fonc.h>
 
 
-/*! @brief class Champ_front_fonc_pois_ipsn Classe derivee de Champ_front_fonc
+/*! @brief class Champ_front_fonc_pois_ipsn Derived class of Champ_front_fonc
  *
  */
 

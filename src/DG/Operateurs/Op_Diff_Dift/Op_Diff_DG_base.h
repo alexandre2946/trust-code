@@ -62,7 +62,7 @@ public:
     nu_a_jour_ = 0;
   }
 
-  void update_nu() const; //met a jour nu
+  void update_nu() const; //updates nu
   inline double nu(int i, int compo) const { return nu_(is_var_ * i, compo); }
 
   DoubleTab& calculer(const DoubleTab&, DoubleTab&) const override;
@@ -71,10 +71,10 @@ public:
 protected:
   OBS_PTR(Domaine_DG) le_dom_dg_;
   OBS_PTR(Domaine_Cl_DG) la_zcl_dg_;
-  mutable SFichier Flux, Flux_moment, Flux_sum; // Fichiers .out
+  mutable SFichier Flux, Flux_moment, Flux_sum; // Output files .out
 
   OBS_PTR(Champ_base) diffusivite_;
-  mutable int nu_a_jour_ = 0; //si on doit mettre a jour nu
+  mutable int nu_a_jour_ = 0; //whether nu needs to be updated
   mutable DoubleTab nu_;
 
   bool is_var_; //if the diffusivity is Uniforme or heterogeneous

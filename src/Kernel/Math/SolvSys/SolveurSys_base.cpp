@@ -52,8 +52,8 @@ void SolveurSys_base::save_matrice_secmem_conditionnel(const Matrice_Base& la_ma
   int binaire=binaire2;
   if (save_matrice_==1)
     {
-      // on simule l'ecriture d'une Matrice et non d'une Matrice_Base
-      // pour aider a la relecture
+      // simulate writing a Matrice rather than a Matrice_Base
+      // to facilitate re-reading
       {
         EcrFicCollecte sortie;
         sortie.set_bin(binaire);
@@ -61,14 +61,14 @@ void SolveurSys_base::save_matrice_secmem_conditionnel(const Matrice_Base& la_ma
         sortie<<la_matrice.que_suis_je()<<finl;
         sortie<<la_matrice;
       }
-      // on sauvegarde le Secmem avec les espaces virtuels !!!!!
+      // save the RHS vector (Secmem) with virtual spaces !!!!!
       {
         EcrFicCollecte sortie;
         sortie.set_bin(binaire);
         sortie.ouvrir("Secmem.sa");
         MD_Vector_tools::dump_vector_with_md(secmem, sortie);
       }
-      // on sauvegarde la solution avec les espaces virtuels !!!!!
+      // save the solution with virtual spaces !!!!!
       {
         EcrFicCollecte sortie;
         sortie.set_bin(binaire);
@@ -80,12 +80,12 @@ void SolveurSys_base::save_matrice_secmem_conditionnel(const Matrice_Base& la_ma
 }
 
 
-// Lecture des parametres du solveurs
+// Read solver parameters
 // Ex: solveur type { ... }
 // chaine_lue_ = "type { ... }"
 void SolveurSys_base::lecture(Entree& is)
 {
-  // Lecture de la chaine de mot cles
+  // Read the keyword string
   Motcle accolade_ouverte("{");
   Motcle accolade_fermee("}");
   Motcle motlu;

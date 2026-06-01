@@ -20,11 +20,11 @@ Implemente_instanciable(Sondes_Int, "Sondes_Int", LIST(Sonde_Int));
 
 Sortie& Sondes_Int::printOn(Sortie& s ) const { return s ; }
 
-/*! @brief Lit une liste de sondes a partir d'un flot d'entree Format: { [LIRE UNE SONDE AUTANT DE FOIS QUE NECESSAIRE] }
+/*! @brief Reads a list of probes from an input stream. Format: { [READ A PROBE AS MANY TIMES AS NEEDED] }
  *
- * @param (Entree& s) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws accolade ouvrante attendue
+ * @param s an input stream
+ * @return the modified input stream
+ * @throws opening brace expected
  */
 Entree& Sondes_Int::readOn(Entree& s )
 {
@@ -62,25 +62,26 @@ Entree& Sondes_Int::readOn(Entree& s )
   return s;
 }
 
-/*! @brief Effectue le postraitement sur chacune des sondes de la liste.
+/*! @brief Performs post-processing on each probe in the list.
  *
+ * @param temps the current time
  */
 void Sondes_Int::postraiter(double temps)
 {
   for (auto& itr : *this) itr.postraiter(temps);
 }
 
-/*! @brief Effectue une mise a jour en temps de chacune des sondes de la liste.
+/*! @brief Updates each probe in the list in time.
  *
- * @param (double temps) le temps de mise a jour
- * @param (double tinit) le temps initial des sondes
+ * @param temps the update time
+ * @param tinit the initial time of the probes
  */
 void Sondes_Int::mettre_a_jour(double temps, double tinit)
 {
   for (auto& itr : *this) itr.mettre_a_jour(temps,tinit);
 }
 
-/*! @brief Associe un postraitement a la liste des sondes.
+/*! @brief Associates a post-processing object with the probe list.
  *
  */
 void Sondes_Int::associer_post(const Postraitement& post)

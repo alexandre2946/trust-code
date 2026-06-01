@@ -265,7 +265,7 @@ DoubleVect& Champ_implementation_P0::valeur_aux_sommets_compo_impl(DoubleVect& r
   int nb_nodes_per_cell = domaine.nb_som_elem();
 
   ArrOfInt count(nb_nodes);
-  // dvq ajout result=0;
+  // dvq added result=0;
   result = 0;
   assert(ncomp >= 0);
   assert(ncomp < ch_base.nb_comp());
@@ -294,7 +294,7 @@ int Champ_implementation_P0::imprime_P0(Sortie& os, int ncomp) const
   int nb_elem_tot = le_dom.nb_elem_tot();
   const DoubleTab& val = cha.valeurs();
   int elem;
-  // On recalcule les centres de gravite :
+  // Recompute the centers of gravity:
   DoubleTab pos_centre;
   le_dom.calculer_centres_gravite(pos_centre);
   os << nb_elem_tot << finl;
@@ -314,15 +314,15 @@ int Champ_implementation_P0::imprime_P0(Sortie& os, int ncomp) const
 int Champ_implementation_P0::affecter_(const Champ_base& ch)
 {
   // if (le_champ().a_un_domaine_dis_base() && ch.a_un_domaine_dis_base() && le_champ().domaine_dis_base()==ch.domaine_dis_base())
-  // Plus general en comparant le domaine:
-  // Ajout de Champ_Uniforme_Morceaux/Champ_Fonc_Morceaux/Champ_Don_Fonc_txyz qui sont aux elements
+  // More general by comparing the domain:
+  // Added Champ_Uniforme_Morceaux/Champ_Fonc_Morceaux/Champ_Don_Fonc_txyz which are element-located fields
   if (sub_type(Champ_Uniforme_Morceaux, ch) ||
       sub_type(Champ_Fonc_Morceaux, ch) ||
       sub_type(Champ_Don_Fonc_txyz, ch) ||
       (le_champ().a_un_domaine_dis_base() && ch.a_un_domaine_dis_base() && le_champ().domaine_dis_base().domaine() == ch.domaine_dis_base().domaine()))
     {
-      // Meme support donc on utilise une methode plus rapide pour affecter_
-      // que la methode generale dans Champ_Fonc_base::affecter_ ou Champ_Inc_base::affecter_
+      // Same support, so we use a faster method for affecter_
+      // than the general method in Champ_Fonc_base::affecter_ or Champ_Inc_base::affecter_
       ch.valeur_aux_centres_de_gravite(le_champ().domaine_dis_base().domaine(), le_champ().valeurs());
       return 1;
     }

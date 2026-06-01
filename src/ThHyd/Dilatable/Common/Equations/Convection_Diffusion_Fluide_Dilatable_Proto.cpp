@@ -44,7 +44,7 @@ void Convection_Diffusion_Fluide_Dilatable_Proto::calculer_div_rho_u_impl
       return;
     }
 
-  // on cherche a changer temporairement le domaine_cl
+  // temporarily swap the domain boundary conditions
   if (!ch_unite_)
     {
       ch_unite_ = eqn.inconnue();
@@ -62,13 +62,12 @@ void Convection_Diffusion_Fluide_Dilatable_Proto::calculer_div_rho_u_impl
     ref_cast_non_const(Operateur_base,op_conv.l_op_base()).associer_domaine_cl_dis(eqn.domaine_Cl_dis());
 }
 
-/*! @brief Renvoie la derivee en temps de l'inconnue de l'equation.
+/*! @brief Returns the time derivative of the equation's unknown.
  *
- * Le calcul est le suivant:
- *          d(inconnue)/dt = M^{-1} * (sources - somme(Op_{i}(inconnue))) / rho
+ * The computation is: d(unknown)/dt = M^{-1} * (sources - sum(Op_i(unknown))) / rho
  *
- * @param (DoubleTab& derivee) le tableau des valeurs de la derivee en temps du champ inconnu
- * @return (DoubleTab&) le tableau des valeurs de la derivee en temps du champ inconnu
+ * @param derivee Array of time-derivative values of the unknown field.
+ * @return Array of time-derivative values of the unknown field.
  */
 DoubleTab& Convection_Diffusion_Fluide_Dilatable_Proto::derivee_en_temps_inco_sans_solveur_masse_impl
 (Convection_Diffusion_Fluide_Dilatable_base& eqn, DoubleTab& derivee, const bool is_expl)
@@ -126,7 +125,7 @@ DoubleTab& Convection_Diffusion_Fluide_Dilatable_Proto::derivee_en_temps_inco_sa
   // Add source term (if any, but for temperatur eit is sure !!! )
   eqn.sources().ajouter(derivee);
 
-  // On divise derivee par rho si espece ou gaz reel... sinon par rho*Cp !
+  // Divide derivee by rho if species or real gas... otherwise divide by rho*Cp!
   bool flag = is_thermal() && fluide_dil.type_fluide()=="Gaz_Parfait";
   if (flag) fluide_dil.update_rho_cp(sch.temps_courant());
   const DoubleTab& array = flag ? eqn.get_champ("rho_cp_comme_T").valeurs() : fluide_dil.masse_volumique().valeurs();
@@ -176,19 +175,19 @@ DoubleTab& Convection_Diffusion_Fluide_Dilatable_Proto::derivee_en_temps_inco_sa
    */
   derivee+=convection;
 
-  // si schema implicite
+  // if implicit scheme
   if (!is_expl && has_mass_flux)
-    derivee += mass_source_term; // pour ca on traite le volume par le solveur de masse plus tard ...
+    derivee += mass_source_term; // for this, the volume is handled by the mass solver later...
 
   if (diffusion_implicite)
     {
       const DoubleTab& Tfutur=eqn.inconnue().futur();
       DoubleTrav secmem(derivee);
-      secmem=derivee; // sans contribution terme source
+      secmem=derivee; // without source term contribution
       eqn.solv_masse().appliquer(secmem);
 
       if (has_mass_flux)
-        secmem += mass_source_term ; // ajoute contribution terme source (deja divise par V)
+        secmem += mass_source_term ; // add source term contribution (already divided by V)
 
       derivee = Tfutur;
 
@@ -199,13 +198,13 @@ DoubleTab& Convection_Diffusion_Fluide_Dilatable_Proto::derivee_en_temps_inco_sa
       eqn.solv_masse().set_name_of_coefficient_temporel("no_coeff");
     }
 
-  // 100% explicite
+  // 100% explicit
   if (!sch.diffusion_implicite() && is_expl)
     {
       eqn.solv_masse().appliquer(derivee);
 
       if (has_mass_flux)
-        derivee += mass_source_term; // ajoute contribution terme source (deja divise par V)
+        derivee += mass_source_term; // add source term contribution (already divided by V)
 
       derivee.echange_espace_virtuel();
     }
@@ -226,7 +225,7 @@ void Convection_Diffusion_Fluide_Dilatable_Proto::assembler_impl
    */
 
   // Elie Saikali
-  // Je garde ce test pour debug ... TODO : a voir si on peut virer tout ca...
+  // Keep this test for debug ... TODO: check if all this can be removed...
   int test_op=0;
   {
     char* theValue = getenv("TRUST_TEST_OPERATEUR_IMPLICITE");
@@ -241,7 +240,7 @@ void Convection_Diffusion_Fluide_Dilatable_Proto::assembler_impl
   const DoubleTab& tab_rho = fluide_dil.masse_volumique().valeurs();
   const int n = tab_rho.dimension(0);
 
-  // ajout diffusion (avec rho, D et Y / ou lambda et T)
+  // add diffusion (with rho, D and Y / or lambda and T)
   eqn.operateur(0).l_op_base().contribuer_a_avec(inco, matrice_morse);
 
   // Add source term (if any)
@@ -250,13 +249,12 @@ void Convection_Diffusion_Fluide_Dilatable_Proto::assembler_impl
   // Really we need to copy ?
   tab_coeff_diffusif_ = matrice_morse.get_set_coeff();
 
-  // on calcule les coefficients de l'op de convection on obtient les coeff de div (rho*u*Y)
-  // ou div(rho*u*T). dans le cas thermique, il faudrait multiplier par cp puis divisier par rho cp
-  // on le fera d'un coup...
+  // compute convection operator coefficients to get coefficients of div(rho*u*Y)
+  // or div(rho*u*T). In the thermal case, multiply by cp then divide by rho*cp all at once.
   matrice_morse.get_set_coeff()=0.;
   eqn.operateur(1).l_op_base().contribuer_a_avec(inco, matrice_morse);
 
-  // on calcule div(rho * u)
+  // compute div(rho * u)
   DoubleTrav tab_derivee2(resu);
   calculer_div_u_ou_div_rhou(tab_derivee2);
 
@@ -293,11 +291,11 @@ void Convection_Diffusion_Fluide_Dilatable_Proto::assembler_impl
         if (is_not_generic) inv_rho = 1.;
         double rapport = 1. / rhoCp(som);
 
-        // il faut multiplier toute la ligne de la matrice par rapport
+        // multiply the whole matrix row by the ratio
         for (auto k=tab1(som)-1; k<tab1(som+1)-1; k++)
           coeff(k)= (coeff(k)*inv_rho+coeff_diffusif(k)*rapport);
 
-        // ajout de Tdiv(rhou )/rho
+        // add T*div(rho*u)/rho
         matrice.add(som,som,derivee2(som)*inv_rho);
       });
       end_gpu_timer(__KERNEL_NAME__);
@@ -308,7 +306,7 @@ void Convection_Diffusion_Fluide_Dilatable_Proto::assembler_impl
       Process::exit();
     }
 
-  // on a la matrice approchee on recalcule le residu;
+  // we have the approximate matrix, now recompute the residual;
   resu=0;
   derivee_en_temps_inco_sans_solveur_masse_impl(eqn,resu,false /* implicit */);
   matrice_morse.ajouter_multvect(inco,resu);
@@ -379,7 +377,7 @@ void Convection_Diffusion_Fluide_Dilatable_Proto::assembler_blocs(Convection_Dif
   coeff = 0;
   eqn.operateur(1).l_op_base().ajouter_blocs(matrices, secmem_tmp, semi_impl);
 
-  // on calcule div(rho * u)
+  // compute div(rho * u)
   calculer_div_u_ou_div_rhou(secmem);
 
   if (!is_thermal()) //espece
@@ -403,10 +401,10 @@ void Convection_Diffusion_Fluide_Dilatable_Proto::assembler_blocs(Convection_Dif
           if (!is_generic()) inv_rho = 1.;
           double rapport = 1. / rhoCp(som);
 
-          // il faut multiplier toute la ligne de la matrice par rapport
+          // multiply the whole matrix row by the ratio
           for (auto k=tab1(som)-1; k<tab1(som+1)-1; k++) coeff(k)= (coeff(k)*inv_rho+coeff_diffusif(k)*rapport);
 
-          // ajout de Tdiv(rhou )/rho
+          // add T*div(rho*u)/rho
           if(mat) (*mat)(som,som) += secmem(som)*inv_rho;
         }
     }
@@ -416,7 +414,7 @@ void Convection_Diffusion_Fluide_Dilatable_Proto::assembler_blocs(Convection_Dif
       Process::exit();
     }
 
-  // on a la matrice approchee on recalcule le residu;
+  // we have the approximate matrix, now recompute the residual;
   secmem=0;
   derivee_en_temps_inco_sans_solveur_masse_impl(eqn,secmem,false /* implicit */);
   if(mat) mat->ajouter_multvect(eqn.inconnue().valeurs(),secmem);
@@ -444,7 +442,7 @@ int Convection_Diffusion_Fluide_Dilatable_Proto::Sauvegarder_WC(Sortie& os,
                                                                 const Fluide_Dilatable_base& fld)
 {
   int bytes=0,a_faire,special;
-  bytes += eq.sauvegarder_base(os); // XXX : voir Convection_Diffusion_std
+  bytes += eq.sauvegarder_base(os); // XXX: see Convection_Diffusion_std
   EcritureLectureSpecial::is_ecriture_special(special,a_faire);
 
   Fluide_Weakly_Compressible& FWC = ref_cast_non_const(Fluide_Weakly_Compressible,fld);
@@ -490,7 +488,7 @@ int Convection_Diffusion_Fluide_Dilatable_Proto::Reprendre_WC(Entree& is,
                                                               Probleme_base& pb)
 {
   // start resuming
-  eq.reprendre_base(is); // XXX : voir Convection_Diffusion_std
+  eq.reprendre_base(is); // XXX: see Convection_Diffusion_std
 
   // XXX : should be set so that Pression_EOS is read and not initialized from data file
   Fluide_Weakly_Compressible& FWC = ref_cast(Fluide_Weakly_Compressible,fld);

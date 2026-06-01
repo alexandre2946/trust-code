@@ -86,14 +86,14 @@ void Source_Masse_Fluide_Dilatable_VDF::ajouter_eq_espece(const Convection_Diffu
   const Domaine_VF& zvf = ref_cast(Domaine_VF, zclb.domaine_dis());
   const IntTab& face_voisins = zvf.face_voisins();
 
-  // pour post
+  // for post-processing
   Champ_Don_base * post_src_ch = fluide.has_source_masse_espece_champ() ? &ref_cast_non_const(Fluide_Dilatable_base, fluide).source_masse_espece() : nullptr;
 
-  // On commence par remplir val_flux seulement pour les bonnes faces ...
+  // First fill val_flux only for the correct faces ...
   DoubleTrav val_flux(zvf.nb_faces(), 1);
   fill_val_flux_tab(val_flux);
 
-  // Maintennat on regarde resu ...
+  // Now look at resu ...
   for (int n_bord = 0; n_bord < domaine_cl_dis_->nb_cond_lim(); n_bord++)
     {
       const Cond_lim& la_cl = domaine_cl_dis_->les_conditions_limites(n_bord);
@@ -109,7 +109,7 @@ void Source_Masse_Fluide_Dilatable_VDF::ajouter_eq_espece(const Convection_Diffu
               const double surface_elem = zvf.face_surfaces(num_face);
               double srcmass = -(Y(elem) * val_flux(num_face, 0) * surface_elem) / rho(elem);
               if (is_expl)
-                srcmass /= zvf.volumes(elem); // on divise par volume (pas de solveur masse dans l'equation ...)
+                srcmass /= zvf.volumes(elem); // divide by volume (no mass solver in the equation ...)
               resu(elem) += srcmass;
 
               if (post_src_ch)
@@ -118,7 +118,7 @@ void Source_Masse_Fluide_Dilatable_VDF::ajouter_eq_espece(const Convection_Diffu
         }
     }
 
-  // pour post
+  // for post-processing
   if (post_src_ch)
     (*post_src_ch).mettre_a_jour(fluide.inco_chaleur().temps());
 }
@@ -130,14 +130,14 @@ void Source_Masse_Fluide_Dilatable_VDF::ajouter_projection(const Fluide_Dilatabl
   const Domaine_VF& zvf = ref_cast(Domaine_VF, zclb.domaine_dis());
   const IntTab& face_voisins = zvf.face_voisins();
 
-  // pour post
+  // for post-processing
   Champ_Don_base* post_src_ch = fluide.has_source_masse_projection_champ() ? &ref_cast_non_const(Fluide_Dilatable_base, fluide).source_masse_projection() : nullptr;
 
-  // On commence par remplir val_flux seulement pour les bonnes faces ...
+  // First fill val_flux only for the correct faces ...
   DoubleTrav val_flux(zvf.nb_faces(), 1);
   fill_val_flux_tab(val_flux);
 
-  // Maintennat on regarde resu ...
+  // Now look at resu ...
   for (int n_bord = 0; n_bord < domaine_cl_dis_->nb_cond_lim(); n_bord++)
     {
       const Cond_lim& la_cl = domaine_cl_dis_->les_conditions_limites(n_bord);
@@ -161,7 +161,7 @@ void Source_Masse_Fluide_Dilatable_VDF::ajouter_projection(const Fluide_Dilatabl
         }
     }
 
-  // pour post
+  // for post-processing
   if (post_src_ch)
     (*post_src_ch).mettre_a_jour(fluide.inco_chaleur().temps());
 }

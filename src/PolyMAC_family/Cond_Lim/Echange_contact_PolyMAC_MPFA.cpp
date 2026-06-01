@@ -43,7 +43,7 @@ void Echange_contact_PolyMAC_MPFA::init_op() const
   const Equation_base& eqn = domaine_Cl_dis().equation(), &o_eqn = ch.equation(); //equations
   i_fvf = eqn.domaine_dis().rang_frontiere(fvf->le_nom()), i_o_fvf = o_eqn.domaine_dis().rang_frontiere(nom_bord_);
 
-  int i_op = -1, o_i_op = -1, i; //indice de l'operateur de diffusion dans l'autre equation
+  int i_op = -1, o_i_op = -1, i; //index of the diffusion operator in the other equation
   for (i = 0; i < eqn.nombre_d_operateurs(); i++)
     if (sub_type(Op_Diff_PolyMAC_MPFA_Elem, eqn.operateur(i).l_op_base()))
       i_op = i;
@@ -59,11 +59,11 @@ void Echange_contact_PolyMAC_MPFA::init_op() const
 
 }
 
-/* identification des elements / faces de l'autre cote de la frontiere, avec offsets */
+/* identification of elements / faces on the other side of the boundary, with offsets */
 void Echange_contact_PolyMAC_MPFA::init_fs_dist() const
 {
   if (fs_dist_init_)
-    return; //deja fait
+    return; //already done
   const Domaine_PolyMAC_MPFA& domaine = ref_cast(Domaine_PolyMAC_MPFA, fvf->domaine_dis()), &o_domaine = ref_cast(Domaine_PolyMAC_MPFA, o_fvf->domaine_dis());
   const DoubleTab& xv = domaine.xv(), &o_xv = o_domaine.xv(), &xs = domaine.domaine().coord_sommets(), &o_xs = o_domaine.domaine().coord_sommets();
   const IntTab& f_s = domaine.face_sommets(), &o_f_s = o_domaine.face_sommets();
@@ -71,17 +71,17 @@ void Echange_contact_PolyMAC_MPFA::init_fs_dist() const
   int i, j, f, o_f, s, o_s, nf_tot = fvf->nb_faces_tot(), o_nf_tot = o_fvf->nb_faces_tot(), d, D = dimension;
   f_dist.resize(nf_tot);
 
-  std::set<int> s_som, s_o_som; //sommets de chaque cote
+  std::set<int> s_som, s_o_som; //vertices on each side
   for (i = 0; i < nf_tot; i++)
     for (f = fvf->num_face(i), j = 0; j < f_s.dimension(1) && (s = f_s(f, j)) >= 0; j++)
       s_som.insert(s);
   for (i = 0; i < o_nf_tot; i++)
     for (f = o_fvf->num_face(i), j = 0; j < o_f_s.dimension(1) && (s = o_f_s(f, j)) >= 0; j++)
       s_o_som.insert(s);
-  std::vector<int> som(s_som.begin(), s_som.end()), o_som(s_o_som.begin(), s_o_som.end()); //en vecteur
+  std::vector<int> som(s_som.begin(), s_som.end()), o_som(s_o_som.begin(), s_o_som.end()); //as vectors
   int ns_tot = (int) som.size(), o_ns_tot = (int) o_som.size();
 
-  DoubleTrav xvf(nf_tot, D), o_xvf(o_nf_tot, D), xsf(ns_tot, D), o_xsf(o_ns_tot, D); //positions locales/distantes -> pour calcul de correspondance
+  DoubleTrav xvf(nf_tot, D), o_xvf(o_nf_tot, D), xsf(ns_tot, D), o_xsf(o_ns_tot, D); //local/distant positions -> for correspondence computation
   for (i = 0; i < nf_tot; i++)
     for (d = 0; d < D; d++)
       xvf(i, d) = xv(fvf->num_face(i), d);
@@ -99,10 +99,10 @@ void Echange_contact_PolyMAC_MPFA::init_fs_dist() const
   MCAuto<DataArrayDouble> fdad(DataArrayDouble::New()), o_fdad(DataArrayDouble::New()), sdad(DataArrayDouble::New()), o_sdad(DataArrayDouble::New());
   fdad->useExternalArrayWithRWAccess(xvf.addr(), nf_tot, D), o_fdad->useExternalArrayWithRWAccess(o_xvf.addr(), o_nf_tot, D);
   sdad->useExternalArrayWithRWAccess(xsf.addr(), ns_tot, D), o_sdad->useExternalArrayWithRWAccess(o_xsf.addr(), o_ns_tot, D);
-  //point de o_{f,s}dad le plus proche de chaque point de {f,s}dad
+  //closest point in o_{f,s}dad for each point of {f,s}dad
   MCAuto<DataArrayIdType> f_idx(nf_tot && o_nf_tot ? o_fdad->findClosestTupleId(fdad) : nullptr), s_idx(ns_tot && o_ns_tot ? o_sdad->findClosestTupleId(sdad) : nullptr);
 
-  for (i = 0; i < nf_tot; i++) //remplissage de f_dist : face distante si coincidence, -1 sinon
+  for (i = 0; i < nf_tot; i++) //fill f_dist: distant face if coincident, -1 otherwise
     {
       f = fvf->num_face(i), o_f = o_nf_tot ? o_fvf->num_face((int)(f_idx->getIJ(i, 0))) : -1;
       double d2 = o_f >= 0 ? domaine.dot(&xv(f, 0), &xv(f, 0), &o_xv(o_f, 0), &o_xv(o_f, 0)) : 1e8;
@@ -113,7 +113,7 @@ void Echange_contact_PolyMAC_MPFA::init_fs_dist() const
       if (i < fvf->nb_faces() && d2 >= 1e-12)
         Process::exit(Nom("Echange_contact_PolyMAC_MPFA: missing opposite faces detected between ") + fvf->le_nom() + " and " + o_fvf->le_nom() + " ! Have you used Decouper_multi?");
     }
-  for (i = 0; i < ns_tot; i++) //remplissage de s_dist
+  for (i = 0; i < ns_tot; i++) //fill s_dist
     {
       s = som[i], o_s = o_ns_tot ? o_som[s_idx->getIJ(i, 0)] : -1;
       if (o_s >= 0 && domaine.dot(&xs(s, 0), &xs(s, 0), &o_xs(o_s, 0), &o_xs(o_s, 0)) < 1e-12)

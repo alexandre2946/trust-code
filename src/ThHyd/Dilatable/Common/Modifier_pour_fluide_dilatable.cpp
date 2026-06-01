@@ -28,14 +28,14 @@ static void multiplier_ou_diviser(DoubleVect& x, const DoubleVect& y, int divise
   else
     tab_divide_any_shape(x, y, VECT_REAL_ITEMS);
   x.echange_espace_virtuel();
-  //Debog::verifier("multiplier_ou_diviser x/y apres x:",x);
+  //Debog::verifier("multiplier_ou_diviser x/y after x:",x);
 }
 
-// Modif B.M: on ne remplit que la partie reelle du tableau.
+// Modif B.M: only the real part of the array is filled.
 void multiplier_diviser_rho(DoubleVect& tab, const Fluide_Dilatable_base& le_fluide, int diviser)
 {
   const Domaine_VF& zvf = ref_cast(Domaine_VF, le_fluide.vitesse().domaine_dis_base());
-  // Descripteurs des tableaux aux elements et aux faces:
+  // Descriptors of the element and face arrays:
   const Domaine& domaine = zvf.domaine();
   const MD_Vector& md_elem = domaine.les_elems().get_md_vector();
   const MD_Vector& md_faces = zvf.md_vector_faces();
@@ -45,8 +45,8 @@ void multiplier_diviser_rho(DoubleVect& tab, const Fluide_Dilatable_base& le_flu
     {
       const DoubleTab& rho = ref_cast(Fluide_Dilatable_base,le_fluide).rho_discvit();
       DoubleTrav rho_bord;
-      // B.M. je cree une copie sinon il faut truander les tests sur les tailles dans multiply_any_shape
-      // ou creer un DoubleTab qui pointe sur rho...
+      // B.M. creating a copy to avoid manipulating size checks in multiply_any_shape
+      // or creating a DoubleTab pointing to rho...
       zvf.creer_tableau_faces_bord(rho_bord, RESIZE_OPTIONS::NOCOPY_NOINIT);
       rho_bord.inject_array(rho, rho_bord.size());
       multiplier_ou_diviser(tab, rho_bord, diviser);
@@ -69,7 +69,7 @@ void multiplier_diviser_rho(DoubleVect& tab, const Fluide_Dilatable_base& le_flu
 
   if (tab.get_md_vector() == md_elem && rho.get_md_vector() == md_faces)
     {
-      // Il faut calculer rho aux elements
+      // rho must be computed at elements
       DoubleTrav tab_rho_elem;
       domaine.creer_tableau_elements(tab_rho_elem, RESIZE_OPTIONS::NOCOPY_NOINIT);
       const int nb_elem_tot = domaine.nb_elem_tot();
@@ -97,10 +97,10 @@ void multiplier_diviser_rho(DoubleVect& tab, const Fluide_Dilatable_base& le_flu
   Process::exit();
 }
 
-/*! @brief multiplie le tableau val par la masse volumique si le fluide est dilatable.
+/*! @brief Multiplies the array val by the density if the fluid is dilatable.
  *
- * Le tableau val peut avoir diverses localisations (determinees a partir de get_md_vector())
- *   et peut etre de type DoubleTab avec des dimension(i>0) quelconques (plusieurs composantes)
+ * @brief The array val can have various localizations (determined from get_md_vector())
+ *   and can be of type DoubleTab with arbitrary dimension(i>0) (multiple components).
  *
  */
 void multiplier_par_rho_si_dilatable(DoubleVect& val, const Milieu_base& mil)
@@ -114,7 +114,7 @@ void multiplier_par_rho_si_dilatable(DoubleVect& val, const Milieu_base& mil)
     }
 }
 
-/*! @brief Idem que multiplier_par_rho_si_dilatable mais on divise par rho.
+/*! @brief Same as multiplier_par_rho_si_dilatable but divides by rho.
  *
  */
 void diviser_par_rho_si_dilatable(DoubleVect& val, const Milieu_base& mil)
@@ -130,16 +130,16 @@ void diviser_par_rho_si_dilatable(DoubleVect& val, const Milieu_base& mil)
 
 void correction_nut_et_cisaillement_paroi_si_qc(Modele_turbulence_hyd_base& mod)
 {
-  // on recgarde si on a un fluide QC
+  // check if the fluid is QC (quasi-compressible)
   if (sub_type(Fluide_Dilatable_base, mod.equation().probleme().milieu()))
     {
       const Fluide_Dilatable_base& le_fluide = ref_cast(Fluide_Dilatable_base, mod.equation().probleme().milieu());
-      // 1 on multiplie nu_t par rho
+      // 1 multiply nu_t by rho
 
       DoubleTab& nut = ref_cast_non_const(DoubleTab, mod.viscosite_turbulente().valeurs());
       multiplier_diviser_rho(nut, le_fluide, 0 /* multiplier */);
 
-      // 2  On modifie le ciasaillement paroi
+      // 2  Modify the wall shear stress
       const DoubleTab& cisaillement_paroi = mod.loi_paroi().Cisaillement_paroi();
       DoubleTab& cisaillement = ref_cast_non_const(DoubleTab, cisaillement_paroi);
       multiplier_diviser_rho(cisaillement, le_fluide, 0 /* multiplier */);

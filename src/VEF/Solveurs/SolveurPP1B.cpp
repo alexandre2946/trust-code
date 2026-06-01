@@ -76,11 +76,11 @@ int SolveurPP1B::resoudre_systeme(const Matrice_Base& A,
 }
 
 
-// Affectation de l'assembleur et du solveur en pression
+// Assignment of the pressure assembler and solver
 int SolveurPP1B::associer(const Assembleur_P_VEFPreP1B& assembleur_pression, const SolveurSys& solveur_pression)
 {
   assembleur_pression_=assembleur_pression;
   solveur_pression_=solveur_pression;
-  fixer_limpr(-1); // Pas d'impression
+  fixer_limpr(-1); // No printing
   return 0;
 }

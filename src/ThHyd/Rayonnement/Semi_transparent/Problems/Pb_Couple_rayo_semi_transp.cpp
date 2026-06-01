@@ -26,7 +26,7 @@ Sortie& Pb_Couple_rayo_semi_transp::printOn(Sortie& os) const { return Probleme_
 
 void Pb_Couple_rayo_semi_transp::initialize()
 {
-  // 1er truc a faire
+  // First thing to do
   int nb_pb_ray = 0;
   for (int l = 0; l < nb_problemes(); l++)
     {
@@ -46,7 +46,7 @@ void Pb_Couple_rayo_semi_transp::initialize()
   else if (nb_pb_ray == 0)
     Process::exit("Pb_Couple_rayo_semi_transp::initialize - It seems you forgot to define the radiation properties in your medium !!!\n");
 
-  // on associe le pb fluide au pb_rayo
+  // associate the fluid problem with the radiation problem
   for (int l = 0; l < nb_problemes(); l++)
     {
       Probleme_base& le_pb = ref_cast(Probleme_base, probleme(l));
@@ -64,7 +64,7 @@ void Pb_Couple_rayo_semi_transp::initialize()
 
   Probleme_Couple::initialize();
   Probleme_base& le_pb = pb_rayo_semi_transp_->probleme_fluide();
-  // Associer le pb rayo aux sources de rayonnement
+  // Associate the radiation problem with the radiation source terms
   for (int i = 0; i < le_pb.nombre_d_equations(); i++)
     {
       Sources& les_sources = le_pb.equation(i).sources();

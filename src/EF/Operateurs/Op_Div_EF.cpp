@@ -76,10 +76,10 @@ DoubleTab& Op_Div_EF::ajouter(const DoubleTab& vit, DoubleTab& div) const
             div(elem) += w * Bij_thilde(elem, s, i) * vit(som, i);
         }
     }
-  // L'espace virtuel du tableau div n'est pas mis a jour par l'operateur,
+  // The virtual space of the div array is not updated by the operator,
   //  assert(invalide_espace_virtuel(div));
   declare_espace_virtuel_invalide(div);
-  // calcul de flux bord
+  // compute boundary fluxes
 
   const IntTab& face_sommets=domaine_ef.face_sommets();
   int nb_som_face=domaine_ef.nb_som_face();
@@ -124,7 +124,7 @@ int Op_Div_EF::impr(Sortie& os) const
   if (je_suis_maitre()) Flux_div.add_col(temps);
 
   int nb_compo=flux_bords_.dimension(1);
-  // On parcours les frontieres pour sommer les flux par frontiere dans le tableau flux_bord
+  // Iterate over boundaries to sum fluxes per boundary into the flux_bord array
   DoubleVect flux_bord(nb_compo);
   DoubleVect bilan(nb_compo);
   bilan = 0;
@@ -145,7 +145,7 @@ int Op_Div_EF::impr(Sortie& os) const
         {
           for(int k=0; k<nb_compo; k++)
             {
-              //Ajout pour impression sur fichiers separes
+              //Added for printing to separate files
               Flux_div.add_col(flux_bord(k));
               bilan(k)+=flux_bord(k);
             }

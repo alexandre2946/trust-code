@@ -88,18 +88,18 @@ protected:
   static void append_blocs(ArrOfInt& dest, const ArrOfInt& src, int offset=0, int multiplier=1);
   static void append_items(ArrOfInt& dest, const ArrOfInt& src, int offset=0, int multiplier=1);
 
-  // Nombre total d'items (reels+virtuels), utilise pour connaitre la taille des tableaux a creer
+  // Total number of items (real+virtual), used to determine the size of arrays to create
   int nb_items_tot_ = -1;
-  // Nombre d'items "reels" (propriete dimension(0) du tableau ou size() pour le vecteur)
-  // En principe les items reels sont tous ceux appartenant aux elements reels, ils sont regroupes au
-  // debut du tableau aux indices 0 <= i < nb_items_reels_.
-  // Si ce nombre vaut -1, il n'y a pas de separation entre items reels et items virtuels
-  //  (cas des tableaux P1Bulle multilocalisation pour lesquels les items reels et virtuels sont melanges)
+  // Number of "real" items (the dimension(0) property of the array, or size() for the vector)
+  // In principle real items are all those belonging to real elements; they are grouped at
+  // the beginning of the array at indices 0 <= i < nb_items_reels_.
+  // If this number is -1, there is no separation between real and virtual items
+  //  (case of P1Bulle multi-localisation arrays for which real and virtual items are mixed)
   int nb_items_reels_ = -1;
 
-  // Nombre total (sur tous les procs) d'items sequentiels (c'est mp_sum(nb_items_seq_local_)) - cela peut depasser 32 bits.
+  // Total number (across all procs) of sequential items (equal to mp_sum(nb_items_seq_local_)) - may exceed 32 bits.
   trustIdType nb_items_seq_tot_ = -1;
-  // Nombre d'items sequentiels sur ce processeur (c'est le nombre d'items dans les blocs de blocs_items_to_sum_)
+  // Number of sequential items on this processor (equal to the number of items in the blocks of blocs_items_to_sum_)
   int nb_items_seq_local_ = -1;
 
 private:

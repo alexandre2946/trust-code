@@ -33,9 +33,9 @@
 #include <Symetrie.h>
 #include <Motcle.h>
 
-/*! @brief Teste la compatibilite des conditions aux limites thermiques et hydrauliques.
+/*! @brief Tests the compatibility of the thermal and hydraulic boundary conditions.
  *
- *     La liste des compatibilites est la suivante:
+ *     The compatibility list is as follows:
  *     -----------------------------------------------------------------------
  *     Hydraulique                      |       Thermique
  *     -----------------------------------------------------------------------
@@ -61,11 +61,11 @@
  *     -----------------------------------------------------------------------
  *     Periodique ======================> Periodique
  *
- * @param (Domaine_Cl_dis_base& domaine_Cl_hydr)
- * @param[in] (Domaine_Cl_dis_base& domaine_Cl_th)
- * @return (int) renvoie toujours 1
- * @throws nombres de conditions aux limites differents
- * @throws conditions aux limites hydraulique et thermique incompatibles
+ * @param domaine_Cl_hydr the hydraulic boundary conditions domain
+ * @param[in] domaine_Cl_th the thermal boundary conditions domain
+ * @return always 1
+ * @throws different number of boundary conditions
+ * @throws incompatible hydraulic and thermal boundary conditions
  */
 int tester_compatibilite_hydr_thermique(const Domaine_Cl_dis_base& domaine_Cl_hydr, const Domaine_Cl_dis_base& domaine_Cl_th)
 {
@@ -147,12 +147,12 @@ int tester_compatibilite_hydr_thermique(const Domaine_Cl_dis_base& domaine_Cl_hy
   return 1;
 }
 
-/*! @brief Affiche un message d'erreur pour la fonction precedente
+/*! @brief Displays an error message for the preceding function.
  *
- * @param (Domaine_Cl_dis_base& domaine_Cl_hydr)
- * @param (Domaine_Cl_dis_base& domaine_Cl_th)
- * @param (int num_Cl) numero de la CL
- * @return (int) renvoie toujours 1
+ * @param la_cl_hydr the hydraulic boundary condition
+ * @param la_cl_th the thermal boundary condition
+ * @param num_Cl the boundary condition index
+ * @return always 1
  */
 int message_erreur_therm(const Cond_lim& la_cl_hydr, const Cond_lim& la_cl_th, int& num_Cl)
 {
@@ -163,9 +163,9 @@ int message_erreur_therm(const Cond_lim& la_cl_hydr, const Cond_lim& la_cl_th, i
   return 1;
 }
 
-/*! @brief Teste la compatibilite des conditions aux limites concentration et hydrauliques.
+/*! @brief Tests the compatibility of the concentration and hydraulic boundary conditions.
  *
- *     La liste des compatibilites est la suivante:
+ *     The compatibility list is as follows:
  *     -----------------------------------------------------------------------
  *     Hydraulique                      |       Concentration
  *     -----------------------------------------------------------------------
@@ -183,11 +183,11 @@ int message_erreur_therm(const Cond_lim& la_cl_hydr, const Cond_lim& la_cl_th, i
  *     -----------------------------------------------------------------------
  *     Periodique ======================> Periodique
  *
- * @param (Domaine_Cl_dis_base& domaine_Cl_hydr)
- * @param (Domaine_Cl_dis_base& domaine_Cl_co)
- * @return (int) renvoie toujours 1
- * @throws nombres de conditions aux limites differents
- * @throws conditions aux limite hydraulique et concentration incompatible
+ * @param domaine_Cl_hydr the hydraulic boundary conditions domain
+ * @param domaine_Cl_co the concentration boundary conditions domain
+ * @return always 1
+ * @throws different number of boundary conditions
+ * @throws incompatible hydraulic and concentration boundary conditions
  */
 int tester_compatibilite_hydr_concentration(const Domaine_Cl_dis_base& domaine_Cl_hydr, const Domaine_Cl_dis_base& domaine_Cl_co)
 {
@@ -254,12 +254,12 @@ int tester_compatibilite_hydr_concentration(const Domaine_Cl_dis_base& domaine_C
   return 1;
 }
 
-/*! @brief Affiche un message d'erreur pour la fonction precedente
+/*! @brief Displays an error message for the preceding function.
  *
- * @param (Domaine_Cl_dis_base& domaine_Cl_hydr)
- * @param (Domaine_Cl_dis_base& domaine_Cl_co)
- * @param (int num_Cl) numero de la CL
- * @return (int) renvoie toujours 1
+ * @param la_cl_hydr the hydraulic boundary condition
+ * @param la_cl_co the concentration boundary condition
+ * @param num_Cl the boundary condition index
+ * @return always 1
  */
 int message_erreur_conc(const Cond_lim& la_cl_hydr, const Cond_lim& la_cl_co, int& num_Cl)
 {
@@ -270,9 +270,9 @@ int message_erreur_conc(const Cond_lim& la_cl_hydr, const Cond_lim& la_cl_co, in
   return 1;
 }
 
-/*! @brief Teste la compatibilite des conditions aux limites fraction massqiues et hydrauliques.
+/*! @brief Tests the compatibility of the mass fraction and hydraulic boundary conditions.
  *
- *     La liste des compatibilites est la suivante:
+ *     The compatibility list is as follows:
  *     -----------------------------------------------------------------------
  *     Hydraulique                      |       Fraction massique
  *     -----------------------------------------------------------------------
@@ -294,11 +294,11 @@ int message_erreur_conc(const Cond_lim& la_cl_hydr, const Cond_lim& la_cl_co, in
  *     -----------------------------------------------------------------------
  *     Periodique ======================> Periodique
  *
- * @param (Domaine_Cl_dis_base& domaine_Cl_hydr)
- * @param[in] (Domaine_Cl_dis_base& domaine_Cl_fm)
- * @return (int) renvoie toujours 1
- * @throws nombres de conditions aux limites differents
- * @throws conditions aux limites hydraulique et fraction massiques incompatibles
+ * @param domaine_Cl_hydr the hydraulic boundary conditions domain
+ * @param[in] domaine_Cl_fm the mass fraction boundary conditions domain
+ * @return always 1
+ * @throws different number of boundary conditions
+ * @throws incompatible hydraulic and mass fraction boundary conditions
  */
 int tester_compatibilite_hydr_fraction_massique(const Domaine_Cl_dis_base& domaine_Cl_hydr, const Domaine_Cl_dis_base& domaine_Cl_fm)
 {
@@ -375,12 +375,12 @@ int tester_compatibilite_hydr_fraction_massique(const Domaine_Cl_dis_base& domai
   return 1;
 }
 
-/*! @brief Affiche un message d'erreur pour la fonction precedente
+/*! @brief Displays an error message for the preceding function.
  *
- * @param (Domaine_Cl_dis_base& domaine_Cl_hydr)
- * @param (Domaine_Cl_dis_base& domaine_Cl_frac_mass)
- * @param (int num_Cl) numero de la CL
- * @return (int) renvoie toujours 1
+ * @param la_cl_hydr the hydraulic boundary condition
+ * @param la_cl_frac_mass the mass fraction boundary condition
+ * @param num_Cl the boundary condition index
+ * @return always 1
  */
 int message_erreur_fraction_massique(const Cond_lim& la_cl_hydr, const Cond_lim& la_cl_frac_mass, int& num_Cl)
 {

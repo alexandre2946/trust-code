@@ -41,9 +41,9 @@ void copy_list_internal(const Static_Int_Lists_32_64<trustIdType>& som_elem, con
 #endif
 }
 
-/*! @brief construction de la structure som_elem pour le domaine donnee On cree pour chaque sommet i la liste des elements adjacents a ce sommet
+/*! @brief Builds the som_elem structure for the given domain. Creates for each vertex i the list of elements adjacent to this vertex
  *
- *   (c'est la liste des elements k tels que il existe j tel que les_elems(k,j) == i)
+ *   (i.e. the list of elements k such that there exists j with les_elems(k,j) == i)
  *
  * @param (nb_sommets)
  * @param (les_elems)
@@ -56,59 +56,59 @@ void construire_connectivite_som_elem(const _SIZE_       nb_sommets,
                                       Static_Int_Lists_32_64<_SIZE_>& som_elem,
                                       bool       include_virtual)
 {
-  // Nombre d'elements du domaine
+  // Number of elements in the domain
   const _SIZE_ nb_elem = (include_virtual) ? les_elems.dimension_tot(0) : les_elems.dimension(0);
-  // Nombre de sommets par element
+  // Number of vertices per element
   const _SIZE_ nb_sommets_par_element = les_elems.dimension(1);
 
-  // Construction d'un tableau initialise a zero : pour chaque sommet,
-  // nombre d'elements voisins de ce sommet
+  // Build an array initialized to zero: for each vertex,
+  // the number of neighboring elements of this vertex
   ArrOfInt_T<_SIZE_> nb_elements_voisins(nb_sommets);
 
-  // Premier passage : on calcule le nombre d'elements voisins de chaque
-  // sommet pour creer la structure de donnees
+  // First pass: compute the number of neighboring elements of each
+  // vertex in order to create the data structure
   ToDo_Kokkos("critical");
   for (_SIZE_ elem = 0; elem < nb_elem; elem++)
     {
       for (int i = 0; i < nb_sommets_par_element; i++)
         {
           _SIZE_ sommet = les_elems(elem, i);
-          // GF cas des polyedres
+          // GF case of polyhedra
           if (sommet==-1) break;
           nb_elements_voisins[sommet]++;
         }
     }
   som_elem.set_list_sizes(nb_elements_voisins);
 
-  // On reutilise le tableau pour stocker le nombre d'elements dans
-  // chaque liste pendant qu'on la remplit
+  // Reuse the array to store the number of elements in
+  // each list while filling it
   nb_elements_voisins = 0;
 
-  // Remplissage du tableau des elements voisins.
+  // Fill the array of neighboring elements.
   ToDo_Kokkos("critical");
   for (_SIZE_ elem = 0; elem < nb_elem; elem++)
     {
       for (int i = 0; i < nb_sommets_par_element; i++)
         {
           _SIZE_ sommet = les_elems(elem, i);
-          // GF cas des polyedres
+          // GF case of polyhedra
           if (sommet==-1) break;
           _SIZE_ n = (nb_elements_voisins[sommet])++;
           som_elem.set_value(sommet, n, elem);
         }
     }
 
-  // Tri de toutes les listes dans l'ordre croissant
+  // Sort all lists in ascending order
   som_elem.trier_liste(-1);
 }
 
-/*! @brief Cherche les elements qui contiennent tous les sommets du tableau sommets_to_find (permet de trouver les elements
+/*! @brief Finds the elements that contain all the vertices of the sommets_to_find array (allows finding elements
  *
- *   adjacents a une face ou une arete)
+ *   adjacent to a face or an edge)
  *
- * @param (som_elem) pour chaque sommet, liste triee des elements adjacents (voir construire_connectivite_som_elem)
- * @param (sommets_to_find) une liste de sommets
- * @param (elements) resultat de la recherche: la liste des elements qui contiennent tous les sommets de sommets_to_find. Si sommets_to_find est vide, on renvoie un tableau vide. (en cas d'appels repetes a cette fonction, il est conseille de mettre le drapeau "smart_resize")
+ * @param (som_elem) for each vertex, sorted list of adjacent elements (see construire_connectivite_som_elem)
+ * @param (sommets_to_find) a list of vertices
+ * @param (elements) result of the search: the list of elements containing all vertices of sommets_to_find. If sommets_to_find is empty, an empty array is returned. (for repeated calls to this function, it is advised to set the "smart_resize" flag)
  */
 template <typename _SIZE_>
 void find_adjacent_elements(const Static_Int_Lists_32_64<_SIZE_>& som_elem,
@@ -116,20 +116,20 @@ void find_adjacent_elements(const Static_Int_Lists_32_64<_SIZE_>& som_elem,
                             SmallArrOfTID_T<_SIZE_>& elements)
 {
   int nb_som_to_find = sommets_to_find.size_array();
-  // on retire les sommets valant -1 (cas ou plusieurs types de faces)
+  // remove vertices equal to -1 (case of multiple face types)
   while (sommets_to_find[nb_som_to_find-1]==-1) nb_som_to_find--;
   if (nb_som_to_find == 0)
     {
       elements.resize_array(0);
       return;
     }
-  // Algorithme: on initialise elements avec tous les elements adjacents
-  //  au premier sommet de la liste.
-  //  Puis pour chacun des autres sommets de la liste, on retire du tableau
-  //  "elements" les elements qui ne sont pas voisins du sommet.
-  //  A la fin, il ne reste que les elements qui sont dans toutes les listes.
+  // Algorithm: initialise elements with all elements adjacent
+  //  to the first vertex of the list.
+  //  Then for each of the other vertices in the list, remove from the array
+  //  "elements" those elements that are not neighbors of the vertex.
+  //  At the end, only elements that are in all lists remain.
   {
-    // Initialisation avec les elements adjacents au premier sommet
+    // Initialization with the elements adjacent to the first vertex
     const _SIZE_ sommet = sommets_to_find[0];
     // OK this is a bit technical here: 'elements' is a small array, even in 64b.
     // But copy_list_to_array() might return a Big array (in 64b). So we cheat, we pass it a big array
@@ -144,14 +144,13 @@ void find_adjacent_elements(const Static_Int_Lists_32_64<_SIZE_>& som_elem,
   for (i_sommet = 1; i_sommet < nb_som_to_find; i_sommet++)
     {
       const _SIZE_ sommet = sommets_to_find[i_sommet];
-      // Calcul des elements communs entre elements[.] et som_elem(sommet,.)
-      // Nombre d'elements communs entre elements et la nouvelle liste de sommets
+      // Compute the common elements between elements[.] and som_elem(sommet,.)
+      // Number of common elements between elements and the new vertex list
       int nb_elems_restants = 0;
-      // Nombre d'elements adjacents au "sommet"
+      // Number of elements adjacent to "sommet"
       const int nb_elem_liste = (int)som_elem.get_list_size(sommet);
-      // On suppose que les listes d'elements sont triees dans l'ordre croissant
-      // On parcourt simultanement les deux listes et on conserve les elements
-      // communs.
+      // Assume the element lists are sorted in ascending order
+      // Traverse both lists simultaneously and keep the common elements
       int i=0, j=0;
       if (nb_elem_found == 0)
         break;
@@ -163,7 +162,7 @@ void find_adjacent_elements(const Static_Int_Lists_32_64<_SIZE_>& som_elem,
               const _SIZE_ elem_j = som_elem(sommet, j);
               if (elem_i == elem_j)
                 {
-                  // Element commun aux deux listes, on le garde
+                  // Element common to both lists, keep it
                   elements[nb_elems_restants] = elem_i;
                   nb_elems_restants++;
                 }

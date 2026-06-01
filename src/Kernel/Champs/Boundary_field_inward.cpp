@@ -68,7 +68,7 @@ void Boundary_field_inward::mettre_a_jour(double tps)
 
   DoubleTab tab_normal_vector(le_bord.nb_faces(),dimension);
 
-  // Evaluation de vit_norm:
+  // Evaluation of vit_norm:
   vit_norm.setVar("t",tps);
   double value = vit_norm.eval();
 

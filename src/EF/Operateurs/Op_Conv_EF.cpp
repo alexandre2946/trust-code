@@ -35,7 +35,7 @@ Op_Conv_BTD_EF::Op_Conv_BTD_EF() : Op_Conv_EF()
 }
 void Op_Conv_BTD_EF::completer()
 {
-  // pour ne pas mettre les flags automatiquement
+  // do not set flags automatically
   Op_Conv_EF_base::completer();
 
 }
@@ -106,7 +106,7 @@ Entree& Op_Conv_EF::readOn(Entree& s )
   if (type_op_lu=="amont3")
     {
       s >> f_lu_;
-      // decommente  les 2 lognes
+      // uncomment the 2 lines
       // centre_impl_=0;
       //	calcul_dt_stab_=1;
     }
@@ -381,7 +381,7 @@ double Op_Conv_EF::calculer_dt_stab() const
         //if (transport_rhou) 	G_e/=rho_elem(elem);
         double ml=0;
         double dx2;
-        // pas de temps de diffusion !!
+        // diffusion time step !!
         double ml2=0;
         double vx[3];
         for (int d=0; d<3; d++)
@@ -409,7 +409,7 @@ double Op_Conv_EF::calculer_dt_stab() const
           }
         diffu /= (is_not_rho_unif ? rho_elem(elem) : rho_elem(0,0));
 
-        // horreur pour NR G2 cas clotaire
+        // ugly workaround for NR G2 clotaire case
         // diffu*=0.5;
         //if (elem==0) Cerr<<"uu "<<diffu<<finl;
         if (transport_rhou)
@@ -421,7 +421,7 @@ double Op_Conv_EF::calculer_dt_stab() const
             for (int d=0; d<dimension; d++)
               vx[d]*=inv_rho2;
           }
-        // le .5* c'est pour avoir le meme dt que g2 mais faux
+        // the .5* factor matches g2 dt but is incorrect
         double dxe=sqrt(ml2);
         if (dxe<min_dx_)
           min_dx_=dxe;
@@ -469,7 +469,7 @@ double Op_Conv_EF::calculer_dt_stab() const
   coefficient_correcteur_supg_.valeurs()(0,0)=min_dx_/max_ue_;
   double dt_stab=dt_l;
   dt_stab = Process::mp_min(dt_stab);
-  // astuce pour contourner le type const de la methode
+  // trick to work around the const type of the method
   Op_Conv_EF_base& op = ref_cast_non_const(Op_Conv_EF_base,*this);
   op.fixer_dt_stab_conv(dt_stab);
 
@@ -478,7 +478,7 @@ double Op_Conv_EF::calculer_dt_stab() const
 
 void Op_Conv_EF::contribue_au_second_membre(DoubleTab& resu ) const
 {
-  // on a rien implicite
+  // nothing is implicit
   ajouter_sous_cond(equation().inconnue().valeurs(),resu,((btd_hors_conv_==1)||btd_impl_),((hourglass_hors_conv_==1)||hourglass_impl_),centre_impl_);
 }
 

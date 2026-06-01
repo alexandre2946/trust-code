@@ -43,9 +43,9 @@ void Op_Evanescence_Homogene_Elem_base::dimensionner_blocs(matrices_t matrices, 
   const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis());
   const DoubleTab& inco = equation().inconnue().valeurs();
 
-  /* on doit pouvoir ajouter / soustraire les equations entre composantes */
+  /* must be able to add / subtract equations between components */
   int i, e, n, N = inco.line_size();
-  if (N == 1) return; //pas d'evanescence en simple phase!
+  if (N == 1) return; //no evanescence in single-phase flow!
   for (auto &&n_m : matrices)
     if (n_m.second->nb_colonnes())
       {
@@ -63,7 +63,7 @@ void Op_Evanescence_Homogene_Elem_base::dimensionner_blocs(matrices_t matrices, 
               for (auto &&c : idx) sten.append_line(i, c);
           }
         Matrix_tools::allocate_morse_matrix(mat.nb_lignes(), mat.nb_colonnes(), sten, mat2);
-        mat = mat2; //pour forcer l'ordre des coefficients dans la matrice (accelere les operations ligne a ligne)
+        mat = mat2; //to force the coefficient ordering in the matrix (speeds up row-by-row operations)
       }
 }
 
@@ -80,13 +80,13 @@ void Op_Evanescence_Homogene_Elem_base::ajouter_blocs(matrices_t matrices, Doubl
 
   int e, k, n, N = inco.line_size(), m, M = p.line_size(), is_m = ch.le_nom() == "alpha", cR = (rho.dimension_tot(0) == 1),
                iter = sch ? sch->iteration_ : 0, p_degen = is_m && sch ? sch->p_degen_ : 0;
-  if (N == 1 || p_degen || (is_m && !iter)) return; //pas d'evanescence en simple phase ou si p est degenere
+  if (N == 1 || p_degen || (is_m && !iter)) return; //no evanescence in single-phase or if p is degenerate
 
-  double a_eps = alpha_res_, a_eps_min = alpha_res_min_, a_m, a_max; //seuil de declenchement du traitement de l'evanescence
+  double a_eps = alpha_res_, a_eps_min = alpha_res_min_, a_m, a_max; //threshold triggering the evanescence treatment
 
   /* recherche de phases evanescentes et traitement des seconds membres */
-  IntTrav maj(inco.dimension_tot(0)); //maj(i) : phase majoritaire de la ligne i
-  DoubleTrav coeff(inco.dimension_tot(0), inco.line_size(), 2); //coeff(i, n, 0/1) : coeff a appliquer a l'equation existante / a l'eq. "inco = v_maj", leurs derivees en alpha
+  IntTrav maj(inco.dimension_tot(0)); //maj(i): majority phase of row i
+  DoubleTrav coeff(inco.dimension_tot(0), inco.line_size(), 2); //coeff(i, n, 0/1): coefficient applied to the existing equation / to the eq. "inco = v_maj", and their derivatives w.r.t. alpha
   Matrice_Morse& mat_diag = *matrices.at(ch.le_nom().getString());
   for (e = 0; e < domaine.nb_elem(); e++)
     {
@@ -100,7 +100,7 @@ void Op_Evanescence_Homogene_Elem_base::ajouter_blocs(matrices_t matrices, Doubl
       for (n = 0, m = 0; n < N; n++, m += (M > 1))
         if (n != k && (a_m = alpha(e, n)) < a_eps)
           {
-            double val = is_m ? 0 : milc.has_saturation(n, k) ? milc.get_saturation(n, k).Tsat(p(e, m)) : inco(e, k); //valeur a laquelle on veut ramener inco(e, n)
+            double val = is_m ? 0 : milc.has_saturation(n, k) ? milc.get_saturation(n, k).Tsat(p(e, m)) : inco(e, k); //target value to which inco(e, n) is relaxed
             coeff(e, n, 0) = (a_eps == a_eps_min ? (a_m < a_eps) : std::min(std::max((a_eps - a_m) / (a_eps - a_eps_min), 0.), 1.));
             coeff(e, n, 1) = mat_diag(N * e + k, N * e + k) * coeff(e, n, 0);
             double flux = coeff(e, n, 0) * secmem(e, n) + coeff(e, n, 1) * (inco(e, n) - val);
@@ -112,7 +112,7 @@ void Op_Evanescence_Homogene_Elem_base::ajouter_blocs(matrices_t matrices, Doubl
   for (auto &&n_m : matrices)
     if (n_m.second->nb_colonnes())
       {
-        int diag = (n_m.first == ch.le_nom().getString()), press = (n_m.first == "pression"); //est-on sur le bloc diagonal, sur le bloc pression?
+        int diag = (n_m.first == ch.le_nom().getString()), press = (n_m.first == "pression"); //are we on the diagonal block, on the pressure block?
         Matrice_Morse& mat = *n_m.second;
         auto i(mat.get_tab1()(0));
         auto j(i);
@@ -120,14 +120,14 @@ void Op_Evanescence_Homogene_Elem_base::ajouter_blocs(matrices_t matrices, Doubl
           for (n = 0, m = 0; n < N; n++, m += (M > 1))
             if (coeff(e, n, 0))
               {
-                k = maj(e); //phase majoritaire
-                double dval = is_m ? 0 : milc.has_saturation(n, k) ? (press ? milc.get_saturation(n, k).dP_Tsat(p(e, m)) : 0) : diag; //derivee de val (nulle si on n'est pas sur le bon bloc)
-                int cval = is_m ? -1 : milc.has_saturation(n, k) ? M * e + m : N * e + k; //indice de colonne associe a cette derivee
+                k = maj(e); //majority phase
+                double dval = is_m ? 0 : milc.has_saturation(n, k) ? (press ? milc.get_saturation(n, k).dP_Tsat(p(e, m)) : 0) : diag; //derivative of val (zero if not on the right block)
+                int cval = is_m ? -1 : milc.has_saturation(n, k) ? M * e + m : N * e + k; //column index associated with this derivative
                 for (i = mat.get_tab1()(N * e + n) - 1, j = mat.get_tab1()(N * e + k) - 1; i < mat.get_tab1()(N * e + n + 1) - 1; i++, j++)
                   {
                     assert(mat.get_tab2()(j) == mat.get_tab2()(i));
-                    int c = mat.get_tab2()(i) - 1; //indice de colonne (commun aux deux lignes grace au dimensionner_blocs())
-                    double dflux = -coeff(e, n, 0) * mat.get_set_coeff()(i) + coeff(e, n, 1) * (diag * (c == N * e + n) - dval * (c == cval)); //derivee de flux en secmem, inco, val
+                    int c = mat.get_tab2()(i) - 1; //column index (common to both rows thanks to dimensionner_blocs())
+                    double dflux = -coeff(e, n, 0) * mat.get_set_coeff()(i) + coeff(e, n, 1) * (diag * (c == N * e + n) - dval * (c == cval)); //derivative of flux w.r.t. secmem, inco, val
                     mat.get_set_coeff()(i) += (p_degen ? rho(!cR * e, n) : 1) * dflux;
                     mat.get_set_coeff()(j) -= (p_degen ? rho(!cR * e, k) : 1) * dflux;
                   }

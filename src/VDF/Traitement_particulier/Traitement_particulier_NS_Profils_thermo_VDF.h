@@ -22,7 +22,7 @@
 
 class Convection_Diffusion_std;
 
-/*! @brief classe Traitement_particulier_NS_Profils_thermo_VDF
+/*! @brief Traitement_particulier_NS_Profils_thermo_VDF class
  *
  * @sa Navier_Stokes_Turbulent, Traitement_particulier_base, Traitement_particulier_VDF, Trait_part_NS_Profils_VDF
  */

@@ -34,26 +34,26 @@ public:
   int imprime_Q4(Sortie&, int) const;
 };
 
-/*! @brief Calcule la coordonnee barycentrique d'un point (x,y) par rapport au sommet specifie d'un triangle ou d'un rectange (un element)
+/*! @brief Computes the barycentric coordinate of a point (x,y) with respect to the specified vertex of a triangle or rectangle (an element).
  *
- *     Ce calcul concerne un point 2D.
+ *     This computation concerns a 2D point.
  *
- * @param (IntTab& polys) tableau contenant les numeros des elements par rapport auxquels on veut calculer une coordonnee barycentrique. polys(i,0) est l'indice du sommet 0 de l'element i dans le tableau des coordonnees (coord).
- * @param (DoubleTab& coord) les coordonnees des sommets par auxquels on veut calculer les coordonnees barycentriques.
- * @param (double x) la premiere coordonnee cartesienne du point dont on veut calculer les coordonnees barycentriques
- * @param (double y) la deuxieme coordonnee cartesienne du point dont on veut calculer les coordonnees barycentriques
- * @param (int le_poly) le numero de l'element (dans le tableau polys) par rapport auquel on calculera la coordonnee barycentrique.
- * @param (int i) le numero du sommet par rapport auquel on veut la coordonnee barycentrique.
- * @return (double) la coordonnee barycentrique du point (x,y) par rapport au sommet specifie (i) dans l'element specifie (le_poly)
- * @throws erreur arithmetique, denominateur nul
- * @throws erreur de calcul, coordonnee barycentrique invalide
+ * @param (IntTab& polys) array containing the indices of the elements with respect to which the barycentric coordinate is to be computed. polys(i,0) is the index of vertex 0 of element i in the coordinate array (coord).
+ * @param (DoubleTab& coord) the coordinates of the vertices for which the barycentric coordinates are to be computed.
+ * @param (double x) the first Cartesian coordinate of the point whose barycentric coordinates are to be computed
+ * @param (double y) the second Cartesian coordinate of the point whose barycentric coordinates are to be computed
+ * @param (int le_poly) the index of the element (in the polys array) with respect to which the barycentric coordinate will be computed.
+ * @param (int i) the index of the vertex with respect to which the barycentric coordinate is wanted.
+ * @return (double) the barycentric coordinate of point (x,y) with respect to the specified vertex (i) in the specified element (le_poly)
+ * @throws arithmetic error, null denominator
+ * @throws computation error, invalid barycentric coordinate
  */
 inline double coord_barycentrique(const IntTab& polys, const DoubleTab& coord, double x, double y, int le_poly, int i)
 {
   int som0, som1, som2;
   int nb_som_elem = polys.dimension(1);
-  //Distinction du calcul de la coordonnee barycentrique en fonction du type de l element
-  //Cas Triangle
+  //Selection of barycentric coordinate computation depending on element type
+  //Triangle case
   if (nb_som_elem == 3)
     {
       switch(i)
@@ -105,7 +105,7 @@ inline double coord_barycentrique(const IntTab& polys, const DoubleTab& coord, d
         }
       return coord_bary;
     }
-  //Cas Rectangle
+  //Rectangle case
   else if (nb_som_elem == 4)
     {
       double alpha_x = 0.;
@@ -176,29 +176,29 @@ inline double coord_barycentrique(const IntTab& polys, const DoubleTab& coord, d
   return 0.;
 }
 
-/*! @brief Calcule la coordonnee barycentrique d'un point (x,y,z) par rapport au sommet specifie d'un tetraedre ou d'un hexaedre (un element)
+/*! @brief Computes the barycentric coordinate of a point (x,y,z) with respect to the specified vertex of a tetrahedron or hexahedron (an element).
  *
- *     Ce calcul concerne un point 3D.
+ *     This computation concerns a 3D point.
  *
- * @param (IntTab& polys) tableau contenant les numeros des elements par rapport auxquels on veut calculer une coordonnee barycentrique. polys(i,0) est l'indice du sommet 0 de l'element i dans le tableau des coordonnees (coord).
- * @param (DoubleTab& coord) les coordonnees des sommets par auxquels on veut calculer les coordonnees barycentriques.
- * @param (double x) la premiere coordonnee cartesienne du point dont on veut calculer les coordonnees barycentriques
- * @param (double y) la deuxieme coordonnee cartesienne du point dont on veut calculer les coordonnees barycentriques
- * @param (double z) la troisieme coordonnee cartesienne du point dont on veut calculer les coordonnees barycentriques
- * @param (int le_poly) le numero de l'element (dans le tableau polys) par rapport auquel on calculera la coordonnee barycentrique.
- * @param (int i) le numero du sommet par rapport auquel on veut la coordonnee barycentrique.
- * @return (double) la coordonnee barycentrique du point (x,y,z) par rapport au sommet specifie (i) dans l'element specifie (le_poly)
- * @throws un tetraedre n'a pas plus de 4 sommets
- * @throws un hexaedre n'a pas plus de 8 sommets
- * @throws erreur arithmetique, denominateur nul
- * @throws erreur de calcul, coordonnee barycentrique invalide
+ * @param (IntTab& polys) array containing the indices of the elements with respect to which the barycentric coordinate is to be computed. polys(i,0) is the index of vertex 0 of element i in the coordinate array (coord).
+ * @param (DoubleTab& coord) the coordinates of the vertices for which the barycentric coordinates are to be computed.
+ * @param (double x) the first Cartesian coordinate of the point whose barycentric coordinates are to be computed
+ * @param (double y) the second Cartesian coordinate of the point whose barycentric coordinates are to be computed
+ * @param (double z) the third Cartesian coordinate of the point whose barycentric coordinates are to be computed
+ * @param (int le_poly) the index of the element (in the polys array) with respect to which the barycentric coordinate will be computed.
+ * @param (int i) the index of the vertex with respect to which the barycentric coordinate is wanted.
+ * @return (double) the barycentric coordinate of point (x,y,z) with respect to the specified vertex (i) in the specified element (le_poly)
+ * @throws a tetrahedron does not have more than 4 vertices
+ * @throws a hexahedron does not have more than 8 vertices
+ * @throws arithmetic error, null denominator
+ * @throws computation error, invalid barycentric coordinate
  */
 inline double coord_barycentrique(const IntTab& polys, const DoubleTab& coord, double x, double y, double z, int le_poly, int i)
 {
   int som0, som1, som2, som3;
   int nb_som_elem = polys.dimension(1);
-  //Distinction du calcul de la coordonnee barycentrique en fonction du type de l element
-  //Cas Tetraedre
+  //Selection of barycentric coordinate computation depending on element type
+  //Tetrahedron case
   if (nb_som_elem == 4)
     {
       switch(i)
@@ -268,7 +268,7 @@ inline double coord_barycentrique(const IntTab& polys, const DoubleTab& coord, d
         }
       return coord_bary;
     }
-  //Cas Hexaedre
+  //Hexahedron case
   else if (nb_som_elem == 8)
     {
       double alpha_x = 0.;

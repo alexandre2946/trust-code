@@ -19,7 +19,7 @@
 #include <Correlation_base.h>
 #include <Champ_Fonc_base.h>
 
-/*! @brief classe Diametre_bulles_constant Contient un champ de bulles de diametre constant
+/*! @brief Constant bubble diameter field.
  *
  *
  *

@@ -89,7 +89,7 @@ void Op_Diff_DG_Elem::completer()
  *
  * @param la_matrice The Matrice_Morse whose sparsity pattern is to be set.
  */
-void Op_Diff_DG_Elem::dimensionner(Matrice_Morse& la_matrice) const // TODO a remonter dans Op_DG_Elem
+void Op_Diff_DG_Elem::dimensionner(Matrice_Morse& la_matrice) const // TODO to be moved up into Op_DG_Elem
 {
 
   const Nom& nom_inco = equation().inconnue().le_nom();
@@ -175,10 +175,10 @@ void Op_Diff_DG_Elem::dimensionner_blocs(matrices_t matrices, const tabs_t& semi
 {
   const std::string nom_inco = equation().inconnue().le_nom().getString();
   if (semi_impl.count(nom_inco))
-    return; // semi-implicite -> rien a dimensionner
+    return; // semi-implicit -> nothing to size
 
-  init_op_ext();                  // TODO DG a completer
-  int n_ext = (int)op_ext.size(); // pour la thermique monolithique
+  init_op_ext();                  // TODO DG to be completed
+  int n_ext = (int)op_ext.size(); // for monolithic thermal coupling
 
   std::vector<Matrice_Morse *> mat(n_ext);
   for (int i = 0; i < n_ext; i++)
@@ -495,7 +495,7 @@ void Op_Diff_DG_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, cons
           bfunc.eval_grad_bfunc_on_facets(quad, elem, f, grad_fbase0);
 
           double h_T = sqrt(domaine.carre_pas_maille(elem));
-          double invh_T = 1. / h_T; // TODO regarder penalisation remplacer h_T par h_F
+          double invh_T = 1. / h_T; // TODO review penalization: replace h_T by h_F
           double sur_f = domaine.face_surfaces(f);
           double nu_F = 0.;
           if (is_aniso_)
@@ -547,12 +547,12 @@ void Op_Diff_DG_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, cons
             }
         }
     }
-  contribuer_au_second_membre(secmem); // TODO DG a integrer proprement dans la boucle
+  contribuer_au_second_membre(secmem); // TODO DG properly integrate into the loop
 }
 
 void Op_Diff_DG_Elem::dimensionner_termes_croises(Matrice_Morse& matrice, const Probleme_base& autre_pb, int nl, int nc) const
 {
-  // TODO pour problemes croises
+  // TODO for coupled problems
   throw;
 }
 
@@ -621,7 +621,7 @@ void Op_Diff_DG_Elem::contribuer_au_second_membre(DoubleTab& resu) const
   DoubleTab grad_fbase(nb_bfunc, nb_pts_int_fac, Objet_U::dimension);
   DoubleTab scalar_product_dim(dim, nb_pts_int_fac); // DoubleTab used for storing scalar products of the RHS and the basis functions in x, y, (z)
   DoubleTab scalar_product(nb_pts_int_fac);          // DoubleTab used for reftab scalar_product_dim for a given dimension
-  // Les conditions aux limites pour le second membre
+  // Boundary conditions for the right-hand side
   const DoubleTab& eta_F = bfunc.get_eta_facet(); // Compute the penalisation coefficient
   int ind_face;
   for (int n_bord = 0; n_bord < nb_bords; n_bord++)
@@ -669,7 +669,7 @@ void Op_Diff_DG_Elem::contribuer_au_second_membre(DoubleTab& resu) const
                           for (int k = 0; k < nb_pts_int_fac; k++)
                             {
 
-                              // Coordonnees des points d'integration
+                              // Coordinates of the integration points
                               xk = integ_points_facets(ind_face, k, 0);
                               yk = integ_points_facets(ind_face, k, 1);
                               if (dimension == 3)
@@ -722,7 +722,7 @@ void Op_Diff_DG_Elem::contribuer_au_second_membre(DoubleTab& resu) const
         }
       else if (sub_type(Dirichlet_homogene, la_cl.valeur()))
         {
-          // On ne fait rien et c'est normal
+          // Nothing to do, this is expected
         }
       else if (sub_type(Dirichlet, la_cl.valeur()))
         {
@@ -747,7 +747,7 @@ void Op_Diff_DG_Elem::contribuer_au_second_membre(DoubleTab& resu) const
                       sur_f = domaine.face_surfaces(ind_face);
 
                       double h_T = sqrt(domaine.carre_pas_maille(elem));
-                      double invh_T = 1. / h_T; // TODO regarder penalisation remplacer h_T par h_F
+                      double invh_T = 1. / h_T; // TODO review penalization: replace h_T by h_F
                       double nu_F = 0.;
                       if (is_aniso_)
                         {
@@ -764,7 +764,7 @@ void Op_Diff_DG_Elem::contribuer_au_second_membre(DoubleTab& resu) const
                           scalar_product_dim = 0.;
                           for (int k = 0; k < nb_pts_int_fac; k++)
                             {
-                              // Coordonnees des points d'integration
+                              // Coordinates of the integration points
                               xk = integ_points_facets(ind_face, k, 0);
                               yk = integ_points_facets(ind_face, k, 1);
                               if (dimension == 3)
@@ -807,7 +807,7 @@ void Op_Diff_DG_Elem::contribuer_au_second_membre(DoubleTab& resu) const
                   sur_f = domaine.face_surfaces(ind_face);
 
                   double h_T = sqrt(domaine.carre_pas_maille(elem));
-                  double invh_T = 1. / h_T; // TODO regarder penalisation remplacer h_T par h_F
+                  double invh_T = 1. / h_T; // TODO review penalization: replace h_T by h_F
                   double nu_F = 0.;
                   if (is_aniso_)
                     {

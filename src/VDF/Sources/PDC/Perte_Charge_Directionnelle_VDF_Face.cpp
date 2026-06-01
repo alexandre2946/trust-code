@@ -40,7 +40,7 @@ void Perte_Charge_Directionnelle_VDF_Face::set_param(Param& param) const
 void Perte_Charge_Directionnelle_VDF_Face::coeffs_perte_charge(const DoubleVect& u, const DoubleVect& pos, double t, double norme_u, double dh, double nu, double reynolds, double& coeff_ortho,
                                                                double& coeff_long, double& u_l, DoubleVect& v_valeur) const
 {
-  // Calcul de lambda
+  // Compute lambda
   lambda.setVar(0, reynolds);
   lambda.setVar(1, t);
   lambda.setVar(2, pos[0]);
@@ -49,19 +49,19 @@ void Perte_Charge_Directionnelle_VDF_Face::coeffs_perte_charge(const DoubleVect&
   if (dimension > 2)
     lambda.setVar(4, pos[2]);
 
-  // Calcul de v et ||v||^2
+  // Compute v and ||v||^2
   //  DoubleVect v_valeur(dimension);
   double vcarre = 0;
   v->valeur_a(pos, v_valeur);
   for (int dim = 0; dim < dimension; dim++)
     vcarre += v_valeur[dim] * v_valeur[dim];
   v_valeur /= sqrt(vcarre);
-  // Calcul de u.v
+  // Compute u.v
   double scal = 0;
   for (int dim = 0; dim < dimension; dim++)
     scal += u[dim] * v_valeur[dim];
   /*
-   // Calcul du resultat
+   // Compute the result
    for (int dim=0;dim<dimension;dim++)
    p_charge[dim] = -lambda.eval()*scal*v_valeur[dim]*norme_u/2./dh;
    */

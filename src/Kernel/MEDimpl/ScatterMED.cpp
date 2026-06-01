@@ -23,10 +23,10 @@ Implemente_instanciable(ScatterMED,"ScatterMED",Scatter);
 // XD scattermed scatter scattermed NO_BRACE This keyword will read the partition of the domain_name domain into a the
 // XD_CONT MED format files file.med created by Medsplitter.
 
-/*! @brief Simple appel a: Interprete::printOn(Sortie&)
+/*! @brief Simple call to: Interprete::printOn(Sortie&)
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& ScatterMED::printOn(Sortie& os) const
 {
@@ -39,12 +39,12 @@ Entree& ScatterMED::readOn(Entree& is)
 }
 
 
-/*! @brief Lit le domaine dans le fichier de nom "nomentree", de type LecFicDistribueBin ou LecFicDistribue
+/*! @brief Reads the domain from the file named "nomentree", of type LecFicDistribueBin or LecFicDistribue
  *
- *   (selon fichier_domaine_format_binaire_)
- *   Le format historique n'est plus supporte.
- *   Format attendu : Domaine::ReadOn
- *   le Domaine est renomme comme le domaine (pour lance_test_seq_par)
+ *   (depending on fichier_domaine_format_binaire_)
+ *   The legacy format is no longer supported.
+ *   Expected format: Domaine::ReadOn
+ *   The domain is renamed after the domain (for lance_test_seq_par).
  *
  */
 void ScatterMED::lire_domaine(Nom& nomentree)
@@ -62,11 +62,11 @@ void ScatterMED::lire_domaine(Nom& nomentree)
   lire_med.associer_domaine(dom);
   lire_med.lire_geom(true);
 
-  // Renseigne dans quel fichier le domaine a ete lu
+  // Record which file the domain was read from
   dom.set_fichier_lu(nomentree);
 
-  // On renomme le domaine (important pour le format lml:
-  // nom de la topologie utilise par lance_test_seq_par)
+  // Rename the domain (important for the lml format:
+  // topology name used by lance_test_seq_par)
   const Nom& nom_dom = dom.le_nom();
   dom.nommer(nom_dom);
 

@@ -26,63 +26,63 @@ class Domaine_dis_base;
 class Motcle;
 class Param;
 
-/*! @brief Classe de base des formats de postraitements pour les champs (lata, med, cgns, lml, single_lata).
+/*! @brief Base class for post-processing output formats for fields (lata, med, cgns, lml, single_lata).
  *
- *  Utilisation de la classe par l'interface generique:
- *  -typer un objet format de postraitement
- *  -initialiser l objet format de postraitement
- *  -proceder a des operations de complement et verification
- *  -ecrire un domaine
- *  -ecrire_temps
- *  -ecrire_champ (un type de champ supporte: aux elements ou aux sommets,
- *                 ou encore aux faces si on a ecrit les faces du domaine
- *                 et si les faces sont supportees par le postraitement)
+ *  Using the class through the generic interface:
+ *  - type a post-processing format object
+ *  - initialize the post-processing format object
+ *  - perform completion and verification operations
+ *  - write a domain
+ *  - ecrire_temps
+ *  - ecrire_champ (supported field types: at elements or at nodes,
+ *                  or at faces if the domain faces have been written
+ *                  and if faces are supported by the post-processing format)
  *
  */
 
-// Les parametres intervenant (eventuellement) dans une operation de postraitement
+// Parameters involved (possibly) in a post-processing operation
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Nom                    nom_fichier                 : nom du fichier sur lequel on ecrit
-// int           champ                  : 1 si postraitement de champ, 0 sinon
-// int            stat                          : 1 si postraitement de statistiques, 0 sinon
-// double            dt_ch                  : periode de postraitement des champs
-// double            dt_stat                  : periode de postraitement des statistiques
-// int            reprise                : 1 si reprise effectuee, 0 sinon
-// int            axi                        : 1 si calcul axi, 0 sinon
-// int            est_le_premier_post         : 1 si premier postraitement pour un fichier d ecriture donne, 0 sinon
-// int            est_le_dernier_post  : 1 si dernier postraitement pour un fichier d ecriture donne, 0 sinon
-// Domaine            dom                        : domaine de calcul
-// Nom                   id_domaine                : nom du domaine
-// IntVect           faces_som                : connectivites faces-sommets
-// IntVect           elem_faces                : connectivites elements-faces
-// int           nb_som                : nombre de sommets du domaine dom
-// int            nb_faces                : nombre de faces du domaine
+// Nom                    nom_fichier                 : name of the file being written
+// int           champ                  : 1 if field post-processing, 0 otherwise
+// int            stat                          : 1 if statistics post-processing, 0 otherwise
+// double            dt_ch                  : period for field post-processing
+// double            dt_stat                  : period for statistics post-processing
+// int            reprise                : 1 if restart was performed, 0 otherwise
+// int            axi                        : 1 if axisymmetric calculation, 0 otherwise
+// int            est_le_premier_post         : 1 if first post-processing for a given output file, 0 otherwise
+// int            est_le_dernier_post  : 1 if last post-processing for a given output file, 0 otherwise
+// Domaine            dom                        : computation domain
+// Nom                   id_domaine                : domain name
+// IntVect           faces_som                : face-to-vertex connectivity
+// IntVect           elem_faces                : element-to-face connectivity
+// int           nb_som                : number of domain vertices
+// int            nb_faces                : number of domain faces
 
-// double            t_init                : temps initial du calcul
-// double            temps_courant          : temps courant du calcul
-// double           temps_champ                : temps du champ cible
-// double            temps_post                : temps de l objet postraitement (ecriture si temps_post<temps_courant)
+// double            t_init                : initial time of the computation
+// double            temps_courant          : current time of the computation
+// double           temps_champ                : target field time
+// double            temps_post                : time of the post-processing object (write if temps_post<temps_courant)
 
-// Nom                    id_champ_post        : identifiant du champ generique (nom ou composante)
-// Nature_du_champ nature_champ                : scalaire, multi_scalaire, vectoriel
-// int            nb_compo                : nombre de composantes du champ
-// Noms            nom_compos                : vecteur contenant le nom des composantes du champ
-// Noms            unites                : vecteur contenant les unites du champ a ecrire
-// Motcle            loc_post                : localisation : ELEM, SOM, FACES
-// int            ncomp                : numero de composante (-1 si ce n est pas une composante)
-// DoubleTab           data                        : tableau de valeurs a ecrire sur fichier
+// Nom                    id_champ_post        : identifier of the generic field (name or component)
+// Nature_du_champ nature_champ                : scalar, multi_scalar, vector
+// int            nb_compo                : number of field components
+// Noms            nom_compos                : vector containing the component names of the field
+// Noms            unites                : vector containing the units of the field to write
+// Motcle            loc_post                : location: ELEM, SOM, FACES
+// int            ncomp                : component number (-1 if not a component)
+// DoubleTab           data                        : array of values to write to file
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Rq: data
-// Si on postraite le champ et non pas une composante d un champ
-//        Si le tableau de valeurs du champ est a une seule entree, data doit etre dimensionne en data(nb_ddl,1)
-// Si on postraite une composante d un champ
-//        Si le tableau de valeurs fourni est a plusieurs entrees,  data doit etre dimensionne en data(nb_ddl)
+// Note: data
+// If post-processing the full field and not a component of a field:
+//        If the field value array has a single entry, data must be dimensioned as data(nb_ddl,1)
+// If post-processing a component of a field:
+//        If the supplied value array has multiple entries, data must be dimensioned as data(nb_ddl)
 
 
-// l utilisation de l interface generique pour realiser une operation de postraitement
-// L enchainement d appel des methodes de l interface pour postraiter un tableau de valeurs d un champ discret a un instant donne
-// est presente ci-dessous (toute methode n est pas forcement necessaire en fonction du format utilise)
+// Using the generic interface to perform a post-processing operation.
+// The sequence of interface method calls to post-process an array of values of a discrete field at a given instant
+// is presented below (not every method is necessarily required depending on the format used)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // format_post.initialize_by_default(nom_fichier)
 // format_post.ecrire_entete(temps_courant,reprise,est_le_premier_post)
@@ -101,7 +101,7 @@ class Format_Post_base : public Objet_U
 {
   Declare_base(Format_Post_base);
 public:
-  // Remet l'objet dans l'etat initial obtenu apres constructeur par defaut
+  // Resets the object to the initial state obtained after the default constructor
   virtual void reset() = 0;
   virtual void resetTime(double t, const std::string dirname);
   virtual void set_param(Param& param) const override=0;

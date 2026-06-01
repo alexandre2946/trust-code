@@ -72,11 +72,11 @@ void convert_domain_to_Domaine(const Domain& dom, Domaine& dom_trio)
     }
 
   /*
-   * XXX Elie Saikali => pour polyedre/polygon faut remplir plus de choses ;)
+   * XXX Elie Saikali => for polyhedron/polygon, more fields need to be filled ;)
    */
   if (type_elem == "POLYEDRE" && poly_generique)
     {
-      // dom_trio tjrs en 32 ... faut bricoler ...
+      // dom_trio is always 32-bit ... need to work around this ...
       Domaine_32_64<trustIdType> dom_trio_poubelle;
       dom_trio_poubelle.typer(type_elem);
 
@@ -152,16 +152,16 @@ void convert_domain_to_Domaine(const Domain& dom, Domaine& dom_trio)
 
           for (trustIdType i = 0; i < nb_elems; i++)
             {
-              polyhedronIndex[i] = face; // Index des polyedres
+              polyhedronIndex[i] = face; // Index of polyhedra
 
               trustIdType index = connIndex[i] + 1;
               int nb_som = static_cast<int>(connIndex[i + 1] - index);
               for (int j = 0; j < nb_som; j++)
                 {
                   if (j == 0 || conn[index + j] < 0)
-                    facesIndex[face++] = node; // Index des faces:
+                    facesIndex[face++] = node; // Index of faces:
                   if (conn[index + j] >= 0)
-                    nodes[node++] = conn[index + j]; // Index local des sommets de la face
+                    nodes[node++] = conn[index + j]; // Local index of face vertices
                 }
             }
           facesIndex[nfaces] = node;
@@ -173,7 +173,7 @@ void convert_domain_to_Domaine(const Domain& dom, Domaine& dom_trio)
 
           poly_poubelle.affecte_connectivite_numero_global(nodes, facesIndex, polyhedronIndex, les_elems);
 
-          // back to life ... faut tout caster car dom_trio est 32 bit
+          // back to life ... all casts needed because dom_trio is 32-bit
           poly.set_nb_som_face_max(poly_poubelle.get_nb_som_elem_max());
 
           // step 1 : polyhedronIndex
@@ -193,7 +193,7 @@ void convert_domain_to_Domaine(const Domain& dom, Domaine& dom_trio)
 
           // step 4 : Nodes
           ArrOfInt tmp3;
-          const auto& nd = poly_poubelle.getNodes(); // attention l'attribue pas nodes local
+          const auto& nd = poly_poubelle.getNodes(); // careful: this is not the local 'nodes' variable
           tmp3.resize((int) nd.size_array());
           for (auto i = 0; i < nd.size_array(); i++)
             tmp3[i] = static_cast<int>(nd[i]);
@@ -213,7 +213,7 @@ void convert_domain_to_Domaine(const Domain& dom, Domaine& dom_trio)
   else
     {
       //      dom_trio.les_sommets()=geom.nodes_;
-      // mais geom.nodes est un FloatTab
+      // but geom.nodes is a FloatTab
       DoubleTab& som = dom_trio.les_sommets();
       int nx = 1, ny = 1, nz = 1;
       if (dom.get_domain_type() == Domain::UNSTRUCTURED)
@@ -327,7 +327,7 @@ void Lata_2_Other::get_fill_infos_loc(const LataDB& lata_db, LataFilter& filter,
         }
     }
 
-  post.set_loc_vector(locs_required_); // utile pour CGNS pour le moment ...
+  post.set_loc_vector(locs_required_); // useful for CGNS for the time being ...
 }
 
 Entree& Lata_2_Other::interpreter(Entree& is)
@@ -345,10 +345,10 @@ Entree& Lata_2_Other::interpreter(Entree& is)
       Process::exit();
     }
 
-  // Creation d'un sous-groupe contenant uniquement le processeur maitre
+  // Creating a sub-group containing only the master processor
   ArrOfInt liste_pe(1);
   OWN_PTR(Comm_Group) group;
-  // on se met en non axi le temps de la conversion
+  // temporarily disable axi mode during conversion
   int axi_sa = axi;
   axi = 0;
   PE_Groups::create_group(liste_pe, group);
@@ -368,7 +368,7 @@ Entree& Lata_2_Other::interpreter(Entree& is)
       LataOptions::extract_path_basename(filename, opt.path_prefix, opt.basename);
       opt.dual_mesh = true;
       opt.faces_mesh = false;
-      // on ne veut jamais creer le domaine IJK
+      // we never want to create the IJK domain
       opt.regularize = 0;
       opt.regularize_tolerance = 1e-7f;
       read_any_format_options(filename, opt);
@@ -377,8 +377,8 @@ Entree& Lata_2_Other::interpreter(Entree& is)
 
       filter.initialize(opt, lata_db);
 
-      // On met dual_mesh a "false" si on lit un domaine de polyedres PolyMAC_HFV (pas encore supporte)
-      // et on-reouvre la database:
+      // Set dual_mesh to "false" if reading a PolyMAC_HFV polyhedron domain (not yet supported)
+      // and re-open the database:
       Noms geom_names = filter.get_exportable_geometry_names();
       int elt_type = filter.get_geometry(Domain_Id(geom_names[0], 1, -1)).elt_type_;
       Cerr << elt_type << finl;
@@ -393,7 +393,7 @@ Entree& Lata_2_Other::interpreter(Entree& is)
       if (format_post_ == "lata_v2")
         format_post_ = "lata";
 
-      // copie de Postraiter_domaine
+      // copy from Postraiter_domaine
 
       Nom type("Format_Post_");
       type += format_post_;
@@ -422,7 +422,7 @@ Entree& Lata_2_Other::interpreter(Entree& is)
       else
         post.initialize(nom_2, format_binaire_, "SIMPLE");
 
-      // ecriture des domaines
+      // write domains
       {
 
         Noms geoms = filter.get_exportable_geometry_names();
@@ -448,7 +448,7 @@ Entree& Lata_2_Other::interpreter(Entree& is)
             filter.release_geometry(dom);
           }
       }
-      // les champs
+      // the fields
       const char *suffix_vector_names[] = { "X", "Y", "Z" };
 
       for (int t = 1; t < lata_db.nb_timesteps(); t++)
@@ -511,7 +511,7 @@ Entree& Lata_2_Other::interpreter(Entree& is)
                         Nom nom_post, ajout;
 
                         nom_post = fields[j].get_field_name();
-                        // pour eviter qu'en med on est le champ aux faces et sur le dual avec le meme nom
+                        // to avoid having the face field and the dual mesh field with the same name in MED
                         if (dom_trio.le_nom().finit_par("_faces"))
                           nom_post += "_Centre";
                         ajout = "_";
@@ -552,7 +552,7 @@ Entree& Lata_2_Other::interpreter(Entree& is)
       PE_Groups::exit_group();
     }
   barrier();
-  // on remet eventuellement axi
+  // restore axi mode if it was set
   axi = axi_sa;
   return is;
 }

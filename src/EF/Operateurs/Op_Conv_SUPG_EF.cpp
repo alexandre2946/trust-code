@@ -26,7 +26,7 @@ Sortie& Op_Conv_SUPG_EF::printOn( Sortie& os ) const
 
 Entree& Op_Conv_SUPG_EF::readOn( Entree& is )
 {
-  btd_=3; // utilise dans calculer_pas_de_temps
+  btd_=3; // used in calculer_pas_de_temps
   Param param(que_suis_je()); // XD convection_supg convection_deriv supg BRACE Only for EF discretization.
   param.ajouter("facteur",&ksupg_,Param::REQUIRED); // XD_ADD_P double
   // XD_CONT not_set

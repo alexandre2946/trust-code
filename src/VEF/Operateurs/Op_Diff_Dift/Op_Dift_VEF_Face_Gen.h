@@ -31,11 +31,11 @@ public:
   template <Type_Champ _TYPE_>
   void fill_grad_Re(const DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&) const;
 
-  // corrige flux bord
+  // correct boundary flux
   template <bool _IS_STAB_ = false>
   void modifie_pour_cl_gen(const DoubleTab&, DoubleTab&, DoubleTab&) const;
 
-  // methodes pour l'explicite
+  // methods for the explicit scheme
   template <Type_Champ _TYPE_,  bool _IS_RANS_ = false> std::enable_if_t<_TYPE_ ==  Type_Champ::VECTORIEL, void>
   ajouter_bord_gen(const DoubleTab& , DoubleTab& , DoubleTab& , const DoubleTab& , const DoubleTab&) const;
 
@@ -51,7 +51,7 @@ public:
     ajouter_interne_gen__<_TYPE_, Type_Schema::EXPLICITE, false, _IS_RANS_ >(inco, &resu, nullptr, nu, nu_turb, nu_turb /* poubelle */);
   }
 
-  // methodes pour l'implicite
+  // methods for the implicit scheme
   template <Type_Champ _TYPE_, bool _IS_STAB_ = false, bool _IS_RANS_ = false>
   void ajouter_contribution_bord_gen(const DoubleTab&, Matrice_Morse&, const DoubleTab&, const DoubleTab&, const DoubleVect&) const;
 
@@ -68,16 +68,16 @@ private:
 
   public_for_cuda
   template <Type_Champ _TYPE_, Type_Schema _SCHEMA_, bool _IS_STAB_ = false, bool _IS_RANS_ = false >
-  void ajouter_bord_perio_gen__(const int , const DoubleTab&, DoubleTab* /* Si explicite */ , Matrice_Morse* /* Si implicite */, const DoubleTab&, const DoubleTab&, const DoubleVect& , DoubleTab* flux_bord = nullptr /* flux_bords */) const;
+  void ajouter_bord_perio_gen__(const int , const DoubleTab&, DoubleTab* /* if explicit */ , Matrice_Morse* /* if implicit */, const DoubleTab&, const DoubleTab&, const DoubleVect& , DoubleTab* flux_bord = nullptr /* flux_bords */) const;
 
   template <Type_Champ _TYPE_, Type_Schema _SCHEMA_, bool _IS_STAB_ = false>
-  void ajouter_bord_scalaire_impose_gen__(const int , const DoubleTab&, DoubleTab* /* Si explicite */ , Matrice_Morse* /* Si implicite */, const DoubleTab&, const DoubleTab&, const DoubleVect& , DoubleTab* flux_bord = nullptr /* flux_bords */ ) const;
+  void ajouter_bord_scalaire_impose_gen__(const int , const DoubleTab&, DoubleTab* /* if explicit */ , Matrice_Morse* /* if implicit */, const DoubleTab&, const DoubleTab&, const DoubleVect& , DoubleTab* flux_bord = nullptr /* flux_bords */ ) const;
 
   template <Type_Champ _TYPE_, Type_Schema _SCHEMA_, bool _IS_STAB_ = false, bool _IS_RANS_ = false >
-  void ajouter_bord_gen__(const int , const DoubleTab&, DoubleTab* /* Si explicite */ , Matrice_Morse* /* Si implicite */, const DoubleTab&, const DoubleTab&, const DoubleVect& , DoubleTab* flux_bord = nullptr /* flux_bords */ ) const;
+  void ajouter_bord_gen__(const int , const DoubleTab&, DoubleTab* /* if explicit */ , Matrice_Morse* /* if implicit */, const DoubleTab&, const DoubleTab&, const DoubleVect& , DoubleTab* flux_bord = nullptr /* flux_bords */ ) const;
 
   template <Type_Champ _TYPE_, Type_Schema _SCHEMA_, bool _IS_STAB_ = false, bool _IS_RANS_ = false >
-  void ajouter_interne_gen__(const DoubleTab&, DoubleTab* /* Si explicite */ , Matrice_Morse* /* Si implicite */, const DoubleTab&, const DoubleTab&, const DoubleVect&) const;
+  void ajouter_interne_gen__(const DoubleTab&, DoubleTab* /* if explicit */ , Matrice_Morse* /* if implicit */, const DoubleTab&, const DoubleTab&, const DoubleVect&) const;
 };
 
 #include <Op_Dift_VEF_Face_Gen.tpp>

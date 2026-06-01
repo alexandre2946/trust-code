@@ -33,9 +33,9 @@ class Convection_Diffusion_Fluide_Dilatable_Proto
 {
 public:
   // E Saikali
-  // Convection_Diffusion_std parce que on a un heritage V et on va appeler la classe mere de l'autre cote ...
-  // Sinon il faut mettre les methodes dans Equation_base... a voir ...
-  // [ Vive les classes templates ... dommage !]
+  // Convection_Diffusion_std because of virtual inheritance — calling the base class from the other side...
+  // Otherwise methods must be placed in Equation_base... to be decided...
+  // [ Templates would be nicer here... unfortunately!]
   static std::vector<YAML_data> data_a_sauvegarder(const Convection_Diffusion_std& eq, const Fluide_Dilatable_base& fld);
   static int Sauvegarder_WC(Sortie& os, const Convection_Diffusion_std& eq, const Fluide_Dilatable_base& fld);
   static int Reprendre_WC(Entree& is, double temps,Convection_Diffusion_std& eq, Fluide_Dilatable_base& fld,
@@ -59,9 +59,9 @@ protected:
   virtual bool is_generic() const = 0;
   mutable OWN_PTR(Champ_Inc_base) ch_unite_;
 #ifdef TRUST_USE_GPU
-  BigDoubleVect tab_coeff_diffusif_; // Tableau de travail
+  BigDoubleVect tab_coeff_diffusif_; // Work array
 #else
-  DoubleVect tab_coeff_diffusif_; // Tableau de travail
+  DoubleVect tab_coeff_diffusif_; // Work array
 #endif
 };
 

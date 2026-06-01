@@ -24,11 +24,12 @@
 class Fluide_Dilatable_base;
 class Probleme_base;
 
-/*! @brief classe Loi_Etat_base Cette classe est la base de la hierarchie des lois d'etat.
+/*! @brief Base class for the state law hierarchy defining a dilatable fluid.
  *
- *      Elle definit un fluide dilatable
+ * Abstract class from which all state laws must derive.
+ * Abstract methods: void calculer_coeff_T(), void calculer_masse_volumique()
  *
- * @sa Fluide_Dilatable_base, Classe abstraite dont toutes les lois d'etat doivent deriver., Methodes abstraites:, void calculer_coeff_T(), void calculer_masse_volumique()
+ * @sa Fluide_Dilatable_base
  */
 
 class Loi_Etat_base : public Objet_U, public Champs_compris_interface
@@ -46,7 +47,7 @@ public :
   Champ_Don_base& ch_temperature();
   const Champ_Don_base& ch_temperature() const;
 
-  // Methodes virtuelles
+  // Virtual methods
   virtual void associer_fluide(const Fluide_Dilatable_base&);
   virtual void preparer_calcul();
   virtual void abortTimeStep();
@@ -63,14 +64,14 @@ public :
   virtual double De_DP(double,double) const ;
   virtual double De_DT(double,double) const ;
 
-  //Methodes de l interface des champs postraitables
+  // Post-processing field interface methods
   const Champ_base& get_champ(const Motcle& nom) const override;
   void creer_champ(const Motcle& motlu) override { }
   void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
   bool has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const override;
   bool has_champ(const Motcle& nom) const override;
 
-  // Methodes virtuelles pure
+  // Pure virtual methods
   const virtual Nom type_fluide() const =0;
   virtual void initialiser() =0;
   virtual void remplir_T() =0;
@@ -78,7 +79,7 @@ public :
   virtual double calculer_masse_volumique(double,double) const =0;
   virtual double inverser_Pth(double,double) =0;
 
-  // Methodes inlines
+  // Inline methods
   inline Champs_compris& champs_compris() { return champs_compris_; }
   inline const DoubleTab& temperature() const { return temperature_->valeurs(); }
   inline const DoubleTab& rho_n() const { return tab_rho_n; }
@@ -89,7 +90,7 @@ protected :
   OBS_PTR(Fluide_Dilatable_base) le_fluide;
   OBS_PTR(Probleme_base) le_prob_;
   OWN_PTR(Champ_Don_base) temperature_;
-  DoubleTab tab_rho_n, tab_rho_np1;    //rho a l'etape precedente et l'etape suivante
+  DoubleTab tab_rho_n, tab_rho_np1;    //rho at the previous and next time steps
   double Pr_;
   int debug;
   virtual void compute_tab_rho(DoubleTab&); // compute tab_rho

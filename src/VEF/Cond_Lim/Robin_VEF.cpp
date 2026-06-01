@@ -65,7 +65,7 @@ void Robin_VEF::completer()
   if (!sub_type(Navier_Stokes_std, mon_dom_cl_dis->equation()))
     Process::exit("Robin_VEF is not yet coded on scalar equations ... \n");
 
-  // pour le moment ....
+  // for now ....
   if (mon_dom_cl_dis->equation().operateur(0).l_op_base().que_suis_je() != "Op_Diff_VEF_P1NC")
     Process::exit("Robin_VEF is now only available for the laminar Op_Diff_VEF_P1NC operator ... \n");
 }
@@ -83,7 +83,7 @@ double Robin_VEF::flux_robin_normal_et_trangentiel_imp(int i, int j) const
 
   if ((le_champ_front->valeurs().dimension(1)==2 && dimension == 2) || (le_champ_front->valeurs().dimension(1)==4 && dimension == 3))
     {
-      if (le_champ_front->valeurs().dimension(0)==1) // a une valeur identique sur toutes les mailles du bord
+      if (le_champ_front->valeurs().dimension(0)==1) // has a single value identical on all boundary cells
         return le_champ_front->valeurs()(0,j);
       else
         return le_champ_front->valeurs()(i,j);

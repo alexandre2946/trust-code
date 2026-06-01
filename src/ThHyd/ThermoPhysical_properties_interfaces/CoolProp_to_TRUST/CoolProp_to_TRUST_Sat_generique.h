@@ -18,10 +18,9 @@
 
 #include <CoolProp_to_TRUST.h>
 
-/*! @brief classe CoolProp_to_TRUST_Sat_generique
+/*! @brief CoolProp interface for saturation properties as functions of temperature.
  *
- *  Interface commune pour TRUST et ses baltiks qui permet appeler les methodes de la lib CoolProp
- *  Methods disponibles pour la saturation en temperature
+ *  Common interface for TRUST and its baltiks to call CoolProp saturation-property methods.
  *
  *  @sa CoolProp_to_TRUST
  */
@@ -50,7 +49,7 @@ public :
     return tppi_get_single_sat_p_(SAT::MU, P, res, 1, 0, false);
   }
 
-  // pour les gens qui cherchent sigma de l'objet saturation
+  // for users seeking sigma from the saturation object
   int tppi_get_sigma_pT(const SpanD P, const SpanD T, SpanD res, int ncomp, int ind) const override
   {
     return tppi_get_single_sat_p_(SAT::SIGMA, P, res, 1, 0, true);
@@ -61,7 +60,7 @@ public :
     return tppi_get_single_sat_p_(SAT::SIGMA, P, res, 1, 0, true);
   }
 
-  // methodes particulieres par application pour gagner en performance : utilisees dans Pb_Multiphase et F5 (pour le moment !)
+  // application-specific methods to improve performance: used in Pb_Multiphase and F5 (for now)
   int tppi_get_all_flux_interfacial_pb_multiphase(const SpanD P, MSatSpanD sats, int ncomp = 1, int ind = 0) const override;
   int tppi_get_all_sat_loi_F5(const MSpanD input, MSatSpanD sats, int ncomp = 1, int ind = 0) const override;
 

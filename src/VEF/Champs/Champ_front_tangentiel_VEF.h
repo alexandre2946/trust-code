@@ -20,8 +20,8 @@
 #include <Champ_front_tangentiel.h>
 /*! @brief class Champ_front_tangentiel_VEF
  *
- *  Classe derivee de Champ_front_base qui represente les
- *  champs aux frontieres tangentiels :
+ *  @brief Derived class from Champ_front_base representing
+ *  tangential boundary fields.
  *
  * @sa Champ_front_base
  */

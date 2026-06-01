@@ -19,10 +19,10 @@ Implemente_instanciable(TroisDto2Daxi,"Extract_2Daxi_from_3D",TroisDto2D);
 // XD extract_2daxi_from_3d extract_2d_from_3d extract_2daxi_from_3d INHERITS_BRACE Keyword to extract a 2D axisymetric
 // XD_CONT mesh by selecting a boundary of the 3D mesh.
 
-/*! @brief Simple appel a: Interprete::printOn(Sortie&)
+/*! @brief Simple call to: Interprete::printOn(Sortie&)
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param os Output stream.
+ * @return The modified output stream.
  */
 Sortie& TroisDto2Daxi::printOn(Sortie& os) const
 {
@@ -30,10 +30,10 @@ Sortie& TroisDto2Daxi::printOn(Sortie& os) const
 }
 
 
-/*! @brief Simple appel a: Interprete::readOn(Entree&)
+/*! @brief Simple call to: Interprete::readOn(Entree&)
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param is Input stream.
+ * @return The modified input stream.
  */
 Entree& TroisDto2Daxi::readOn(Entree& is)
 {

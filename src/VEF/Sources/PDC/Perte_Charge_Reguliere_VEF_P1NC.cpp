@@ -52,9 +52,9 @@ Entree& Perte_Charge_Reguliere_VEF_P1NC::readOn(Entree& s )
 
 /////////////////////////////////////////////////////////////////////
 //
-//                    Implementation des fonctions
+//                    Implementation of functions
 //
-//               de la classe Perte_Charge_Reguliere_VEF_P1NC
+//               of class Perte_Charge_Reguliere_VEF_P1NC
 //
 ////////////////////////////////////////////////////////////////////
 
@@ -107,7 +107,7 @@ void Perte_Charge_Reguliere_VEF_P1NC::remplir_num_faces(Nom& un_nom_sous_domaine
                 {
                   num_poly_vois = face_voisins(num_face,i);
                   if (num_poly_vois != -1)
-                    if (num_loc[num_poly_vois] == -1)  // le poly voisin n'est pas dans le sous_domaine
+                    if (num_loc[num_poly_vois] == -1)  // the neighbouring poly is not in the sub-domain
                       {
                         corr_front_ss[nfac-1] = volumes(num_poly)/(volumes(num_poly)+volumes(num_poly_vois)) ;
                       }
@@ -174,8 +174,8 @@ DoubleTab& Perte_Charge_Reguliere_VEF_P1NC::ajouter(DoubleTab& resu) const
           else
             d_visco = 0.5*(visco[n0]+visco[n1]);
         }
-      // GF La vitesse pour caluler le Rey ne depend pas de la porosite
-      // et on utilise la norme
+      // GF The velocity for computing Re does not depend on porosity
+      // and we use the norm
       U_abs=0;
       for (int j =0; j<dimension; j++ )
         U_abs += vit(numfa,j)*vit(numfa,j);
@@ -255,8 +255,8 @@ void  Perte_Charge_Reguliere_VEF_P1NC::contribuer_a_avec(const DoubleTab&, Matri
           else
             d_visco = 0.5*(visco[n0]+visco[n1]);
         }
-      // GF La vitesse pour caluler le Rey ne depend pas de la porosite
-      // et on utilise la norme
+      // GF The velocity for computing Re does not depend on porosity
+      // and we use the norm
       U_abs=0;
       for (int j =0; j<dimension; j++ )
         U_abs += vit(numfa,j)*vit(numfa,j);

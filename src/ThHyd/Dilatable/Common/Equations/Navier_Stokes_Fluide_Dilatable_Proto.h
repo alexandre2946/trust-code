@@ -27,7 +27,7 @@ class Champ_Inc_base;
 class Matrice_Morse;
 class Sortie;
 
-/*! @brief classe Navier_Stokes_Fluide_Dilatable_Proto
+/*! @brief Navier_Stokes_Fluide_Dilatable_Proto
  *
  *
  *

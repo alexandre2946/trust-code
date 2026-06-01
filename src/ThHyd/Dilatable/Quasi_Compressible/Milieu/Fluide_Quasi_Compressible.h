@@ -18,9 +18,9 @@
 
 #include <Fluide_Dilatable_base.h>
 
-/*! @brief classe Fluide_Quasi_Compressible Cette classe represente un d'un fluide quasi compressible
+/*! @brief Fluide_Quasi_Compressible class This class represents a quasi-compressible fluid,
  *
- *     c'est a dire heritant de fluide dilatable
+ *     i.e. inheriting from the dilatable fluid class
  *
  * @sa Milieu_base Fluide_Dilatable_base
  */

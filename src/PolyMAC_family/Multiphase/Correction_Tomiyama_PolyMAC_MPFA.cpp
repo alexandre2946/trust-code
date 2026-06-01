@@ -33,16 +33,16 @@ Entree& Correction_Tomiyama_PolyMAC_MPFA::readOn(Entree& is)
   param.ajouter("secu_diam", &secu_diam_);
   param.lire_avec_accolades_depuis(is);
 
-  //identification des phases
+  //identification of phases
   Pb_Multiphase *pbm = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()) : nullptr;
 
   if (!pbm || pbm->nb_phases() == 1) Process::exit(que_suis_je() + " : not needed for single-phase flow!");
-  for (int n = 0; n < pbm->nb_phases(); n++) //recherche de n_l, n_g : phase {liquide,gaz}_continu en priorite
+  for (int n = 0; n < pbm->nb_phases(); n++) //search for n_l, n_g : {liquid,gas}_continu phase with priority
     if (pbm->nom_phase(n).debute_par("liquide") && (n_l < 0 || pbm->nom_phase(n).finit_par("continu")))  n_l = n;
 
   if (n_l < 0) Process::exit(que_suis_je() + " : liquid phase not found!");
 
-  pbm->creer_champ("distance_paroi_globale"); // Besoin de distance a la paroi
+  pbm->creer_champ("distance_paroi_globale"); // Need the wall distance field
 
   return is;
 }
@@ -87,7 +87,7 @@ void Correction_Tomiyama_PolyMAC_MPFA::ajouter_blocs(matrices_t matrices, Double
 
   double fac, a_l, rho_l, rho_k, db_l, secmem_l, Eo, Cw, dist, correction, sig_face;
 
-  // Et pour les methodes span de la classe Saturation
+  // And for the span methods of the Saturation class
   for (k = 0; k < N; k++)
     {
       if (milc.has_saturation(k, n_l))
@@ -203,7 +203,7 @@ void Correction_Tomiyama_PolyMAC_MPFA::ajouter_blocs(matrices_t matrices, Double
             Eo = ( rho(e, n_l) - rho(e, k) ) * g_ * 2. * d_bulles(e, k) / sigma_l(k,e) ;
 
 
-            dist = std::max(y_elem(e), secu_diam_ * d_bulles(e, k)); // securite numerique
+            dist = std::max(y_elem(e), secu_diam_ * d_bulles(e, k)); // numerical safety threshold
             correction = std::max(1.- y_elem(e)/d_bulles(e, k), 0.) ;
 
             if (Eo < 1.) {Cw = 0.74 ;}

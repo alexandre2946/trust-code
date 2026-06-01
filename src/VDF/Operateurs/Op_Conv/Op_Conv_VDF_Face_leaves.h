@@ -16,7 +16,7 @@
 #ifndef Op_Conv_VDF_Face_leaves_included
 #define Op_Conv_VDF_Face_leaves_included
 
-#include <Eval_Conv_VDF_Elem_leaves.h> // pour les compilos (templates :-) )
+#include <Eval_Conv_VDF_Elem_leaves.h> // for compilers (templates :-) )
 #include <Eval_Conv_VDF_Face_leaves.h>
 #include <Iterateur_VDF_Face.h>
 #include <Pb_Multiphase.h>
@@ -27,10 +27,10 @@ class Op_Conv_VDF_Face_leaves
 { };
 /// \endcond
 
-/*! @brief class Op_Conv_Amont_VDF_Face Cette classe represente l'operateur de convection associe a une equation de la quantite de mouvement.
+/*! @brief class Op_Conv_Amont_VDF_Face This class represents the convection operator associated with a momentum equation.
  *
- *   La discretisation est VDF. Le champ convecte est de type Champ_Face_VDF. Le schema de convection est du type Amont
- *   L'iterateur associe est de type Iterateur_VDF_Face. L'evaluateur associe est de type Eval_Amont_VDF_Face
+ *   The discretization is VDF. The convected field is of type Champ_Face_VDF. The convection scheme is of upwind type.
+ *   The associated iterator is of type Iterateur_VDF_Face. The associated evaluator is of type Eval_Amont_VDF_Face
  *
  */
 class Op_Conv_Amont_VDF_Face : public Op_Conv_VDF_base, public Op_Conv_VDF<Op_Conv_Amont_VDF_Face>
@@ -52,10 +52,10 @@ public:
   }
 };
 
-/*! @brief class Op_Conv_Centre_VDF_Face Cette classe represente l'operateur de convection associe a une equation de la quantite de mouvement.
+/*! @brief class Op_Conv_Centre_VDF_Face This class represents the convection operator associated with a momentum equation.
  *
- *   La discretisation est VDF. Le champ convecte est de type Champ_Face_VDF. Le schema de convection est du type Centre
- *   L'iterateur associe est de type Iterateur_VDF_Face. L'evaluateur associe est de type Eval_Centre_VDF_Face
+ *   The discretization is VDF. The convected field is of type Champ_Face_VDF. The convection scheme is of centered type.
+ *   The associated iterator is of type Iterateur_VDF_Face. The associated evaluator is of type Eval_Centre_VDF_Face
  *
  */
 class Op_Conv_Centre_VDF_Face : public Op_Conv_VDF_base, public Op_Conv_VDF<Op_Conv_Centre_VDF_Face>
@@ -72,10 +72,10 @@ public:
   inline void dimensionner_blocs(matrices_t mats, const tabs_t& semi_impl) const override { dimensionner_blocs_impl<Type_Operateur::Op_CONV_FACE>(mats); }
 };
 
-/*! @brief class Op_Conv_Centre4_VDF_Face Cette classe represente l'operateur de convection associe a une equation de la quantite de mouvement.
+/*! @brief class Op_Conv_Centre4_VDF_Face This class represents the convection operator associated with a momentum equation.
  *
- *   La discretisation est VDF. Le champ convecte est de type Champ_Face_VDF. Le schema de convection est du type centre4 (centre sur 4 points)
- *   L'iterateur associe est de type Iterateur_VDF_Face. L'evaluateur associe est de type Eval_Centre4_VDF_Face
+ *   The discretization is VDF. The convected field is of type Champ_Face_VDF. The convection scheme is of centered4 type (4-point centered).
+ *   The associated iterator is of type Iterateur_VDF_Face. The associated evaluator is of type Eval_Centre4_VDF_Face
  *
  */
 class Op_Conv_Centre4_VDF_Face : public Op_Conv_VDF_base, public Op_Conv_VDF<Op_Conv_Centre4_VDF_Face>
@@ -90,10 +90,10 @@ public:
   inline const Champ_base& vitesse() const override { return vitesse_impl<Eval_Centre4_VDF_Face>(); }
 };
 
-/*! @brief class Op_Conv_Quick_VDF_Face Cette classe represente l'operateur de convection associe a une equation de la quantite de mouvement.
+/*! @brief class Op_Conv_Quick_VDF_Face This class represents the convection operator associated with a momentum equation.
  *
- *   La discretisation est VDF. Le champ convecte est de type Champ_Face_VDF
- *   Le schema de convection est du type Quick. L'iterateur associe est de type Iterateur_VDF_Face. L'evaluateur associe est de type Eval_Quick_VDF_Face
+ *   The discretization is VDF. The convected field is of type Champ_Face_VDF.
+ *   The convection scheme is of Quick type. The associated iterator is of type Iterateur_VDF_Face. The associated evaluator is of type Eval_Quick_VDF_Face
  *
  */
 class Op_Conv_Quick_VDF_Face_Axi : public Op_Conv_VDF_base, public Op_Conv_VDF<Op_Conv_Quick_VDF_Face_Axi>
@@ -108,10 +108,10 @@ public:
   inline const Champ_base& vitesse() const override { return vitesse_impl<Eval_Quick_VDF_Face_Axi>(); }
 };
 
-/*! @brief class Op_Conv_Quick_VDF_Face Cette classe represente l'operateur de convection associe a une equation de la quantite de mouvement.
+/*! @brief class Op_Conv_Quick_VDF_Face This class represents the convection operator associated with a momentum equation.
  *
- *   La discretisation est VDF. Le champ convecte est de type Champ_Face_VDF. Le schema de convection est du type Quick
- *   L'iterateur associe est de type Iterateur_VDF_Face. L'evaluateur associe est de type Eval_Quick_VDF_Face
+ *   The discretization is VDF. The convected field is of type Champ_Face_VDF. The convection scheme is of Quick type.
+ *   The associated iterator is of type Iterateur_VDF_Face. The associated evaluator is of type Eval_Quick_VDF_Face
  *
  */
 class Op_Conv_Quick_VDF_Face : public Op_Conv_VDF_base, public Op_Conv_VDF<Op_Conv_Quick_VDF_Face>

@@ -72,9 +72,9 @@ void Op_Div_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl)
 {
 
   if (!matrices.count("vitesse"))
-    return; // rien a faire
+    return; // nothing to do
   if (semi_impl.count("vitesse"))
-    return; // semi-implicite -> rien a dimensionner
+    return; // semi-implicit -> nothing to dimension
 
   Matrice_Morse *matv = matrices.count("vitesse") ? matrices["vitesse"] : nullptr,
                  *matp = matrices.count("pression") ? matrices["pression"] : nullptr,
@@ -166,9 +166,9 @@ void Op_Div_DG::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl)
 
       tabp1(0) = 1;
 
-      // Nombre de colonnes non nulles par ligne :
-      // pour chaque ddl pression d'un élément, on couple avec tous les ddl pression
-      // de l'élément courant + de son stencil.
+      // Number of non-zero columns per row:
+      // for each pressure DOF of an element, we couple with all pressure DOFs
+      // of the current element and its stencil.
       for (int nelem = 0; nelem < nb_elem_tot; nelem++)
         {
           nb_indices_line = 0;
@@ -447,7 +447,7 @@ void Op_Div_DG::ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, Dou
 
                         for (int k = 0; k < nb_pts_int_fac; k++)
                           {
-                            // Coordonnees des points d'integration
+                            // Coordinates of integration points
                             xk = integ_points_facets(face, k, 0);
                             yk = integ_points_facets(face, k, 1);
                             if (dimension == 3)
@@ -597,5 +597,5 @@ void Op_Div_DG::volumique(DoubleTab& div) const
   const int nb_elem = domaine_DG.domaine().nb_elem_tot();
 
   for (int num_elem = 0; num_elem < nb_elem; num_elem++)
-    div(num_elem, 0) /= vol(num_elem); // TODO DFG ici c'est n'importe quoi, trouve comment avoir une valeur coherente !!!
+    div(num_elem, 0) /= vol(num_elem); // TODO DFG this is inconsistent, find out how to get a coherent value !!!
 }

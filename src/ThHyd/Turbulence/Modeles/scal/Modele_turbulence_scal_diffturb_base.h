@@ -22,10 +22,9 @@
 
 #include <TRUST_Ref.h>
 
-/*! @brief Classe Mod_Turb_scal_diffuturb_base Cette classe represente la classe de base pour le modele de calcul suivant
+/*! @brief Base class for scalar turbulence models that compute turbulent diffusivity as:
  *
- *     pour la diffusivite turbulente:
- *                   alpha_turb = visco_turb / coeff_turb;
+ *                   alpha_turb = visco_turb / coeff_turb
  *
  * @sa Modele_turbulence_scal_base
  */

@@ -27,11 +27,11 @@ Entree& Cond_lim::readOn(Entree& s )
   return OWN_PTR(Cond_lim_base)::readOn(s) ;
 }
 
-/*! @brief Adopte la Cond_lim passee en parametre.
+/*! @brief Adopts the Cond_lim passed as a parameter.
  *
- * Il n'y a pas de copie.
- *     La Cond_lim_base eventuellement detenue avant l'appel est detruite.
- *     ATTENTION cl est nul ensuite
+ * There is no copy.
+ *     The Cond_lim_base possibly held before the call is destroyed.
+ *     WARNING cl is null after
  *
  * @param (Cond_lim& cl)
  */

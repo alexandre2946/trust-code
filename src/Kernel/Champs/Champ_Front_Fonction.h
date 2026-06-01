@@ -22,9 +22,9 @@
 
 class Probleme_base;
 
-/*! @brief Classe Champ_Front_Fonction Classe derivee de Champ_front_var_instationnaire_dep qui represente les
+/*! @brief Class Champ_Front_Fonction Derived class of Champ_front_var_instationnaire_dep representing
  *
- *      champs fonctions d'un autre champ par une fonction
+ *      fields that are functions of another field via an analytical function
  *
  *
  *

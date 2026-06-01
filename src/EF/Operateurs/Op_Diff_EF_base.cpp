@@ -74,9 +74,9 @@ void Op_Diff_EF_base::associer(const Domaine_dis_base& domaine_dis,
 double Op_Diff_EF_base::calculer_dt_stab() const
 {
   remplir_nu(nu_);
-  // La diffusivite est constante dans le domaine donc
+  // The diffusivity is constant over the domain, so
   //
-  //          dt_diff = h*h/diffusivite
+  //          dt_diff = h*h/diffusivity
 
   double dt_stab = DMAXFLOAT;
   const Domaine_EF& domaine_EF = le_dom_EF.valeur();
@@ -84,10 +84,10 @@ double Op_Diff_EF_base::calculer_dt_stab() const
     {
       if (1)
         {
-          // Methode "standard" de calcul du pas de temps
-          // Ce calcul est tres conservatif: si le max de la diffusivite
-          // n'est pas atteint a l'endroit ou le min de delta_h_carre est atteint,
-          // le pas de temps est sous-estime.
+          // "Standard" method for computing the time step.
+          // This estimate is very conservative: if the max of the diffusivity
+          // is not reached where the min of delta_h_squared is reached,
+          // the time step is underestimated.
           const Champ_base& champ_diffusivite = diffusivite_pour_pas_de_temps();
           const DoubleVect&      valeurs_diffusivite = champ_diffusivite.valeurs();
           double alpha_max = local_max_vect(valeurs_diffusivite);
@@ -109,7 +109,7 @@ double Op_Diff_EF_base::calculer_dt_stab() const
           const DoubleVect&      valeurs_diffusivite = champ_diffusivite.valeurs();
           const int nb_elem = domaine_EF.nb_elem();
           int elem;
-          // Champ de masse volumique variable.
+          // Variable density field.
           for (elem = 0; elem < nb_elem; elem++)
             {
 
@@ -140,7 +140,7 @@ double Op_Diff_EF_base::calculer_dt_stab() const
       assert(sub_type(Champ_Fonc_P0_base, champ_diffu));
       const int nb_elem = domaine_EF.nb_elem();
       int elem;
-      // Champ de masse volumique variable.
+      // Variable density field.
       for (elem = 0; elem < nb_elem; elem++)
         {
           const double h_carre = domaine_EF.carre_pas_maille(elem);

@@ -29,7 +29,7 @@ public:
   DoubleTab& calculer( const DoubleTab&, DoubleTab&) const override;
   DoubleTab& ajouter( const DoubleTab&, DoubleTab&) const override;
 
-  // Methode pour rendre le vecteur normal a la "face" de l'element "elem"
+  // Method to return the normal vector to the "face" of element "elem"
   DoubleTab vecteur_normal(const int face, const int elem) const;
 
   void associer_coins(const ArrOfInt&);

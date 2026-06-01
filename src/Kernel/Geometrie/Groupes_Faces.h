@@ -19,7 +19,7 @@
 #include <TRUST_List.h>
 #include <Groupe_Faces.h>
 
-/*! @brief Class Groupes_Faces Cette classe represente une liste d'objets de type Groupe_Faces
+/*! @brief Groupes_Faces class — represents a list of Groupe_Faces objects.
  *
  * @sa Groupes_Faces
  */

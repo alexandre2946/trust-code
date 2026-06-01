@@ -21,7 +21,7 @@ void Redistribute_Field::initialize(const Domaine_IJK& input,
                                     const Domaine_IJK& output,
                                     const Domaine_IJK::Localisation loc)
 {
-  // map vide => ok pour des maillages de tailles identiques
+  // empty map => ok for meshes of identical sizes
   VECT(IntTab) map;
   initialize(input, output, loc, map);
 }
@@ -32,7 +32,7 @@ void Redistribute_Field::initialize(const Domaine_IJK& input,
                                     const VECT(IntTab) & redistribute_maps)
 {
   IntTab map;
-  // Calcul des tableaux send_blocs
+  // Compute the send_blocs arrays
   for (int dir = 0; dir < 3; dir++)
     {
       if (redistribute_maps.size() == 0)
@@ -52,7 +52,7 @@ void Redistribute_Field::initialize(const Domaine_IJK& input,
           map = redistribute_maps[dir];
         }
       compute_send_blocs(input, output, loc, dir, map, send_blocs_[dir]);
-      // inverse la 'map' pour calculer les recv_blocs
+      // invert the map to compute the recv_blocs
       for (int i = 0; i < map.dimension(0); i++)
         {
           int x = map(i,0);
@@ -62,7 +62,7 @@ void Redistribute_Field::initialize(const Domaine_IJK& input,
       compute_send_blocs(output, input, loc, dir, map, recv_blocs_[dir]);
     }
 
-  // Calcul du schema de communication (liste des processeurs voisins et tailles des donnees
+  // Compute the communication schedule (list of neighbouring processors and data sizes)
   const FixedVector<IntTab, 3>& send_blocs = send_blocs_;
   const FixedVector<IntTab, 3>& recv_blocs = recv_blocs_;
   Schema_Comm_Vecteurs& schema = schema_comm_;
@@ -117,10 +117,10 @@ void Redistribute_Field::initialize(const Domaine_IJK& input,
   schema.end_init();
 }
 
-// Calcule l'intersection des segments [s1, s1 + n1 - 1] et [s2, s2 + n2 - 1],
-// stocke le resultat dans s2 et n2,
-// si l'origine s2 est modifiee, met a jour s3 comme
-//  nouveau s3 = ancien s3 + nouveau s2 - ancien s2
+// Computes the intersection of segments [s1, s1 + n1 - 1] and [s2, s2 + n2 - 1],
+// stores the result in s2 and n2.
+// If the origin s2 is modified, updates s3 as:
+//   new s3 = old s3 + new s2 - old s2
 void Redistribute_Field::intersect(const int s1, const int n1, int& s2, int& n2, int& s3)
 {
   // end of segment (plus one)
@@ -134,25 +134,25 @@ void Redistribute_Field::intersect(const int s1, const int n1, int& s2, int& n2,
   s3 += s2 - old_s2;
 }
 
-// Calcule comment redistribuer les donnees locales de mon processeur d'un champ input
-// dans un champ output (calcul des donnees a envoyer aux autres processeurs)
-// pour la direction "dir".
-// global_index_mapping: tableau a trois colonnes.
-//  colonne 1: index global du premier indice de segment a copier dans input
-//  colonne 2: index global du debut du segment destination (dans output)
-//  colonne 3: nombre d'elements du segment a copier
-// Si on veut redistribuer un champ simple, il suffit de passer un tableau global_index_mapping
-//  avec une ligne et trois colonnes: { 0, 0, n } ou n est le nombre d'elements global du champ
-// Si on veut redistribuer en periodisant (construction du champ etendu pour le front-tracking)
-//  on passe un tableau a trois lignes:
-//    ligne 0, la zone centrale:  { 0, extend_size, ni }  (ni est la taille du champ non etendu)
-//    ligne 1, la zone de gauche: { ni-extend_size, 0, extend_size }
-//    ligne 2, la zone de droite: { 0, ni + extend_size, extend_size }
+// Computes how to redistribute the local data of this processor from an input field
+// into an output field (computation of the data to send to other processors)
+// for direction "dir".
+// global_index_mapping: array with three columns.
+//   column 1: global index of the first segment element to copy from input
+//   column 2: global index of the beginning of the destination segment (in output)
+//   column 3: number of elements in the segment to copy
+// To redistribute a simple field, pass a global_index_mapping array
+//   with one row and three columns: { 0, 0, n } where n is the global element count of the field.
+// To redistribute with periodisation (building the extended field for front-tracking),
+//   pass an array with three rows:
+//     row 0, the central zone:   { 0, extend_size, ni }  (ni is the non-extended field size)
+//     row 1, the left zone:      { ni-extend_size, 0, extend_size }
+//     row 2, the right zone:     { 0, ni + extend_size, extend_size }
 //
-// On remplit le tableau send_blocs: liste de segments de donnees a envoyer aux autres processeurs
-//  (colonne 0: indice local du premier element a envoyer,
-//   colonne 1: numero de la tranche destination,
-//   colonne 2: nombre d'elements consecutifs a envoyer)
+// Fills the send_blocs array: list of data segments to send to other processors
+//   (column 0: local index of the first element to send,
+//    column 1: destination slice number,
+//    column 2: number of consecutive elements to send)
 void Redistribute_Field::compute_send_blocs(const Domaine_IJK& input,
                                             const Domaine_IJK& output,
                                             const Domaine_IJK::Localisation localisation,
@@ -160,17 +160,17 @@ void Redistribute_Field::compute_send_blocs(const Domaine_IJK& input,
                                             const IntTab& global_index_mapping,
                                             IntTab& send_blocs)
 {
-  // Distribution du champ output sur les differentes tranches de processeurs:
+  // Distribution of the output field over the different processor slices:
   ArrOfInt output_slice_offsets;
   ArrOfInt output_slice_size;
   output.get_slice_offsets(dir, output_slice_offsets);
   output.get_slice_size(dir, localisation, output_slice_size);
 
-  // Quelle partie du champ input est-ce que j'ai sur mon processeur:
+  // Which part of the input field is on this processor:
   const int input_slice_start = input.get_offset_local(dir);
   const int input_slice_size = input.get_nb_items_local(localisation, dir);
   send_blocs.resize(0,3);
-  // Boucle sur les segments a copier (un par ligne du global_index_mapping)
+  // Loop over the segments to copy (one per row of global_index_mapping)
   const int n_segments = global_index_mapping.dimension(0);
   for (int i_segment = 0; i_segment < n_segments; i_segment++)
     {
@@ -178,17 +178,17 @@ void Redistribute_Field::compute_send_blocs(const Domaine_IJK& input,
       int output_seg_start = global_index_mapping(i_segment, 1);
       int seg_length = global_index_mapping(i_segment, 2);
 
-      // Intersection du segment a copier avec les donnees locales du processeur:
+      // Intersection of the segment to copy with the local data of this processor:
       intersect(input_slice_start, input_slice_size, input_seg_start, seg_length, output_seg_start);
 
-      // Boucle sur les tranches du champ output:
+      // Loop over the output field slices:
       const int nb_output_slices = output_slice_offsets.size_array();
       for (int oslice = 0; oslice < nb_output_slices; oslice++)
         {
           int input_start = input_seg_start;
           int output_start = output_seg_start;
           int n = seg_length;
-          // Cette tranche oslice a-t-elle une intersection avec le output_segment courant ?
+          // Does this slice oslice intersect with the current output_segment?
           intersect(output_slice_offsets[oslice], output_slice_size[oslice], output_start, n, input_start);
           if (n > 0)
             {
@@ -237,18 +237,18 @@ void Redistribute_Field::redistribute_(const IJK_Field_double& input_field,
           const int nk            = send_blocs[2](ibloc[2], 2);
 
           const int dest_pe = output_field.get_domaine().get_processor_by_ijk(dest_slice_i, dest_slice_j, dest_slice_k);
-          // Si le processeur destination est moi meme, on prend un tableau local sans passer par MPI:
+          // If the destination processor is this process, use a local array without going through MPI:
           ArrOfDouble *buf_ptr;
           if (dest_pe == Process::me())
             {
-              // On fait pointer tmp sur une zone du buffer local de la bonne taille:
+              // Point tmp to a zone of the local buffer of the correct size:
               tmp.ref_array(buffer_for_me, index_buffer_for_me /* start index */, ni*nj*nk /* size */);
-              index_buffer_for_me += ni*nj*nk; // avance de la taille du bloc dans le buffer
+              index_buffer_for_me += ni*nj*nk; // advance by the block size in the buffer
               buf_ptr = &tmp;
             }
           else
             {
-              // Le buffer est dans le schema de communication:
+              // The buffer is in the communication schedule:
               buf_ptr = &schema.get_next_area_template<double>(dest_pe, ni*nj*nk);
             }
           ArrOfDouble& buf = *buf_ptr;
@@ -287,14 +287,14 @@ void Redistribute_Field::redistribute_(const IJK_Field_double& input_field,
           ArrOfDouble *buf_ptr;
           if (src_pe == Process::me())
             {
-              // On fait pointer tmp sur une zone du buffer local de la bonne taille:
+              // Point tmp to a zone of the local buffer of the correct size:
               tmp.ref_array(buffer_for_me, index_buffer_for_me /* start index */, ni*nj*nk /* size */);
-              index_buffer_for_me += ni*nj*nk; // avance de la taille du bloc dans le buffer
+              index_buffer_for_me += ni*nj*nk; // advance by the block size in the buffer
               buf_ptr = &tmp;
             }
           else
             {
-              // Le buffer est dans le schema de communication:
+              // The buffer is in the communication schedule:
               buf_ptr = &schema.get_next_area_template<double>(src_pe, ni*nj*nk);
             }
           ArrOfDouble& buf = *buf_ptr;

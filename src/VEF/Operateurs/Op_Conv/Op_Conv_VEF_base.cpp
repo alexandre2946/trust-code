@@ -38,7 +38,7 @@ Entree& Op_Conv_VEF_base::readOn(Entree& s )
 }
 
 
-/*! @brief definit si l'on convecte psi avec phi*u ou avec u
+/*! @brief Defines whether psi is convected with phi*u or with u.
  *
  */
 int  Op_Conv_VEF_base::phi_u_transportant(const Equation_base& eq) const
@@ -68,18 +68,17 @@ double Op_Conv_VEF_base::calculer_dt_stab() const
   if (vitesse().le_nom()=="rho_u" && equation().probleme().is_dilatable())
     diviser_par_rho_si_dilatable(fluent_,equation().milieu());
 
-  // Remplissage de faces_entrelaces_Cl_ qui contient les faces
-  // de bord non Dirichlet et les faces internes non std pour
-  // lequelles on utilise le volumes_entrelaces_Cl
-  // Ce tableau temporaire a ete cree pour fusionner plusieurs
-  // kernels Kokkos en un seul
+  // Fill faces_entrelaces_Cl_ which contains non-Dirichlet boundary faces
+  // and non-standard internal faces for which volumes_entrelaces_Cl is used.
+  // This temporary array was created to merge several
+  // Kokkos kernels into one
   if (faces_entrelaces_Cl_.size_array()==0)
     {
       faces_entrelaces_Cl_.resize(domaine_VEF.premiere_face_std());
       int ind_face=-1;
-      // On traite les conditions aux limites
-      // Si une face porte une condition de Dirichlet on n'en tient pas compte
-      // dans le calcul de dt_stab
+      // Process boundary conditions.
+      // If a face carries a Dirichlet condition, it is not taken into account
+      // in the computation of dt_stab.
       for (int n_bord = 0; n_bord < domaine_VEF.nb_front_Cl(); n_bord++)
         {
           const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -92,7 +91,7 @@ double Op_Conv_VEF_base::calculer_dt_stab() const
                 faces_entrelaces_Cl_(++ind_face) = num_face;
             }
         }
-      // Faces internes non std:
+      // Non-standard internal faces:
       int ndeb = domaine_VEF.premiere_face_int();
       int nfin = domaine_VEF.premiere_face_std();
       for (int num_face = ndeb; num_face < nfin; num_face++)
@@ -115,15 +114,15 @@ double Op_Conv_VEF_base::calculer_dt_stab() const
   }, Kokkos::Min<double>(dt_stab));
   end_gpu_timer(__KERNEL_NAME__);
 
-  // On traite les faces internes standard
+  // Process standard internal faces
   int ndeb = domaine_VEF.premiere_face_std();
   int nfin = domaine_VEF.nb_faces();
 
   const DoubleVect& tab_volumes_entrelaces = domaine_VEF.volumes_entrelaces();
   CDoubleArrView volumes_entrelaces = tab_volumes_entrelaces.view_ro();
-  // Necessaire car Kokkos::parallel_reduce() reecrit dt_stab avec le
-  // resultat de la reduction quelle que soit la valeur de depart (en
-  // particulier, celle d'une reduction precedente, comme ici).
+  // Necessary because Kokkos::parallel_reduce() overwrites dt_stab with the
+  // result of the reduction regardless of the initial value (in
+  // particular, the value from a previous reduction, as here).
   double dt_stab_2 = dt_stab;
   Kokkos::parallel_reduce(
     start_gpu_timer(__KERNEL_NAME__),
@@ -136,9 +135,9 @@ double Op_Conv_VEF_base::calculer_dt_stab() const
   end_gpu_timer(__KERNEL_NAME__);
   if (dt_stab_2 < dt_stab) dt_stab = dt_stab_2;
 
-  // Min sur l'ensemble des processeurs
+  // Min over all processors
   dt_stab = Process::mp_min(dt_stab);
-  // astuce pour contourner le type const de la methode
+  // trick to work around the const type of the method
   Op_Conv_VEF_base& op = ref_cast_non_const(Op_Conv_VEF_base,*this);
   op.fixer_dt_stab_conv(dt_stab);
   if (vitesse().le_nom()=="rho_u" && equation().probleme().is_dilatable())
@@ -147,7 +146,7 @@ double Op_Conv_VEF_base::calculer_dt_stab() const
   return dt_stab;
 }
 
-// cf Op_Conv_VEF_base::calculer_dt_stab() pour choix de calcul de dt_stab
+// cf Op_Conv_VEF_base::calculer_dt_stab() for the choice of dt_stab computation
 void Op_Conv_VEF_base::calculer_pour_post(Champ_base& espace_stockage,const Nom& option,int comp) const
 {
   if (Motcle(option)=="stabilite")
@@ -166,9 +165,9 @@ void Op_Conv_VEF_base::calculer_pour_post(Champ_base& espace_stockage,const Nom&
           if (vitesse().le_nom()=="rho_u" && equation().probleme().is_dilatable())
             diviser_par_rho_si_dilatable(fluent_,equation().milieu());
 
-          // On traite les conditions aux limites
-          // Si une face porte une condition de Dirichlet on n'en tient pas compte
-          // dans le calcul de dt_stab
+          // Process boundary conditions.
+          // If a face carries a Dirichlet condition, it is not taken into account
+          // in the computation of dt_stab.
           for (int n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
             {
               const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -187,7 +186,7 @@ void Op_Conv_VEF_base::calculer_pour_post(Champ_base& espace_stockage,const Nom&
                 }
             }
 
-          // On traite les faces internes non standard
+          // Process non-standard internal faces
           int ndeb = domaine_VEF.premiere_face_int();
           int nfin = domaine_VEF.premiere_face_std();
 
@@ -197,7 +196,7 @@ void Op_Conv_VEF_base::calculer_pour_post(Champ_base& espace_stockage,const Nom&
               es_valeurs(num_face) = dt_face;
             }
 
-          // On traite les faces internes standard
+          // Process standard internal faces
           ndeb = nfin;
           nfin = domaine_VEF.nb_faces();
           for (int num_face=ndeb; num_face<nfin; num_face++)
@@ -261,17 +260,17 @@ DoubleTab& Op_Conv_VEF_base::calculer(const DoubleTab& transporte,
 }
 void Op_Conv_VEF_base::remplir_fluent() const
 {
-  // Remplissage du tableau fluent par appel a ajouter
-  // C'est cher mais au moins cela corrige (en attendant
-  // d'optimiser) le probleme d'un pas de temps de convection
-  // calcule avec des vitesses du passe
+  // Fill the fluent array by calling ajouter.
+  // This is expensive but at least it fixes (while waiting
+  // to optimize) the problem of a convection time step
+  // computed with velocities from the past.
   DoubleTrav tmp(equation().inconnue().valeurs());
-  DoubleTab flux_bords_sauve(flux_bords_);  // On sauve les flux_bords car sinon mis a 0
+  DoubleTab flux_bords_sauve(flux_bords_);  // Save flux_bords, otherwise set to 0
   ajouter(tmp,tmp);
   flux_bords_=flux_bords_sauve;
-  // PL: C'est vraiment lourd, mais comment faire? fluent est dependant
-  // du schema et donc on peut coder quelque chose comme fluent=vitesse*surface*porosite
-  // dans cette presente methode
+  // PL: This is really heavy, but what else? fluent depends on
+  // the scheme, so something like fluent=velocity*surface*porosity
+  // could be coded in this method
 }
 
 

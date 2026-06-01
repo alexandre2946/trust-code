@@ -24,13 +24,13 @@
 class Matrice_Morse;
 class Objet_U;
 
-//types de l'interface {dimensionner,ajouter}_blocs
-//derivees d'un DoubleTab par rapport a plusieurs inconues : deriv[nom_inco] = tableau
-//dictionnaire de matrices
+//types of the interface {dimensionner,ajouter}_blocs
+//derivatives of a DoubleTab with respect to several unknowns : deriv[nom_inco] = array
+//matrix dictionary
 typedef std::map<std::string, Matrice_Morse *> matrices_t;
-//dictionnaires de DoubleTabs
+//DoubleTab dictionaries
 typedef std::map<std::string, DoubleTab >  tabs_t;
 typedef std::map<std::string, DoubleTab*> ptabs_t;
-//calcul d'un OWN_PTR(Champ_Inc_base) ainsi que de ses derivees et de ses valeurs aux bords
+//calculation of an OWN_PTR(Champ_Inc_base) as well as its derivatives and its values at boundaries
 typedef void (*fonc_calc_t)(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv);
 #endif

@@ -43,11 +43,12 @@ DoubleTab& Champ_P0_VDF::remplir_coord_noeuds(DoubleTab& positions) const
   return positions;
 }
 
-/*! @brief renvoie la moyenne du champ au sens P0 i.
+/*! @brief Returns the P0-average of the field, i.e. the sum, divided by the total domain volume,
  *
- * e la somme, divisee par le volume total du domaine, des valeurs constantes par element
- *  multipliees par les volumes des elements
+ * @brief of the piecewise-constant values multiplied by the element volumes.
  *
+ * @param porosite_elem Porosity at elements.
+ * @return Average value vector.
  */
 DoubleVect Champ_P0_VDF::moyenne(const DoubleVect& porosite_elem) const
 {
@@ -71,8 +72,11 @@ DoubleVect Champ_P0_VDF::moyenne(const DoubleVect& porosite_elem) const
   return moy;
 }
 
-/*! @brief Cette fonction effectue le calcul de la moyenne au sens P0 de la kieme composante du champ
+/*! @brief Computes the P0-average of the k-th component of the field.
  *
+ * @param porosite_elem Porosity at elements.
+ * @param ncomp Component index.
+ * @return Average value of the component.
  */
 double Champ_P0_VDF::moyenne(const DoubleVect& porosite_elem, int ncomp) const
 {
@@ -92,17 +96,20 @@ double Champ_P0_VDF::moyenne(const DoubleVect& porosite_elem, int ncomp) const
   return moy;
 }
 
-/*! @brief Ecrit le champ sous la forme IJK
+/*! @brief Writes the field in IJK format.
  *
+ * @param os Output stream.
+ * @param ncomp Component index to print.
+ * @return 1 on success.
  */
 int Champ_P0_VDF::imprime(Sortie& os, int ncomp) const
 {
   // valeur_au_ijk(xi,yj,zk,valeurs,ncomp);
-  // principe  : creer un tableau points avec selon si champ_elem ou champ_faces
-  // une grille construite a partie de xi,yj,zk lu dans un fichier
-  // sub_type(Champ_P0, *this) : grille construite a partir de (xi+xi+1)/2,etc...
-  // Sinon : grille construite a partir de xi,xi+1,etc...
-  // Boucle sur ni,nj,nk
+  // principle: create a point array depending on whether the field is element-based or face-based
+  // with a grid built from xi,yj,zk read from a file
+  // sub_type(Champ_P0, *this): grid built from (xi+xi+1)/2, etc...
+  // Otherwise: grid built from xi, xi+1, etc...
+  // Loop over ni,nj,nk
   // K=
   //     I=1 I=2 I=3 I=4
   // J=10 Vij
@@ -114,7 +121,7 @@ int Champ_P0_VDF::imprime(Sortie& os, int ncomp) const
   int cmax=7;
   DoubleVect xi,yj,zk;
   DoubleTab Grille;
-  //Lecture de xi,yj,zk dans un fichier .xiyjzk
+  //Reading xi,yj,zk from a .xiyjzk file
   Nom nomfic(nom_du_cas());
   nomfic+=".xiyjzk";
   LecFicDiffuse ficijk(nomfic);
@@ -131,7 +138,7 @@ int Champ_P0_VDF::imprime(Sortie& os, int ncomp) const
     {
       if (dimension==3)
         {
-          // Grille ordonnee sur les centres des elements
+          // Grid ordered at element centers
           np=(ni-1)*(nj-1)*(nk-1);
           Grille.resize(np,dimension);
           for(k=0; k<nk-1; k++)

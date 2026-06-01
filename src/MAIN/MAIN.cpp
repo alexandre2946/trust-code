@@ -87,7 +87,7 @@ int main_TRUST(int argc, char** argv,mon_main*& main_process,bool with_mpi, bool
   Nom log_directory = "";
   bool helptrust = false;
   // if bool ieee = true => use of feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
-// Crashes bizarres sur compilateurs clang++, fcc, nvc++, nvcc donc on desactive:
+// Strange crashes on clang++, fcc, nvc++, nvcc compilers so we disable this:
 #if defined(_COMPILE_AVEC_CLANG) || defined (_COMPILE_AVEC_FCC) || defined(__NVCOMPILER) || defined(__NVCC__)
   ieee = false;
 #endif
@@ -105,7 +105,7 @@ int main_TRUST(int argc, char** argv,mon_main*& main_process,bool with_mpi, bool
   for (int i = 1; i < argc; i++)
     {
       // int error = 0;
-      // Le -help est reserve par Petsc
+      // -help is reserved by Petsc
       if (strcmp(argv[i], "-help_trust") == 0)
         {
           helptrust = true;
@@ -188,7 +188,7 @@ int main_TRUST(int argc, char** argv,mon_main*& main_process,bool with_mpi, bool
         }
       else if (i == 1)
         {
-          // Les deux derniers tests doivent rester a la fin, inserer les arguments supplementaires avant.
+          // The last two tests must remain at the end; insert any additional arguments before them.
           data_file = argv[1];
           arguments_info += "Data file name = ";
           arguments_info += data_file;
@@ -220,7 +220,7 @@ int main_TRUST(int argc, char** argv,mon_main*& main_process,bool with_mpi, bool
             }
           else
             {
-              // Mise en commentaire car dans certains scripts verifie on teste: trust $jdd -ksp_view
+              // Commented out because some verification scripts test: trust $jdd -ksp_view
               /*
                       Nom fichier=argv[i];
                       fichier.prefix(".data");
@@ -257,10 +257,10 @@ int main_TRUST(int argc, char** argv,mon_main*& main_process,bool with_mpi, bool
 
   {
 
-    // ************** Initialisation de Petsc, du parallele (si Petsc) **********
-    // .. et demarrage du journal
-    // (tout ce qu'on veut faire en commun avec l'interface python doit etre
-    //  mis dans mon_main)
+    // ************** Initialisation of Petsc and the parallel layer (if Petsc) **********
+    // .. and start of the journal
+    // (everything that should be shared with the Python interface must be
+    //  placed in mon_main)
     statistics().begin_count(STD_COUNTERS::total_execution_time);
     main_process=new  mon_main(verbose_level, journal_master, log_directory, apply_verification, disable_stop);
     main_process->init_parallel(argc, argv, with_mpi, check_enabled, with_petsc);
@@ -283,17 +283,16 @@ int main_TRUST(int argc, char** argv,mon_main*& main_process,bool with_mpi, bool
           }
       }
 
-    // A partir d'ici on a le droit d'utiliser les communications entre processeurs,
+    // From here on, inter-processor communications are allowed,
     // me() etc...
     const int master = Process::je_suis_maitre();
 
-    // Modif B.Mathieu 28/09/2004 :
-    //  Pour debugger trust, on donne parametre le nom
-    //  d'une commande systeme a executer lorsqu'on arrive a cet endroit.
-    //  Le plus pratique, c'est d'utiliser un shell script qui ouvre
-    //  un xterm et lance gdb. On peut aussi faire un tail -f du fichier log,
-    //  etc...
-    //  La commande est executee avec comme parametre le numero du PE.
+    // Modif B.Mathieu 28/09/2004:
+    //  To debug TRUST, a system command name can be passed as a parameter
+    //  to be executed when this point is reached.
+    //  The most convenient approach is a shell script that opens
+    //  an xterm and launches gdb. A tail -f on the log file also works.
+    //  The command is executed with the PE rank as its argument.
     if(exec_script != "")
       {
         exec_script += " ";
@@ -306,8 +305,8 @@ int main_TRUST(int argc, char** argv,mon_main*& main_process,bool with_mpi, bool
       {
         if (helptrust) usage();
 
-        // On affiche le resultat de la ligne de commande ici pour ne pas remplir stderr
-        // avec tous les processeurs...
+        // The command-line summary is printed here to avoid filling stderr
+        // with output from all processors...
         Cerr << arguments_info;
 
         if (nproc != -1 && Process::nproc() != nproc)
@@ -326,15 +325,15 @@ int main_TRUST(int argc, char** argv,mon_main*& main_process,bool with_mpi, bool
     // Handle dataset name - only if we are not in unit_test mode for which we do not want to process any datafile at all.
     if (!unit_test)
       {
-        // ****************** Nom du cas ***********************
+        // ****************** Case name ***********************
         if (data_file == "")
           {
-            // TRUST sans argument => nom du cas = nom du repertoire courant
+            // TRUST without argument => case name = current directory name
             Nom pwd(::pwd());
             if (master)
               Cerr << "No command line argument. Data file name from directory name:\n "
                    << pwd << finl;
-            const int l = pwd.longueur() - 1; // Attention, longueur()=strlen+1
+            const int l = pwd.longueur() - 1; // Note: longueur()=strlen+1
             int i = l - 1;
             while(i > 0 && pwd[i] != directory_separator)
               {
@@ -348,13 +347,13 @@ int main_TRUST(int argc, char** argv,mon_main*& main_process,bool with_mpi, bool
                     Process::exit();
                   }
               }
-            data_file = pwd.substr_old(i + 2, l - i - 1); // Attention, voir Nom::substr()
+            data_file = pwd.substr_old(i + 2, l - i - 1); // Note: see Nom::substr()
           }
         if (master)
           {
             Cerr << "Data file : " << data_file << finl;
           }
-        // Si le nom du cas finit par .data, on l'enleve.
+        // If the case name ends with .data, strip the extension.
         if (data_file.finit_par(".data"))
           {
             if (master)
@@ -408,7 +407,7 @@ int main_TRUST(int argc, char** argv,mon_main*& main_process,bool with_mpi, bool
   if(statistics().is_running(STD_COUNTERS::total_execution_time))
     statistics().end_count(STD_COUNTERS::total_execution_time);
 
-  //  pour detruire les derniers octets
+  //  free the last remaining bytes
   desalloue_pwd();
   return (0);
 }

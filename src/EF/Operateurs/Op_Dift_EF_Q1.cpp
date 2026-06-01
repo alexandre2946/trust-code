@@ -85,7 +85,7 @@ void Op_Dift_EF_Q1::remplir_marqueur_elem_CL_paroi(ArrOfInt& marqueur,const Doma
     }
 }
 
-/*! @brief associe le champ de diffusivite
+/*! @brief Associates the diffusivity field.
  *
  */
 void Op_Dift_EF_Q1::associer_diffusivite(const Champ_base& diffu)
@@ -96,7 +96,7 @@ void Op_Dift_EF_Q1::associer_diffusivite(const Champ_base& diffu)
 void Op_Dift_EF_Q1::remplir_nu(DoubleTab& nu) const
 {
   const Domaine_EF& domaine_EF = le_dom_EF.valeur();
-  // On dimensionne nu
+  // Size nu
   if (!nu.get_md_vector())
     domaine_EF.domaine().creer_tableau_elements(nu);
   const DoubleTab& diffu=diffusivite().valeurs();
@@ -253,7 +253,7 @@ DoubleTab& Op_Dift_EF_Q1::ajouter_new(const DoubleTab& tab_inconnue, DoubleTab& 
   //  Journal()<<max(resu)<<" "<<min(resu)<<finl;
 
 
-  // on ajoute la contribution des bords
+  // add the contribution from boundaries
   ajouter_bords(tab_inconnue,resu);
   return resu;
 }
@@ -267,7 +267,7 @@ DoubleTab& Op_Dift_EF_Q1::calculer(const DoubleTab& tab_inconnue, DoubleTab& res
 
 
 /////////////////////////////////////////
-// Methode pour l'implicite
+// Method for the implicit scheme
 /////////////////////////////////////////
 
 
@@ -300,9 +300,8 @@ void Op_Dift_EF_Q1::ajouter_contribution(const DoubleTab& transporte, Matrice_Mo
     {
       ajouter_contribution_new(transporte,matrice);
     }
-  // On remplit le tableau nu car l'assemblage d'une
-  // matrice avec ajouter_contribution peut se faire
-  // avant le premier pas de temps
+  // Fill the nu array because matrix assembly with ajouter_contribution
+  // can happen before the first time step
   remplir_nu(nu_);
 
   DoubleVect diffu_turb(diffusivite_turbulente().valeurs());
@@ -359,9 +358,8 @@ void Op_Dift_EF_Q1::ajouter_contribution(const DoubleTab& transporte, Matrice_Mo
 void Op_Dift_EF_Q1::ajouter_contribution_new(const DoubleTab& transporte, Matrice_Morse& matrice ) const
 {
   //Cerr<<" NEW"<<finl;
-  // On remplit le tableau nu car l'assemblage d'une
-  // matrice avec ajouter_contribution peut se faire
-  // avant le premier pas de temps
+  // Fill the nu array because matrix assembly with ajouter_contribution
+  // can happen before the first time step
   remplir_nu(nu_);
 
   DoubleVect diffu_turb(diffusivite_turbulente().valeurs());
@@ -425,13 +423,13 @@ void Op_Dift_EF_Q1::contribuer_au_second_membre(DoubleTab& resu ) const
 }
 void Op_Dift_EF_Q1::ajouter_bords(const DoubleTab& tab_inconnue,DoubleTab& resu,  int contrib_interne ) const
 {
-  // a mettre dans calculer_flux_bord....
+  // to be moved into calculer_flux_bord....
 
   const Domaine_Cl_EF& domaine_Cl_EF = la_zcl_EF.valeur();
   const Domaine_EF& domaine_EF = le_dom_EF.valeur();
   flux_bords_=0.;
   // const DoubleTab& tab_inconnue=equation().inconnue().valeurs();
-  // on parcourt toutes les faces de bord et on calcule lambda*gradT
+  // loop over all boundary faces and compute lambda*gradT
   const Domaine_EF& domaine_ef=ref_cast(Domaine_EF,equation().domaine_dis());
   const IntTab& face_voisins=domaine_ef.face_voisins();
   const DoubleTab& bij=domaine_ef.Bij();
@@ -474,7 +472,7 @@ void Op_Dift_EF_Q1::ajouter_bords(const DoubleTab& tab_inconnue,DoubleTab& resu,
                   ArrOfDouble effort_elem(dimension);
                   ArrOfInt som_CL(nb_som_face);
 
-                  // Boucle sur les faces de la CL
+                  // Loop over the BC faces
                   for (int ind_face=num1; ind_face<num2; ind_face++)
                     {
                       int num_face = le_bord.num_face(ind_face);
@@ -488,19 +486,19 @@ void Op_Dift_EF_Q1::ajouter_bords(const DoubleTab& tab_inconnue,DoubleTab& resu,
                       for (int a=0; a<dimension; a++) n[a]=face_normales(num_face,a);
                       n/=norme_array(n);
 
-                      // Calcul du gradient gradU via tau
-                      // Au bord, n toujours oriente vers l'exterieur
+                      // Compute gradient gradU via tau
+                      // At the boundary, n is always oriented outward
                       for (int nc=0; nc<dimension; nc++)
                         for (int nc2=0; nc2<dimension; nc2++)
                           Tgrad(nc,nc2)=tau_tan_(num_face,nc)*n[nc2];
 
-                      // Boucle sur les faces de l'element
-                      // (Sigma_e somme_face n = 0 => -Sigma_e somme_face_cl n = + Sigma_e somme_face_non_cl n)
+                      // Loop over the element faces
+                      // (Sigma_e sum_face n = 0 => -Sigma_e sum_face_cl n = + Sigma_e sum_face_non_cl n)
                       effort_elem = 0.;
                       for (int i=0; i<nb_faces_elem; i++)
                         {
                           int face_i=elem_faces(elem,i);
-                          // On calcule la contribution de la face :
+                          // Compute the contribution of the face:
                           effort_face = 0.;
                           double ori=1.;
                           if ( face_voisins(face_i,0) != elem ) ori=-1;
@@ -513,8 +511,8 @@ void Op_Dift_EF_Q1::ajouter_bords(const DoubleTab& tab_inconnue,DoubleTab& resu,
                         }
                       //  Cerr<<"force cisaillement elem "<<elem<<" => "<<effort_elem<<finl;
 
-                      // On calcule la contribution a chaque noeud de l'element :
-                      // (les nb_som_face noeuds de la face CL Dirichlet ne sont pas concernes)
+                      // Compute the contribution to each element node:
+                      // (the nb_som_face nodes of the Dirichlet BC face are not concerned)
                       int nb_iok = 0;
                       for (int jsom=0; jsom<nb_som_elem; jsom++)
                         {
@@ -933,20 +931,20 @@ void Op_Dift_EF_Q1::calculer_pour_post(Champ_base& espace_stockage,const Nom& op
 
 double Op_Dift_EF_Q1::calculer_dt_stab() const
 {
-  // 12/04: Premiers efforts d'optimisation du code a tenir
-  // compte lors de la factorisation des pas de temps de stabilite
+  // 12/04: First optimization efforts to account for
+  // stability time step factorization
 
-  // Calcul de dt_stab
-  // La diffusivite est constante par elements donc
-  // il faut calculer dt_diff pour chaque element et
+  // Compute dt_stab
+  // Diffusivity is constant per element, so
+  // dt_diff must be computed for each element and
   //  dt_stab=Min(dt_diff (K) = h(K)*h(K)/(2*dimension*diffu2_(K)))
-  // ou diffu2_ est la somme des 2 diffusivite laminaire et turbulente
+  // where diffu2_ is the sum of the laminar and turbulent diffusivities
 
   //GF
   // alpha_dt_stab=(alpha+alpha_t)*alpha_dt_stab/alpha
   // alpha_dt_stab=(nu+diff_nu_turb)*valeurs_diffusivite_dt/nu
 
-  // On remplit le tableau nu contenant la diffusivite en chaque elem
+  // Fill the nu array containing the diffusivity at each element
   remplir_nu(nu_);
 
   double dt_stab=1.e30;

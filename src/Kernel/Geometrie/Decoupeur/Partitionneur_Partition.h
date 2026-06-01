@@ -21,7 +21,7 @@
 
 #include <Domaine_forward.h>
 
-/*! @brief Partitionneur de domaine en fonction du partitionnement d'un autre domaine
+/*! @brief Domain partitioner based on the partitioning of another domain.
  *
  */
 class Partitionneur_Partition : public Partitionneur_base
@@ -38,7 +38,7 @@ public:
   void construire_partition(IntVect& elem_part, int& nb_parts_tot) const override;
 
 private:
-  // Parametres du partitionneur
+  // Partitioner parameters
   OBS_PTR(Domaine) ref_domaine_interpol_;
   Nom dom_calcul_ = "";
 };

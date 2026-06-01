@@ -21,8 +21,8 @@
 
 /*! @brief class Op_Grad_PolyMAC_MPFA_Face
  *
- *   Cette classe represente l'operateur de gradient La discretisation est PolyMAC_MPFA
- *   On calcule le gradient d'un champ_Elem_PolyMAC_MPFA (la pression)
+ * @brief Gradient operator for PolyMAC_MPFA discretization, computing the gradient of a
+ *        Champ_Elem_PolyMAC_MPFA field (pressure).
  *
  * @sa Operateur_Grad_base
  */
@@ -38,12 +38,12 @@ public:
 
   void update_grad(int full_stencil = 0) const;
 
-  /* public pour utilisation par Assembleur_P_PolyMAC_MPFA : [grad p]_f */
+  /* public for use by Assembleur_P_PolyMAC_MPFA : [grad p]_f */
   mutable IntTab fgrad_d, fgrad_e;
   mutable DoubleTab fgrad_c;
 
 protected:
-  mutable double last_gradp_ = -DBL_MAX; //dernier temps utilise pour interpoler grad p (mis a DBL_MAX si grad p non reinterpole)
+  mutable double last_gradp_ = -DBL_MAX; //last time used to interpolate grad p (set to DBL_MAX if grad p has not been re-interpolated)
   mutable std::map<int, std::map<int, double>> dgp_gb_;
   mutable std::map<int, std::map<int, double>> dgb_v_;
   mutable std::vector<std::vector<std::pair<int, double>>> dgf_pe_;

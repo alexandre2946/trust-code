@@ -22,14 +22,14 @@
 
 class Fluide_Ostwald;
 
-/*! @brief classe Champ_Ostwald Represente un champ qui varie en fonction de la consistance et
+/*! @brief Champ_Ostwald Represents a field that varies as a function of consistency and
  *
- *         de l'indice de structure.
- *    Classe mere qui gere le champ utilise pour le fluide d'Ostwald dans les deux
- *    discretisations.
- *    Possede les fonctions generiques aux deux discretisations.
- *    Fait reference a un fluide d'Ostwald pour pouvoir utiliser les deux
- *    parametres du fluide d'Ostwald : K et N.
+ *         the structure index.
+ *    Base class that manages the field used for the Ostwald fluid in both
+ *    discretizations.
+ *    Contains generic functions common to both discretizations.
+ *    References an Ostwald fluid in order to use the two
+ *    parameters of the Ostwald fluid: K and N.
  *
  * @sa Champ_Don_base
  */
@@ -51,7 +51,7 @@ public :
   }
 
 protected:
-  OBS_PTR(Fluide_Ostwald) mon_fluide_;  // pour obtenir K et N
+  OBS_PTR(Fluide_Ostwald) mon_fluide_;  // to obtain K and N
 };
 
 #endif /* Champ_Ostwald_included */

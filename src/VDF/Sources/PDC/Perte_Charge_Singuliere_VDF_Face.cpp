@@ -46,7 +46,7 @@ Entree& Perte_Charge_Singuliere_VDF_Face::readOn(Entree& s)
 void Perte_Charge_Singuliere_VDF_Face::completer()
 {
   Perte_Charge_VDF_Face::completer();
-  // eq_masse besoin de champ_conserve !
+  // eq_masse needs champ_conserve!
   if (sub_type(Pb_Multiphase, mon_equation->probleme()))
     ref_cast(Pb_Multiphase, mon_equation->probleme()).equation_masse().init_champ_conserve();
 }
@@ -178,7 +178,7 @@ void Perte_Charge_Singuliere_VDF_Face::ajouter_blocs(matrices_t matrices, Double
 
         for (int n = 0; n < N; n++)
           {
-            const double Ud = vit(numfa, n) * porosite_surf[numfa]; // vitesse debitante
+            const double Ud = vit(numfa, n) * porosite_surf[numfa]; // bulk velocity
             const double U = inco(numfa, n) * porosite_surf[numfa];
 
             secmem(numfa,n) += aar_f(n) * Ck * U * std::fabs(Ud) * volumes_entrelaces[numfa] * porosite_surf[numfa];

@@ -39,10 +39,10 @@ double Op_Diff_PolyMAC_CDO_base::calculer_dt_stab() const
 
   if (!has_champ_masse_volumique())
     {
-      // Methode "standard" de calcul du pas de temps
-      // Ce calcul est tres conservatif: si le max de la diffusivite
-      // n'est pas atteint a l'endroit ou le min de delta_h_carre est atteint,
-      // le pas de temps est sous-estime.
+      // "Standard" method for computing the time step
+      // This computation is very conservative: if the max of the diffusivity
+      // is not reached at the location where the min of delta_h_carre is reached,
+      // the time step is underestimated.
       const Champ_base& champ_diffusivite = diffusivite_pour_pas_de_temps();
       const DoubleVect& valeurs_diffusivite = champ_diffusivite.valeurs();
       double alpha_max = local_max_vect(valeurs_diffusivite);
@@ -103,8 +103,8 @@ double Op_Diff_PolyMAC_CDO_base::calculer_dt_stab() const
       assert(sub_type(Champ_Elem_PolyMAC_CDO, champ_rho));
       assert(sub_type(Champ_Fonc_P0_base, champ_diffu));
       // assert(valeurs_rho.size_array()== mon_dom.les_elems().dimension_tot(0));
-      // Champ_Elem_PolyMAC_CDO : champ aux elems et aux faces
-      // Champ de masse volumique variable.
+      // Champ_Elem_PolyMAC_CDO: field at elements and faces
+      // Variable density field.
       const IntTab& e_f = le_dom_poly_->elem_faces();
       //Cerr << e_f << finl;
       for (int elem = 0; elem < nb_elem; elem++)
@@ -119,23 +119,23 @@ double Op_Diff_PolyMAC_CDO_base::calculer_dt_stab() const
               for (int i = 0; i < e_f.dimension(1); i++)
                 if (e_f(elem, i) != -1)
                   nb_rf++;
-              flag = (nb_rf == deux_dim); // a ameliorer, ca pourrait ne pas etre un hexa regulier...
+              flag = (nb_rf == deux_dim); // to improve: this could not be a regular hexahedron...
             }
           else
             flag = (e_f.dimension(1) == deux_dim || e_f(elem, deux_dim) == -1);
           if (flag)
             {
-              // Maille type VDF (deux_dim faces sur l'element)
-              // ToDo: coder dans le cas has_champ_masse_volumique()==false
+              // VDF-type cell (deux_dim faces per element)
+              // ToDo: implement for the case has_champ_masse_volumique()==false
               double h = 0;
               for (int f = 0; f < deux_dim; f++)
                 {
                   int face = e_f(elem, f);
                   const double d = le_dom_poly_->volumes(elem) / le_dom_poly_->surface(face);
-                  h += 0.5 / (d * d); // On multiplie par 0.5 car face comptee 2 fois
+                  h += 0.5 / (d * d); // multiply by 0.5 since each face is counted twice
                   //Cerr << elem << " " << face << " " << le_dom_poly_->surface(face) << finl;
                 }
-              // Voir Op_Diff_VDF_Elem_base::calculer_dt_stab():
+              // See Op_Diff_VDF_Elem_base::calculer_dt_stab():
               dt = 0.5 * rho / ((diffu + DMINFLOAT) * h);
               //Cerr << "VDF " << dt << finl;
             }
@@ -164,22 +164,22 @@ void Op_Diff_PolyMAC_CDO_base::completer()
 
 void Op_Diff_PolyMAC_CDO_base::update_nu() const
 {
-  if (nu_a_jour_) return; // on a deja fait le travail
+  if (nu_a_jour_) return; // already done
 
   const Domaine_PolyMAC_CDO& domaine = le_dom_poly_.valeur();
   const Conds_lim& cls = la_zcl_poly_->les_conditions_limites();
   int i, j, f;
 
   /* 1. nu_ */
-  //dimensionnement
+  //sizing
   const DoubleTab& diffu = diffusivite().valeurs();
   if (equation().que_suis_je() != "Transport_K_Epsilon")
     {
       if (!diffu.get_md_vector())
         {
-          // diffusvite uniforme
+          // uniform diffusivity
           int n = nu_.dimension_tot(0), nb_comp = nu_.line_size();
-          // Tableaux vus comme uni-dimenionnels:
+          // Arrays viewed as one-dimensional:
           const DoubleVect& arr_diffu = diffu;
           DoubleVect& arr_nu = nu_;
           for (i = 0; i < n; i++)
@@ -194,7 +194,7 @@ void Op_Diff_PolyMAC_CDO_base::update_nu() const
         }
     }
 
-  /* ajout de la diffusivite turbulente si elle existe */
+  /* add turbulent diffusivity if it exists */
   if (has_diffusivite_turbulente())
     {
       const DoubleTab& diffu_turb = diffusivite_turbulente().valeurs();
@@ -214,9 +214,9 @@ void Op_Diff_PolyMAC_CDO_base::update_nu() const
         {
           if (!diffu_turb.get_md_vector())
             {
-              // diffusvite uniforme
+              // uniform diffusivity
               int n = nu_.dimension_tot(0), nb_comp = nu_.line_size();
-              // Tableaux vus comme uni-dimenionnels:
+              // Arrays viewed as one-dimensional:
               const DoubleVect& arr_diffu_turb = diffu_turb;
               DoubleVect& arr_nu = nu_;
               for (i = 0; i < n; i++)
@@ -232,24 +232,24 @@ void Op_Diff_PolyMAC_CDO_base::update_nu() const
         }
     }
 
-  /* 2. nu_fac : prend en compte les lois de parois et le facteur utilisateur (nu_fac_mod) */
-  // utilise-t-on des lois de paroi ?
+  /* 2. nu_fac: accounts for wall laws and the user factor (nu_fac_mod) */
+  // are wall laws used?
   const RefObjU& modele_turbulence = equation().get_modele(TURBULENCE);
   int loi_par = modele_turbulence && sub_type(Modele_turbulence_scal_base, modele_turbulence.valeur()) &&
                 ref_cast(Modele_turbulence_scal_base,modele_turbulence.valeur()).loi_paroi().use_equivalent_distance();
 
-  for (i = 0; i <= cls.size(); i++) //boucle sur les bords, puis sur les faces internes
+  for (i = 0; i <= cls.size(); i++) //loop over boundaries, then over internal faces
     {
       int deb = i < cls.size() ? ref_cast(Front_VF, cls[i]->frontiere_dis()).num_premiere_face() : domaine.premiere_face_int(), num =
                   i < cls.size() ? ref_cast(Front_VF, cls[i]->frontiere_dis()).nb_faces() : domaine.nb_faces() - domaine.premiere_face_int();
-      for (f = deb; f < deb + num; f++) //nu par composante a chaque face
+      for (f = deb; f < deb + num; f++) //nu per component at each face
         {
-          if (i < cls.size() && loi_par) //facteur multiplicatif du a une loi de paroi
+          if (i < cls.size() && loi_par) //multiplicative factor due to a wall law
             nu_fac_(f) = domaine.dist_norm_bord(f) / ref_cast(Modele_turbulence_scal_base,modele_turbulence.valeur()).loi_paroi().equivalent_distance(i, f - deb);
           else
-            nu_fac_(f) = equation().milieu().porosite_face(f); //par defaut : facteur du a la porosite
+            nu_fac_(f) = equation().milieu().porosite_face(f); //default: factor due to porosity
           if (nu_fac_mod.size())
-            nu_fac_(f) *= nu_fac_mod(f); //prise en compte de nu_fac_mod
+            nu_fac_(f) *= nu_fac_mod(f); //account for nu_fac_mod
         }
     }
   nu_fac_.echange_espace_virtuel();

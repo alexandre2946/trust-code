@@ -85,9 +85,9 @@ Sortie& Pave_32_64<_SIZE_>::printOn(Sortie& s ) const
   return Domaine_t::printOn(s) ;
 }
 
-/*! @brief Lit les specifications d'un pave a partir d'un flot d'entree.
+/*! @brief Reads the specifications of a pave from an input stream.
  *
- *     Le format de lecture d'un pave dans le jeu de donnee est le suivant:
+ *     The format for reading a pave in the data set is as follows:
  *      Pave nom_pave
  *      {
  *      Origine OX OY (OZ)
@@ -111,16 +111,16 @@ Sortie& Pave_32_64<_SIZE_>::printOn(Sortie& s ) const
  *	    ...
  *      }
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws dimension d'espace necessaire pour mailler
- * @throws accolade ouvrante attendue
- * @throws Symy n'a de sens que pour une dimension >= 2
- * @throws Symz n'a de sens qu'en dimension 3
- * @throws Les facteurs de progression doivent etre positifs
- * @throws Il doit y avoir au moins deux mailles en x
- * @throws accolade ouvrante attendue avant lecture des bords
- * @throws mot cle non reconnu
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
+ * @throws space dimension required for meshing
+ * @throws opening brace expected
+ * @throws Symy only makes sense for dimension >= 2
+ * @throws Symz only makes sense in dimension 3
+ * @throws progression factors must be positive
+ * @throws there must be at least two cells in x
+ * @throws opening brace expected before reading boundaries
+ * @throws unrecognised keyword
  */
 template <typename _SIZE_>
 Entree& Pave_32_64<_SIZE_>::readOn(Entree& is)
@@ -412,7 +412,7 @@ Entree& Pave_32_64<_SIZE_>::readOn(Entree& is)
     }
   if (this->axi)
     {
-      // Les coordonnees sont modulo 2 pi
+      // Coordinates are modulo 2 pi
       double deux_pi=M_PI*2.0 ;
       {
         int_t nb_som=this->sommets_.dimension(0);
@@ -506,7 +506,7 @@ Entree& Pave_32_64<_SIZE_>::readOn(Entree& is)
   return is;
 }
 
-///*! @brief Effectue un maillage 1D, du pave avec les valeurs des parametres lus par ReadOn.
+///*! @brief Performs a 1D meshing of the pave using the parameter values read by ReadOn.
 // *
 // */
 //template <typename _SIZE_>
@@ -573,7 +573,7 @@ Entree& Pave_32_64<_SIZE_>::readOn(Entree& is)
 //}
 
 
-/*! @brief Effectue un maillage 2D, du pave avec les valeurs des parametres lus par ReadOn.
+/*! @brief Performs a 2D meshing of the box with the values of the parameters read by ReadOn.
  *
  */
 template <typename _SIZE_>
@@ -601,7 +601,7 @@ void Pave_32_64<_SIZE_>::maille2D()
       assert(!est_egal(xa_tanh,-123.));
       if ((xa_tanh>epsilon_geom)&&(xa_tanh<1.) )
         {
-          ///  Maillage en x en tanh
+          ///  Tanh mesh in x
           Cerr << "In if( (xa_tanh>epsilon_geom)&&(xa_tanh<1.) )" << finl;
           pourcent =0;
           double fac_sym;
@@ -720,7 +720,7 @@ void Pave_32_64<_SIZE_>::maille2D()
       assert(!est_egal(a_tanh,-123.));
       if ((a_tanh>epsilon_geom)&&(a_tanh<1.) )
         {
-          ///  Maillage en y en tanh
+          ///  Tanh mesh in y
           Cerr << "In if( (a_tanh>epsilon_geom)&&(a_tanh<1.) )" << finl;
           pourcent =0;
           double fac_sym;
@@ -838,7 +838,7 @@ void Pave_32_64<_SIZE_>::maille2D()
   Cerr << "Step of mesh ended " << finl;
 }
 
-/*! @brief Effectue un maillage 3D, du pave avec les valeurs des parametres lus par ReadOn.
+/*! @brief Performs a 3D meshing of the box with the values of the parameters read by ReadOn.
  */
 template <typename _SIZE_>
 void Pave_32_64<_SIZE_>::maille3D()
@@ -871,7 +871,7 @@ void Pave_32_64<_SIZE_>::maille3D()
       assert(!est_egal(xa_tanh,-123.));
       if ((xa_tanh>epsilon_geom)&&(xa_tanh<1.) )
         {
-          ///  Maillage en x en tanh
+          ///  Tanh mesh in x
           Cerr << "In if( (xa_tanh>epsilon)&&(xa_tanh<1.) )" << finl;
           pourcent =0;
           double fac_sym;
@@ -1000,7 +1000,7 @@ void Pave_32_64<_SIZE_>::maille3D()
       assert(!est_egal(a_tanh,-123.));
       if ((a_tanh>epsilon_geom)&&(a_tanh<1.) )
         {
-          ///  Maillage en y en tanh
+          ///  Tanh mesh in y
           Cerr << "In if( (a_tanh>epsilon)&&(a_tanh<1.) )" << finl;
           pourcent =0;
           double fac_sym;
@@ -1129,7 +1129,7 @@ void Pave_32_64<_SIZE_>::maille3D()
       assert(!est_egal(za_tanh,-123.));
       if ((za_tanh>epsilon_geom)&&(za_tanh<1.) )
         {
-          ///  Maillage en z en tanh
+          ///  Tanh mesh in z
           Cerr << "In if( (za_tanh>epsilon)&&(za_tanh<1.) )" << finl;
           pourcent =0;
           double fac_sym;
@@ -1251,7 +1251,7 @@ void Pave_32_64<_SIZE_>::maille3D()
     }
 
 
-  // PaQ : pour pouvoir passer d'un maillage VDF a VEF suivant tetraedriser homogene
+  // PaQ: to allow switching from a VDF mesh to a VEF mesh using tetraedriser homogene
 
   if(rep_VEF)
     {
@@ -1267,12 +1267,12 @@ void Pave_32_64<_SIZE_>::maille3D()
 }
 
 
-/*! @brief Type le pave suivant la dimension d'espace et suivant le repere de coordonnees demande (cylindrique
+/*! @brief Types the pave according to the space dimension and the requested coordinate system (cylindrical
  *
- *     ou cartesien)
- *     En dimension 1      : le pave est maille avec des segments
- *     En dimension 2 (axi): la pave est maille avec des rectangle (axi)
- *     En dimension 3 (axi): la pave est maille avec des hexaedres (axi)
+ *     or Cartesian).
+ *     In dimension 1      : the pave is meshed with segments
+ *     In dimension 2 (axi): the pave is meshed with rectangles (axi)
+ *     In dimension 3 (axi): the pave is meshed with hexahedra (axi)
  */
 template <typename _SIZE_>
 void Pave_32_64<_SIZE_>::typer_()
@@ -1304,12 +1304,12 @@ void Pave_32_64<_SIZE_>::typer_()
   Domaine_t::typer(typ);
 }
 
-/*! @brief Lit les longueurs LX LY [LZ] du jeu de donnee a partir d'un flot d'entree.
+/*! @brief Reads the lengths LX LY [LZ] from the data set input stream.
  *
- *     Methode appelee par readOn(Entree&)
+ *     Method called by readOn(Entree&)
  *
- * @param (Entree& is) un flot d'entree
- * @throws La Longueur est en nombre de tour en axi, comprise entre 0 et 1
+ * @param (Entree& is) an input stream
+ * @throws The Length in axi is given as number of turns, must be between 0 and 1
  */
 template <typename _SIZE_>
 void Pave_32_64<_SIZE_>::lire_longueurs(Entree& is)
@@ -1330,13 +1330,13 @@ void Pave_32_64<_SIZE_>::lire_longueurs(Entree& is)
     }
 }
 
-/*! @brief Lit le nombre de noeuds dans le jeu de donnee a partir d'un flot d'entree et construit les noeuds.
+/*! @brief Reads the number of nodes from the data set input stream and builds the nodes.
  *
- *     Methode appelee par readOn(Entree&)
+ *     Method called by readOn(Entree&)
  *
- * @param (Entree& is) un flot d'entree
- * @throws en coordonnees axi il faut lire les longueurs d'abord
- * @throws dimension d'espace non prevue
+ * @param (Entree& is) an input stream
+ * @throws in axi coordinates, lengths must be read first
+ * @throws unsupported space dimension
  */
 template <typename _SIZE_>
 void Pave_32_64<_SIZE_>::lire_noeuds(Entree& is)
@@ -1432,25 +1432,25 @@ void Pave_32_64<_SIZE_>::lire_noeuds(Entree& is)
     }
 }
 
-/*! @brief Lit les specifications d'une frontiere du jeu de donnee a partir d'un flot d'entree et la construit.
+/*! @brief Reads the specifications of a boundary from the data set input stream and builds it.
  *
  *     Format:
  *     nom_front X = X0 Y0 <= Y <= Y1 Z0 <= Z <= Z1
  *
- * @param (Entree& is) un flot d'entree
- * @param (Frontiere& front) la frontiere lue
- * @throws mot clef "X" attendu
- * @throws mot clef "=" attendu
- * @throws extremite en X invalide
- * @throws mot clef "X" ou "Y" attendu
- * @throws mot clef "<=" attendu
- * @throws mot clef "Y" attendu
- * @throws extremite en Y invalide
- * @throws il n'y a pas de bord en teta, vous avez maille
- * une couronne complete
- * @throws mot clef "X" ou "Y" ou "Z" attendu
- * @throws mot clef "Z" attendu
- * @throws extremite en Z invalide
+ * @param (Entree& is) an input stream
+ * @param (Frontiere& front) the boundary being read
+ * @throws keyword "X" expected
+ * @throws keyword "=" expected
+ * @throws invalid X endpoint
+ * @throws keyword "X" or "Y" expected
+ * @throws keyword "<=" expected
+ * @throws keyword "Y" expected
+ * @throws invalid Y endpoint
+ * @throws there is no boundary in theta, you have meshed
+ * a complete annulus
+ * @throws keyword "X" or "Y" or "Z" expected
+ * @throws keyword "Z" expected
+ * @throws invalid Z endpoint
  */
 template <typename _SIZE_>
 void Pave_32_64<_SIZE_>::lire_front(Entree& is, Frontiere_t& front)

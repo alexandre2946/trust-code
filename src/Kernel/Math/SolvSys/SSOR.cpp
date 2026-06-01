@@ -53,13 +53,13 @@ void SSOR::prepare_(const Matrice_Base& la_matrice, const DoubleVect& secmem)
     {
       md_secmem_ = secmem.get_md_vector();
       line_size_ = secmem.line_size();
-      // Pour le prochain preconditionnement, verifier la matrice
+      // For the next preconditioning step, check the matrix
       avec_assert_ = 1;
 
       if (nproc() == 1 || !(md_secmem_)) algo_items_communs_ = 0;
       else
         {
-          // Nombre d'items sequentiels sur ce proc
+          // Number of sequential items on this proc
           const int sz_tot = secmem.size_totale();
           items_a_traiter_.reset();
           items_a_traiter_.resize(sz_tot / line_size_, line_size_, RESIZE_OPTIONS::NOCOPY_NOINIT);
@@ -67,12 +67,12 @@ void SSOR::prepare_(const Matrice_Base& la_matrice, const DoubleVect& secmem)
           int n = md_secmem_->get_sequential_items_flags(items_a_traiter_, line_size_);
           int sz = md_secmem_->get_nb_items_reels();
 
-          if (sz < 0) // size() est invalide, les items reels ne sont pas groupes a debut !
+          if (sz < 0) // size() is invalid: real items are not grouped at the start!
             algo_items_communs_ = 1;
           else
             {
               assert(sz >= n);
-              if (mp_sum(sz) > mp_sum(n)) algo_items_communs_ = 1; // Il y a des items partages parmi les items reels
+              if (mp_sum(sz) > mp_sum(n)) algo_items_communs_ = 1; // There are shared items among the real items
               else
                 {
                   algo_items_communs_ = 0;
@@ -91,7 +91,7 @@ void SSOR::prepare_(const Matrice_Base& la_matrice, const DoubleVect& secmem)
  */
 int SSOR::preconditionner_(const Matrice_Base& la_matrice, const DoubleVect& b, DoubleVect& solution)
 {
-  // pour compatibilite historique:
+  // for historical compatibility:
   if (omega_ <= 0. || omega_ >= 2)
     {
       operator_egal(solution, b);
@@ -107,13 +107,13 @@ int SSOR::preconditionner_(const Matrice_Base& la_matrice, const DoubleVect& b, 
     }
   else if (sub_type(Matrice_Bloc_Sym, la_matrice))
     {
-      // Matrice correspondant a un vecteur multi-localisation (MD_Vector_composite)
+      // Matrix corresponding to a multi-location vector (MD_Vector_composite)
       const Matrice_Bloc_Sym& matrice = ref_cast(Matrice_Bloc_Sym, la_matrice);
       ssor(matrice, solution);
     }
   else if (sub_type(Matrice_Bloc, la_matrice))
     {
-      // On suppose une matrice reelle-reelle et une matrice reelle-virtuelle
+      // Assume a real-real matrix and a real-virtual matrix
       const Matrice_Bloc& mat = ref_cast(Matrice_Bloc, la_matrice);
       const Matrice_Morse_Sym& matrice = ref_cast(Matrice_Morse_Sym, mat.get_bloc(0, 0).valeur());
       ssor(matrice, solution);
@@ -133,13 +133,13 @@ void traite_diagonale(const double omega, const Matrice_Morse& mat, DoubleVect& 
   const auto& tab1 = mat.get_tab1();
   const auto& coeff = mat.get_coeff();
   const double psi = (2. - omega) / omega;
-  const double *coeff_fortran = coeff.addr() - 1; // indexable par index fortran
+  const double *coeff_fortran = coeff.addr() - 1; // indexable by Fortran index
   const auto *tab1_ptr = tab1.addr();
   double *vect_ptr = vecteur.addr();
   for (int i = nb_lignes_a_traiter; i; i--, tab1_ptr++, vect_ptr++)
     {
       const auto j = *tab1_ptr;
-      // Coefficient diagonale de la ligne i:
+      // Diagonal coefficient of row i:
       const double coeff_i_i = coeff_fortran[j];
       (*vect_ptr) *= psi * coeff_i_i;
     }
@@ -155,11 +155,11 @@ void descente_generique(const double omega, const Matrice_Morse& mat, DoubleVect
   const auto& tab2 = mat.get_tab2();
   const auto& coeff = mat.get_coeff();
   const int nb_lignes_a_traiter = vecteur.size_reelle_ok() ? vecteur.size_reelle() : vecteur.size_totale();
-  // pointeur "fortran" vers le tableau solution (indexable avec index fortran) le pointeur est constant, pas le tableau pointe.
+  // "Fortran" pointer to the solution array (indexable with Fortran index); the pointer is constant, not the pointed data.
   double * const sol_fortran = vecteur.addr() - 1;
   const auto *tab1_ptr = tab1.addr();
   assert(nb_lignes_a_traiter <= tab1.size_array() + 1);
-  assert(*tab1_ptr == 1); // sinon 2 lignes ci-dessous fausses.
+  assert(*tab1_ptr == 1); // otherwise the 2 lines below are wrong.
   const int *tab2_ptr = tab2.addr();
   const double *coeff_ptr = coeff.addr();
   auto last_tab1_de_i = *tab1_ptr;
@@ -172,12 +172,12 @@ void descente_generique(const double omega, const Matrice_Morse& mat, DoubleVect
       if (IS_NORMAL_ASSERT || IS_DIAG_ASSERT) assert(nvois >= 0 && (tab1_de_i - 1) <= tab2.size_array());
 
       last_tab1_de_i = tab1_de_i;
-      // Ce test doit rester, sinon on pollue les autres lignes du vecteur sol avec des valeurs dependant des items communs et virtuels
+      // This check must remain: without it, other rows of the solution vector would be polluted by values depending on shared and virtual items
       {
         double v_i;
         if (NOT_DIAG)
           {
-            // Le premier coeff doit etre le coef diagonal et doit etre strictement positif
+            // The first coefficient must be the diagonal coefficient and must be strictly positive
             if (IS_NORMAL_ASSERT)  assert(nvois >= 1 && (*tab2_ptr) == i && (*coeff_ptr) > 0.);
 
             const double omega_coeff_i_i = omega / (*coeff_ptr);
@@ -187,18 +187,18 @@ void descente_generique(const double omega, const Matrice_Morse& mat, DoubleVect
           }
         else // PRECOND DIAG !!
           {
-            // Pas de coefficient diagonal stocke (ni dans tab2 ni dans coeff), la diagonale vaut 1:
+            // No stored diagonal coefficient (neither in tab2 nor in coeff), the diagonal equals 1:
             v_i = sol_fortran[i] *= omega;
           }
 
         for (int j = nvois-1; j; j--, tab2_ptr++, coeff_ptr++)
           {
-            const int i2 = *tab2_ptr; // indice de colonne pour le prochain coefficient
+            const int i2 = *tab2_ptr; // column index for the next coefficient
             const double coeff_i_i2 = *coeff_ptr;
-            // la matrice n'a que des coeffs diagonaux superieurs et on a deja traite la diagonale, donc i2 > i. Pas d'items virtuels autorises !
+            // the matrix only has upper diagonal coefficients and the diagonal has already been handled, so i2 > i. No virtual items allowed!
             if (IS_NORMAL_ASSERT || IS_DIAG_ASSERT) assert(i2 > i && i2 <= nb_lignes_a_traiter);
-            // B.M.: ... en revanche, le test sur les items communs est superflu ici car la valeur sera annulee (voir **Annulation items communs**),
-            // gain de perfs si on ne fait pas le test
+            // B.M.: ... however, the check on shared items is redundant here because the value will be zeroed out (see **Annulation items communs**);
+            // skipping the check gives a performance gain
             sol_fortran[i2] -= coeff_i_i2 * v_i;
           }
       }
@@ -230,8 +230,8 @@ void descente_assert_precond_diag(const double omega, const Matrice_Morse& mat, 
   descente_generique<descente_enum::DIAG_ASSERT>(omega,mat,vecteur);
 }
 
-// Descente sur un bloc extradiagonal. Methode appelee par SSOR(const Matrice_bloc & ...)
-// vecteur: de taille "nombre de lignes de la matrice", vecteur2: "nombre de colonnes"
+// Forward sweep on an off-diagonal block. Method called by SSOR(const Matrice_bloc & ...)
+// vecteur: size = "number of rows of the matrix", vecteur2: size = "number of columns"
 void descente_bloc_extradiag_assert(const Matrice_Morse& mat, const DoubleVect& vecteur, DoubleVect& vecteur2)
 {
   const auto& tab1 = mat.get_tab1();
@@ -249,7 +249,7 @@ void descente_bloc_extradiag_assert(const Matrice_Morse& mat, const DoubleVect& 
         const double v_i = *vecteur_ptr;
         auto index = tab1[i_ligne];
         const auto index_fin = tab1[i_ligne + 1];
-        // Il peut n'y avoir aucun coefficient sur la ligne => index_fin == index
+        // There may be no coefficient on the row => index_fin == index
         assert(index > 0 && index_fin >= index && index_fin <= tab2.size_array() + 1);
         const int *tab2_ptr = tab2_fortran_ptr + index;
         const double *coeff_ptr = coeff_fortran_ptr + index;
@@ -258,7 +258,7 @@ void descente_bloc_extradiag_assert(const Matrice_Morse& mat, const DoubleVect& 
             const int i_colonne = *tab2_ptr;
             assert(i_colonne >= 1 && i_colonne <= vecteur2.size_array());
             const double c = *coeff_ptr;
-            // pas de test item commun sur les colonnes, voir **Annulation items communs**
+            // no shared-item check on columns, see **Annulation items communs**
             vecteur2_fortran_ptr[i_colonne] -= c * v_i;
           }
       }
@@ -273,13 +273,13 @@ void descente_generique(const double omega, const Matrice_Morse& mat, DoubleVect
   const auto& tab2 = mat.get_tab2();
   const auto& coeff = mat.get_coeff();
   const int nb_lignes_a_traiter = vecteur.size_reelle_ok() ? vecteur.size_reelle() : vecteur.size_totale();
-  // pointeur "fortran" vers le tableau solution (indexable avec index fortran) le pointeur est constant, pas le tableau pointe.
+  // "Fortran" pointer to the solution array (indexable with Fortran index); the pointer is constant, not the pointed data.
   double * const sol_fortran = vecteur.addr() - 1;
   const int *flags_ptr = items_a_traiter.addr();
   assert(nb_lignes_a_traiter <= items_a_traiter.size_array());
   const auto *tab1_ptr = tab1.addr();
   assert(nb_lignes_a_traiter <= tab1.size_array() + 1);
-  assert(*tab1_ptr == 1); // sinon 2 lignes ci-dessous fausses.
+  assert(*tab1_ptr == 1); // otherwise the 2 lines below are wrong.
   const int *tab2_ptr = tab2.addr();
   const double *coeff_ptr = coeff.addr();
   auto last_tab1_de_i = *tab1_ptr;
@@ -292,7 +292,7 @@ void descente_generique(const double omega, const Matrice_Morse& mat, DoubleVect
       if (IS_NORMAL_ASSERT || IS_DIAG_ASSERT) assert(nvois >= 0 && (tab1_de_i - 1) <= tab2.size_array());
 
       last_tab1_de_i = tab1_de_i;
-      // Ce test doit rester, sinon on pollue les autres lignes du vecteur sol avec des valeurs dependant des items communs et virtuels
+      // This check must remain: without it, other rows of the solution vector would be polluted by values depending on shared and virtual items
       if (IS_NORMAL_ASSERT || IS_DIAG_ASSERT) assert((flags_ptr - items_a_traiter.addr()) == (i-1));
 
       const int item_a_traiter = *(flags_ptr++);
@@ -301,7 +301,7 @@ void descente_generique(const double omega, const Matrice_Morse& mat, DoubleVect
           double v_i;
           if (NOT_DIAG)
             {
-              // Le premier coeff doit etre le coef diagonal et doit etre strictement positif
+              // The first coefficient must be the diagonal coefficient and must be strictly positive
               if (IS_NORMAL_ASSERT) assert(nvois >= 1 && (*tab2_ptr) == i && (*coeff_ptr) > 0.);
 
               const double omega_coeff_i_i = omega / (*coeff_ptr);
@@ -311,33 +311,33 @@ void descente_generique(const double omega, const Matrice_Morse& mat, DoubleVect
             }
           else // PRECOND DIAG !!
             {
-              // Pas de coefficient diagonal stocke (ni dans tab2 ni dans coeff), la diagonale vaut 1:
+              // No stored diagonal coefficient (neither in tab2 nor in coeff), the diagonal equals 1:
               v_i = sol_fortran[i] *= omega;
             }
 
           for (int j = nvois-1; j; j--, tab2_ptr++, coeff_ptr++)
             {
-              const int i2 = *tab2_ptr; // indice de colonne pour le prochain coefficient
+              const int i2 = *tab2_ptr; // column index for the next coefficient
               const double coeff_i_i2 = *coeff_ptr;
-              // la matrice n'a que des coeffs diagonaux superieurs et on a deja traite la diagonale, donc i2 > i.
+              // the matrix only has upper diagonal coefficients and the diagonal has already been handled, so i2 > i.
               if (IS_NORMAL_ASSERT || IS_DIAG_ASSERT) assert(i2 > i && i2 <= vecteur.size_totale());
 
-              // B.M.: ... en revanche, le test sur les items communs est superflu ici car
-              // la valeur sera annulee (voir **Annulation items communs**), gain de perfs si on ne fait pas le test
+              // B.M.: ... however, the check on shared items is redundant here because
+              // the value will be zeroed out (see **Annulation items communs**); skipping the check gives a performance gain
               sol_fortran[i2] -= coeff_i_i2 * v_i;
             }
         }
       else
         {
           // **Annulation items communs**
-          // c'est la derniere fois qu'on ecrit dans sol_fortran[i] car la matrice est diagonale superieure. Pour eviter le test sur items_a_traiter_
-          // dans la remontee, on annule la solution pour les items communs et virtuels (sol_fortran[i] ne sera plus modifie ensuite dans la descente)
+          // this is the last write to sol_fortran[i] because the matrix is upper triangular. To avoid the items_a_traiter_ check
+          // in the back-substitution, the solution is zeroed for shared and virtual items (sol_fortran[i] will not be modified again in the forward sweep)
           sol_fortran[i] = 0.;
           coeff_ptr += nvois;
           tab2_ptr += nvois;
         }
     }
-  // **Annulation items communs** : Pour la remontee il faut annuler les valeurs dans les cases virtuelles
+  // **Annulation items communs** : For the back-substitution, values in virtual slots must be zeroed
   {
     const int fin = vecteur.size_totale();
     for (int i = nb_lignes_a_traiter+1; i <= fin; i++)
@@ -370,8 +370,8 @@ void descente_assert_precond_diag(const double omega, const Matrice_Morse& mat, 
   descente_generique<descente_enum::DIAG_ASSERT>(omega,mat,vecteur,items_a_traiter);
 }
 
-// Descente sur un bloc extradiagonal. Methode appelee par SSOR(const Matrice_bloc & ...)
-// vecteur: de taille "nombre de lignes de la matrice", vecteur2: "nombre de colonnes"
+// Forward sweep on an off-diagonal block. Method called by SSOR(const Matrice_bloc & ...)
+// vecteur: size = "number of rows of the matrix", vecteur2: size = "number of columns"
 void descente_bloc_extradiag_assert(const Matrice_Morse& mat, const DoubleVect& vecteur, DoubleVect& vecteur2, const ArrOfInt& items_a_traiter)
 {
   const auto& tab1 = mat.get_tab1();
@@ -391,7 +391,7 @@ void descente_bloc_extradiag_assert(const Matrice_Morse& mat, const DoubleVect& 
           const double v_i = *vecteur_ptr;
           auto index = tab1[i_ligne];
           const auto index_fin = tab1[i_ligne + 1];
-          // Il peut n'y avoir aucun coefficient sur la ligne => index_fin == index
+          // There may be no coefficient on the row => index_fin == index
           assert(index > 0 && index_fin >= index && index_fin <= tab2.size_array() + 1);
           const int *tab2_ptr = tab2_fortran_ptr + index;
           const double *coeff_ptr = coeff_fortran_ptr + index;
@@ -400,7 +400,7 @@ void descente_bloc_extradiag_assert(const Matrice_Morse& mat, const DoubleVect& 
               const int i_colonne = *tab2_ptr;
               assert(i_colonne >= 1 && i_colonne <= vecteur2.size_array());
               const double c = *coeff_ptr;
-              // pas de test item commun sur les colonnes, voir **Annulation items communs**
+              // no shared-item check on columns, see **Annulation items communs**
               vecteur2_fortran_ptr[i_colonne] -= c * v_i;
             }
         }
@@ -421,14 +421,14 @@ void remontee_generique(const double omega, const Matrice_Morse& mat, DoubleVect
   const int nb_lignes_a_traiter = vecteur.size_reelle_ok() ? vecteur.size_reelle() : vecteur.size_totale();
   const double psi = IS_DIAG_OK_ASSERT ? -1e10 : (2. - omega) / omega;
 
-  // pointeur "fortran" vers le tableau solution (indexable avec index fortran)
+  // "fortran" pointer to the solution array (indexable with Fortran index)
   const double *const sol_fortran = vecteur.addr() - 1;
   const auto *tab1_ptr = tab1.addr() + nb_lignes_a_traiter;
   auto last_tab1_de_i = *tab1_ptr;
   tab1_ptr--;
-  // On ne va pas a la fin de tab2 car on n'est pas sur que nb_lignes_a_traiter = tab1.size_array() :
-  // -2 car last_tab1_de_i est l'indice du premier coefficient de la ligne suivante en fortran
-  //  (dont -1 pour fortran->c et -1 pour passer au dernier coeff de la ligne precedente)
+  // We do not go to the end of tab2 because nb_lignes_a_traiter = tab1.size_array() is not guaranteed:
+  // -2 because last_tab1_de_i is the Fortran index of the first coefficient of the next row
+  //  (-1 for Fortran->C conversion and -1 to move to the last coefficient of the previous row)
   const int *tab2_ptr = tab2.addr() + last_tab1_de_i - 2;
   const double *coeff_ptr = coeff.addr() + last_tab1_de_i - 2;
   double *soli_ptr = vecteur.addr() + nb_lignes_a_traiter - 1;
@@ -440,8 +440,8 @@ void remontee_generique(const double omega, const Matrice_Morse& mat, DoubleVect
       if (IS_NORMAL_ASSERT || IS_DIAG_OK_ASSERT || IS_DIAG_ASSERT) assert(nvois >= 0 && tab1_de_i > 0);
 
       last_tab1_de_i = tab1_de_i;
-      // Ce test doit rester car il ne faut pas modifier sol[i] pour les items communs
-      // et virtuels (ils sont nuls et doivent le rester pour ne pas polluer les autres lignes):
+      // This check must remain: sol[i] must not be modified for shared
+      // and virtual items (they are zero and must stay zero to avoid polluting other rows):
       if (1)
         {
           // Operation "diagonale":
@@ -450,26 +450,26 @@ void remontee_generique(const double omega, const Matrice_Morse& mat, DoubleVect
             {
               const int i2 = *tab2_ptr;
               const double coeff_i_i2 = *coeff_ptr;
-              // Operation nulle pour les items communs et virtuels
-              // (on a annule le second membre lors de la descente)
+              // Zero operation for shared and virtual items
+              // (their RHS contribution was zeroed during the forward sweep)
               x += coeff_i_i2 * sol_fortran[i2];
             }
 
           if (NOT_DIAG)
             {
-              // ici coeff_ptr est le coeff diagonal
+              // here coeff_ptr is the diagonal coefficient
               if (IS_NORMAL_ASSERT || IS_DIAG_OK_ASSERT) assert((*tab2_ptr) == i);
 
               const double coeff_i_i = *coeff_ptr;
               const double omega_coeff_i_i = omega / coeff_i_i;
-              // Si IS_DIAG_OK_ASSERT : La diagonale a deja ete multipliee par psi * coeff_i_i
+              // If IS_DIAG_OK_ASSERT: the diagonal has already been multiplied by psi * coeff_i_i
               *soli_ptr = IS_DIAG_OK_ASSERT ? ((*soli_ptr) - x) * omega_coeff_i_i : (*soli_ptr) * psi * omega - x * omega_coeff_i_i;
               coeff_ptr--;
               tab2_ptr--;
             }
           else // PRECOND DIAG !!
             {
-              // Preconditionnement diagonal, pas de coefficient diagonal stocke:
+              // Diagonal preconditioning, no diagonal coefficient stored:
               *soli_ptr = ((*soli_ptr) * psi - x) * omega;
             }
         }
@@ -507,8 +507,8 @@ void remontee_assert_precond_diag(const double omega, const Matrice_Morse& mat, 
   remontee_generique<remontee_enum::DIAG_ASSERT>(omega,mat,vecteur);
 }
 
-// Remontee sur un bloc extradiagonal. Methode appelee par SSOR(const Matrice_bloc & ...)
-// vecteur: de taille "nombre de lignes de la matrice", vecteur2: "nombre de colonnes"
+// Back-substitution on an off-diagonal block. Method called by SSOR(const Matrice_bloc & ...)
+// vecteur: size = "number of rows of the matrix", vecteur2: size = "number of columns"
 void remontee_bloc_extradiag_assert(const Matrice_Morse& mat, DoubleVect& vecteur, const DoubleVect& vecteur2)
 {
   const auto& tab1 = mat.get_tab1();
@@ -526,7 +526,7 @@ void remontee_bloc_extradiag_assert(const Matrice_Morse& mat, DoubleVect& vecteu
         double x = *vecteur_ptr;
         auto index = tab1[i_ligne];
         const auto index_fin = tab1[i_ligne + 1];
-        // Il peut n'y avoir aucun coefficient sur la ligne => index_fin == index
+        // There may be no coefficient on the row => index_fin == index
         assert(index > 0 && index_fin >= index && index_fin <= tab2.size_array() + 1);
         const int *tab2_ptr = tab2_fortran_ptr + index;
         const double *coeff_ptr = coeff_fortran_ptr + index;
@@ -536,7 +536,7 @@ void remontee_bloc_extradiag_assert(const Matrice_Morse& mat, DoubleVect& vecteu
             assert(i_colonne >= 1 && i_colonne <= vecteur2.size_array());
             const double c = *coeff_ptr;
             const double x2 = vecteur2_fortran_ptr[i_colonne];
-            // pas de test item commun sur les colonnes, voir **Annulation items communs**
+            // no shared-item check on columns, see **Annulation items communs**
             x -= c * x2;
           }
         *vecteur_ptr = x;
@@ -558,14 +558,14 @@ void remontee_generique(const double omega, const Matrice_Morse& mat, DoubleVect
   assert(nb_lignes_a_traiter <= items_a_traiter.size_array());
   const double psi =  IS_DIAG_OK_ASSERT ? -1e10 : (2. - omega) / omega;
 
-  // pointeur "fortran" vers le tableau solution (indexable avec index fortran)
+  // "fortran" pointer to the solution array (indexable with Fortran index)
   const double * const sol_fortran = vecteur.addr() - 1;
   const auto *tab1_ptr = tab1.addr() + nb_lignes_a_traiter;
   auto last_tab1_de_i = *tab1_ptr;
   tab1_ptr--;
-  // On ne va pas a la fin de tab2 car on n'est pas sur que nb_lignes_a_traiter = tab1.size_array() :
-  // -2 car last_tab1_de_i est l'indice du premier coefficient de la ligne suivante en fortran
-  //  (dont -1 pour fortran->c et -1 pour passer au dernier coeff de la ligne precedente)
+  // We do not go to the end of tab2 because nb_lignes_a_traiter = tab1.size_array() is not guaranteed:
+  // -2 because last_tab1_de_i is the Fortran index of the first coefficient of the next row
+  //  (-1 for Fortran->C conversion and -1 to move to the last coefficient of the previous row)
   const int *tab2_ptr = tab2.addr() + last_tab1_de_i - 2;
   const double *coeff_ptr = coeff.addr() + last_tab1_de_i - 2;
   double * soli_ptr = vecteur.addr() + nb_lignes_a_traiter - 1;
@@ -576,8 +576,8 @@ void remontee_generique(const double omega, const Matrice_Morse& mat, DoubleVect
       if (IS_NORMAL_ASSERT || IS_DIAG_OK_ASSERT || IS_DIAG_ASSERT) assert(nvois >= 0 && tab1_de_i > 0);
 
       last_tab1_de_i = tab1_de_i;
-      // Ce test doit rester car il ne faut pas modifier sol[i] pour les items communs
-      // et virtuels (ils sont nuls et doivent le rester pour ne pas polluer les autres lignes):
+      // This check must remain: sol[i] must not be modified for shared
+      // and virtual items (they are zero and must stay zero to avoid polluting other rows):
       if (*(flags_ptr--))
         {
           // Operation "diagonale":
@@ -586,25 +586,25 @@ void remontee_generique(const double omega, const Matrice_Morse& mat, DoubleVect
             {
               const int i2 = *tab2_ptr;
               const double coeff_i_i2 = *coeff_ptr;
-              // Operation nulle pour les items communs et virtuels
-              // (on a annule le second membre lors de la descente)
+              // Zero operation for shared and virtual items
+              // (their RHS contribution was zeroed during the forward sweep)
               x += coeff_i_i2 * sol_fortran[i2];
             }
           if (NOT_DIAG)
             {
-              // ici coeff_ptr est le coeff diagonal
+              // here coeff_ptr is the diagonal coefficient
               if (IS_NORMAL_ASSERT || IS_DIAG_OK_ASSERT) assert((*tab2_ptr) == i);
 
               const double coeff_i_i = *coeff_ptr;
               const double omega_coeff_i_i = omega / coeff_i_i;
-              // Si IS_DIAG_OK_ASSERT : La diagonale a deja ete multipliee par psi * coeff_i_i
+              // If IS_DIAG_OK_ASSERT: the diagonal has already been multiplied by psi * coeff_i_i
               *soli_ptr = IS_DIAG_OK_ASSERT ? ((*soli_ptr) - x) * omega_coeff_i_i : (*soli_ptr) * psi * omega - x * omega_coeff_i_i;
               coeff_ptr--;
               tab2_ptr--;
             }
           else // PRECOND DIAG !!
             {
-              // Preconditionnement diagonal, pas de coefficient diagonal stocke:
+              // Diagonal preconditioning, no diagonal coefficient stored:
               *soli_ptr = ((*soli_ptr) * psi - x) * omega;
             }
         }
@@ -642,8 +642,8 @@ void remontee_assert_precond_diag(const double omega, const Matrice_Morse& mat, 
   remontee_generique<remontee_enum::DIAG_ASSERT>(omega,mat,vecteur,items_a_traiter);
 }
 
-// Remontee sur un bloc extradiagonal. Methode appelee par SSOR(const Matrice_bloc & ...)
-// vecteur: de taille "nombre de lignes de la matrice", vecteur2: "nombre de colonnes"
+// Back-substitution on an off-diagonal block. Method called by SSOR(const Matrice_bloc & ...)
+// vecteur: size = "number of rows of the matrix", vecteur2: size = "number of columns"
 void remontee_bloc_extradiag_assert(const Matrice_Morse& mat, DoubleVect& vecteur, const DoubleVect& vecteur2, const ArrOfInt& items_a_traiter)
 {
   const auto& tab1 = mat.get_tab1();
@@ -663,7 +663,7 @@ void remontee_bloc_extradiag_assert(const Matrice_Morse& mat, DoubleVect& vecteu
           double x = *vecteur_ptr;
           auto index = tab1[i_ligne];
           const auto index_fin = tab1[i_ligne + 1];
-          // Il peut n'y avoir aucun coefficient sur la ligne => index_fin == index
+          // There may be no coefficient on the row => index_fin == index
           assert(index > 0 && index_fin >= index && index_fin <= tab2.size_array() + 1);
           const int *tab2_ptr = tab2_fortran_ptr + index;
           const double *coeff_ptr = coeff_fortran_ptr + index;
@@ -673,7 +673,7 @@ void remontee_bloc_extradiag_assert(const Matrice_Morse& mat, DoubleVect& vecteu
               assert(i_colonne >= 1 && i_colonne <= vecteur2.size_array());
               const double c = *coeff_ptr;
               const double x2 = vecteur2_fortran_ptr[i_colonne];
-              // pas de test item commun sur les colonnes, voir **Annulation items communs**
+              // no shared-item check on columns, see **Annulation items communs**
               x -= c * x2;
             }
           *vecteur_ptr = x;
@@ -681,15 +681,15 @@ void remontee_bloc_extradiag_assert(const Matrice_Morse& mat, DoubleVect& vecteu
     }
 }
 
-// On calcule solution = inverse(C)*b avec:
+// We compute solution = inverse(C)*b with:
 //   inverse(C) = inverse((1/w D - E)) * (2-w/w D) * inverse((1/wD -E)t)
-//   D :partie diagonale de la matrice, E :partie triangulaire inferieure de la matrice
+//   D : diagonal part of the matrix, E : lower triangular part of the matrix
 void SSOR::ssor(const Matrice_Morse_Sym& matrice, DoubleVect& solution)
 {
   const auto& tab2 = matrice.get_tab2();
   if (tab2.size_array() > 0 && tab2[0] == 1)
     {
-      // La diagonale est presente dans la matrice
+      // The diagonal is present in the matrix
       if (avec_assert_)
         {
           if (algo_items_communs_)
@@ -719,7 +719,7 @@ void SSOR::ssor(const Matrice_Morse_Sym& matrice, DoubleVect& solution)
     }
   else
     {
-      // Pas de diagonale stockee, on suppose qu'on a que des 1 sur la diagonale (preconditionnement diagonal)
+      // No stored diagonal: assuming all diagonal entries are 1 (diagonal preconditioning)
       if (avec_assert_)
         {
           if (algo_items_communs_)
@@ -747,7 +747,7 @@ void SSOR::ssor(const Matrice_Morse_Sym& matrice, DoubleVect& solution)
             }
         }
     }
-  avec_assert_ = 0; // Ne pas reverifier au prochain preconditionnement...
+  avec_assert_ = 0; // Do not re-check at the next preconditioning step...
 }
 
 void SSOR::ssor(const Matrice_Bloc_Sym& matrice, DoubleVect& solution)
@@ -760,7 +760,7 @@ void SSOR::ssor(const Matrice_Bloc_Sym& matrice, DoubleVect& solution)
   assert(s_parts.size() == nb_parts);
   assert(matrice.nb_bloc_lignes() == nb_parts);
 
-  // Descente
+  // Forward sweep
   int i_part;
   for (i_part = 0; i_part < nb_parts; i_part++)
     {
@@ -771,19 +771,19 @@ void SSOR::ssor(const Matrice_Bloc_Sym& matrice, DoubleVect& solution)
       if (algo_items_communs_) descente_diag_ok_assert(omega_, MB00, partie, items_parts[i_part]);
       else descente_diag_ok_assert(omega_, MB00, partie);
 
-      // blocs extra-diagonaux
+      // off-diagonal blocks
       for (int j_part = i_part + 1; j_part < nb_parts; j_part++)
         {
           const Matrice_Bloc& Aij = ref_cast(Matrice_Bloc, matrice.get_bloc(i_part, j_part).valeur());
           const Matrice_Morse& MB00bis = ref_cast(Matrice_Morse, Aij.get_bloc(0, 0).valeur());
           DoubleVect& partie_j = s_parts[j_part];
-          // Attention: le test sur les items communs concerne les lignes de la matrice, pas les colonnes (on passe items_parts[i_part], pas j_part)
-          // (note BM: je crois que la version precedente etait buggee mais ca ne s'est pas vu parce que la matrice elem-elem arrive en premier et qu'il n'y a pas d'items communs sur les elements)
+          // Warning: the shared-item check concerns matrix rows, not columns (we pass items_parts[i_part], not j_part)
+          // (note BM: I believe the previous version was buggy but it went unnoticed because the elem-elem matrix comes first and there are no shared items on elements)
           if (algo_items_communs_) descente_bloc_extradiag_assert(MB00bis, partie, partie_j, items_parts[i_part]);
           else descente_bloc_extradiag_assert(MB00bis, partie, partie_j);
         }
     }
-  // Traitement de la diagonale
+  // Diagonal treatment
   for (i_part = 0; i_part < nb_parts; i_part++)
     {
       const Matrice_Bloc& matrice0 = ref_cast(Matrice_Bloc, matrice.get_bloc(i_part, i_part).valeur());
@@ -792,7 +792,7 @@ void SSOR::ssor(const Matrice_Bloc_Sym& matrice, DoubleVect& solution)
       traite_diagonale(omega_, MB00, partie);
     }
 
-  // Remontee
+  // Back-substitution
   for (i_part = nb_parts - 1; i_part >= 0; i_part--)
     {
       const Matrice_Bloc& matrice0 = ref_cast(Matrice_Bloc, matrice.get_bloc(i_part, i_part).valeur());
@@ -801,13 +801,13 @@ void SSOR::ssor(const Matrice_Bloc_Sym& matrice, DoubleVect& solution)
       if (algo_items_communs_) remontee_diag_ok_assert(omega_, MB00bis, partie, items_parts[i_part]);
       else remontee_diag_ok_assert(omega_, MB00bis, partie);
 
-      // Blocs extra-diagonaux (parcours horizontal au lieu de vertical)
+      // Off-diagonal blocks (horizontal traversal instead of vertical)
       for (int j_part = 0; j_part < i_part; j_part++)
         {
           const Matrice_Bloc& Aij = ref_cast(Matrice_Bloc, matrice.get_bloc(j_part, i_part).valeur());
           const Matrice_Morse& MB00 = ref_cast(Matrice_Morse, Aij.get_bloc(0, 0).valeur());
           DoubleVect& partie_j = s_parts[j_part];
-          // Attention: le test sur les items communs concerne les lignes de la matrice, pas les colonnes (on passe items_parts[i_part], pas j_part)
+          // Warning: the shared-item check concerns matrix rows, not columns (we pass items_parts[i_part], not j_part)
           if (algo_items_communs_) remontee_bloc_extradiag_assert(MB00, partie_j, partie, items_parts[j_part]);
           else remontee_bloc_extradiag_assert(MB00, partie_j, partie);
         }

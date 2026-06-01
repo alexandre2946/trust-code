@@ -21,9 +21,9 @@ class Matrice_Morse;
 
 /*! @brief : class Op_Conv_EF_Stab_PolyMAC_HFV_Elem
  *
- *  <Description of class Op_Conv_EF_Stab_PolyMAC_HFV_Elem>
- *
- *
+ *  Convection operator for scalar or multiphase fields on PolyMAC_HFV elements.
+ *  Implements the EF-Stab (stabilized finite element) convection scheme,
+ *  parameterized by alpha: alpha=0 gives centered, alpha=1 gives upwind.
  *
  */
 
@@ -50,19 +50,19 @@ public :
   void mettre_a_jour(double temps) override;
   void set_transporting_velocity_phase_index(int idx) override { idx_phase_transportante_ = idx; }
 
-  double alpha_ = 1.0; //alpha = 0 -> centre, alpha = 1 -> amont
+  double alpha_ = 1.0; //alpha = 0 -> centered, alpha = 1 -> upwind
 
 protected :
   void ajouter_blocs_gen(matrices_t mats, DoubleTab& secmem, const DoubleTab& vit, const tabs_t& semi_impl) const;
   double calculer_dt_stab_gen(const DoubleTab& vit) const;
   void mettre_a_jour_gen(double temps, const DoubleTab& vit);
-  /* si operateur de convection de Masse_Multiphase */
-  std::vector<OWN_PTR(Champ_Inc_base)> cc_phases_; //flux massiques (kg/m2/s)
-  Motcles noms_cc_phases_; //leurs noms
-  std::vector<OWN_PTR(Champ_Inc_base)> vd_phases_; //vitesses debitantes
-  Motcles noms_vd_phases_; //leurs noms
-  std::vector<OWN_PTR(Champ_Inc_base)> x_phases_; //titres par phase
-  Motcles noms_x_phases_; //leurs noms
+  /* if convection operator of Masse_Multiphase */
+  std::vector<OWN_PTR(Champ_Inc_base)> cc_phases_; //mass fluxes (kg/m2/s)
+  Motcles noms_cc_phases_; //their names
+  std::vector<OWN_PTR(Champ_Inc_base)> vd_phases_; //volumetric flow velocities
+  Motcles noms_vd_phases_; //their names
+  std::vector<OWN_PTR(Champ_Inc_base)> x_phases_; //titles per phase
+  Motcles noms_x_phases_; //their names
   int idx_phase_transportante_ = -1;
 };
 

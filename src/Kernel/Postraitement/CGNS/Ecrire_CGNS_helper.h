@@ -109,7 +109,7 @@ struct Ecrire_CGNS_helper
                                           const std::string&, const std::string&, const std::string&, const std::string&, const std::string&,
                                           const std::vector<double>&);
 
-  /* helplers utiles pour les links ! */
+  /* helpers useful for linked files ! */
   inline void cgns_write_zone_and_classic_links(const bool write_zone, const int fileId, const int baseId, const std::string& zone_name_to_write, const cgsize_t *isize, int& zoneId,
                                                 const int zone_goto_id, const std::string& linkfile, const std::string& target_base_name, const std::string& target_zone_name,
                                                 const std::vector<std::string>& connect_names, const char *where, const bool write_connectivity = true);
@@ -127,14 +127,14 @@ struct Ecrire_CGNS_helper
 
   std::string convert_double_to_string(const double t)
   {
-    // On fait comme dans les latas !
+    // Same approach as in lata files !
     char str_temps[100] = "0.0";
     if (t >= 0.)
       snprintf(str_temps, 100, "%.10f", t);
 
     return std::string(str_temps);
 
-// Sinon je laisse cette belle methode au cas ou elle pourrait servir un jour !
+// Otherwise I keep this nice method in case it might be useful someday!
 //    /* KEEP GOOD PRECISION */
 //    std::stringstream ss;
 //    ss << std::fixed << std::setprecision(15) << t;

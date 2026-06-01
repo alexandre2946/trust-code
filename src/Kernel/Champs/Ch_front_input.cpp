@@ -79,7 +79,7 @@ void Ch_front_input::getTemplate(TrioField& afield) const
   int org=1;
   if (faces_.dimension(1)==4) org=0;
   org=0;
-  // en mettant org a o1 on revient a l'ancien codage
+  // setting org to 1 reverts to the old coding
 
 
   const DoubleTab& sommets=org==1?mon_pb->domaine().les_sommets():sommets_;
@@ -135,7 +135,7 @@ void Ch_front_input::buildSommetsFaces() const
   sommets.resize(ntot,dimension);
 
 
-  // on refait les faces
+  // rebuild the faces
   for (int f=0; f<faces.dimension(0); f++)
     for (int s=0; s<faces.dimension(1); s++)
       faces(f,s) = faces_org(f, s) >= 0 ? marqueur[faces_org(f,s)] : -1;

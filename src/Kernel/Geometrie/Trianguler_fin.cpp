@@ -31,12 +31,12 @@ Sortie& Trianguler_fin::printOn(Sortie& os) const { return Interprete::printOn(o
 
 Entree& Trianguler_fin::readOn(Entree& is) { return Interprete::readOn(is); }
 
-/*! @brief Triangule tous les element d'un domaine: transforme les elements goemetriques du domaine en triangles.
+/*! @brief @brief Triangulates all elements of a domain: transforms the geometric elements of the domain into triangles.
  *
- *     Pour l'instant on ne sait trianguler que des Rectangles
- *     (on les coupe en 8).
+ *     Currently only Rectangles can be triangulated
+ *     (they are split into 8).
  *
- * @param (Domaine& domaine) le domaine dont on veut trianguler les elements
+ * @param dom The domain whose elements are to be triangulated.
  */
 void Trianguler_fin::trianguler(Domaine& dom) const
 {
@@ -175,7 +175,7 @@ void Trianguler_fin::trianguler(Domaine& dom) const
       sommets.resize(nbs + oldsz + j, dimension);
       les_elems.ref(new_elems);
 
-      // Reconstruction de l'octree
+      // Rebuild the octree
       Cerr << "We have split the rectangles..." << finl;
       dom.invalide_octree();
       dom.typer("Triangle");

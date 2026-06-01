@@ -19,11 +19,11 @@
 #include <DP_Impose.h>
 #include <Param.h>
 
-/*! @brief Lit les specifications d'un Delta P impose a partir d'un flot d'entree.
+/*! @brief Reads the specifications of an imposed Delta P from an input stream.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws pas un champ
+ * @param is an input stream
+ * @return the modified input stream
+ * @throws not a field
  */
 
 // XD type_perte_charge_deriv objet_lecture type_perte_charge_deriv INHERITS_BRACE not_set
@@ -102,6 +102,6 @@ void DP_Impose::update_dp_regul(const Equation_base& eqn, double deb, DoubleVect
       fac_regul_ -= dt * eps * error;
     }
 
-  //pour le fichier de suivi : seulement sur le maitre, car Source_base::imprimer() fait une somme sur les procs
+  //for the monitoring file: only on the master, because Source_base::imprimer() sums over all processes
   if (!Process::me()) bilan(0) = f_DP_.eval() * fac_regul_, bilan(1) = deb, bilan(2) = deb_cible;
 }

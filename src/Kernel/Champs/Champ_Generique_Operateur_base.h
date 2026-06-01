@@ -20,12 +20,12 @@
 
 class Operateur_base;
 
-/*! @brief Classe Champ_Generique_Operateur_base Classe de base des classes de champs generiques dediees a l 'application d operateur
+/*! @brief Classe Champ_Generique_Operateur_base Base class for generic field classes dedicated to applying an operator
  *
- *   Une classe heritant de Champ_Generique_Operateur_base porte un operateur
- *   Les operateurs consideres sont gradient et divergence
+ *   A class inheriting from Champ_Generique_Operateur_base carries an operator
+ *   The operators considered are gradient and divergence
  *
- * @sa Postraitement, Classe abstraite
+ * @sa Postraitement, Abstract class
  */
 
 class Champ_Generique_Operateur_base : public Champ_Gen_de_Champs_Gen

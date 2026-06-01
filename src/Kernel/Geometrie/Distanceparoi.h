@@ -21,7 +21,7 @@
 #include <Domaine_forward.h>
 
 
-/*! @brief class Distanceparoi Realise une boite de recirculation (maillage hexa) extrudee d'un bord
+/*! @brief class Distanceparoi Computes the distance to the wall.
  *
  * @sa Interprete
  */

@@ -18,10 +18,9 @@
 
 #include <Modele_turbulence_scal_diffturb_base.h>
 
-/*! @brief Classe Modele_turbulence_scal_Schmidt Cette classe represente le modele de calcul suivant
+/*! @brief Scalar turbulence model using the turbulent Schmidt number to compute turbulent diffusion:
  *
- *     pour la diffusion turbulente:
- *                   diffu_turb = visco_turb / Sc_turb;
+ *                   diffu_turb = visco_turb / Sc_turb
  *
  * @sa Mod_Turb_scal_diffuturb_base
  */

@@ -21,7 +21,7 @@
 #include <Equation_base.h>
 #include <type_traits>
 
-using ARR1 = std::array<double, 1>; // OK je sais mais bon ... ne demande pas alors :-)
+using ARR1 = std::array<double, 1>; // OK I know, but ... don't ask :-)
 using ARR2 = std::array<double, 2>;
 using ARR3 = std::array<double, 3>;
 using ARR4 = std::array<double, 4>;
@@ -31,26 +31,26 @@ enum class Ordre_RK { UN , RATIO_DEUX , DEUX_CLASSIQUE , DEUX_WILLIAMSON , TROIS
 template <Ordre_RK _ORDRE_ >
 class TRUSTSchema_RK : public Schema_Temps_base
 {
-  // Renvoie le nombre de valeurs temporelles a conserver. Ici : n et n+1, donc 2.
+  // Returns the number of temporal values to retain. Here: n and n+1, so 2.
   int nb_valeurs_temporelles() const override { return 2 ; }
 
-  // Renvoie le nombre de valeurs temporelles futures. Ici : n+1, donc 1.
+  // Returns the number of future temporal values. Here: n+1, so 1.
   int nb_valeurs_futures() const override { return 1 ; }
 
-  // Renvoie le le temps a la i-eme valeur future. Ici : t(n+1)
+  // Returns the time at the i-th future value. Here: t(n+1)
   double temps_futur(int i) const override
   {
     assert(i == 1);
     return temps_courant() + pas_de_temps();
   }
 
-  // Renvoie le le temps le temps que doivent rendre les champs a l'appel de valeurs(). Ici : t(n+1)
+  // Returns the time that fields must return when valeurs() is called. Here: t(n+1)
   double temps_defaut() const override { return temps_courant() + pas_de_temps(); }
 
   // a surcharger si utile
   void completer() override { /* Do nothing */ }
 
-  friend class RK3_FT; // pour trio
+  friend class RK3_FT; // for trio
   int faire_un_pas_de_temps_eqn_base(Equation_base& eq) override { return faire_un_pas_de_temps_eqn_base_generique<_ORDRE_>(eq); } // SFINAE :-)
 
 protected:
@@ -82,9 +82,9 @@ private:
   static constexpr std::array<ARR3, 3> BUTCHER_4_3_8 = { { { 1. / 3., 0. , 0.}, { -1. / 3., 1., 0.}, { 1. , -1., 1. } } }; /* RK4 3/8 rule */
 
   static constexpr std::array<ARR4, 4> BUTCHER_TAB = { {
-      { 0., 1., 0., 0. }, /* RK2 classique*/
-      { 1. / 6., 2. / 3., 1. / 6., 0. }, /* RK3 classique*/
-      { 1. / 6., 1. / 3., 1. / 3., 1. / 6. }, /* RK4 classique*/
+      { 0., 1., 0., 0. }, /* classic RK2*/
+      { 1. / 6., 2. / 3., 1. / 6., 0. }, /* classic RK3*/
+      { 1. / 6., 1. / 3., 1. / 3., 1. / 6. }, /* classic RK4*/
       { 1. / 8., 3. / 8., 3. / 8., 1. / 8. } /* RK4 3/8 rule */
     }
   };

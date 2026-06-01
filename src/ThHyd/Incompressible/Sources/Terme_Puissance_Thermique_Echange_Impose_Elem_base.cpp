@@ -93,7 +93,7 @@ void Terme_Puissance_Thermique_Echange_Impose_Elem_base::mettre_a_jour(double te
       bilan()(n) += himp(!c_h * e, n) * volumes(e) * (DT_regul_ + Text(!c_T * e, n) - T(e, n));
 
   if (regul_) pid_process();
-  //pour le fichier de suivi : seulement sur le maitre, car Source_base::imprimer() fait une somme sur les procs
+  //for the monitoring file: only on the master, because Source_base::imprimer() sums over all processes
   if (!Process::me()) bilan()(N) = DT_regul_;
 
   himp_->mettre_a_jour(temps);
@@ -108,7 +108,7 @@ void Terme_Puissance_Thermique_Echange_Impose_Elem_base::pid_process()
   if (dt < equation().probleme().schema_temps().pas_temps_min())
     {
       p_error = error;
-      return; // dt vaut 0 a l'initialisation
+      return; // dt equals 0 at initialization
     }
   DT_regul_ += Kp * error + dt * Ki * error + Kd * (error - p_error) / dt;
   p_error = error;

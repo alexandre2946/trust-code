@@ -55,7 +55,7 @@ void Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs(matrices_t mats, DoubleTab& secme
   DoubleTab& flux_bords = op_base->flux_bords();
   flux_bords.resize(le_dom->nb_faces_bord(), ncomp);
   flux_bords = 0.;
-  // modif b.m.: on va faire += sur des items virtuels, initialiser les cases : sinon risque que les cases soient invalides ou non initialisees
+  // modif b.m.: will do += on virtual items; initialize entries to avoid invalid or uninitialized values
   {
     int n = secmem.size_array() - secmem.size();
     double *data = secmem.addr() + secmem.size();
@@ -162,7 +162,7 @@ void Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_interne(const int N, matrices_t m
   VectorDeriv d_cc;
   fill_derivee_cc(mats, semi_impl, d_cc);
 
-  //derivees : vitesse
+  //derivatives: velocity
   if (m_vit)
     for (int face = ndeb; face < nfin; face++)
       {
@@ -172,7 +172,7 @@ void Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_interne(const int N, matrices_t m
             (*m_vit)(N * elem(face, i) + n, Mv * face + m) += (i ? -1.0 : 1.0) * aef(n);
       }
 
-  //derivees : champ convecte
+  //derivatives: convected field
   if (mat || d_cc.size() > 0)
     for (int face = ndeb; face < nfin; face++)
       {
@@ -197,22 +197,22 @@ void Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_bords_(const BC& cl, const int nd
   if (should_calc_flux)
     {
       if (is_Neum_paroi_adiab)
-        Process::exit(); // On bloque ici :-)
+        Process::exit(); // Stop here :-)
 
       const DoubleTab& donnee = semi_impl.count(nom_ch_inco_) ? semi_impl.at(nom_ch_inco_) : le_champ_convecte_ou_inc->valeurs(),
                        val_b = sub_type(Champ_Face_base, le_champ_convecte_ou_inc.valeur()) ? DoubleTab() :
-                               (use_base_val_b_ ? le_champ_convecte_ou_inc->Champ_base::valeur_aux_bords() : le_champ_convecte_ou_inc->valeur_aux_bords()); // si le champ associe est un champ_face, alors on est dans un operateur de div
+                               (use_base_val_b_ ? le_champ_convecte_ou_inc->Champ_base::valeur_aux_bords() : le_champ_convecte_ou_inc->valeur_aux_bords()); // if the associated field is a champ_face, then we are in a divergence operator
 
       Matrice_Morse *mat = (!is_pb_multiphase() && mats.count(nom_ch_inco_)) ? mats.at(nom_ch_inco_) : nullptr;
       VectorDeriv d_cc;
 
-      // XXX Corentin , Novembre 2023 : pour le cas avec flux_parietal
-      // TODO FIXME : ceci ne marche qu'avec une CL scalaire_impose_paroi, faire le bon truc pour paroi_temperature_imposee ?
+      // XXX Corentin, November 2023: for the case with parietal flux
+      // TODO FIXME: this only works with a scalaire_impose_paroi BC; handle paroi_temperature_imposee properly
       if (is_Temp_impose_flux_parietal || is_Neumann_flux_parietal || is_paroi_contact_flux_parietal)
         {
           fill_derivee_cc(mats, semi_impl, d_cc);
-          const DoubleTab& donnee2 = is_pb_multiphase() ? le_champ_convecte_ou_inc->valeurs() : donnee ; // On tente de toujours impliciter le flux parietal en pb multi lol
-          mat = mats.count(nom_ch_inco_) ? mats.at(nom_ch_inco_) : nullptr; // On tente de toujours impliciter le flux parietal en pb multi lol
+          const DoubleTab& donnee2 = is_pb_multiphase() ? le_champ_convecte_ou_inc->valeurs() : donnee ; // Always try to implicitate the parietal flux in multiphase lol
+          mat = mats.count(nom_ch_inco_) ? mats.at(nom_ch_inco_) : nullptr; // Always try to implicitate the parietal flux in multiphase lol
           ajouter_blocs_bords_flux_parietal_<Type_Double, BC>(cl, ndeb, nfin, N, donnee2, resu, mat, d_cc, semi_impl);
         }
       else
@@ -229,7 +229,7 @@ void Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_bords_(const BC& cl, const int nd
 
           fill_derivee_cc(mats, semi_impl, d_cc);
 
-          //derivees : vitesse
+          //derivatives: velocity
           if (m_vit)
             {
               const IntTab *fcl_v = le_ch_v ? &ref_cast(Champ_Face_base, le_ch_v.valeur()).fcl() : nullptr;
@@ -244,7 +244,7 @@ void Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_bords_(const BC& cl, const int nd
                   }
             }
 
-          //derivees : champ convecte
+          //derivatives: convected field
           if (mat || d_cc.size() > 0)
             for (int face = ndeb; face < nfin; face++)
               {
@@ -264,12 +264,12 @@ void Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_bords_(const Periodique& cl, cons
     {
       const DoubleTab& donnee = semi_impl.count(nom_ch_inco_) ? semi_impl.at(nom_ch_inco_) : le_champ_convecte_ou_inc->valeurs();
 
-      // Luis : je rajoute l'option multiscalar_diff dans les CL périodiques
+      // Luis: adding the multiscalar_diff option in periodic BCs
       Type_Double flux(N), aii(N * (multiscalar_diff_ ? N : 1)), ajj(N * (multiscalar_diff_ ? N : 1)), aef(N);
       for (int face = ndeb; face < nfin; face++)
         {
           const int e0 = elem(face, 0), e1 = elem(face, 1);
-          flux_evaluateur.flux_face(donnee, donnee, face, cl, ndeb, flux); // attention 2 fois donnee
+          flux_evaluateur.flux_face(donnee, donnee, face, cl, ndeb, flux); // note: donnee appears twice intentionally
 
           for (int n = 0; n < N; n++)
             {
@@ -290,7 +290,7 @@ void Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_bords_(const Periodique& cl, cons
       VectorDeriv d_cc;
       fill_derivee_cc(mats, semi_impl, d_cc);
 
-      //derivees : vitesse
+      //derivatives: velocity
       if (m_vit)
         for (int face = ndeb; face < nfin; face++)
           {
@@ -304,7 +304,7 @@ void Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_bords_(const Periodique& cl, cons
                 if ((ndeb + frontiere_dis.nb_faces() / 2) <= face) (*m_vit)(e1 * N + i, face * N + i) -= aef[i];
           }
 
-      //derivees : champ convecte
+      //derivatives: convected field
       if (mat || d_cc.size() > 0)
         for (int face = ndeb; face < nfin; face++)
           {
@@ -320,11 +320,11 @@ void Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_bords_(const Echange_externe_impo
 {
   if (_TYPE_::CALC_FLUX_FACES_ECH_EXT_IMP)
     {
-      // Si la method est faite dans FT, on sort
+      // If the method is handled in FT, return
       const bool calculated_in_FT = ajouter_blocs_bords_echange_ext_FT_TCL<Type_Double>(cl, ndeb, nfin, num_cl, N, frontiere_dis, mats, resu, semi_impl);
       if ( calculated_in_FT ) return;
 
-      // Sinon, GO !
+      // Otherwise, GO!
       const DoubleTab& donnee = semi_impl.count(nom_ch_inco_) ? semi_impl.at(nom_ch_inco_) : le_champ_convecte_ou_inc->valeurs();
 
       Type_Double flux(N), aii(N * (multiscalar_diff_ ? N : 1)), ajj(N * (multiscalar_diff_ ? N : 1)), aef(N);
@@ -344,7 +344,7 @@ void Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_bords_(const Echange_externe_impo
       VectorDeriv d_cc;
       fill_derivee_cc(mats, semi_impl, d_cc);
 
-      //derivees : vitesse
+      //derivatives: velocity
       if (m_vit)
         {
           DoubleTab val_b = use_base_val_b_ ? le_champ_convecte_ou_inc->Champ_base::valeur_aux_bords() : le_champ_convecte_ou_inc->valeur_aux_bords();
@@ -359,13 +359,13 @@ void Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_bords_(const Echange_externe_impo
             }
         }
 
-      //derivees : champ convecte
+      //derivatives: convected field
       if (mat || d_cc.size() > 0)
         for (int face = ndeb; face < nfin; face++)
           {
             const int local_face = le_dom->front_VF(boundary_index).num_local_face(face);
             flux_evaluateur.coeffs_face(donnee, boundary_index, face, local_face, ndeb, cl, aii, ajj);
-            fill_coeffs_matrices(face, aii, ajj, mat, d_cc); // XXX : Attention Yannick pour d_cc c'est pas tout a fait comme avant ... N et M ...
+            fill_coeffs_matrices(face, aii, ajj, mat, d_cc); // XXX: Attention Yannick, for d_cc this is not exactly as before... N and M...
           }
     }
 }
@@ -373,7 +373,7 @@ void Iterateur_VDF_Elem<_TYPE_>::ajouter_blocs_bords_(const Echange_externe_impo
 template<class _TYPE_>
 inline void Iterateur_VDF_Elem<_TYPE_>::fill_derivee_cc(matrices_t mats, const tabs_t& semi_impl, VectorDeriv& d_cc) const
 {
-  //liste des derivees de cc a renseigner : couples (derivee de cc, matrice, nb de compos de la variable)
+  //list of derivatives of cc to fill in: pairs (derivative of cc, matrix, number of variable components)
   if (is_pb_multiphase() && is_convective_op() && !semi_impl.count(le_champ_convecte_ou_inc->le_nom().getString()))
     {
       for (auto &i_m : mats)
@@ -449,7 +449,7 @@ inline void Iterateur_VDF_Elem<_TYPE_>::fill_coeffs_matrices(const int face, Typ
 }
 
 #include <Iterateur_VDF_Elem_bis.tpp>
-#include <Iterateur_VDF_Elem_FT_TCL.tpp> // pour FT ...
-#include <Iterateur_VDF_Elem_Multiphase_Parietal.tpp> // pour partie Multiphase si vap paroi ...
+#include <Iterateur_VDF_Elem_FT_TCL.tpp> // for FT ...
+#include <Iterateur_VDF_Elem_Multiphase_Parietal.tpp> // for Multiphase part if wall vapour ...
 
 #endif /* Iterateur_VDF_Elem_TPP_included */

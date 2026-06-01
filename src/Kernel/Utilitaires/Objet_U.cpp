@@ -33,23 +33,22 @@ bool Objet_U::disable_TU=false; ///< Flag to disable or not the writing of the .
 bool Objet_U::stat_per_proc_perf_log=false; ///< Flag to enable the writing of the statistics detailed per processor in _csv.TU file
 Type_info Objet_U::info_obj("Objet_U");
 
-// Permet de debugger en remontant a la creation d'un objet donne:
+// Allows debugging by tracing back to the creation of a given object:
 static int object_id_to_track = -1;
 
-// Fonction utilitaire pour intercepter la creation d'un objet
-// ATTENTION: depuis gcc3, le compilo genere plusieurs routines pour
-//  chaque constructeur: au moins Objet_U::Objet_U() et Objet_U::Objet_U$base()
-//  Cela rend difficile l'utilisation de breakpoints dans ces routines.
-//  Poser le breakpoint ici:
+// Utility function to intercept the creation of an object.
+// NOTE: since gcc3, the compiler generates multiple routines for
+//  each constructor: at least Objet_U::Objet_U() and Objet_U::Objet_U$base().
+//  This makes it difficult to use breakpoints in those routines.
+//  Place the breakpoint here:
 static void object_trap(int obj_id)
 {
   Cerr << "Objet_U::Objet_U() : object_id_=" << obj_id << finl;
 }
 
-/*! @brief Constructeur par defaut : attribue un numero d'identifiant unique a l'objet (object_id_), et enregistre l'objet en "memoire"
+/*! @brief Default constructor: assigns a unique identifier to the object (object_id_) and registers the object in "memory" by giving it a _num_obj_ number.
  *
- *    en lui donnant un numero _num_obj_. L'object_id_ et tres
- *    pratique pour debugger...
+ *    object_id_ is very useful for debugging.
  *
  */
 Objet_U::Objet_U() :  Process(),
@@ -64,9 +63,9 @@ Objet_U::Objet_U() :  Process(),
   _num_obj_ = memoire.add(this);
 }
 
-/*! @brief Constructeur par copie.
+/*! @brief Copy constructor.
  *
- * Cree un nouveau numero d'objet (ne copie pas le numero de l'autre objet !)
+ * Creates a new object number (does not copy the number from the other object!).
  *
  */
 Objet_U::Objet_U(const Objet_U&) : Process(),
@@ -81,7 +80,7 @@ Objet_U::Objet_U(const Objet_U&) : Process(),
   _num_obj_ = memoire.add(this);
 }
 
-/*! @brief Operateur= : ne fait rien (on conserve le numero et l'identifiant)
+/*! @brief Assignment operator: does nothing (the number and identifier are preserved).
  *
  */
 const Objet_U& Objet_U::operator=(const Objet_U&)
@@ -89,28 +88,29 @@ const Objet_U& Objet_U::operator=(const Objet_U&)
   return *this;
 }
 
-/*! @brief Renvoie l'identifiant unique de l'objet object_id_
+/*! @brief Returns the unique identifier of the object (object_id_).
  *
+ * @return The unique object identifier.
  */
 int Objet_U::get_object_id() const
 {
   return object_id_;
 }
 
-/*! @brief renvoie la chaine identifiant la classe.
+/*! @brief Returns the string identifying the class.
  *
- * @return (const Nom&) Nom identifiant la classe de l'objet
+ * @return Name identifying the class of the object.
  */
 const Nom& Objet_U::que_suis_je() const
 {
   return get_info()->name();
 }
 
-/*! @brief Lecture des parametres de type non simple d'un objet_U a partir d'un flot d'entree.
+/*! @brief Reads non-simple-type parameters of an Objet_U from an input stream.
  *
- * @param (Motcle& motlu) le nom du terme a lire
- * @param (Entree& is) un flot d'entree
- * @return (int) negative value if the keyword is not understood, otherwise positive value.
+ * @param motlu The name of the keyword to read.
+ * @param is An input stream.
+ * @return Negative value if the keyword is not understood, otherwise positive value.
  */
 int Objet_U::lire_motcle_non_standard(const Motcle& motlu, Entree& is)
 {
@@ -119,9 +119,9 @@ int Objet_U::lire_motcle_non_standard(const Motcle& motlu, Entree& is)
   return -1;
 }
 
-/*! @brief Donne des informations sur le type de l'Objet_U
+/*! @brief Returns type information for the Objet_U.
  *
- * @return (const Type_info*) structure regroupant les informations sur le type de l'Objet_U
+ * @return Structure containing type information for the Objet_U.
  */
 const Type_info*  Objet_U::get_info() const
 {
@@ -129,40 +129,39 @@ const Type_info*  Objet_U::get_info() const
 }
 
 
-/*! @brief Donne des informations sur le type de l'Objet_U
+/*! @brief Returns type information for the Objet_U (static version).
  *
- * @return (const Type_info*) structure regroupant les informations sur le type de l'Objet_U
+ * @return Structure containing type information for the Objet_U.
  */
 const Type_info*  Objet_U::info()
 {
   return &info_obj;
 }
 
-/*! @brief Renvoie une reference constante vers le nom du cas.
+/*! @brief Returns a constant reference to the case name. This method is static.
  *
- * Cette methode est statique.
- *
+ * @return Constant reference to the case name.
  */
 const Nom& Objet_U::nom_du_cas()
 {
   return get_set_nom_du_cas();
 }
 
-/*! @brief Renvoie une reference non constante vers le nom du cas (pour pouvoir le modifier).
+/*! @brief Returns a non-constant reference to the case name (to allow modification). This method is static.
  *
- *   Cette methode est statique.
- *
+ * @return Non-constant reference to the case name.
  */
 Nom& Objet_U::get_set_nom_du_cas()
 {
-  // Cet objet statique est construit au premier appel
-  // a la fonction.
+  // This static object is constructed on the first call to the function.
   static Nom nom_du_cas_;
   return nom_du_cas_;
 }
 
-/*! @brief methode ajoutee pour caster en python
+/*! @brief Method added for casting in Python.
  *
+ * @param obj The object to cast.
+ * @return Constant reference to the object.
  */
 const Objet_U& Objet_U::self_cast(const Objet_U& obj)
 {
@@ -173,10 +172,10 @@ Objet_U& Objet_U::self_cast(Objet_U& obj)
   return ref_cast_non_const(Objet_U,obj);
 }
 
-/*! @brief Change le numero interne de l'Objet_U
+/*! @brief Changes the internal number of the Objet_U.
  *
- * @param (const int* const new_ones) tableau compose des nouveaux numeros, indexe par les anciens numeros
- * @return (int) le nouveau numero affecte a l'Objet_U
+ * @param new_ones Array of new numbers, indexed by old numbers.
+ * @return The new number assigned to the Objet_U.
  */
 int Objet_U::change_num(const int* const new_ones)
 {
@@ -184,21 +183,21 @@ int Objet_U::change_num(const int* const new_ones)
 }
 
 
-/*! @brief Donne le nom du type de l'Objet_U
+/*! @brief Returns the type name of the Objet_U.
  *
- * @return (const char*) chaine de caracteres representant le type de l'Objet_U
+ * @return Character string representing the type of the Objet_U.
  */
 const char* Objet_U::le_type() const
 {
   return get_info()->name();
 }
 
-/*! @brief Associe l'Objet_U a un autre Objet_U Methode virtuelle a surcharger
+/*! @brief Associates the Objet_U with another Objet_U. Virtual method to override.
  *
- * @param (Objet_U&) l'Objet_U avec lequel doit s'effectuer l'association
- * @return (int) code de retour
+ * @param obj The Objet_U to associate with.
+ * @return Return code.
  */
-int Objet_U::associer_(Objet_U&)
+int Objet_U::associer_(Objet_U& obj)
 {
   return 0;
 }
@@ -208,38 +207,34 @@ static Interprete& interprete_bidon()
   static Lire bidon;
   return bidon;
 }
-// BM : a supprimer a terme (utiliser Interprete::objet)
+// BM: to be removed eventually (use Interprete::objet instead)
 const Interprete& Objet_U::interprete() const
 {
   return interprete_bidon();
 }
 
-// BM : a supprimer a terme (utiliser Interprete::objet)
+// BM: to be removed eventually (use Interprete::objet instead)
 Interprete& Objet_U::interprete()
 {
   return interprete_bidon();
 }
 
-/*! @brief retourne x.
+/*! @brief Returns x.est_egal_a(y).
  *
- * est_egal_a(y)
- *
- * @param (const Objet_U& x) Objet_U a utiliser pour la comparaison
- * @param (const Objet_U& y) Objet_U a utiliser pour la comparaison
- * @return (int) 1 si les deux Objet_U sont egaux, 0 sinon
+ * @param x First Objet_U for comparison.
+ * @param y Second Objet_U for comparison.
+ * @return 1 if the two Objet_U are equal, 0 otherwise.
  */
 int operator==(const Objet_U& x, const Objet_U& y)
 {
   return x.est_egal_a(y);
 }
 
-/*! @brief Comparaison de deux Objet_U x et y Renvoie 1 - x.
+/*! @brief Returns 1 - x.est_egal_a(y).
  *
- * est_egal_a(y);
- *
- * @param (const Objet_U& x) Objet_U a utiliser pour la comparaison
- * @param (const Objet_U& y) Objet_U a utiliser pour la comparaison
- * @return (int) 1 si les deux Objet_U sont differents, 0 s'ils sont egaux
+ * @param x First Objet_U for comparison.
+ * @param y Second Objet_U for comparison.
+ * @return 1 if the two Objet_U are different, 0 if they are equal.
  */
 int operator!=(const Objet_U& x, const Objet_U& y)
 {
@@ -250,7 +245,7 @@ int operator!=(const Objet_U& x, const Objet_U& y)
 
 double Objet_U::precision_geom = 1e-10;
 
-/*! @brief Destructeur, supprime l'objet de la liste d'objets enregistres dans "memoire".
+/*! @brief Destructor. Removes the object from the list of objects registered in "memory".
  *
  */
 Objet_U::~Objet_U()
@@ -262,8 +257,9 @@ Objet_U::~Objet_U()
 #endif
 }
 
-/*! @brief Renvoie l'indice de l'objet dans Memoire::data
+/*! @brief Returns the index of the object in Memoire::data.
  *
+ * @return The object's index in memory.
  */
 int Objet_U::numero() const
 {
@@ -274,10 +270,10 @@ int Objet_U::numero() const
 #endif
 }
 
-/*! @brief Ecriture de l'objet sur un flot de sortie Methode a surcharger
+/*! @brief Writes the object to an output stream. Virtual method to override.
  *
- * @param (Sortie& s) flot de sortie
- * @return (Sortie&) flot de sortie modifie
+ * @param s Output stream.
+ * @return Modified output stream.
  */
 Sortie& Objet_U::printOn(Sortie& s) const
 {
@@ -285,18 +281,20 @@ Sortie& Objet_U::printOn(Sortie& s) const
 }
 
 
-/*! @brief Lecture d'un Objet_U sur un flot d'entree Methode a surcharger
+/*! @brief Reads an Objet_U from an input stream. Virtual method to override.
  *
- * @param (Entree& s) flot d'entree
- * @return (Entree& s) flot d'entree modifie
+ * @param s Input stream.
+ * @return Modified input stream.
  */
 Entree& Objet_U::readOn(Entree& s)
 {
   return s;
 }
 
-/*! @brief Renvoie 1 si l'objet x et *this sont une seule et meme instance (meme adresse en memoire).
+/*! @brief Returns 1 if x and *this are the same instance (same memory address).
  *
+ * @param x The object to compare with.
+ * @return 1 if same instance, 0 otherwise.
  */
 int Objet_U::est_egal_a(const Objet_U& x) const
 {
@@ -312,9 +310,9 @@ int Objet_U::est_egal_a(const Objet_U& x) const
 #endif
 }
 
-/*! @brief Donne le nom de l'Objet_U Methode a surcharger : renvoie "neant" dans cette implementation
+/*! @brief Returns the name of the Objet_U. Virtual method to override: returns "neant" in this implementation.
  *
- * @return (Nom&) le nom de l'Objet_U
+ * @return The name of the Objet_U.
  */
 const Nom& Objet_U::le_nom() const
 {
@@ -322,20 +320,20 @@ const Nom& Objet_U::le_nom() const
   return inconnu;
 }
 
-/*! @brief Donne un nom a l'Objet_U Methode virtuelle a surcharger
+/*! @brief Assigns a name to the Objet_U. Virtual method to override.
  *
- * @param (const Nom&) le nom a affectuer a l'Objet_U
+ * @param nom The name to assign to the Objet_U.
  */
-void Objet_U::nommer(const Nom&)
+void Objet_U::nommer(const Nom& nom)
 {
 }
 
-/*! @brief Reprise d'un Objet_U sur un flot d'entree Methode a surcharger
+/*! @brief Restores an Objet_U from an input stream. Virtual method to override.
  *
- * @param (Entree&) flot d'entree a utiliser pour la reprise
- * @return (int) code de retour
+ * @param is Input stream to use for restoration.
+ * @return Return code.
  */
-int Objet_U::reprendre(Entree&)
+int Objet_U::reprendre(Entree& is)
 {
 #ifndef LATATOOLS
   Cerr << "The method " << __func__ << " must be overloaded in " << que_suis_je() << " !!!!" << finl;
@@ -344,12 +342,12 @@ int Objet_U::reprendre(Entree&)
   return 1;
 }
 
-/*! @brief Sauvegarde d'un Objet_U sur un flot de sortie Methode a surcharger
+/*! @brief Saves an Objet_U to an output stream. Virtual method to override.
  *
- * @param (Sortie&) flot de sortie a utiliser pour la sauvegarde
- * @return (int) code de retour
+ * @param os Output stream to use for saving.
+ * @return Return code.
  */
-int Objet_U::sauvegarder(Sortie& ) const
+int Objet_U::sauvegarder(Sortie& os) const
 {
 #ifndef LATATOOLS
   Cerr << "The method " << __func__ << " must be overloaded in " << que_suis_je() << " !!!!" << finl;

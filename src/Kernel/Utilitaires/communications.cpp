@@ -21,42 +21,42 @@
 #include <TRUSTTab.h>
 #include <Motcle.h>
 
-/*! @brief Envoi de messages point-to-point synchrone entre la source et la cible.
+/*! @brief Synchronous point-to-point message sending between source and target.
  *
- * La fonction envoyer se termine au plus tard lorsque le message a ete
- *   recu par l'instruction "recevoir" correspondante  et l'envoi peut etre blocant
- *   (le blocage est force en mode debug, selon Comm_Group::check_enabled() )
- *   Ces communications utilisent Comm_Group::send() et Comm_Group::recv()
- *   Exemples d'utilisations possibles:
- *   1) communication point-a-point (processeur 2 vers processeur 5)
+ * The envoyer function completes at the latest when the message has been
+ *   received by the corresponding "recevoir" instruction, and the send can be blocking
+ *   (blocking is forced in debug mode, according to Comm_Group::check_enabled())
+ *   These communications use Comm_Group::send() and Comm_Group::recv()
+ *   Examples of possible uses:
+ *   1) point-to-point communication (processor 2 to processor 5)
  *        if (me() == 2)
  *          envoyer(objet, 5, canal);
  *        else if (me() == 5)
  *          recevoir(objet, 2, canal);
- *      ou de facon equivalente :
- *        envoyer(objet, 2, 5, canal); // ne fait rien sur les processeurs autres que 2
- *        recevoir(objet, 2, 5, canal); // ne fait rien sur les processeurs autres que 5
- *   2) gather : le processeur 0 recupere les donnees de l'objet t de tout le monde
- *        envoyer(t, me(), 0, canal); // Tout le monde envoie au processeur 0, sur le maitre, ne fait rien
+ *      or equivalently:
+ *        envoyer(objet, 2, 5, canal); // does nothing on processors other than 2
+ *        recevoir(objet, 2, 5, canal); // does nothing on processors other than 5
+ *   2) gather: processor 0 retrieves the data of object t from everyone
+ *        envoyer(t, me(), 0, canal); // Everyone sends to processor 0, on master it does nothing
  *        if (je_suis_maitre())
  *          for (i = 0; i < nproc(); i++) {
- *            recevoir(t, 0, i; canal); // Si i==0, ne fait rien.
- *            ... faire quelque chose avec t
+ *            recevoir(t, 0, i; canal); // If i==0, does nothing.
+ *            ... do something with t
  *          }
- *   3) broadcast : le processeur 0 envoie l'objet a tous les autres processeurs
- *      Il n'est pas necessaire de faire le test "if (je_suis_maitre())"
- *        envoyer(objet, 0, -1, canal); // Les processeurs autres que 0 ignorent l'appel
- *        recevoir(objet, 0, -1, canal);// Le processeur 0 ignore l'appel
- *      Il vaut mieux utiliser envoyer_broadcast() pour cet usage.
- *   4) broadcast : ecriture equivalente
+ *   3) broadcast: processor 0 sends the object to all other processors
+ *      It is not necessary to do the test "if (je_suis_maitre())"
+ *        envoyer(objet, 0, -1, canal); // Processors other than 0 ignore the call
+ *        recevoir(objet, 0, -1, canal);// Processor 0 ignores the call
+ *      It is better to use envoyer_broadcast() for this purpose.
+ *   4) broadcast: equivalent form
  *        if (je_suis_maitre())
- *          envoyer(objet, -1, canal); // Emission par le maitre a tous les processeurs, sauf lui-meme
+ *          envoyer(objet, -1, canal); // Emission by master to all processors, except itself
  *        else
- *          recevoir(objet, 0, canal); // Reception d'un message du processeur maitre
- *      Il vaut mieux utiliser envoyer_broadcast() pour cet usage.
- *  Dans l'implementation de envoyer_, on encapsule l'objet recu dans un buffer et on envoie le buffer.
- *  Ca marche donc pour les types complexes pourvu que Entree et Sortie sachent lire et ecrire l'objet.
- *  Chaque envoi necessite l'envoi de deux messages : d'abord la taille du buffer, puis le contenu.
+ *          recevoir(objet, 0, canal); // Reception of a message from the master processor
+ *      It is better to use envoyer_broadcast() for this purpose.
+ *  In the implementation of envoyer_, the received object is encapsulated in a buffer and the buffer is sent.
+ *  This therefore works for complex types as long as Entree and Sortie can read and write the object.
+ *  Each send requires two messages: first the buffer size, then the content.
  *
  */
 template <typename T>
@@ -94,7 +94,7 @@ bool envoyer_buffered_(const T& objet, int source, int cible, int canal)
   return true;
 }
 
-/*! @brief Reception d'un message en provenance du processeur source
+/*! @brief Reception of a message from the source processor.
  *
  */
 template <typename T>
@@ -119,9 +119,9 @@ bool recevoir_buffered_(T& objet, int source, int cible, int canal)
   return true;
 }
 
-/*! @brief Broadcast de l'objet par le processeur source a tous les autres processeurs.
+/*! @brief Broadcast of the object by the source processor to all other processors.
  *
- * Fonctionne pour des types complexes supportes par Entree ou Sortie.
+ * Works for complex types supported by Entree or Sortie.
  *
  */
 template <typename T>
@@ -176,7 +176,7 @@ bool envoyer_broadcast(Objet_U& t, int source)
   return envoyer_broadcast_buffered_(t, source);
 }
 
-// Template qui marche pour tout objet T qui ressemble a un vecteur (possede un operator[]) de taille nproc()
+// Template that works for any object T that looks like a vector (has an operator[]) of size nproc()
 template <typename T>
 bool envoyer_all_to_all_(const T& src, T& dest)
 {
@@ -222,12 +222,12 @@ bool envoyer_all_to_all(const TRUST_Vector<TRUSTArray<trustIdType>>& src, TRUST_
 }
 #endif
 
-/*! @brief On suppose que les tableaux en entree et en sortie sont de taille nproc() .
+/*! @brief Assumes that the input and output arrays are of size nproc().
  *
- * On envoie src[0] au proc 0,
- *   src[1] au proc 1, etc... la valeur recue du processeur 0 et mise dans
- *   dest[0], processeur 1 dans dest[1], etc...
- *   Il est autorise d'appeler la fonction avec le meme tableau src et dest.
+ * src[0] is sent to proc 0,
+ *   src[1] to proc 1, etc... the value received from processor 0 is placed in
+ *   dest[0], processor 1 in dest[1], etc...
+ *   It is allowed to call this function with the same array for src and dest.
  *
  */
 bool envoyer_all_to_all(std::vector<long long>& src, std::vector<long long>& dest)
@@ -248,17 +248,17 @@ bool envoyer_all_to_all(std::vector<long long>& src, std::vector<long long>& des
   return true;
 }
 
-/*! @brief Calcule la transposee d'une liste de processeurs: On construit le tableau dest_list tel que:
+/*! @brief Computes the transpose of a processor list: builds the array dest_list such that:
  *
- *         x est dans la liste src_list sur le processeur y
- *       si et seulement si
- *         y est dans la liste dest_list sur le processeur x
- *   En pratique, cette fonction permet de calculer la liste des
- *   processeurs qui recoivent des messages si on connait la liste
- *   des processeurs qui envoient des messages, et reciproquement.
+ *         x is in the src_list on processor y
+ *       if and only if
+ *         y is in the dest_list on processor x
+ *   In practice, this function computes the list of
+ *   processors that receive messages when the list of
+ *   processors that send messages is known, and vice versa.
  *
- * @param (src_list) Une liste de numeros de PEs presents dans ce groupe de comm. Ce sont les indices des pes dans le groupe courant (0 <= pe < nproc_)
- * @param (dest_list) Le tableau ou stocker le resultat. On le met a la bonne taille et on le remplit. Les numeros de PEs sont mis dans l'ordre croissant. Ce sont les indices des pes dans le groupe courant (0 <= pe < nproc_)
+ * @param (src_list) A list of PE numbers present in this comm group. These are the indices of the PEs in the current group (0 <= pe < nproc_)
+ * @param (dest_list) The array in which to store the result. It is resized and filled appropriately. PE numbers are stored in ascending order. These are the indices of the PEs in the current group (0 <= pe < nproc_)
  */
 bool reverse_send_recv_pe_list(const ArrOfInt& src_list, ArrOfInt& dest_list)
 {
@@ -285,12 +285,12 @@ bool reverse_send_recv_pe_list(const ArrOfInt& src_list, ArrOfInt& dest_list)
   return true;
 }
 
-/*! @brief On suppose que les tableaux en entree et en sortie sont tels que dimension(0)==nproc() et que les autres dimensions
+/*! @brief Assumes that the input and output arrays have dimension(0)==nproc() and that the other dimensions
  *
- *   sont identiques. On envoie src(0, i, j, ...) au proc 0,
- *   src(0, i, j, ...) au proc 1, etc... la valeur recue du processeur 0 et mise dans
- *   dest(0, i, j, ...) , processeur 1 dans dest(1, i, j, ...) , etc...
- *   Il est autorise d'appeler la fonction avec le meme tableau src et dest.
+ *   are identical. src(0, i, j, ...) is sent to proc 0,
+ *   src(0, i, j, ...) to proc 1, etc... the value received from processor 0 is placed in
+ *   dest(0, i, j, ...) , processor 1 in dest(1, i, j, ...) , etc...
+ *   It is allowed to call this function with the same array for src and dest.
  *
  */
 void envoyer_all_to_all(const DoubleTab& src, DoubleTab& dest)
@@ -400,15 +400,15 @@ void envoyer_all_gatherv(const DoubleTab& src, DoubleTab& dest, const IntTab& re
 }
 
 
-/*! @brief renvoie le drapeau Comm_Group::check_enabled().
+/*! @brief Returns the Comm_Group::check_enabled() flag.
  *
- * Ce drapeau indique si le code tourne en mode DEBUG du parallele. Dans ce cas, des communications supplementaires ont lieu pour verifier la coherence du parallelisme et le mode de communication
- *   est force en mode synchrone. Cette methode permet de tester le drapeau, et s'il est mis de realiser des verifications supplementaires
+ * This flag indicates whether the code is running in parallel DEBUG mode. In that case, additional communications take place to verify parallelism consistency and the communication mode
+ *   is forced to synchronous. This method allows testing the flag, and if it is set, performing additional checks.
  *
  */
 bool comm_check_enabled() { return Comm_Group::check_enabled(); }
 
-/*! @brief renvoie 1 (sur tous les procs) si le parametre est identique sur tous les procs, sinon renvoie 0 (sur tous les procs)
+/*! @brief Returns 1 (on all procs) if the parameter is identical on all procs, otherwise returns 0 (on all procs).
  *
  */
 bool is_parallel_object(const int x)
@@ -427,7 +427,7 @@ bool is_parallel_object(const trustIdType x)
 }
 #endif
 
-/*! @brief renvoie 1 (sur tous les procs) si le parametre est identique sur tous les procs, sinon renvoie 0 (sur tous les procs)
+/*! @brief Returns 1 (on all procs) if the parameter is identical on all procs, otherwise returns 0 (on all procs).
  *
  */
 bool is_parallel_object(const double x)
@@ -458,7 +458,7 @@ template <class T> int compare(const Objet_U& a, const Objet_U& b, int& erreur)
     }
 }
 
-/*! @brief renvoie 1 (sur tous les procs) si le parametre est identique sur tous les procs, sinon renvoie 0 (sur tous les procs)
+/*! @brief Returns 1 (on all procs) if the parameter is identical on all procs, otherwise returns 0 (on all procs).
  *
  */
 bool is_parallel_object(const Objet_U& obj)
@@ -472,7 +472,7 @@ bool is_parallel_object(const Objet_U& obj)
         {
           recevoir(copie, i, 67 /* tag */);
           if (erreur)
-            continue; // On a deja trouve une erreur, on recoit les autres messages mais c'est tout...
+            continue; // We already found an error, we receive the other messages but that's all...
           const Objet_U& obj2 = copie.valeur();
           if (obj2.que_suis_je() != obj.que_suis_je())
             {
@@ -480,9 +480,9 @@ bool is_parallel_object(const Objet_U& obj)
             }
           else
             {
-              // L'operateur == n'est pas virtuel, on ne peut pas se contenter de comparer avec ==.
-              // Il faut appeler == pour le sous-type specifique de l'objet.
-              // L'ordre est important: d'abord le type le plus derive, puis sa classe de base.
+              // The == operator is not virtual, so we cannot simply compare with ==.
+              // We must call == for the specific sub-type of the object.
+              // The order is important: first the most derived type, then its base class.
               if (compare<IntTab> (obj, obj2, erreur)) { /* Do nothing */ }
               else if (compare<DoubleTab> (obj, obj2, erreur)) { /* Do nothing */ }
               else if (compare<IntVect> (obj, obj2, erreur)) { /* Do nothing */ }
@@ -501,7 +501,7 @@ bool is_parallel_object(const Objet_U& obj)
     }
   else
     {
-      // On envoie un objet de type OWN_PTR..
+      // We send an object of type OWN_PTR..
       DerObjU copie(obj);
       envoyer(copie, 0, 67 /* tag */);
     }
@@ -510,9 +510,9 @@ bool is_parallel_object(const Objet_U& obj)
   return !erreur;
 }
 
-/*! @brief en mode comm_check_enabled(), verifie que le parametre a la meme valeur sur tous les processeurs.
+/*! @brief In comm_check_enabled() mode, verifies that the parameter has the same value on all processors.
  *
- * Ne fonctionne pas pour tous les types ! Pour l'instant ok pour Noms, Motcles et tableaux.
+ * Does not work for all types! Currently ok for Noms, Motcles and arrays.
  *
  */
 void assert_parallel(const Objet_U& obj)

@@ -38,10 +38,10 @@ Operateur_base::Operateur_base()
 
 /*! @brief DOES NOTHING - to override in derived classes.
  *
- *     Imprime l'operateur sur un flot de sortie.
+ *     Prints the operator to an output stream.
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Operateur_base::printOn(Sortie& os) const
 {
@@ -51,10 +51,10 @@ Sortie& Operateur_base::printOn(Sortie& os) const
 
 /*! @brief DOES NOTHING - to override in derived classes.
  *
- *     Lit un operateur sur un flot d'entree.
+ *     Reads an operator from an input stream.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
  */
 Entree& Operateur_base::readOn(Entree& is)
 {
@@ -64,9 +64,9 @@ Entree& Operateur_base::readOn(Entree& is)
 
 /*! @brief DOES NOTHING - to override in derived classes.
  *
- *     Mise a jour de l'operateur
+ *     Update of the operator
  *
- * @param (double) un pas de temps
+ * @param (double) a time step
  */
 void Operateur_base::mettre_a_jour(double )
 {
@@ -82,9 +82,9 @@ void Operateur_base::resetTime(double)
   // hmmm ... hopefully nothing to do here??
 }
 
-/*! @brief Associe l'operateur au domaine_dis, le domaine_Cl_dis, et a l'inconnue de son equation.
+/*! @brief Associates the operator with the domaine_dis, the domaine_Cl_dis, and the unknown of its equation.
  *
- * @throws pas d'equation associee
+ * @throws no associated equation
  */
 void Operateur_base::completer()
 {
@@ -101,11 +101,11 @@ void Operateur_base::completer()
       const Frontiere_dis_base& la_fr = itr->frontiere_dis();
       col_width_ = std::max(col_width_, la_fr.le_nom().longueur());
     }
-  int w_suffix = 3; // pour ajout _Mx (moment)
+  int w_suffix = 3; // for adding _Mx (moment)
 
-  // pour les champs a plusieurs composantes, le header des colonnes des fichiers .out prend la forme
+  // for fields with multiple components, the column header of .out files takes the form
   // Time cl1_compo1  cl1_compo2 ...
-  // on prend en compte la longueur de compo1, compo2, etc...
+  // we take into account the length of compo1, compo2, etc...
   Noms noms_compo_courts(inco.noms_compo());
   if (noms_compo_courts.size() > 1)
     for (int i = 0; i < noms_compo_courts.size(); ++i)
@@ -122,9 +122,9 @@ void Operateur_base::associer_champ(const Champ_Inc_base& ch, const std::string&
   nom_inco_ = nom_ch;
 }
 
-/*! @brief Calcul dt_stab
+/*! @brief Computes dt_stab
  *
- * @return (double) renvoie toujours  1.e30
+ * @return (double) always returns 1.e30
  */
 double Operateur_base::calculer_dt_stab() const
 {
@@ -139,10 +139,10 @@ void Operateur_base::calculer_dt_local(DoubleTab& dt) const
 }
 /*! @brief DOES NOTHING - to override in derived classes.
  *
- *     Imprime l'operateur sur un flot de sortie.
+ *     Prints the operator to an output stream.
  *
  * @param (Sortie& os)
- * @return (int) renvoie toujours 1
+ * @return (int) always returns 1
  */
 int Operateur_base::impr(Sortie& os) const
 {
@@ -152,12 +152,12 @@ int Operateur_base::impr(Sortie& os) const
 
 /*! @brief DOES NOTHING - to override in derived classes.
  *
- * @param (Matrice_Morse&) une matrice au format Morse
- * @throws methode a surcharger
+ * @param (Matrice_Morse&) a matrix in Morse format
+ * @throws method to override
  */
 void Operateur_base::dimensionner(Matrice_Morse& mat) const
 {
-  /* on tente dimensionner_blocs() */
+  /* try dimensionner_blocs() */
   if (has_interface_blocs())
     dimensionner_blocs( { { equation().inconnue().le_nom().getString(), &mat } });
   else
@@ -166,7 +166,7 @@ void Operateur_base::dimensionner(Matrice_Morse& mat) const
 
 void Operateur_base::dimensionner_bloc_vitesse(Matrice_Morse& mat) const
 {
-  /* on tente dimensionner_blocs() */
+  /* try dimensionner_blocs() */
   if (has_interface_blocs())
     dimensionner_blocs( { { "vitesse", &mat } });
 }
@@ -176,13 +176,13 @@ void Operateur_base::dimensionner_termes_croises(Matrice_Morse& mat, const Probl
   if (!has_interface_blocs()) return;
   std::string nom_inco = equation().inconnue().le_nom().getString(),
               nom = equation().probleme().le_nom() == autre_pb.le_nom() ? nom_inco :
-                    nom_inco + "/" + autre_pb.le_nom().getString(); //nom de bloc croise pour l'interface_blocs
+                    nom_inco + "/" + autre_pb.le_nom().getString(); //cross-block name for the interface_blocs
   dimensionner_blocs({{ nom, &mat }}, {});
 }
 
 void Operateur_base::ajouter_termes_croises(const DoubleTab& inco, const Probleme_base& autre_pb, const DoubleTab& autre_inco, DoubleTab& resu) const
 {
-  //si on a Interface_blocs, alors ajouter_blocs() est suffisant
+  //if we have Interface_blocs, then ajouter_blocs() is sufficient
   return;
 }
 
@@ -190,11 +190,11 @@ void Operateur_base::contribuer_termes_croises(const DoubleTab& inco, const Prob
 {
   if (!has_interface_blocs())
     return;
-  DoubleTrav secmem(inco); //on va le jeter
+  DoubleTrav secmem(inco); //will be discarded
   secmem = inco;
   std::string nom_inco = equation().inconnue().le_nom().getString(),
               nom = equation().probleme().le_nom() == autre_pb.le_nom() ? nom_inco :
-                    nom_inco + "/" + autre_pb.le_nom().getString(); //nom de bloc croise pour l'interface_blocs
+                    nom_inco + "/" + autre_pb.le_nom().getString(); //cross-block name for the interface_blocs
   ajouter_blocs( { { nom, &matrice } }, secmem, { });
 }
 
@@ -210,9 +210,9 @@ void Operateur_base::ajouter_blocs(matrices_t mats, DoubleTab& secmem, const tab
 
 /*! @brief DOES NOTHING - to override in derived classes.
  *
- * @param (Matrice_Morse&) une matrice au format Morse
- * @param (DoubleTab&) un tableau de valeur (double)
- * @throws methode a surcharger
+ * @param (Matrice_Morse&) a matrix in Morse format
+ * @param (DoubleTab&) a double-valued array
+ * @throws method to override
  */
 void Operateur_base::modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const
 {
@@ -227,13 +227,13 @@ void Operateur_base::modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const
 
 DoubleTab&  Operateur_base::ajouter(const DoubleTab& inco, DoubleTab& secmem) const
 {
-  /* on tente ajouter_blocs */
+  /* try ajouter_blocs */
   if (has_interface_blocs())
     {
       if (equation().discretisation().is_poly_family())
         ajouter_blocs({}, secmem);
       else
-        ajouter_blocs({}, secmem, {{ equation().inconnue().le_nom().getString(),inco }} ); //pour prise en compte du parametre inco (qui est pas forcement l'inco de l'equation)
+        ajouter_blocs({}, secmem, {{ equation().inconnue().le_nom().getString(),inco }} ); //to account for the inco parameter (which is not necessarily the equation's unknown)
     }
   else Process::exit(que_suis_je() + " : ajouter() not coded!");
   return secmem;
@@ -247,13 +247,13 @@ DoubleTab&  Operateur_base::calculer(const DoubleTab& inco, DoubleTab& secmem) c
 
 /*! @brief DOES NOTHING - to override in derived classes.
  *
- * @param (DoubleTab&) un tableau de valeur (double)
- * @param (Matrice_Morse&) une matrice au format Morse
- * @throws methode a surcharger
+ * @param (DoubleTab&) a double-valued array
+ * @param (Matrice_Morse&) a matrix in Morse format
+ * @throws method to override
  */
 void Operateur_base::contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& matrice) const
 {
-  DoubleTrav secmem(inco); //on va le jeter
+  DoubleTrav secmem(inco); //will be discarded
   secmem = inco;
   if (has_interface_blocs())
     ajouter_blocs( { { equation().inconnue().le_nom().getString(), &matrice } }, secmem);
@@ -265,7 +265,7 @@ void Operateur_base::contribuer_bloc_vitesse(const DoubleTab& inco, Matrice_Mors
 {
   if (has_interface_blocs())
     {
-      DoubleTrav secmem(inco); //on va le jeter
+      DoubleTrav secmem(inco); //will be discarded
       secmem = inco;
       ajouter_blocs({{ "vitesse", &matrice }}, secmem);
     }
@@ -273,8 +273,8 @@ void Operateur_base::contribuer_bloc_vitesse(const DoubleTab& inco, Matrice_Mors
 
 /*! @brief DOES NOTHING - to override in derived classes.
  *
- * @param (DoubleTab&) un tableau de valeur (double)
- * @throws methode a surcharger
+ * @param (DoubleTab&) a double-valued array
+ * @throws method to override
  */
 void Operateur_base::contribuer_au_second_membre(DoubleTab&) const
 {
@@ -306,14 +306,14 @@ void Operateur_base::set_fichier(const Nom& nom)
   out_+=equation().probleme().le_nom()+"_"+nom;
 }
 
-/*! @brief Ouverture/creation d'un fichier d'impression d'un operateur A surcharger dans les classes derivees.
+/*! @brief Opening/creation of a file for printing an operator. To override in derived classes.
  *
- * @throws methode a surcharger
+ * @throws method to override
  */
 void Operateur_base::ouvrir_fichier(SFichier& os,const Nom& type, const int flag) const
 {
 
-  // flag nul on n'ouvre pas le fichier
+  // null flag means we don't open the file
   if (flag==0 || os.is_open())
     return ;
 
@@ -331,7 +331,7 @@ void Operateur_base::ouvrir_fichier(SFichier& os,const Nom& type, const int flag
   if (type!="") nomfichier+=(Nom)"_"+type;
   nomfichier+=".out";
   struct stat f;
-  // On cree le fichier a la premiere impression avec l'en tete ou si le fichier n'existe pas
+  // Create the file on the first printing with the header, or if the file does not exist
   if (stat(nomfichier,&f) || (sch.nb_impr()==1 && !pb.reprise_effectuee()))
     {
       os.ouvrir(nomfichier);
@@ -352,7 +352,7 @@ void Operateur_base::ouvrir_fichier(SFichier& os,const Nom& type, const int flag
           Process::exit();
         }
 
-      // s'il y a plusieurs composantes par CL, on se sert des noms de composante de l'inconnue
+      // if there are multiple components per BC, we use the component names of the unknown
       int nb_compo = flux_bords_.line_size();
       if (type=="moment" && dimension == 2) nb_compo=1;
       Noms noms_compo_courts(eqn.inconnue().noms_compo());
@@ -360,9 +360,9 @@ void Operateur_base::ouvrir_fichier(SFichier& os,const Nom& type, const int flag
         for (int i = 0; i < noms_compo_courts.size(); ++i)
           noms_compo_courts[i] = Motcle(noms_compo_courts[i]).getSuffix(eqn.inconnue().le_nom());
 
-      // ecriture de l'entete des colonnes de la forme
+      // writing the column header in the form
       // Time cl1  cl2  cl3  ...
-      // ou s'il y a plusieurs composantes :
+      // or if there are multiple components:
       // Time cl1_compo1  cl1_compo2 cl2 compo1 cl2_compo2 ...
       for (int num_cl=0; num_cl<les_cls.size(); num_cl++)
         {
@@ -410,25 +410,25 @@ void Operateur_base::ouvrir_fichier(SFichier& os,const Nom& type, const int flag
 
       os << finl;
     }
-  // Sinon on l'ouvre
+  // Otherwise open it
   else
     {
       os.ouvrir(nomfichier,ios::app);
     }
   os.precision(precision);
   os.setf(ios::scientific);
-  // Ajout de os a la liste des fichiers a fermer lors de l'appel a Probleme_base::finir()
+  // Add os to the list of files to be closed when Probleme_base::finir() is called
   pb.get_set_out_files().add(os);
 }
 
-/*! @brief Ouverture/creation d'un fichier d'impression d'un operateur A surcharger dans les classes derivees.
+/*! @brief Opening/creation of a shared file for printing an operator. To override in derived classes.
  *
- * @throws methode a surcharger
+ * @throws method to override
  */
 void Operateur_base::ouvrir_fichier_partage(EcrFicPartage& os,const Nom& type, const int flag) const
 {
 
-  // flag nul on n'ouvre pas le fichier
+  // null flag means we don't open the file
   if (flag==0)
     return ;
 
@@ -438,12 +438,12 @@ void Operateur_base::ouvrir_fichier_partage(EcrFicPartage& os,const Nom& type, c
   Nom nomfichier(out_);
   if (type!="") nomfichier+=(Nom)"_"+type;
   nomfichier+=".face";
-  // On cree le fichier a la premiere impression avec l'en tete
+  // Create the file on the first printing with the header
   if (sch.nb_impr()==1 && !pb.reprise_effectuee())
     {
       os.ouvrir(nomfichier);
     }
-  // Sinon on l'ouvre
+  // Otherwise open it
   else
     {
       os.ouvrir(nomfichier,ios::app);
@@ -454,7 +454,7 @@ void Operateur_base::ouvrir_fichier_partage(EcrFicPartage& os,const Nom& type, c
 
 void Operateur_base::ajouter_contribution_explicite_au_second_membre(const Champ_Inc_base& inconnue, DoubleTab& derivee) const
 {
-  // Methode par defaut pour les operateurs de TRUST:
+  // Default method for TRUST operators:
   ajouter(inconnue.valeurs(), derivee);
 }
 
@@ -481,9 +481,9 @@ void Operateur_base::get_noms_champs_postraitables(Noms& nom, Option opt) const
     nom.add(champs_compris_.liste_noms_compris());
 }
 
-//Calcul du tableau de valeurs d une quantite lie a un operateur pour postraitement
-//Options reconnues : "stabilite" pour dt_stab
-//                      "flux_bords" ou "flux_surfacique_bords" pour flux_bords_
+//Computes the array of values of a quantity related to an operator for post-processing
+//Recognized options: "stabilite" for dt_stab
+//                    "flux_bords" or "flux_surfacique_bords" for flux_bords_
 //
 void Operateur_base::calculer_pour_post(Champ_base& espace_stockage,const Nom& option, int comp) const
 {
@@ -539,7 +539,7 @@ Motcle Operateur_base::get_localisation_pour_post(const Nom& option) const
 }
 
 // MODIF ELI LAUCOIN : 6/08/2008
-// Je rajoute deux methodes pour le calcul du flux
+// Adding two methods for flux computation
 void Operateur_base::ajouter_flux(const DoubleTab& inconnue, DoubleTab& contribution) const
 {
   Cerr << "Warning : 'Operateur_base::ajouter_flux()' must be overloaded" << finl;
@@ -554,15 +554,15 @@ void Operateur_base::calculer_flux(const DoubleTab& inconnue, DoubleTab& flux) c
 // FIN MODIF ELI LAUCOIN : 6/08/2008
 
 
-// Je rajoute une methode preparer_calcul()
-// Ca me permet de coder plus facilement les operateurs de diffusion selon
-// que la diffusivite varie ou non.
+// Adding a preparer_calcul() method
+// This makes it easier to implement diffusion operators depending on
+// whether diffusivity varies or not.
 //
-// Par defaut : ne fait rien
+// Default implementation: does nothing
 void Operateur_base::preparer_calcul() { }
 
-// Methode pour tester la methode contribuer_a_avec
-// Test active par une variable d'environnement
+// Method to test the contribuer_a_avec method
+// Test activated by an environment variable
 void Operateur_base::tester_contribuer_a_avec(const DoubleTab& inco, const Matrice_Morse& matrice)
 {
   int test_op=0;
@@ -581,10 +581,10 @@ void Operateur_base::tester_contribuer_a_avec(const DoubleTab& inco, const Matri
   auto& coeff_contribuer = mat_contribuer.get_set_coeff();
   // A*Inc(n)=Op(Inc(n))+
   coeff_contribuer = 0;
-  calculer(inco, resu); // Calcule l'operateur Op(Inc(n)) avec methode ajouter dans resu
-  contribuer_a_avec(inco, mat_contribuer); // Construit la matrice de l'operateur (mat=-A)
+  calculer(inco, resu); // Computes the operator Op(Inc(n)) with the ajouter method into resu
+  contribuer_a_avec(inco, mat_contribuer); // Builds the operator matrix (mat=-A)
 
-  // calcul de la matrice par differences finies
+  // computation of the matrix by finite differences
   if (inco.dimension(1) == 1)
     {
       const double eps = 1e-6;

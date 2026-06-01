@@ -19,13 +19,12 @@
 #include <Convection_Diffusion_Temperature_IBM.h>
 #include <Convection_Diffusion_Turbulent.h>
 
-/*! @brief classe Convection_Diffusion_Temperature_IBM_Turbulent Cette classe represente le cas particulier de
+/*! @brief Turbulent IBM convection-diffusion equation for temperature.
  *
- *      convection diffusion turbulente lorsque l'inconnue
- *      est la temperature.
- *      Cette herite de Convection_Diffusion_Turbulent qui contient
- *      le modele de turbulence et de Convection_Diffusion_Temperature_IBM
- *      qui modelise l'equation non turbulente.
+ *      This class represents the particular case of turbulent convection-diffusion
+ *      when the unknown is temperature.
+ *      It inherits from Convection_Diffusion_Turbulent (which contains the turbulence model)
+ *      and from Convection_Diffusion_Temperature_IBM (which models the non-turbulent equation).
  *
  * @sa Convection_Diffusion_Turbulent  Convection_Diffusion_Temperature_IBM
  */

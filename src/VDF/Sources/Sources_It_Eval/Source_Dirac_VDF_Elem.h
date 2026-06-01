@@ -20,7 +20,7 @@
 #include <Iterateur_Source_Elem.h>
 #include <Eval_Dirac_VDF_Elem.h>
 
-/*! @brief class Source_Dirac_VDF_Elem Cette classe represente un  terme source de Dirac.
+/*! @brief class Source_Dirac_VDF_Elem This class represents a Dirac source term.
  *
  */
 class Source_Dirac_VDF_Elem : public Terme_Puissance_Thermique_VDF_base

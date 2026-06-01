@@ -24,24 +24,24 @@
 #include <kokkos++.h>
 #include <TRUSTArray_kokkos.tpp>
 
-/*! @brief Classe Matrice_Morse Represente une matrice M (creuse), non necessairement carree
+/*! @brief Matrice_Morse class - Represents a (sparse) matrix M, not necessarily square,
  *
- *     stockee au format Morse.
+ *     stored in Morse format.
  *     -----------------------------------------------------------------------
- *     On utilise 3 tableaux tab1(n+1), tab2(nnz) et coeff_(nnz):
- *     On note Vi = { j differents de i / M(i,j) est non nul }
- *             tab1[i] = rang dans tab2 de la ieme ligne
- *             pour tab1[i] <= j < tab1[i+1],  tab2[j] decrit Vi
- *             et coeff_[j] = M(i,tab2[j])
- *             tab1 et tab2 sont des rangs au sens fortran:
+ *     Uses 3 arrays tab1(n+1), tab2(nnz) and coeff_(nnz):
+ *     Let Vi = { j different from i / M(i,j) is non-zero }
+ *             tab1[i] = position in tab2 of the i-th row
+ *             for tab1[i] <= j < tab1[i+1], tab2[j] describes Vi
+ *             and coeff_[j] = M(i,tab2[j])
+ *             tab1 and tab2 are Fortran-style ranks:
  *                   1 <= tab2[i] <= n
  *                   tab1[n+1] = nnz+1
- *     Remarque: dans ce commentaire le [] est a prendre au sens fortran:
- *                     tab1[1] designe la premiere valeur de tab1
+ *     Note: in this comment [] is used in the Fortran sense:
+ *                     tab1[1] refers to the first value of tab1
  *
- *     C'est aussi le format decrit dans la page Wikipedia :
+ *     This is also the format described on the Wikipedia page:
  *         https://fr.wikipedia.org/wiki/Matrice_creuse
- *     en faisant un +1 sur tous les elements des tableaux d'indices (IA et JA dans la page)
+ *     by adding +1 to all elements of the index arrays (IA and JA on the page)
  *     -----------------------------------------------------------------------
  *
  * @sa Matrice_Base Matrice_Morse_Sym
@@ -55,14 +55,14 @@ public :
 
   //constructeurs :
 
-  // par defaut le scalaire 0:
+  // default: scalar 0:
   Matrice_Morse() ;
   template<typename _SIZE_> Matrice_Morse(int n, _SIZE_ nnz) ;
 
-  // Une matrice a n lignes et m colonnes a nnz coefficients non nuls :
+  // A matrix with n rows and m columns and nnz non-zero coefficients:
   template<typename _SIZE_> Matrice_Morse(int n, int m, _SIZE_ nnz) ;
 
-  // copie :
+  // copy:
   Matrice_Morse(const Matrice_Morse& ) ;
   Matrice_Morse(int , int , const IntLists& ,const DoubleLists& ,const DoubleVect& );
 
@@ -72,7 +72,7 @@ public :
   Sortie& imprimer_image(Sortie& s) const;
   Sortie& imprimer_image(Sortie& s, int symetrie) const;
   void WriteFileMTX(const Nom&) const;
-  int largeur_de_bande() const;         // Retourne la largeur de bande
+  int largeur_de_bande() const;         // Returns the bandwidth
   void remplir(const IntLists& ,const DoubleLists& ,const DoubleVect& );
   void remplir(const IntLists& ,const DoubleLists&);
   void remplir(const int, const int, const int, const int, const Matrice_Morse& ) ;
@@ -80,16 +80,16 @@ public :
   template<typename _SIZE_> void dimensionner(int n, _SIZE_ nnz);
   template<typename _SIZE_> void dimensionner(int n, int m, _SIZE_ nnz);
 
-  // place pour d'eventuels nouveaux coefficients non nuls
+  // space for potential new non-zero coefficients
   // (modif MT)
   void dimensionner(const IntTab&);
 
-  // ordre retourne n si n==m
+  // ordre returns n if n==m
   int ordre() const override;
 
-  int nb_lignes() const override { return tab1_.size_array()-1; } // nb_lignes retourne n
-  int nb_colonnes() const override { return m_; } // nb_colonnes retourne m
-  auto nb_coeff() const { return coeff_.size(); } // nb_coeff retourne nnz
+  int nb_lignes() const override { return tab1_.size_array()-1; } // nb_lignes returns n
+  int nb_colonnes() const override { return m_; } // nb_colonnes returns m
+  auto nb_coeff() const { return coeff_.size(); } // nb_coeff returns nnz
 
   void set_nb_columns( const int );
   void set_symmetric( const int );
@@ -113,18 +113,18 @@ public :
 
   int nb_vois(int i) const
   {
-    return (int)(get_tab1()(i+1)-get_tab1()(i)); // nb_vois(i) : nombre d'elements non nuls de la ligne i
+    return (int)(get_tab1()(i+1)-get_tab1()(i)); // nb_vois(i): number of non-zero elements in row i
   }
 
-  //methode pour nettoyer la matrice.
+  //method to clean the matrix.
   void clean() override;
 
-  // operateurs :
+  // operators:
   // 0<=i,j<=n-1
   inline double& operator()(int i, int j);
   inline double operator()(int i, int j) const;
-  // Ne pas supprimer ces deux methodes coef(i,j) qui bien qu'elles fassent la meme chose que les
-  // deux precedents sont utilisees tres souvent par OVAP:
+  // Do not remove these two coef(i,j) methods which, although they do the same thing as
+  // the two above, are used very often by OVAP:
   // Access to coefficients do not modify the stencil so we can leave these two access functions
   inline double coef(int i, int j) const { return operator()(i,j); }
   inline double& coef(int i,int j) { return operator()(i,j); }
@@ -154,7 +154,7 @@ public :
   DoubleVect& ajouter_multvect_(const DoubleVect& ,DoubleVect& ) const override;
   ArrOfDouble& ajouter_multvect_(const ArrOfDouble& ,ArrOfDouble&, ArrOfInt& ) const;
 
-  // Y += AX ou X et Y sont des DoubleTab a 2 dimensions
+  // Y += AX where X and Y are 2-dimensional DoubleTabs
   DoubleTab& ajouter_multTab_(const DoubleTab& ,DoubleTab& ) const override;
 
   // y += transposee(A) x
@@ -167,10 +167,10 @@ public :
   // A=x*A (x vecteur diag)
   virtual Matrice_Morse& diagmulmat(const DoubleVect& x);
 
-  //recupere la partie sup de la matrice et la stocke dans celle-ci
+  //retrieve the upper part of the matrix and store it in this one
   virtual Matrice_Morse& partie_sup(const Matrice_Morse& a);
 
-  // initialisation a la matrice unite
+  // initialize to the identity matrix
   void unite();
 
   // extraction d'un sous-bloc
@@ -189,7 +189,7 @@ public :
   bool is_sorted_stencil() const;
   bool is_diagonal();
 
-  mutable int sorted_; //1 si le stencil est classe : obtenu en appellant sort_stencil()
+  mutable int sorted_; //1 if the stencil is sorted: obtained by calling sort_stencil()
   void set_tab1_int32() const
   {
 #ifdef TRUST_USE_GPU
@@ -229,7 +229,7 @@ protected :
 
   mutable int morse_matrix_structure_has_changed_=-1; // Flag if matrix structure changes
   int m_;          // Number of columns
-  int symetrique_; // Pour inliner operator()(i,j) afin d'optimiser
+  int symetrique_; // For inlining operator()(i,j) to optimize
 
   template<typename _TAB_T_, typename _VALUE_T_>
   inline void get_stencil_coeff_templ( Stencil& stencil, _TAB_T_& coeffs_span) const;
@@ -262,7 +262,7 @@ inline double Matrice_Morse::operator()(int i, int j) const
   else
     for (auto k=k1; k<k2; k++)
       if (tab2_[k]-1 == j) return(coeff_[k]);
-  // Si coefficient non trouve c'est qu'il est nul:
+  // If coefficient not found it is zero:
   return(0);
 }
 
@@ -288,9 +288,9 @@ inline double& Matrice_Morse::operator()(int i, int j)
   else
     for (auto k=k1; k<k2; k++)
       if (tab2_[k]-1 == j) return(coeff_[k]);
-  if (symetrique_==2) return zero_; // Pour Matrice_Morse_Diag, on ne verifie pas si la case est definie et l'on renvoie 0
+  if (symetrique_==2) return zero_; // For Matrice_Morse_Diag, we do not check if the slot is defined and return 0
 #ifndef NDEBUG
-  // Uniquement en debug afin de permettre l'inline en optimise
+  // Only in debug mode to allow inlining in optimized builds
   Cerr << "i or j are not suitable " << finl;
   Cerr << "i=" << i << finl;
   Cerr << "j=" << j << finl;
@@ -302,7 +302,7 @@ inline double& Matrice_Morse::operator()(int i, int j)
   // in debug mode: there is a test to check the parallelism of the symmetric matrix...
   Cerr << "Error Matrice_Morse::operator("<< i << "," << j << ") not defined!" << finl;
   exit();
-  return coeff_[0];     // On ne passe jamais ici
+  return coeff_[0];     // Never reached
 }
 
 // Kokkos: First (and quick) implementation of a Matrix view. Future: Kokkos kernels ?
@@ -410,7 +410,7 @@ public:
   void add(int i, int j, double coeff, bool atomic=false) const
   {
     if (symetrique_==2 && i!=j)
-      return; // Pour Matrice_Morse_Diag, on ne verifie pas si la case est definie et l'on renvoie 0
+      return; // For Matrice_Morse_Diag: we do not check whether the entry is defined and we return 0
     else if ((symetrique_==1) && ((j-i)<0))
       {
         // std::swap(i,j) refused by HIP:  reference to __host__ function 'swap<int>' in __host__ __device__ function

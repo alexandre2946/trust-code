@@ -80,7 +80,7 @@ void Partitionneur_Metis_32_64<_SIZE_>::set_param(Param& param) const
   // XD_CONT periodic elements on the same processor. This option can slightly improve the partitionning quality but it
   // XD_CONT consumes more memory and takes more time. It is not mandatory since a correction algorithm is always
   // XD_CONT applied afterwards to ensure a correct partitionning for periodic boundaries.
-  param.ajouter_flag("use_segment_to_build_connectivite_elem_elem",&use_segment_to_build_connectivite_elem_elem_); // option pour construire le grpah a partir des liens (segment) pour reseau electrique, sides ....
+  param.ajouter_flag("use_segment_to_build_connectivite_elem_elem",&use_segment_to_build_connectivite_elem_elem_); // option to build the graph from links (segments) for electrical networks, sides, etc.
 }
 
 template <typename _SIZE_>
@@ -123,11 +123,10 @@ int Partitionneur_Metis_32_64<_SIZE_>::lire_motcle_non_standard(const Motcle& mo
     return Partitionneur_base_32_64<_SIZE_>::lire_motcle_non_standard(mot,is);
 }
 
-/*! @brief Calcule le graphe de connectivite pour Metis, appelle le partitionneur et remplit elem_part (pour chaque element, numero de la partie qui lui
+/*! @brief @brief Computes the connectivity graph for Metis, calls the partitioner and fills elem_part (for each element, the number of the part assigned to it).
  *
- *   est attribuee).
- *   Les parties sont equilibrees de facon a minimiser le nombre de faces de joint
- *   et a equilibrer le nombre d'elements par partie.
+ *   Parts are balanced to minimise the number of joint faces
+ *   and to balance the number of elements per part.
  *
  */
 template <typename _SIZE_>
@@ -150,7 +149,7 @@ void Partitionneur_Metis_32_64<_SIZE_>::construire_partition(BigIntVect_& elem_p
       Process::exit();
     }
 
-  // Cas particulier: si nb_parts == 1, METIS ne veut rien faire...
+  // Special case: if nb_parts == 1, METIS does nothing...
   if (nb_parties_ == 1)
     {
       int_t nb_elem = ref_domaine_->nb_elem_tot();
@@ -178,7 +177,7 @@ void Partitionneur_Metis_32_64<_SIZE_>::construire_partition(BigIntVect_& elem_p
 
   std::vector<idx_t> partition(graph.nvtxs);
   idx_t int_parts = nb_parties_;
-  idx_t edgecut = 0; // valeur renvoyee par metis (nombre total de faces de joint)
+  idx_t edgecut = 0; // value returned by metis (total number of joint faces)
 
   switch(algo_)
     {
@@ -187,7 +186,7 @@ void Partitionneur_Metis_32_64<_SIZE_>::construire_partition(BigIntVect_& elem_p
         Cerr << "===============" << finl;
         Cerr << "Call for PMETIS" << finl;
         Cerr << "===============" << finl;
-        // Voir le manual.pdf de METIS 5.0
+        // See the manual.pdf of METIS 5.0
         idx_t options[METIS_NOPTIONS];
         METIS_SetDefaultOptions(options);
         //options[METIS_OPTION_PTYPE]=METIS_PTYPE_RB|METIS_PTYPE_KWAY; // Methode de partitionnement
@@ -195,13 +194,13 @@ void Partitionneur_Metis_32_64<_SIZE_>::construire_partition(BigIntVect_& elem_p
         //options[METIS_OPTION_CTYPE]=METIS_CTYPE_SHEM|METIS_CTYPE_RM; // Matching scheme during coarsening
         //options[METIS_OPTION_IPTYPE]=METIS_IPTYPE_GROW; // Algorithm during initial partitioning
         //options[METIS_OPTION_RTYPE]=METIS_RTYPE_FM;   // Algorithm for refinement
-        options[METIS_OPTION_NCUTS]=nb_essais_;         // Nombre de partitionnements testes pour en prendre le meilleur
-        options[METIS_OPTION_NUMBERING]=0;              // Numerotation C qui demarre a 0
-        options[METIS_OPTION_DBGLVL]=111111111;         // Mode verbose maximal
+        options[METIS_OPTION_NCUTS]=nb_essais_;         // Number of partitionings tested to select the best one
+        options[METIS_OPTION_NUMBERING]=0;              // C numbering starting at 0
+        options[METIS_OPTION_DBGLVL]=111111111;         // Maximum verbosity mode
         //options[METIS_OPTION_NO2HOP]=1;                 // 5.1.0: not perform any 2-hop matchings (as 5.0.3)
         idx_t ncon=1;
 
-        // Implementation reduite (plusieurs valeurs par defaut->nullptr) pour METIS 5.0
+        // Reduced implementation (several default values->nullptr) for METIS 5.0
         int status = METIS_PartGraphRecursive(&graph.nvtxs, &ncon, graph.xadj.addr(),
                                               graph.adjncy.addr(), graph.vwgts.addr(), nullptr, graph.ewgts.addr(),
                                               &int_parts, nullptr, nullptr, options,
@@ -228,12 +227,12 @@ void Partitionneur_Metis_32_64<_SIZE_>::construire_partition(BigIntVect_& elem_p
         //options[METIS_OPTION_CTYPE]=METIS_CTYPE_SHEM; // Matching scheme during coarsening
         //options[METIS_OPTION_IPTYPE]=METIS_IPTYPE_GROW; // Algorithm during initial partitioning
         //options[METIS_OPTION_RTYPE]=METIS_RTYPE_FM; // Algorithm for refinement
-        options[METIS_OPTION_NCUTS]=nb_essais_;         // Nombre de partitionnements testes pour en prendre le meilleur
-        options[METIS_OPTION_NUMBERING]=0;     // Numerotation C qui demarre a 0
-        options[METIS_OPTION_DBGLVL]=111111111; // Mode verbose maximal
+        options[METIS_OPTION_NCUTS]=nb_essais_;         // Number of partitionings tested to select the best one
+        options[METIS_OPTION_NUMBERING]=0;     // C numbering starting at 0
+        options[METIS_OPTION_DBGLVL]=111111111; // Maximum verbosity mode
         idx_t ncon=1;
-        // Conseil de la doc Metis 4.0 : METIS_PartGraphKway si int_parts>8, METIS_PartGraphRecursive sinon...
-        // En effet semble plus rapide, mais edgecut en sortie est moins bon...
+        // Recommendation from Metis 4.0 doc: METIS_PartGraphKway if int_parts>8, METIS_PartGraphRecursive otherwise...
+        // Indeed seems faster, but the output edgecut is worse...
         int status = METIS_PartGraphKway(&graph.nvtxs, &ncon, graph.xadj.addr(),
                                          graph.adjncy.addr(), graph.vwgts.addr(), nullptr, graph.ewgts.addr(),
                                          &int_parts, nullptr, nullptr, options ,
@@ -266,7 +265,7 @@ void Partitionneur_Metis_32_64<_SIZE_>::construire_partition(BigIntVect_& elem_p
   for (int_t i = 0; i < n; i++)
     elem_part[i] = static_cast<int>(partition[i]); // here cast is OK, a partition index (i.e. a proc number) should always be under 32b
 
-  // Correction de la partition pour la periodicite. (***)
+  // Correction of the partition for periodicity. (***)
   if (graph_elements_perio.get_nb_lists() > 0)
     {
       Cerr << "Correction of the partition for the periodicity" << finl;

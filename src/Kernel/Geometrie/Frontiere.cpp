@@ -22,14 +22,14 @@ Implemente_base_32_64(Frontiere_32_64,"Frontiere",Objet_U);
 // XD_CONT nor connectors are not specified. The duplicate nodes of two blocks in contact are automatically recognized
 // XD_CONT and deleted.
 
-/*! @brief Lit les specification d'une frontiere a partir d'un flot d'entree.
+/*! @brief Reads the specifications of a boundary from an input stream.
  *
- *     On lit:
- *        le nom
- *        les faces
+ *     Reads:
+ *        the name
+ *        the faces
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
  */
 template <typename _SIZE_>
 Entree& Frontiere_32_64<_SIZE_>::readOn(Entree& is)
@@ -39,14 +39,14 @@ Entree& Frontiere_32_64<_SIZE_>::readOn(Entree& is)
 }
 
 
-/*! @brief Ecrit la frontiere sur un flot de sortie.
+/*! @brief Writes the boundary to an output stream.
  *
- * On ecrit:
- *       le nom de la frontiere
- *       les faces
+ * Writes:
+ *       the name of the boundary
+ *       the faces
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 template <typename _SIZE_>
 Sortie& Frontiere_32_64<_SIZE_>::printOn(Sortie& os) const
@@ -55,9 +55,9 @@ Sortie& Frontiere_32_64<_SIZE_>::printOn(Sortie& os) const
   return os << les_faces;
 }
 
-/*! @brief Associe la frontiere au domaine dont elle depend.
+/*! @brief Associates the boundary to the domain it belongs to.
  *
- * @param (Domaine& un_domaine) le domaine a associer a la frontiere
+ * @param (Domaine& un_domaine) the domain to associate with the boundary
  */
 template <typename _SIZE_>
 void Frontiere_32_64<_SIZE_>::associer_domaine(const Domaine_t& un_domaine)
@@ -66,9 +66,9 @@ void Frontiere_32_64<_SIZE_>::associer_domaine(const Domaine_t& un_domaine)
   les_faces.associer_domaine(un_domaine);
 }
 
-/*! @brief Donne un nom a la frontiere
+/*! @brief Gives a name to the boundary.
  *
- * @param (Nom& name) le nom a donner a la frontiere
+ * @param (Nom& name) the name to give to the boundary
  */
 template <typename _SIZE_>
 void Frontiere_32_64<_SIZE_>::nommer(const Nom& name)
@@ -76,11 +76,11 @@ void Frontiere_32_64<_SIZE_>::nommer(const Nom& name)
   nom=name;
 }
 
-/*! @brief Ajoute une (ou plusieurs) face(s) a la frontiere, la (les) face(s) est (sont) specifiee(s) par un tableau
+/*! @brief Adds one or more faces to the boundary; the face(s) are specified by an array
  *
- *     contenant les numeros des sommets.
+ *     containing the vertex indices.
  *
- * @param (IntTab& sommets) tableau contenant les numeros des sommets des face a ajouter
+ * @param (IntTab& sommets) array containing the vertex indices of the faces to add
  */
 template <typename _SIZE_>
 void Frontiere_32_64<_SIZE_>::ajouter_faces(const IntTab_t& sommets)
@@ -88,9 +88,9 @@ void Frontiere_32_64<_SIZE_>::ajouter_faces(const IntTab_t& sommets)
   les_faces.ajouter(sommets);
 }
 
-/*! @brief Type les faces de la frontiere.
+/*! @brief Sets the type of the boundary faces.
  *
- * @param (Motcle& typ) le type (geometrique) des faces
+ * @param (Motcle& typ) the geometric type of the faces
  */
 template <typename _SIZE_>
 void Frontiere_32_64<_SIZE_>::typer_faces(const Motcle& typ)
@@ -98,9 +98,9 @@ void Frontiere_32_64<_SIZE_>::typer_faces(const Motcle& typ)
   les_faces.typer(typ);
 }
 
-/*! @brief Type les faces de la frontiere
+/*! @brief Sets the type of the boundary faces.
  *
- * @param (Type_Face& typ) le type (geometrique) des faces
+ * @param (Type_Face& typ) the geometric type of the faces
  */
 template <typename _SIZE_>
 void Frontiere_32_64<_SIZE_>::typer_faces(const Type_Face& typ)
@@ -108,18 +108,18 @@ void Frontiere_32_64<_SIZE_>::typer_faces(const Type_Face& typ)
   les_faces.typer(typ);
 }
 
-/*! @brief Renvoie les sommets des faces de la frontiere
+/*! @brief Returns the vertices of the boundary faces.
  *
- * @return (IntTab&) le tableau contenant les numeros des sommets des faces de la frontiere
+ * @return (IntTab&) the array containing the vertex indices of the boundary faces
  */
 template <typename _SIZE_>
 typename Frontiere_32_64<_SIZE_>::IntTab_t& Frontiere_32_64<_SIZE_>::les_sommets_des_faces()
 {
   return les_faces.les_sommets();
 }
-/*! @brief Renvoie les sommets des faces de la frontiere
+/*! @brief Returns the vertices of the boundary faces (const version).
  *
- * @return (IntTab&) le tableau contenant les numeros des sommets des faces de la frontiere
+ * @return (IntTab&) the array containing the vertex indices of the boundary faces
  */
 template <typename _SIZE_>
 const typename Frontiere_32_64<_SIZE_>::IntTab_t& Frontiere_32_64<_SIZE_>::les_sommets_des_faces() const
@@ -127,11 +127,11 @@ const typename Frontiere_32_64<_SIZE_>::IntTab_t& Frontiere_32_64<_SIZE_>::les_s
   return les_faces.les_sommets();
 }
 
-/*! @brief Renumerote les noeuds (sommets) des faces.
+/*! @brief Renumbers the nodes (vertices) of the faces.
  *
- * Le noeud de numero k devient le noeud de numero Les_Nums[k]
+ * The node with index k becomes the node with index Les_Nums[k].
  *
- * @param (IntVect& Les_Nums) le vecteur de renumerotation le_nouveau_sommet[i] = Les_Nums[ancien_sommet[i]]
+ * @param (IntVect& Les_Nums) the renumbering vector: new_vertex[i] = Les_Nums[old_vertex[i]]
  */
 template <typename _SIZE_>
 void Frontiere_32_64<_SIZE_>::renum(const IntVect_t& Les_Nums)
@@ -144,11 +144,9 @@ void Frontiere_32_64<_SIZE_>::renum(const IntVect_t& Les_Nums)
       les_sommets(i,j)=Les_Nums[les_sommets(i,j)];
 }
 
-/*! @brief Renvoie le domaine associe a la frontiere.
+/*! @brief Returns the domain associated with the boundary (const version).
  *
- * (version const)
- *
- * @return (Domaine&) le domaine associe a la frontiere
+ * @return (Domaine&) the domain associated with the boundary
  */
 template <typename _SIZE_>
 const typename Frontiere_32_64<_SIZE_>::Domaine_t& Frontiere_32_64<_SIZE_>::domaine() const
@@ -156,9 +154,9 @@ const typename Frontiere_32_64<_SIZE_>::Domaine_t& Frontiere_32_64<_SIZE_>::doma
   return le_dom.valeur();
 }
 
-/*! @brief Renvoie le domaine associe a la frontiere.
+/*! @brief Returns the domain associated with the boundary.
  *
- * @return (Domaine&) le domaine associe a la frontiere
+ * @return (Domaine&) the domain associated with the boundary
  */
 template <typename _SIZE_>
 typename Frontiere_32_64<_SIZE_>::Domaine_t& Frontiere_32_64<_SIZE_>::domaine()
@@ -167,9 +165,9 @@ typename Frontiere_32_64<_SIZE_>::Domaine_t& Frontiere_32_64<_SIZE_>::domaine()
 }
 
 
-/*! @brief Ajoute les sommets (et faces) de la frontiere passee en parametre a l'objet (Frontiere_32_64).
+/*! @brief Adds the vertices (and faces) of the given boundary to this object (Frontiere_32_64).
  *
- * @param (Frontiere_32_64& front) la frontiere a "ajouter" a l'objet
+ * @param (Frontiere_32_64& front) the boundary to "add" to this object
  */
 template <typename _SIZE_>
 void Frontiere_32_64<_SIZE_>::add(const Frontiere_32_64& front)
@@ -195,8 +193,9 @@ void Frontiere_32_64<_SIZE_>::add(const Frontiere_32_64& front)
       les_faces.voisin(nbf1+face, voisin)=a_ajouter.voisin(face, voisin);
 }
 
-/*! @brief Cree un tableau ayant une "ligne" par face de cette frontiere Voir MD_Vector_tools::creer_tableau_distribue()
+/*! @brief Creates an array with one "row" per face of this boundary.
  *
+ * See MD_Vector_tools::creer_tableau_distribue()
  */
 template <typename _SIZE_>
 void Frontiere_32_64<_SIZE_>::creer_tableau_faces(Array_base& v, RESIZE_OPTIONS opt) const
@@ -205,7 +204,7 @@ void Frontiere_32_64<_SIZE_>::creer_tableau_faces(Array_base& v, RESIZE_OPTIONS 
   MD_Vector_tools::creer_tableau_distribue(md, v, opt);
 }
 
-/*! @brief Renvoie la trace sur la frontiere du tableau aux elements y
+/*! @brief Returns the trace on the boundary of the element-based array y.
  *
  */
 template <>
@@ -214,7 +213,7 @@ void Frontiere_32_64<int>::trace_elem_local(const DoubleTab& y, DoubleTab& x) co
   const int size = nb_faces();
   int nb_compo_ = y.line_size();
 
-  // On dimensionne x si ce n'est pas fait
+  // Resize x if not already done
   if (x.size_array() == 0 && size != 0)
     x.resize(size, nb_compo_);
   else if (x.dimension(0) != size || nb_compo_ != x.line_size())
@@ -233,7 +232,7 @@ void Frontiere_32_64<int>::trace_elem_local(const DoubleTab& y, DoubleTab& x) co
     }
 }
 
-/*! @brief Renvoie la trace sur la frontiere du tableau aux noeuds y
+/*! @brief Returns the trace on the boundary of the node-based array y.
  *
  */
 template <>
@@ -244,7 +243,7 @@ void Frontiere_32_64<int>::trace_som_local(const DoubleTab& y, DoubleTab& x) con
   int nb_compo_ = y.line_size();
   const int nsomfa = som_face.dimension_int(1);
 
-  // On dimensionne x si ce n'est pas fait
+  // Resize x if not already done
   if (x.size_array() == 0 && size != 0)
     x.resize(size, nb_compo_);
   else if (x.dimension(0) != size || nb_compo_ != x.line_size())
@@ -265,7 +264,7 @@ void Frontiere_32_64<int>::trace_som_local(const DoubleTab& y, DoubleTab& x) con
       }
 }
 
-/*! @brief Renvoie la trace sur la frontiere du tableau aux faces y
+/*! @brief Returns the trace on the boundary of the face-based array y.
  *
  */
 template <>
@@ -276,7 +275,7 @@ void Frontiere_32_64<int>::trace_face_local(const DoubleVect& y, DoubleVect& x) 
   Process::exit();
 }
 
-/*! @brief Renvoie la trace sur la frontiere du tableau aux faces y
+/*! @brief Returns the trace on the boundary of the face-based array y (DoubleTab version).
  */
 template <>
 void Frontiere_32_64<int>::trace_face_local(const DoubleTab& y, DoubleTab& x) const

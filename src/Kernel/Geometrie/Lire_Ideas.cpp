@@ -76,8 +76,8 @@ Entree& Lire_Ideas::interpreter_(Entree& is)
   ArrOfInt NGELEM(NGROUPE);
   ArrOfInt WORK(std::max(NTETRA,NFACB*4));
   //
-  //Passage F77 a C++: les indices entre les deux langages sont inverses
-  // (methode de stockage differente)
+  //Switching F77 to C++: indices between the two languages are reversed
+  // (different storage convention)
   //
   IntTab TETRA(4,NTETRA);
   IntTab FACB(3,NFACB);
@@ -112,7 +112,7 @@ Entree& Lire_Ideas::interpreter_(Entree& is)
   dom.type_elem()->associer_domaine(dom);
 
   //
-  // On commence par transferer les coordonnees
+  // First, transfer the coordinates
   //
   coord.resize(NNOEUDS, dimension);
   {
@@ -126,7 +126,7 @@ Entree& Lire_Ideas::interpreter_(Entree& is)
   //
   Cerr << " Completing the assignment of coordinates of nodes" << finl;
   //
-  // On continue par les elements (connectivite element -> noeuds)
+  // Then, process the elements (element -> node connectivity)
   //
   IntTab& les_elems=dom.les_elems();
   les_elems.resize(NTETRA, dimension+1);
@@ -135,7 +135,7 @@ Entree& Lire_Ideas::interpreter_(Entree& is)
       for(int j=0; j<dimension+1; j++)
         {
           //
-          // ATTENTION : Inversion des indices entre le tableau Fortran et C++
+          // NOTE: Index inversion between Fortran and C++ arrays
           //
           les_elems(i,j)= TETRA(j,i)-1 ;
         }
@@ -144,38 +144,38 @@ Entree& Lire_Ideas::interpreter_(Entree& is)
   Cerr << " Completing the assignment of elements" << finl;
   //
   //
-  // Maintenant, on traite les faces de bords (tableau FACB, de dim (NFACB,3))
-  // qui se trouvent dans les differents groupes de faces de bords. Chaque
-  // groupe correspond a un bord bien defini du domaine (paroi, entree, sortie,
-  // symetrie, ...) et chaque groupe porte le nom de ce type de bord (GRNAME)
+  // Now process the boundary faces (array FACB, of dimension (NFACB,3))
+  // located in the different boundary face groups. Each
+  // group corresponds to a well-defined boundary of the domain (wall, inlet, outlet,
+  // symmetry, ...) and each group bears the name of that boundary type (GRNAME)
   //
-  // En resume :
-  //    GRNAME (NGROUPE)         : Nom des differents bords
-  //    GROUP  (NNOEUDS,NGROUPE) : Groupe de faces de bord (Numero de la face)
-  //    NGELEM (NGROUPE)         : Nombre de faces de bords pour le groupe NGROUPE
-  //    FACB   (NFACB,3)         : Connectivite des faces de bords (les 3 noeuds du triangle)
+  // Summary:
+  //    GRNAME (NGROUPE)         : Names of the different boundaries
+  //    GROUP  (NNOEUDS,NGROUPE) : Group of boundary faces (face number)
+  //    NGELEM (NGROUPE)         : Number of boundary faces for group NGROUPE
+  //    FACB   (NFACB,3)         : Connectivity of boundary faces (the 3 nodes of the triangle)
   //
   //
   //
-  // On ouvre le fichier contenant les noms des groupes
+  // Open the file containing the group names
   //
   Nom nom1="nom.groupe";
   EFichier fic(nom1);
-  fic.set_check_types(1); // Remplace UFichier
+  fic.set_check_types(1); // Replaces UFichier
   Cerr << "Reading of the file : " << nom1 << finl;
-  // On definit les bords comme etant des faces de bords du domaine
-  // On fait Domaine --> les_bords
+  // Define the boundaries as boundary faces of the domain
+  // Domaine --> les_bords
   //
   Bords& les_bords=dom.faces_bord();
   //
-  // Ici, on associe les bords au domaine (on se refere a dom)
-  // On fait les_bords --> Domaine
+  // Associate the boundaries with the domain (reference to dom)
+  // les_bords --> Domaine
   //
   les_bords.associer_domaine(dom);
   //
   Nom nom_bord="Bord";
   //
-  // On affecte les bords :
+  // Assign the boundaries:
   //
   for(int k=0; k<NGROUPE; k++)
     {
@@ -191,9 +191,9 @@ Entree& Lire_Ideas::interpreter_(Entree& is)
       for (int j=0; j<NGELEM[k]; j++)
         {
           //
-          // ATTENTION : Inversion des indices entre le tableau Fortran et C++
+          // NOTE: Index inversion between Fortran and C++ arrays
           //
-          //        GF renumerotation dans lire_ideas.f maintenant...
+          //        GF renumbering in lire_ideas.f now...
           //
           //num=GROUP(j,k)-1-NTETRA;
           num=GROUP(j,k)-1;

@@ -16,9 +16,9 @@
 #ifndef Schema_Implicite_base_included
 #define Schema_Implicite_base_included
 
-/*! @brief class Schema_Implicite_base Classe de base pour tous les schemas en temps implicite
+/*! @brief class Schema_Implicite_base Base class for all implicit time schemes.
  *
- *   Il porte un objet de type Solveur ( ex le Simpler)
+ *   It carries a Solver object (e.g. the Simpler solver).
  *
  */
 

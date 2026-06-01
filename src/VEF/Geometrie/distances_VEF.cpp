@@ -23,7 +23,7 @@ double norm_2D_vit1(const DoubleTab& vit,int num1,int num2,int fac,const Domaine
   const Domaine& domaine_geom = domaine.domaine();
   int nfac = domaine_geom.nb_faces_elem();
 
-  // fac numero de la face a paroi fixe
+  // fac: index of the fixed-wall face
   double r0,r1;
   calcule_r0r1(face_normale,fac,r0,r1);
 
@@ -44,7 +44,7 @@ double norm_2D_vit1(const DoubleTab& vit,int num1,int num2,int fac,const Domaine
   const Domaine& domaine_geom = domaine.domaine();
   int nfac = domaine_geom.nb_faces_elem();
 
-  // fac numero de la face a paroi fixe
+  // fac: index of the fixed-wall face
   double r0,r1;
   calcule_r0r1(face_normale,fac,r0,r1);
 
@@ -53,7 +53,7 @@ double norm_2D_vit1(const DoubleTab& vit,int num1,int num2,int fac,const Domaine
   double v = vitesse_tangentielle(v1,v2,r0,r1);
   double psc = r0*v1+r1*v2;
 
-  // val1 et val2 sont les vitesses tangentielles
+  // val1 and val2 are the tangential velocities
   val1=(v1-psc*r0)/(v+DMINFLOAT);
   val2=(v2-psc*r1)/(v+DMINFLOAT);
 
@@ -63,9 +63,9 @@ double norm_2D_vit1(const DoubleTab& vit,int num1,int num2,int fac,const Domaine
 
 double norm_2D_vit1_lp(const DoubleTab& vit,int fac,int num1,int num2,const Domaine_VEF& domaine,double& val1, double& val2)
 {
-  // PQ : 03/03 : Definition de la vitesse tangentielle a une paroi
-  // obtenue par "moyennage" des vitesses aux faces associees a des elements standards
-  // (dont on suppose le bon comportement suivant la loi log)
+  // PQ : 03/03 : Definition of the tangential velocity at a wall,
+  // obtained by averaging the velocities at faces associated with standard elements
+  // (which are assumed to follow the log-law behavior)
 
   const DoubleTab& face_normale = domaine.face_normales();
   double c1,c2;
@@ -88,7 +88,7 @@ double norm_2D_vit1_lp(const DoubleTab& vit,int fac,int num1,int num2,const Doma
 
   double psc = r0 * v0 + r1 * v1;
   double norm_vit = vitesse_tangentielle(v0,v1,r0,r1);
-  // composantes du vecteur tangent normalise
+  // components of the normalized tangent vector
   val1 = (v0-psc*r0)/(norm_vit+DMINFLOAT);
   val2 = (v1-psc*r1)/(norm_vit+DMINFLOAT);
 
@@ -102,7 +102,7 @@ double norm_2D_vit1(const DoubleTab& vit,int num1,int num2,int num3,int fac,cons
   const Domaine& domaine_geom = domaine.domaine();
   int nfac = domaine_geom.nb_faces_elem();
 
-  // fac numero de la face a paroi fixe
+  // fac: index of the fixed-wall face
   double r0,r1;
   calcule_r0r1(face_normale,fac,r0,r1);
   double v1=(vit(num1,0)+vit(num2,0)+vit(num3,0))/nfac;
@@ -122,7 +122,7 @@ double norm_2D_vit1(const DoubleTab& vit,int num1,int num2,int num3,int num4,int
   const Domaine& domaine_geom = domaine.domaine();
   int nfac = domaine_geom.nb_faces_elem();
 
-  // fac numero de la face a paroi fixe
+  // fac: index of the fixed-wall face
   double r0,r1;
   calcule_r0r1(face_normale,fac,r0,r1);
   double v1=(vit(num1,0)+vit(num2,0)+vit(num3,0)+vit(num4,0))/nfac;
@@ -141,7 +141,7 @@ double norm_2D_vit2(const DoubleTab& vit,int num1,int num2,int fac,const Domaine
   const DoubleTab& face_normale = domaine.face_normales();
   const Domaine& domaine_geom = domaine.domaine();
   int nfac = domaine_geom.nb_faces_elem();
-  // fac numero de la face a paroi defilante
+  // fac: index of the sliding-wall face
   double r0,r1;
   calcule_r0r1(face_normale,fac,r0,r1);
   double v1=(vit(num1,0)+vit(num2,0)-2.*vit(fac,0))/nfac;
@@ -159,7 +159,7 @@ double norm_2D_vit2(const DoubleTab& vit,int num1,int num2,int num3,int fac,cons
   const DoubleTab& face_normale = domaine.face_normales();
   const Domaine& domaine_geom = domaine.domaine();
   int nfac = domaine_geom.nb_faces_elem();
-  // fac numero de la face a paroi defilante
+  // fac: index of the sliding-wall face
   double r0,r1;
   calcule_r0r1(face_normale,fac,r0,r1);
   double v1=(vit(num1,0)+vit(num2,0)+vit(num3,0)-3.*vit(fac,0))/nfac;
@@ -178,7 +178,7 @@ double norm_2D_vit2(const DoubleTab& vit,int num1,int num2,int num3,int num4,int
   const Domaine& domaine_geom = domaine.domaine();
   int nfac = domaine_geom.nb_faces_elem();
 
-  // fac numero de la face a paroi fixe
+  // fac: index of the fixed-wall face
   double r0,r1;
   calcule_r0r1(face_normale,fac,r0,r1);
   double v1=(vit(num1,0)+vit(num2,0)+vit(num3,0)+vit(num4,0)-4.*vit(fac,0))/nfac;
@@ -194,8 +194,8 @@ double norm_2D_vit2(const DoubleTab& vit,int num1,int num2,int num3,int num4,int
 // See distance in distances_VEF.h for Kokkos functions
 double distance_2D(int fac,int elem,const Domaine_VEF& domaine)
 {
-  const DoubleTab& xp = domaine.xp();    // centre de gravite des elements
-  const DoubleTab& xv = domaine.xv();    // centre de gravite des faces
+  const DoubleTab& xp = domaine.xp();    // center of gravity of elements
+  const DoubleTab& xv = domaine.xv();    // center of gravity of faces
 
   const DoubleTab& face_normale = domaine.face_normales();
   double r0,r1;
@@ -215,7 +215,7 @@ double norm_2D_vit1_k(const DoubleTab& vit,int fac,int num1,
                       double& val1,double& val2)
 {
   const DoubleTab& face_normale = domaine.face_normales();
-  // fac numero de la face a paroi fixe
+  // fac: index of the fixed-wall face
   double r0,r1;
   calcule_r0r1(face_normale,fac,r0,r1);
   double v1=vit(num1,0);
@@ -224,7 +224,7 @@ double norm_2D_vit1_k(const DoubleTab& vit,int fac,int num1,
 
   double psc = r0*v1+r1*v2;
 
-  // val1 et val2 sont les vitesses tangetentielles
+  // val1 and val2 are the tangential velocities
   val1=(v1-psc*r0)/(norm_vit+DMINFLOAT);
   val2=(v2-psc*r1)/(norm_vit+DMINFLOAT);
 
@@ -237,7 +237,7 @@ double norm_3D_vit1_k(const DoubleTab& vit,int fac,int num1,
                       double& val1,double& val2,double& val3)
 {
   const DoubleTab& face_normale = domaine.face_normales();
-  // fac numero de la face a paroi fixe
+  // fac: index of the fixed-wall face
   double r0,r1,r2;
   calcule_r0r1r2(face_normale,fac,r0,r1,r2);
   double v1=vit(num1,0);
@@ -246,7 +246,7 @@ double norm_3D_vit1_k(const DoubleTab& vit,int fac,int num1,
   double norm_vit = vitesse_tangentielle(v1,v2,v3,r0,r1,r2);
 
   double psc = r0*v1+r1*v2+r2*v3;
-  // val1,val2 val3 sont les vitesses tangentielles
+  // val1, val2, val3 are the tangential velocities
   val1=(v1-psc*r0)/(norm_vit+DMINFLOAT);
   val2=(v2-psc*r1)/(norm_vit+DMINFLOAT);
   val3=(v3-psc*r2)/(norm_vit+DMINFLOAT);
@@ -262,14 +262,14 @@ double norm_3D_vit1(const DoubleTab& vit,int fac,int num1,int num2,int num3,
   const DoubleTab& face_normale = domaine.face_normales();
   const Domaine& domaine_geom = domaine.domaine();
   int nfac = domaine_geom.nb_faces_elem();
-  // fac numero de la face a paroi fixe
+  // fac: index of the fixed-wall face
   double r0,r1,r2;
   calcule_r0r1r2(face_normale,fac,r0,r1,r2);
   double v1=(vit(num1,0)+vit(num2,0)+vit(num3,0))/nfac;
   double v2=(vit(num1,1)+vit(num2,1)+vit(num3,1))/nfac;
   double v3=(vit(num1,2)+vit(num2,2)+vit(num3,2))/nfac;
   double norm_vit = vitesse_tangentielle(v1,v2,v3,r0,r1,r2);
-  // val1,val2 val3 sont les vitesses tangentielles
+  // val1, val2, val3 are the tangential velocities
   double psc = r0*v1+r1*v2+r2*v3;
   val1=(v1-psc*r0)/(norm_vit+DMINFLOAT);
   val2=(v2-psc*r1)/(norm_vit+DMINFLOAT);
@@ -285,14 +285,14 @@ double norm_3D_vit1(const DoubleTab& vit,int fac,int num1,int num2,int num3,int 
   const DoubleTab& face_normale = domaine.face_normales();
   const Domaine& domaine_geom = domaine.domaine();
   int nfac = domaine_geom.nb_faces_elem();
-  // fac numero de la face a paroi fixe
+  // fac: index of the fixed-wall face
   double r0,r1,r2;
   calcule_r0r1r2(face_normale,fac,r0,r1,r2);
   double v1=(vit(num1,0)+vit(num2,0)+vit(num3,0)+vit(num4,0))/nfac;
   double v2=(vit(num1,1)+vit(num2,1)+vit(num3,1)+vit(num4,1))/nfac;
   double v3=(vit(num1,2)+vit(num2,2)+vit(num3,2)+vit(num4,2))/nfac;
   double norm_vit = vitesse_tangentielle(v1,v2,v3,r0,r1,r2);
-  // val1,val2 val3 sont les vitesses tangentielles
+  // val1, val2, val3 are the tangential velocities
   double psc = r0*v1+r1*v2+r2*v3;
   val1=(v1-psc*r0)/(norm_vit+DMINFLOAT);
   val2=(v2-psc*r1)/(norm_vit+DMINFLOAT);
@@ -306,14 +306,14 @@ double norm_3D_vit1(const DoubleTab& vit,int fac,int num1,int num2,int num3,int 
   const DoubleTab& face_normale = domaine.face_normales();
   const Domaine& domaine_geom = domaine.domaine();
   int nfac = domaine_geom.nb_faces_elem();
-  // fac numero de la face a paroi fixe
+  // fac: index of the fixed-wall face
   double r0,r1,r2;
   calcule_r0r1r2(face_normale,fac,r0,r1,r2);
   double v1=(vit(num1,0)+vit(num2,0)+vit(num3,0)+vit(num4,0)+vit(num5,0))/nfac;
   double v2=(vit(num1,1)+vit(num2,1)+vit(num3,1)+vit(num4,1)+vit(num5,1))/nfac;
   double v3=(vit(num1,2)+vit(num2,2)+vit(num3,2)+vit(num4,2)+vit(num5,2))/nfac;
   double norm_vit = vitesse_tangentielle(v1,v2,v3,r0,r1,r2);
-  // val1,val2 val3 sont les vitesses tangentielles
+  // val1, val2, val3 are the tangential velocities
   double psc = r0*v1+r1*v2+r2*v3;
   val1=(v1-psc*r0)/(norm_vit+DMINFLOAT);
   val2=(v2-psc*r1)/(norm_vit+DMINFLOAT);
@@ -327,14 +327,14 @@ double norm_2D_vit2_k(const DoubleTab& vit,int fac,int num1,
                       double& val1,double& val2)
 {
   const DoubleTab& face_normale = domaine.face_normales();
-  // fac numero de la face a paroi defilante
+  // fac: index of the sliding-wall face
   double r0,r1;
   calcule_r0r1(face_normale,fac,r0,r1);
 
   double v1=vit(num1,0)-vit(fac,0);
   double v2=vit(num1,1)-vit(fac,1);
   double norm_vit = vitesse_tangentielle(v1,v2,r0,r1);
-  // val1 et val2 sont les vitesses tangetentielles
+  // val1 and val2 are the tangential velocities
   double psc = r0*v1+r1*v2;
   val1=(v1-psc*r0)/(norm_vit+DMINFLOAT);
   val2=(v2-psc*r1)/(norm_vit+DMINFLOAT);
@@ -346,14 +346,14 @@ double norm_3D_vit2_k(const DoubleTab& vit,int fac,int num1,
                       double& val1,double& val2,double& val3)
 {
   const DoubleTab& face_normale = domaine.face_normales();
-  // fac numero de la face a paroi defilante
+  // fac: index of the sliding-wall face
   double r0,r1,r2;
   calcule_r0r1r2(face_normale,fac,r0,r1,r2);
   double v1=vit(num1,0)-vit(fac,0);
   double v2=vit(num1,1)-vit(fac,1);
   double v3=vit(num1,2)-vit(fac,2);
   double norm_vit = vitesse_tangentielle(v1,v2,v3,r0,r1,r2);
-  // val1,val2 val3 sont les vitesses tangentielles
+  // val1, val2, val3 are the tangential velocities
   double psc = r0*v1+r1*v2+r2*v3;
   val1=(v1-psc*r0)/(norm_vit+DMINFLOAT);
   val2=(v2-psc*r1)/(norm_vit+DMINFLOAT);
@@ -369,14 +369,14 @@ double norm_3D_vit2(const DoubleTab& vit,int fac,int num1,int num2,int num3,
   const DoubleTab& face_normale = domaine.face_normales();
   const Domaine& domaine_geom = domaine.domaine();
   int nfac = domaine_geom.nb_faces_elem();
-  // fac numero de la face a paroi defilante
+  // fac: index of the sliding-wall face
   double r0,r1,r2;
   calcule_r0r1r2(face_normale,fac,r0,r1,r2);
   double v1=(vit(num1,0)+vit(num2,0)+vit(num3,0)-(nfac-1)*vit(fac,0))/nfac;
   double v2=(vit(num1,1)+vit(num2,1)+vit(num3,1)-(nfac-1)*vit(fac,1))/nfac;
   double v3=(vit(num1,2)+vit(num2,2)+vit(num3,2)-(nfac-1)*vit(fac,2))/nfac;
   double norm_vit = vitesse_tangentielle(v1,v2,v3,r0,r1,r2);
-  // val1,val2 val3 sont les vitesses tangentielles
+  // val1, val2, val3 are the tangential velocities
   double psc = r0*v1+r1*v2+r2*v3;
   val1=(v1-psc*r0)/(norm_vit+DMINFLOAT);
   val2=(v2-psc*r1)/(norm_vit+DMINFLOAT);
@@ -388,9 +388,9 @@ double norm_3D_vit1_lp(const DoubleTab& vit,int fac,int num1,int num2,int num3,
                        const Domaine_VEF& domaine,
                        double& val1,double& val2,double& val3)
 {
-  // PQ : 03/03 : Definition de la vitesse tangentielle a une paroi
-  // obtenue par "moyennage" des vitesses aux faces associees a des elements standards
-  // (dont on suppose le bon comportement suivant la loi log)
+  // PQ : 03/03 : Definition of the tangential velocity at a wall,
+  // obtained by averaging the velocities at faces associated with standard elements
+  // (which are assumed to follow the log-law behavior)
 
   const DoubleTab& face_normale = domaine.face_normales();
   //  const IntVect& rang_elem_non_std = domaine.rang_elem_non_std();
@@ -418,7 +418,7 @@ double norm_3D_vit1_lp(const DoubleTab& vit,int fac,int num1,int num2,int num3,
 
   double psc = r0 * v0 + r1 * v1 + r2 * v2;
   double norm_vit = vitesse_tangentielle(v0,v1,v2,r0,r1,r2);
-  // composantes du vecteur tangent normalise
+  // components of the normalized tangent vector
   val1 = (v0-psc*r0)/(norm_vit+DMINFLOAT);
   val2 = (v1-psc*r1)/(norm_vit+DMINFLOAT);
   val3 = (v2-psc*r2)/(norm_vit+DMINFLOAT);
@@ -433,7 +433,7 @@ double norm_3D_vit2(const DoubleTab& vit,int fac,int num1,int num2,int num3,int 
   const DoubleTab& face_normale = domaine.face_normales();
   const Domaine& domaine_geom = domaine.domaine();
   int nfac = domaine_geom.nb_faces_elem();
-  // fac numero de la face a paroi defilante
+  // fac: index of the sliding-wall face
   double r0,r1,r2;
   calcule_r0r1r2(face_normale,fac,r0,r1,r2);
 
@@ -441,7 +441,7 @@ double norm_3D_vit2(const DoubleTab& vit,int fac,int num1,int num2,int num3,int 
   double v2=(vit(num1,1)+vit(num2,1)+vit(num3,1)+vit(num4,1)-nfac*vit(fac,1))/nfac;
   double v3=(vit(num1,2)+vit(num2,2)+vit(num3,2)+vit(num4,2)-nfac*vit(fac,2))/nfac;
   double norm_vit = vitesse_tangentielle(v1,v2,v3,r0,r1,r2);
-  // val1,val2 val3 sont les vitesses tangentielles
+  // val1, val2, val3 are the tangential velocities
   double psc = r0*v1+r1*v2+r2*v3;
   val1=(v1-psc*r0)/(norm_vit+DMINFLOAT);
   val2=(v2-psc*r1)/(norm_vit+DMINFLOAT);
@@ -456,7 +456,7 @@ double norm_3D_vit2(const DoubleTab& vit,int fac,int num1,int num2,int num3,int 
   const DoubleTab& face_normale = domaine.face_normales();
   const Domaine& domaine_geom = domaine.domaine();
   int nfac = domaine_geom.nb_faces_elem();
-  // fac numero de la face a paroi defilante
+  // fac: index of the sliding-wall face
   double r0,r1,r2;
   calcule_r0r1r2(face_normale,fac,r0,r1,r2);
 
@@ -464,7 +464,7 @@ double norm_3D_vit2(const DoubleTab& vit,int fac,int num1,int num2,int num3,int 
   double v2=(vit(num1,1)+vit(num2,1)+vit(num3,1)+vit(num4,1)+vit(num5,1)-nfac*vit(fac,1))/nfac;
   double v3=(vit(num1,2)+vit(num2,2)+vit(num3,2)+vit(num4,2)+vit(num5,2)-nfac*vit(fac,2))/nfac;
   double norm_vit = vitesse_tangentielle(v1,v2,v3,r0,r1,r2);
-  // val1,val2 val3 sont les vitesses tangentielles
+  // val1, val2, val3 are the tangential velocities
   double psc = r0*v1+r1*v2+r2*v3;
   val1=(v1-psc*r0)/(norm_vit+DMINFLOAT);
   val2=(v2-psc*r1)/(norm_vit+DMINFLOAT);
@@ -476,8 +476,8 @@ double norm_3D_vit2(const DoubleTab& vit,int fac,int num1,int num2,int num3,int 
 // See distance in distances_VEF.h for Kokkos functions
 double distance_3D(int fac,int elem,const Domaine_VEF& domaine)
 {
-  const DoubleTab& xp = domaine.xp();    // centre de gravite des elements
-  const DoubleTab& xv = domaine.xv();    // centre de gravite des faces
+  const DoubleTab& xp = domaine.xp();    // center of gravity of elements
+  const DoubleTab& xv = domaine.xv();    // center of gravity of faces
   const DoubleTab& face_normale = domaine.face_normales();
   double r0,r1,r2;
   calcule_r0r1r2(face_normale,fac,r0,r1,r2);
@@ -516,7 +516,7 @@ DoubleVect& calcul_longueur_filtre(DoubleVect& longueur_filtre, const Motcle& me
           longueur_filtre(element) = exp(log(volume[element])/double(dim));
         }
     }
-  else if (methode == Motcle("arete"))  // recherche de la plus longue arete d'un element
+  else if (methode == Motcle("arete"))  // search for the longest edge of an element
     {
       longueur_filtre=-1.;
 
@@ -536,7 +536,7 @@ DoubleVect& calcul_longueur_filtre(DoubleVect& longueur_filtre, const Motcle& me
               longueur_filtre(element) = std::max(longueur_filtre(element), distance);
             }
     }
-  else if (methode ==  Motcle("Scotti"))  // application de Scotti a un pseudo-cube
+  else if (methode ==  Motcle("Scotti"))  // application of Scotti to a pseudo-cube
     {
       longueur_filtre=-1.;
 
@@ -544,7 +544,7 @@ DoubleVect& calcul_longueur_filtre(DoubleVect& longueur_filtre, const Motcle& me
       int som0,som1,som2,som3;
       int som_0,som_1,som_2,som_3;
 
-      if(Objet_U::dimension==2)  // On revient a la racine carre du volume
+      if(Objet_U::dimension==2)  // Fall back to the square root of the volume
         {
           int nbr_elementb=domaine.nb_elem_tot();
           int elementb;
@@ -688,7 +688,7 @@ double distance_sommets(const int sommet1, const int sommet2, const Domaine_VEF&
       double z2 = xs(sommet2,2);
       return sqrt( carre(x2-x1) + carre(y2-y1) + carre(z2-z1) );
     }
-  else // en dimension 2
+  else // in 2D
     {
       return sqrt( carre(x2-x1) + carre(y2-y1) );
     }
@@ -724,7 +724,7 @@ double som_pscal(const int som0, const int som1, const int som2, const int som3,
 double norm_vit_lp_k(const DoubleTab& vit,int face,int face_b,const Domaine_VEF& domaine,ArrOfDouble& val,int is_defilante)
 {
   int dimension=Objet_U::dimension;
-  //assert(face_b<domaine.premiere_face_int()); assert a ameliorer ou faces_virt...
+  //assert(face_b<domaine.premiere_face_int()); assert to be improved or faces_virt...
   if (is_defilante==0)
     if (dimension==3)
       return norm_3D_vit1_k(vit,face_b,face,domaine,val[0],val[1],val[2]);

@@ -25,9 +25,9 @@ Sortie& Champ_Ostwald_VEF::printOn(Sortie& os) const { return os << valeurs()(0,
 
 Entree& Champ_Ostwald_VEF::readOn(Entree& is) { return is; }
 
-/*! @brief met le parametre mu a jour
+/*! @brief @brief Update the parameter mu at the given time.
  *
- * @param (double)
+ * @param (double) current time
  */
 void Champ_Ostwald_VEF::mettre_a_jour(double tps)
 {
@@ -36,12 +36,11 @@ void Champ_Ostwald_VEF::mettre_a_jour(double tps)
   Champ_Don_base::mettre_a_jour(tps);
 }
 
-/*! @brief Calcul la viscosite mu en fonction de la consistance et de l'indice de structure en utilisant la loi d'Ostwald.
+/*! @brief @brief Compute the viscosity mu as a function of the consistency and the structure index using the Ostwald law.
  *
- * Pour
- *    des viscsites tres faible et tres fortes on utilise une regression
+ *  For very low and very high viscosities, a regression is used.
  *
- * @param (DoubleTab&) les viscosite au temps precedent
+ * @param (DoubleTab&) viscosities at the previous time step
  */
 
 void Champ_Ostwald_VEF::calculer_mu(DoubleTab& mu_tab)
@@ -60,7 +59,7 @@ void Champ_Ostwald_VEF::calculer_mu(DoubleTab& mu_tab)
           else
             mu_tab[i] = d_k * pow(0.5 * mu_tab[i], (d_n - 1.) / 2.);
         }
-      else  // K varie en fonction de la temperature
+      else  // K varies as a function of temperature
         {
           const DoubleTab& K_tab = mon_fluide_->consistance().valeurs();
           if (mu_tab[i] < 1.E-4)
@@ -108,11 +107,9 @@ void Champ_Ostwald_VEF::calculer_dscald(DoubleTab& dscald)
       }
 }
 
-/*! @brief Calcul le champ Ostwald : calcul de D::D
+/*! @brief @brief Compute the Ostwald field: compute D::D then compute mu.
  *
- *         puis calcul de mu
- *
- * @param (double) temps ou le calcul est effectue
+ * @param (double) time at which the computation is performed
  */
 
 void Champ_Ostwald_VEF::me_calculer(double tps)
@@ -124,7 +121,7 @@ void Champ_Ostwald_VEF::me_calculer(double tps)
     }
 }
 
-/*! @brief Initialise le champs
+/*! @brief @brief Initialize the field.
  *
  */
 void Champ_Ostwald_VEF::init_mu(DoubleTab& mu_tab)

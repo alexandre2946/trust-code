@@ -38,7 +38,7 @@ public:
   Nom get_name_of_type_for(const Nom& class_operateur, const Nom& type_operateur, const Equation_base& eqn, const OBS_PTR(Champ_base) &champ_sup) const override;
 
   bool is_PolyMAC_HFV() const override { return true; }
-  bool is_PolyMAC_CDO() const override { return false; } // attention heritage !
+  bool is_PolyMAC_CDO() const override { return false; } // note: inheritance!
 
 private:
   void discretiser_champ_fonc_don(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& nom, const Noms& unite, int nb_comp, double temps, Objet_U& champ) const override;

@@ -62,7 +62,7 @@ Entree& Extraire_domaine::interpreter_(Entree& is)
 
   associer_domaine(nom_dom);
   Domaine& dom=domaine();
-  // on recupere le pb
+  // retrieve the problem
   if(! sub_type(Probleme_base, objet(nom_pb)))
     {
       Cerr << nom_pb << " is of type " << objet(nom_pb).que_suis_je() << finl;
@@ -79,7 +79,7 @@ Entree& Extraire_domaine::interpreter_(Entree& is)
   domaine_vf.domaine().creer_tableau_elements(tab_marq_elem);
   IntArrView marq_elem = static_cast<ArrOfInt&>(tab_marq_elem).view_wo();
   int nb_elem_m=0;
-  // on marque les elts qui nous interessent
+  // mark the elements of interest
   if (nom_sous_domaine== Nom())
     {
       int dim = Objet_U::dimension;
@@ -120,10 +120,10 @@ Entree& Extraire_domaine::interpreter_(Entree& is)
       }, nb_elem_m);
       end_gpu_timer(__KERNEL_NAME__);
     }
-  // Attention grosse ruse on echange pas les espaces virtuels pour que le joint devienne un bord
+  // Note: trick - we do not exchange virtual spaces so that the joint becomes a boundary
   // marq_elem.echange_espace_virtuel();
   int nb_faces=domaine_vf.nb_faces();
-  // on cherche les faces au bord du domaine (joint compris)
+  // find the faces on the boundary of the domain (joints included)
   int nb_t=0;
   ArrOfInt tab_marq(nb_faces);
   IntArrView marq = tab_marq.view_rw();
@@ -141,7 +141,7 @@ Entree& Extraire_domaine::interpreter_(Entree& is)
       {
         if ((val0 == 1) || (val1 == 1))
           {
-            if (marq[fac] != -1) //pas un joint
+            if (marq[fac] != -1) //not a joint
               {
                 marq[fac] = 1;
                 local_nb_t++;
@@ -185,7 +185,7 @@ Entree& Extraire_domaine::interpreter_(Entree& is)
       {
         for (int s=0; s<nb_som_face; s++)
           indfaces(nb,s)=face_sommets(fac,s);
-        // on calcule la normale
+        // compute the normal
         nb++;
       }
   Cerr<<finl;;

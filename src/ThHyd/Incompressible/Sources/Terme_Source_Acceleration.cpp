@@ -261,18 +261,18 @@ const Champ_Fonc_base& Terme_Source_Acceleration::get_terme_source_post() const
 
 Champ_Fonc_base& Terme_Source_Acceleration::get_set_terme_source_post() const
 {
-  // terme_source_post_ est mutable, on peut donc le renvoyer "non const"
+  // terme_source_post_ is mutable, so it can be returned as "non-const"
   return terme_source_post_.valeur();
 }
 
-/*! @brief Calcul de la valeur du champ la_source aux faces en fonction de - calculer_vitesse_faces()
+/*! @brief Computes the value of the la_source field at faces based on - calculer_vitesse_faces()
  *
  *   - champ_acceleration_
  *   - omega_
  *   - domegadt_
  *   - centre_rotation_
  *
- * @param (champ_source) un champ discretise aux elements du domaine_VF dans lequel on stocke le resultat du calcul. Espace virtuel a jour.
+ * @param acceleration_aux_faces a field discretized at elements of the domaine_VF in which the result of the computation is stored. Virtual space up to date.
  */
 const DoubleTab&
 Terme_Source_Acceleration::calculer_la_source(DoubleTab& acceleration_aux_faces) const
@@ -288,7 +288,7 @@ Terme_Source_Acceleration::calculer_la_source(DoubleTab& acceleration_aux_faces)
   const int dim = Objet_U::dimension;
 
   // ****************************************************************
-  // INITIALISATION DE a, w, dw, c
+  // INITIALIZATION OF a, w, dw, c
   int rotation_solide = 0;
   {
     int j;
@@ -302,12 +302,12 @@ Terme_Source_Acceleration::calculer_la_source(DoubleTab& acceleration_aux_faces)
 
     if (omega_)
       {
-        // L'utilisateur a specifie un mouvement de rotation solide
+        // The user has specified a solid rotation motion
         const DoubleTab& champ_w  = omega_          ->valeurs();
         const DoubleTab& champ_dw = domegadt_       ->valeurs();
         const DoubleTab& champ_c  = centre_rotation_->valeurs();
-        // Attention: en 2D, le vecteur rotation est typiquement oriente
-        // dans la direction Z : donc boucle jusqu'a 3 dans tous les cas:
+        // Note: in 2D, the rotation vector is typically oriented
+        // in the Z direction: so loop up to 3 in all cases:
         for (j = 0; j < 3; j++) w[j]  = champ_w(0,j);
         for (j = 0; j < 3; j++) dw[j] = champ_dw(0,j);
         for (j = 0; j < dim; j++) c[j]  = champ_c(0,j);
@@ -315,29 +315,29 @@ Terme_Source_Acceleration::calculer_la_source(DoubleTab& acceleration_aux_faces)
       }
   }
 
-  // Si on a un terme source de rotation solide, on a besoin des trois
-  // composantes de la vitesse du fluide aux faces:
+  // If we have a solid rotation source term, we need the three
+  // components of the fluid velocity at the faces:
 
-  // Un espace de stockage pour la vitesse si elle doit etre
-  // calculee (en VDF, on calcule les trois composantes a chaque face)
+  // A storage space for the velocity if it needs to be
+  // computed (in VDF, the three components are computed at each face)
   DoubleTab vitesse_faces_stockage;
-  // Calcul du champ de vitesse aux faces (a partir de l'inconnue
-  // de l'equation de N.S.)
+  // Computation of the velocity field at the faces (from the unknown
+  // of the N.S. equation)
   const DoubleTab& vitesse_faces =
     (rotation_solide)
     ? calculer_vitesse_faces(vitesse_faces_stockage)
     : vitesse_faces_stockage;
 
   // **************************************************
-  // BOUCLE SUR LES FACES
+  // LOOP OVER FACES
   int i_face;
   const int nb_faces = acceleration_aux_faces.dimension(0);
 
-  // Vecteur vitesse du fluide dans l'element courant
-  //  (attention: initialisation de la composante Z pour le 2D)
+  // Fluid velocity vector in the current element
+  //  (note: Z component initialized for 2D)
   double v[3] = {0., 0., 0.};
-  // Vecteur (centre_face - centre_rotation)
-  //  (idem)
+  // Vector (centre_face - centre_rotation)
+  //  (same)
   double xgr[3] = {0., 0., 0.};
 
   for (i_face = 0; i_face < nb_faces; i_face++)
@@ -381,7 +381,7 @@ Terme_Source_Acceleration::calculer_la_source(DoubleTab& acceleration_aux_faces)
   return acceleration_aux_faces;
 }
 
-/*! @brief resu=0; ajouter(resu); (appel a ajouter() de la classe derivee)
+/*! @brief resu=0; ajouter(resu); (calls ajouter() of the derived class)
  *
  */
 DoubleTab& Terme_Source_Acceleration::calculer(DoubleTab& resu) const
@@ -392,7 +392,7 @@ DoubleTab& Terme_Source_Acceleration::calculer(DoubleTab& resu) const
   return resu;
 }
 
-/*! @brief Evalue les champs d'acceleration et de rotation au temps t.
+/*! @brief Evaluates the acceleration and rotation fields at time t.
  *
  */
 void Terme_Source_Acceleration::mettre_a_jour(double temps)
@@ -409,11 +409,11 @@ void Terme_Source_Acceleration::mettre_a_jour(double temps)
   get_set_terme_source_post().mettre_a_jour(temps);
 }
 
-/*! @brief Methode surchargee de Source_base.
+/*! @brief Overridden method from Source_base.
  *
- * Les mots compris sont:
- *   "ACCELERATION" => renvoie terme_source_post_, homogene a d/dt(rho*v)
- *   Attention a l'effet de bord de ajouter() (voir commentaires de ajouter())
+ * Recognized keywords:
+ *   "ACCELERATION" => returns terme_source_post_, homogeneous to d/dt(rho*v)
+ *   Beware of the side effect of ajouter() (see comments of ajouter())
  *
  */
 int Terme_Source_Acceleration::a_pour_Champ_Fonc(const Motcle& mot,
@@ -428,7 +428,7 @@ int Terme_Source_Acceleration::a_pour_Champ_Fonc(const Motcle& mot,
   return ok;
 }
 
-/*! @brief Renvoie eq_hydraulique_ !
+/*! @brief Returns eq_hydraulique_ !
  *
  */
 const Navier_Stokes_std& Terme_Source_Acceleration::get_eq_hydraulique() const

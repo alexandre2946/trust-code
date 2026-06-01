@@ -32,12 +32,12 @@ enum class Entity { NODE, SEGMENT, FACE, ELEMENT };
 
 /*! @brief class Champ_Generique_base
  *
- * Classe de base des champs generiques pour importation d un champ discret et actions elementaires sur ce champ
+ * Base class of generic fields for importing a discrete field and elementary actions on this field
  *
- *   (postraitement, etc)
- *  Attention: toutes les methodes sont PARALLELES, il faut les appeler
- *   simultanement sur tous les processeurs (get_domain() peut par exemple
- *   construire le domaine parallele avant de le renvoyer).
+ *   (post-processing, etc)
+ *  Warning: all methods are PARALLEL, they must be called
+ *   simultaneously on all processors (get_domain() can for example
+ *   build the parallel domain before returning it).
  *
  */
 class Champ_Generique_base : public Objet_U
@@ -45,7 +45,7 @@ class Champ_Generique_base : public Objet_U
   Declare_base(Champ_Generique_base);
 public:
 
-  /* XXX Elie Saikali : re-mets ici et pas dans Objet_U */
+  /* XXX Elie Saikali : put it here and not in Objet_U */
   virtual std::vector<YAML_data> data_a_sauvegarder() const { return std::vector<YAML_data>(); };
   int sauvegarder(Sortie& os) const override { return 0; }
   int reprendre(Entree& is) override { return 1; }
@@ -53,61 +53,61 @@ public:
   virtual void set_param(Param& param) const override=0;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   virtual int  get_dimension() const;
-  virtual double  get_time() const; //rend le temps du champ encapsule
+  virtual double  get_time() const; //returns the time of the encapsulated field
   virtual const   Probleme_base& get_ref_pb_base() const;
   virtual const   Discretisation_base&  get_discretisation() const;
   virtual const   Motcle                get_directive_pour_discr() const;
 
   void nommer(const Nom& nom) override;
   virtual const Nom& get_nom_post() const;
-  //rend -1 si identifiant est le nom, numero de composante sinon
+  //returns -1 if identifier is the name, component number otherwise
   static inline int composante(const Nom& nom_test,const Nom& nom, const Noms& composantes,const Noms& synonyms);
 
   virtual void              get_property_names(Motcles& list) const;
-  virtual const Noms        get_property(const Motcle& query) const;  //repond aux requetes nom, nom_cible, unites et composantes
+  virtual const Noms        get_property(const Motcle& query) const;  //answers requests for name, target_name, units and components
 
-  virtual Entity            get_localisation(const int index = -1) const; //localisation ELEMENT ou SOM sont post-traitables
+  virtual Entity            get_localisation(const int index = -1) const; //localization ELEMENT or NODE are post-processable
   virtual int               get_nb_localisations() const;
 
   virtual const DoubleTab&  get_ref_values() const;
   virtual void              get_copy_values(DoubleTab&) const;
   virtual void              get_xyz_values(const DoubleTab& coords, DoubleTab& values, ArrOfBit& validity_flag) const;
 
-  virtual const Domaine&    get_ref_domain() const; //rend une reference au domaine associe au champ
+  virtual const Domaine&    get_ref_domain() const; //returns a reference to the domain associated with the field
   virtual void              get_copy_domain(Domaine&) const;
-  virtual const Domaine_dis_base&  get_ref_domaine_dis_base() const; //rend le domaine discretise lie au domaine
-  virtual const Domaine_Cl_dis_base&  get_ref_zcl_dis_base() const; //rend la zcl discretisee liee a l equation portant le champ cible
+  virtual const Domaine_dis_base&  get_ref_domaine_dis_base() const; //returns the discretized domain linked to the domain
+  virtual const Domaine_Cl_dis_base&  get_ref_zcl_dis_base() const; //returns the discretized boundary conditions linked to the equation carrying the target field
 
   virtual const DoubleTab&  get_ref_coordinates() const;
   virtual void              get_copy_coordinates(DoubleTab&) const;
   virtual const IntTab&     get_ref_connectivity(Entity index1, Entity index2) const;
   virtual void              get_copy_connectivity(Entity index1, Entity index2, IntTab&) const;
 
-  // Remet l'objet dans l'etat obtenu par le constructeur par defaut
+  // Resets the object to the state obtained by the default constructor
   virtual void  reset() = 0;
-  virtual void completer(const Postraitement_base& post) = 0; //Complete l operateur eventuellement porte par le champ
-  //et nomme les sources par defaut
-  virtual void  mettre_a_jour(double temps) = 0;              //Mise a jour d un operateur eventuellement porte par le champ
+  virtual void completer(const Postraitement_base& post) = 0; //Completes the operator possibly carried by the field
+  //and names the sources by default
+  virtual void  mettre_a_jour(double temps) = 0;              //Updates an operator possibly carried by the field
 
-  //  La methode get_champ() est en particulier appelee par la classe de postraitement lorsque
-  //  le champ doit etre postraite (dt_post ecoule).
-  //  L'appelant doit fournir un champ "espace_stockage" non type comme parametre
+  //  The get_champ() method is in particular called by the post-processing class when
+  //  the field must be post-processed (dt_post elapsed).
+  //  The caller must provide an untyped "espace_stockage" field as parameter
   //   "espace_stockage".
   //
-  //  Soit elle renvoie un champ existant (voir Champ_Generique_refChamp)
-  //   et elle n'utilise pas espace_stockage.
-  //  Soit elle construit un nouveau champ qu'elle stocke dans espace_stockage,
-  //   et la valeur de retour est espace_stockage
-  //  L'appelant recupere le resultat du calcul dans la valeur de retour,
-  //   sachant qu'elle peut eventuellement referencer espace_stockage
-  //   (donc, ne pas detruire espace_stockage trop tot).
+  //  Either it returns an existing field (see Champ_Generique_refChamp)
+  //   and does not use espace_stockage.
+  //  Or it builds a new field stored in espace_stockage,
+  //   and the return value is espace_stockage.
+  //  The caller retrieves the computation result in the return value,
+  //   knowing that it may possibly reference espace_stockage
+  //   (so, do not destroy espace_stockage too early).
 
-  // Les etapes de creation de l espace de stockage sont :
+  // The steps to create the storage space are:
   // espace_stockage.typer(type_champ)
   // espace_stockage.associer_domaine_dis_base(un_domaine_dis)
   // espace_stockage.fixer_nb_comp(nb_comp);
   // espace_stockage.fixer_nb_valeurs_nodales(nb_ddl);
-  // Calcul des valeurs par instruction de la forme
+  // Computation of values by an instruction of the form
   // espace_stockage.valeurs() = Operateur.calculer(source.valeurs())
   // espace_stockage.valeurs().echange_espace_virtuel()
   //return espace_stockage
@@ -115,19 +115,19 @@ public:
   virtual const Champ_base& get_champ(OWN_PTR(Champ_base) &espace_stockage) const = 0;
   virtual const Champ_base& get_champ_without_evaluation(OWN_PTR(Champ_base)& espace_stockage) const=0;
 
-  //get_champ_post() renvoie le champ si l identifiant passe en parametre designe
-  //le nom du champ ou l une de ses composantes
+  //get_champ_post() returns the field if the identifier passed as parameter designates
+  //the field name or one of its components
   virtual const Champ_Generique_base& get_champ_post(const Motcle& nom) const;
   virtual bool has_champ_post(const Motcle& nom) const;
 
-  //renvoie 1 si le champ est identifie, 0 sinon
+  //returns 1 if the field is identified, 0 otherwise
   virtual int comprend_champ_post(const Motcle& identifiant) const;
 
-  //get_info_type_post() renvoie 0 si l on doit postraiter un tableau, 1 pour un tenseur
+  //get_info_type_post() returns 0 if a table must be post-processed, 1 for a tensor
   virtual int get_info_type_post() const = 0;
 
-  //fixe l attribut identifiant_appel_ du champ pour indiquer si la requete
-  //a ete lancee par le nom ou une composante du champ (cf Champ_Generique_Interpolation)
+  //sets the identifiant_appel_ attribute of the field to indicate whether the request
+  //was launched by the field name or one of its components (cf Champ_Generique_Interpolation)
   inline void fixer_identifiant_appel(const Nom& identifiant)
   {
     identifiant_appel_ = identifiant;
@@ -181,7 +181,7 @@ inline int Champ_Generique_base::composante(const Nom& nom_test,const Nom& nom,c
 /*
  * @brief class Champ_Generique_erreur
  *
- * Classe Champ_Generique_erreur
+ * Class Champ_Generique_erreur
  */
 class Champ_Generique_erreur
 {

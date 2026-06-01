@@ -82,7 +82,7 @@ void Op_Diff_PolyMAC_CDO_Elem::completer()
 void Op_Diff_PolyMAC_CDO_Elem::update_delta_int() const
 {
   if (delta_int_a_jour_)
-    return; //deja fait
+    return; //already done
   const DoubleTab& inco = equation().inconnue().valeurs();
   const Domaine_PolyMAC_CDO& domaine = le_dom_poly_.valeur();
   const IntTab& e_f = domaine.elem_faces();
@@ -90,16 +90,16 @@ void Op_Diff_PolyMAC_CDO_Elem::update_delta_int() const
   int i, j, k, l, e, f, fb, ne_tot = domaine.nb_elem_tot(), n, N = inco.line_size();
   double fac, fac_n;
 
-  update_nu(); //prerequis : nu
+  update_nu(); //prerequisite: nu
   delta_f_int = 0;
   DoubleTrav nu_ef(e_f.dimension(1), N), de_num(N), de_den(N);
   for (e = 0; e < domaine.nb_elem_tot(); e++)
     {
-      de_num = 0, de_den = 0; //numerateur / denominateur de delta_e
+      de_num = 0, de_den = 0; //numerator / denominator of delta_e
       remplir_nu_ef(e, nu_ef);
       for (i = 0, j = domaine.m2d(e); j < domaine.m2d(e + 1); i++, j++)
         {
-          //partie 'face-face'
+          //'face-face' part
           for (f = e_f(e, i), k = domaine.w2i(j); k < domaine.w2i(j + 1); k++)
             for (fb = e_f(e, l = domaine.w2j(k)), fac = fs(f) * fs(fb) / ve(e) * domaine.w2c(k), n = 0; n < N; n++)
               {
@@ -107,14 +107,14 @@ void Op_Diff_PolyMAC_CDO_Elem::update_delta_int() const
                 de_num(n) += fac_n, delta_f_int(f, n, 0) += fac_n;
                 delta_f_int(f, n, 1) += std::fabs(inco(ne_tot + fb, n) - inco(ne_tot + f, n));
               }
-          //partie 'face-element'
+          //'face-element' part
           for (n = 0; n < N; n++)
             {
               fac = std::fabs(inco(e, n) - inco(ne_tot + f, n));
               de_den(n) += fac, delta_f_int(f, n, 1) += fac;
             }
         }
-      //on peut calculer delta_e des maintenant
+      //we can compute delta_e now
       for (n = 0; n < N; n++)
         delta_e(e, n) = de_den(n) > 1e-8 ? std::fabs(de_num(n)) / de_den(n) : 0;
     }
@@ -125,23 +125,23 @@ void Op_Diff_PolyMAC_CDO_Elem::update_delta_int() const
 void Op_Diff_PolyMAC_CDO_Elem::update_delta() const
 {
   if (delta_a_jour_)
-    return; //deja fait
+    return; //already done
   const Champ_Elem_PolyMAC_CDO& ch = ref_cast(Champ_Elem_PolyMAC_CDO, equation().inconnue());
   const Conds_lim& cls = la_zcl_poly_->les_conditions_limites();
   const Domaine_PolyMAC_CDO& domaine = le_dom_poly_.valeur();
   int i, f, n, N = ch.valeurs().line_size();
 
-  //prerequis : delta_int interne + dans les CL Echange_contact
+  //prerequisite: delta_int internally + in Echange_contact boundary conditions
   update_delta_int();
   for (i = 0; i < cls.size(); i++)
     if (sub_type(Echange_contact_PolyMAC_CDO, cls[i].valeur()))
       ref_cast_non_const(Echange_contact_PolyMAC_CDO, cls[i].valeur()).update_coeffs();
-  //calcul final de delta_f
+  //final computation of delta_f
   for (f = 0; f < domaine.nb_faces_tot(); f++)
     for (n = 0; n < N; n++)
       {
         double n_d[2] = { delta_f_int(f, n, 0), delta_f_int(f, n, 1) };
-        //contribution de l'autre probleme par des CL de type Echange_contact
+        //contribution from the other problem via Echange_contact boundary conditions
         for (i = 0; ch.fcl()(f, 0) == 3 && i < 2; i++)
           n_d[i] += ref_cast(Echange_contact_PolyMAC_CDO, cls[ch.fcl()(f, 1)].valeur()).delta_int(ch.fcl()(f, 2), n, i);
         delta_f(f, n) = n_d[1] > 1e-8 ? std::fabs(n_d[0]) / n_d[1] : 0;
@@ -178,7 +178,7 @@ void Op_Diff_PolyMAC_CDO_Elem::dimensionner_bloc(Matrice_Morse& mat, const int p
 
   for (e = 0; e < domaine.nb_elem_tot(); e++)
     {
-      //dependance en les Te : diagonale -> faces autour de chaque element
+      //dependence on Te: diagonal -> faces around each element
       if (e < domaine.nb_elem())
         for (n = 0; n < N; n++)
           {
@@ -192,18 +192,18 @@ void Op_Diff_PolyMAC_CDO_Elem::dimensionner_bloc(Matrice_Morse& mat, const int p
             sp[2].append_line(N * f + n, N * e + n);
           }
 
-      //dependence en les Tf
+      //dependence on Tf
       for (j = 0, k = domaine.m2d(e); k < domaine.m2d(e + 1); j++, k++)
         for (f = e_f(e, j), l = domaine.w2i(k); l < domaine.w2i(k + 1); l++)
           {
-            //blocs superieurs : divergence
+            //upper blocks: divergence
             for (n = 0; e < domaine.nb_elem() && n < N; n++)
               {
                 stencil.append_line(N * e + n, N * (ne_tot + e_f(e, domaine.w2j(l))) + n);
                 sp[1].append_line(N * e + n, N * e_f(e, domaine.w2j(l)) + n);
               }
 
-            //blocs inferieurs : continuite
+            //lower blocks: continuity
             for (n = 0; f < domaine.nb_faces() && n < N; n++)
               {
                 stencil.append_line(N * (ne_tot + f) + n, N * (ne_tot + e_f(e, domaine.w2j(l))) + n);
@@ -260,7 +260,7 @@ void Op_Diff_PolyMAC_CDO_Elem::ajouter_termes_croises(const DoubleTab& inco, con
   const Conds_lim& cls = la_zcl_poly_->les_conditions_limites();
   int i, j, k, l, f, n, N = ch.valeurs().line_size(), ne_tot = domaine.nb_elem_tot();
 
-  //prerequis : nu, delta en interne + coeffs/delta dans les CL Echange_contact
+  //prerequisites: nu, delta internally + coeffs/delta in Echange_contact boundary conditions
   update_nu(), update_delta();
   for (i = 0; i < cls.size(); i++)
     if (sub_type(Echange_contact_PolyMAC_CDO, cls[i].valeur()))
@@ -277,13 +277,13 @@ void Op_Diff_PolyMAC_CDO_Elem::ajouter_termes_croises(const DoubleTab& inco, con
           {
             f = fvf.num_face(j);
             for (n = 0; n < N; n++)
-              resu(ne_tot + f, n) -= cl.coeff(j, 0, n) * inco(ne_tot + f, n); //terme de la face elle-meme
+              resu(ne_tot + f, n) -= cl.coeff(j, 0, n) * inco(ne_tot + f, n); //face's own term
             for (k = 0; k < cl.item.dimension(1) && (l = cl.item(j, k)) >= 0; k++)
               for (n = 0; n < N; n++)
                 {
-                  //operateur
+                  //operator
                   resu(ne_tot + f, n) -= cl.coeff(j, k + 1, n) * autre_inco(l, n);
-                  //correction non lineaire
+                  //nonlinear correction
                   if (stab_)
                     resu(ne_tot + f, n) -= std::max(delta_f(f, n), cl.delta(j, k, n)) * (inco(ne_tot + f, n) - autre_inco(l, n));
                 }
@@ -298,7 +298,7 @@ void Op_Diff_PolyMAC_CDO_Elem::contribuer_termes_croises(const DoubleTab& inco, 
   const Conds_lim& cls = la_zcl_poly_->les_conditions_limites();
   int i, j, k, l, f, n, N = ch.valeurs().line_size(), ne_tot = domaine.nb_elem_tot();
 
-  //prerequis : nu, delta en interne + coeffs/delta dans les CL Echange_contact
+  //prerequisites: nu, delta internally + coeffs/delta in Echange_contact boundary conditions
   update_nu(), update_delta();
   for (i = 0; i < cls.size(); i++)
     if (sub_type(Echange_contact_PolyMAC_CDO, cls[i].valeur()))
@@ -311,10 +311,10 @@ void Op_Diff_PolyMAC_CDO_Elem::contribuer_termes_croises(const DoubleTab& inco, 
         if (cl.nom_autre_pb() != autre_pb.le_nom())
           continue; //not our problem
         const Front_VF& fvf = ref_cast(Front_VF, cl.frontiere_dis());
-        for (j = 0; j < fvf.nb_faces(); j++) //on peut remplir tous les coeffs, sauf celui de la face elle-meme (rempli par contribuer_a_avec)
+        for (j = 0; j < fvf.nb_faces(); j++) //we can fill all coefficients except the face's own (filled by contribuer_a_avec)
           for (k = 0, f = fvf.num_face(j); k < cl.item.dimension(1) && (l = cl.item(j, k)) >= 0; k++)
             for (n = 0; n < N; n++)
-              matrice(N * (ne_tot + f) + n, N * l + n) += cl.coeff(j, k + 1, n) - (stab_ ? std::max(delta_f(f, n), cl.delta(j, k, n)) : 0); //operateur + correction non lineaire
+              matrice(N * (ne_tot + f) + n, N * l + n) += cl.coeff(j, k + 1, n) - (stab_ ? std::max(delta_f(f, n), cl.delta(j, k, n)) : 0); //operator + nonlinear correction
       }
 }
 
@@ -329,7 +329,7 @@ DoubleTab& Op_Diff_PolyMAC_CDO_Elem::ajouter(const DoubleTab& inco, DoubleTab& r
   bool elem_only = polymac_flica5 ? resu.dimension_tot(0) == ne_tot : false;
   double fac;
 
-  //prerequis : nu, delta en interne + coeffs/delta dans les CL Echange_contact
+  //prerequisites: nu, delta internally + coeffs/delta in Echange_contact boundary conditions
   update_nu(), update_delta();
   for (i = 0; i < cls.size(); i++)
     if (sub_type(Echange_contact_PolyMAC_CDO, cls[i].valeur()))
@@ -339,8 +339,8 @@ DoubleTab& Op_Diff_PolyMAC_CDO_Elem::ajouter(const DoubleTab& inco, DoubleTab& r
   DoubleTrav nu_ef(e_f.dimension(1), N), mff(N), mfe(N), mee(N);
   for (e = 0; e < ne_tot; e++)
     {
-      /* operateur : divergence pour les lignes aux elements, continuite pour les lignes aux faces */
-      int n_f = domaine.m2d(e + 1) - domaine.m2d(e); //nombre de faces de l'element e
+      /* operator: divergence for element rows, continuity for face rows */
+      int n_f = domaine.m2d(e + 1) - domaine.m2d(e); //number of faces of element e
       for (remplir_nu_ef(e, nu_ef), mee = 0, i = 0; i < n_f; i++, mee += mfe)
         {
           for (f = e_f(e, i), j = domaine.w2i(domaine.m2d(e) + i), mfe = 0; j < domaine.w2i(domaine.m2d(e) + i + 1); j++, mfe += mff)
@@ -356,7 +356,7 @@ DoubleTab& Op_Diff_PolyMAC_CDO_Elem::ajouter(const DoubleTab& inco, DoubleTab& r
               for (n = 0; n < N; n++)
                 resu(e, n) += mff(n) * inco(ne_tot + fb, n);
 
-              //correction non lineaire : partie "faces/faces"
+              //nonlinear correction: "faces/faces" part
               if (!elem_only)
                 for (n = 0; stab_ && ch.fcl()(f, 0) < 4 && n < N; n++)
                   resu(ne_tot + f, n) -= std::max(delta_f(f, n), delta_f(fb, n)) * (inco(ne_tot + f, n) - inco(ne_tot + fb, n));
@@ -374,8 +374,8 @@ DoubleTab& Op_Diff_PolyMAC_CDO_Elem::ajouter(const DoubleTab& inco, DoubleTab& r
                 resu(ne_tot + f, n) -= fs(f) * ref_cast(Echange_impose_base, cls[ch.fcl()(f, 1)].valeur()).h_imp(ch.fcl()(f, 2), n)
                                        * (inco(ch.fcl()(f, 0) == 1 ? ne_tot + f : e, n) - ref_cast(Echange_impose_base, cls[ch.fcl()(f, 1)].valeur()).T_ext(ch.fcl()(f, 2), n));
 
-          //correction non lineaire : parties "elements/faces" et "faces/elements"
-          for (n = 0; stab_ && ch.fcl()(f, 0) < 4 && n < N; n++) //non appliquee aux CLs de Dirichlet ou Neumann
+          //nonlinear correction: "elements/faces" and "faces/elements" parts
+          for (n = 0; stab_ && ch.fcl()(f, 0) < 4 && n < N; n++) //not applied to Dirichlet or Neumann boundary conditions
             {
               double corr = std::max(delta_e(e, n), delta_f(f, n)) * (inco(e, n) - inco(ne_tot + f, n));
               resu(e, n) -= corr, resu(ne_tot + f, n) += corr;
@@ -401,17 +401,17 @@ void Op_Diff_PolyMAC_CDO_Elem::contribuer_bloc(const DoubleTab& inco, Matrice_Mo
   int i, j, k, l, e, f, fb, ne_tot = domaine.nb_elem_tot(), n, N = inco.line_size();
   double fac;
 
-  //prerequis : nu, delta en interne + coeffs/delta dans les CL Echange_contact
+  //prerequisites: nu, delta internally + coeffs/delta in Echange_contact boundary conditions
   update_nu(), update_delta();
   for (i = 0; i < cls.size(); i++)
     if (sub_type(Echange_contact_PolyMAC_CDO, cls[i].valeur()))
       ref_cast_non_const(Echange_contact_PolyMAC_CDO, cls[i].valeur()).update_coeffs(), ref_cast(Echange_contact_PolyMAC_CDO, cls[i].valeur()).update_delta();
 
-  /* operateur : divergence pour les lignes aux elements, continuite pour les lignes aux faces */
+  /* operator: divergence for element rows, continuity for face rows */
   DoubleTrav nu_ef(e_f.dimension(1), N), mff(N), mfe(N), mee(N);
   for (e = 0; e < ne_tot; e++)
     {
-      int n_f = domaine.m2d(e + 1) - domaine.m2d(e); //nombre de faces de l'element e
+      int n_f = domaine.m2d(e + 1) - domaine.m2d(e); //number of faces of element e
       for (remplir_nu_ef(e, nu_ef), mee = 0, i = 0; i < n_f; i++, mee += mfe)
         {
           for (f = e_f(e, i), j = domaine.w2i(domaine.m2d(e) + i), mfe = 0; j < domaine.w2i(domaine.m2d(e) + i + 1); j++, mfe += mff)
@@ -433,7 +433,7 @@ void Op_Diff_PolyMAC_CDO_Elem::contribuer_bloc(const DoubleTab& inco, Matrice_Mo
                     matrice(N * e + n, N * fb + n) -= mff(n);
                 }
 
-              //correction non lineaire : partie "faces/faces"
+              //nonlinear correction: "faces/faces" part
               for (n = 0; stab_ && ch.fcl()(f, 0) < 4 && f < domaine.nb_faces() && n < N; n++)
                 for (k = 0, fac = std::max(delta_f(f, n), delta_f(fb, n)); k < 2; k++)
                   {
@@ -460,18 +460,18 @@ void Op_Diff_PolyMAC_CDO_Elem::contribuer_bloc(const DoubleTab& inco, Matrice_Mo
                 else
                   Process::exit("Echange_impose_base et diffusion explicite : pas bon!");
               }
-          else if (ch.fcl()(f, 0) == 3 && f < domaine.nb_faces()) //paroi_contact gere en monolithique -> ajout du coeff a la face issu de l'autre cote
+          else if (ch.fcl()(f, 0) == 3 && f < domaine.nb_faces()) //paroi_contact handled monolithically -> add coefficient to face from the other side
             {
               const Echange_contact_PolyMAC_CDO& cl = ref_cast(Echange_contact_PolyMAC_CDO, cls[ch.fcl()(f, 1)].valeur());
               for (j = ch.fcl()(f, 2), n = 0; n < N; n++)
                 {
                   if (ip == -1)
-                    matrice(N * (ne_tot + f) + n, N * (ne_tot + f) + n) += cl.coeff(j, 0, n); //coeff de la face elle-meme
+                    matrice(N * (ne_tot + f) + n, N * (ne_tot + f) + n) += cl.coeff(j, 0, n); //coefficient of the face itself
                   else
                     Process::exit("Echange_impose_base et diffusion explicite : pas bon!");
                 }
               for (k = 0; stab_ && k < cl.item.dimension(1) && cl.item(j, k) >= 0; k++)
-                for (n = 0; n < N; n++) //correction non lineaire
+                for (n = 0; n < N; n++) //nonlinear correction
                   {
                     if (ip == -1)
                       matrice(N * (ne_tot + f) + n, N * (ne_tot + f) + n) += std::max(delta_f(f, n), cl.delta(j, k, n));
@@ -480,8 +480,8 @@ void Op_Diff_PolyMAC_CDO_Elem::contribuer_bloc(const DoubleTab& inco, Matrice_Mo
                   }
             }
 
-          //correction non lineaire : parties "elements/faces" et "faces/elements"
-          for (n = 0; stab_ && ch.fcl()(f, 0) < 4 && n < N; n++) //non appliquee aux CLs de Dirichlet ou Neumann
+          //nonlinear correction: "elements/faces" and "faces/elements" parts
+          for (n = 0; stab_ && ch.fcl()(f, 0) < 4 && n < N; n++) //not applied to Dirichlet or Neumann boundary conditions
             {
               double corr = std::max(delta_e(e, n), delta_f(f, n));
               for (k = 0; k < 2; k++)
@@ -522,13 +522,13 @@ static Matrice_Morse FE, FF;
 void Op_Diff_PolyMAC_CDO_Elem::update_auxiliary_variables(DoubleTab& inco)
 {
   if (!polymac_flica5) return;
-// resolution de M_ff T_f = -M_fe T_e
+// solve M_ff T_f = -M_fe T_e
   DoubleTab sm(inco);
   sm = 0.;
   DoubleTab_parts inco_parts(inco);
   DoubleTab_parts sm_parts(sm);
 
-  // 1. dimensionnement
+  // 1. sizing
   //std::clock_t start = std::clock();
   if (FF.nb_lignes() == 0)
     {
@@ -542,11 +542,11 @@ void Op_Diff_PolyMAC_CDO_Elem::update_auxiliary_variables(DoubleTab& inco)
       FF.clean();
     }
   //Cout << "[Op_Diff_PolyMAC_CDO_Elem] Time to initialize matrix: " << (std::clock() - start) / (double) CLOCKS_PER_SEC << finl;
-  // 2. remplissage
+  // 2. filling
   contribuer_a_avec(inco, FE);
   contribuer_a_avec(inco, FF);
 
-  // 3. resolution
+  // 3. solving
   FE *= -1.;
   FE.ajouter_multvect(inco_parts[0], sm_parts[1]);
 
@@ -568,7 +568,7 @@ void Op_Diff_PolyMAC_CDO_Elem::update_auxiliary_variables(DoubleTab& inco)
         }
       catch(...)
         {
-          // PL: Crash de Cholesky_lapack sur maillages avec pas de diffusion localement:
+          // PL: Cholesky_lapack crash on meshes with no local diffusion:
           statistics().end_count(STD_COUNTERS::system_solver,0,0);
           Nom solv("Petsc Cholesky { quiet }");
           Cerr << "Echec du solveur dans Op_Diff_PolyMAC_CDO_Elem..." << finl;

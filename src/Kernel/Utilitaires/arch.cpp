@@ -60,10 +60,10 @@ using std::endl;
 
 static char* buf=0;  //new char[801];
 // pwd :
-// alloue une chaine!
+// allocates a string!
 void desalloue_pwd()
 {
-  // si on a alloue le buf on le detruit ...
+  // if we have allocated the buf, destroy it ...
 #if defined(_CSH_) || defined(linux) || defined(cygwin) || defined(MICROSOFT)
   if (buf)
     delete [] buf;

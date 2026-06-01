@@ -65,10 +65,10 @@ Entree& Domaine_PolyMAC_MPFA::readOn(Entree& is) { return Domaine_Poly_base::rea
 
 void Domaine_PolyMAC_MPFA::discretiser()
 {
-  /* on saut le discretiser() de Domaine_PolyMAC_HFV pour eviter d'initialiser les variables de PolyMAC_HFV_V1 */
+  /* skip the discretiser() of Domaine_PolyMAC_HFV to avoid initializing PolyMAC_HFV_V1 variables */
   Domaine_Poly_base::discretiser();
 
-  //MD_vector pour Champ_Face_PolyMAC_MPFA (faces + dimension * champ_p0)
+  //MD_vector for Champ_Face_PolyMAC_MPFA (faces + dimension * champ_p0)
   MD_Vector_composite mdc_ch_face;
   mdc_ch_face.add_part(md_vector_faces());
   mdc_ch_face.add_part(domaine().md_vector_elements(), dimension);
@@ -122,7 +122,7 @@ void Domaine_PolyMAC_MPFA::init_stencils() const
   const int ne_tot = nb_elem_tot(), ns_tot = domaine().nb_som_tot();
   fsten_d.resize(1);
 
-  /* connectivite sommets -> elems / faces de bord */
+  /* vertex -> element / boundary face connectivity */
   std::vector<std::set<int>> som_eb(ns_tot);
   for (int e = 0; e < nb_elem_tot(); e++)
     for (int i = 0; i < e_s.dimension(1); i++)
@@ -143,11 +143,11 @@ void Domaine_PolyMAC_MPFA::init_stencils() const
           som_eb[s].insert(ne_tot + f);
         }
 
-  std::set<int> f_eb; //sommets de la face f, elems connectes a e par soms, sommets / faces connectes par une face commune
+  std::set<int> f_eb; //vertices of face f, elements connected to e via vertices, vertices / faces connected through a common face
   for (int f = 0; f < nb_faces_tot(); fsten_d.append_line(fsten_eb.size()), f++)
     if (f_e(f, 0) >= 0 && (fbord(f) >= 0 || f_e(f, 1) >= 0))
       {
-        /* connectivite par un sommet de f */
+        /* connectivity through a vertex of f */
         f_eb.clear();
         for (int i = 0; i < f_s.dimension(1); i++)
           {
@@ -158,7 +158,7 @@ void Domaine_PolyMAC_MPFA::init_stencils() const
               f_eb.insert(el);
           }
 
-        /* remplissage */
+        /* fill */
         for (auto &&el : f_eb)
           fsten_eb.append_line(el);
       }
@@ -233,48 +233,48 @@ void Domaine_PolyMAC_MPFA::fgrad(int N, int is_p, const Conds_lim& cls, const In
   phif_c.resize(fsten_eb.dimension(0), N);
   phif_c = 0;
 
-  std::vector<int> s_eb, s_f; //listes d'elements/bord, de faces autour du sommet
-  std::vector<double> surf_fs, vol_es; //surfaces partielles des faces connectees au sommet (meme ordre que s_f)
-  std::vector<std::array<std::array<double, 3>,2>> vec_fs;//pour chaque facette, base de (D-1) vecteurs permettant de la parcourir
-  std::vector<std::vector<int>> se_f; /* se_f[i][.] : faces connectees au i-eme element connecte au sommet s */
-  DoubleTrav M, B, X, Ff, Feb, Mf, Meb, W(1), x_fs, A, S; //systeme M.(grad u) = B dans chaque element, flux a la face Ff.u_fs + Feb.u_eb, equations Mf.u_fs = Meb.u_eb
+  std::vector<int> s_eb, s_f; //lists of elements/boundary items, faces around the vertex
+  std::vector<double> surf_fs, vol_es; //partial surfaces of faces connected to the vertex (same order as s_f)
+  std::vector<std::array<std::array<double, 3>,2>> vec_fs;//for each facet, a basis of (D-1) vectors spanning it
+  std::vector<std::vector<int>> se_f; /* se_f[i][.]: faces connected to the i-th element connected to vertex s */
+  DoubleTrav M, B, X, Ff, Feb, Mf, Meb, W(1), x_fs, A, S; //system M.(grad u) = B in each element, flux at face Ff.u_fs + Feb.u_eb, equations Mf.u_fs = Meb.u_eb
   IntTrav piv, ctr[3];
   for (i = 0; first_fgrad_ && i < 3; i++) domaine().creer_tableau_sommets(ctr[i]);
 
-  /* contributions aux sommets : en evitant ceux de som_ext */
+  /* contributions at vertices: skipping those in som_ext */
   for (i_s = 0; i_s <= (som_ext ? som_ext->size() : 0); i_s++)
     for (s = (som_ext && i_s ? (*som_ext)(i_s - 1) + 1 : 0); s < (som_ext && i_s < som_ext->size() ? (*som_ext)(i_s) : (virt ? nb_som_tot() : nb_som())); s++)
       {
-        /* elements connectes a s : a partir de som_elem (deja classes) */
+        /* elements connected to s: from som_elem (already sorted) */
         for (s_eb.clear(), n_e = 0; n_e < s_e.get_list_size(s); n_e++) s_eb.push_back(s_e(s, n_e));
-        /* faces et leurs surfaces partielles */
+        /* faces and their partial surfaces */
         for (s_f.clear(), surf_fs.clear(), vec_fs.clear(), se_f.resize(std::max(int(se_f.size()), n_e)), i = 0, ok = 1; i < n_e; i++)
           for (se_f[i].clear(), e = s_eb[i], j = 0; j < e_f.dimension(1) && (f = e_f(e, j)) >= 0; j++)
             {
               for (k = 0, sb = 0; k < f_s.dimension(1) && (sb = f_s(f, k)) >= 0; k++)
                 if (sb == s) break;
-              if (sb != s) continue; /* face de e non connectee a s -> on saute */
-              if (fbord(f) >= 0) s_eb.insert(std::lower_bound(s_eb.begin(), s_eb.end(), ne_tot + f), ne_tot + f); //si f est de bord, on ajoute l'indice correspondant a s_eb
-              else ok &= (f_e(f, 0) >= 0 && f_e(f, 1) >= 0); //si f est interne, alors l'amont/aval doivent etre presents
-              se_f[i].push_back(f); //faces connectees a e et s
-              if ((ll = std::lower_bound(s_f.begin(), s_f.end(), f) - s_f.begin()) == s_f.size() || s_f[ll] != f) /* si f n'est pas dans s_f, on l'ajoute */
+              if (sb != s) continue; /* face of e not connected to s -> skip */
+              if (fbord(f) >= 0) s_eb.insert(std::lower_bound(s_eb.begin(), s_eb.end(), ne_tot + f), ne_tot + f); //if f is a boundary face, add its index to s_eb
+              else ok &= (f_e(f, 0) >= 0 && f_e(f, 1) >= 0); //if f is internal, upstream/downstream must be present
+              se_f[i].push_back(f); //faces connected to both e and s
+              if ((ll = std::lower_bound(s_f.begin(), s_f.end(), f) - s_f.begin()) == s_f.size() || s_f[ll] != f) /* if f is not in s_f, add it */
                 {
-                  s_f.insert(s_f.begin() + ll, f); //face -> dans s_f
-                  if (D < 3) surf_fs.insert(surf_fs.begin() + ll, fs(f) / 2), vec_fs.insert(vec_fs.begin() + ll, {{{ xs(s, 0) - xv_(f, 0), xs(s, 1) - xv_(f, 1), 0}, { 0, 0, 0 }}}); //2D -> facile
-                  else for (surf_fs.insert(surf_fs.begin() + ll, 0), vec_fs.insert(vec_fs.begin() + ll, {{{ 0, 0, 0}, {0, 0, 0 }}}), m = 0; m < 2; m++) //3D -> deux sous-triangles
+                  s_f.insert(s_f.begin() + ll, f); //add face to s_f
+                  if (D < 3) surf_fs.insert(surf_fs.begin() + ll, fs(f) / 2), vec_fs.insert(vec_fs.begin() + ll, {{{ xs(s, 0) - xv_(f, 0), xs(s, 1) - xv_(f, 1), 0}, { 0, 0, 0 }}}); //2D -> straightforward
+                  else for (surf_fs.insert(surf_fs.begin() + ll, 0), vec_fs.insert(vec_fs.begin() + ll, {{{ 0, 0, 0}, {0, 0, 0 }}}), m = 0; m < 2; m++) //3D -> two sub-triangles
                   {
-                    if (m == 1 || k > 0) sb = f_s(f, m ? (k + 1 < f_s.dimension(1) && f_s(f, k + 1) >= 0 ? k + 1 : 0) : k - 1); //sommet suivant (m = 1) ou precedent avec k > 0 -> facile
-                    else for (n = f_s.dimension(1) - 1; (sb = f_s(f, n)) == -1; ) n--; //sommet precedent avec k = 0 -> on cherche a partir de la fin
-                    auto v = cross(D, D, &xs(s, 0), &xs(sb, 0), &xv_(f, 0), &xv_(f, 0));//produit vectoriel (xs - xf)x(xsb - xf)
-                    if (fs(f) > 0) surf_fs[ll] += std::fabs(dot(&v[0], &nf(f, 0))) / fs(f) / 4; //surface a ajouter
-                    for (d = 0; d < D; d++) vec_fs[ll][m][d] = (xs(s, d) + xs(sb, d)) / 2 - xv_(f, d); //vecteur face -> arete
+                    if (m == 1 || k > 0) sb = f_s(f, m ? (k + 1 < f_s.dimension(1) && f_s(f, k + 1) >= 0 ? k + 1 : 0) : k - 1); //next vertex (m = 1) or previous with k > 0 -> straightforward
+                    else for (n = f_s.dimension(1) - 1; (sb = f_s(f, n)) == -1; ) n--; //previous vertex with k = 0 -> search from the end
+                    auto v = cross(D, D, &xs(s, 0), &xs(sb, 0), &xv_(f, 0), &xv_(f, 0));//cross product (xs - xf)x(xsb - xf)
+                    if (fs(f) > 0) surf_fs[ll] += std::fabs(dot(&v[0], &nf(f, 0))) / fs(f) / 4; //surface to add
+                    for (d = 0; d < D; d++) vec_fs[ll][m][d] = (xs(s, d) + xs(sb, d)) / 2 - xv_(f, d); //vector face -> edge
                   }
                 }
             }
-        if (!ok) continue; //au moins un voisin manquant
+        if (!ok) continue; //at least one missing neighbor
         n_eb = (int)s_eb.size(), n_f = (int)s_f.size();
 
-        /* conversion de se_f en indices dans s_f */
+        /* convert se_f to indices in s_f */
         for (i = 0; i < n_e; i++)
           for (j = 0; j < (int) se_f[i].size(); j++) se_f[i][j] = (int)(std::lower_bound(s_f.begin(), s_f.end(), se_f[i][j]) - s_f.begin());
         for (vol_es.resize(n_e), vol_s = 0, i = 0; i < n_e; vol_s += vol_es[i], i++)
@@ -284,11 +284,11 @@ void Domaine_PolyMAC_MPFA::fgrad(int N, int is_p, const Conds_lim& cls, const In
               if (fs(f) > 0) vol_es[i] += surf_fs[k] * std::fabs(dot(&xp_(e, 0), &nf(f, 0), &xv_(f, 0))) / fs(f) / D;
             }
 
-        for (essai = 0; essai < 3; essai++) /* essai 0 : MPFA O -> essai 1 : MPFA O avec x_fs mobiles -> essai 2 : MPFA symetrique (corecive, mais pas tres consistante) */
+        for (essai = 0; essai < 3; essai++) /* attempt 0: MPFA-O -> attempt 1: MPFA-O with mobile x_fs -> attempt 2: symmetric MPFA (coercive but not very consistent) */
           {
-            if (essai == 1) /* essai 1 : choix des points x_fs de continuite aux facettes pour obtenir un schema symetrique */
+            if (essai == 1) /* attempt 1: choose x_fs continuity points at facets to obtain a symmetric scheme */
               {
-                /* systeme lineaire */
+                /* linear system */
                 for (M.resize(N, nc = (D - 1) * n_f, nl = D * (D - 1) / 2 * n_e), B.resize(N, n_m = std::max(nc, nl)), M = 0, B = 0, i = 0, il = 0; i < n_e; i++)
                   for (d = 0; d < D; d++)
                     for (db = 0; db < d; db++, il++)
@@ -296,60 +296,60 @@ void Domaine_PolyMAC_MPFA::fgrad(int N, int is_p, const Conds_lim& cls, const In
                         for (sgn = e == f_e(f = s_f[k = se_f[i][j]], 0) ? 1 : -1, n = 0; n < N; n++)
                           {
                             const double inv_fs = fs(f) > 0 ? 1. / fs(f) : 0.;
-                            for (l = 0; l < D; l++) fac[l] = sgn * nu_dot(nu, e, n, &nf(f, 0), i3[l]) * surf_fs[k] * inv_fs / vol_es[i]; //vecteur lambda_e nf sortant * facteur commun
-                            B(n, il) += fac[d] * (xv_(f, db) - xp_(e, db)) - fac[db] * (xv_(f, d) - xp_(e, d)); //second membre
-                            for (l = 0; l < D - 1; l++) M(n, (D - 1) * k + l, il) += fac[db] * vec_fs[k][l][d] - fac[d] * vec_fs[k][l][db]; //matrice
+                            for (l = 0; l < D; l++) fac[l] = sgn * nu_dot(nu, e, n, &nf(f, 0), i3[l]) * surf_fs[k] * inv_fs / vol_es[i]; //outward lambda_e nf vector * common factor
+                            B(n, il) += fac[d] * (xv_(f, db) - xp_(e, db)) - fac[db] * (xv_(f, d) - xp_(e, d)); //right-hand side
+                            for (l = 0; l < D - 1; l++) M(n, (D - 1) * k + l, il) += fac[db] * vec_fs[k][l][d] - fac[d] * vec_fs[k][l][db]; //matrix
                           }
 
-                /* resolution -> DEGLSY */
+                /* solve -> DGELSY */
                 nw = -1, piv.resize(nc), F77NAME(dgelsy)(&nl, &nc, &un, &M(0, 0, 0), &nl, &B(0, 0), &n_m, &piv(0), &eps_g, &rk, &W(0), &nw, &infoo);
                 for (W.resize(nw = (int)std::lrint(W(0))), n = 0; n < N; n++) piv = 0, F77NAME(dgelsy)(&nl, &nc, &un, &M(n, 0, 0), &nl, &B(n, 0), &n_m, &piv(0), &eps_g, &rk, &W(0), &nw, &infoo);
-                /* x_fs = xf + corrections */
+                /* x_fs = xf + corrections (clamped to [0, 0.5]) */
                 for (x_fs.resize(N, n_f, D), n = 0; n < N; n++)
                   for (i = 0; i < n_f; i++)
                     for (f = s_f[i], d = 0; d < D; d++)
                       for (x_fs(n, i, d) = xv_(f, d), k = 0; k < D - 1; k++) x_fs(n, i, d) += std::min(std::max(B(n, (D - 1) * i + k), 0.), 0.5) * vec_fs[i][k][d];
               }
 
-            /* gradients par maille en fonctions des (u_eb, u_fs), flux F = Ff.u_fs + Feb.u_eb, et systeme Mf.u_fs = Feb.u_eb */
+            /* per-cell gradients as functions of (u_eb, u_fs), flux F = Ff.u_fs + Feb.u_eb, and system Mf.u_fs = Feb.u_eb */
             Ff.resize(n_f, n_f, N), Feb.resize(n_f, n_eb, N), Mf.resize(N, n_f, n_f), Meb.resize(N, n_eb, n_f);
             for (Ff = 0, Feb = 0, Mf = 0, Meb = 0, i = 0; i < n_e; i++)
               for (e = s_eb[i], M.resize(n_ef = (int)se_f[i].size(), D), B.resize(D, n_m = std::max(D, n_ef)), X.resize(n_ef, D), piv.resize(n_ef), n = 0; n < N; n++)
                 {
-                  if (essai < 2) /* essais 0 et 1 : gradient consistant donne par (u_e, (u_fs)_{f v e, s})*/
+                  if (essai < 2) /* attempts 0 and 1: consistent gradient given by (u_e, (u_fs)_{f adj e, s})*/
                     {
-                      /* gradient dans (e, s) -> matrice / second membre M.x = B du systeme (grad u)_i = sum_f b_{fi} (x_fs_i - x_e), avec x_fs le pt de continuite de u_fs */
+                      /* gradient in (e, s) -> matrix / right-hand side M.x = B of the system (grad u)_i = sum_f b_{fi} (x_fs_i - x_e), where x_fs is the continuity point of u_fs */
                       for (j = 0; j < n_ef; j++)
                         for (f = s_f[k = se_f[i][j]], d = 0; d < D; d++) M(j, d) = (essai ? x_fs(n, k, d) : xv_(f, d)) - xp_(e, d);
                       for (B = 0, d = 0; d < D; d++) B(d, d) = 1;
                       nw = -1, piv = 0, F77NAME(dgelsy)(&D, &n_ef, &D, &M(0, 0), &D, &B(0, 0), &n_m, &piv(0), &eps_g, &rk, &W(0), &nw, &infoo);
                       W.resize(nw = (int)std::lrint(W(0))), F77NAME(dgelsy)(&D, &n_ef, &D, &M(0, 0), &D, &B(0, 0), &n_m, &piv(0), &eps_g, &rk, &W(0), &nw, &infoo);
                       for (j = 0; j < n_ef; j++)
-                        for (d = 0; d < D; d++) X(j, d) = B(d, j); /* pour pouvoir utiliser nu_dot */
+                        for (d = 0; d < D; d++) X(j, d) = B(d, j); /* transposed to enable nu_dot */
                     }
                   else for (j = 0; j < n_ef; j++)
-                      for (sgn = e == f_e(f = s_f[k = se_f[i][j]], 0) ? 1 : -1, d = 0; d < D; d++) /* essai 2 : gradient non consistant */
+                      for (sgn = e == f_e(f = s_f[k = se_f[i][j]], 0) ? 1 : -1, d = 0; d < D; d++) /* attempt 2: inconsistent gradient */
                         {
                           const double inv_fs = fs(f) > 0 ? 1. / fs(f) : 0.;
                           X(j, d) = surf_fs[k] / vol_es[i] * sgn * nf(f, d) * inv_fs;
                         }
 
-                  /* flux et equation. Remarque : les CLs complexes des equations scalaires sont gerees directement dans Op_Diff_PolyMAC_MPFA_Elem */
+                  /* flux and equation. Note: complex BCs for scalar equations are handled directly in Op_Diff_PolyMAC_MPFA_Elem */
                   for (j = 0; j < n_ef; j++)
                     {
-                      k = se_f[i][j], f = s_f[k], sgn = e == f_e(f, 0) ? 1 : -1; //face et son indice
-                      const Cond_lim_base *cl = fcl(f, 0) ? &cls[fcl(f, 1)].valeur() : nullptr; //si on est sur une CL, pointeur vers celle-ci
-                      int is_dir = cl && (is_p ? sub_type(Neumann, *cl) : sub_type(Dirichlet, *cl) || sub_type(Dirichlet_homogene, *cl)); //est-elle de Dirichlet?
+                      k = se_f[i][j], f = s_f[k], sgn = e == f_e(f, 0) ? 1 : -1; //face and its index
+                      const Cond_lim_base *cl = fcl(f, 0) ? &cls[fcl(f, 1)].valeur() : nullptr; //pointer to BC if on a boundary
+                      int is_dir = cl && (is_p ? sub_type(Neumann, *cl) : sub_type(Dirichlet, *cl) || sub_type(Dirichlet_homogene, *cl)); //is it Dirichlet?
                       for (l = 0; l < n_ef; l++)
                         {
                           const double inv_fs = fs(f) > 0 ? 1. / fs(f) : 0.;
-                          x = sgn * nu_dot(nu, e, n, &nf(f, 0), &X(l, 0)) * surf_fs[k] * inv_fs; //contribution au flux
-                          if (sgn > 0) Ff(k, se_f[i][l], n) += x, Feb(k, i, n) -= x; //flux amont->aval
-                          if (!is_dir) Mf(n, se_f[i][l], k) += x, Meb(n, i, k) += x; //equation sur u_fs (sauf si CL Dirichlet)
+                          x = sgn * nu_dot(nu, e, n, &nf(f, 0), &X(l, 0)) * surf_fs[k] * inv_fs; //contribution to the flux
+                          if (sgn > 0) Ff(k, se_f[i][l], n) += x, Feb(k, i, n) -= x; //flux upstream->downstream
+                          if (!is_dir) Mf(n, se_f[i][l], k) += x, Meb(n, i, k) += x; //equation on u_fs (except if Dirichlet BC)
                         }
-                      if (!cl) continue; //rien de l'autre cote
+                      if (!cl) continue; //nothing on the other side
                       else if (is_dir) Mf(n, k, k) = Meb(n, (int)(std::find(s_eb.begin(), s_eb.end(), ne_tot + f) - s_eb.begin()), k) = 1; //Dirichlet -> equation u_fs = u_b
-                      else if (is_p ? !is_dir : sub_type(Neumann, *cl)) //Neumann -> ajout du flux au bord
+                      else if (is_p ? !is_dir : sub_type(Neumann, *cl)) //Neumann -> add boundary flux
                         Meb(n, (int)(std::find(s_eb.begin(), s_eb.end(), ne_tot + f) - s_eb.begin()), k) += surf_fs[k];
                       else if (sub_type(Frottement_global_impose, *cl)) //Frottement_global_impose -> flux =  - coeff * v_e
                         Meb(n, i, k) -= surf_fs[k] * ((nu) ? ref_cast(Frottement_global_impose, *cl).coefficient_frottement(fcl(f, 2), n) : ref_cast(Frottement_global_impose, *cl).coefficient_frottement_grad(fcl(f, 2), n) ) ;
@@ -358,44 +358,44 @@ void Domaine_PolyMAC_MPFA::fgrad(int N, int is_p, const Conds_lim& cls, const In
                       else if (sub_type(Echange_impose_base, *cl)) //Echange_impose_base -> flux =  - h * (T_{e,f} - T_ext)
                         {
                           double h = (nu) ? ref_cast(Echange_impose_base, *cl).h_imp(fcl(f, 2), n) : ref_cast(Echange_impose_base, *cl).h_imp_grad(fcl(f, 2), n) ;
-                          Meb(n, (int)(std::find(s_eb.begin(), s_eb.end(), ne_tot + f) - s_eb.begin()), k) += surf_fs[k] * h; //partie h * T_ext
-                          if (sub_type(Echange_externe_impose, *cl)) Mf(n, k, k) += surf_fs[k] * h; //Echange_externe_impose : partie h * T_f
-                          else Meb(n, i, k) -= surf_fs[k] * h; //Echange_global_impose : partie h * T_e
+                          Meb(n, (int)(std::find(s_eb.begin(), s_eb.end(), ne_tot + f) - s_eb.begin()), k) += surf_fs[k] * h; //h * T_ext contribution
+                          if (sub_type(Echange_externe_impose, *cl)) Mf(n, k, k) += surf_fs[k] * h; //Echange_externe_impose: h * T_f contribution
+                          else Meb(n, i, k) -= surf_fs[k] * h; //Echange_global_impose: h * T_e contribution
                         }
                     }
                 }
-            /* resolution de Mf.u_fs = Meb.u_eb : DGELSY, au cas ou */
+            /* solve Mf.u_fs = Meb.u_eb: DGELSY, just in case */
             nw = -1, piv.resize(n_f), F77NAME(dgelsy)(&n_f, &n_f, &n_eb, &Mf(0, 0, 0), &n_f, &Meb(0, 0, 0), &n_f, &piv(0), &eps, &rk, &W(0), &nw, &infoo);
             for (W.resize(nw = (int)std::lrint(W(0))), n = 0; n < N; n++)
               piv = 0, F77NAME(dgelsy)(&n_f, &n_f, &n_eb, &Mf(n, 0, 0), &n_f, &Meb(n, 0, 0), &n_f, &piv(0), &eps, &rk, &W(0), &nw, &infoo);
 
-            /* substitution dans Feb */
+            /* substitute into Feb */
             for (i = 0; i < n_f; i++)
               for (j = 0; j < n_eb; j++)
                 for (n = 0; n < N; n++)
                   for (k = 0; k < n_f; k++)
                     Feb(i, j, n) += Ff(i, k, n) * Meb(n, j, k);
 
-            /* A : forme bilineaire */
-            if (essai == 2) break;//pas la peine pour VFSYM
+            /* A: bilinear form */
+            if (essai == 2) break;//not needed for VFSYM
             for (A.resize(N, n_e, n_e), A = 0, i = 0; i < n_e; i++)
               for (e = s_eb[i], j = 0; j < (int) se_f[i].size(); j++)
                 for (sgn = e == f_e(f = s_f[k = se_f[i][j]], 0) ? 1 : -1, l = 0; l < n_e; l++)
                   for (n = 0; n < N; n++)
                     A(n, i, l) -= sgn * Feb(k, l, n);
-            /* symmetrisation */
+            /* symmetrization */
             for (n = 0; n < N; n++)
               for (i = 0; i < n_e; i++)
                 for (j = 0; j <= i; j++) A(n, i, j) = A(n, j, i) = (A(n, i, j) + A(n, j, i)) / 2;
-            /* v.p. la plus petite : DSYEV */
+            /* smallest eigenvalue: DSYEV */
             nw = -1, F77NAME(DSYEV)("N", "U", &n_e, &A(0, 0, 0), &n_e, S.addr(), &W(0), &nw, &infoo);
             for (W.resize(nw = (int)std::lrint(W(0))), S.resize(n_e), n = 0, ok = 1; n < N; n++)
               F77NAME(DSYEV)("N", "U", &n_e, &A(n, 0, 0), &n_e, &S(0), &W(0), &nw, &infoo), ok &= S(0) > -1e-8 * vol_s;
-            if (ok) break; //pour qu' "essai" ait la bonne valeur en sortie
+            if (ok) break; //so that "essai" has the correct value on exit
           }
         if (first_fgrad_) ctr[essai](s) = 1;
 
-        /* stockage dans phif_c */
+        /* store into phif_c */
         for (i = 0; i < n_f; i++)
           for (f = s_f[i], j = 0; j < n_eb; j++)
             for (k = (int)(std::lower_bound(fsten_eb.addr() + fsten_d(f), fsten_eb.addr() + fsten_d(f + 1), s_eb[j]) - fsten_eb.addr()), n = 0; n < N; n++)
@@ -403,7 +403,7 @@ void Domaine_PolyMAC_MPFA::fgrad(int N, int is_p, const Conds_lim& cls, const In
       }
 
 
-  /* simplification du stencil */
+  /* stencil simplification */
 
   int skip;
   DoubleTrav scale(N);
@@ -411,16 +411,16 @@ void Domaine_PolyMAC_MPFA::fgrad(int N, int is_p, const Conds_lim& cls, const In
     if (fbord(f) >= 0 || (f_e(f, 0) >= 0 && f_e(f, 1) >= 0))
       {
         for (n = 0; n < N; n++)
-          if (fs(f) > 0) scale(n) = nu_dot(nu, f_e(f, 0), n, &nf(f, 0), &nf(f, 0)) / (fs(f) * vf(f)); //ordre de grandeur des coefficients
+          if (fs(f) > 0) scale(n) = nu_dot(nu, f_e(f, 0), n, &nf(f, 0), &nf(f, 0)) / (fs(f) * vf(f)); //order of magnitude of the coefficients
         for (j = fsten_d(f); j < fsten_d(f + 1); j++)
           {
-            for (skip = !full_stencil && fsten_eb(j) != f_e(f, 0), n = 0; n < N; n++) skip &= std::fabs(phif_c(j, n)) < 1e-8 * scale(n); //que mettre ici?
+            for (skip = !full_stencil && fsten_eb(j) != f_e(f, 0), n = 0; n < N; n++) skip &= std::fabs(phif_c(j, n)) < 1e-8 * scale(n); //what threshold to use here?
             if (skip) continue;
             for (n = 0; n < N; n++) phif_c(i, n) = phif_c(j, n);
             phif_e.append_line(fsten_eb(j)), i++;
           }
       }
-  /* comptage */
+  /* counting */
   if (!first_fgrad_) return;
   double count[3] = { mp_somme_vect_as_double(ctr[0]), mp_somme_vect_as_double(ctr[1]), mp_somme_vect_as_double(ctr[2]) }, tot = count[0] + count[1] + count[2];
   if (tot > 1.0e-4)

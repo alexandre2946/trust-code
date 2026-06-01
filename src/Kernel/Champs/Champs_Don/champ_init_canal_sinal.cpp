@@ -91,7 +91,7 @@ Entree& champ_init_canal_sinal::readOn(Entree& is)
         case 0:
           is >> Ucent;
           Cerr << "Centerline Longitudinal Velocity = " << Ucent << finl;
-          // valeur par defaut de ampli_sin = Ucent/10.
+          // default value of ampli_sin = Ucent/10.
           ampli_sin = Ucent / 10.;
           Verif[0] = 1;
           break;

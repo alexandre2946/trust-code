@@ -18,11 +18,11 @@
 
 #include <Modele_turbulence_hyd_LES_VDF_base.h>
 
-/*! @brief classe Modele_turbulence_hyd_LES_Wale_VDF Cette classe correspond a la mise en oeuvre du modele sous
+/*! @brief Modele_turbulence_hyd_LES_Wale_VDF class
  *
- *  maille Wale en VDF
+ *  @brief This class implements the WALE sub-grid scale model in VDF.
  *
- *  .SECTION  voir aussi
+ *  .SECTION  see also
  *  Modele_turbulence_hyd_LES_base
  *
  */

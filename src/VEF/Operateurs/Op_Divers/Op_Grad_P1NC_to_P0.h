@@ -23,8 +23,8 @@
 
 /*! @brief class Op_Grad_P1NC_to_P0
  *
- *   Cette classe represente un operateur de gradient. La discretisation est VEF
- *   On calcule le gradient d'un champ_P1NC a une composante (temperature,concentration) et le champ de sortie est P0 (aux elements)
+ *   This class represents a gradient operator. The discretization is VEF.
+ *   Computes the gradient of a single-component Champ_P1NC field (temperature, concentration); the output field is P0 (element-based).
  *
  * @sa Operateur_Grad_base
  */

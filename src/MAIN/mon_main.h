@@ -22,17 +22,16 @@
 #include <Comm_Group.h>
 #include <list>
 
-/*! @brief Classe creee et executee par main() et lors d'une execution TRUST a travers Python.
+/*! @brief Class created and run by main() and during a TRUST execution through Python.
  *
- * Il faut
- *    - creer une instance mon_main
- *    - initialiser le parallele
- *    - appeler dowork(nom_du_cas) (lecture et interpretation du jdd)
- *    A cet instant on peut jouer avec les objets crees en python
- *    (voir Interprete_bloc::objet_global(nom))
- *    - detruire l'instance mon_main
- *    L'interprete principal conserve ses objets jusqu'a la destruction
- *    de l'instance mon_main
+ * Usage:
+ *    - create a mon_main instance
+ *    - initialise the parallel layer
+ *    - call dowork(nom_du_cas) (read and interpret the dataset)
+ *    At this point Python objects can be manipulated
+ *    (see Interprete_bloc::objet_global(nom))
+ *    - destroy the mon_main instance
+ *    The main interpreter keeps its objects until the mon_main instance is destroyed.
  *
  */
 class mon_main

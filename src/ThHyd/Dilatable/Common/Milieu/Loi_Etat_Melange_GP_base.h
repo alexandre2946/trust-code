@@ -20,9 +20,9 @@
 
 class Fluide_Dilatable_base;
 
-/*! @brief classe Loi_Etat_Melange_GP_base Cette classe represente la loi d'etat pour un melange de gaz parfaits.
+/*! @brief State law class for a mixture of ideal gases.
  *
- *      Elle definit un fluide dilatable dont la loi d'etat est :
+ *  @brief Defines a dilatable fluid whose state law is:
  *         Pth = rho*R*T*sum(Yi/Mi)
  *
  * @sa Fluide_Dilatable_base Loi_Etat_base Loi_Etat_GP_base

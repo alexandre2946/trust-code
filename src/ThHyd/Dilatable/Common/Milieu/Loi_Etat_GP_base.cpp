@@ -37,19 +37,18 @@ Entree& Loi_Etat_GP_base::readOn(Entree& is)
   return is;
 }
 
-/*! @brief Renvoie le type de fluide associe.
+/*! @brief Returns the type of fluid associated.
  *
- * @param (Sortie& os) le flot de sortie pour l'impression
- * @return (Sortie&) le flot de sortie modifie
+ * @return The fluid type name ("Gaz_Parfait").
  */
 const Nom Loi_Etat_GP_base::type_fluide() const
 {
   return "Gaz_Parfait";
 }
 
-/*! @brief Associe le fluide a la loi d'etat
+/*! @brief Associates the fluid with the state law.
  *
- * @param (Fluide_Dilatable_base& fl) le fluide associe
+ * @param fl The dilatable fluid to associate.
  */
 void Loi_Etat_GP_base::associer_fluide(const Fluide_Dilatable_base& fl)
 {
@@ -57,7 +56,7 @@ void Loi_Etat_GP_base::associer_fluide(const Fluide_Dilatable_base& fl)
   le_fluide->set_Cp(Cp_);
 }
 
-/*! @brief Initialise la loi d'etat : calcul Pth
+/*! @brief Initialises the state law by computing Pth.
  *
  */
 void Loi_Etat_GP_base::initialiser()
@@ -71,9 +70,7 @@ void Loi_Etat_GP_base::initialiser()
   remplir_T();
 }
 
-/*! @brief Remplit le tableau de la temperature : T=temp+273.
- *
- * 15
+/*! @brief Fills the temperature array: T = temp + 273.15.
  *
  */
 void Loi_Etat_GP_base::remplir_T()
@@ -82,7 +79,7 @@ void Loi_Etat_GP_base::remplir_T()
   temperature_->valeurs() = tab_Temp;
 }
 
-/*! @brief Calcule le Cp NE FAIT RIEN : le Cp est constant
+/*! @brief Computes Cp. Does nothing: Cp is constant.
  *
  */
 void Loi_Etat_GP_base::calculer_Cp()
@@ -90,7 +87,7 @@ void Loi_Etat_GP_base::calculer_Cp()
   /* Do nothing */
 }
 
-/*! @brief Calcule la conductivite
+/*! @brief Computes the thermal conductivity.
  *
  */
 void Loi_Etat_GP_base::calculer_lambda()
@@ -99,7 +96,7 @@ void Loi_Etat_GP_base::calculer_lambda()
   const DoubleTab& tab_mu = mu.valeurs();
   Champ_Don_base& lambda = le_fluide->conductivite();
   DoubleTab& tab_lambda =lambda.valeurs();
-  //La conductivite est soit un champ uniforme soit calculee a partir de la viscosite dynamique et du Pr
+  //The conductivity is either a uniform field or computed from the dynamic viscosity and Pr
   if (sub_type(Champ_Fonc_Tabule,lambda))
     {
       lambda.mettre_a_jour(temperature_->temps());
@@ -139,7 +136,7 @@ void Loi_Etat_GP_base::calculer_lambda()
   tab_lambda.echange_espace_virtuel();
 }
 
-/*! @brief Calcule la diffusivite
+/*! @brief Computes the thermal diffusivity.
  *
  */
 void Loi_Etat_GP_base::calculer_alpha()
@@ -182,8 +179,11 @@ void Loi_Etat_GP_base::calculer_alpha()
   tab_alpha.echange_espace_virtuel();
 }
 
-/*! @brief Calcule la pression avec la temperature et la masse volumique
+/*! @brief Computes the thermodynamic pressure from temperature and density.
  *
+ * @param T Temperature.
+ * @param rho Density.
+ * @return Thermodynamic pressure Pth = rho * R * T.
  */
 double Loi_Etat_GP_base::inverser_Pth(double T, double rho)
 {

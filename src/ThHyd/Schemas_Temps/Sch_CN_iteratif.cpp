@@ -41,32 +41,32 @@ Entree& Sch_CN_iteratif::readOn(Entree& s) { return Schema_Temps_base::readOn(s)
 void Sch_CN_iteratif::ajuster_facsec(type_convergence cv)
 {
 
-  if (facsec_!=last_facsec) // On n'ajuste qu'une fois pour un initTimeStep.
+  if (facsec_!=last_facsec) // Only adjust once per initTimeStep.
     return;
 
   switch (cv)
     {
     case DIVERGENCE:
-      // le critere de divergence a ete atteint
+      // the divergence criterion has been reached
       facsec_=last_facsec*0.8;
       break;
     case NON_CONVERGENCE:
-      // ni le critere de divergence ni le critere de convergence
-      // n'ont ete atteints en niter_max iterations
+      // neither the divergence nor the convergence criterion
+      // was reached in niter_max iterations
       facsec_=last_facsec*0.9;
       break;
     case CONVERGENCE_LENTE:
-      // le critere de convergence a ete atteint en plus que niter_avg
+      // the convergence criterion was reached in more than niter_avg
       // iterations
       facsec_=last_facsec*0.99;
       break;
     case CONVERGENCE_RAPIDE:
-      // le critere de convergence a ete atteint en moins que niter_avg
+      // the convergence criterion was reached in fewer than niter_avg
       // iterations
       facsec_=last_facsec*1.01;
       break;
     case CONVERGENCE_OK:
-      // le critere de convergence a ete atteint en niter_avg iterations
+      // the convergence criterion was reached in exactly niter_avg iterations
       break;
     default:
       break;
@@ -93,13 +93,13 @@ void Sch_CN_iteratif::set_param(Param& param) const
 
 ////////////////////////////////
 //                            //
-// Caracteristiques du schema //
+// Scheme characteristics     //
 //                            //
 ////////////////////////////////
 
-/*! @brief Renvoie le nombre de valeurs temporelles a conserver.
+/*! @brief Returns the number of time values to keep.
  *
- * Ici : n, n+1/2 et n+1, donc 3
+ * Here: n, n+1/2 and n+1, so 3.
  *
  */
 int Sch_CN_iteratif::nb_valeurs_temporelles() const
@@ -107,9 +107,9 @@ int Sch_CN_iteratif::nb_valeurs_temporelles() const
   return 3;
 }
 
-/*! @brief Renvoie le nombre de valeurs temporelles futures.
+/*! @brief Returns the number of future time values.
  *
- * Ici : n+1/2 et n+1 donc 2.
+ * Here: n+1/2 and n+1, so 2.
  *
  */
 int Sch_CN_iteratif::nb_valeurs_futures() const
@@ -117,7 +117,7 @@ int Sch_CN_iteratif::nb_valeurs_futures() const
   return 2;
 }
 
-/*! @brief Renvoie le le temps a la i-eme valeur future.
+/*! @brief Returns the time at the i-th future value.
  *
  */
 double Sch_CN_iteratif::temps_futur(int i) const
@@ -129,9 +129,9 @@ double Sch_CN_iteratif::temps_futur(int i) const
     return temps_courant()+pas_de_temps()/2;
 }
 
-/*! @brief Renvoie le temps que doivent utiliser les champs a l'appel de valeurs()
+/*! @brief Returns the time that fields should use when calling valeurs().
  *
- *     Ici : t(n+1/2)
+ *     Here: t(n+1/2).
  *
  */
 double Sch_CN_iteratif::temps_defaut() const
@@ -141,7 +141,7 @@ double Sch_CN_iteratif::temps_defaut() const
 
 /////////////////////////////////////////
 //                                     //
-// Fin des caracteristiques du schema  //
+// End of scheme characteristics       //
 //                                     //
 /////////////////////////////////////////
 
@@ -149,8 +149,8 @@ bool Sch_CN_iteratif::initTimeStep(double dt)
 {
 
   if (nb_pas_dt()==0)
-    mettre_a_jour_dt_stab(); // sinon deja appele par validateTimeStep
-  //Plus necessaire car desormais dt_ est mis a jour dans Schema_Temps_base::computeTimeStep(bool& stop)
+    mettre_a_jour_dt_stab(); // otherwise already called by validateTimeStep
+  //No longer necessary since dt_ is now updated in Schema_Temps_base::computeTimeStep(bool& stop)
   //facsec_=dt/dt_;
   last_facsec=facsec_;
 
@@ -191,17 +191,17 @@ bool Sch_CN_iteratif::iterateTimeStep(bool& converged)
 
   iteration ++;
   if (iteration<niter_min)
-    converged=false; // Continuer a iterer de toutes facons
+    converged=false; // Continue iterating anyway
 
-  // Un peu de bon sens...
+  // Sanity check...
   assert(!(converged&&diverged));
 
-  // Si convergence
+  // If convergence
   if (converged)
     {
-      if (iteration<niter_avg) // Convergence trop rapide, augmenter facsec
+      if (iteration<niter_avg) // Convergence too fast, increase facsec
         ajuster_facsec(CONVERGENCE_RAPIDE);
-      else if (iteration>niter_avg) // Convergence trop lente, reduire facsec
+      else if (iteration>niter_avg) // Convergence too slow, reduce facsec
         ajuster_facsec(CONVERGENCE_LENTE);
       else
         ajuster_facsec(CONVERGENCE_OK);
@@ -214,7 +214,7 @@ bool Sch_CN_iteratif::iterateTimeStep(bool& converged)
       return true;
     }
 
-  // Si divergence
+  // If divergence
   else if (diverged)
     {
       ajuster_facsec(DIVERGENCE);
@@ -226,7 +226,7 @@ bool Sch_CN_iteratif::iterateTimeStep(bool& converged)
       return false;
     }
 
-  // Si pas converge assez vite
+  // If not converged fast enough
   else if (iteration==niter_max-1)
     {
       ajuster_facsec(NON_CONVERGENCE);
@@ -238,7 +238,7 @@ bool Sch_CN_iteratif::iterateTimeStep(bool& converged)
       return false;
     }
 
-  // Sinon, en cours de convergence
+  // Otherwise, still converging
   if (je_suis_maitre())
     {
       fic << " facsec= " << facsec_
@@ -248,13 +248,13 @@ bool Sch_CN_iteratif::iterateTimeStep(bool& converged)
 }
 
 
-/*! @brief Calcule une iteration de la resolution sur l'equation i.
+/*! @brief Computes one iteration of the resolution on equation i.
  *
- * Calcule u(n+1/2,p+1)=u(n)+f(u(n+1/2,p))*dt/2
- *  et u(n+1,p+1)=u(n)+f(u(n+1/2,p))*dt
- *  ou f donne du/dt en fonction de u
- *  Retourne true dans converged si ca ne bouge plus d'une iteration a l'autre, false sinon
- *  Renvoie true si OK pour continuer a iterer, false sinon (diverge ou trop d'iterations)
+ * Computes u(n+1/2,p+1)=u(n)+f(u(n+1/2,p))*dt/2
+ *  and u(n+1,p+1)=u(n)+f(u(n+1/2,p))*dt
+ *  where f gives du/dt as a function of u.
+ *  Returns true in converged if no change between iterations, false otherwise.
+ *  Returns true if OK to continue iterating, false otherwise (diverged or too many iterations).
  *
  */
 bool Sch_CN_iteratif::iterateTimeStepOnEquation(int i,bool& converged)
@@ -267,7 +267,7 @@ bool Sch_CN_iteratif::iterateTimeStepOnEquation(int i,bool& converged)
       Cout<< "====================================================" << finl;
       Cout<< eqn.que_suis_je()<<" equation is not solved."<<finl;
       Cout<< "====================================================" << finl;
-      // On calcule une fois la derivee pour avoir les flux bord
+      // Compute the derivative once to obtain the boundary fluxes
       if (eqn.schema_temps().nb_pas_dt()==0)
         {
           DoubleTab inconnue_valeurs(eqn.inconnue().valeurs());
@@ -290,24 +290,24 @@ bool Sch_CN_iteratif::iterateTimeStepOnEquation(int i,bool& converged)
   DoubleTab delta(intermediaire);
   delta*=-1;
 
-  // On impose les CLs Dirichlet au temps intermediaire.
-  // En effet, les operateurs de diffusion n'utilisent que
-  // l'inconnue et ne vont pas lire les CLs.
-  // Cela permet en particulier d'avoir l'egalite des flux en pb
-  // couple thermique VEF avec Chap_front_contact_VEF, meme avant convergence.
-  // WEC :  /!\ la vitesse au temps intermediaire
-  // n'est pas forcement a divergence nulle.
+  // Impose Dirichlet BCs at the intermediate time.
+  // Indeed, diffusion operators only use the unknown
+  // and do not read the BCs.
+  // This ensures in particular equal fluxes for coupled
+  // thermal VEF problems with Chap_front_contact_VEF, even before convergence.
+  // WEC: /!\ the velocity at the intermediate time
+  // is not necessarily divergence-free.
   eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_intermediaire);
 
-  // Calcul de la derivee dudt pour la valeur intermediaire de l'inconnue.
-  // Bidouille : Comme les operateurs prennent par defaut le present,
-  // on avance temporairement l'inconnue.
+  // Compute the time derivative dudt for the intermediate value of the unknown.
+  // Trick: since operators take the present value by default,
+  // we temporarily advance the unknown.
 
   eqn.inconnue().avancer();
   eqn.derivee_en_temps_inco(dudt);
   eqn.inconnue().reculer();
 
-  // Mise a jour des valeurs de l'inconnue aux temps intermediaire et final
+  // Update the unknown values at the intermediate and final times:
   // intermediaire = present + dt_intermediaire * dudt;
   // final =  present + dt_final * dudt;
   intermediaire = dudt;
@@ -321,16 +321,16 @@ bool Sch_CN_iteratif::iterateTimeStepOnEquation(int i,bool& converged)
   eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_final);
   final.echange_espace_virtuel();
 
-  delta+=intermediaire; // delta = Contient u(n+1/2,p+1) - u(n+1/2,p)
+  delta+=intermediaire; // delta = contains u(n+1/2,p+1) - u(n+1/2,p)
 
-  // Si l'equation a diverge
+  // If the equation has diverged
   if (divergence(present,intermediaire,delta,iteration))
     {
       converged=false;
       return false;
     }
 
-  // Si l'equation a converge
+  // If the equation has converged
   if (convergence(present,intermediaire,delta,iteration))
     {
       converged=true;
@@ -348,8 +348,8 @@ bool Sch_CN_iteratif::iterateTimeStepOnEquation(int i,bool& converged)
 }
 
 
-// WEC : on pourrait le coder, mais ca ne semble pas utile.
-// Ce serait une boucle de IterateTimeStepOnEquation
+// WEC: this could be coded, but it doesn't seem useful.
+// It would be a loop over IterateTimeStepOnEquation
 int Sch_CN_iteratif::faire_un_pas_de_temps_eqn_base(Equation_base&)
 {
   Cerr << "Sch_CN_iteratif::faire_un_pas_de_temps_eqn_base non code!" << finl;
@@ -358,39 +358,39 @@ int Sch_CN_iteratif::faire_un_pas_de_temps_eqn_base(Equation_base&)
 }
 
 
-/*! @brief Indique si le calcul iteratif a converge.
+/*! @brief Indicates whether the iterative computation has converged.
  *
- * Critere de convergence utilise :
+ * Convergence criterion used:
  *     || u(n+1,p+1) - u(n+1,p) ||  <  seuil * || u(n+1/2,p+1) ||
- *  C'est equivalent a
+ *  This is equivalent to:
  *     || u(n+1,p) - u(n+1) || < seuil * || (Id-(dt/2).(df/du))^-1 || * || u(n+1/2,p+1) ||
- *  ou u(n+1) est la solution exacte en n+1,
- *     df/du est le lagrangien de f(u), pris en u(n+1/2)
- *     et les normes sont compatibles entre matrices et vecteurs (ici norme infinie).
+ *  where u(n+1) is the exact solution at n+1,
+ *     df/du is the Jacobian of f(u), taken at u(n+1/2),
+ *     and the norms are compatible between matrices and vectors (here the infinity norm).
  *
- * @param (DoubleTab& u0) L'inconnue au debut de l'intervalle de temps u(n). C'est aussi la premiere estimation u(n+1/2,0) de l'inconnue en tn+1/2.
- * @param (DoubleTab& up1) Estimation de l'inconnue en tn+1/2 a l'iteration p+1 : u(n+1/2,p+1)
- * @param (DoubleTab& delta) u(n+1/2,p+1) - u(n+1/2,p)
- * @return (bool) true=converge, false=non converge
+ * @param u0 The unknown at the beginning of the time interval u(n). Also the first estimate u(n+1/2,0).
+ * @param up1 Estimate of the unknown at tn+1/2 at iteration p+1: u(n+1/2,p+1).
+ * @param delta u(n+1/2,p+1) - u(n+1/2,p).
+ * @return true if converged, false otherwise.
  */
 bool Sch_CN_iteratif::convergence(const DoubleTab& u0, const DoubleTab& up1, const DoubleTab& delta, int p) const
 {
   double a = mp_max_abs_vect(delta);
   double b = mp_max_abs_vect(up1);
   int resu = (2. * a) < (seuil * b);
-  envoyer_broadcast(resu, 0); // pour etre certain que tout le monde fait la meme chose
+  envoyer_broadcast(resu, 0); // to ensure all processes make the same decision
   return resu;
 }
 
-/*! @brief Indique si le calcul iteratif a diverge.
+/*! @brief Indicates whether the iterative computation has diverged.
  *
- * @param (DoubleTab& u0) L'inconnue au debut de l'intervalle de temps u(n). C'est aussi la premiere estimation u(n+1/2,0) de l'inconnue en tn+1/2.
- * @param (DoubleTab& up1) Estimation de l'inconnue en tn+1/2 a l'iteration p+1 : u(n+1/2,p+1)
- * @param (DoubleTab& delta) u(n+1/2,p+1) - u(n+1/2,p)
- * @return (bool) true=diverge, false=non diverge
+ * @param u0 The unknown at the beginning of the time interval u(n). Also the first estimate u(n+1/2,0).
+ * @param up1 Estimate of the unknown at tn+1/2 at iteration p+1: u(n+1/2,p+1).
+ * @param delta u(n+1/2,p+1) - u(n+1/2,p).
+ * @return true if diverged, false otherwise.
  */
 bool Sch_CN_iteratif::divergence(const DoubleTab& u0, const DoubleTab& up1, const DoubleTab& delta, int p) const
 {
-  // WEC : ameliorable...
+  // WEC: could be improved...
   return false;
 }

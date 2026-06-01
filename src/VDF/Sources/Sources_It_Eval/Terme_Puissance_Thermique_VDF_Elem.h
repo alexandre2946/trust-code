@@ -20,9 +20,9 @@
 #include <Eval_Puiss_Th_VDF_Elem.h>
 #include <Iterateur_Source_Elem.h>
 
-/*! @brief class Terme_Puissance_Thermique_VDF_Elem Cette classe represente un terme source de l'equation de la thermique
+/*! @brief class Terme_Puissance_Thermique_VDF_Elem This class represents a source term of the heat equation
  *
- *  du type degagement volumique de puissance thermique
+ *  of the type volumetric thermal power release
  *
  * @sa Terme_Puissance_Thermique, Terme_Source_VDF_base
  */

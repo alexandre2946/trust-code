@@ -52,13 +52,13 @@ bool Conduction_IBM::initTimeStep(double dt)
   return true;
 }
 
-// ajoute les contributions des operateurs et des sources
+// adds the contributions from operators and sources
 void Conduction_IBM::assembler(Matrice_Morse& matrice, const DoubleTab& inco, DoubleTab& resu)
 {
   assembler_ibm_proto(matrice, inco, resu);
 }
 
-// for IBM methods; on ajoute source PDF au RHS
+// for IBM methods: adds the PDF source term to the RHS
 void Conduction_IBM::derivee_en_temps_inco_sources(DoubleTrav& secmem)
 {
   derivee_en_temps_inco_ibm_proto(secmem);

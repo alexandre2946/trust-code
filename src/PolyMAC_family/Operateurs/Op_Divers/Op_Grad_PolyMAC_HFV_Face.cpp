@@ -43,15 +43,15 @@ void Op_Grad_PolyMAC_HFV_Face::completer()
   Operateur_Grad_base::completer();
   const Domaine_PolyMAC_HFV& domaine = ref_cast(Domaine_PolyMAC_HFV, ref_domaine.valeur());
 
-  /* initialisation des inconnues auxiliaires de la pression... */
+  /* initialize auxiliary unknowns for pressure... */
   ref_cast(Champ_Elem_PolyMAC_HFV, ref_cast(Navier_Stokes_std, equation()).pression()).init_auxiliary_variables();
 
-  /* et de grad P si la vitesse en a */
+  /* and of grad P if the velocity field has it */
   if (equation().inconnue().valeurs().get_md_vector() == domaine.mdv_faces_aretes)
     if (ref_cast(Navier_Stokes_std, equation()).has_grad_P())
       ref_cast(Champ_Face_PolyMAC_HFV, ref_cast(Navier_Stokes_std, equation()).grad_P()).init_auxiliary_variables();
 
-  /* besoin d'un joint de 1 */
+  /* requires a ghost layer of width 1 */
   if (domaine.domaine().nb_joints() && domaine.domaine().joint(0).epaisseur() < 1)
     {
       Cerr << "Op_Grad_PolyMAC_HFV_Face : largeur de joint insuffisante (minimum 1)!" << finl;
@@ -61,7 +61,7 @@ void Op_Grad_PolyMAC_HFV_Face::completer()
 
 void Op_Grad_PolyMAC_HFV_Face::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
-  if (!matrices.count("pression")) return; //rien a faire
+  if (!matrices.count("pression")) return; //nothing to do
 
   const Domaine_PolyMAC_HFV& domaine = ref_cast(Domaine_PolyMAC_HFV, ref_domaine.valeur());
   const Champ_Face_PolyMAC_HFV& ch = ref_cast(Champ_Face_PolyMAC_HFV, equation().inconnue());
@@ -100,7 +100,7 @@ void Op_Grad_PolyMAC_HFV_Face::dimensionner_blocs(matrices_t matrices, const tab
         }
     }
 
-  /* allocation / remplissage */
+  /* allocation / filling */
   tableau_trier_retirer_doublons(sten);
   Matrix_tools::allocate_morse_matrix(vit.size_totale(), press.size_totale(), sten, mat2);
 
@@ -125,7 +125,7 @@ void Op_Grad_PolyMAC_HFV_Face::ajouter_blocs(matrices_t matrices, DoubleTab& sec
 
   Matrice_Morse *mat = !semi_impl.count("pression") && matrices.count("pression") ? matrices.at("pression") : nullptr;
 
-  DoubleTrav w2, alpha(N), coeff_e(N); //matrice W2 dans chaque element, taux de vide a la face
+  DoubleTrav w2, alpha(N), coeff_e(N); //W2 matrix in each element, void fraction at the face
 
   for (int e = 0; e < ne_tot; e++)
     {
@@ -136,8 +136,8 @@ void Op_Grad_PolyMAC_HFV_Face::ajouter_blocs(matrices_t matrices, DoubleTab& sec
 
           if (f < domaine.nb_faces())
             {
-              /* taux de vide a la face (identique a celui de Masse_PolyMAC_HFV_Face) */
-              double prefac = (e == f_e(f, 0) ? 1 : -1) * pe(e) * vfd(f, e != f_e(f, 0)) / fs(f); /* ponderation pour elimner p_f si on est en TPFA */
+              /* void fraction at the face (same as in Masse_PolyMAC_HFV_Face) */
+              double prefac = (e == f_e(f, 0) ? 1 : -1) * pe(e) * vfd(f, e != f_e(f, 0)) / fs(f); /* weighting to eliminate p_f in TPFA */
 
               alpha = 0.;
 

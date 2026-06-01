@@ -39,7 +39,7 @@ void Op_Diff_PolyMAC_HFV_Face::completer()
   const Domaine_PolyMAC_HFV& domaine = ref_cast(Domaine_PolyMAC_HFV, le_dom_poly_.valeur());
   Equation_base& eq = equation();
   Champ_Face_PolyMAC_HFV& ch = ref_cast(Champ_Face_PolyMAC_HFV, le_champ_inco ? le_champ_inco.valeur() : eq.inconnue());
-  ch.init_auxiliary_variables(); /* ajout des inconnues auxiliaires (vorticites aux aretes) */
+  ch.init_auxiliary_variables(); /* add auxiliary unknowns (vorticities at edges) */
   flux_bords_.resize(domaine.premiere_face_int(), dimension * ch.valeurs().line_size());
   if (domaine.domaine().nb_joints() && domaine.domaine().joint(0).epaisseur() < 1)
     {
@@ -61,7 +61,7 @@ double Op_Diff_PolyMAC_HFV_Face::calculer_dt_stab() const
                           &ref_cast(Pb_Multiphase, equation().probleme()).equation_masse().inconnue().passe() : nullptr,
                           *a_r = sub_type(Pb_Multiphase, equation().probleme()) ?
                                  &ref_cast(Pb_Multiphase, equation().probleme()).equation_masse().champ_conserve().passe() :
-                                 (has_champ_masse_volumique() ? &get_champ_masse_volumique().valeurs() : nullptr); /* produit alpha * rho */
+                                 (has_champ_masse_volumique() ? &get_champ_masse_volumique().valeurs() : nullptr); /* alpha * rho product */
 
   const DoubleVect& pe = equation().milieu().porosite_elem(), &vf = domaine.volumes_entrelaces(), &ve = domaine.volumes();
   update_nu();
@@ -85,7 +85,7 @@ double Op_Diff_PolyMAC_HFV_Face::calculer_dt_stab() const
         }
 
       for (int n = 0; n < N; n++)
-        if ((!alp || (*alp)(e, n) > 0.25) && flux(n)) /* sous 0.5e-6, on suppose que l'evanescence fait le job */
+        if ((!alp || (*alp)(e, n) > 0.25) && flux(n)) /* below 0.5e-6, assume evanescence handles it */
           dt = std::min(dt, vol * (a_r ? (*a_r)(e, n) : 1) / flux(n));
     }
   return Process::mp_min(dt);
@@ -96,7 +96,7 @@ void Op_Diff_PolyMAC_HFV_Face::dimensionner_blocs_ext(int aux_only, matrices_t m
   const Champ_Face_PolyMAC_HFV& ch = ref_cast(Champ_Face_PolyMAC_HFV, le_champ_inco ? le_champ_inco.valeur() : equation().inconnue());
   const std::string& nom_inco = ch.le_nom().getString();
   if (!matrices.count(nom_inco))
-    return; //pas de bloc diagonal -> rien a faire
+    return; //no diagonal block -> nothing to do
 
   const Domaine_PolyMAC_HFV& domaine = ref_cast(Domaine_PolyMAC_HFV, le_dom_poly_.valeur());
   const IntTab& e_f = domaine.elem_faces(), &f_s = domaine.face_sommets(), &e_a = domaine.domaine().elem_aretes(), &fcl = ch.fcl();
@@ -114,7 +114,7 @@ void Op_Diff_PolyMAC_HFV_Face::dimensionner_blocs_ext(int aux_only, matrices_t m
 
   Cerr << "Op_Diff_PolyMAC_HFV_Face::dimensionner() : ";
 
-  /* bloc (faces, aretes) : rot [(lambda grad)^u]*/
+  /* block (faces, edges): rot [(lambda grad)^u]*/
   if (!semi && !aux_only)
     for (int f = 0; f < domaine.nb_faces(); f++)
       for (int i = 0; i < f_s.dimension(1); i++)
@@ -123,16 +123,16 @@ void Op_Diff_PolyMAC_HFV_Face::dimensionner_blocs_ext(int aux_only, matrices_t m
           if (s < 0) continue;
 
           const int a = D < 3 ? s :
-                        domaine.som_arete[s].at(f_s(f, i + 1 < f_s.dimension(1) && f_s(f, i + 1) >= 0 ? i + 1 : 0)); //indice d'arete
+                        domaine.som_arete[s].at(f_s(f, i + 1 < f_s.dimension(1) && f_s(f, i + 1) >= 0 ? i + 1 : 0)); //edge index
 
           for (int n = 0; n < N; n++)
             stencil.append_line(N * f + n, N * (nf_tot + a) + n);
         }
 
-  /* blocs (aretes, faces) et (aretes, aretes) : avec M2 et W1 dans chaque element */
-  Matrice33 L(0, 0, 0, 0, 0, 0, 0, 0, D < 3), iL; //tenseur de diffusion dans chaque element, son inverse
+  /* blocks (edges, faces) and (edges, edges): using M2 and W1 in each element */
+  Matrice33 L(0, 0, 0, 0, 0, 0, 0, 0, D < 3), iL; //diffusion tensor in each element, its inverse
 
-  DoubleTrav inu, m2, w1, v_e, v_ea; //au format compris par domaine.nu_dot
+  DoubleTrav inu, m2, w1, v_e, v_ea; //in the format expected by domaine.nu_dot
 
   nu_.nb_dim() == 2 ? inu.resize(1, N) :
   nu_.nb_dim() == 3 ? inu.resize(1, N, D) :
@@ -141,7 +141,7 @@ void Op_Diff_PolyMAC_HFV_Face::dimensionner_blocs_ext(int aux_only, matrices_t m
   if (!semi)
     for (int e = 0; e < domaine.nb_elem_tot(); e++)
       {
-        //tenseur de diffusion diagonal ou anisotrope diagonal : inverse faciles!
+        //diagonal or anisotropic diagonal diffusion tensor: easy inversion!
         if (nu_.nb_dim() < 4)
           {
             for (int i = 0; i < N_nu; i++)
@@ -149,7 +149,7 @@ void Op_Diff_PolyMAC_HFV_Face::dimensionner_blocs_ext(int aux_only, matrices_t m
           }
         else
           {
-            for (int n = 0; n < N; n++) //sinon : une matrice a inverser par composante
+            for (int n = 0; n < N; n++) //otherwise: one matrix to invert per component
               {
                 for (int d = 0; d < D; d++)
                   for (int db = 0; db < D; db++)
@@ -166,9 +166,9 @@ void Op_Diff_PolyMAC_HFV_Face::dimensionner_blocs_ext(int aux_only, matrices_t m
         domaine.M2(&inu, e, m2);
 
         if (D > 2)
-          domaine.W1(&nu_, e, w1, v_e, v_ea); //uniquement en 3D: en 2D, matrice diagonale
+          domaine.W1(&nu_, e, w1, v_e, v_ea); //only in 3D: in 2D, diagonal matrix
 
-        //bloc (aretes, faces): en parcourant les aretes de chaque face
+        //block (edges, faces): by iterating over the edges of each face
         if (!aux_only)
           for (int i = 0; i < m2.dimension(0); i++)
             {
@@ -179,20 +179,20 @@ void Op_Diff_PolyMAC_HFV_Face::dimensionner_blocs_ext(int aux_only, matrices_t m
                   const int s = f_s(f, j);
                   if (s < 0) continue;
 
-                  const int a = D < 3 ? s : domaine.som_arete[s].at(f_s(f, j + 1 < f_s.dimension(1) && f_s(f, j + 1) >= 0 ? j + 1 : 0)); //indice d'arete
+                  const int a = D < 3 ? s : domaine.som_arete[s].at(f_s(f, j + 1 < f_s.dimension(1) && f_s(f, j + 1) >= 0 ? j + 1 : 0)); //edge index
 
                   if (a < (D < 3 ? domaine.domaine().nb_som() : domaine.domaine().nb_aretes()))
                     for (int k = 0; k < m2.dimension(1); k++)
                       {
                         const int fb = e_f(e, k);
                         for (int n = 0; n < N; n++)
-                          if (fcl(f, 0) == 2 || m2(i, k, n)) //si f est Symetrie, alors il y a aussi une partie en ve -> dependance complete
+                          if (fcl(f, 0) == 2 || m2(i, k, n)) //if f is Symmetry, there is also a ve contribution -> full dependence
                             stencil.append_line(N * (nf_tot + a) + n, N * fb + n);
                       }
                 }
             }
 
-        //bloc (aretes, aretes) : avec m1 si D = 3 (sinon, fait ensuite)
+        //block (edges, edges): with m1 if D = 3 (otherwise handled below)
         if (D > 2)
           for (int i = 0; i < w1.dimension(0); i++)
             {
@@ -225,8 +225,8 @@ void Op_Diff_PolyMAC_HFV_Face::dimensionner_blocs_ext(int aux_only, matrices_t m
     mat = mat2;
 }
 
-// ajoute la contribution de la convection au second membre resu
-// renvoie resu
+// adds the diffusion contribution to the right-hand side resu
+// returns resu
 void Op_Diff_PolyMAC_HFV_Face::ajouter_blocs_ext(int aux_only, matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const Champ_Face_PolyMAC_HFV& ch = ref_cast(Champ_Face_PolyMAC_HFV, le_champ_inco ? le_champ_inco.valeur() : equation().inconnue());
@@ -252,22 +252,22 @@ void Op_Diff_PolyMAC_HFV_Face::ajouter_blocs_ext(int aux_only, matrices_t matric
 
   const DoubleVect& la = domaine.longueur_aretes(), &vf = domaine.volumes_entrelaces(), &fs = domaine.face_surfaces(), &ve = domaine.volumes();
 
-  /* que faire avec les variables auxiliaires ? */
-  if (aux_only)  /* 1) on est en train d'assembler le systeme de resolution des variables auxiliaires lui-meme */
+  /* what to do with auxiliary variables? */
+  if (aux_only)  /* 1) assembling the auxiliary variable resolution system itself */
     use_aux_ = 0;
-  else if (mat && !semi) /* 2) on est en implicite complet : pas besoin de mat_aux / var_aux */
+  else if (mat && !semi) /* 2) fully implicit: no need for mat_aux / var_aux */
     {
       t_last_aux_ = t;
       use_aux_ = 0;
     }
-  else if (t_last_aux_ < t) /* 3) premier pas a ce temps en semi-implicite : on calcule les variables auxiliaires a t et on les stocke dans var_aux */
+  else if (t_last_aux_ < t) /* 3) first step at this time in semi-implicit: compute auxiliary variables at t and store in var_aux */
     update_aux(t);
 
-  ConstDoubleTab_parts p_inco(inco); /* deux parties de l'inconnue */
+  ConstDoubleTab_parts p_inco(inco); /* two parts of the unknown */
 
-  const DoubleTab& omega = use_aux_ ? var_aux : p_inco[1]; /* les variables auxiliaires peuvent etre soit dans inco/semi_impl (cas 1), soit dans var_aux (cas 2) */
+  const DoubleTab& omega = use_aux_ ? var_aux : p_inco[1]; /* auxiliary variables can be either in inco/semi_impl (case 1) or in var_aux (case 2) */
 
-  /* bloc (faces, aretes) : rot [(lambda grad)^u]*/
+  /* block (faces, edges): rot [(lambda grad)^u]*/
   if (!aux_only)
     for (int f = 0; f < domaine.nb_faces(); f++)
       for (int i = 0; i < f_s.dimension(1); i++)
@@ -275,11 +275,11 @@ void Op_Diff_PolyMAC_HFV_Face::ajouter_blocs_ext(int aux_only, matrices_t matric
           const int s = f_s(f, i);
           if (s < 0) continue;
 
-          const int a = D < 3 ? s : domaine.som_arete[s].at(f_s(f, i + 1 < f_s.dimension(1) && f_s(f, i + 1) >= 0 ? i + 1 : 0)); //indice d'arete
+          const int a = D < 3 ? s : domaine.som_arete[s].at(f_s(f, i + 1 < f_s.dimension(1) && f_s(f, i + 1) >= 0 ? i + 1 : 0)); //edge index
 
           auto vec = domaine.cross(3, D, D < 3 ? vecz : &ta(a, 0), &xv(f, 0), nullptr, &xa(a, 0));
 
-          const int sgn = domaine.dot(&nf(f, 0), &vec[0]) > 0 ? 1 : -1; //orientation arete-face
+          const int sgn = domaine.dot(&nf(f, 0), &vec[0]) > 0 ? 1 : -1; //edge-face orientation
 
           for (int n = 0; n < N; n++)
             secmem(f, n) -= sgn * vf(f) / fs(f) * (D < 3 ? 1 : la(a)) * omega(a, n);
@@ -289,9 +289,9 @@ void Op_Diff_PolyMAC_HFV_Face::ajouter_blocs_ext(int aux_only, matrices_t matric
               (*mat)(N * f + n, N * (nf_tot + a) + n) += sgn * vf(f) / fs(f) * (D < 3 ? 1 : la(a));
         }
 
-  /* blocs (aretes, faces) et (aretes, aretes) : avec M2 et W1 dans chaque element */
-  Matrice33 L(0, 0, 0, 0, 0, 0, 0, 0, D < 3), iL; //tenseur de diffusion dans chaque element, son inverse et le carre de celui-ci
-  DoubleTrav dL(N), inu, m2, w1, v_e, v_ea; //determinant, inverse (au format compris par domaine.nu_dot), matrices M2(iL) / W1(L)
+  /* blocks (edges, faces) and (edges, edges): using M2 and W1 in each element */
+  Matrice33 L(0, 0, 0, 0, 0, 0, 0, 0, D < 3), iL; //diffusion tensor in each element, its inverse and its square
+  DoubleTrav dL(N), inu, m2, w1, v_e, v_ea; //determinant, inverse (in the format expected by domaine.nu_dot), matrices M2(iL) / W1(L)
 
   if (nu_.nb_dim() == 2)
     inu.resize(1, N);
@@ -303,16 +303,16 @@ void Op_Diff_PolyMAC_HFV_Face::ajouter_blocs_ext(int aux_only, matrices_t matric
   if (!aux_only && mat && semi)
     {
       for (int a = 0; a < xa.dimension(0); a++)
-        for (int n = 0; n < N; n++) /* en semi-implicite : egalites w_a^+ = var_aux */
+        for (int n = 0; n < N; n++) /* semi-implicit: equalities w_a^+ = var_aux */
           {
             secmem(nf_tot + a, n) += omega(a, n) - ch.valeurs()(nf_tot + a, n);
             (*mat)(N * (nf_tot + a) + n, N * (nf_tot + a) + n)++;
           }
     }
   else if (mat && !semi)
-    for (int e = 0; e < domaine.nb_elem_tot(); e++) /* en implicite : vraies equations */
+    for (int e = 0; e < domaine.nb_elem_tot(); e++) /* implicit: true equations */
       {
-        //tenseur de diffusion diagonal ou anisotrope diagonal : inverses faciles!
+        //diagonal or anisotropic diagonal diffusion tensor: easy inversions!
         if (nu_.nb_dim() == 2)
           {
             for (int n = 0; n < N; n++)
@@ -341,13 +341,13 @@ void Op_Diff_PolyMAC_HFV_Face::ajouter_blocs_ext(int aux_only, matrices_t matric
           }
         else
           {
-            for (int n = 0; n < N; n++) //sinon : une matrice a inverser par composante
+            for (int n = 0; n < N; n++) //otherwise: one matrix to invert per component
               {
                 for (int d = 0; d < D; d++)
                   for (int db = 0; db < D; db++)
                     L(d, db) = nu_(e, n, d, db);
 
-                dL(n) = Matrice33::inverse(L, iL); //renvoie le determinant!
+                dL(n) = Matrice33::inverse(L, iL); //returns the determinant!
 
                 for (int d = 0; d < D; d++)
                   for (int db = 0; db < D; db++)
@@ -357,9 +357,9 @@ void Op_Diff_PolyMAC_HFV_Face::ajouter_blocs_ext(int aux_only, matrices_t matric
 
         domaine.M2(&inu, e, m2);
         if (D > 2)
-          domaine.W1(&nu_, e, w1, v_e, v_ea); //uniquement en 3D: en 2D, matrice diagonale
+          domaine.W1(&nu_, e, w1, v_e, v_ea); //only in 3D: in 2D, diagonal matrix
 
-        //bloc (aretes, faces): en parcourant les aretes de chaque face
+        //block (edges, faces): by iterating over the edges of each face
         for (int i = 0; i < m2.dimension(0); i++)
           {
             const int f = e_f(e, i);
@@ -368,18 +368,18 @@ void Op_Diff_PolyMAC_HFV_Face::ajouter_blocs_ext(int aux_only, matrices_t matric
                 const int s = f_s(f, j);
                 if (s < 0) continue;
 
-                const int a = D < 3 ? s : domaine.som_arete[s].at(f_s(f, j + 1 < f_s.dimension(1) && f_s(f, j + 1) >= 0 ? j + 1 : 0)); // indice arrete
+                const int a = D < 3 ? s : domaine.som_arete[s].at(f_s(f, j + 1 < f_s.dimension(1) && f_s(f, j + 1) >= 0 ? j + 1 : 0)); // edge index
 
                 if (a < (D < 3 ? domaine.domaine().nb_som() : domaine.domaine().nb_aretes()))
                   {
                     auto vec = domaine.cross(3, D, D < 3 ? vecz : &ta(a, 0), &xv(f, 0), nullptr, &xa(a, 0));
 
-                    const int sgn = (e == f_e(f, 0) ? 1 : -1) * domaine.dot(&nf(f, 0), &vec[0]) > 0 ? 1 : -1; //orientation arete-face (dans le sens sortant de e)
+                    const int sgn = (e == f_e(f, 0) ? 1 : -1) * domaine.dot(&nf(f, 0), &vec[0]) > 0 ? 1 : -1; //edge-face orientation (in the outward direction of e)
 
                     for (int k = 0; k < m2.dimension(1); k++)
                       {
                         const int fb = e_f(e, k);
-                        for (int n = 0; n < N; n++) //partie x_e -> x_f avec m2 + partie x_f -> x_a avec v_e si bord de Neumann / Symetrie
+                        for (int n = 0; n < N; n++) //part x_e -> x_f with m2 + part x_f -> x_a with v_e if Neumann/Symmetry boundary
                           {
                             const double coeff = m2(i, k, n) + (fcl(f, 0) == 2 ? domaine.nu_dot(&inu, 0, n, &xa(a, 0), &xv(fb, 0), &xv(f, 0), &xp(e, 0)) / ve(e) : 0);
 
@@ -394,7 +394,7 @@ void Op_Diff_PolyMAC_HFV_Face::ajouter_blocs_ext(int aux_only, matrices_t matric
                       }
 
                     if (fcl(f, 0) == 3 && sub_type(Dirichlet, cls[fcl(f, 1)].valeur()))
-                      for (int n = 0; n < N; n++) //si bord de Dirichlet : partie x_f -> x_a avec la vitesse donnee par la CL
+                      for (int n = 0; n < N; n++) //if Dirichlet boundary: part x_f -> x_a with the velocity given by the BC
                         {
                           for (int d = 0; d < D; d++)
                             v_cl[d] = ref_cast(Dirichlet, cls[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), N * d + n); //v impose
@@ -405,7 +405,7 @@ void Op_Diff_PolyMAC_HFV_Face::ajouter_blocs_ext(int aux_only, matrices_t matric
               }
           }
 
-        //bloc (aretes, aretes) : avec m1 si D = 3, diagonale * surface si D = 2
+        //block (edges, edges): using m1 if D = 3, diagonal * surface if D = 2
         if (D == 2)
           {
             for (int i = 0; i < e_f.dimension(1); i++)
@@ -420,7 +420,7 @@ void Op_Diff_PolyMAC_HFV_Face::ajouter_blocs_ext(int aux_only, matrices_t matric
                       {
                         auto vec = domaine.cross(D, D, &xv(f, 0), &xs(s, 0), &xp(e, 0), &xp(e, 0));
 
-                        const double surf = std::abs(vec[2]) / 2.; //surface du triangle (e, f, s)
+                        const double surf = std::abs(vec[2]) / 2.; //area of triangle (e, f, s)
 
                         for (int n = 0; n < N; n++)
                           secmem(!aux_only * nf_tot + s, n) -= surf * inco(nf_tot + s, n) / dL(n);

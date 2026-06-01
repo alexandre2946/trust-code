@@ -58,13 +58,13 @@ public:
   inline DoubleTab& viscosite_turbulente() { return nu_ou_lambda_turb_; }
   inline DoubleTab& diffusivite_turbulente() { return nu_ou_lambda_turb_; }
 
-  // remplissage par la correlation : ICI c'est NU_T ET PAS MU_T => m2/s et pas kg/ms
+  // filled by the correlation: HERE it is NU_T NOT MU_T => m2/s not kg/ms
   inline void call_compute_nu_turb()
   {
     ref_cast(Viscosite_turbulente_base, corr_.valeur()).eddy_viscosity(nu_ou_lambda_turb_);
   }
 
-  // remplissage par la correlation : ICI c'est LAMBDA_T ET PAS ALPHA_T => W/mK et pas m2/s
+  // filled by the correlation: HERE it is LAMBDA_T NOT ALPHA_T => W/mK not m2/s
   inline void call_compute_diff_turb(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb)
   {
     ref_cast(Transport_turbulent_base, corr_.valeur()).modifier_mu(eq, visc_turb, nu_ou_lambda_turb_);
@@ -72,10 +72,10 @@ public:
 
 protected:
   bool is_pbm_ = true;
-  DoubleTab nu_ou_lambda_turb_; // comme le nom dit
-  OWN_PTR(Correlation_base) corr_; // correlation de viscosite/transport turbulente
-  std::vector<OWN_PTR(Champ_Fonc_base)> nu_ou_lambda_turb_post_, mu_ou_alpha_turb_post_; // champ de postraitement
-  Motcles noms_nu_ou_lambda_turb_post_, noms_mu_ou_alpha_turb_post_; //leurs noms
+  DoubleTab nu_ou_lambda_turb_; // as the name suggests
+  OWN_PTR(Correlation_base) corr_; // turbulent viscosity/transport correlation
+  std::vector<OWN_PTR(Champ_Fonc_base)> nu_ou_lambda_turb_post_, mu_ou_alpha_turb_post_; // post-processing fields
+  Motcles noms_nu_ou_lambda_turb_post_, noms_mu_ou_alpha_turb_post_; //their names
   OBS_PTR(Probleme_base) pbm_;
   OBS_PTR(Champs_compris) le_chmp_compris_;
 };

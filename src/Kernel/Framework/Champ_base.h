@@ -28,16 +28,16 @@ class Format_Post_base;
 class Frontiere_dis_base;
 class Domaine_Cl_dis_base;
 
-/*! @brief classe Champ_base Cette classe est la base de la hierarchie des champs.
+/*! @brief class Champ_base This class is the base of the fields hierarchy.
  *
- *      Ses membres sont les attributs et les methodes communs
- *      a toutes les classes qui representent des champs.
- *      Champ_base derive de Champ_Proto, afin d'avoir une interface conforme
- *      a tous les champs, et d'heriter des operations courantes sur les
- *      Champs.
- *      Un champ possede un nom, une unite et des valeurs.
+ *      Its members are the attributes and methods common
+ *      to all classes that represent fields.
+ *      Champ_base derives from Champ_Proto, in order to have an interface conforming
+ *      to all fields, and to inherit common operations on
+ *      Fields.
+ *      A field has a name, a unit and values.
  *
- * @sa Champ_Proto Ch_Inc_base Ch_Don_base, Classe abstraite, Methodes abstraites:, Champ_base& affecter_(const Champ_base& ), Champ_base& affecter_compo(const Champ_base&, int compo )
+ * @sa Champ_Proto Ch_Inc_base Ch_Don_base, Abstract class, Abstract methods:, Champ_base& affecter_(const Champ_base& ), Champ_base& affecter_compo(const Champ_base&, int compo )
  */
 class Champ_base : public Field_base, public Champ_Proto
 {
@@ -47,7 +47,7 @@ public:
   Champ_base();
 
   //
-  // Nouvelles methodes
+  // New methods
   //
   virtual int nb_valeurs_nodales() const
   {
@@ -59,14 +59,14 @@ public:
   double temps() const;
   virtual double changer_temps(const double t);
 
-  // Attention, il faut avoir fixe nb_comp et nature_du_champ avant
-  // de fixer le nb_valeurs_nodales.
+  // Warning, you must have set nb_comp and nature_du_champ before
+  // setting nb_valeurs_nodales.
   virtual int fixer_nb_valeurs_nodales(int n);
-  // Par defaut, ces deux methodes provoquent une erreur. L'appel
-  // est invalide sauf si le champ possede un Domaine_dis
+  // By default, these two methods cause an error. The call
+  // is invalid unless the field has a Domaine_dis
   virtual void associer_domaine_dis_base(const Domaine_dis_base&);
   virtual const Domaine_dis_base& domaine_dis_base() const;
-  virtual int a_un_domaine_dis_base() const { return 0; } // Par defaut, on ne sait pas si un domain_dis_base sera defini
+  virtual int a_un_domaine_dis_base() const { return 0; } // By default, we don't know if a domain_dis_base will be defined
 
   virtual void mettre_a_jour(double);
   virtual void abortTimeStep();
@@ -76,7 +76,7 @@ public:
   void affecter_erreur();
   virtual Champ_base& affecter_compo(const Champ_base&, int compo) = 0;
   virtual int imprime(Sortie&, int) const =0;
-  // methode supprime pour eviter confusion avec  trace(const Frontiere_dis_base&, DoubleTab&,,double)
+  // method removed to avoid confusion with  trace(const Frontiere_dis_base&, DoubleTab&,,double)
   //DoubleTab& trace(const Frontiere_dis_base&, DoubleTab&,int distant) const;
   virtual DoubleTab& trace(const Frontiere_dis_base&, DoubleTab&, double, int distant) const;
 
@@ -100,14 +100,14 @@ public:
   virtual DoubleTab& eval_elem(DoubleTab& valeurs) const;
 
 
-  /* ces methodes ne s'appliquent que si a_un_domaine_dis_base() */
+  /* these methods only apply if a_un_domaine_dis_base() */
   virtual DoubleTab& valeur_aux_faces(DoubleTab& result) const;
   virtual DoubleTab valeur_aux_bords() const;
 
-  // XXX Elie SAIKALI : ajout pour CGNS => utile pour champs faces vdf ...
+  // XXX Elie SAIKALI : addition for CGNS => useful for vdf face fields ...
   virtual DoubleTab& valeur_aux_faces_post(DoubleTab& result) const
   {
-    return valeur_aux_faces(result); // par defaut => valeur_aux_faces
+    return valeur_aux_faces(result); // by default => valeur_aux_faces
   }
 
   void calculer_valeurs_som_post(DoubleTab& valeurs, int nbsom, Nom& nom_post, const Domaine& dom) const;

@@ -36,8 +36,8 @@ int grad_Champ_Face_PolyMAC_MPFA::fixer_nb_valeurs_nodales(int n)
   assert(n < 0);
 
   const MD_Vector& md = domaine.mdv_ch_face;
-  // Probleme: nb_comp vaut 2 mais on ne veut qu'une dimension !!!
-  // HACK :
+  // Problem: nb_comp equals 2 but we only want one dimension !!!
+  // HACK:
   int old_nb_compo = nb_compo_;
   nb_compo_ /= dimension;
   creer_tableau_distribue(md);
@@ -62,9 +62,9 @@ void grad_Champ_Face_PolyMAC_MPFA::me_calculer(double tps)
 {
   if (!is_init)
     init_grad();
-  update_tab_grad(0); // calcule les coefficients de fgrad requis pour le calcul du champ aux faces
+  update_tab_grad(0); // compute the fgrad coefficients required for the field computation at faces
   calc_gradfve();
-  update_ge(); // calcule le champ aux elements a partir du champ aux faces
+  update_ge(); // compute the field at elements from the field at faces
   valeurs().echange_espace_virtuel();
 }
 
@@ -72,7 +72,7 @@ void grad_Champ_Face_PolyMAC_MPFA::update_tab_grad(int full_stencil)
 {
   const IntTab& f_cl = champ_a_deriver().fcl();
   const Domaine_PolyMAC_MPFA& domaine = ref_cast(Domaine_PolyMAC_MPFA, domaine_vf());
-  const Conds_lim& cls = champ_a_deriver().domaine_Cl_dis().les_conditions_limites(); // CAL du champ a deriver
+  const Conds_lim& cls = champ_a_deriver().domaine_Cl_dis().les_conditions_limites(); // boundary conditions for the field to differentiate
 
   domaine.fgrad(champ_a_deriver().valeurs().line_size(), 0, cls, f_cl, nullptr, nullptr, 1, full_stencil, gradve_d, gradve_e, gradve_w);
 }
@@ -83,14 +83,14 @@ void grad_Champ_Face_PolyMAC_MPFA::calc_gradfve()
   const Champ_Face_PolyMAC_MPFA& ch = ref_cast(Champ_Face_PolyMAC_MPFA, champ_a_deriver());
 
   const IntTab& fcl = champ_a_deriver().fcl();
-  const Conds_lim& cls = ch.domaine_Cl_dis().les_conditions_limites(); // CAL du champ a deriver
+  const Conds_lim& cls = ch.domaine_Cl_dis().les_conditions_limites(); // boundary conditions for the field to differentiate
 
   /*  const IntTab&                   fcl = fcl_g;
    const Conds_lim&                cls = cls_g;*/
   int f, n;
-  int d_U; //coordonnee de la vitesse
+  int d_U; //velocity coordinate
   int D = dimension;
-  int N = champ_a_deriver().valeurs().line_size(); //nombre phases
+  int N = champ_a_deriver().valeurs().line_size(); //number of phases
   int ne_tot = domaine.nb_elem_tot(), nf_tot = domaine.nb_faces_tot(), nf = domaine.nb_faces();
 
   const DoubleTab& tab_ch = ch.passe();
@@ -99,19 +99,19 @@ void grad_Champ_Face_PolyMAC_MPFA::calc_gradfve()
   for (f = 0; f < nf; f++)
     {
       for (d_U = 0; d_U < D; d_U++)
-        for (n = 0; n < N; n++) // Coordonnees de la vitesse et phase
+        for (n = 0; n < N; n++) // velocity coordinates and phase
           {
             val(f, d_U + n * D) = 0;
             for (int j = gradve_d(f); j < gradve_d(f + 1); j++)
               {
                 int e = gradve_e(j);
                 int f_bord;
-                if (e < ne_tot) //contrib d'un element
+                if (e < ne_tot) //contribution from an element
                   {
                     double val_e = tab_ch(nf_tot + d_U + e * D, n);
                     val(f, d_U + n * D) += gradve_w(j, n) * val_e;
                   }
-                else if (fcl(f_bord = e - ne_tot, 0) == 3) //contrib d'un bord : seul Dirichlet contribue
+                else if (fcl(f_bord = e - ne_tot, 0) == 3) //contribution from a boundary: only Dirichlet contributes
                   {
                     double val_f_bord = ref_cast(Dirichlet, cls[fcl(f_bord, 1)].valeur()).val_imp(fcl(f_bord, 2), N * d_U + n);
                     val(f, d_U + n * D) += gradve_w(j, n) * val_f_bord;

@@ -67,7 +67,7 @@ DoubleVect& Champ_val_tot_sur_vol_VEF::eval_contrib_loc(const Domaine_dis_base& 
       for (int elem=0; elem<size_sz; elem++)
         {
           el = sz(elem);
-          //On ne retient ques les elements reels
+          // Keep only the real elements
           if (el<nb_elem)
             {
               for (int fac=0; fac<nb_fac_el; fac++)
@@ -77,8 +77,8 @@ DoubleVect& Champ_val_tot_sur_vol_VEF::eval_contrib_loc(const Domaine_dis_base& 
                   if (!face_fait(face_g))
                     {
 
-                      //Parmi les deux elements voisins de la face traitee on retient
-                      //celui qui n est pas l element courant dans la sous domaine
+                      // Among the two neighboring elements of the processed face, keep
+                      // the one that is not the current element in the sub-domain
                       elem0 = zvef.face_voisins(face_g,0);
                       elem1 = zvef.face_voisins(face_g,1);
                       if (elem0==el)
@@ -86,16 +86,16 @@ DoubleVect& Champ_val_tot_sur_vol_VEF::eval_contrib_loc(const Domaine_dis_base& 
                       else
                         elem_test = elem0;
 
-                      //Quatre situations possibles
-                      //-elem_test=-1 condition limite
-                      //-elem_test est aussi dans la sous domaine courante
-                      //-elem_test est dans un autre sous domaine
-                      //-elem_test est dans la partie par defaut du domaine (pas dans un sous domaine)
+                      // Four possible situations:
+                      // - elem_test=-1: boundary condition
+                      // - elem_test is also in the current sub-domain
+                      // - elem_test is in another sub-domain
+                      // - elem_test is in the default part of the domain (not in a sub-domain)
 
                       int ok_trouve_loc = 0;
-                      //Recherche si elem_test est dans la sous domaine courante
-                      //(1 si element reel-2 si virtuel-0 sinon)
-                      //ok_trouve_loc fixe a 1 si elem_test dans la sous domaine courante 0 sinon
+                      // Check if elem_test is in the current sub-domain
+                      // (1 if real element, 2 if virtual, 0 otherwise)
+                      // ok_trouve_loc set to 1 if elem_test is in the current sub-domain, 0 otherwise
                       for (int poly=0; poly<size_sz; poly++)
                         {
                           if (elem_test==sz(poly))
@@ -107,11 +107,11 @@ DoubleVect& Champ_val_tot_sur_vol_VEF::eval_contrib_loc(const Domaine_dis_base& 
                             }
                         }
 
-                      //elem_test est dans la sous domaine courante (en element reel) ou est en condition limite
+                      // elem_test is in the current sub-domain (as a real element) or is a boundary condition
                       if ((ok_trouve_loc==1) || (elem_test==-1))
                         fac_pond = 1.;
-                      //elem_test est dans un autre sous domaine ou dans la partie par defaut
-                      //ou dans la sous domaine courante mais en element virtuel
+                      // elem_test is in another sub-domain or in the default part
+                      // or in the current sub-domain but as a virtual element
                       else
                         fac_pond = 0.5;
 
@@ -127,8 +127,8 @@ DoubleVect& Champ_val_tot_sur_vol_VEF::eval_contrib_loc(const Domaine_dis_base& 
             }
         }
 
-      //on retire les contribs vol_entrelaces_Cl pour les faces de Dirichlet car la puissance
-      //attribuee sur ces vol_entrelaces_Cl n'est pas effective au cours du calcul
+      // Remove the vol_entrelaces_Cl contributions for Dirichlet faces because the power
+      // attributed to these vol_entrelaces_Cl is not effective during the computation
       for (int n_bord=0; n_bord<zvef.nb_front_Cl(); n_bord++)
         {
           const Cond_lim& la_cl = zclvef.les_conditions_limites(n_bord);
@@ -158,8 +158,8 @@ DoubleVect& Champ_val_tot_sur_vol_VEF::eval_contrib_loc(const Domaine_dis_base& 
     }
 
 
-  //on retire les contribs vol_entrelaces_Cl pour les faces de Dirichlet car la puissance
-  //attribuee sur ces vol_entrelaces_Cl n'est pas effective au cours du calcul
+  // Remove the vol_entrelaces_Cl contributions for Dirichlet faces because the power
+  // attributed to these vol_entrelaces_Cl is not effective during the computation
   for (int n_bord=0; n_bord<zvef.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = zclvef.les_conditions_limites(n_bord);

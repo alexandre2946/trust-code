@@ -17,9 +17,9 @@
 #define Operateur_Div_base_included
 
 
-/*! @brief Classe Operateur_Div_base Cette classe est la base de la hierarchie des operateurs representant
+/*! @brief Classe Operateur_Div_base This class is the base of the hierarchy of operators representing
  *
- *     le calcul de la divergence d'un champ dans une equation.
+ *     the computation of the divergence of a field in an equation.
  *
  * @sa Operateur_base
  */
@@ -33,7 +33,7 @@ public :
   DoubleVect& multvect(const DoubleTab&, DoubleTab&) const;
   virtual void volumique(DoubleTab& ) const=0;
 
-  /* version etendue de ajouter_blocs pour pouvoir donner en argument le champ dont on prend la divergence -> utile pour implementer ajouter() */
+  /* extended version of ajouter_blocs to be able to pass as argument the field whose divergence is taken -> useful for implementing ajouter() */
   virtual void ajouter_blocs_ext(const DoubleTab& vit, matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const
   {
     Process::exit(que_suis_je() + " : ajouter_blocs_ext() not coded!");

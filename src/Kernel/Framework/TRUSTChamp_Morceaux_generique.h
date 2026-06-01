@@ -61,9 +61,9 @@ protected:
   LIST(OBS_PTR(Sous_Domaine)) les_sous_domaines;
   OBS_PTR(Domaine) mon_domaine;
   OBS_PTR(Probleme_base) ref_pb;
-  VECT(Parser_U) parser; /* vecteur de tous les parsers */
-  Nom nom_champ_parametre_; /* nom du champ dont les fonctions ont parametres */
-  IntTab parser_idx_; /* parser_idx(i, j) : parser a appeller pour calculer la composante j du champ a la maille i */
+  VECT(Parser_U) parser; /* vector of all parsers */
+  Nom nom_champ_parametre_; /* name of the field whose functions have parameters */
+  IntTab parser_idx_; /* parser_idx(i, j): parser to call to calculate component j of the field in cell i */
   bool read_pb_instead_of_domain = false;
   void interprete_get_domaine(const Nom& nom);
 

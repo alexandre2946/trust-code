@@ -29,10 +29,10 @@ Entree& Frottement_interfacial_Wallis::readOn(Entree& is)
   Param param(que_suis_je());
   param.lire_avec_accolades_depuis(is);
 
-  //identification des phases
+  //phase identification
   const Pb_Multiphase *pbm = sub_type(Pb_Multiphase, pb_.valeur()) ? &ref_cast(Pb_Multiphase, pb_.valeur()) : nullptr;
   if (!pbm || pbm->nb_phases() == 1) Process::exit(que_suis_je() + " : not needed for single-phase flow!");
-  for (int n = 0; n < pbm->nb_phases(); n++) //recherche de n_l, n_g : phase {liquide,gaz}_continu en priorite
+  for (int n = 0; n < pbm->nb_phases(); n++) //search for n_l, n_g: continuous {liquid,gas} phase with priority
     if (pbm->nom_phase(n).debute_par("liquide") && (n_l < 0 || pbm->nom_phase(n).finit_par("continu")))  n_l = n;
     else if (pbm->nom_phase(n).debute_par("gaz") && (n_g < 0 || pbm->nom_phase(n).finit_par("continu"))) n_g = n;
 
@@ -46,9 +46,9 @@ void Frottement_interfacial_Wallis::coefficient(const DoubleTab& alpha, const Do
                                                 const DoubleTab& rho, const DoubleTab& mu, const DoubleTab& sigma, double Dh,
                                                 const DoubleTab& ndv, const DoubleTab& d_bulles, DoubleTab& coeff) const
 {
-  double A_i = 4 * sqrt(alpha(n_g)) / Dh, //aire interfaciale
-         d_f = Dh / 2 * (1 - sqrt(alpha(n_g))), //epaisseur de film,
-         Cf = 0.005 * (1 + 300 * d_f / Dh); //coeff de frottement
+  double A_i = 4 * sqrt(alpha(n_g)) / Dh, //interfacial area
+         d_f = Dh / 2 * (1 - sqrt(alpha(n_g))), //film thickness,
+         Cf = 0.005 * (1 + 300 * d_f / Dh); //friction coefficient
   coeff = 0;
   coeff(n_l, n_g, 1) = coeff(n_g, n_l, 1) = A_i * Cf * rho(n_g);
   coeff(n_l, n_g, 0) = coeff(n_g, n_l, 0) = coeff(n_l, n_g, 1) * ndv(n_l, n_g);

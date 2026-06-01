@@ -29,10 +29,10 @@ Entree& Integrale_tps_produit_champs::readOn(Entree& s)
   return s;
 }
 
-/*! @brief Mets a jour l'integrale.
+/*! @brief Updates the integral.
  *
- * Verifie que le temps de l'integrale est inferieur a celui du champ associe et poursuit l'integration jusqu'au temps courant.
- *     si la borne superieure de l'integrale n'est pas depassee.
+ * @brief Checks that the integral time is less than or equal to the current time of the associated field and continues
+ *     the integration up to the current time, if the upper bound of the integral has not been exceeded.
  *
  */
 void Integrale_tps_produit_champs::mettre_a_jour_integrale()
@@ -86,12 +86,11 @@ void Integrale_tps_produit_champs::ajoute_produit_tensoriel(double alpha, const 
   if (support_different_)
     {
       ToDo_Kokkos("Use DoubleTrav and don't resize...");
-      // On ramene au centre des elements
+      // Bring values back to element centers
       const DoubleTab& xp = ref_cast(Domaine_VF,le_champ_->domaine_dis_base()).xp();
       int nb_elem_tot = xp.dimension_tot(0);
       DoubleTab val_a, val_b;
-      // Le jour ou les champs seront mieux foutus, on n'aura
-      // pas a faire ca:
+      // Once fields have a cleaner interface, this workaround will not be needed:
       val_a.resize(nb_elem_tot, a.nb_comp());
       val_b.resize(nb_elem_tot, b.nb_comp());
       a.valeur_aux(xp, val_a);

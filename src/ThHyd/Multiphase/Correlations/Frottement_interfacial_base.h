@@ -20,15 +20,15 @@
 #include <Correlation_base.h>
 #include <TRUSTTab.h>
 
-/*! @brief classe Frottement_interfacial_base utilitaire pour les operateurs de frottement interfacial prenant la forme
+/*! @brief Frottement_interfacial_base class: utility for interfacial friction operators taking the form
  *
  *       F_{kl} = - F_{lk} = - C_{kl} (u_k - u_l)
- *       cette classe definit une fonction C_{kl} dependant de :
- *         alpha, p, T -> inconnues (une valeur par phase chacune)
- *         rho, mu, sigma -> proprietes physiques (idem)
- *         ndv(k, l) -> ||v_k - v_l||, a remplir pour k < l
- *     sortie :
- *         coeff(k, l, 0/1) -> coefficient C_{kl} et sa derivee en ndv(k, l), rempli pour k < l
+ *       This class defines a function C_{kl} depending on:
+ *         alpha, p, T -> unknowns (one value per phase each)
+ *         rho, mu, sigma -> physical properties (idem)
+ *         ndv(k, l) -> ||v_k - v_l||, to be filled for k < l
+ *     output:
+ *         coeff(k, l, 0/1) -> coefficient C_{kl} and its derivative with respect to ndv(k, l), filled for k < l
  *
  *
  */

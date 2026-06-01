@@ -45,7 +45,7 @@ struct OctreeLoc
 };
 
 
-/*! @brief Classe Octree
+/*! @brief Class Octree
  *
  * @sa OctreeLoc OctreeRoot OctreeFloor
  */
@@ -72,7 +72,7 @@ public :
   virtual const Domaine_t& domaine() const  {  return pere->domaine(); }
   void construire(int, const ArrOfInt_t&, const OctreeLoc&, Octree_t* p=0);
   int niveau() const;
-  virtual int_t taille() const;  // taille memoire
+  virtual int_t taille() const;  // memory size
   static int nombre_d_octrees()  { return 1 << Objet_U::dimension; /* = 2**O_U::dimension */ }
 
   virtual Sortie& printOn(Sortie& is) const;
@@ -93,7 +93,7 @@ protected :
 };
 
 
-/*! @brief Classe OctreeRoot
+/*! @brief Class OctreeRoot
  *
  * @sa OctreeLoc Octree OctreeFloor
  */
@@ -155,7 +155,7 @@ protected :
   int valid_, reel_ = -1;
 };
 
-/*! @brief Classe OctreeFloor
+/*! @brief Class OctreeFloor
  *
  * @sa OctreeLoc Octree  OctreeRoot
  */
@@ -186,7 +186,7 @@ protected :
   using Octree_t::pere;
 
   ArrOfInt_t num_elem;
-  mutable ArrOfDouble pos; // Tableau de travail - size 3
+  mutable ArrOfDouble pos; // Work array - size 3
 };
 
 

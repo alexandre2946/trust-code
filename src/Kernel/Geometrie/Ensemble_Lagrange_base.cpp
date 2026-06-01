@@ -41,8 +41,8 @@ void Ensemble_Lagrange_base::associer_domaine(const Domaine& un_domaine)
 
 void Ensemble_Lagrange_base::remplir_sommets_tmp(DoubleTab& soms_tmp)
 {
-  //Premier cas : les sommets ont ete lus dans un fichier
-  //On copie sommets_lu_ dans un tableau temporaire sommets_tmp
+  //First case: the vertices were read from a file
+  //Copy sommets_lu_ into a temporary array sommets_tmp
 
   if (sommets_lu_.dimension(0)!=0)
     {
@@ -53,20 +53,20 @@ void Ensemble_Lagrange_base::remplir_sommets_tmp(DoubleTab& soms_tmp)
       soms_tmp = som_lu;
     }
   else if (nb_marqs_par_sz().size()!=0)
-    //Deuxieme cas : les sommets sont crees dans des sous domaines
-    //On remplit le tableau temporaire
+    //Second case: the vertices are created in sub-domains
+    //Fill the temporary array
     generer_marqueurs_sz(soms_tmp);
   else
     soms_tmp.resize(0,0);
 }
 
-//Generation des coordonnees des particules sur une ou plusieurs sous domaines
-//Pour chacune des sous domaines :
-// - Etape 1 : On determine le min et max pour x, y et z en tenant compte de tous les processeurs
-// - Etape 2  : Le processeur maitre va calculer les coordonnees des particules
-//                -soit avec une distribution uniforme
-//                -soit avec une distribution aleatoire
-// - Etape 3 : Le processeur maitre envoie les valeurs des coordonnees aux autres processeurs
+//Generation of particle coordinates over one or several sub-domains
+//For each sub-domain:
+// - Step 1: determine the min and max for x, y and z, taking all processors into account
+// - Step 2: the master processor computes the particle coordinates
+//                -either with a uniform distribution
+//                -or with a random distribution
+// - Step 3: the master processor sends the computed coordinate values to the other processors
 
 void Ensemble_Lagrange_base::generer_marqueurs_sz(DoubleTab& soms_tmp)
 {
@@ -96,7 +96,7 @@ void Ensemble_Lagrange_base::generer_marqueurs_sz(DoubleTab& soms_tmp)
           zmin = zmax = 0.;
         }
 
-      //Etape 1 : On determine le min et max en tenant compte de tous les processeurs
+      //Step 1: determine the min and max taking all processors into account
       if (nb_elem!=0)
         {
           poly = sz(0);
@@ -124,7 +124,7 @@ void Ensemble_Lagrange_base::generer_marqueurs_sz(DoubleTab& soms_tmp)
                 if (dim==3)
                   zmax=std::max(zmax,dom.coord(madomaine.sommet_elem(poly,le_som),2));
               }
-        } //Fin if (nb_elem!=0)
+        } //End if (nb_elem!=0)
 
 
       xmin = Process::mp_min(xmin);
@@ -137,7 +137,7 @@ void Ensemble_Lagrange_base::generer_marqueurs_sz(DoubleTab& soms_tmp)
           zmax = Process::mp_max(zmax);
         }
 
-      //Etape 2 : Le processeur maitre va calculer les coordonnees des particules
+      //Step 2: the master processor will compute the particle coordinates
       if (je_suis_maitre())
         {
 
@@ -154,7 +154,7 @@ void Ensemble_Lagrange_base::generer_marqueurs_sz(DoubleTab& soms_tmp)
           soms_tmp.resize(old_size+nb_marq_sz,dim);
           int marq;
 
-          //Cas d une distribution aleatoire
+          //Case of a random distribution
           if (nb_marqs_par_dir(i,0)==0)
             {
               //double a,b,c;
@@ -167,7 +167,7 @@ void Ensemble_Lagrange_base::generer_marqueurs_sz(DoubleTab& soms_tmp)
                     soms_tmp(old_size+marq,2) = zmoy + deltaz*(-1.+2.*drand48());
                 }
             }
-          //Cas d une distribution uniforme
+          //Case of a uniform distribution
           else
             {
               double dx, dy, dz;
@@ -201,10 +201,10 @@ void Ensemble_Lagrange_base::generer_marqueurs_sz(DoubleTab& soms_tmp)
                         }
                 }
             }
-        }//Fin de if je_suis_maitre()
+        }//End of if je_suis_maitre()
 
-      //Etape 3 : Le processeur maitre envoie les valeurs des coordonnees calculees (soms_tmp)
-      //               aux autres processeurs
+      //Step 3: the master processor sends the computed coordinate values (soms_tmp)
+      //             to the other processors
       if (je_suis_maitre())
         for(int p=1; p<Process::nproc(); p++)
           envoyer(soms_tmp,0, p, 0);

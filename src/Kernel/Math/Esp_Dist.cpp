@@ -17,14 +17,14 @@
 
 Implemente_instanciable_sans_constructeur(Esp_Dist,"Esp_Dist",ArrOfInt);
 
-/*! @brief Constructeur par defaut
+/*! @brief Default constructor
  *
  */
 Esp_Dist::Esp_Dist() : PE_voisin_(-1) { }
 
-/*! @brief Lecture d'un espace distant dans un flot d'entree.
+/*! @brief Reads a distant space from an input stream.
  *
- * Un espace distant est represente par son tableau d'indices et le processus voisin concerne.
+ * A distant space is represented by its index array and the relevant neighbour process.
  *
  */
 Entree& Esp_Dist::readOn(Entree& is)
@@ -35,7 +35,7 @@ Entree& Esp_Dist::readOn(Entree& is)
   return is;
 }
 
-/*! @brief Ecriture d'un espace distant sur un flot de sortie Un espace distant est represente par son tableau d'indices et le processus voisin concerne.
+/*! @brief Writes a distant space to an output stream. A distant space is represented by its index array and the relevant neighbour process.
  *
  */
 Sortie& Esp_Dist::printOn(Sortie& os) const

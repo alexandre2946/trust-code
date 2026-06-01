@@ -16,7 +16,7 @@
 #ifndef Domaine_forward
 #define Domaine_forward
 
-/*! This include file should be used in place of the former
+/*! @brief This include file should be used in place of the former
  *
  *       class Domaine;
  *

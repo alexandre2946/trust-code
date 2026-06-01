@@ -18,12 +18,12 @@
 
 #include <Champ_front_var_instationnaire.h>
 
-/*! @brief classe Ch_front_var_instationnaire_indep Cette classe abstraite represente un champ sur une frontiere,
+/*! @brief class Ch_front_var_instationnaire_indep This abstract class represents a field on a boundary,
  *
- *      variable en espace, instationnaire en temps, et independant de
- *      donnees exterieures au champ.
- *      De ce fait, la methode initialiser peut appeler la methode
- *      mettre_a_jour. Cette classe factorise cet appel.
+ *      variable in space, unsteady in time, and independent of
+ *      data external to the field.
+ *      For this reason, the initializer method can call the method
+ *      update. This class factors out this call.
  *
  *
  */

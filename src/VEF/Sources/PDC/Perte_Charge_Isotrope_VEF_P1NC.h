@@ -18,13 +18,13 @@
 
 #include <Perte_Charge_VEF.h>
 
-//!  Perte de charge isotrope (proportionnelle a -u )
+//!  Isotropic pressure drop (proportional to -u)
 /**
    du/dt = - lambda(Re,x,y,z,t) * u * ||u|| / 2 Dh
 
-   Lecture des arguments :
+   Reading of arguments:
 
-   Perte_Charge_Isotrope_VEF_P1NC diametre_hydraulique {
+   Perte_Charge_Isotrope_VEF_P1NC hydraulic_diameter {
    lambda expression(Re,x,y,z,t)
    diam_hydr champ_don
    [sous_domaine nom]
@@ -44,7 +44,7 @@ public:
 
 protected:
 
-  //! Implemente le calcul effectif de la perte de charge pour un lieu donne
+  //! Implements the effective computation of the pressure drop at a given location
   void coeffs_perte_charge(const DoubleVect& u, const DoubleVect& pos,
                            double t, double norme_u, double dh, double nu, double reynolds,
                            double& coeff_ortho, double& coeff_long, double& u_l, DoubleVect& v_valeur) const override;

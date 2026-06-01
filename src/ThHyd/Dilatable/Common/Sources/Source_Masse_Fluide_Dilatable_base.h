@@ -24,7 +24,7 @@ class Convection_Diffusion_Fluide_Dilatable_base;
 class Fluide_Dilatable_base;
 class Domaine_Cl_dis_base;
 
-/*! @brief : classe Source_Masse_Fluide_Dilatable_base Une source speciale pour l'equation de masse (utilisee seulement lors de la projection/correction donc).
+/*! @brief Special mass source term for the mass equation (used only during the projection/correction step).
  *
  */
 class Source_Masse_Fluide_Dilatable_base: public Objet_U
@@ -47,7 +47,7 @@ public :
 
   void fill_val_flux_tab(DoubleTrav& val_flux) const;
 
-  // methodes virtuelles pures
+  // Pure virtual methods
   virtual void ajouter_eq_espece(const Convection_Diffusion_Fluide_Dilatable_base& eqn, const Fluide_Dilatable_base& fluide, const bool is_expl, DoubleVect& resu) const = 0;
   virtual void ajouter_projection(const Fluide_Dilatable_base& fluide, DoubleVect& resu) const = 0;
 

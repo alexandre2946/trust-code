@@ -24,7 +24,7 @@ Entree& Op_Conv_Amont_VPoly_VDF_Face::readOn(Entree& s ) { return s ; }
 void Op_Conv_Amont_VPoly_VDF_Face::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const Domaine_VDF& domaine = iter_->domaine();
-  // okok je sais ... tgv
+  // okok I know ... tgv
   DoubleTab& tab_flux_bords = flux_bords();
   tab_flux_bords.resize(domaine.nb_faces_bord(), dimension);
   tab_flux_bords = 0.;
@@ -139,7 +139,7 @@ void Op_Conv_Amont_VPoly_VDF_Face::ajouter_blocs(matrices_t matrices, DoubleTab&
                                           if (f_e(fb, 0) < 0)
                                             fac *= 0.5;
                                           if (fd >= 0)
-                                            secmem(fb, n) -= fac * inco(fd, m); //autre face calculee
+                                            secmem(fb, n) -= fac * inco(fd, m); //other computed face
                                           else
                                             {
                                               for (d = 0; d < D; d++)  //CL de Dirichlet
@@ -150,7 +150,7 @@ void Op_Conv_Amont_VPoly_VDF_Face::ajouter_blocs(matrices_t matrices, DoubleTab&
                                                 }
                                             }
 
-                                          // si compressible :partie v div(alpha rho v)
+                                          // if compressible: part v div(alpha rho v)
                                           if (comp)
                                             secmem(fb, n) += fac * inco(fb, m);
 
@@ -178,7 +178,7 @@ void Op_Conv_Amont_VPoly_VDF_Face::ajouter_blocs(matrices_t matrices, DoubleTab&
                                           if (f_e(fb, 0) < 0)
                                             fac *= 0.5;
                                           if (fd >= 0)
-                                            secmem(fb, n) -= fac * inco(fd, m); //autre face calculee
+                                            secmem(fb, n) -= fac * inco(fd, m); //other computed face
                                           else
                                             {
                                               for (d = 0; d < D; d++)  //CL de Dirichlet
@@ -189,7 +189,7 @@ void Op_Conv_Amont_VPoly_VDF_Face::ajouter_blocs(matrices_t matrices, DoubleTab&
                                                 }
                                             }
 
-                                          // si compressible :partie v div(alpha rho v)
+                                          // if compressible: part v div(alpha rho v)
                                           if (comp)
                                             secmem(fb, n) += fac * inco(fb, m);
 

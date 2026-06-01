@@ -58,8 +58,8 @@ void Dispersion_bulles_VDF::ajouter_blocs(matrices_t matrices, DoubleTab& secmem
   DoubleTab const * k_turb = (equation().probleme().has_champ("k")) ? &equation().probleme().get_champ("k").passe() : nullptr ;
 
   int N = pvit.line_size() , Np = press.line_size(), nf_tot = domaine.nb_faces_tot(), nf = domaine.nb_faces(), ne_tot = domaine.nb_elem_tot(),  cR = (rho.dimension_tot(0) == 1), cM = (mu.dimension_tot(0) == 1), Nk = (k_turb) ? (*k_turb).dimension(1) : 1;
-  DoubleTrav nut(domaine.nb_elem_tot(), N); //viscosite turbulente
-  if (is_turb) ref_cast(Viscosite_turbulente_base, (*ref_cast(Operateur_Diff_base, equation().operateur(0).l_op_base()).correlation_viscosite_turbulente())).eddy_viscosity(nut); //remplissage par la correlation
+  DoubleTrav nut(domaine.nb_elem_tot(), N); //turbulent viscosity
+  if (is_turb) ref_cast(Viscosite_turbulente_base, (*ref_cast(Operateur_Diff_base, equation().operateur(0).l_op_base()).correlation_viscosite_turbulente())).eddy_viscosity(nut); //fill via the correlation
 
   // Input-output
   const Dispersion_bulles_base& correlation_db = ref_cast(Dispersion_bulles_base, correlation_.valeur());
@@ -68,7 +68,7 @@ void Dispersion_bulles_VDF::ajouter_blocs(matrices_t matrices, DoubleTab& secmem
   in.alpha.resize(N), in.T.resize(N), in.p.resize(N), in.rho.resize(N), in.mu.resize(N), in.sigma.resize(N*(N-1)/2), in.k_turb.resize(N), in.nut.resize(N), in.d_bulles.resize(N), in.nv.resize(N, N);
   out.Ctd.resize(N, N);
 
-  /* Calcul de grad alpha aux faces */
+  /* Computation of grad alpha at faces */
 
   DoubleTrav grad_f_a(nf_tot, N);
   assert ( alpha.dimension_tot(0) == ne_tot );
@@ -76,24 +76,24 @@ void Dispersion_bulles_VDF::ajouter_blocs(matrices_t matrices, DoubleTab& secmem
   const Operateur_Grad& Op_Grad_alp = eq_alp.operateur_gradient_inconnue();
   Op_Grad_alp.calculer(alpha,grad_f_a); // compute grad(diss) at faces
 
-  // Vitesse passee aux elems
+  // Past velocity at elements
   DoubleTab pvit_elem(0, N * dimension);
   domaine.domaine().creer_tableau_elements(pvit_elem);
   ch.get_elem_vector_field(pvit_elem, true);
 
-  // Et pour les methodes span de la classe Interface pour choper la tension de surface
-  const int nb_max_sat =  N * (N-1) /2; // oui !! suite arithmetique !!
+  // For the span methods of the Interface class to retrieve the surface tension
+  const int nb_max_sat =  N * (N-1) /2; // yes!! arithmetic sequence!!
   DoubleTrav Sigma_tab(ne_tot,nb_max_sat);
 
-  // remplir les tabs ...
+  // fill the arrays ...
   for (int k = 0; k < N; k++)
     for (int l = k + 1; l < N; l++)
       {
         if (milc.has_saturation(k, l))
           {
             Saturation_base& z_sat = milc.get_saturation(k, l);
-            const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Et oui ! matrice triang sup !
-            // recuperer sigma ...
+            const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Yes! upper triangular matrix!
+            // retrieve sigma ...
             const DoubleTab& sig = z_sat.get_sigma_tab();
             // fill in the good case
             for (int ii = 0; ii < ne_tot; ii++) Sigma_tab(ii, ind_trav) = sig(ii);
@@ -101,7 +101,7 @@ void Dispersion_bulles_VDF::ajouter_blocs(matrices_t matrices, DoubleTab& secmem
         else if (milc.has_interface(k, l))
           {
             Interface_base& sat = milc.get_interface(k,l);
-            const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Et oui ! matrice triang sup !
+            const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Yes! upper triangular matrix!
             for (int i = 0 ; i<ne_tot ; i++)
               Sigma_tab(i,ind_trav) = res_en_T ? sat.sigma(temp(i,k),press(i,k * (Np > 1))) : sat.sigma_h(temp(i,k),press(i,k * (Np > 1)));
           }

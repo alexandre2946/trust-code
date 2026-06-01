@@ -43,7 +43,7 @@ Entree& PDF_model::readOn(Entree& is)
   param.ajouter("eta",&eta_, Param::REQUIRED); // XD_ADD_P floattant
   // XD_CONT penalization coefficient
   param.ajouter("bilan_PDF",&pdf_bilan_,Param::OPTIONAL); // XD_ADD_P entier
-  // XD_CONT type de bilan du terme PDF (seul/avec temps/avec convection)
+  // XD_CONT type of PDF term balance (alone/with time/with convection)
   param.ajouter("temps_relaxation_coefficient_PDF",&temps_relax_,Param::OPTIONAL); // XD_ADD_P floattant
   // XD_CONT time relaxation on the forcing term to help
   param.ajouter("echelle_relaxation_coefficient_PDF",&echelle_relax_,Param::OPTIONAL); // XD_ADD_P floattant
@@ -160,7 +160,7 @@ void PDF_model::affecter_variable_imposee(Domaine_VF& le_dom, const DoubleTab& c
 {
   if (type_variable_imposee_ == 1)
     {
-      // pour des data aux sommets
+      // for node data
       int nb_som_tot = le_dom.nb_som_tot();
 
       DoubleTab& variable_imposee_ref = variable_imposee_->valeurs();
@@ -191,7 +191,7 @@ void PDF_model::affecter_variable_imposee(Domaine_VF& le_dom, const DoubleTab& c
 
 void PDF_model::affecter_vitesse_shape_IBM(Domaine_VF& le_dom_VF, const DoubleTab& coords, double temps)
 {
-  // pour des data aux elements
+  // for element data
   const Domaine& le_dom =  le_dom_VF.domaine();
   int nb_elem_tot = le_dom.nb_elem_tot();
   int nb_som_elem = le_dom.nb_som_elem();

@@ -21,10 +21,10 @@
 class Probleme_Couple;
 class Matrice_Base;
 
-/*! @brief classe Schema_Backward_Differentiation_order_2 Cette classe represente un schema de differentiation retrograde d'ordre 2 :
+/*! @brief Second-order Backward Differentiation Formula (BDF2) time scheme:
  *
- *      U(n+1) = 4/3 *U(n) - 1/3 U(n-1) + 2/3 * dt*(dU/dt)(n+1) dans le cas
- *      ou le pas de temps est constant au cours du temps
+ *      U(n+1) = 4/3 * U(n) - 1/3 * U(n-1) + 2/3 * dt * (dU/dt)(n+1)
+ *      (for constant time step)
  *
  * @sa Schema_Temps_base
  */

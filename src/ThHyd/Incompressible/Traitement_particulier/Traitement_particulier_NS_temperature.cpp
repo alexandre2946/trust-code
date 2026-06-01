@@ -21,10 +21,10 @@ Implemente_base_sans_constructeur_ni_destructeur(Traitement_particulier_NS_tempe
 // XD attr direction entier direction REQ not_set
 
 
-/*! @brief
+/*! @brief Prints the object to an output stream.
  *
- * @param (Sortie& is) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param is an output stream
+ * @return the modified output stream
  */
 Sortie& Traitement_particulier_NS_temperature::printOn(Sortie& is) const
 {
@@ -32,10 +32,10 @@ Sortie& Traitement_particulier_NS_temperature::printOn(Sortie& is) const
 }
 
 
-/*! @brief
+/*! @brief Reads the object from an input stream.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param is an input stream
+ * @return the modified input stream
  */
 Entree& Traitement_particulier_NS_temperature::readOn(Entree& is)
 {
@@ -66,7 +66,7 @@ Entree& Traitement_particulier_NS_temperature::lire(Entree& is)
               }
             case 1 :
               {
-                is >> dir;      // intervalle de temps de sorties des moyennes temporelles
+                is >> dir;      // time interval for printing temporal averages
                 break;
               }
             default :

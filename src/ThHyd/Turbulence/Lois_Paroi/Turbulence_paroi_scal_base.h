@@ -29,14 +29,11 @@ class Probleme_base;
 class EcrFicPartage;
 class Domaine_VF;
 
-/*! @brief Classe Turbulence_paroi_scal_base Classe de base pour la hierarchie des classes representant les modeles
+/*! @brief Base class for the hierarchy of scalar wall-law models computing turbulent quantities near walls.
+ *         The main method to implement in derived classes is calculer_scal,
+ *         which must compute and fill the equivalent_distance_ array of equivalent wall distances.
  *
- *     de calcul des grandeurs turbulentes aux voisinages des parois.
- *     La methode principale a implenter dans les classes filles est calculer_scal
- *     qui doit se charger de calculer et remplir le tableau equivalent_distance_ des distances equivalentes
- *     en paroi.
- *
- * @sa Classe abstraite, Methodes abstraites
+ * @sa abstract class
  */
 class Turbulence_paroi_scal_base: public Champs_compris_interface, public Objet_U
 {
@@ -70,7 +67,7 @@ public:
   bool has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const override;
   bool has_champ(const Motcle& nom) const override;
 
-  // Ecriture dans un fichier separe de u_star, Cisaillement_paroi etc...
+  // Writing u_star, Cisaillement_paroi, etc. to a separate file...
   void ouvrir_fichier_partage(EcrFicPartage&, const Nom&) const;
   void ouvrir_fichier_partage(EcrFicPartage&, const Nom&, const Nom&) const;
   inline const int& get_flag_calcul_ldp_en_flux_impose() const { return calcul_ldp_en_flux_impose_; }
@@ -102,25 +99,24 @@ public:
 
 protected:
   OBS_PTR(Modele_turbulence_scal_base) mon_modele_turb_scal;
-  mutable int nb_impr_ = 0, nb_impr0_ = 0;                        // Compteur d'impression
-  int calcul_ldp_en_flux_impose_; // flag defenissant si on utilise la ldp en flux impose 0 par defaut
-  double Prdt_sur_kappa_;         // Constante dans la loi de paroi
+  mutable int nb_impr_ = 0, nb_impr0_ = 0;                        // print counter
+  int calcul_ldp_en_flux_impose_; // flag defining whether the wall law is used with imposed flux, 0 by default
+  double Prdt_sur_kappa_;         // constant in the wall law
   KOKKOS_INLINE_FUNCTION
   double T_plus(double y_plus, double Pr, double Prdt_sur_kappa);
 
   DoubleVects equivalent_distance_;
-  // tableau des distances equivalentes sur chaque bord
-  // calculees lors de l'application des lois
-  // de paroi et a utiliser dans le calcul des
-  // coefficients d'echange a la paroi
-  // En VDF contrairement au VEF, on n'a pas besoin des contributions des faces de
-  // bord virtuelles car le scalaire est au centre des elements en VDF alors
-  // qu'il est au centre des faces en VEF
-  // Comme il faut tenir compte des faces de virtuelles de bord
-  // en VEF pour l'application dans l'operateur de diffusion
-  // de equivalent_distance_, on utilise tableau par bord et
-  // chaque tableau est dimensionne au nombre de faces de
-  // bord totales (reelles+virtuelles)
+  // array of equivalent distances on each boundary
+  // computed during the application of wall laws
+  // and to be used in the computation of
+  // wall heat transfer coefficients
+  // In VDF, unlike VEF, contributions from virtual boundary faces are not needed
+  // because the scalar is at the cell center in VDF whereas
+  // it is at the face center in VEF
+  // Since virtual boundary faces must be accounted for
+  // in VEF when applying the diffusion operator
+  // of equivalent_distance_, one array per boundary is used and
+  // each array is dimensioned to the total number of boundary faces (real+virtual)
   mutable DoubleTab tab_; // Array containing the Nusset fields
   int nb_fields_ = 6; // Number of Nusselt fields
 
@@ -132,11 +128,11 @@ private:
 
 };
 
-// Loi analytique avec raccordement des comportements
-// asymptotiques de la temperature adimensionnee T+
-// avec Kader:
-// sous-couche conductrice : T+=Pr y+
-// domaine logarithmique : T+=2.12*ln(y+)+Beta
+// Analytical law with matching of the asymptotic behaviors
+// of the dimensionless temperature T+
+// using Kader:
+// conductive sub-layer: T+=Pr y+
+// logarithmic region: T+=2.12*ln(y+)+Beta
 KOKKOS_INLINE_FUNCTION
 double Turbulence_paroi_scal_base::T_plus(double y_plus, double Pr, double Prdt_sur_kappa)
 {
@@ -145,9 +141,10 @@ double Turbulence_paroi_scal_base::T_plus(double y_plus, double Pr, double Prdt_
   return Pr * y_plus * exp(-Gamma) + (Prdt_sur_kappa * log(1. + y_plus) + Beta) * exp(-1. / (Gamma + 1e-20));
 }
 
-/*! @brief Associe un modele de turbulence a l'objet.
+/*! @brief Associates a turbulence model to the object.
  *
- * @param (Modele_turbulence_hyd_base& le_modele) le modele de turbulence hydraulique a associer a l'objet
+ * @brief Associates a scalar turbulence model to the object.
+ * @param (Modele_turbulence_scal_base& le_modele) the scalar turbulence model to associate with the object
  */
 inline void Turbulence_paroi_scal_base::associer_modele(const Modele_turbulence_scal_base& le_modele)
 {

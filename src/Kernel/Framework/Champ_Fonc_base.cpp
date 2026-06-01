@@ -43,9 +43,9 @@ const Domaine_VF& Champ_Fonc_base::domaine_vf() const
   return le_dom_VF.valeur();
 }
 
-/*! @brief Mise a jour en temps du champ.
+/*! @brief Time update of the field.
  *
- * @param (double temps) le temps de mise a jour
+ * @param (double temps) the update time
  */
 void Champ_Fonc_base::mettre_a_jour(double un_temps)
 {
@@ -62,15 +62,15 @@ int Champ_Fonc_base::fixer_nb_valeurs_nodales(int nb_noeuds)
 
 void Champ_Fonc_base::creer_tableau_distribue(const MD_Vector& md, RESIZE_OPTIONS opt)
 {
-  // Note B.M.: pour etre symetrique avec Champ_Inc_base, il faudrait tester si le
-  // champ est scalaire ou multi-scalaire (voir Champ_Inc_base::creer_tableau_distribue())
+  // Note B.M.: to be symmetric with Champ_Inc_base, we should test if the
+  // field is scalar or multi-scalar (see Champ_Inc_base::creer_tableau_distribue())
   if (valeurs_.size_array() == 0 && (!valeurs_.get_md_vector()))
     {
-      // Note B.M.: les methodes fixer_nb_valeurs_nodales sont appelees a tort et a travers.
-      // Ne rien faire si le tableau a deja la bonne structure
+      // Note B.M.: the fixer_nb_valeurs_nodales methods are called haphazardly.
+      // Do nothing if the array already has the correct structure
       valeurs_.resize(0, nb_compo_);
     }
-  // Ca va planter si on a attache une autre structure parallele (c'est voulu !)
+  // This will crash if we attached another parallel structure (this is intentional!)
   if (!(valeurs_.get_md_vector() == md))
     {
       if (valeurs_.get_md_vector())
@@ -101,14 +101,14 @@ std::vector<YAML_data> Champ_Fonc_base::data_a_sauvegarder() const
   return data;
 }
 
-/*! @brief Sauvegarde le champ sur un flot de sortie Ecrit le nom, le temps et les valeurs.
+/*! @brief Saves the field to an output stream. Writes the name, time and values.
  *
- * @param (Sortie& fich) un flot de sortie
- * @return (int) renvoie toujours 1
+ * @param (Sortie& fich) an output stream
+ * @return (int) always returns 1
  */
 int Champ_Fonc_base::sauvegarder(Sortie& fich) const
 {
-  // en mode ecriture special seul le maitre ecrit l'entete
+  // in special write mode only the master writes the header
   int a_faire, special;
   EcritureLectureSpecial::is_ecriture_special(special, a_faire);
 
@@ -149,7 +149,7 @@ int Champ_Fonc_base::sauvegarder(Sortie& fich) const
     }
   if (a_faire)
     {
-      //fich << flush ; Ne marche pas en binaire, preferer:
+      //fich << flush ; Does not work in binary, prefer:
       fich.flush();
     }
   Cerr << "Backup of the field " << nom_ << " performed on time : " << Nom(temps_, "%e") << finl;
@@ -157,18 +157,18 @@ int Champ_Fonc_base::sauvegarder(Sortie& fich) const
   return bytes;
 }
 
-/*! @brief Reprise a partir d'un flot d'entree Lit le temps et les valeurs du champ.
+/*! @brief Restart from an input stream. Reads the time and values of the field.
  *
- *     Saute un bloc si le nom du champ est "anonyme".
+ *     Skips a block if the field name is "anonymous".
  *
- * @param (Entree& fich) un flot d'entree
- * @return (int) renvoie toujours 1
+ * @param (Entree& fich) an input stream
+ * @return (int) always returns 1
  */
 int Champ_Fonc_base::reprendre(Entree& fich)
 {
   double un_temps;
   int special = EcritureLectureSpecial::is_lecture_special();
-  if (nom_ != Nom("anonyme")) // lecture pour reprise
+  if (nom_ != Nom("anonyme")) // reading for restart
     {
       Cerr << "Resume of the field " << nom_;
       if(TRUST_2_PDI::is_PDI_restart())
@@ -188,7 +188,7 @@ int Champ_Fonc_base::reprendre(Entree& fich)
         }
       Cerr << " performed." << finl;
     }
-  else // lecture pour sauter le bloc
+  else // reading to skip the block
     {
       if(TRUST_2_PDI::is_PDI_restart())
         {
@@ -203,10 +203,10 @@ int Champ_Fonc_base::reprendre(Entree& fich)
   return 1;
 }
 
-/*! @brief Affecte un Champ_base dans un Champ_Fonc_base.
+/*! @brief Assigns a Champ_base to a Champ_Fonc_base.
  *
- * @param (Champ_base& ch) le champ partie droite de l'affectation
- * @return (Champ_base&) le resultat de l'affectation (*this) (avec upcast)
+ * @param (Champ_base& ch) the field on the right side of the assignment
+ * @return (Champ_base&) the result of the assignment (*this) (with upcast)
  */
 Champ_base& Champ_Fonc_base::affecter_(const Champ_base& ch)
 {
@@ -217,11 +217,11 @@ Champ_base& Champ_Fonc_base::affecter_(const Champ_base& ch)
   return *this;
 }
 
-/*! @brief Affecte une composante d'un Champ_base dans la meme composnate d'un Champ_Fonc_base.
+/*! @brief Assigns a component of a Champ_base to the same component of a Champ_Fonc_base.
  *
- * @param (Champ_base& ch) le champ partie droite de l'affectation
- * @param (int compo) l'indice de la composante a affecter
- * @return (Champ_base&) le resultat de l'affectation (*this) (avec upcast)
+ * @param (Champ_base& ch) the field on the right side of the assignment
+ * @param (int compo) the index of the component to assign
+ * @return (Champ_base&) the result of the assignment (*this) (with upcast)
  */
 Champ_base& Champ_Fonc_base::affecter_compo(const Champ_base& ch, int compo)
 {
@@ -237,44 +237,44 @@ Champ_base& Champ_Fonc_base::affecter_compo(const Champ_base& ch, int compo)
   return *this;
 }
 
-/*! @brief NE FAIT RIEN A surcharger dans les classes derivees
+/*! @brief DOES NOTHING TO override in derived classes
  *
  * @param (DoubleTab&)
  * @param (IntVect&)
- * @return (int) renvoie toujours 0
+ * @return (int) always returns 0
  */
 int Champ_Fonc_base::remplir_coord_noeuds_et_polys(DoubleTab&, IntVect&) const
 {
   return 0;
 }
 
-/*! @brief NE FAIT RIEN A surcharger dans les classes derivees
+/*! @brief DOES NOTHING TO override in derived classes
  *
  * @param (DoubleTab& coord)
- * @return (DoubleTab&) renvoie toujours le parametre coord
+ * @return (DoubleTab&) always returns the coord parameter
  */
 DoubleTab& Champ_Fonc_base::remplir_coord_noeuds(DoubleTab& coord) const
 {
   return coord;
 }
 
-/*! @brief NE FAIT RIEN A surcharger dans les classes derivees
+/*! @brief DOES NOTHING TO override in derived classes
  *
  * @param (DoubleTab& coord)
  * @param (int)
- * @return (DoubleTab&) renvoie toujours le parametre coord
+ * @return (DoubleTab&) always returns the coord parameter
  */
 DoubleTab& Champ_Fonc_base::remplir_coord_noeuds_compo(DoubleTab& coord, int) const
 {
   return coord;
 }
 
-/*! @brief NE FAIT RIEN A surcharger dans les classes derivees
+/*! @brief DOES NOTHING TO override in derived classes
  *
  * @param (DoubleTab&)
  * @param (IntVect&)
  * @param (int)
- * @return (int) renvoie toujours 0
+ * @return (int) always returns 0
  */
 int Champ_Fonc_base::remplir_coord_noeuds_et_polys_compo(DoubleTab&, IntVect&, int) const
 {

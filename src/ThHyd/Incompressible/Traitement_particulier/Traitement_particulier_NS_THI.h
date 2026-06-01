@@ -23,10 +23,10 @@
 #include <Domaine_VF.h>
 
 
-/*! @brief classe Traitement_particulier_THI Cette classe permet de faire les traitements particuliers
+/*! @brief Traitement_particulier_THI This class performs specific post-processing treatments
  *
- *      pour les calculs de THI, en particulier initialisation
- *      particuliere et calculs des spectres!!
+ *      for Homogeneous Isotropic Turbulence (THI) computations, in particular
+ *      specific initialization and spectral calculations.
  *
  *
  * @sa Navier_Stokes_Turbulent, Traitement_particulier_base, Traitement_particulier_VEF

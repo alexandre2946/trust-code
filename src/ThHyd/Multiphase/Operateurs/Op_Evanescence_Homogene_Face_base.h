@@ -19,9 +19,7 @@
 #include <Operateur_Evanescence_base.h>
 #include <set>
 
-/*! @brief Classe Op_Evanescence_Homogene_Face_base
- *
- *    gestion de l'evanescence dans une equation aux faces (-> QDM)
+/*! @brief Manages evanescence in a face-based equation (-> QDM).
  *
  * @sa Operateur_Evanescence_base Operateur_base
  */
@@ -35,7 +33,7 @@ public :
   double alpha_res() const override { return alpha_res_; }
 
 protected:
-  double alpha_res_ = 0., alpha_res_min_ = 0.; //seuil de declenchement du traitement de l'evanescence
+  double alpha_res_ = 0., alpha_res_min_ = 0.; // threshold for triggering evanescence treatment
   virtual void calc_grad_alpha_faces(DoubleTab&) const {Process::exit(que_suis_je() + " : calc_grad_alpha_faces is not defined !");};
   void calc_vort_faces(DoubleTab&) const;
 

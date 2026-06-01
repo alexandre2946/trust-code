@@ -45,7 +45,7 @@ void Masse_PolyMAC_HFV_Face::completer()
   Solveur_Masse_Face_proto::associer_masse_proto(*this,le_dom_PolyMAC_CDO.valeur());
 }
 
-// XXX : a voir si on peut utiliser Solveur_Masse_Face_proto::appliquer_impl_proto ...
+// XXX : to check if Solveur_Masse_Face_proto::appliquer_impl_proto can be used here ...
 DoubleTab& Masse_PolyMAC_HFV_Face::appliquer_impl(DoubleTab& sm) const
 {
   const Domaine_PolyMAC_CDO& domaine = le_dom_PolyMAC_CDO.valeur();
@@ -56,12 +56,12 @@ DoubleTab& Masse_PolyMAC_HFV_Face::appliquer_impl(DoubleTab& sm) const
                    &vfd = domaine.volumes_entrelaces_dir();
   double fac;
 
-  //vitesses aux faces
+  //velocities at faces
   for (f = 0; f < domaine.nb_faces(); f++)
     for (n = 0; n < N; n++)
       {
         for (fac = 0, i = 0; i < 2 && (e = f_e(f, i)) >= 0; i++) fac += vfd(f, i) * (a_r ? (*a_r)(e, n) : 1);
-        sm(f, n) /= pf(f) * fac; //vitesse calculee
+        sm(f, n) /= pf(f) * fac; //computed velocity
       }
 
   sm.echange_espace_virtuel();
@@ -80,7 +80,7 @@ void Masse_PolyMAC_HFV_Face::ajouter_blocs(matrices_t matrices, DoubleTab& secme
   Solveur_Masse_Face_proto::ajouter_blocs_proto( matrices, secmem,  dt,semi_impl, resoudre_en_increments);
 }
 
-//sert a imposer les CLs de Dirichlet en multiphase (ou la variation de P_bord ne permet de corriger que v_melange)
+//used to impose Dirichlet BCs in multiphase (where the variation of P_bord can only correct v_melange)
 DoubleTab& Masse_PolyMAC_HFV_Face::corriger_solution(DoubleTab& x, const DoubleTab& y, int incr) const
 {
   const Domaine_PolyMAC_CDO& domaine = le_dom_PolyMAC_CDO.valeur();
@@ -92,10 +92,10 @@ DoubleTab& Masse_PolyMAC_HFV_Face::corriger_solution(DoubleTab& x, const DoubleT
 
   for (f = 0; f < domaine.nb_faces_tot(); f++)
     if (fcl(f, 0) == 2 || fcl(f, 0) == 4)
-      for (n = 0; n < N; n++) x(f, n) = incr ? -vit(f, n) : 0; //Dirichlet homogene / Symetrie: on revient a 0
+      for (n = 0; n < N; n++) x(f, n) = incr ? -vit(f, n) : 0; //homogeneous Dirichlet / Symmetry: reset to 0
     else if (fcl(f, 0) == 3)
       for (n = 0; n < N; n++)
-        for (x(f, n) = incr ? -vit(f, n) : 0, d = 0; d < D; d++) //Dirichlet : valeur de la CL
+        for (x(f, n) = incr ? -vit(f, n) : 0, d = 0; d < D; d++) //Dirichlet: BC value
           x(f, n) += nf(f, d) / fs(f) * ref_cast(Dirichlet, cls[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), N * d + n);
 
   return x;

@@ -56,8 +56,8 @@ Entree& Solv_cuDSS::readOn(Entree& entree)
   EChaine is(get_chaine_lue());
   Motcle accolade_ouverte("{"), accolade_fermee("}");
   Motcle solver, motlu;
-  is >> solver;   // On lit le solveur en premier puis les options du solveur
-  is >> motlu; // On lit l'accolade
+  is >> solver;   // Read the solver type first, then the solver options
+  is >> motlu; // Read the opening brace
   if (motlu != accolade_ouverte)
     {
       Cerr << "[cuDSS] Error while reading the parameters of the solver " << solver << " { ... }" << finl;
@@ -77,7 +77,7 @@ Entree& Solv_cuDSS::readOn(Entree& entree)
       mtype=CUDSS_MTYPE_SYMMETRIC;
       mview=CUDSS_MVIEW_UPPER;
     }
-  // Lecture des parametres du solver (LU non symetric, cholesky symmetric)
+  // Read the solver parameters (LU non-symmetric, Cholesky symmetric)
   // LU|Cholesky { algo name [impr] }
   is >> motlu;
   while (motlu!=accolade_fermee)
@@ -88,7 +88,7 @@ Entree& Solv_cuDSS::readOn(Entree& entree)
         }
       else if (motlu==(Motcle)"algo")
         {
-          is >> motlu; // Lecture de l'algo
+          is >> motlu; // Read the algorithm
 
           if (motlu==(Motcle)"0") {  reorder_alg = CUDSS_ALG_DEFAULT;}
           else if (motlu==(Motcle)"1") {  reorder_alg = CUDSS_ALG_1;}
@@ -121,7 +121,7 @@ Entree& Solv_cuDSS::readOn(Entree& entree)
 
 Solv_cuDSS::Solv_cuDSS(const Solv_cuDSS& org)
 {
-  // on relance la lecture .... Necessary for some reasons
+  // re-trigger the reading .... Necessary for some reasons
   EChaine recup(org.get_chaine_lue());
   readOn(recup);
 }

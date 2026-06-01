@@ -21,13 +21,13 @@
 #include <EFichier.h>
 #include <sys/stat.h>
 #include <Param.h>
-#include <string> // Necessaire avec xlC pour std::getline
+#include <string> // Required with xlC for std::getline
 
 Implemente_instanciable_sans_constructeur(Format_Post_Lata,"Format_Post_Lata",Format_Post_base);
 
 #define _LATA_INT_TYPE_ trustIdType
 
-/*! @brief Constructeur par defaut: format_ ASCII et options_para_ = SINGLE_FILE
+/*! @brief Default constructor: format_ ASCII and options_para_ = SINGLE_FILE.
  *
  */
 Format_Post_Lata::Format_Post_Lata()
@@ -35,7 +35,7 @@ Format_Post_Lata::Format_Post_Lata()
   reset();
 }
 
-/*! @brief Remet l'objet dans l'etat obtenu par le constructeur par defaut.
+/*! @brief Resets the object to the state obtained by the default constructor.
  *
  */
 void Format_Post_Lata::reset()
@@ -60,12 +60,12 @@ Sortie& Format_Post_Lata::printOn(Sortie& os) const
   return os;
 }
 
-/*! @brief Lecture des parametres du postraitement au format "jeu de donnees" Le format attendu est le suivant:
+/*! @brief Reads post-processing parameters in "data set" format. The expected format is:
  *
  *   {
- *        nom_fichier nom                       champ obligatoire
- *      [ format   ascii|binaire ]              valeur par defaut : ascii
- *      [ parallel single_file|multiple_files ] valeur par defaut : single_file
+ *        nom_fichier nom                       required field
+ *      [ format   ascii|binaire ]              default value: ascii
+ *      [ parallel single_file|multiple_files ] default value: single_file
  *   }
  *
  */
@@ -90,7 +90,7 @@ int Format_Post_Lata::lire_motcle_non_standard(const Motcle& mot, Entree& is)
   return 0;
 }
 
-/*! @brief Renvoie l'extension conventionnelle des fichiers lata : ".lata"
+/*! @brief Returns the conventional extension for lata files: ".lata"
  *
  */
 const char * Format_Post_Lata::extension_lata()
@@ -99,7 +99,7 @@ const char * Format_Post_Lata::extension_lata()
   return ext;
 }
 
-/*! @brief Renvoie le nom d'un fichier sans le path : on enleve les caracteres avant le dernier /
+/*! @brief Returns the file name without its path: strips all characters before the last /
  *
  */
 const char * Format_Post_Lata::remove_path(const char * filename)
@@ -110,7 +110,7 @@ const char * Format_Post_Lata::remove_path(const char * filename)
   return filename + i;
 }
 
-/*! @brief Ouvre le fichier maitre en mode ERASE et ecrit l'entete du fichier lata (sur le processeur maitre seulement).
+/*! @brief Opens the master file in ERASE mode and writes the lata file header (on the master processor only).
  *
  * void Format_Post_Lata::ecrire_entete_lata()
  *
@@ -145,7 +145,7 @@ fill_tmp_array(const TRUSTTab<TYP,int>& tab, int upper, int offset, bool decal_f
   const TYP *data = tab.addr();
   for (int i = 0; i < upper; i++)
     {
-      // valeur a ecrire (conversion en numerotation fortran si besoin)
+      // value to write (conversion to Fortran numbering if needed)
       _LATA_INT_TYPE_ x = data[i+offset];
       if (x > -1)
         x += decalage_partiel;
@@ -184,7 +184,7 @@ trustIdType write_T_tab(Fichier_Lata& fichier, bool decal_fort, trustIdType deca
     case Format_Post_Lata::SINGLE_FILE_MPIIO:
     case Format_Post_Lata::SINGLE_FILE:
       nb_lignes_tot = Process::mp_sum(nb_lignes);
-      // En parallele, tous les tableaux doivent avoir le meme nombre de colonnes (ou etre vides).
+      // In parallel, all arrays must have the same number of columns (or be empty).
       nb_colonnes = Process::mp_max(line_size);
       nb_octets = nb_colonnes * nb_lignes_tot * (trustIdType) sizeof(LATA_TYP);
       assert(nb_lignes == 0 || line_size == nb_colonnes);
@@ -200,26 +200,26 @@ trustIdType write_T_tab(Fichier_Lata& fichier, bool decal_fort, trustIdType deca
 
   SFichier& sfichier = fichier.get_SFichier();
 
-  // Debut de bloc fortran
+  // Start of Fortran block
   if (fichier.is_master())
     sfichier << nb_octets << finl;
 
-  // Ecriture des donnees.
+  // Writing data.
   if (sub_type(EcrFicPartageMPIIO, sfichier))
     {
-      // On convertit le tout en LATA_TYP
+      // Convert everything to LATA_TYP
       LATA_TYP *tmp = new LATA_TYP[tab_size];
       fill_tmp_array(tab, tab_size, 0, decal_fort, decalage_partiel, tmp);
       sfichier.put(tmp, tab_size, line_size);
       delete[] tmp;
-      // Fin de bloc fortran
+      // End of Fortran block
       if (fichier.is_master())
         sfichier << nb_octets << finl;
     }
   else
     {
-      // On convertit le tout en _INT_TYPE_ par paquet de N valeurs
-      // Buffer dont la taille est un multiple de line_size:
+      // Convert everything to _INT_TYPE_ in batches of N values
+      // Buffer whose size is a multiple of line_size:
       const int N = 16384;
       int bufsize = (N / line_size + 1) * line_size;
       LATA_TYP *tmp = new LATA_TYP[bufsize];
@@ -229,15 +229,15 @@ trustIdType write_T_tab(Fichier_Lata& fichier, bool decal_fort, trustIdType deca
           if (j_max > tab_size - i)
             j_max = tab_size - i;
 
-          // Conversion du bloc en LATA_TYP:
+          // Convert the block to LATA_TYP:
           fill_tmp_array(tab, j_max, i, decal_fort, decalage_partiel, tmp);
 
-          // Ecriture avec retour a la ligne a chaque ligne du tableau
+          // Write with a newline at each row of the array
           sfichier.put(tmp, j_max, line_size);
         }
       delete[] tmp;
       fichier.syncfile();
-      // Fin de bloc fortran
+      // End of Fortran block
       if (fichier.is_master())
         sfichier << nb_octets << finl;
       fichier.syncfile();
@@ -248,10 +248,10 @@ trustIdType write_T_tab(Fichier_Lata& fichier, bool decal_fort, trustIdType deca
 } // end anonymous namespace
 
 
-/*! @brief fichier est un fichier lata de donnees (pas le fichier maitre) on y ecrit le tableau tab tel quel (en binaire ou ascii et sur un ou
+/*! @brief fichier is a lata data file (not the master file). The array tab is written as-is (in binary or ASCII, on one or
  *
- *   plusieurs fichiers en parallel).
- *   nb_colonnes est rempli avec le produit des tab.dimension(i) pour i>0
+ *   several files in parallel).
+ *   nb_colonnes is filled with the product of tab.dimension(i) for i>0.
  *
  */
 trustIdType Format_Post_Lata::write_doubletab(Fichier_Lata& fichier, const DoubleTab& tab, int& nb_colonnes, const Options_Para& option)
@@ -260,20 +260,20 @@ trustIdType Format_Post_Lata::write_doubletab(Fichier_Lata& fichier, const Doubl
 }
 
 
-/*! @brief Ecriture d'un tableau d'entiers dans le fichier fourni.
+/*! @brief Writing an integer array to the given file.
  *
- * Les valeurs ecrites sont les valeurs du tableau auquelles ont ajoute "decalage". Cette valeur est utilisee pour passer en numerotation
- *   fortran (ajouter 1), ou pour passer en numerotation globale (ajouter le nombre d'elements sur les processeurs precedents).
+ * The values written are the array values incremented by "decalage". This value is used to switch to Fortran numbering
+ *   (add 1), or to switch to global numbering (add the number of elements on previous processors).
  *
- *  On renvoie dans nb_colonnes la somme des dimension(i) pour i>0.
- *  Valeur de retour: somme des dimension(0) ecrits (selon que tous les processeurs ecrivent sur le meme fichier ou pas).
+ *  nb_colonnes is filled with the sum of dimension(i) for i>0.
+ *  Return value: sum of the written dimension(0) values (depending on whether all processors write to the same file or not).
  */
 trustIdType Format_Post_Lata::write_inttab(Fichier_Lata& fichier, bool decal_fort, trustIdType decalage_partiel, const IntTab& tab, int& nb_colonnes, const Options_Para& option)
 {
   return ::write_T_tab<int, _LATA_INT_TYPE_>(fichier, decal_fort, decalage_partiel, tab, nb_colonnes, option);
 }
 
-/*! @brief Initialisation de la classe avec des parametres par defaut (format ASCII, SINGLE_FILE)
+/*! @brief Initializes the class with default parameters (ASCII format, SINGLE_FILE).
  *
  */
 int Format_Post_Lata::initialize_by_default(const Nom& file_basename)
@@ -286,7 +286,7 @@ int Format_Post_Lata::initialize_by_default(const Nom& file_basename)
 int Format_Post_Lata::initialize(const Nom& file_basename, const int format, const Nom& option_para)
 {
   assert(status == RESET);
-  // Changement du format LATA (par defaut binaire)
+  // Change the LATA format (default is binary)
   format_ = BINAIRE;
   if (format == 0)
     format_ = ASCII;
@@ -308,7 +308,7 @@ int Format_Post_Lata::initialize(const Nom& file_basename, const int format, con
   return 1;
 }
 
-/*! @brief Initialisation de la classe, ouverture du fichier et ecriture de l'entete.
+/*! @brief Initializes the class, opens the file and writes the header.
  *
  */
 int Format_Post_Lata::initialize_lata(const Nom& file_basename, const Format format, const Options_Para options_para)
@@ -327,7 +327,7 @@ int Format_Post_Lata::modify_file_basename(const Nom file_basename, bool for_res
 {
   Nom post_file;
   post_file = file_basename + extension_lata();
-  // On verifie que le fichier maitre existe et a une entete correcte
+  // Check that the master file exists and has a correct header
   bool master_file_exists = false;
   if (Process::je_suis_maitre())
     {
@@ -350,7 +350,7 @@ int Format_Post_Lata::modify_file_basename(const Nom file_basename, bool for_res
                     {
                       double temps;
                       tmp >> temps;
-                      // On verifie le temps du fichier de reprise
+                      // Check the time of the restart file
                       if (temps < tinit)
                         master_file_exists = true;
                     }
@@ -386,7 +386,7 @@ int Format_Post_Lata::modify_file_basename(const Nom file_basename, bool for_res
   return 1;
 }
 
-// Copie du debut du fichier before_restart dans post_file (jusqu'au TEMPS=tinit)
+// Copy the beginning of the before_restart file into post_file (up to TEMPS=tinit)
 int Format_Post_Lata::reconstruct(const Nom post_file, const Nom before_restart, const double tinit)
 {
   EFichier LataOld(before_restart);
@@ -399,26 +399,26 @@ int Format_Post_Lata::reconstruct(const Nom post_file, const Nom before_restart,
   tinit_ = tinit;
   while (!LataOld.eof())
     {
-      LataOld >> mot; // je lis le premier mot de la ligne dans .before_restart.lata
-      if (mot != "FIN") // Si le mot n'est pas FIN
+      LataOld >> mot; // read the first word of the line in .before_restart.lata
+      if (mot != "FIN") // If the word is not FIN
         {
-          if (mot == "TEMPS") // Si le mot suivant est TEMPS
+          if (mot == "TEMPS") // If the next word is TEMPS
             {
               LataOld >> temps;
-              if (temps == tinit) // Si le temps trouvee = tinit alors j'arrete
+              if (temps == tinit) // If the found time equals tinit then stop
                 break;
-              std::getline(LataOld.get_ifstream(), line); // je lis le reste de la ligne
-              LataNew.get_ofstream() << mot << " " << temps << line << std::endl; // et j'ecris le tout dans le lata
+              std::getline(LataOld.get_ifstream(), line); // read the rest of the line
+              LataNew.get_ofstream() << mot << " " << temps << line << std::endl; // write it all to the lata
             }
           else
             {
-              std::getline(LataOld.get_ifstream(), line); // je lis le reste de la ligne
-              LataNew.get_ofstream() << mot << line << std::endl; // et j'ecris le tout dans le lata
+              std::getline(LataOld.get_ifstream(), line); // read the rest of the line
+              LataNew.get_ofstream() << mot << line << std::endl; // write it all to the lata
             }
         }
       else
         {
-          break; // Sinon j'arrete
+          break; // Otherwise stop
         }
     }
   LataNew.close();
@@ -445,22 +445,22 @@ int Format_Post_Lata::finir_sans_reprise(const Nom file_basename)
           double temps;
           while (!Lata.eof())
             {
-              Lata >> mot; // je lis le premier mot de la ligne dans .lata
-              if (mot == "TEMPS") // Si le mot suivant n'est pas TEMPS
+              Lata >> mot; // read the first word of the line in .lata
+              if (mot == "TEMPS") // If the next word is not TEMPS
                 {
                   Lata >> temps;
-                  if (temps == tinit_) // Si le temps trouvee = tinit alors
+                  if (temps == tinit_) // If the found time equals tinit
                     {
                       std::getline(Lata.get_ifstream(), line);
-                      LataRep.get_ofstream() << mot << " " << temps << line << std::endl; // je peux commencer a ecrire
+                      LataRep.get_ofstream() << mot << " " << temps << line << std::endl; // can start writing
                       break;
                     }
                 }
             }
           while (!Lata.eof())
             {
-              std::getline(Lata.get_ifstream(), line); // je lis le reste du .lata
-              LataRep.get_ofstream() << line << std::endl; // et j'ecris le tout dans le after_restart.lata
+              std::getline(Lata.get_ifstream(), line); // read the rest of the .lata
+              LataRep.get_ofstream() << line << std::endl; // write it all to after_restart.lata
             }
           Lata.close();
           LataRep.close();
@@ -487,7 +487,7 @@ void Format_Post_Lata::ecrire_offset(SFichier& sfichier, long int offset_single_
     }
 }
 
-// E Saikali : on ajoute cette liste qui est utile pour un probleme couple dans le cas ou on ecrit dans meme fichier
+// E Saikali : adding this list which is useful for a coupled problem when writing to the same file
 static Noms liste_single_lata_ecrit;
 
 /*! @brief Low level routine to write a mesh into a LATA file.
@@ -499,12 +499,12 @@ void Format_Post_Lata::ecrire_domaine_low_level(const Nom& id_domaine, const Dou
   const int dim = sommets.dimension(1);
   Motcle type_elem(type_element);
 
-  // GF Pour assuerer la lecture avec le plugin lata
+  // GF To ensure correct reading with the lata plugin
   if (type_element == "PRISME") type_elem = "PRISM6";
 
-  trustIdType nb_som_tot, nb_elem_tot;  // Nombre de sommets/elements dans le fichier
+  trustIdType nb_som_tot, nb_elem_tot;  // Number of vertices/elements in the file
 
-  // Construction du nom du fichier de geometrie
+  // Build the geometry file name
   Nom basename_geom(lata_basename_), extension_geom(extension_lata());
 
   if (un_seul_fichier_lata_) extension_geom += "_single";
@@ -528,7 +528,7 @@ void Format_Post_Lata::ecrire_domaine_low_level(const Nom& id_domaine, const Dou
 
     Fichier_Lata fichier_geom(basename_geom, extension_geom, should_erase ? Fichier_Lata::ERASE : Fichier_Lata::APPEND, format_, options_para_);
 
-    // on ajout dans la liste si pas dedans et si un_seul_fichier_lata_ !!!
+    // add to the list if not already in it and if un_seul_fichier_lata_ !!!
     if (not_in_list && un_seul_fichier_lata_) liste_single_lata_ecrit.add(lata_basename_); // BOOM !
 
     nom_fichier_geom = fichier_geom.get_filename();
@@ -538,7 +538,7 @@ void Format_Post_Lata::ecrire_domaine_low_level(const Nom& id_domaine, const Dou
       if (fichier_geom.is_master())
         offset_som_ = fichier_geom.get_SFichier().get_ofstream().tellp();
 
-    // Coordonnees des sommets
+    // Vertex coordinates
     if (axi)
       {
         DoubleTab sommets2(sommets);
@@ -556,13 +556,13 @@ void Format_Post_Lata::ecrire_domaine_low_level(const Nom& id_domaine, const Dou
 
     assert(nb_som_tot == 0 || nb_col == dim);
 
-    // Elements : Les indices de sommets, elements et autres dans le fichier lata commencent a 1 :
+    // Elements: vertex, element and other indices in the lata file start at 1:
     if (options_para_ == SINGLE_FILE || options_para_ == SINGLE_FILE_MPIIO)
       {
-        // Tous les processeurs ecrivent dans un fichier unique, il faut renumeroter les indices pour passer en numerotation globale.
-        // Le processeur 0 numerote ses sommets de 1 a n0
-        // Le processeur 1 numerote ses sommets de n0+1 a n0+n1, etc...
-        // Decalage a ajouter aux indices pour avoir une numerotation globale.
+        // All processors write to a single file; indices must be renumbered to global numbering.
+        // Processor 0 numbers its vertices from 1 to n0
+        // Processor 1 numbers its vertices from n0+1 to n0+n1, etc...
+        // Offset to add to indices for global numbering.
         const int nbsom = sommets.dimension(0);
         decalage_sommets += mppartial_sum(nbsom);
         const int nbelem = elements.dimension(0);
@@ -584,7 +584,7 @@ void Format_Post_Lata::ecrire_domaine_low_level(const Nom& id_domaine, const Dou
   }
 
   {
-    // Attention, il faut refermer le fichier avant d'appeler ecrire_item_int qui va ouvrir a nouveau le fichier.
+    // Note: the file must be closed before calling ecrire_item_int, which will reopen it.
     Fichier_Lata_maitre fichier_lata(lata_basename_, extension_lata(), Fichier_Lata::APPEND, options_para_);
     SFichier& sfichier = fichier_lata.get_SFichier();
 
@@ -627,7 +627,7 @@ void Format_Post_Lata::ecrire_domaine_low_level(const Nom& id_domaine, const Dou
     fichier_lata.syncfile();
   }
 
-  // En mode parallele, on ecrit en plus des fichiers contenant les donnees paralleles sur les sommets, les elements et les faces...
+  // In parallel mode, additional files containing parallel data on vertices, elements and faces are written...
   if (Process::is_parallel())
     if (options_para_ == SINGLE_FILE || options_para_ == SINGLE_FILE_MPIIO)
       {
@@ -653,11 +653,11 @@ void Format_Post_Lata::ecrire_domaine_low_level(const Nom& id_domaine, const Dou
       }
 }
 
-/*! @brief voir Format_Post_base::ecrire_domaine On accepte l'ecriture d'un domaine dans un pas de temps, mais
+/*! @brief See Format_Post_base::ecrire_domaine. Writing a domain within a time step is accepted, but
  *
- *   les id_domaines doivent etre tous distincts.
- *   Ecrit le fichier "basename(_XXXXX).lata.nom_domaine", qui contient la liste des sommets et la liste des elements.
- *   Si le PE est maitre, ouvre le fichier maitre en mode APPEND et ajoute une reference a ce fichier.
+ *   all id_domaines must be distinct.
+ *   Writes the file "basename(_XXXXX).lata.nom_domaine", which contains the vertex list and element list.
+ *   If the PE is master, opens the master file in APPEND mode and adds a reference to this file.
  */
 int Format_Post_Lata::ecrire_domaine(const Domaine& domaine,const int est_le_premier_post)
 {
@@ -670,18 +670,18 @@ int Format_Post_Lata::ecrire_domaine(const Domaine& domaine,const int est_le_pre
 
   ecrire_domaine_low_level(domaine.le_nom(), domaine.les_sommets(), domaine.les_elems(), type_elem);
 
-  // Si on a des frontieres domaine, on les ecrit egalement
+  // If there are domain boundary sub-domains, write them too
   const LIST(OBS_PTR(Domaine)) bords= domaine.domaines_frontieres();
   for (int i=0; i<bords.size(); i++)
     ecrire_domaine(bords[i].valeur(),est_le_premier_post);
 
-  return 1; // ok tout va bien
+  return 1; // ok all is well
 }
 
-/*! @brief commence l'ecriture d'un nouveau pas de temps En l'occurence pour le format LATA:
+/*! @brief Starts writing a new time step. For the LATA format specifically:
  *
- *   Ouvre le fichier maitre en mode APPEND et ajoute une ligne
- *    "TEMPS xxxxx" si ce temps n'a pas encore ete ecrit
+ *   Opens the master file in APPEND mode and adds a line
+ *    "TEMPS xxxxx" if this time has not yet been written.
  *
  */
 int Format_Post_Lata::ecrire_temps(const double temps)
@@ -698,7 +698,7 @@ int Format_Post_Lata::ecrire_champ(const Domaine& domaine, const Noms& unite_, c
 {
   Motcle id_du_champ_modifie(id_du_champ), iddomaine(id_du_domaine);
 
-  //On utilise prefix avec un argument en majuscule
+  //Using prefix with an uppercase argument
   if ((Motcle) localisation == "SOM")
     {
       id_du_champ_modifie.prefix(id_du_domaine);
@@ -719,7 +719,7 @@ int Format_Post_Lata::ecrire_champ(const Domaine& domaine, const Noms& unite_, c
     }
   Nom& id_champ = id_du_champ_modifie;
 
-  // Construction du nom du fichier
+  // Build the file name
   Nom basename_champ(lata_basename_), extension_champ(extension_lata());
 
   if (un_seul_fichier_lata_) extension_champ += "_single";
@@ -747,7 +747,7 @@ int Format_Post_Lata::ecrire_champ(const Domaine& domaine, const Noms& unite_, c
 
     Fichier_Lata fichier_champ(basename_champ, extension_champ, should_erase ? Fichier_Lata::ERASE : Fichier_Lata::APPEND, format_, options_para_);
 
-    // on ajout dans la liste si pas dedans et si un_seul_fichier_lata_ !!!
+    // add to the list if not already in it and if un_seul_fichier_lata_ !!!
     if (not_in_list && un_seul_fichier_lata_) liste_single_lata_ecrit.add(lata_basename_); // BOOM !
 
     // XXX Elie Saikali : attention offset ici avant write_doubletab ! sinon decalage d'un champ !
@@ -759,8 +759,8 @@ int Format_Post_Lata::ecrire_champ(const Domaine& domaine, const Noms& unite_, c
     size_tot = write_doubletab(fichier_champ, valeurs, nb_compo, options_para_);
   }
 
-  // Ouverture du fichier .lata en mode append.
-  // Ajout de la reference au champ
+  // Opening the .lata file in append mode.
+  // Adding the field reference
   Fichier_Lata_maitre fichier(lata_basename_, extension_lata(), Fichier_Lata::APPEND, options_para_);
   SFichier& sfichier = fichier.get_SFichier();
   if (fichier.is_master())
@@ -786,17 +786,16 @@ int Format_Post_Lata::ecrire_champ(const Domaine& domaine, const Noms& unite_, c
   return 1;
 }
 
-/*! @brief voir Format_Post_base::ecrire_champ ATTENTION: si "reference" est non vide on ajoute 1 a toutes les
+/*! @brief See Format_Post_base::ecrire_champ. WARNING: if "reference" is non-empty, 1 is added to all values to switch to Fortran numbering, and if furthermore a single lata file is written for all processors, an
  *
- *    valeurs pour passer en numerotation fortran, et si de plus on ecrit un fichier lata unique pour tous les processeurs, on ajoute un
- *    decalage a toutes les valeurs (renumerotation des indices pour passer en numerotation globale, voir le codage de ecrire_domaine par exemple)
+ *    offset is added to all values (renumbering of indices to switch to global numbering; see ecrire_domaine for an example)
  *
  */
 template<typename TYP>
 int Format_Post_Lata::ecrire_item_integral_T(const Nom& id_item, const Nom& id_du_domaine, const Nom& id_domaine, const Nom& localisation,
                                              const Nom& reference, const TRUSTVect<TYP, int>& val, const int reference_size)
 {
-  // Construction du nom du fichier
+  // Build the file name
   Nom basename_champ(lata_basename_), extension_champ(extension_lata());
 
   if (un_seul_fichier_lata_) extension_champ += "_single";
@@ -826,7 +825,7 @@ int Format_Post_Lata::ecrire_item_integral_T(const Nom& id_item, const Nom& id_d
 
     Fichier_Lata fichier_champ(basename_champ, extension_champ, should_erase ? Fichier_Lata::ERASE : Fichier_Lata::APPEND, format_, options_para_);
 
-    // on ajout dans la liste si pas dedans et si un_seul_fichier_lata_ !!!
+    // add to the list if not already in it and if un_seul_fichier_lata_ !!!
     if (not_in_list && un_seul_fichier_lata_) liste_single_lata_ecrit.add(lata_basename_); // BOOM !
 
     if (un_seul_fichier_lata_)
@@ -834,7 +833,7 @@ int Format_Post_Lata::ecrire_item_integral_T(const Nom& id_item, const Nom& id_d
         offset_elem_ = fichier_champ.get_SFichier().get_ofstream().tellp();
 
     filename_champ = fichier_champ.get_filename();
-    // On suppose que si reference est non vide, c'est un indice dans un autre tableau, donc numerotation fortran :
+    // Assuming that if reference is non-empty, it is an index into another array, so Fortran numbering applies:
     bool decal = false;
     trustIdType decal_partiel = 0;
     if (reference != "")
@@ -843,8 +842,8 @@ int Format_Post_Lata::ecrire_item_integral_T(const Nom& id_item, const Nom& id_d
         decal_partiel = 1;
         if (options_para_ == SINGLE_FILE || options_para_ == SINGLE_FILE_MPIIO)
           {
-            // Tous les processeurs ecrivent dans un fichier unique, il faut renumeroter les indices pour passer en numerotation globale.
-            // Decalage a ajouter aux indices pour avoir une numerotation globale.
+            // All processors write to a single file; indices must be renumbered to global numbering.
+            // Offset to add to indices for global numbering.
             decal_partiel += mppartial_sum(reference_size);
           }
       }
@@ -852,7 +851,7 @@ int Format_Post_Lata::ecrire_item_integral_T(const Nom& id_item, const Nom& id_d
   }
 
   {
-    // Ouverture du fichier .lata en mode append. Ajout de la reference au champ
+    // Opening the .lata file in append mode. Adding the field reference.
     Fichier_Lata_maitre fichier(lata_basename_, extension_lata(), Fichier_Lata::APPEND, options_para_);
     SFichier& sfichier = fichier.get_SFichier();
     if (fichier.is_master())
@@ -887,7 +886,7 @@ int Format_Post_Lata::ecrire_item_integral_T(const Nom& id_item, const Nom& id_d
     fichier.syncfile();
   }
 
-  // Astuce pour les donnees paralleles des faces:
+  // Trick for parallel face data:
   if ((id_item == "FACES" && Process::is_parallel()) && (options_para_ == SINGLE_FILE || options_para_ == SINGLE_FILE_MPIIO))
     {
       const int n = valeurs.dimension(0);
@@ -921,13 +920,13 @@ int Format_Post_Lata::ecrire_entete_lata(const Nom& base_name, const Options_Par
 {
   if (est_le_premier_post)
     {
-      // Determination du format binaire:
-      //  big endian => l'entier 32 bits "1" s'ecrit 0x00 0x00 0x00 0x01
-      //  little endian =>                           0x01 0x00 0x00 0x00
+      // Determine the binary format:
+      //  big endian => the 32-bit integer "1" is written as 0x00 0x00 0x00 0x01
+      //  little endian =>                                   0x01 0x00 0x00 0x00
       const unsigned int one = 1;
       const int big_endian = (*((unsigned char*) &one) == 0) ? 1 : 0;
 
-      // Effacement du fichier .lata et ecriture de l'entete
+      // Erase the .lata file and write the header
       Fichier_Lata_maitre fichier(base_name, extension_lata(), Fichier_Lata::ERASE, option);
 
       SFichier& sfichier = fichier.get_SFichier();
@@ -978,11 +977,11 @@ int Format_Post_Lata::ecrire_entete_lata(const Nom& base_name, const Options_Par
 int Format_Post_Lata::ecrire_temps_lata(const double temps, double& temps_format, const Nom& base_name, Status& stat, const Options_Para& option)
 {
   assert(stat != RESET);
-  // On ecrit le temps que si ce n'est pas le meme...
+  // Write the time only if it has changed...
   if (stat != WRITING_TIME || temps_format != temps)
     {
       temps_format = temps;
-      // Ouverture du fichier .lata en mode append
+      // Opening the .lata file in append mode
       Fichier_Lata_maitre fichier(base_name, extension_lata(), Fichier_Lata::APPEND, option);
       if (fichier.is_master())
         fichier.get_SFichier() << "TEMPS " << temps << finl;

@@ -105,7 +105,7 @@ void Champ_implementation_P1::value_interpolation(const DoubleTab& positions, co
   ArrOfInt index(nb_nodes_per_cell);
   ArrOfDouble position(Objet_U::dimension);
   resu = 0;
-  if (zpoly) //polyedred -> interpolation ponderee par les volumes
+  if (zpoly) //polyhedron -> volume-weighted interpolation
     {
       const DoubleTab& v_es = zpoly->vol_elem_som();
       const DoubleVect& ve = zpoly->volumes();
@@ -164,12 +164,12 @@ void Champ_implementation_P1::value_interpolation(const DoubleTab& positions, co
       }
 }
 
-/*! @brief Initialise le tableau de valeurs aux sommets du domaine dom a partir de valeurs lues dans "input".
+/*! @brief Initializes the array of values at the vertices of domain dom from values read from "input".
  *
- * (on dimensionne, associe la structure parallele et remplit les valeurs reelles et virtuelles)
- *   Le fichier doit avoir le format suivant (n est le nombre de valeurs nodales
- *   stockees, x, y, z sont les coordonnees des sommets, compo1... sont les valeurs
- *   des composantes.
+ * (the array is sized, associated with the parallel structure, and filled with real and virtual values)
+ *   The file must have the following format (n is the number of nodal values
+ *   stored, x, y, z are the coordinates of the vertices, compo1... are the values
+ *   of the components.
  *   n  (int)
  *   x y [z] compo1 [compo2 [compo3 ... ]]   (type double)
  *
@@ -179,12 +179,12 @@ void Champ_implementation_P1::init_from_file(DoubleTab& val, const Domaine& dom,
   val.resize(0, nb_comp);
   dom.creer_tableau_sommets(val, RESIZE_OPTIONS::NOCOPY_NOINIT);
 
-  // Construction d'un octree avec les sommets du domaine:
+  // Build an octree with the domain vertices:
   const DoubleTab& coord = dom.coord_sommets();
   Octree_Double octree;
   octree.build_nodes(coord, 0 /* do not include virtual nodes */);
 
-  // Lecture des valeurs dans input
+  // Read values from input
   int nb_val_lues;
   input >> nb_val_lues;
   const int dim = coord.dimension(1);
@@ -218,7 +218,7 @@ void Champ_implementation_P1::init_from_file(DoubleTab& val, const Domaine& dom,
         }
       else
         {
-          // Ce sommet n'est pas sur ce processeur...
+          // This vertex is not on this processor...
         }
     }
 
@@ -230,28 +230,28 @@ void Champ_implementation_P1::init_from_file(DoubleTab& val, const Domaine& dom,
   val.echange_espace_virtuel();
 }
 
-/*! @brief Calcule la coordonnee barycentrique d'un point (x,y) par rapport au sommet specifie d'un triangle ou d'un rectange (un element)
+/*! @brief Computes the barycentric coordinate of a point (x,y) with respect to the specified vertex of a triangle or rectangle (an element).
  *
- *     Ce calcul concerne un point 2D.
+ *     This computation concerns a 2D point.
  *
- * @param (IntTab& polys) tableau contenant les numeros des elements par rapport auxquels on veut calculer une coordonnee barycentrique. polys(i,0) est l'indice du sommet 0 de l'element i dans le tableau des coordonnees (coord).
- * @param (DoubleTab& coord) les coordonnees des sommets par auxquels on veut calculer les coordonnees barycentriques.
- * @param (double x) la premiere coordonnee cartesienne du point dont on veut calculer les coordonnees barycentriques
- * @param (double y) la deuxieme coordonnee cartesienne du point dont on veut calculer les coordonnees barycentriques
- * @param (int le_poly) le numero de l'element (dans le tableau polys) par rapport auquel on calculera la coordonnee barycentrique.
- * @param (int i) le numero du sommet par rapport auquel on veut la coordonnee barycentrique.
- * @return (double) la coordonnee barycentrique du point (x,y) par rapport au sommet specifie (i) dans l'element specifie (le_poly)
- * @throws erreur arithmetique, denominateur nul
- * @throws erreur de calcul, coordonnee barycentrique invalide
+ * @param (IntTab& polys) array containing the indices of the elements with respect to which the barycentric coordinate is to be computed. polys(i,0) is the index of vertex 0 of element i in the coordinate array (coord).
+ * @param (DoubleTab& coord) the coordinates of the vertices for which the barycentric coordinates are to be computed.
+ * @param (double x) the first Cartesian coordinate of the point whose barycentric coordinates are to be computed
+ * @param (double y) the second Cartesian coordinate of the point whose barycentric coordinates are to be computed
+ * @param (int le_poly) the index of the element (in the polys array) with respect to which the barycentric coordinate will be computed.
+ * @param (int i) the index of the vertex with respect to which the barycentric coordinate is wanted.
+ * @return (double) the barycentric coordinate of point (x,y) with respect to the specified vertex (i) in the specified element (le_poly)
+ * @throws arithmetic error, null denominator
+ * @throws computation error, invalid barycentric coordinate
  */
 double coord_barycentrique_P1(const IntTab& polys, const DoubleTab& coord, double x, double y, int le_poly, int i)
 {
   int nb_som_elem = polys.dimension(1);
-  //Distinction du calcul de la coordonnee barycentrique en fonction du type de l element
-  //Cas Triangle
+  //Selection of barycentric coordinate computation depending on element type
+  //Triangle case
   if (nb_som_elem == 3)
     return coord_barycentrique_P1_triangle(polys, coord, x, y, le_poly, i);
-  //Cas Rectangle
+  //Rectangle case
   else if (nb_som_elem == 4)
     return coord_barycentrique_P1_rectangle(polys, coord, x, y, le_poly, i);
   Cerr << "The number of nodes by element " << nb_som_elem << " does not correspond to a treated situation in the coord_barycentrique_P1 function." << finl;
@@ -259,28 +259,28 @@ double coord_barycentrique_P1(const IntTab& polys, const DoubleTab& coord, doubl
   return 0.;
 }
 
-/*! @brief Calcule la coordonnee barycentrique d'un point (x,y,z) par rapport au sommet specifie d'un tetraedre ou d'un hexaedre (un element)
+/*! @brief Computes the barycentric coordinate of a point (x,y,z) with respect to the specified vertex of a tetrahedron or hexahedron (an element).
  *
- *     Ce calcul concerne un point 3D.
+ *     This computation concerns a 3D point.
  *
- * @param (IntTab& polys) tableau contenant les numeros des elements par rapport auxquels on veut calculer une coordonnee barycentrique. polys(i,0) est l'indice du sommet 0 de l'element i dans le tableau des coordonnees (coord).
- * @param (DoubleTab& coord) les coordonnees des sommets par auxquels on veut calculer les coordonnees barycentriques.
- * @param (double x) la premiere coordonnee cartesienne du point dont on veut calculer les coordonnees barycentriques
- * @param (double y) la deuxieme coordonnee cartesienne du point dont on veut calculer les coordonnees barycentriques
- * @param (double z) la troisieme coordonnee cartesienne du point dont on veut calculer les coordonnees barycentriques
- * @param (int le_poly) le numero de l'element (dans le tableau polys) par rapport auquel on calculera la coordonnee barycentrique.
- * @param (int i) le numero du sommet par rapport auquel on veut la coordonnee barycentrique.
- * @return (double) la coordonnee barycentrique du point (x,y,z) par rapport au sommet specifie (i) dans l'element specifie (le_poly)
- * @throws un tetraedre n'a pas plus de 4 sommets
- * @throws un hexaedre n'a pas plus de 8 sommets
- * @throws erreur arithmetique, denominateur nul
- * @throws erreur de calcul, coordonnee barycentrique invalide
+ * @param (IntTab& polys) array containing the indices of the elements with respect to which the barycentric coordinate is to be computed. polys(i,0) is the index of vertex 0 of element i in the coordinate array (coord).
+ * @param (DoubleTab& coord) the coordinates of the vertices for which the barycentric coordinates are to be computed.
+ * @param (double x) the first Cartesian coordinate of the point whose barycentric coordinates are to be computed
+ * @param (double y) the second Cartesian coordinate of the point whose barycentric coordinates are to be computed
+ * @param (double z) the third Cartesian coordinate of the point whose barycentric coordinates are to be computed
+ * @param (int le_poly) the index of the element (in the polys array) with respect to which the barycentric coordinate will be computed.
+ * @param (int i) the index of the vertex with respect to which the barycentric coordinate is wanted.
+ * @return (double) the barycentric coordinate of point (x,y,z) with respect to the specified vertex (i) in the specified element (le_poly)
+ * @throws a tetrahedron does not have more than 4 vertices
+ * @throws a hexahedron does not have more than 8 vertices
+ * @throws arithmetic error, null denominator
+ * @throws computation error, invalid barycentric coordinate
  */
 double coord_barycentrique_P1(const IntTab& polys, const DoubleTab& coord, double x, double y, double z, int le_poly, int i)
 {
   int nb_som_elem = polys.dimension(1);
-  //Distinction du calcul de la coordonnee barycentrique en fonction du type de l element
-  //Cas Tetraedre
+  //Selection of barycentric coordinate computation depending on element type
+  //Tetrahedron case
   if (nb_som_elem == 4)
     return coord_barycentrique_P1_tetraedre(polys, coord, x, y, z, le_poly, i);
   else if (nb_som_elem == 8)

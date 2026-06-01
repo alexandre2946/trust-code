@@ -56,7 +56,7 @@ Entree& Op_Diff_VEF_Face_Penalise::readOn(Entree& is )
  *
  */
 
-/*! @brief methode qui calcule la contribution de l'operateur.
+/*! @brief Method that computes the contribution of the operator.
  *
  */
 DoubleTab& Op_Diff_VEF_Face_Penalise::
@@ -88,24 +88,24 @@ ajouter(const DoubleTab& inconnue, DoubleTab& resu) const
   IntList voisinage_ordre2,voisinage_ordre2_strict;
   IntList ensemble_faces;
 
-  /* On calcule le resultat du a la matrice de penalisation
-   * i.e. somme_j U_j P_i,j ou P_i,j est le terme de la matrice
-   * de penalisation.
+  /* Compute the result due to the penalisation matrix
+   * i.e. sum_j U_j P_i,j where P_i,j is the term of the
+   * penalisation matrix.
    */
   for (nb_composante = 0; nb_composante < dimension; nb_composante++)
     {
       for (numero_global_face = 0; numero_global_face < domaine_vef().nb_faces();
            numero_global_face++)
         {
-          /* Calcul des voisinages de numero_global_face */
+          /* Compute the neighbourhoods of numero_global_face */
           voisinage(numero_global_face,voisinage_ordre1);
           voisinage(voisinage_ordre1,voisinage_ordre2);
           reduction(voisinage_ordre1,voisinage_ordre2,voisinage_ordre2_strict);
           //           Cerr << "Nombre iterations " << numero_global_face << finl;
           //           Cerr << "Nombre de faces " << domaine_vef().nb_faces() << finl;
 
-          /* Calcul de resu(numero_face_global,nb_comp)
-           * pour le voisinage_ordre2_strict
+          /* Compute resu(numero_face_global,nb_comp)
+           * for voisinage_ordre2_strict
            */
           for (local = 0 ; local < voisinage_ordre2_strict.size(); local++)
             {
@@ -138,8 +138,8 @@ ajouter(const DoubleTab& inconnue, DoubleTab& resu) const
 
             }
 
-          /* Calcul de resu(numero_global_face,nb_comp)
-           * pour le voisinage_ordre1_strict
+          /* Compute resu(numero_global_face,nb_comp)
+           * for voisinage_ordre1_strict
            */
           for (local = 0 ; local < voisinage_ordre1_strict.size(); local++)
             {
@@ -156,8 +156,8 @@ ajouter(const DoubleTab& inconnue, DoubleTab& resu) const
                 (-1./3.);
             }
 
-          /* Cas 1: la face consideree est au bord du domaine.
-           * et numero_global_face = face
+          /* Case 1: the face under consideration is on the domain boundary
+           * and numero_global_face = face.
            */
           if (numero_global_face < domaine_vef().nb_faces_bord())
             for (local = 0; local < voisinage_ordre1.size(); local++)
@@ -178,7 +178,7 @@ ajouter(const DoubleTab& inconnue, DoubleTab& resu) const
                   longueur(face_penalisation);
               }
 
-          /* Cas 2: la face est interne et numero_global_face = face */
+          /* Case 2: the face is internal and numero_global_face = face */
           else
             for (local = 0; local < voisinage_ordre1_strict.size(); local++)
               {
@@ -303,15 +303,15 @@ voisinage(const IntList& Ensemble_faces, IntList& Voisinage) const
        nb_elements_Ensemble_faces < Ensemble_faces.size();
        nb_elements_Ensemble_faces++)
     {
-      /* Parametre interne a la boucle */
+      /* Loop-internal parameter */
       const int numero_face_dans_Ensemble_faces =
         Ensemble_faces[nb_elements_Ensemble_faces];
 
-      /* On vide la liste temporaire a chaque fois que l'on change de face */
+      /* Clear the temporary list each time we change face */
       if (! liste_temporaire.est_vide() ) liste_temporaire.vide();
 
-      /* Dans la liste temporaire, on place le voisinage
-       * de numero_face_dans_Ensemble_faces
+      /* Place the neighbourhood of numero_face_dans_Ensemble_faces
+       * into the temporary list.
        */
       voisinage(numero_face_dans_Ensemble_faces,liste_temporaire);
       //      Cerr << "Taille liste temporaire " << liste_temporaire.size() << finl;
@@ -437,7 +437,7 @@ coefficient_penalisation(const int Numero_face) const
  *
  */
 
-/*! @brief fonction membre qui renvoie la liste des faces appartenant au voisinage de Face1 ET de Face2.
+/*! @brief Member function returning the list of faces belonging to the neighbourhood of both Face1 AND Face2.
  *
  */
 void  Op_Diff_VEF_Face_Penalise::
@@ -507,9 +507,8 @@ reduction(const IntList& Liste1,const IntList& Liste2,
       liste_de_plus_grande_taille = &Liste2;
     }
 
-  /* Enfin, on supprime de la liste_de_plus_grande_taille,
-   * les elements de la liste_de_plus_petite_taille si ceux-ci
-   * sont bien dans la liste_de_plus_grande_taille.
+  /* Remove from liste_de_plus_grande_taille the elements
+   * of liste_de_plus_petite_taille that are present in it.
    */
   for (int ll = 0 ; ll < (*liste_de_plus_grande_taille).size() ; ll++)
     Liste_reduite.add( (*liste_de_plus_grande_taille)[ll] );
@@ -607,9 +606,7 @@ const
   for (numero_local = 0; numero_local < nb_faces_element; numero_local++)
 
     {
-      /* On recupere le numero global de chacune des
-       * faces de Element
-       */
+      /* Retrieve the global index of each face of Element */
       const int numero_global_face =
         domaine_vef().elem_faces(elem_commun,numero_local);
 

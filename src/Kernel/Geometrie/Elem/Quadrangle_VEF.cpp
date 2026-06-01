@@ -18,7 +18,7 @@
 #include <Triangle.h>
 #include <Polygon_geom_tools.h>
 
-// Definition des sommets :
+// Vertex numbering convention:
 //  y
 //  ^
 //  |
@@ -28,7 +28,7 @@
 //  |     |
 //  0-----1--> x
 //
-// Definition des faces d'un quadrangle:
+// Face numbering convention for a quadrangle:
 //
 //  *--3--*
 //  |     |
@@ -59,9 +59,9 @@ Entree& Quadrangle_VEF_32_64<_SIZE_>::readOn(Entree& s )
 }
 
 
-/*! @brief Renvoie le nom LML d'un Quadrangle_VEF = "GOLGOTH24".
+/*! @brief Returns the LML name of a Quadrangle_VEF = "GOLGOTH24".
  *
- * @return (Nom&) toujours egal a "GOLGOTH24"
+ * @return Always equal to "GOLGOTH24" (or "VOXEL8" / "QUADRANGLE_3D" depending on dimension).
  */
 template <typename _SIZE_>
 const Nom& Quadrangle_VEF_32_64<_SIZE_>::nom_lml() const
@@ -73,14 +73,13 @@ const Nom& Quadrangle_VEF_32_64<_SIZE_>::nom_lml() const
 }
 
 
-/*! @brief Renvoie 1 si l'element ielem du domaine associe a l'element geometrique contient le point
+/*! @brief Returns 1 if element "element" of the domain associated with this geometric element contains the point
  *
- *               de coordonnees specifiees par le parametre "pos".
- *     Renvoie 0 sinon.
+ * with coordinates specified by "pos". Returns 0 otherwise.
  *
- * @param (DoubleVect& pos) coordonnees du point que l'on cherche a localiser
- * @param (int ielem) le numero de l'element du domaine dans lequel on cherche le point.
- * @return (int) 1 si le point de coordonnees specifiees appartient a l'element ielem 0 sinon
+ * @param pos Coordinates of the point to locate.
+ * @param element Index of the domain element in which to search for the point.
+ * @return 1 if the point belongs to element "element", 0 otherwise.
  */
 template <typename _SIZE_>
 int Quadrangle_VEF_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t element) const
@@ -92,15 +91,14 @@ int Quadrangle_VEF_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t element
   int_t som1 = domaine.sommet_elem(element,1);
   int_t som2 = domaine.sommet_elem(element,2);
   int_t som3 = domaine.sommet_elem(element,3);
-  // On regarde tout d'abord si le point cherche n'est pas un des
-  // sommets du quadrangle
+  // First check if the point is one of the quadrangle vertices
   if( (est_egal(dom.coord(som0,0),pos[0]) && est_egal(dom.coord(som0,1),pos[1]))
       || (est_egal(dom.coord(som1,0),pos[0]) && est_egal(dom.coord(som1,1),pos[1]))
       || (est_egal(dom.coord(som2,0),pos[0]) && est_egal(dom.coord(som2,1),pos[1]))
       || (est_egal(dom.coord(som3,0),pos[0]) && est_egal(dom.coord(som3,1),pos[1])) )
     return 1;
   double prod,p0,p1,p2,p3;
-  // Calcul de prod = 01 vectoriel 02 selon z
+  // Compute prod = 01 cross product 02 along z
   prod = (dom.coord(som1,0)-dom.coord(som0,0))*(dom.coord(som2,1)-dom.coord(som0,1))
          - (dom.coord(som1,1)-dom.coord(som0,1))*(dom.coord(som2,0)-dom.coord(som0,0));
   double signe;
@@ -108,19 +106,19 @@ int Quadrangle_VEF_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t element
     signe = 1;
   else
     signe = -1;
-  // Calcul de p0 = 0M vectoriel 1M selon z
+  // Compute p0 = 0M cross product 1M along z
   p0 = (pos[0]-dom.coord(som0,0))*(pos[1]-dom.coord(som1,1))
        - (pos[1]-dom.coord(som0,1))*(pos[0]-dom.coord(som1,0));
   p0 *= signe;
-  // Calcul de p1 = 1M vectoriel 3M selon z
+  // Compute p1 = 1M cross product 3M along z
   p1 = (pos[0]-dom.coord(som1,0))*(pos[1]-dom.coord(som3,1))
        - (pos[1]-dom.coord(som1,1))*(pos[0]-dom.coord(som3,0));
   p1 *= signe;
-  // Calcul de p2 = 3M vectoriel 2M selon z
+  // Compute p2 = 3M cross product 2M along z
   p2 = (pos[0]-dom.coord(som3,0))*(pos[1]-dom.coord(som2,1))
        - (pos[1]-dom.coord(som3,1))*(pos[0]-dom.coord(som2,0));
   p2 *= signe;
-  // Calcul de p3 = 2M vectoriel 0M selon z
+  // Compute p3 = 2M cross product 0M along z
   p3 = (pos[0]-dom.coord(som2,0))*(pos[1]-dom.coord(som0,1))
        - (pos[1]-dom.coord(som2,1))*(pos[0]-dom.coord(som0,0));
   p3 *= signe;
@@ -132,13 +130,13 @@ int Quadrangle_VEF_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t element
 }
 
 
-/*! @brief Renvoie 1 si les sommets specifies par le parametre "pos" sont les sommets de l'element "element" du domaine associe a
+/*! @brief Returns 1 if the vertices specified by parameter "som" are the vertices of element "element"
  *
- *     l'element geometrique.
+ * in the domain associated with this geometric element. Returns 0 otherwise.
  *
- * @param (IntVect& pos) les numeros des sommets a comparer avec ceux de l'elements "element"
- * @param (int element) le numero de l'element du domaine dont on veut comparer les sommets
- * @return (int) 1 si les sommets passes en parametre sont ceux de l'element specifie, 0 sinon
+ * @param som Vertex indices to compare with those of element "element".
+ * @param element Index of the domain element whose vertices are to be compared.
+ * @return 1 if the specified vertices are those of the given element, 0 otherwise.
  */
 template <typename _SIZE_>
 int Quadrangle_VEF_32_64<_SIZE_>::contient(const SmallArrOfTID_t& som, int_t element ) const
@@ -153,9 +151,9 @@ int Quadrangle_VEF_32_64<_SIZE_>::contient(const SmallArrOfTID_t& som, int_t ele
     return 0;
 }
 
-/*! @brief Calcule les volumes des elements du domaine associe.
+/*! @brief Computes the volumes of the elements of the associated domain.
  *
- * @param (DoubleVect& volumes) le vecteur contenant les valeurs  des des volumes des elements du domaine
+ * @param volumes Vector to fill with the volumes of domain elements.
  */
 template <typename _SIZE_>
 void Quadrangle_VEF_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const
@@ -173,7 +171,7 @@ void Quadrangle_VEF_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const
       const int_t S3 = domaine.sommet_elem(num_poly,3);
       const int_t S[4] = { S0, S1, S2, S3 };
 
-      // TRUST quadrangle local numbering is "papillonnée": 0-1-2-3.
+      // TRUST quadrangle local numbering is "butterfly-shaped": 0-1-2-3.
       // The boundary (CCW) order is 0-1-3-2; use this for the shoelace formula.
       static const int ord[4] = {0, 1, 3, 2};
 
@@ -188,7 +186,7 @@ void Quadrangle_VEF_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const
 }
 
 
-/*! @brief Reordonne
+/*! @brief Reorders the vertices of the quadrangle elements.
  */
 template <typename _SIZE_>
 void Quadrangle_VEF_32_64<_SIZE_>::reordonner()
@@ -206,7 +204,7 @@ void Quadrangle_VEF_32_64<_SIZE_>::reordonner()
       for(int i=0; i<4; i++)
         S[i] = elem(num_poly,i);
 
-      // adaptation de Hexaedre_VEF ::reordonne
+      // adapted from Hexaedre_VEF::reordonne
 
       const DoubleTab_t& coord=domaine.les_sommets();
       DoubleTab v(3,3);
@@ -250,7 +248,7 @@ void Quadrangle_VEF_32_64<_SIZE_>::reordonner()
               if (opp!=-1)
                 {
                   op=2;
-                  // on a deux produits negatifs on ne fait rien
+                  // two negative products: do nothing
                 }
               opp=op;
 
@@ -272,7 +270,7 @@ void Quadrangle_VEF_32_64<_SIZE_>::reordonner()
     }
 }
 
-/*! @brief voir ElemGeomBase::get_tab_faces_sommets_locaux
+/*! @brief See ElemGeomBase::get_tab_faces_sommets_locaux.
  *
  */
 template <typename _SIZE_>

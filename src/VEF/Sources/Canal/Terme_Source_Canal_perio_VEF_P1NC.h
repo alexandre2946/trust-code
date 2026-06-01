@@ -16,9 +16,10 @@
 #ifndef Terme_Source_Canal_perio_VEF_P1NC_included
 #define Terme_Source_Canal_perio_VEF_P1NC_included
 
-/*! @brief class Terme_Source_Canal_perio_VEF_P1NC Cette classe permet de conserver le debit dans une simulation
+/*! @brief class Terme_Source_Canal_perio_VEF_P1NC
  *
- *   temporelle de Canal
+ * @brief This class allows the flow rate to be conserved in a
+ *   transient channel simulation.
  *
  *
  * @sa Terme_Source_Canal_perio
@@ -33,7 +34,7 @@ class Probleme_base;
 class Domaine_Cl_VEF;
 class Domaine_VEF;
 
-// La classe derive de Source_base et peut etre d'un terme source
+// The class derives from Source_base and can be a source term
 class Terme_Source_Canal_perio_VEF_P1NC : public Terme_Source_Canal_perio
 {
   Declare_instanciable(Terme_Source_Canal_perio_VEF_P1NC);
@@ -49,7 +50,7 @@ protected :
 
   public_for_cuda
   void calculer_debit(double&) const override;
-  // les attributs ont ete mis dans la classe mere
+  // attributes have been moved to the base class
 
 };
 

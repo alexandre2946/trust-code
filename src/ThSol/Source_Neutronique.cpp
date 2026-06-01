@@ -150,7 +150,7 @@ double Source_Neutronique::rho(double t, double T)
 
 
 /**
- * Renvoie la chaine de caracere representant la fonction de repartition f(x,y,z) de la puissance
+ * Returns the string representing the spatial distribution function f(x,y,z) of the power.
  */
 const Nom& Source_Neutronique::repartition() const
 {
@@ -158,7 +158,7 @@ const Nom& Source_Neutronique::repartition() const
 }
 
 /**
- * Renvoie le nom de la sous domaine de degagement de puissance
+ * Returns the name of the sub-domain where power is released.
  */
 const Nom& Source_Neutronique::nom_ssz() const
 {
@@ -193,8 +193,9 @@ void Source_Neutronique::completer()
 
 
 /**
- * Effectue resu = m*v
- */void Source_Neutronique::mul(DoubleTab& m, DoubleVect& v, DoubleVect& resu)
+ * Computes resu = m*v.
+ */
+void Source_Neutronique::mul(DoubleTab& m, DoubleVect& v, DoubleVect& resu)
 {
   resu = 0.;
   resu(0) = m(0,0)*v(0);
@@ -207,7 +208,7 @@ void Source_Neutronique::completer()
 
 
 /**
- * Schema de Runge Kutta classique
+ * Classical Runge-Kutta scheme.
  */
 void Source_Neutronique::faire_un_pas_de_temps_RK()
 {
@@ -249,7 +250,7 @@ void Source_Neutronique::faire_un_pas_de_temps_RK()
 
 
 /**
- * Met a jour les coefficients de la matrice A
+ * Updates the coefficients of matrix A.
  */
 void Source_Neutronique::mettre_a_jour_matA(double temps)
 {
@@ -259,7 +260,7 @@ void Source_Neutronique::mettre_a_jour_matA(double temps)
 
 
 /**
- * Schema Euler explicite
+ * Explicit Euler scheme.
  */
 void Source_Neutronique::faire_un_pas_de_temps_EE()
 {
@@ -273,7 +274,7 @@ void Source_Neutronique::faire_un_pas_de_temps_EE()
 }
 
 /**
- * Aller_au_temps : permet d'avancer avec le pas de temps de stabilite propre de l'equation.
+ * Advances in time using the stability time step specific to the equation.
  */
 void Source_Neutronique::aller_au_temps(double temps)
 {
@@ -291,7 +292,7 @@ void Source_Neutronique::aller_au_temps(double temps)
 }
 
 /**
- * Imprime les resultats dans le fichier puissance.dat
+ * Prints results to the file puissances.dat.
  */
 void Source_Neutronique::imprimer(double temps) const
 {
@@ -314,14 +315,14 @@ int Source_Neutronique::limpr(double le_temps_courant,double ddt) const
 {
   static const double epsilon = 1.e-9;
   const Schema_Temps_base& sch = mon_equation->schema_temps();
-  // Si impression a chaque pas de temps, alors que pas demande, faire comme limpr() de Echange_contact_Correlation_VDF.cpp
+  // If printing at every time step when not requested, behave like limpr() in Echange_contact_Correlation_VDF.cpp
   if (sch.nb_pas_dt()==0)
     return 0;
   if (dt_impr<=ddt || ((sch.temps_final_atteint() || sch.nb_pas_dt_max_atteint() || sch.nb_pas_dt()<=1 || sch.stationnaire_atteint()) && dt_impr!=1e10))
     return 1;
   else
     {
-      // Voir Schema_Temps_base::limpr pour information sur epsilon et modf
+      // See Schema_Temps_base::limpr for information on epsilon and modf
       double i, j;
       modf(le_temps_courant/dt_impr + epsilon, &i);
       modf((le_temps_courant-ddt)/dt_impr + epsilon, &j);

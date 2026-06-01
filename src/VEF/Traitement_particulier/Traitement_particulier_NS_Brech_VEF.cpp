@@ -234,7 +234,7 @@ void Traitement_particulier_NS_Brech_VEF::post_traitement_particulier_calcul_flu
       DoubleTab Surf_trace(taille,3) ;
       DoubleTab valeurs_(taille,3) ;
 
-      // Modifs VB pour prise en compte rho et calcul du flux enthalpique + Tmoy
+      // VB modifications to account for rho and compute enthalpy flux + Tmoy
       OBS_PTR(Champ_base) rch1 ;
       OBS_PTR(Champ_Inc_base) l_inco ;
       const Probleme_base& pb = mon_equation->probleme();
@@ -250,7 +250,7 @@ void Traitement_particulier_NS_Brech_VEF::post_traitement_particulier_calcul_flu
       DoubleTab temper_(taille,1);
       DoubleTab rho_(taille,1) ;
       DoubleTab cp_(taille,1) ;
-      // Fin Modifs VB
+      // End VB modifications
       //
       double rad, teta ;
       double dr    = ( r_out(ii) - r_int(ii) ) /delta_r(ii) ;
@@ -261,20 +261,20 @@ void Traitement_particulier_NS_Brech_VEF::post_traitement_particulier_calcul_flu
       Surf_trace.resize(taille,3) ;
       valeurs_.resize(taille,3);
 
-      // Modifs VB pour prise en compte rho et calcul du flux enthalpique + Tmoy
+      // VB modifications to account for rho and compute enthalpy flux + Tmoy
       rho_.resize(taille,1) ;
       temper_.resize(taille,1);
       cp_.resize(taille,1);
-      // Fin Modifs VB
+      // End VB modifications
 
       double a,b,c ;
 
-      // Modifs VB pour calculer le flux sur une face inclinee
-      // anglex est l'angle que fait la normale a la face par rapport a l'axe des x (angle aigu)
+      // VB modifications to compute the flux on an inclined face
+      // anglex is the angle between the face normal and the x axis (acute angle)
       double anglex = acos(C_trans(ii,0)/sqrt( C_trans(ii,0) * C_trans(ii,0)
                                                + C_trans(ii,1) * C_trans(ii,1)
                                                + C_trans(ii,2) * C_trans(ii,2) )) ;
-      // Fin Modifs VB
+      // End VB modifications
 
       int i =-1 ;
 
@@ -282,12 +282,12 @@ void Traitement_particulier_NS_Brech_VEF::post_traitement_particulier_calcul_flu
         for (teta = dteta/2. ; teta < 2.*3.14159 ; teta += dteta )
           {
             i++ ;
-            // Modifs VB pour calculer le flux sur une face inclinee
+            // VB modifications to compute the flux on an inclined face
             //            a = 0. ;
             //            b = rad * cos(teta) ;
             a = - rad * cos(teta) * sin(anglex) ;
             b =   rad * cos(teta) * cos(anglex) ;
-            // Fin Modifs VB
+            // End VB modifications
             c = rad * sin(teta) ;
             coord_trace(i,0) = a + R_loc(ii,0) ;
             coord_trace(i,1) = b + R_loc(ii,1) ;
@@ -300,13 +300,13 @@ void Traitement_particulier_NS_Brech_VEF::post_traitement_particulier_calcul_flu
       double flux_pos = 0. ;
       double flux_neg = 0. ;
       double flux ;
-      // Modifs VB pour prise en compte rho et calcul du flux enthalpique + Tmoy
+      // VB modifications to account for rho and compute enthalpy flux + Tmoy
       double tempmoy = 0. ;
       double massvol = 0. ;
       double fluxE_pos = 0. ;
       double fluxE_neg = 0. ;
       double fluxE ;
-      // fin modifs VB
+      // end VB modifications
 
       const Domaine_dis_base& zdis=mon_equation->inconnue().domaine_dis_base();
       const Domaine& domaine=zdis.domaine();
@@ -314,28 +314,28 @@ void Traitement_particulier_NS_Brech_VEF::post_traitement_particulier_calcul_flu
       domaine.chercher_elements(coord_trace, les_polys);
       mon_equation->inconnue().valeur_aux_elems(coord_trace, les_polys, valeurs_);
 
-      // Modifs VB pour prise en compte rho et calcul du flux enthalpique + Tmoy
+      // VB modifications to account for rho and compute enthalpy flux + Tmoy
       mon_equation->fluide().masse_volumique().valeur_aux_elems(coord_trace, les_polys, rho_);
       mon_equation->fluide().capacite_calorifique().valeur_aux_elems(coord_trace, les_polys, cp_);
       temp.valeur_aux_elems(coord_trace, les_polys, temper_);
-      // Fin Modifs VB
+      // End VB modifications
 
-      // On annulle la partie virtuelle
+      // Zero out the virtual part
       for (i=0 ; i<taille; i++)
         if (les_polys(i)>=domaine.nb_elem())
           {
             for (int k=0; k<dimension; k++)
               valeurs_(i,k)=0;
-            // Modifs VB pour prise en compte rho et calcul du flux enthalpique + Tmoy
+            // VB modifications to account for rho and compute enthalpy flux + Tmoy
             rho_(i)=0.;
             temper_(i)=0.;
             cp_(i)=0.;
           }
-      // Fin Modifs VB
+      // End VB modifications
 
       for (i=0 ; i<taille; i++ )
         {
-          // Modifs VB pour prise en compte rho et calcul du flux enthalpique + Tmoy
+          // VB modifications to account for rho and compute enthalpy flux + Tmoy
           //       flux = valeurs_(i,0)*Surf_trace(i,0) ;
           massvol += rho_(i) ;
           tempmoy += temper_(i) ;
@@ -452,7 +452,7 @@ void Traitement_particulier_NS_Brech_VEF::post_traitement_particulier_calcul_pre
   gradient.calculer(mon_equation->pression().valeurs(),gradP);
   //gradient.calculer(la_pression,gradP);
   // Cerr << "gradP " << gradP << finl;
-  //on veut BM-1Bt(psi*Pression)
+  // we want BM-1Bt(psi*Pression)
   mon_equation->solv_masse().appliquer(gradP);
 
   DoubleTab grad_temp(vitesse);
@@ -485,22 +485,22 @@ calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF&
                             DoubleVect& P,
                             const DoubleTab& vit) const
 {
-  // P est discretise comme K et Eps i.e au centre des elements
+  // P is discretised like K and Eps, i.e. at element centres
   //
   // P(elem) = -(2/3)*k(i)*div_U(i) + nu_t(i) * F(u,v,w)
   //
   //                          2          2          2
-  //    avec F(u,v,w) = 2[(du/dx)  + (dv/dy)  + (dw/dz) ] +
+  //    with F(u,v,w) = 2[(du/dx)  + (dv/dy)  + (dw/dz) ] +
   //
   //                               2               2               2
   //                  (du/dy+dv/dx) + (du/dz+dw/dx) + (dw/dy+dv/dz)
   //
-  // Rqs: On se place dans le cadre incompressible donc on neglige
-  //      le terme (2/3)*k(i)*div_U(i)
+  // Note: we work in the incompressible framework so we neglect
+  //       the term (2/3)*k(i)*div_U(i)
 
   P= 0;
 
-  // Calcul de F(u,v,w):
+  // Compute F(u,v,w):
 
   //  const Domaine& domaine = domaine_VEF.domaine();
   int nb_elem = domaine_VEF.nb_elem();
@@ -514,11 +514,11 @@ calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF&
   int fac=0, poly1, poly2;
   int nb_faces_ = domaine_VEF.nb_faces();
 
-  // (du/dx du/dy dv/dx dv/dy ...) pour un poly
+  // (du/dx du/dy dv/dx dv/dy ...) for a polyhedron
 
   ///////////////////////////////////////////////////////////////////////////////////////////////
   //                        <
-  // calcul des gradients;  < [ Ujp*np/vol(j) ]
+  // compute gradients;  < [ Ujp*np/vol(j) ]
   //                         j
   ////////////////////////////////////////////////////////////////////////////////////////////////
   int n_bord;
@@ -526,7 +526,7 @@ calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF&
   DoubleTab gradient_elem(nb_elem,dimension,dimension);
   Champ_P1NC::calcul_gradient(vit,gradient_elem,zcl_VEF);
 
-  // On a les gradient_elem par elements
+  // We have gradient_elem per element
   ////////////////////////////////////////////////////////////////////////////////////
 
   double du_dx;
@@ -540,11 +540,11 @@ calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF&
   double dw_dz;
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // Calcul des du/dx dv/dy et des derivees croisees sur les faces de chaque elements dans le cas 2D
+  // Compute du/dx, dv/dy and the cross-derivatives on the faces of each element in the 2D case
   /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  // Boucle sur les bords pour traiter les faces de bord
-  // en distinguant le cas periodicite
+  // Loop over boundaries to process boundary faces,
+  // distinguishing the periodic case
 
   for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
@@ -567,7 +567,7 @@ calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF&
               dv_dx =a*gradient_elem(poly1,1,0) + b*gradient_elem(poly2,1,0);
               dv_dy =a*gradient_elem(poly1,1,1) + b*gradient_elem(poly2,1,1);
 
-              // Determination du terme de production
+              // Compute the production term
 
               P(fac) = ( 2*(du_dx *du_dx  + dv_dy *dv_dy) + ((du_dy+dv_dx)*(du_dy+dv_dx)));
 
@@ -579,7 +579,7 @@ calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF&
                   dw_dy=a*gradient_elem(poly1,2,1) + b*gradient_elem(poly2,2,1);
                   dw_dz=a*gradient_elem(poly1,2,2) + b*gradient_elem(poly2,2,2);
 
-                  // Determination du terme de production
+                  // Compute the production term
 
                   P(fac) = (2*( du_dx*du_dx + dv_dy*dv_dy + dw_dz*dw_dz )
                             + ( (du_dy+dv_dx)*(du_dy+dv_dx)
@@ -598,7 +598,7 @@ calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF&
               du_dy=gradient_elem(poly1,0,1);
               dv_dx=gradient_elem(poly1,1,0);
               dv_dy=gradient_elem(poly1,1,1);
-              // Determination du terme de production
+              // Compute the production term
               P(fac) = ( 2*(du_dx*du_dx + dv_dy*dv_dy) + ((du_dy+dv_dx)*(du_dy+dv_dx)));
 
 
@@ -610,7 +610,7 @@ calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF&
                   dw_dy=gradient_elem(poly1,2,1);
                   dw_dz=gradient_elem(poly1,2,2);
 
-                  // Determination du terme de production
+                  // Compute the production term
 
                   P(fac) = (2*( du_dx*du_dx + dv_dy*dv_dy + dw_dz*dw_dz )
                             + ( (du_dy+dv_dx)*(du_dy+dv_dx)
@@ -622,7 +622,7 @@ calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF&
     }
 
 
-  // Traitement des faces internes
+  // Process internal faces
 
   for (; fac<nb_faces_; fac++)
     {
@@ -636,7 +636,7 @@ calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF&
       dv_dx=a*gradient_elem(poly1,1,0) + b*gradient_elem(poly2,1,0);
       dv_dy=a*gradient_elem(poly1,1,1) + b*gradient_elem(poly2,1,1);
 
-      // Determination du terme de production
+      // Determination of the production term
 
       P(fac) = ( 2*(du_dx*du_dx + dv_dy*dv_dy) + ((du_dy+dv_dx)*(du_dy+dv_dx)));
 
@@ -648,7 +648,7 @@ calculer_terme_production_K(const Domaine_VEF& domaine_VEF,const Domaine_Cl_VEF&
           dw_dy=a*gradient_elem(poly1,2,1) + b*gradient_elem(poly2,2,1);
           dw_dz=a*gradient_elem(poly1,2,2) + b*gradient_elem(poly2,2,2);
 
-          // Determination du terme de production
+          // Determination of the production term
 
           P(fac) = (2*( du_dx*du_dx + dv_dy*dv_dy + dw_dz*dw_dz )
                     + ( (du_dy+dv_dx)*(du_dy+dv_dx)
@@ -666,7 +666,7 @@ calculer_terme_destruction_K(const Domaine_VEF& domaine_VEF,
                              const DoubleVect& beta,const DoubleVect& gravite) const
 {
   //
-  // G est discretise comme K et Eps i.e au centre des faces
+  // G is discretised like K and Eps, i.e. at face centres
   //
   //                                       --> ----->
   // G(face) = beta alpha_t(face) G . gradT(face)
@@ -691,9 +691,9 @@ calculer_terme_destruction_K(const Domaine_VEF& domaine_VEF,
   //DoubleVect coef(Objet_U::dimension);
   //  const IntTab& les_elem_faces = domaine_VEF.elem_faces();
 
-  // Calcul du gradient de temperature :
+  // Compute the temperature gradient:
 
-  // On traite les bords
+  // Process boundary faces
   int n_bord;
   for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
@@ -726,7 +726,7 @@ calculer_terme_destruction_K(const Domaine_VEF& domaine_VEF,
         }
     }
 
-  // On traite les faces internes
+  // Process internal faces
   for (fac = premiere_face_entier ; fac<nb_faces_; fac++)
     {
       elem1=face_voisins(fac,0);
@@ -742,9 +742,9 @@ calculer_terme_destruction_K(const Domaine_VEF& domaine_VEF,
     for (int i=0; i<dimension; i++)
       gradient_elem(elem,i) /= volumes(elem);
 
-  // Calcul de u_teta :
+  // Compute u_teta:
 
-  // On traite les bords
+  // Process boundary faces
 
   for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
@@ -787,7 +787,7 @@ calculer_terme_destruction_K(const Domaine_VEF& domaine_VEF,
         u_teta(fac,i)=a*beta(elem1)*gradient_elem(elem1,i)+b*beta(elem2)*gradient_elem(elem2,i);
     }
   //           ------->  ------>
-  // Calcul de gravite . u_teta
+  // Compute gravity . u_teta
   //
   G = 0;
   for (fac=0; fac< nb_faces_; fac++)

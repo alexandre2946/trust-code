@@ -30,14 +30,14 @@ void Op_Dift_VDF_base::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, con
 {
   iter_->ajouter_blocs(matrices,secmem,semi_impl);
 
-  // On ajoute des termes si axi ...
+  // We add terms if axi ...
   Op_Dift_VDF_base::ajoute_terme_pour_axi_turb(matrices, secmem, semi_impl);
 }
 
-// Ajout du terme supplementaire en V/(R*R) dans le cas des coordonnees axisymetriques
+// Addition of the extra V/(R*R) term in the axisymmetric coordinate case
 void Op_Dift_VDF_base::ajoute_terme_pour_axi_turb(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  if (equation().domaine_application() == Motcle("Hydraulique")) // On est dans le cas des equations de Navier_Stokes
+  if (equation().domaine_application() == Motcle("Hydraulique")) // We are in the case of the Navier_Stokes equations
     {
       const std::string& nom_inco = equation().inconnue().le_nom().getString();
       Matrice_Morse *mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr;

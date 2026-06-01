@@ -21,10 +21,7 @@
 
 class Fluide_Dilatable_base;
 
-/*! @brief classe Pb_Dilatable_base Cette classe est censee factoriser ce qui est commun a l'ensemble
- *
- *     des problemes dilatables.
- *
+/*! @brief Base class for dilatable fluid problems, factorising what is common to all dilatable problems.
  *
  * @sa Pb_Fluide_base
  */
@@ -36,7 +33,7 @@ class Pb_Dilatable_base : public Pb_Fluide_base
 public:
   bool initTimeStep(double dt) override;
   void preparer_calcul() override;
-  void mettre_a_jour(double temps) override; // Ne met a jour que les postraitements
+  void mettre_a_jour(double temps) override; // Updates post-processing fields only
   void associer_milieu_base(const Milieu_base& ) override;
   void associer_sch_tps_base(const Schema_Temps_base&) override;
   virtual void update_pressure_fields(double );

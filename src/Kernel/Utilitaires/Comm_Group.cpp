@@ -39,16 +39,16 @@ Comm_Group::Comm_Group()
 {
   static const int group_increment = 32;
 
-  // Les tags des communications sont differents
-  // pour chaque groupe tant qu'il n'y a pas plus de 32 groupes.
-  // Ainsi, chaque communication de chaque groupe aura un tag different.
+  // Communication tags are different
+  // for each group as long as there are no more than 32 groups.
+  // Thus, each communication of each group will have a different tag.
   group_number_ = static_group_number_;
   group_tag_increment_ = group_increment;
   static_group_number_++;
   group_communication_tag_ = group_number_ % group_increment;
 }
 
-/*! @brief Le constructeur par copie est interdit !
+/*! @brief Copy constructor is forbidden!
  *
  */
 Comm_Group::Comm_Group(const Comm_Group& a): Objet_U(a)
@@ -57,7 +57,7 @@ Comm_Group::Comm_Group(const Comm_Group& a): Objet_U(a)
   Process::exit();
 }
 
-/*! @brief La copie est interdite !
+/*! @brief Assignment is forbidden!
  *
  */
 const Comm_Group& Comm_Group::operator=(const Comm_Group&)
@@ -66,25 +66,24 @@ const Comm_Group& Comm_Group::operator=(const Comm_Group&)
   return *this;
 }
 
-/*! @brief Destructeur (pour l'instant, rien a faire)
+/*! @brief Destructor (nothing to do for now).
  *
  */
 Comm_Group::~Comm_Group()
 {
 }
 
-/*! @brief Cette fonction doit etre appelee simultanement par tous les PEs du groupe current_group avec les memes parametres.
+/*! @brief This function must be called simultaneously by all PEs of the current_group with the same parameters.
  *
- *   Les processeurs de la pe_list sont les rangs dans current_group() des
- *   processeurs du nouveau groupe. Le maitre du groupe est le premier de la liste,
- *   le rang du processeur courant, s'il est dans le groupe est determine par
- *   son rang dans la liste. Il ne doit pas y avoir de doublon.
- *   Cette fonction est appelee par les methodes init_group des classes derivees.
+ *   The processors in pe_list are the ranks within current_group() of the processors of the new group.
+ *   The master of the group is the first in the list. The rank of the current processor, if it is in
+ *   the group, is determined by its position in the list. There must be no duplicates.
+ *   This function is called by the init_group methods of derived classes.
  *
  */
 void Comm_Group::init_group(const ArrOfInt& pe_list)
 {
-  // Tous les processeurs du groupe courant doivent arriver ici
+  // All processors in the current group must arrive here
   const Comm_Group& current = PE_Groups::current_group();
   current.barrier(0);
 
@@ -102,7 +101,7 @@ void Comm_Group::init_group(const ArrOfInt& pe_list)
 
   for (int i = 0; i < nproc_; i++)
     {
-      // rank du pe dans current_group()
+      // rank of the pe in current_group()
       const int pe = pe_list[i], me = Process::me();
       const bool in_group = std::find(pe_list.begin(), pe_list.end(), me) != pe_list.end();
 
@@ -130,7 +129,7 @@ void Comm_Group::init_group(const ArrOfInt& pe_list)
                << pe << " is not in current_group()" << finl;
           Process::exit();
         }
-      // rank du pe dans le groupe_TRUST
+      // rank of the pe in groupe_TRUST
       const int world_rank = current.world_ranks_[pe];
 
       if (local_ranks_[world_rank] >= 0)
@@ -146,9 +145,9 @@ void Comm_Group::init_group(const ArrOfInt& pe_list)
     }
 }
 
-/*! @brief Initialise le groupe_TRUST().
+/*! @brief Initializes groupe_TRUST().
  *
- * Cette methode est appelee par init_group_trio() des classes derivees
+ * This method is called by init_group_trio() of derived classes.
  *
  */
 void Comm_Group::init_group_trio(int nproc_tot, int arank)

@@ -21,16 +21,14 @@
 
 class Champ_base;
 
-/*! @brief classe Fluide_base Cette classe represente un d'un fluide incompressible ainsi que
- *
- *     ses proprietes:
- *         - viscosite cinematique, (mu)
- *         - viscosite dynamique,   (nu)
- *         - masse volumique,       (rho)
- *         - diffusivite,           (alpha)
- *         - conductivite,          (lambda)
- *         - capacite calorifique,  (Cp)
- *         - dilatabilite thermique du constituant (beta_co)
+/*! @brief Base class for an incompressible fluid and its properties:
+ *         - kinematic viscosity (mu)
+ *         - dynamic viscosity   (nu)
+ *         - density             (rho)
+ *         - diffusivity         (alpha)
+ *         - conductivity        (lambda)
+ *         - specific heat       (Cp)
+ *         - constituent thermal expansion coefficient (beta_co)
  *
  * @sa Milieu_base
  */
@@ -61,21 +59,21 @@ public :
   inline Champ_Don_base& viscosite_dynamique() { return ch_mu_.valeur(); }
   bool has_viscosite_dynamique() const { return bool(ch_mu_); }
 
-  // Renvoie la dilatabilite du constituant, beta_co.
+  // Returns the constituent expansion coefficient, beta_co.
   inline const Champ_Don_base& beta_c() const { return ch_beta_co_.valeur(); }
   inline Champ_Don_base& beta_c() { return ch_beta_co_.valeur(); }
   bool has_beta_c() const { return bool(ch_beta_co_); }
 
-  // Renvoie le coefficient d'absorbtion du fluide
+  // Returns the fluid absorption coefficient
   inline Champ_Don_base& kappa() { return coeff_absorption_.valeur(); }
   inline const Champ_Don_base& kappa() const { return coeff_absorption_.valeur(); }
   bool has_kappa() const { return bool(coeff_absorption_); }
 
-  // Renvoie l'indice de refraction du fluide
+  // Returns the fluid refractive index
   inline Champ_Don_base& indice() { return indice_refraction_.valeur(); }
   inline const Champ_Don_base& indice() const { return indice_refraction_.valeur(); }
 
-  //  Renvoie la longueur de penetration du rayonnement dans le fluide definie comme l = 1/(3*kappa)
+  // Returns the radiation penetration depth in the fluid defined as l = 1/(3*kappa)
   inline Champ_Don_base& longueur_rayo() { return longueur_rayo_.valeur(); }
   inline const Champ_Don_base& longueur_rayo() const { return longueur_rayo_.valeur(); }
   void typer_longeur_rayo(const Nom& typ) { longueur_rayo_.typer(typ); }
@@ -87,22 +85,22 @@ public :
 
 protected :
   void creer_e_int() const; // creation sur demande de e_int / h
-  void creer_temperature_multiphase() const; // seulement si Energie_Multiphase_Enthalpie
-  void calculer_temperature_multiphase() const; // seulement si Energie_Multiphase_Enthalpie
+  void creer_temperature_multiphase() const; // only if Energie_Multiphase_Enthalpie
+  void calculer_temperature_multiphase() const; // only if Energie_Multiphase_Enthalpie
 
-  mutable int e_int_auto_ = 0; //1 si on a cree e_int
-  static void calculer_e_int(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv); // fonction de calcul par defaut
+  mutable int e_int_auto_ = 0; //1 if e_int was created automatically
+  static void calculer_e_int(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv); // default computation function
 
   mutable OWN_PTR(Champ_base) ch_e_int_, ch_h_ou_T_; //pour la creation sur demande : h is Energie_Multiphase et T si Energie_Multiphase_Enthalpie
   OWN_PTR(Champ_Don_base) ch_mu_, ch_nu_, ch_beta_co_;
   double h0_ = 0, T0_ = 0;
 
-  bool is_rad_transp_med_ = false; // fluide rayonnant transparent
+  bool is_rad_transp_med_ = false; // transparent radiating fluid
 
-  // Parametres du fluide rayonnant semi transparent
+  // Parameters of the semi-transparent radiating fluid
   OWN_PTR(Champ_Don_base) coeff_absorption_, indice_refraction_;
 
-  // Longueur caractaristique de la longueur de penetration du rayonnement dans le milieu semi transparent definie comme l = 1/(3*kappa)
+  // Characteristic radiation penetration depth in the semi-transparent medium defined as l = 1/(3*kappa)
   OWN_PTR(Champ_Don_base) longueur_rayo_;
 
   void creer_nu();

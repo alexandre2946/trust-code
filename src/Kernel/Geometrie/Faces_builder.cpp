@@ -46,16 +46,20 @@ void Faces_builder_32_64<_SIZE_>::reset()
   face_elem_.reset();
 }
 
-/*! @brief A partir de la description des elements du domaine et des frontieres (bords, raccords, groupe de faces et joints) :
+/*! @brief From the description of the domain elements and boundaries (borders, connections, face groups, and joints):
  *
- *   Remplissage des structures suivantes:
- *   - pour les frontieres du domaine: fixer_num_premiere_face
- *   - les_faces.faces_sommets (faces reeles)
- *   - les_faces.faces_voisins (faces reeles)
- *   - elem_faces              (pour les faces reeles des elements reels)
- *        (on initialise elem_faces de taille nb_elem_reels, nb_faces_par_elem)
+ *   Fills the following structures:
+ *   - for each domain boundary: fixer_num_premiere_face
+ *   - les_faces.faces_sommets (real faces)
+ *   - les_faces.faces_voisins (real faces)
+ *   - elem_faces              (for the real faces of real elements)
+ *        (elem_faces is initialised with size nb_elem_reels x nb_faces_par_elem)
  *   - joints.items_communs(FACE)
  *
+ * @param domaine The domain whose faces are being built.
+ * @param connect_som_elem Vertex-to-element connectivity.
+ * @param les_faces The faces object to fill.
+ * @param elem_faces The element-to-face connectivity array to fill.
  */
 template <typename _SIZE_>
 void Faces_builder_32_64<_SIZE_>::creer_faces_reeles(Domaine_t& domaine,
@@ -66,10 +70,10 @@ void Faces_builder_32_64<_SIZE_>::creer_faces_reeles(Domaine_t& domaine,
   les_elements_ptr_ = & domaine.les_elems();
 
   connectivite_som_elem_ptr_ = & connect_som_elem;
-  // La connectivite doit contenir les sommets virtuels
+  // The connectivity must include virtual vertices
   assert(connect_som_elem.get_nb_lists() == domaine.nb_som_tot());
 
-  // Remplissage du tableau des faces de l'element de reference
+  // Fill the reference-element face table
 
   is_polyedre_=0;
   if (sub_type(Poly_geom_base,domaine.type_elem().valeur()))
@@ -78,48 +82,47 @@ void Faces_builder_32_64<_SIZE_>::creer_faces_reeles(Domaine_t& domaine,
     }
   else
     domaine.type_elem()->get_tab_faces_sommets_locaux(faces_element_reference_old_);
-  // Tableau de taille (nb_faces, nb_sommets par face),
-  // pour chaque face, les indices de ses sommets dans le domaine.
-  // L'ordre des sommets est celui donne par l'element de reference,
-  // pour celui des elements voisins de la face qui a le plus petit
-  // indice.
+  // Array of size (nb_faces, nb_vertices_per_face),
+  // giving for each face the indices of its vertices in the domain.
+  // Vertex ordering follows the reference element, for the neighboring
+  // element of the face with the smallest index.
   IntTab_t& faces_sommets = les_faces.les_sommets();
 
-  // Tableau de taille (nb_faces, 2) contenant pour chaque face
-  // les indices des deux elements voisins. Si "i_face" a un seul voisin,
+  // Array of size (nb_faces, 2) containing for each face
+  // the indices of the two neighboring elements. If "i_face" has only one neighbor,
   // faces_voisins_(i_face, 1) = -1;
   IntTab_t& faces_voisins = les_faces.voisins();
 
-  // Initialisation des references utilisees dans check_erreur_faces
+  // Initialise references used in check_erreur_faces
   faces_sommets_ = faces_sommets;
   face_elem_ = faces_voisins;
   ref_domaine_ = domaine;
 
-  // Le tableau des faces des elements:
-  //  dimension(0) = nombre d'elements,
-  //  dimension(1) = nombre de faces par element
-  //  elem_faces(i,j) = indice de la face j de l'element i dans les
-  //                    tableaux faces_sommets et faces_voisins
-  //   (les faces de l'element sont dans l'ordre donne par faces_element_reference)
-  //  espaces distants et virtuels appropries pour les elements
+  // Element-to-face array:
+  //  dimension(0) = number of elements,
+  //  dimension(1) = number of faces per element
+  //  elem_faces(i,j) = index of face j of element i in the
+  //                    faces_sommets and faces_voisins arrays
+  //   (element faces are in the order given by faces_element_reference)
+  //  appropriate remote and virtual spaces for elements
   const int_t nb_elements          = les_elements().dimension(0);
   const int nb_faces_par_element = faces_element_reference(0).dimension(0);
   elem_faces.resize(nb_elements, nb_faces_par_element);
   elem_faces = -1;
 
   const int nb_sommets_par_face = faces_element_reference(0).dimension(1);
-  // On ajoute chaque face avec resize(n+1,...), donc smart_resize:
-  // Calcul du nombre theorique de faces:
+  // Each face is added with resize(n+1,...), so smart_resize is used:
+  // Compute the theoretical number of faces:
   const int_t nb_faces_front = domaine.nb_faces_frontiere() + domaine.nb_faces_joint();
   int_t nb_faces_prevision = (nb_elements * nb_faces_par_element + nb_faces_front) / 2;
   if (is_polyedre_)
     {
-      // les faces sont toutes deja connues....
+      // all faces are already known....
       const Poly_geom_base_t& poly=ref_cast(Poly_geom_base_t,ref_domaine_->type_elem().valeur());
       nb_faces_prevision=(poly.get_somme_nb_faces_elem()+ nb_faces_front) / 2;;
     }
-  // Allocation memoire pour le nombre de faces prevu pour eviter de reallouer
-  // de la memoire n fois (voir set_smart_resize)
+  // Pre-allocate memory for the expected number of faces to avoid repeated
+  // reallocations (see set_smart_resize)
 
   faces_sommets.resize(nb_faces_prevision, nb_sommets_par_face);
   faces_sommets.resize(0, nb_sommets_par_face);
@@ -127,10 +130,10 @@ void Faces_builder_32_64<_SIZE_>::creer_faces_reeles(Domaine_t& domaine,
   faces_voisins.resize(nb_faces_prevision, 2);
   faces_voisins.resize(0, 2);
 
-  // ******** Traitement des frontieres **********
-  //  attention, on initialise "num_premiere_face" pour les frontieres !
+  // ******** Boundary processing **********
+  //  note: "num_premiere_face" is initialised for boundaries here!
 
-  // Creation des faces de bord
+  // Create boundary faces
   {
     Bords_t& bords = domaine.faces_bord();
     const int n = bords.size();
@@ -138,21 +141,21 @@ void Faces_builder_32_64<_SIZE_>::creer_faces_reeles(Domaine_t& domaine,
       {
         Frontiere_t& frontiere = bords[i];
 
-        creer_faces_frontiere(1, /* un element voisin par face */
+        creer_faces_frontiere(1, /* one neighboring element per face */
                               frontiere,
                               faces_sommets,
                               faces_voisins,
                               elem_faces);
       }
   }
-// Raccords
+// Connections (Raccords)
   {
     Raccords_t& raccords = domaine.faces_raccord();
     const int n = raccords.size();
     for (int i = 0; i < n; i++)
       {
         Frontiere_t& frontiere = raccords[i].valeur();
-        creer_faces_frontiere(1, /* un element voisin par face */
+        creer_faces_frontiere(1, /* one neighboring element per face */
                               frontiere,
                               faces_sommets,
                               faces_voisins,
@@ -160,46 +163,46 @@ void Faces_builder_32_64<_SIZE_>::creer_faces_reeles(Domaine_t& domaine,
       }
   }
 
-// Faces de "bord internes"
+// Internal boundary faces
   {
     Bords_Internes_t& faces_int = domaine.bords_int();
     const int n = faces_int.size();
     for (int i = 0; i < n; i++)
       {
         Frontiere_t& frontiere = faces_int[i];
-        creer_faces_frontiere(2, /* deux elements voisin par face */
+        creer_faces_frontiere(2, /* two neighboring elements per face */
                               frontiere,
                               faces_sommets,
                               faces_voisins,
                               elem_faces);
       }
 
-    // On duplique les faces internes : pour chaque face qui a deux
-    // voisins, on cree une deuxieme face identique avec le deuxieme voisin,
-    // on efface le deuxieme voisin de la face d'origine et on change
-    // la face voisins de deuxieme voisin:
+    // Duplicate internal faces: for each face that has two neighbors,
+    // create a second identical face with the second neighbor,
+    // clear the second neighbor of the original face, and update
+    // the neighbor face of the second neighbor:
     if (n > 0)
       {
         Cerr << "Faces_builder_32_64<_SIZE_>::creer_faces_reeles not coded for the internal faces of boundary" << finl;
         Process::exit();
-        // A faire selon l'ancienne version de domaine2... et a tester !
+        // To be done based on the old version of domaine2... and needs testing!
       }
   }
 
-// Faces de joint
+// Joint faces
   {
     Joints_t& joints = domaine.faces_joint();
     const int n = joints.size();
     for (int i = 0; i < n; i++)
       {
         Frontiere_t& frontiere = joints[i];
-        creer_faces_frontiere(2, /* elements voisins par face */
+        creer_faces_frontiere(2, /* neighboring elements per face */
                               frontiere,
                               faces_sommets,
                               faces_voisins,
                               elem_faces);
-        // Remplissage de items_communs(FACE)
-        // Les faces de joint sont dans le meme ordre en local et sur le voisin.
+        // Fill items_communs(FACE)
+        // Joint faces are in the same order locally and on the neighboring domain.
         Joint_t& joint = joints[i];
         ArrOfInt_t& indices_faces =
           joint.set_joint_item(JOINT_ITEM::FACE).set_items_communs();
@@ -212,14 +215,14 @@ void Faces_builder_32_64<_SIZE_>::creer_faces_reeles(Domaine_t& domaine,
   }
 
 // *********************************************
-// Faces internes
+// Internal faces
 
   creer_faces_internes(faces_sommets,
                        elem_faces,
                        faces_voisins);
 
 
-// Identification des groupes de faces
+// Face group identification
   {
     Groupes_Faces_t& groupes_faces = domaine.groupes_faces();
     const int n = groupes_faces.size();
@@ -231,7 +234,7 @@ void Faces_builder_32_64<_SIZE_>::creer_faces_reeles(Domaine_t& domaine,
       }
   }
 // *********************************************
-// C'est fini: on verifie qu'on a bien le nombre de faces prevu
+// Done: verify that the actual number of faces matches the predicted number
   if (faces_sommets.dimension(0) != nb_faces_prevision)
     {
       Cerr << "Error in Faces_builder_32_64<_SIZE_>::creer_faces_reeles:\n"
@@ -240,15 +243,19 @@ void Faces_builder_32_64<_SIZE_>::creer_faces_reeles(Domaine_t& domaine,
       Process::exit();
     }
 
-// RAZ attribut smart_resize des tableaux faces_sommets et faces_voisins.
+// Reset the smart_resize attribute of the faces_sommets and faces_voisins arrays.
 
 
-// RAZ des attributs de la classe
+// Reset class attributes
   reset();
 }
 
-/*! @brief methode outil pour creer_faces_frontiere et creer_faces_internes (si liste non vide sur au moins un processeur, affiche un message et exit()).
+/*! @brief Helper method for creer_faces_frontiere and creer_faces_internes.
  *
+ * If the list is non-empty on at least one processor, prints an error message and calls exit().
+ *
+ * @param message Error message to display.
+ * @param liste_faces List of faces that caused the error.
  */
 template <typename _SIZE_>
 void Faces_builder_32_64<_SIZE_>::check_erreur_faces(const char * message,
@@ -304,7 +311,7 @@ void Faces_builder_32_64<_SIZE_>::check_erreur_faces(const char * message,
     }
 }
 
-/*! @brief ajoute une face reelle dans faces_sommets et faces_voisins.
+/*! @brief Adds a real face to faces_sommets and faces_voisins.
  *
  */
 template <typename _SIZE_>
@@ -352,15 +359,15 @@ int Faces_builder_32_64<_SIZE_>::chercher_face_element(const IntTab_t&    elem_s
           else
             sommet_domaine = elem_som(elem, sommet_elem_ref);
           for (i_som2 = 0; i_som2 < nb_sommets_par_face; i_som2++)
-            if (une_face[i_som2] == sommet_domaine) // si sommet trouve, stop
+            if (une_face[i_som2] == sommet_domaine) // if vertex found, stop
               break;
-          if (i_som2 == nb_sommets_par_face) // si sommet non trouve, stop
+          if (i_som2 == nb_sommets_par_face) // if vertex not found, stop
             break;
         }
-      if (i_som == nb_sommets_par_face) // si tous les sommets ont ete trouves, stop
+      if (i_som == nb_sommets_par_face) // if all vertices have been found, stop
         break;
     }
-  if (i_face == nb_faces_element) // si face non trouvee
+  if (i_face == nb_faces_element) // if face not found
     return -1;
   else
     return i_face;
@@ -382,11 +389,10 @@ const IntTab& Faces_builder_32_64<_SIZE_>::faces_element_reference(int_t elem) c
 }
 
 
-/*! @brief Methode outil: on suppose que "une_face" contient les indices des sommets d'une face de l'element d'indice "elem" dans le domaine.
+/*! @brief Helper method: assumes "une_face" contains the vertex indices of a face of the element with index "elem" in the domain.
  *
- *   On cherche quel est le numero de cette face sur l'element
- *   de reference. Si les sommets ne correspondent a aucune face de
- *   l'element, on renvoie -1.
+ *   Searches for the number of this face on the reference element.
+ *   If the vertices do not correspond to any face of the element, returns -1.
  *
  */
 template <typename _SIZE_>
@@ -399,11 +405,11 @@ int Faces_builder_32_64<_SIZE_>::chercher_face_element(const SmallArrOfTID_t& un
   return i_face;
 }
 
-/*! @brief Insere les faces de la frontiere donnee dans les trois tableaux, a la suite des faces deja presentes dans faces_sommets.
+/*! @brief Inserts the faces of the given boundary into the three arrays, after the faces already present in faces_sommets.
  *
- *   Remplissage de :
+ *   Fills:
  *    frontiere.num_premiere_face
- *   Completion de :
+ *   Completes:
  *    faces_sommets
  *    elem_faces
  *    faces_voisins
@@ -450,7 +456,7 @@ void Faces_builder_32_64<_SIZE_>::creer_faces_frontiere(const int_t nb_voisins_a
         for (int i = std::min(nb_sommets_par_face, nb_sommets_par_face_fr); i < nb_sommets_par_face; i++)
           une_face[i] = -1;
       }
-      // Quels sont les elements voisins de cette face ?
+      // What are the neighboring elements of this face?
       find_adjacent_elements(som_elem, une_face, voisins);
       const int_t nb_voisins = voisins.size_array();
       const int_t elem0 = (nb_voisins > 0) ? voisins[0] : -1;
@@ -462,7 +468,7 @@ void Faces_builder_32_64<_SIZE_>::creer_faces_frontiere(const int_t nb_voisins_a
         {
         case 0:
           {
-            // Erreur: la face n'a pas de voisin
+            // Error: the face has no neighbor
             liste_faces_erreur0.append_array(indice_face);
             if(STOP_FIRST_ERR) Process::exit("A least one face has no neighbor!");
             break;
@@ -476,18 +482,18 @@ void Faces_builder_32_64<_SIZE_>::creer_faces_frontiere(const int_t nb_voisins_a
                 for (i_voisin = 0; i_voisin < nb_voisins; i_voisin++)
                   {
                     const int_t elem = voisins[i_voisin];
-                    // Quelle est la face de l'element ?
+                    // What is the face of the element?
                     const int i_face_elem = chercher_face_element(une_face, elem);
                     if (i_face_elem >= 0)
                       {
-                        // Si c'est un element reel, on associe la face
+                        // If it is a real element, associate the face
                         if (elem < nb_elem_reels)
                           {
                             if (elem_faces(elem, i_face_elem) < 0)
                               elem_faces(elem, i_face_elem) = indice_face;
                             else
                               {
-                                // Erreur: cette face existe deja (dans cette frontiere ou une autre)
+                                // Error: this face already exists (in this or another boundary)
                                 liste_faces_erreur3.append_array(indice_face);
                                 if(STOP_FIRST_ERR) Process::exit("A face already exists! Was found twice!");
                               }
@@ -495,7 +501,7 @@ void Faces_builder_32_64<_SIZE_>::creer_faces_frontiere(const int_t nb_voisins_a
                       }
                     else
                       {
-                        // Erreur: la face n'est pas une face de l'element.
+                        // Error: the face does not belong to the element.
                         liste_faces_erreur0.append_array(indice_face);
                         if(STOP_FIRST_ERR) Process::exit("A face does not belong to any element!");
                       }
@@ -503,14 +509,14 @@ void Faces_builder_32_64<_SIZE_>::creer_faces_frontiere(const int_t nb_voisins_a
               }
             else
               {
-                // Erreur, on attendait pas ce nombre de voisins.
+                // Error: unexpected number of neighbors.
                 liste_faces_erreur1.append_array(indice_face);
                 if(STOP_FIRST_ERR) Process::exit("A face has an unexpected number of neighbors!");
               }
             break;
           }
         default:
-          // Erreur, plus de deux voisins, c'est n'importe quoi...
+          // Error: more than two neighbors, which should not happen.
           liste_faces_erreur2.append_array(indice_face);
           if(STOP_FIRST_ERR) Process::exit("A face has more than 2 neighbors!");
         }
@@ -539,10 +545,9 @@ void Faces_builder_32_64<_SIZE_>::creer_faces_frontiere(const int_t nb_voisins_a
     }
   if (sub_type(Joint, frontiere))
     {
-      // Deux sources d'erreur possibles: les faces de joint sont fausses
-      // ou bien le domaine ne contient pas les elements virtuels (il faut
-      // au moins que le domaine contienne les elements virtuels voisins des
-      // faces de joint).
+      // Two possible error sources: the joint faces are incorrect,
+      // or the domain does not contain virtual elements (at a minimum the domain
+      // must contain the virtual elements neighboring the joint faces).
       msg += "(Error in a Joint object: internal error in the mesh splitter or scatter ? )\n";
     }
   check_erreur_faces(msg, liste_faces_erreur1);
@@ -558,9 +563,9 @@ void Faces_builder_32_64<_SIZE_>::creer_faces_frontiere(const int_t nb_voisins_a
   check_erreur_faces(msg, liste_faces_erreur3);
 }
 
-/*! @brief Construction des faces interieures au domaine (faces qui ont deux voisins et qui ne sont pas des "faces_bord_internes")
+/*! @brief Construction of the internal faces of the domain (faces with two neighbors that are not "faces_bord_internes").
  *
- *   Les faces de joint ont deja ete creees.
+ *   Joint faces have already been created.
  *
  */
 template <typename _SIZE_>
@@ -575,48 +580,46 @@ void Faces_builder_32_64<_SIZE_>::creer_faces_internes(IntTab_t& faces_sommets,
   const int   nb_faces_par_element = faces_element_reference(0).dimension(0);
   const int   nb_sommets_par_face  = nb_faces_par_element ? faces_element_reference(0).dimension(1) : 3;
 
-  // Tableau temporaire dans lequel on stocke les indices des sommets
-  // de la face en cours de traitement
+  // Temporary array storing the vertex indices of the face being processed
   SmallArrOfTID_t une_face(nb_sommets_par_face);
-  // Tableau temporaire (liste des elements voisins d'une face)
+  // Temporary array (list of neighboring elements of a face)
   SmallArrOfTID_t voisins;
 
-  // Liste des faces n'ayant qu'un seul voisin et qui ne figurent pas
-  // dans les faces de bord (ce sont des erreurs):
+  // List of faces with only one neighbor not listed in boundary faces (errors):
   ArrOfInt_t liste_faces_frontiere_non_declarees;
 
   ArrOfInt_t liste_faces_joint_non_declarees;
 
-  // Liste des faces presentant une erreur de connectivite (plus de
-  // deux elements voisins, ou connection a des sommets qui ne
-  // sont pas une face de l'element:
+  // List of faces with a connectivity error (more than
+  // two neighboring elements, or connection to vertices that are
+  // not on any face of the element:
   ArrOfInt_t liste_faces_erreurs_connectivite;
 
   constexpr bool STOP_FIRST_ERR = false; // set this to true in Debug to stop gdb at the right place.
 
-  // Boucle sur les elements
+  // Loop over elements
   int_t i_elem;
   for (i_elem = 0; i_elem < nb_elem; i_elem++)
     {
       int i_face;
-      // Boucle sur les faces de l'element
+      // Loop over the faces of the element
       for (i_face = 0; i_face < nb_faces_par_element; i_face++)
         {
 
-          // L'indice de cette face dans le tableau faces_sommets.
-          // Il vaut -1 si la face n'a pas encore ete creee,
+          // Index of this face in the faces_sommets array.
+          // It is -1 if the face has not yet been created.
           int_t indice_face = elem_faces(i_elem, i_face);
 
-          // Calcul des indices des sommets de la face dans le domaine:
+          // Compute the vertex indices of the face in the domain:
           int i;
-          // Attention il ne faut laisser l'appel ici...
+          // Note: this call must stay here...
           const IntTab& faces_elem_ref       = faces_element_reference(i_elem);
 
           for (i = 0; i < nb_sommets_par_face; i++)
             {
-              // indice du sommet sur l'element de reference
+              // index of the vertex on the reference element
               const int i_som_ref = faces_elem_ref(i_face, i);
-              // indice du sommet dans le domaine
+              // index of the vertex in the domain
               if (i_som_ref==-1)
                 une_face[i] = -1;
               else
@@ -627,31 +630,31 @@ void Faces_builder_32_64<_SIZE_>::creer_faces_internes(IntTab_t& faces_sommets,
             }
           if (une_face[0]==-1)
             {
-              // on a une face bidon on ne fait rien
+              // dummy face, do nothing
               elem_faces(i_elem, i_face) = -1;
             }
           else
             {
-              // Recherche des elements voisins de cette face.
-              // Le tableau "voisins" est classe dans l'ordre croissant.
+              // Search for neighboring elements of this face.
+              // The "voisins" array is sorted in ascending order.
               find_adjacent_elements(som_elem, une_face, voisins);
 
               const int_t nb_voisins = voisins.size_array();
-              assert (nb_voisins > 0); // Il devrait au moins y avoir i_elem !!! (ou alors on a une face constitues de -1);
+              assert (nb_voisins > 0); // There should be at least i_elem !!! (or else we have a face made of -1);
 
-              if (nb_voisins == 1)   // ***** La face a 1 voisin ********
+              if (nb_voisins == 1)   // ***** The face has 1 neighbor ********
                 {
 
-                  assert(voisins[0] == i_elem); // L'element voisin est forcement i_elem
-                  // Une face ayant un seul element voisin est une face de frontiere.
+                  assert(voisins[0] == i_elem); // The neighboring element must be i_elem
+                  // A face with only one neighboring element is a boundary face.
                   if (indice_face >= 0)
                     {
-                      // Ok, c'est normal, les frontieres ont deja ete traitees
+                      // Ok, this is normal; boundary faces have already been processed
                     }
                   else
                     {
-                      // Erreur: la face n'existe pas encore. Elle devrait avoir ete
-                      // creee a partir des frontieres (creer_faces_frontiere)
+                      // Error: the face does not yet exist. It should have been
+                      // created from the boundaries (creer_faces_frontiere)
                       indice_face = ajouter_une_face(une_face, i_elem, -1,
                                                      faces_sommets, faces_voisins);
                       liste_faces_frontiere_non_declarees.append_array(indice_face);
@@ -659,7 +662,7 @@ void Faces_builder_32_64<_SIZE_>::creer_faces_internes(IntTab_t& faces_sommets,
                     }
 
                 }
-              else if (nb_voisins == 2)     // ***** La face a 2 voisins ********
+              else if (nb_voisins == 2)     // ***** The face has 2 neighbors ********
                 {
 
                   const int_t elem0 = voisins[0];
@@ -667,38 +670,37 @@ void Faces_builder_32_64<_SIZE_>::creer_faces_internes(IntTab_t& faces_sommets,
                   assert(elem0 < elem1);
                   if (indice_face >= 0)
                     {
-                      // La face a deje ete creee.
+                      // The face has already been created.
                     }
                   else
                     {
-                      // La face n'existe pas encore.
+                      // The face does not yet exist.
                       if (elem0 == i_elem)
                         {
-                          // Les voisins sont classes: elem0 < elem1
-                          // donc c'est la premiere fois qu'on parcourt cette face dans la boucle
-                          // sur les elements.
+                          // Neighbors are sorted: elem0 < elem1
+                          // so this is the first time this face is encountered in the
+                          // element loop.
                           indice_face = ajouter_une_face(une_face, elem0, elem1,
                                                          faces_sommets, faces_voisins);
 
-                          // Ou est cette face sur l'element voisin ?
+                          // Where is this face on the neighboring element?
                           const int i_face_elem1 = chercher_face_element(une_face, elem1);
                           if (i_face_elem1 >= 0)
                             {
-                              if (elem1 < nb_elem) // Element voisin reel ?
+                              if (elem1 < nb_elem) // Is the neighboring element real?
                                 elem_faces(elem1, i_face_elem1) = indice_face;
                             }
                           else
                             {
-                              // Erreur, les sommets de la face sont des sommets de l'element elem1
-                              // mais ne sont pas sur une face de cet element. Erreur de
-                              // connectivite du maillage.
+                              // Error: the face vertices belong to elem1
+                              // but are not on any face of that element. Mesh connectivity error.
                               liste_faces_erreurs_connectivite.append_array(indice_face);
                               if(STOP_FIRST_ERR) Process::exit("Connectivity issue with face!");
                             }
                           if (elem1 >= nb_elem)
                             {
-                              // Erreur : le voisin est un element virtuel, cette face
-                              // devrait etre dans les faces de joint, donc deja creee.
+                              // Error: the neighbor is a virtual element; this face
+                              // should be in the joint faces and thus already created.
                               liste_faces_joint_non_declarees.append_array(indice_face);
                               if(STOP_FIRST_ERR) Process::exit("Pb with face: its neighbor is virtual! Should not happen here.");
                             }
@@ -708,18 +710,17 @@ void Faces_builder_32_64<_SIZE_>::creer_faces_internes(IntTab_t& faces_sommets,
                           assert(elem1 == i_elem);
                           indice_face = ajouter_une_face(une_face, elem0, elem1,
                                                          faces_sommets, faces_voisins);
-                          // On aurait deja du creer cette face car elle est voisine de elem0
-                          // qui est deja traite (indice plus petit). Si on arrive ici,
-                          // c'est que les sommets de "une_face" appartiennent bien a l'elem0,
-                          // mais qu'ils ne sont pas sur une face de cet element. C'est une
-                          // erreur de connectivite.
+                          // We should have already created this face since it is a neighbor of elem0,
+                          // which has already been processed (smaller index). If we reach here,
+                          // the vertices of "une_face" belong to elem0 but are not on any face
+                          // of that element. This is a connectivity error.
                           liste_faces_erreurs_connectivite.append_array(indice_face);
                           if(STOP_FIRST_ERR) Process::exit("Pb with face: connectivity error.");
                         }
                     }
 
                 }
-              else                        // ***** La face a > 2 voisins ********
+              else                        // ***** The face has > 2 neighbours ********
                 {
                   if (indice_face < 0)
                     {
@@ -732,15 +733,15 @@ void Faces_builder_32_64<_SIZE_>::creer_faces_internes(IntTab_t& faces_sommets,
                   if(STOP_FIRST_ERR) Process::exit("Pb with face: connectivity error 2.");
                 }
 
-              // Si la face n'existait pas, on l'a creee et on a mis son indice
-              // dans indice_face. Sinon on a trouve l'indice de la face existante.
+              // If the face did not exist, it has been created and its index stored in indice_face.
+              // Otherwise, the index of the existing face has been found.
               assert(indice_face >= 0);
               elem_faces(i_elem, i_face) = indice_face; /* WRITE elem_faces */
             }
         }
     }
 
-  // Traitement des erreurs:
+  // Error handling:
   {
     const char * const msg1 = "We found faces which belong to one element/cell only and are not declared in any boundary ! You forgot to define at least one boundary in your mesh. Fix your mesh.\n";
     const char * const msg2 = "Joint faces are incomplete: internal error in the mesh splitter\n";
@@ -751,9 +752,9 @@ void Faces_builder_32_64<_SIZE_>::creer_faces_internes(IntTab_t& faces_sommets,
   }
 }
 
-/*! @brief Identification des groupes de faces specifiees dans le domaine
+/*! @brief Identification of the face groups specified in the domain.
  *
- *   Remplissage du tableau indices_faces d'un groupes de faces specifique
+ *   Fills the indices_faces array of a specific face group.
  *
  */
 template <typename _SIZE_>
@@ -786,7 +787,7 @@ void Faces_builder_32_64<_SIZE_>::identification_groupe_faces(Groupe_Faces_t& gr
         for (int i = std::min(nb_sommets_par_face, nb_sommets_par_face_fr); i < nb_sommets_par_face; i++)
           une_face[i] = -1;
       }
-      // Quels sont les elements voisins de cette face ?
+      // What are the neighboring elements of this face?
       find_adjacent_elements(som_elem, une_face, voisins);
       const int_t nb_voisins = voisins.size_array();
 
@@ -794,7 +795,7 @@ void Faces_builder_32_64<_SIZE_>::identification_groupe_faces(Groupe_Faces_t& gr
         {
         case 0:
           {
-            // Erreur: la face n'a pas de voisin
+            // Error: the face has no neighbor
             liste_faces_erreur0.append_array(i_face);
             break;
           }
@@ -802,16 +803,16 @@ void Faces_builder_32_64<_SIZE_>::identification_groupe_faces(Groupe_Faces_t& gr
         case 2:
           {
             const int_t elem = voisins[0];
-            // Quelle est la face de l'element ?
+            // Which face of the element is it?
             const int i_face_elem = chercher_face_element(une_face, elem);
 
             if (i_face_elem >= 0)
-              // Quel est le numero de la face
+              // What is the index of the face
               indices_faces[i_face] = elem_faces(elem,i_face_elem);
             break;
           }
         default:
-          // Erreur, plus de deux voisins, c'est n'importe quoi...
+          // Error: more than two neighbors, which should not happen.
           liste_faces_erreur1.append_array(i_face);
         }
     }

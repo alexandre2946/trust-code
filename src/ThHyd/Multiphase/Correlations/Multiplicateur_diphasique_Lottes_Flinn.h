@@ -17,13 +17,13 @@
 #define Multiplicateur_diphasique_Lottes_Flinn_included
 #include <Multiplicateur_diphasique_base.h>
 
-/*! @brief classe Multiplicateur_diphasique_Lottes_Flinn correlation de multiplicateur diphasique de Lottes-Flinn :
+/*! @brief Lottes-Flinn two-phase multiplier correlation.
  *
- *         alpha < alpha_min -> seule la phase liquide frotte avec phi = 1 / (1-alpha)^2
- *         alpha > alpha_max -> seule la vapeur frotte
- *       parametres :
- *        - alpha_min -> debut de la transition
- *        - alpha_fin -> fin de la transition
+ *         alpha < alpha_min -> only the liquid phase contributes friction: phi = 1 / (1-alpha)^2
+ *         alpha > alpha_max -> only vapor contributes friction
+ *       parameters:
+ *        - alpha_min -> start of the transition
+ *        - alpha_fin -> end of the transition
  *
  *
  */
@@ -37,7 +37,7 @@ public:
                    const double Fm, DoubleTab& coeff) const override;
 protected:
   double alpha_min_ = 0.9, alpha_max_ = 0.95;
-  int n_l = -1, n_g = -1; //indices des phases frottantes : liquide, gaz
+  int n_l = -1, n_g = -1; //indices of the friction phases: liquid, gas
 };
 
 #endif

@@ -38,11 +38,11 @@ public:
   void associer_domaines(const Domaine_dis_base&, const Domaine_Cl_dis_base&) override {}
 
 protected:
-  Nom tag_; //pour trouver le terme source en face
-  OBS_PTR(Echange_Thermique_Volumique_Elem) o_ech_; //autre terme source
-  OWN_PTR(Champ_Don_base) Ai_, ep_cond_, cond_; //aire interfaciale, epaisseur pour la conduction, conductivite
+  Nom tag_; // to locate the source term on the facing side
+  OBS_PTR(Echange_Thermique_Volumique_Elem) o_ech_; // other source term
+  OWN_PTR(Champ_Don_base) Ai_, ep_cond_, cond_; // interfacial area, thickness for conduction, conductivity
 
-  OWN_PTR(Correlation_base) flux_par_;//correlation de flux parietal
+  OWN_PTR(Correlation_base) flux_par_; // wall heat flux correlation
 };
 
 #endif

@@ -17,9 +17,9 @@
 #define TRUST_Vector_included
 
 #include <type_traits>
-#include <algorithm> // pour std::transform
+#include <algorithm> // for std::transform
 #include <vector>
-#include <memory> // pour std::shared_ptr
+#include <memory> // for std::shared_ptr
 #include <Nom.h>
 #include <Separateur.h>
 
@@ -28,11 +28,11 @@ class MD_Vector;
 // MACRO to replace VECT(THECLASS) by TRUST_Vector<THECLASS> & keep previous syntax for some developers
 #define VECT(_TYPE_) TRUST_Vector<_TYPE_>
 
-/*! @brief classe TRUST_Vector
+/*! @brief TRUST_Vector class
  *
- *  - La classe template TRUST_Vector est utilisable pour n'importe quelle classe
+ *  - The template class TRUST_Vector can be used for any class.
  *
- *      Utilisation (par exemple):
+ *      Usage examples:
  *
  *        - TRUST_Vector<MD_Vector>
  *        - TRUST_Vector<Milieu_base>
@@ -166,7 +166,7 @@ public:
   const value_type& operator[](int i) const { return *z_vect_[i]; }
   value_type& operator[](int i) { return *z_vect_[i]; }
 
-  // XXX : Elie Saikali : Pas de negociation pour ca desole ...
+  // XXX : Elie Saikali : No negotiation for this, sorry ...
   const value_type& operator()(int i) const = delete;
   value_type& operator()(int i) = delete;
   value_type& add() = delete; //{ return add(_CLASSE_()); }

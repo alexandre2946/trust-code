@@ -18,9 +18,9 @@
 
 #include <TRUST_Deriv.h>
 
-/*! @brief classe Parametre_equation_base Un objet Parametre_equation_base est un objet regroupant les differentes
+/*! @brief Parametre_equation_base A Parametre_equation_base object groups the various
  *
- *      options specifiques pour unre equation voir Parametre_simpler
+ *      specific options for an equation, see Parametre_simpler
  *
  */
 class Parametre_equation_base : public Objet_U

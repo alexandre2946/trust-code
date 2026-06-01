@@ -33,12 +33,12 @@ Implemente_instanciable(Pb_Hydraulique,"Pb_Hydraulique",Pb_Fluide_base);
 Sortie& Pb_Hydraulique::printOn(Sortie& os) const { return Pb_Fluide_base::printOn(os); }
 Entree& Pb_Hydraulique::readOn(Entree& is) { return Pb_Fluide_base::readOn(is); }
 
-/*! @brief Renvoie l'equation d'hydraulique de type Navier_Stokes_std si i=0, sort (exit) sinon.
+/*! @brief Returns the hydraulic equation of type Navier_Stokes_std if i=0, exits otherwise.
  *
- *     (version const)
+ *     (const version)
  *
- * @param (int i) l'index de l'equation a renvoyer
- * @return (Equation_base&) l'equation d'hydraulique de type Navier_Stokes_std
+ * @param i the index of the equation to return
+ * @return the hydraulic equation of type Navier_Stokes_std
  */
 const Equation_base& Pb_Hydraulique::equation(int i) const
 {
@@ -52,10 +52,10 @@ const Equation_base& Pb_Hydraulique::equation(int i) const
   return eq_hydraulique;
 }
 
-/*! @brief Renvoie l'equation d'hydraulique de type Navier_Stokes_std si i=0, sort (exit) sinon.
+/*! @brief Returns the hydraulic equation of type Navier_Stokes_std if i=0, exits otherwise.
  *
- * @param (int i) l'index de l'equation a renvoyer
- * @return (Equation_base&) l'equation d'hydraulique de type Navier_Stokes_std
+ * @param i the index of the equation to return
+ * @return the hydraulic equation of type Navier_Stokes_std
  */
 Equation_base& Pb_Hydraulique::equation(int i)
 {
@@ -71,12 +71,12 @@ Equation_base& Pb_Hydraulique::equation(int i)
 
 
 
-/*! @brief Associe le milieu au probleme.
+/*! @brief Associates the medium to the problem.
  *
- * Le milieu doit etre de type fluide incompressible.
+ * The medium must be of type incompressible fluid.
  *
- * @param (Milieu_base& mil) le milieu physique a associer au probleme
- * @throws le milieu n'est pas du type Fluide_base
+ * @param mil the physical medium to associate with the problem
+ * @throws the medium is not of type Fluide_base
  */
 void Pb_Hydraulique::associer_milieu_base(const Milieu_base& mil)
 {

@@ -20,11 +20,11 @@
 /*****************************************************************************/
 
 
-/*! @brief Gestion des dependances machines pour l'appel a FORTRAN La macro F77DECLARE(TOTO) permet de declarer une routine FORTRAN.
+/*! @brief Management of machine dependencies for calling FORTRAN routines. The macro F77DECLARE(TOTO) allows declaring a FORTRAN routine.
  *
- *   La macro F77NAME(TOTO) permet d'appeler une routine FORTRAN.
- *   Exemple :
- *   toto.f :
+ *   The macro F77NAME(TOTO) allows calling a FORTRAN routine.
+ *   Example:
+ *   toto.f:
  *          SUBROUTINE TOTO(DOUBLE X)
  *          X=2.0*X
  *          RETURN

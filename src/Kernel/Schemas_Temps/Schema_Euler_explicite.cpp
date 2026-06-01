@@ -23,7 +23,7 @@ Sortie& Schema_Euler_explicite::printOn(Sortie& s) const { return  TRUSTSchema_R
 
 Entree& Schema_Euler_explicite::readOn(Entree& s) { return TRUSTSchema_RK<Ordre_RK::UN>::readOn(s) ; }
 
-/*! @brief Effectue un pas de temps d'Euler explicite sur l'equation passee en parametre.
+/*! @brief Performs an explicit Euler time step on the equation passed as parameter.
  *
  */
 int Schema_Euler_explicite::faire_un_pas_de_temps_eqn_base(Equation_base& eqn)

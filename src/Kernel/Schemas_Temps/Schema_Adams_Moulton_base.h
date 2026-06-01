@@ -15,9 +15,9 @@
 
 #ifndef Schema_Adams_Moulton_base_included
 #define Schema_Adams_Moulton_base_included
-/*! @brief class Schema_Adams_Moulton_base Il herite de schema implicite base et porte un solveur par exemple
+/*! @brief class Schema_Adams_Moulton_base It inherits from the implicit base scheme and carries a solver, for example
  *
- *   le Simpler pour effectuer les Faire_un_pas_de_temps..
+ *   the Simpler solver, to perform the time-stepping operations.
  *
  */
 
@@ -44,7 +44,7 @@ public :
   inline const DoubleTab& coefficients() const override;
   inline DoubleTab& coefficients() override;
 
-  //pour les schemas en temps a pas multiples
+  // for multi-timestep schemes
   void modifier_second_membre_full_impl(const Equation_base& eqn, DoubleTab& secmem) override;
 
 protected :

@@ -93,7 +93,7 @@ int EOS_to_TRUST_generique::tppi_get_beta_pT(const SpanD P, const SpanD T, SpanD
 #endif
 }
 
-// methodes particulieres par application pour gagner en performance : utilisees dans Pb_Multiphase (pour le moment !)
+// application-specific methods for performance gain: used in Pb_Multiphase (for now!)
 #ifdef HAS_EOS
 int EOS_to_TRUST_generique::tppi_get_all_properties_T_(const MSpanD input , NEPTUNE::EOS_Fields& flds_out, NEPTUNE::EOS_Error_Field& ferr, int ncomp, int id) const
 {
@@ -161,7 +161,7 @@ int EOS_to_TRUST_generique::tppi_get_CPMLB_pb_multiphase_pT(const MSpanD input, 
       SpanD span_ = itr.second;
       if (prop_ != Loi_en_T::BETA)
         flds_out[i_out++] = NEPTUNE::EOS_Field(EOS_prop_en_T[(int) prop_][0], EOS_prop_en_T[(int) prop_][1], (int) span_.size(), (double*) span_.begin());
-      else /* pour beta on recalcule sans appel a beta de eos ... */
+      else /* for beta, we recompute without calling eos beta ... */
         {
           flds_out[i_out++] = NEPTUNE::EOS_Field(EOS_prop_en_T[(int) Loi_en_T::RHO][0], EOS_prop_en_T[(int) Loi_en_T::RHO][1], (int) rho.size(), (double*) rho.begin());
           flds_out[i_out++] = NEPTUNE::EOS_Field(EOS_prop_en_T[(int) Loi_en_T::RHO_DT][0], EOS_prop_en_T[(int) Loi_en_T::RHO_DT][1], (int) drho_dt.size(), (double*) drho_dt.begin());

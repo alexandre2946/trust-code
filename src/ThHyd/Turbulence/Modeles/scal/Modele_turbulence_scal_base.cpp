@@ -90,7 +90,7 @@ int Modele_turbulence_scal_base::lire_motcle_non_standard(const Motcle& mot, Ent
       Nom accolade_fermee = "}";
       nom_fichier_ = Objet_U::nom_du_cas() + "_" + equation().probleme().le_nom() + "_nusselt_mean_only";
       Domaine& dom = equation().probleme().domaine();
-      LIST(Nom) nlistbord_dom;                      //!< liste stockant tous les noms de frontiere du domaine
+      LIST(Nom) nlistbord_dom;                      //!< list storing all boundary names of the domain
       int nbfr = dom.nb_front_Cl();
       for (int b = 0; b < nbfr; b++)
         {
@@ -130,7 +130,7 @@ int Modele_turbulence_scal_base::lire_motcle_non_standard(const Motcle& mot, Ent
                     {
                       is >> nom_bord_lu;
                       boundaries_list_.add(Nom(nom_bord_lu));
-                      //  verif nom bords
+                      //  check boundary names
                       if (!nlistbord_dom.contient(boundaries_list_[i]))
                         {
                           Cerr << "Problem in the dt_impr_nusselt_mean_only instruction:" << finl;
@@ -139,7 +139,7 @@ int Modele_turbulence_scal_base::lire_motcle_non_standard(const Motcle& mot, Ent
                         }
                     }
                 }
-              // lecture accolade fermee
+              // read closing brace
               is >> motlu;
               if (motlu != accolade_fermee)
                 {
@@ -161,28 +161,28 @@ int Modele_turbulence_scal_base::lire_motcle_non_standard(const Motcle& mot, Ent
   return retval;
 }
 
-/*! @brief Associe l'equation passe en parametre au modele de turbulence.
+/*! @brief Associates the equation passed as parameter to the turbulence model.
  *
- * L'equation est caste en Convection_Diffusion_std.
+ * The equation is cast to Convection_Diffusion_std.
  *
- * @param (Equation_base& eqn) l'equation a laquelle l'objet s'associe
+ * @param eqn The equation to associate with this object.
  */
 void Modele_turbulence_scal_base::associer_eqn(const Equation_base& eqn)
 {
   mon_equation_ = ref_cast(Convection_Diffusion_std, eqn);
 }
 
-/*! @brief NE FAIT RIEN
+/*! @brief Does nothing.
  *
- * @param (Domaine_dis_base&) un domaine discretise
- * @param (Domaine_Cl_dis_base&) un domaine de conditions aux limites discretisees
+ * @param Discretized domain (unused).
+ * @param Discretized boundary conditions domain (unused).
  */
 void Modele_turbulence_scal_base::associer(const Domaine_dis_base&, const Domaine_Cl_dis_base&)
 {
   ;
 }
 
-/*! @brief Discretise le modele de turbulence.
+/*! @brief Discretizes the turbulence model.
  *
  */
 void Modele_turbulence_scal_base::discretiser()
@@ -196,24 +196,26 @@ void Modele_turbulence_scal_base::discretiser()
   champs_compris_.ajoute_champ(diffusivite_turbulente_);
 }
 
-/*! @brief Complete le modele de turbulence: met a jour des references de l'objet.
+/*! @brief Completes the turbulence model: updates object references.
  *
  */
 void Modele_turbulence_scal_base::completer()
 {
 }
 
-/*! @brief A surcharger dans les classes derivees qui possedent une ou des equations Appeler preparer_pas_de_temps sur ces equations.
+/*! @brief To be overridden in derived classes that own one or more equations. Calls preparer_pas_de_temps on those equations.
  *
+ * @param dt Time step.
+ * @return True if successful.
  */
 bool Modele_turbulence_scal_base::initTimeStep(double dt)
 {
   return true;
 }
 
-/*! @brief NE FAIT RIEN
+/*! @brief Does nothing.
  *
- * @return (int) renvoie toujours 1
+ * @return Always returns 1.
  */
 int Modele_turbulence_scal_base::preparer_calcul()
 {
@@ -236,10 +238,10 @@ std::vector<YAML_data> Modele_turbulence_scal_base::data_a_sauvegarder() const
   return data;
 }
 
-/*! @brief NE FAIT RIEN
+/*! @brief Does nothing.
  *
- * @param (Sortie&) un flot de sortie
- * @return (int) renvoie toujours 1
+ * @param os Output stream.
+ * @return Always returns 1.
  */
 int Modele_turbulence_scal_base::sauvegarder(Sortie& os) const
 {
@@ -249,8 +251,9 @@ int Modele_turbulence_scal_base::sauvegarder(Sortie& os) const
     return 0;
 }
 
-/*! @brief Effectue l'ecriture d'une identite si cela est necessaire.
+/*! @brief Writes an identity string to the output stream if necessary.
  *
+ * @param os Output stream.
  */
 void Modele_turbulence_scal_base::a_faire(Sortie& os) const
 {
@@ -269,10 +272,10 @@ void Modele_turbulence_scal_base::a_faire(Sortie& os) const
     }
 }
 
-/*! @brief NE FAIT RIEN
+/*! @brief Does nothing.
  *
- * @param (Entree&) un flot d'entree
- * @return (int) renvoie toujours 1
+ * @param is Input stream.
+ * @return Always returns 1.
  */
 int Modele_turbulence_scal_base::reprendre(Entree& is)
 {
@@ -297,7 +300,7 @@ bool Modele_turbulence_scal_base::has_champ(const Motcle& nom, OBS_PTR(Champ_bas
     if (loipar_->has_champ(nom, ref_champ))
       return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 bool Modele_turbulence_scal_base::has_champ(const Motcle& nom) const
@@ -309,7 +312,7 @@ bool Modele_turbulence_scal_base::has_champ(const Motcle& nom) const
     if (loipar_->has_champ(nom))
       return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 const Champ_base& Modele_turbulence_scal_base::get_champ(const Motcle& nom) const
@@ -337,10 +340,13 @@ void Modele_turbulence_scal_base::get_noms_champs_postraitables(Noms& nom, Optio
     loipar_->get_noms_champs_postraitables(nom, opt);
 }
 
-/*! @brief Indique s'il faut imprimer ou non le Nusselt local
+/*! @brief Indicates whether local Nusselt values should be printed.
  *
- * @param (double temps_courant, double dt) un flot d'entree
- * @return (int) renvoie 1 si on imprime, 0 sinon
+ * @param temps_courant Current time.
+ * @param temps_prec Previous time.
+ * @param dt Current time step.
+ * @param dt_nusselt Nusselt printing period.
+ * @return 1 if printing is required, 0 otherwise.
  */
 int Modele_turbulence_scal_base::limpr_nusselt(double temps_courant, double temps_prec, double dt, double dt_nusselt) const
 {
@@ -361,9 +367,9 @@ int Modele_turbulence_scal_base::limpr_nusselt(double temps_courant, double temp
     }
 }
 
-/*! @brief Effectue l'impression si cela est necessaire.
+/*! @brief Performs printing if necessary.
  *
- * @return renvoie toujours 1
+ * @param os Output stream.
  */
 void Modele_turbulence_scal_base::imprimer(Sortie& os) const
 {

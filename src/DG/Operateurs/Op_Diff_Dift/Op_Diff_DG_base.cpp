@@ -67,10 +67,10 @@ double Op_Diff_DG_base::calculer_dt_stab() const
 
   if (!has_champ_masse_volumique())
     {
-      // Methode "standard" de calcul du pas de temps
-      // Ce calcul est tres conservatif: si le max de la diffusivite
-      // n'est pas atteint a l'endroit ou le min de delta_h_carre est atteint,
-      // le pas de temps est sous-estime.
+      // "Standard" method for computing the time step
+      // This estimate is very conservative: if the maximum diffusivity
+      // is not co-located with the minimum delta_h_squared,
+      // the time step will be underestimated.
       const Champ_base& champ_diffusivite = diffusivite_pour_pas_de_temps();
       const DoubleVect& valeurs_diffusivite = champ_diffusivite.valeurs();
       double alpha_max = local_max_vect(valeurs_diffusivite);
@@ -131,8 +131,8 @@ double Op_Diff_DG_base::calculer_dt_stab() const
       assert(sub_type(Champ_Elem_DG, champ_rho));
       assert(sub_type(Champ_Fonc_P0_base, champ_diffu));
       // assert(valeurs_rho.size_array()== mon_dom.les_elems().dimension_tot(0));
-      // Champ_Elem_DG : champ aux elems et aux faces
-      // Champ de masse volumique variable.
+      // Champ_Elem_DG: field at elements and faces
+      // Variable density field.
       const IntTab& e_f = le_dom_dg_->elem_faces();
       for (int elem = 0; elem < nb_elem; elem++)
         {
@@ -141,16 +141,16 @@ double Op_Diff_DG_base::calculer_dt_stab() const
           double dt;
           if (e_f.dimension(1) == deux_dim || e_f(elem, deux_dim) == -1)
             {
-              // Maille type VDF (deux_dim faces sur l'element)
-              // ToDo: coder dans le cas has_champ_masse_volumique()==false
+              // VDF-type cell (deux_dim faces on the element)
+              // ToDo: implement for the case has_champ_masse_volumique()==false
               double h = 0;
               for (int f = 0; f < deux_dim; f++)
                 {
                   int face = e_f(elem, f);
                   const double d = le_dom_dg_->volumes(elem) / le_dom_dg_->face_surfaces(face);
-                  h += 0.5 / (d * d); // On multiplie par 0.5 car face comptee 2 fois
+                  h += 0.5 / (d * d); // multiply by 0.5 because each face is counted twice
                 }
-              // Voir Op_Diff_VDF_Elem_base::calculer_dt_stab():
+              // See Op_Diff_VDF_Elem_base::calculer_dt_stab():
               dt = 0.5 * rho / ((diffu + DMINFLOAT) * h);
             }
           else
@@ -233,7 +233,7 @@ void Op_Diff_DG_base::completer()
  */
 void Op_Diff_DG_base::update_nu() const
 {
-  if (nu_a_jour_) return; // on a deja fait le travail
+  if (nu_a_jour_) return; // already computed
 
   int i, j;
 
@@ -242,9 +242,9 @@ void Op_Diff_DG_base::update_nu() const
     {
       if (!diffu.get_md_vector())
         {
-          // diffusivite uniforme
+          // uniform diffusivity
           int n = nu_.dimension_tot(0), nb_comp = nu_.line_size();
-          // Tableaux vus comme uni-dimenionnels:
+          // Arrays viewed as one-dimensional:
           const DoubleVect& arr_diffu = diffu;
           DoubleVect& arr_nu = nu_;
           for (i = 0; i < n; i++)
@@ -281,9 +281,9 @@ void Op_Diff_DG_base::update_nu() const
         {
           if (!diffu_turb.get_md_vector())
             {
-              // diffusvite uniforme
+              // uniform diffusivity
               int n = nu_.dimension_tot(0), nb_comp = nu_.line_size();
-              // Tableaux vus comme uni-dimenionnels:
+              // Arrays viewed as one-dimensional:
               const DoubleVect& arr_diffu_turb = diffu_turb;
               DoubleVect& arr_nu = nu_;
               for (i = 0; i < n; i++)

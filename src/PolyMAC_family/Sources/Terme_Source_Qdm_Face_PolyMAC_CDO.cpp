@@ -53,7 +53,7 @@ DoubleTab& Terme_Source_Qdm_Face_PolyMAC_CDO::ajouter(DoubleTab& resu) const
   const Domaine_PolyMAC_CDO& domaine_PolyMAC_CDO = le_dom_PolyMAC_CDO.valeur();
   const Domaine_Cl_PolyMAC_family& Domaine_Cl_PolyMAC_family = le_dom_Cl_PolyMAC_CDO.valeur();
 
-  /* 1. faces de bord -> on ne contribue qu'aux faces de Neumann */
+  /* 1. boundary faces: contribute only to Neumann faces */
   for (int n_bord = 0; n_bord < domaine_PolyMAC_CDO.nb_front_Cl(); n_bord++)
     {
       const Cond_lim& la_cl = Domaine_Cl_PolyMAC_family.les_conditions_limites(n_bord);
@@ -68,7 +68,7 @@ DoubleTab& Terme_Source_Qdm_Face_PolyMAC_CDO::ajouter(DoubleTab& resu) const
             resu(f) += fac * la_source->valeurs()(sub_type(Champ_Uniforme,la_source.valeur()) ? 0 : e, r) * (domaine_PolyMAC_CDO.xv(f, r) - domaine_PolyMAC_CDO.xp(e, r));
         }
     }
-  /* 2. faces internes -> contributions amont/aval */
+  /* 2. internal faces -> upstream/downstream contributions */
   for (int f = domaine_PolyMAC_CDO.premiere_face_int(); f < domaine_PolyMAC_CDO.nb_faces(); f++)
     {
       double fac = equation().milieu().porosite_face(f) * domaine_PolyMAC_CDO.face_surfaces(f);

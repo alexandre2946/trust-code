@@ -634,7 +634,7 @@ void Matrix_tools::matdiag_mult_matmorse( const DoubleTab& diag,
       const int nnz_i = (int)(tab1[ i+1 ] - tab1[ i ]); // nnz sur la ligne i
       for(int k=0; k<nnz_i; k++)
         {
-          const int j = tab2[nnz_tot + k] - 1 ; // indice de la colonne
+          const int j = tab2[nnz_tot + k] - 1 ; // column index
           double& coefficient = mat.coef( i, j );
           if( inverse )
             coefficient *= 1./diag[ i ] ;
@@ -658,7 +658,7 @@ void Matrix_tools::matmorse_mult_matdiag( const DoubleTab& diag,
       const int nnz_i = (int)(tab1[ i+1 ] - tab1[ i ]); // nnz sur la ligne i
       for(int k=0; k<nnz_i; k++)
         {
-          const int j = tab2[nnz_tot + k] - 1 ; // indice de la colonne
+          const int j = tab2[nnz_tot + k] - 1 ; // column index
           double& coefficient = mat.coef( i, j );
           if( inverse )
             coefficient *= 1./diag[ j ] ;
@@ -683,7 +683,7 @@ void Matrix_tools::uniform_matdiag_mult_matmorse( const double diag,
       const int nnz_i = (int)(tab1[ i+1 ] - tab1[ i ]); // nnz sur la ligne i
       for(int k=0; k<nnz_i; k++)
         {
-          const int j = tab2[nnz_tot + k] - 1 ; // indice de la colonne
+          const int j = tab2[nnz_tot + k] - 1 ; // column index
           double& coefficient = mat.coef( i, j );
           if( inverse )
             coefficient *= 1./diag ;

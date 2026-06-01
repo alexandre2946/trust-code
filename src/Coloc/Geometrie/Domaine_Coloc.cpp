@@ -31,10 +31,10 @@ void Domaine_Coloc::discretiser()
 
 void Domaine_Coloc::calculer_h_carre()
 {
-  // Calcul de h_carre
+  // Computation of h_carre
   h_carre = 1.e30;
   h_carre_.resize(nb_faces());
-  // Calcul des surfaces
+  // Computation of surfaces
   Elem_geom_base& elem_geom = domaine().type_elem().valeur();
   int is_polyedre = sub_type(Poly_geom_base, elem_geom) ? 1 : 0;
   const ArrOfInt PolyIndex = is_polyedre ? ref_cast(Poly_geom_base, domaine().type_elem().valeur()).getElemIndex() : ArrOfInt(0);
@@ -66,8 +66,8 @@ void Domaine_Coloc::modifier_pour_Cl(const Conds_lim& conds_lim)
         Process::exit("Domaine_Coloc::modifier_pour_Cl not coded for Periodic BC \n");
     }
 
-  // PQ : 10/10/05 : les faces periodiques etant a double contribution
-  //          l'appel a marquer_faces_double_contrib s'effectue dans cette methode
-  //          afin de pouvoir beneficier de conds_lim.
+  // PQ : 10/10/05 : periodic faces have double contribution,
+  //          so the call to marquer_faces_double_contrib is done in this method
+  //          in order to take advantage of conds_lim.
   Domaine_VF::marquer_faces_double_contrib(conds_lim);
 }

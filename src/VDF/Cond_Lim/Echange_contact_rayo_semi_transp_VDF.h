@@ -20,11 +20,12 @@
 #include <Echange_contact_VDF.h>
 
 
-/*! @brief classe Echange_contact_rayo_semi_transp_VDF Cette classe est utilisee pour realiser un couplage entre une
+/*! @brief class Echange_contact_rayo_semi_transp_VDF
  *
- *     paroi solide et un fluide semi transparent en prenant en compte
- *     le rayonnement de la paroi.
- *     Elle est utilisee uniquement pour une discretisation VDF.
+ *   This class is used to model a coupling between a
+ *   solid wall and a semi-transparent fluid, taking into account
+ *   the wall radiation.
+ *   It is used exclusively for a VDF discretization.
  *
  *
  */

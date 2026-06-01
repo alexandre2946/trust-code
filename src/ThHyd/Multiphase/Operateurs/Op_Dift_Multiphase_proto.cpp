@@ -30,7 +30,7 @@ void Op_Dift_Multiphase_proto::associer_proto(const Probleme_base& pb, Champs_co
 void Op_Dift_Multiphase_proto::ajout_champs_(const bool is_face)
 {
   /*
-   * Les correlations donnent nu_turb et lambda_turb
+   * The correlations provide nu_turb and lambda_turb
    */
   const int nb_phases = is_pbm_ ? ref_cast(Pb_Multiphase, pbm_.valeur()).nb_phases() : 1;
   noms_nu_ou_lambda_turb_post_.dimensionner(nb_phases);
@@ -41,7 +41,7 @@ void Op_Dift_Multiphase_proto::ajout_champs_(const bool is_face)
                                         (is_pbm_ ? Nom("conductivite_turbulente_") + ref_cast(Pb_Multiphase, pbm_.valeur()).nom_phase(i) : Nom("conductivite_turbulente"));
 
   /*
-   * On recalcule mu_turb et alpha_turb
+   * We recompute mu_turb and alpha_turb
    */
   noms_mu_ou_alpha_turb_post_.dimensionner(nb_phases);
   mu_ou_alpha_turb_post_.resize(nb_phases);
@@ -70,7 +70,7 @@ void Op_Dift_Multiphase_proto::get_noms_champs_postraitables_proto(const Nom& cl
 void Op_Dift_Multiphase_proto::creer_champ_(const Motcle& motlu, const bool is_face)
 {
   /*
-   * Les correlations donnent nu_turb et lambda_turb
+   * The correlations provide nu_turb and lambda_turb
    */
   int i = noms_nu_ou_lambda_turb_post_.rang(motlu);
   if (i >= 0 && !nu_ou_lambda_turb_post_[i])
@@ -83,7 +83,7 @@ void Op_Dift_Multiphase_proto::creer_champ_(const Motcle& motlu, const bool is_f
     }
 
   /*
-   * On recalcule mu_turb et alpha_turb
+   * We recompute mu_turb and alpha_turb
    */
   i = noms_mu_ou_alpha_turb_post_.rang(motlu);
   if (i >= 0 && !mu_ou_alpha_turb_post_[i])
@@ -98,7 +98,7 @@ void Op_Dift_Multiphase_proto::creer_champ_(const Motcle& motlu, const bool is_f
 
 void Op_Dift_Multiphase_proto::completer_(const Operateur_Diff_base& op,const bool is_face)
 {
-  //si la correlation a besoin du gradient de u, on doit le creer maintenant
+  //if the correlation needs the gradient of u, we must create it now
   if (is_face)
     {
       if (corr_ && ref_cast(Viscosite_turbulente_base, corr_.valeur()).gradu_required())
@@ -126,9 +126,9 @@ void Op_Dift_Multiphase_proto::mettre_a_jour_(const double temps, const bool is_
   for (int n = 0; n < N; n++)
     {
       /*
-       * Les correlations donnent nu_turb et lambda_turb
+       * The correlations provide nu_turb and lambda_turb
        */
-      if (nu_ou_lambda_turb_post_[n]) // viscosite/diffusivite turbulente : toujours scalaire
+      if (nu_ou_lambda_turb_post_[n]) // turbulent viscosity/diffusivity: always scalar
         {
           DoubleTab& val = nu_ou_lambda_turb_post_[n]->valeurs();
           const int nl = val.dimension(0);
@@ -139,9 +139,9 @@ void Op_Dift_Multiphase_proto::mettre_a_jour_(const double temps, const bool is_
         }
 
       /*
-       * On recalcule mu_turb et alpha_turb
+       * We recompute mu_turb and alpha_turb
        */
-      if (mu_ou_alpha_turb_post_[n]) // viscosite/diffusivite turbulente : toujours scalaire
+      if (mu_ou_alpha_turb_post_[n]) // turbulent viscosity/diffusivity: always scalar
         {
           DoubleTab& val = mu_ou_alpha_turb_post_[n]->valeurs();
           const DoubleTab& rho = pbm_->milieu().masse_volumique().passe();

@@ -21,8 +21,8 @@
 #include <TRUSTTabs.h>
 #include <Schema_Comm_Vecteurs.h>
 
-// Classe outil permettant de redistribuer un champ d'un maillage ijk sur un maillage
-// distribue differemment (copie maille par maille sans interpolation)
+// Utility class to redistribute a field from one IJK mesh to another
+// mesh with a different distribution (cell-by-cell copy without interpolation)
 class Redistribute_Field
 {
 public:

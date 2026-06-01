@@ -25,9 +25,9 @@ class Op_Dift_VEF_Face_Q1 : public Op_Dift_VEF_base
 public:
   double calculer_dt_stab() const override { return calculer_dt_stab_P1NCP1B(); }
 
-  DoubleTab& ajouter(const DoubleTab&, DoubleTab&) const override; // pour l'explicite
+  DoubleTab& ajouter(const DoubleTab&, DoubleTab&) const override; // for explicit time stepping
 
-  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override; // pour l'implicite
+  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override; // for implicit time stepping
 
   void contribuer_au_second_membre(DoubleTab&) const override
   {

@@ -20,7 +20,7 @@
 #include <Nom.h>
 class Entree;
 
-/*! @brief Definit une constante dans le jeu de donnees
+/*! @brief Defines a constant in the data set.
  *
  */
 class Constante :  public Objet_U

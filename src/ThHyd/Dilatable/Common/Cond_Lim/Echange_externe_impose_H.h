@@ -21,7 +21,7 @@
 
 class Fluide_Dilatable_base;
 
-/*! @brief Classe Echange_externe_impose_H: Cette classe represente le cas particulier de la classe Echange_externe_impose pour une equation en enthalpie..
+/*! @brief Particular case of the Echange_externe_impose class for an enthalpy equation.
  *
  * @sa Echange_impose_base Echange_externe_impose
  */

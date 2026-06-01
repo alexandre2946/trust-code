@@ -71,7 +71,7 @@ Sortie& Op_Diff_VEFP1NCP1B_Face::printOn(Sortie& s ) const
 
 Entree& Op_Diff_VEFP1NCP1B_Face::readOn(Entree& s )
 {
-  //Les mots a reconnaitre
+  //Keywords to recognise
   Motcle motlu, accouverte = "{" , accfermee = "}" ;
   Motcles les_mots(6);
   {
@@ -164,7 +164,7 @@ Entree& Op_Diff_VEFP1NCP1B_Face::readOn(Entree& s )
   return s;
 }
 
-//// associer
+//// associate
 //
 
 
@@ -178,7 +178,7 @@ void Op_Diff_VEFP1NCP1B_Face::associer(const Domaine_dis_base& domaine_dis,
   const Domaine_VEF& zvef = ref_cast(Domaine_VEF,domaine_dis);
   const Domaine_Cl_VEF& zclvef = ref_cast(Domaine_Cl_VEF,domaine_cl_dis);
 
-  // On bloque la symetrie dans l operateur de diffusion P1NC sur vitesse (OK pour scalaire)
+  // Block symmetry in the P1NC diffusion operator on velocity (OK for scalar)
   for (int i = 0; i<zclvef.nb_cond_lim(); i++)
     {
       Cond_lim la_cl = zclvef.les_conditions_limites(i);
@@ -208,7 +208,7 @@ void Op_Diff_VEFP1NCP1B_Face::completer()
   initialiser();
 }
 
-//ATTENTION : NE TIENT PAS COMPTE DE LA POROSITE 09/04/2009
+//WARNING: DOES NOT ACCOUNT FOR POROSITY 09/04/2009
 double Op_Diff_VEFP1NCP1B_Face::calculer_dt_stab() const
 {
   const Domaine_VEF& domaine_VEF=domaine_vef();
@@ -237,11 +237,11 @@ double Op_Diff_VEFP1NCP1B_Face::calculer_dt_stab() const
 
   double dt_stab=DMAXFLOAT;
 
-  //Calcul de la porosite
+  //Compute porosity
   remplir_nu(nu_);
   modif_par_porosite_si_flag(nu_,nu,!marq,porosite_elem);
 
-  //Calcul : contribution des parties P0, P1 et Pa au dt_stab
+  //Compute: contribution of the P0, P1 and Pa parts to dt_stab
   if (alphaE) calculer_dt_stab_elem(nu,coeffOperateur);
   if (alphaS)
     {
@@ -257,7 +257,7 @@ double Op_Diff_VEFP1NCP1B_Face::calculer_dt_stab() const
       remplir_nu_pA(nu,nu_pA);
       calculer_dt_stab_aretes(nu_pA,coeffOperateur);
     }
-  //Calcul : modification pour tenir compte de la matrice de masse
+  //Compute: modification to account for the mass matrix
   for (face=0; face<nb_faces; face++)
     {
       coeffOperateur(face)/=volumes_entrelaces(face);
@@ -265,7 +265,7 @@ double Op_Diff_VEFP1NCP1B_Face::calculer_dt_stab() const
       coeffOperateur(face)=1./(coeffOperateur(face)+DMINFLOAT);
     }
 
-  //Calcul : modification pour les faces de Dirichlet
+  //Compute: modification for Dirichlet faces
   for (n_bord=0; n_bord<nb_bords; n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -284,8 +284,8 @@ double Op_Diff_VEFP1NCP1B_Face::calculer_dt_stab() const
           }
     }
 
-  //Calcul du pas de temps de stabilite
-  //: on en a besoin que sur les faces reelles
+  //Compute stability time step
+  //: only needed on real faces
   for (face=0; face<nb_faces; face++)
     if (coeffOperateur(face)<dt_stab)
       dt_stab=coeffOperateur(face);
@@ -386,10 +386,10 @@ calculer_dt_stab_som(const DoubleTab& nu_som, DoubleTab& coeffOperateur) const
   if (laplacien_p1_.nb_lignes()<2) dimensionner(laplacien_p1_);
   if (!is_laplacian_filled_) calculer_laplacien_som(nu_som);
 
-  //REMARQUE : on multiplie par -1 car laplacien_p1_=+Delta
+  //NOTE: multiply by -1 because laplacien_p1_=+Delta
   for (face=0; face<nb_faces; face++)
     {
-      face_C=face*dim_ch_;//pour le cas vectoriel
+      face_C=face*dim_ch_;//for the vector case
       coeffOperateur(face)+=-1.*laplacien_p1_(face_C,face_C);
     }
 }
@@ -422,7 +422,7 @@ calculer_gradient_elem(const DoubleVect& inconnue) const
   double signe=0.;
   double volume=0.;
 
-  //Valeurs INTEGRALES du gradient_p0_
+  //INTEGRAL values of gradient_p0_
   for(elem=0; elem<nb_elem_tot; elem++)
     for(face_loc=0; face_loc<nb_faces_elem; face_loc++)
       {
@@ -438,7 +438,7 @@ calculer_gradient_elem(const DoubleVect& inconnue) const
                                             face_normales(face,compj);
       }
 
-  //Valeurs NODALES du gradient_p0_
+  //NODAL values of gradient_p0_
   for (elem=0; elem<nb_elem_tot; elem++)
     {
       volume = volumes(elem);
@@ -448,8 +448,8 @@ calculer_gradient_elem(const DoubleVect& inconnue) const
           gradient_p0_(elem,compi,compj)/=(coeff_*volume);
     }
 
-  //REMARQUE : cet echange_espace_virtuel() est NECESSAIRE
-  //dans le cas ou alphaS==1 et/ou alphaA=1
+  //NOTE: this echange_espace_virtuel() is REQUIRED
+  //when alphaS==1 and/or alphaA=1
   if (alphaS) gradient_p0_*=convexite_;
   gradient_p0_.echange_espace_virtuel();
   Debog::verifier("OpDifP1NCP1B Gradient P0 : ",gradient_p0_);
@@ -497,7 +497,7 @@ calculer_gradient_som(const DoubleVect& inconnue) const
   const IntTab& face_voisins=domaine_VEF.face_voisins();
   const IntTab& face_sommets=domaine_VEF.face_sommets();
 
-  //Le second membre du systeme a inverser
+  //Right-hand side of the system to invert
   secmem=0.;
   for(elem=0; elem<nb_elem_tot; elem++)
     {
@@ -528,7 +528,7 @@ calculer_gradient_som(const DoubleVect& inconnue) const
   secmem.echange_espace_virtuel();
   Debog::verifier("OpDifP1NCP1B secmem, avant CL : ", secmem);
 
-  //Les conditions aux limites pour le second membre
+  //Boundary conditions for the right-hand side
   for (n_bord=0; n_bord<nb_bords; n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -539,7 +539,7 @@ calculer_gradient_som(const DoubleVect& inconnue) const
 
       if (sub_type(Dirichlet_homogene,la_cl.valeur()))
         {
-          //On ne fait rien et c'est normal
+          //Nothing to do, this is expected
         }
       else if (sub_type(Dirichlet,la_cl.valeur()))
         {
@@ -565,14 +565,14 @@ calculer_gradient_som(const DoubleVect& inconnue) const
                     {
                       som=dom.get_renum_som_perio(face_sommets(face,som_loc));
 
-                      //Formule d'integration numerique exacte pour les polynomes de degre 2
-                      if (dimension==2) //formule de Simpson
+                      //Exact numerical integration formula for degree-2 polynomials
+                      if (dimension==2) //Simpson's rule
                         {
-                          //Coordonnees du sommet "som"
+                          //Coordinates of vertex "som"
                           x=coord_sommets(som,0);
                           y=coord_sommets(som,1);
 
-                          //Valeur de l'inconnue au point d'integration
+                          //Value of the unknown at the integration point
                           for (compi=0; compi<dim_ch_; compi++)
                             {
                               inconnue_pt=
@@ -583,22 +583,22 @@ calculer_gradient_som(const DoubleVect& inconnue) const
                                   1./6*(2*inconnue[face*dim_ch_+compi]+inconnue_pt)
                                   *face_normales(face,compj) ;
                             }
-                        }//fin du if sur dimension==2
+                        }//end if on dimension==2
 
-                      else //formule exacte pour les polynomes de degre 2
+                      else //exact formula for degree-2 polynomials
                         {
-                          //On suppose que l'element considere est un TETRAEDRE
+                          //Assume the element is a TETRAHEDRON
                           for (i=1; i<3; i++)
                             {
                               int som2=face_sommets(face,(som_loc+i)%nb_som_face);
                               som2=dom.get_renum_som_perio(som2);
 
-                              //Coordonnees des points d'integration
+                              //Coordinates of the integration points
                               x=(coord_sommets(som,0)+coord_sommets(som2,0))/2.;
                               y=(coord_sommets(som,1)+coord_sommets(som2,1))/2.;
                               z=(coord_sommets(som,2)+coord_sommets(som2,2))/2.;
 
-                              //Vitesse au point d'integration
+                              //Velocity at the integration point
                               for (compi=0; compi<dim_ch_; compi++)
                                 {
                                   inconnue_pt=
@@ -609,13 +609,13 @@ calculer_gradient_som(const DoubleVect& inconnue) const
                                                                  1/2.*inconnue_pt*face_normales(face,compj) ;
                                 }
                             }
-                        }//fin du else sur la dimension
+                        }//end else on dimension
 
-                    }//fin du for sur "som_loc"
+                    }//end loop over "som_loc"
 
-                }//fin du for sur "ind_face"
+                }//end loop over "ind_face"
 
-            }//fin du if sur "Champ_front_txyz"
+            }//end if on "Champ_front_txyz"
           else
             {
               for (ind_face=num1; ind_face<num2; ind_face++)
@@ -631,12 +631,12 @@ calculer_gradient_som(const DoubleVect& inconnue) const
                           secmem(som,compi,compj) += 1./dimension*
                                                      inconnue[face*dim_ch_+compi]*face_normales(face,compj) ;
 
-                    }//fin du for sur "som_loc"
+                    }//end loop over "som_loc"
 
-                }//fin du for sur "ind_face"
+                }//end loop over "ind_face"
             }
 
-        }//fin du if sur "Dirichlet"
+        }//end if on "Dirichlet"
 
       else if (!sub_type(Periodique,la_cl.valeur()))
         {
@@ -653,18 +653,18 @@ calculer_gradient_som(const DoubleVect& inconnue) const
                       secmem(som,compi,compj) += 1./dimension*
                                                  inconnue[face*dim_ch_+compi]*face_normales(face,compj) ;
 
-                }//fin du for sur "som_loc"
+                }//end loop over "som_loc"
 
-            }//fin du for sur "ind_face"
+            }//end loop over "ind_face"
 
-        }//fin du if sur "!Periodique"
+        }//end if on "!Periodique"
 
-    }//fin du for sur "n_bord"
+    }//end loop over "n_bord"
 
   secmem.echange_espace_virtuel();
   Debog::verifier("OpDifP1NCP1B secmem, apres CL : ", secmem);
 
-  //Calcul de la solution du systeme a inverser
+  //Compute the solution of the system to invert
   for (compi=0; compi<dim_ch_; compi++)
     for (compj=0; compj<dimension; compj++)
       {
@@ -674,7 +674,7 @@ calculer_gradient_som(const DoubleVect& inconnue) const
             secmemij(som)=secmem(som,compi,compj);
           }
 
-        //Resolution du systeme
+        //Solve the system
         for(i=0; i<nb_som; i++)
           {
             som=dom.get_renum_som_perio(i);
@@ -724,13 +724,13 @@ corriger_div_pour_Cl(const DoubleVect& inconnue,const DoubleTab& nu,
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
 
-      //Reinitialisation de num1 et num2
+      //Re-initialise num1 and num2
       num1 = 0;
       num2 = le_bord.nb_faces();
 
       if (sub_type(Periodique,la_cl.valeur()))
         {
-          //periodicite
+          //periodicity
           const Periodique& la_cl_perio = ref_cast(Periodique, la_cl.valeur());
 
           for (ind_face=num1; ind_face<num2; ind_face++)
@@ -746,9 +746,9 @@ corriger_div_pour_Cl(const DoubleVect& inconnue,const DoubleTab& nu,
                     div[face_associee*dim_ch_+comp]=div[face*dim_ch_+comp];
                   }
 
-            }//fin du if sur for "ind_face"
+            }//end loop over "ind_face"
 
-        }//fin de la periodicite
+        }//end of periodicity
 
       else if (sub_type(Neumann_paroi,la_cl.valeur()))
         {
@@ -770,7 +770,7 @@ corriger_div_pour_Cl(const DoubleVect& inconnue,const DoubleTab& nu,
                 }
             }
 
-        }//fin if sur "Neumann"
+        }//end if on "Neumann"
       else if (sub_type(Echange_externe_impose,la_cl.valeur()))
         {
           const Echange_externe_impose& la_cl_paroi=
@@ -790,7 +790,7 @@ corriger_div_pour_Cl(const DoubleVect& inconnue,const DoubleTab& nu,
                 }
             }
         }
-    }//fin du for sur "n_bords"
+    }//end loop over "n_bords"
 
   div.echange_espace_virtuel();
   Debog::verifier("OpDifP1NCP1B divergence apres CL : ", div);
@@ -857,7 +857,7 @@ calculer_divergence_som(DoubleVect& div) const
   static double coeff_som=1./(dimension)/(dimension+1);
   double signe=0.;
 
-  //Algorithme sans tenir compte des CL
+  //Algorithm without accounting for boundary conditions
   for(elem=0; elem<nb_elem_tot; elem++)
     for(face_loc=0; face_loc<nb_faces_elem; face_loc++)
       {
@@ -877,7 +877,7 @@ calculer_divergence_som(DoubleVect& div) const
                 coeff_som*gradient_p1_(som,compi,compj)*sigma[compj];
       }
 
-  //Les conditions aux limites
+  //Boundary conditions
   const Domaine_Cl_VEF& domaine_Cl_VEF = la_zcl_vef.valeur();
   const Conds_lim& les_cl = domaine_Cl_VEF.les_conditions_limites();
   const IntTab& face_sommets = domaine_VEF.face_sommets();
@@ -900,15 +900,15 @@ calculer_divergence_som(DoubleVect& div) const
         {
           for (ind_face=num1; ind_face<num2; ind_face++)
             {
-              //Le numero de la face (qui peut etre virtuelle)
+              //The face index (which may be virtual)
               face=le_bord.num_face(ind_face);
 
-              //Le numero de l'element voisin
+              //The index of the neighbouring element
               elem=face_voisins(face,0);
               assert(elem!=-1);
 
-              //Calcul du gradient au milieu de la face de bord
-              //On prend une integration numerique approchee
+              //Compute the gradient at the midpoint of the boundary face
+              //using an approximate numerical integration
               gradient_bord=0.;
               for (som_loc=0; som_loc<nb_som_face; som_loc++)
                 {
@@ -921,19 +921,19 @@ calculer_divergence_som(DoubleVect& div) const
                 }
               gradient_bord/=dimension;
 
-              //Calcul divergence au bord : formule d'integration numerique
-              //exacte pour polynome d'ordre 1
+              //Compute boundary divergence: exact numerical integration formula
+              //for degree-1 polynomials
               for(compi=0; compi<dim_ch_; compi++)
                 for(compj=0; compj<dimension; compj++)
                   div[face*dim_ch_+compi]-=
                     gradient_bord(compi,compj)
                     *face_normales(face,compj);
 
-            }//fin du for sur "ind_face"
+            }//end loop over "ind_face"
 
-        }//fin du if sur "Neumann_paroi", "Neumann", "Symetrie"
+        }//end if on "Neumann_paroi", "Neumann", "Symetrie"
 
-    }//fin du for sur "n_bords"
+    }//end loop over "n_bords"
 
   div.echange_espace_virtuel();
   Debog::verifier("OpDifP1NCP1B divergence P1 : ", div);
@@ -968,7 +968,7 @@ calculer_laplacien_som(const DoubleTab& nu_som) const
 
   coeff=0.;
   ajouter_contribution_som(inconnue1,porosite_face,nu_som,laplacien_p1_);
-  coeff*=-1;//pour l'explicite
+  coeff*=-1;//for the explicit scheme
 }
 
 DoubleTab& Op_Diff_VEFP1NCP1B_Face::
@@ -979,10 +979,10 @@ ajouter(const DoubleTab& inconnue, DoubleTab& resu) const
 
   const int nb_aretes_tot=domaine.nb_aretes_tot();
 
-  //Recuperation de la diffusivite
+  //Retrieve the diffusivity
   remplir_nu(nu_);
 
-  //Pour tenir compte de la porosite
+  //To account for porosity
   const int marq = phi_psi_diffuse(equation());
   const DoubleVect& porosite_face = equation().milieu().porosite_face();
   const DoubleVect& porosite_elem = equation().milieu().porosite_elem();
@@ -1024,15 +1024,13 @@ ajouter(const DoubleTab& inconnue, DoubleTab& resu) const
     }
   corriger_div_pour_Cl(inconnue2,nu,resu3);
 
-  //Le corriger_div_pour_Cl() doit etre fait AVANT le calcul
-  //de la partie p1 car la matrice est deja codee pour tenir
-  //compte des coefficients periodiques
-  //REMARQUE IMPORTANTE : pour des raisons techniques inherentes
-  //a TrioU, le calcul du dt_stab a lieu AVANT l'application
-  //de la fonction ajouter(). Or le dt_stab a besoin de la matrice
-  //pour etre correctement calcule par consequent, la matrice
-  //laplacien_p1_ est construite dans la fonction calculer_dt_stab()
-  //et est seulement reutilisee ici.
+  //corriger_div_pour_Cl() must be called BEFORE computing
+  //the p1 part because the matrix is already coded to account
+  //for periodic coefficients
+  //IMPORTANT NOTE: for technical reasons inherent to TrioU, the dt_stab
+  //computation takes place BEFORE the ajouter() function is applied.
+  //Since dt_stab needs the matrix to be correctly computed, the matrix
+  //laplacien_p1_ is built in calculer_dt_stab() and is only reused here.
   if (alphaS)
     {
       domaine.creer_tableau_sommets(nu_p1);
@@ -1076,7 +1074,7 @@ void Op_Diff_VEFP1NCP1B_Face::initialiser()
   const DoubleTab& unknown = equation().inconnue().valeurs();
   const int size = unknown.line_size();
 
-  //Definition des gradients
+  //Define the gradients
   gradient_p0_.resize(0, size, Objet_U::dimension);
   domaine_VEF.domaine().creer_tableau_elements(gradient_p0_);
 
@@ -1089,15 +1087,15 @@ void Op_Diff_VEFP1NCP1B_Face::initialiser()
       domaine_VEF.creer_tableau_aretes(gradient_pa_);
     }
 
-  //Initialisation de l'attribut dim_ch_
+  //Initialise the dim_ch_ attribute
   dim_ch_=size;
 
-  //Dimensionnemt du tableau flux_bords
+  //Size the flux_bords array
   flux_bords_.resize(domaine_VEF.nb_faces_bord(),size);
   flux_bords_=0.;
 }
 
-//Fonction qui calcule le flux aux bords du domaine
+//Function that computes the flux at the domain boundaries
 void Op_Diff_VEFP1NCP1B_Face::calculer_flux_bords_elem(const DoubleVect& inconnue) const
 {
   const Domaine_VEF& domaine_VEF = domaine_vef();
@@ -1185,17 +1183,17 @@ void Op_Diff_VEFP1NCP1B_Face::calculer_flux_bords_elem(const DoubleVect& inconnu
               elem=face_voisins(face,0);
               assert(elem!=-1);
 
-              //le coefficient de convexite est deja dans gradient_p0_
+              //the convexity coefficient is already included in gradient_p0_
               for (compi=0; compi<dim_ch_; compi++)
                 for (compj=0; compj<dimension; compj++)
                   flux_bords_(face,compi)=gradient_p0_(elem,compi,compj)
                                           *face_normales(face,compj);
             }
         }
-    }//fin du for sur n_bord
+    }//end loop over n_bord
 }
 
-//Fonction qui calcule le flux aux bords du domaine
+//Function that computes the flux at the domain boundaries
 void Op_Diff_VEFP1NCP1B_Face::calculer_flux_bords_som(const DoubleVect& inconnue) const
 {
   const Domaine_VEF& domaine_VEF = domaine_vef();
@@ -1283,7 +1281,7 @@ void Op_Diff_VEFP1NCP1B_Face::calculer_flux_bords_som(const DoubleVect& inconnue
             {
               face=le_bord.num_face(ind_face);
 
-              //le coefficient de convexite est deja dans gradient_p1_
+              //the convexity coefficient is already included in gradient_p1_
               for (som_loc=0; som_loc<nb_som_face; som_loc++)
                 {
                   som=face_sommets(face,som_loc);
@@ -1299,10 +1297,10 @@ void Op_Diff_VEFP1NCP1B_Face::calculer_flux_bords_som(const DoubleVect& inconnue
                 flux_bords_(face,compi)/=nb_som_face;
             }
         }
-    }//fin du for sur n_bord
+    }//end loop over n_bord
 }
 
-//Fonction qui calcule le flux aux bords du domaine
+//Function that computes the flux at the domain boundaries
 void Op_Diff_VEFP1NCP1B_Face::calculer_flux_bords_aretes(const DoubleVect& inconnue) const
 {
   Cerr<<"Op_Dift_VEF_P1NCP1B_Face::calculer_flux_bords_aretes() not coded"<<finl;
@@ -1312,7 +1310,7 @@ void Op_Diff_VEFP1NCP1B_Face::calculer_flux_bords_aretes(const DoubleVect& incon
 
 
 ///////////////////////////////////////////////////////////////
-//Fonctions pour l'implicite
+//Functions for the implicit scheme
 //////////////////////////////////////////////////////////////
 void Op_Diff_VEFP1NCP1B_Face::
 ajouter_contribution_elem(const DoubleTab& inconnue,const DoubleVect& porosite_face,
@@ -1352,10 +1350,10 @@ ajouter_contribution_elem(const DoubleTab& inconnue,const DoubleVect& porosite_f
               elem1 = face_voisins(num_face,0);
               fac_asso = la_cl_perio.face_associee(num_face-num1)+num1;
 
-              //A la fin de la boucle :
-              //si ok=1, alors num_face appartient bien a elem1
-              //si ok=0, alors num_face n'appartient pas a elem1 et
-              //         fac_asso appartient a elem1
+              // At the end of the loop:
+              // if ok=1, then num_face belongs to elem1
+              // if ok=0, then num_face does not belong to elem1 and
+              //         fac_asso belongs to elem1
               int ok=1;
               int fac_loc=0;
               while ((fac_loc<nb_faces_elem) && (elem_faces(elem1,fac_loc)!=num_face)) fac_loc++;
@@ -1388,7 +1386,7 @@ ajouter_contribution_elem(const DoubleTab& inconnue,const DoubleVect& porosite_f
                       }
                   }
 
-              //Deuxieme element
+              //Second element
               elem2 = face_voisins(num_face,1);
 
               for (i=0; i<nb_faces_elem; i++)
@@ -1406,7 +1404,7 @@ ajouter_contribution_elem(const DoubleTab& inconnue,const DoubleVect& porosite_f
                       }
                   }
 
-            }//fin du for sur "num_face"
+            }//end loop over "num_face"
         }
       else
         {
@@ -1425,7 +1423,7 @@ ajouter_contribution_elem(const DoubleTab& inconnue,const DoubleVect& porosite_f
 
                         matrice(n0,n0)+=val*porosite_face(num_face)*coeff;
                         matrice(n0,j0)-=val*porosite_face(j)*coeff;
-                        if (j<nb_faces) //necessaire ????
+                        if (j<nb_faces) //needed ????
                           {
                             matrice(j0,n0)-=val*porosite_face(num_face)*coeff;
                             matrice(j0,j0)+=val*porosite_face(j)*coeff;
@@ -1437,7 +1435,7 @@ ajouter_contribution_elem(const DoubleTab& inconnue,const DoubleVect& porosite_f
         }
     }
 
-  //On ne remplit que les lignes reelles
+  //Fill only real rows
   for (num_face=domaine_VEF.premiere_face_int(); num_face<nb_faces; num_face++)
     {
       elem1 = face_voisins(num_face,0);
@@ -1463,7 +1461,7 @@ ajouter_contribution_elem(const DoubleTab& inconnue,const DoubleVect& porosite_f
                 }
             }
 
-          //           if (elem2!=-1) //test non necessaire car la face est reelle
+          //           if (elem2!=-1) //test not needed as the face is real
           if ( (j=elem_faces(elem2,i)) > num_face )
             {
               val= viscA(num_face,j,elem2,nu(elem2));
@@ -1493,7 +1491,7 @@ ajouter_contribution_som(const DoubleTab& inconnue,const DoubleVect& porosite_fa
   const Domaine_VEF& domaine_VEF=domaine_vef();
   const Domaine_Cl_VEF& domaine_Cl_VEF = la_zcl_vef.valeur();
 
-  IntVect liste_som(dimension+2);//pour triangles et tetraedres
+  IntVect liste_som(dimension+2);//for triangles and tetrahedra
 
   DoubleTab gradient0(dimension,dimension+2);
   DoubleTab gradient1(dimension);
@@ -1526,15 +1524,15 @@ ajouter_contribution_som(const DoubleTab& inconnue,const DoubleVect& porosite_fa
     }
 
   //
-  //Partie P1 du laplacien discret :
-  //on tourne sur les lignes donc nous n'avons
-  //besoin que de remplir les lignes reelles.
-  //ATTENTION : le remplissage des lignes reelles
-  //peut induire le calcul d'un coefficient
-  //lie a une colonne virtuelle
+  //P1 part of the discrete Laplacian:
+  //iterating over rows, so we only need
+  //to fill the real rows.
+  //WARNING: filling the real rows
+  //may involve computing a coefficient
+  //linked to a virtual column
   //
 
-  /* Faces internes */
+  /* Internal faces */
   for (face=premiere_face_int; face<nb_faces; face++)
     {
       coeff_matrice_som(face,liste_som,
@@ -1560,8 +1558,7 @@ ajouter_contribution_som(const DoubleTab& inconnue,const DoubleVect& porosite_fa
               face=le_bord.num_face(ind_face);
               faceAss=le_bord.num_face(la_cl_perio.face_associee(ind_face));
 
-              //On prend la plus petite des faces pour etre sur de n'oublier
-              //aucune face de bord
+              //Take the smallest face index to ensure no boundary face is missed
               coeff_matrice_som_perio(face,faceAss,liste_som,
                                       gradient0,gradient1,
                                       porosite_face,nu_som,
@@ -1599,8 +1596,7 @@ ajouter_contribution_aretes(const DoubleTab& inconnue,const DoubleVect& porosite
 {
 }
 
-//Fonction qui calcule les coefficients de la matrice pour une face
-//INTERNE.
+//Function that computes the matrix coefficients for an INTERNAL face.
 void Op_Diff_VEFP1NCP1B_Face::
 coeff_matrice_som(const int face,IntVect& liste_som,
                   DoubleTab& gradient0, DoubleTab& gradient1,
@@ -1633,7 +1629,7 @@ coeff_matrice_som(const int face,IntVect& liste_som,
   double coeff_conv=1.;
   if (alphaE) coeff_conv=(1.-convexite_);
 
-  //Quelques verifications
+  //Some checks
   assert(gradient0.nb_dim()==2);
   assert(gradient0.dimension(0)==dimension);
   assert(gradient0.dimension(1)==dimension+2);
@@ -1642,15 +1638,15 @@ coeff_matrice_som(const int face,IntVect& liste_som,
   assert(liste_som.size()==dimension+2);
 
   //
-  //Partie P1 du laplacien discret
+  //P1 part of the discrete Laplacian
   //
   liste_som=-1;
   gradient0=0.;
   gradient_som(face,nnz,liste_som,gradient0);
 
 
-  /* gradient associe a "face" : calcul du coefficient */
-  /* diagonal de la matrice associee a l'inconnue */
+  /* gradient associated with "face": compute the diagonal */
+  /* coefficient of the matrix for the unknown */
   coeff_mat=0.;
   for (som_loc=0; som_loc<nnz; som_loc++)
     {
@@ -1676,20 +1672,20 @@ coeff_matrice_som(const int face,IntVect& liste_som,
     }
 
 
-  /* calcul des coefficients extra-diagonaux de la matrice laplacien */
-  /* la matrice etant diagonale par bloc, on effectue le calcul du */
-  /* produit scalaire une seule fois avant de l'affecter aux differentes */
-  /* composantes de la matrice */
+  /* compute the off-diagonal coefficients of the Laplacian matrix */
+  /* since the matrix is block diagonal, compute the dot product */
+  /* only once before assigning it to the different */
+  /* components of the matrix */
   face_C=face*dim_ch_;
   auto debut=tab1[face_C]-1;
   auto size=tab1[face_C+1]-tab1[face_C];
 
-  for (i=1; i<size; i++) //i=0 -> face2_C=face_C -> deja rempli
+  for (i=1; i<size; i++) //i=0 -> face2_C=face_C -> already filled
     {
       face2_C=tab2[debut+i]-1;
-      face2=face2_C/dim_ch_;//division euclidienne
+      face2=face2_C/dim_ch_;//integer division
 
-      if (face2>face)//pour la symetrie de l'operateur
+      if (face2>face)//for operator symmetry
         {
           coeff_mat=0.;
           for (som_loc=0; som_loc<nnz; som_loc++)
@@ -1698,7 +1694,7 @@ coeff_matrice_som(const int face,IntVect& liste_som,
               coeff_som=volume_aux_sommets(som)*coeff_;
               isInStencil(face2,som,elem0,som_loc0,elem1,som_loc1);
 
-              if (elem0!=-1)//les deux faces se "voient"
+              if (elem0!=-1)//the two faces "see" each other
                 {
                   assert(som_loc0!=-1);
                   gradient1=0.;
@@ -1735,8 +1731,8 @@ coeff_matrice_som(const int face,IntVect& liste_som,
     }
 }
 
-//Fonction qui calcule les coefficients de la matrice pour une face
-//de BORD qui n'est ni periodique ni symetrique.
+//Function that computes the matrix coefficients for a BOUNDARY face
+//that is neither periodic nor symmetric.
 void Op_Diff_VEFP1NCP1B_Face::
 coeff_matrice_som_CL(const int face,IntVect& liste_som,
                      DoubleTab& gradient0, DoubleTab& gradient1,
@@ -1769,7 +1765,7 @@ coeff_matrice_som_CL(const int face,IntVect& liste_som,
   double coeff_conv=1.;
   if (alphaE) coeff_conv=(1.-convexite_);
 
-  //Quelques verifications
+  //Some checks
   assert(gradient0.nb_dim()==2);
   assert(gradient0.dimension(0)==dimension);
   assert(gradient0.dimension(1)==dimension+2);
@@ -1778,15 +1774,15 @@ coeff_matrice_som_CL(const int face,IntVect& liste_som,
   assert(liste_som.size()==dimension+2);
 
   //
-  //Partie P1 du laplacien discret
+  //P1 part of the discrete Laplacian
   //
   liste_som=-1;
   gradient0=0.;
   gradient_som_CL(face,nnz,liste_som,gradient0);
 
 
-  /* gradient associe a "face" : calcul du coefficient */
-  /* diagonal de la matrice associee a l'inconnue */
+  /* gradient associated with "face": compute the diagonal */
+  /* coefficient of the matrix for the unknown */
   coeff_mat=0.;
   for (som_loc=0; som_loc<nnz; som_loc++)
     {
@@ -1812,20 +1808,20 @@ coeff_matrice_som_CL(const int face,IntVect& liste_som,
     }
 
 
-  /* calcul des coefficients extra-diagonaux de la matrice laplacien */
-  /* la matrice etant diagonale par bloc, on effectue le calcul du */
-  /* produit scalaire une seule fois avant de l'affecter aux differentes */
-  /* composantes de la matrice */
+  /* compute the off-diagonal coefficients of the Laplacian matrix */
+  /* since the matrix is block diagonal, compute the dot product */
+  /* only once before assigning it to the different */
+  /* components of the matrix */
   face_C=face*dim_ch_;
   auto debut=tab1[face_C]-1;
   auto size=tab1[face_C+1]-tab1[face_C];
 
-  for (i=1; i<size; i++) //i=0 -> face2_C=face_C -> deja rempli
+  for (i=1; i<size; i++) //i=0 -> face2_C=face_C -> already filled
     {
       face2_C=tab2[debut+i]-1;
-      face2=face2_C/dim_ch_;//division euclidienne
+      face2=face2_C/dim_ch_;//integer division
 
-      if (face2>face)//pour la symetrie de l'operateur
+      if (face2>face)//for operator symmetry
         {
           coeff_mat=0.;
           for (som_loc=0; som_loc<nnz; som_loc++)
@@ -1834,7 +1830,7 @@ coeff_matrice_som_CL(const int face,IntVect& liste_som,
               coeff_som=volume_aux_sommets(som)*coeff_;
               isInStencil(face2,som,elem0,som_loc0,elem1,som_loc1);
 
-              if (elem0!=-1)//les deux faces se "voient"
+              if (elem0!=-1)//the two faces "see" each other
                 {
                   assert(som_loc0!=-1);
                   gradient1=0.;
@@ -1871,8 +1867,8 @@ coeff_matrice_som_CL(const int face,IntVect& liste_som,
     }
 }
 
-//Fonction qui calcule les coefficients de la matrice pour une face
-//de BORD qui est une face de SYMETRIE.
+//Function that computes the matrix coefficients for a boundary face
+//that is a SYMMETRY face.
 void Op_Diff_VEFP1NCP1B_Face::
 coeff_matrice_som_symetrie(const int face,IntVect& liste_som,
                            DoubleTab& gradient0, DoubleTab& gradient1,
@@ -1905,7 +1901,7 @@ coeff_matrice_som_symetrie(const int face,IntVect& liste_som,
   double coeff_conv=1.;
   if (alphaE) coeff_conv=(1.-convexite_);
 
-  //Quelques verifications
+  //Some checks
   assert(gradient0.nb_dim()==2);
   assert(gradient0.dimension(0)==dimension);
   assert(gradient0.dimension(1)==dimension+2);
@@ -1914,15 +1910,15 @@ coeff_matrice_som_symetrie(const int face,IntVect& liste_som,
   assert(liste_som.size()==dimension+2);
 
   //
-  //Partie P1 du laplacien discret
+  //P1 part of the discrete Laplacian
   //
   liste_som=-1;
   gradient0=0.;
   gradient_som_CL(face,nnz,liste_som,gradient0);
 
 
-  /* gradient associe a "face" : calcul du coefficient */
-  /* diagonal de la matrice associee a l'inconnue */
+  /* gradient associated with "face": compute the diagonal */
+  /* coefficient of the matrix for the unknown */
   coeff_mat=0.;
   for (som_loc=0; som_loc<nnz; som_loc++)
     {
@@ -1948,24 +1944,24 @@ coeff_matrice_som_symetrie(const int face,IntVect& liste_som,
     }
 
 
-  /* calcul des coefficients extra-diagonaux de la matrice laplacien */
-  /* la matrice etant diagonale par bloc, on effectue le calcul du */
-  /* produit scalaire une seule fois avant de l'affecter aux differentes */
-  /* composantes de la matrice */
-  /* REMARQUE : la matrice est modifiee pour tenir compte des CL de */
-  /* symetrie, mais on ne calcule pas les modifications associees -> */
-  /* c'est la fonction Op_VEF_Face::modifier_pour_Cl() qui le fera */
+  /* compute the off-diagonal coefficients of the Laplacian matrix */
+  /* since the matrix is block diagonal, compute the dot product */
+  /* only once before assigning it to the different */
+  /* components of the matrix */
+  /* NOTE: the matrix is modified to account for symmetry BCs, */
+  /* but the associated modifications are not computed here -> */
+  /* this is handled by Op_VEF_Face::modifier_pour_Cl() */
   face_C=face*dim_ch_;
   auto debut=tab1[face_C]-1;
   auto size=tab1[face_C+1]-tab1[face_C];
-  size-=(dim_ch_-1);//-> pour ne pas calculer les coefficients inutiles
+  size-=(dim_ch_-1);//-> to avoid computing unnecessary coefficients
 
-  for (i=1; i<size; i++) //i=0 -> face2_C=face_C -> deja rempli
+  for (i=1; i<size; i++) //i=0 -> face2_C=face_C -> already filled
     {
       face2_C=tab2[debut+i]-1;
-      face2=face2_C/dim_ch_;//division euclidienne
+      face2=face2_C/dim_ch_;//integer division
 
-      if (face2>face)//pour la symetrie de l'operateur
+      if (face2>face)//for operator symmetry
         {
           coeff_mat=0.;
           for (som_loc=0; som_loc<nnz; som_loc++)
@@ -1974,7 +1970,7 @@ coeff_matrice_som_symetrie(const int face,IntVect& liste_som,
               coeff_som=volume_aux_sommets(som)*coeff_;
               isInStencil(face2,som,elem0,som_loc0,elem1,som_loc1);
 
-              if (elem0!=-1)//les deux faces se "voient"
+              if (elem0!=-1)//the two faces "see" each other
                 {
                   assert(som_loc0!=-1);
                   gradient1=0.;
@@ -2011,8 +2007,7 @@ coeff_matrice_som_symetrie(const int face,IntVect& liste_som,
     }
 }
 
-//Fonction qui calcule les coefficients de la matrice pour une face
-//PERIODIQUE.
+//Function that computes the matrix coefficients for a PERIODIC face.
 void Op_Diff_VEFP1NCP1B_Face::
 coeff_matrice_som_perio(const int face,const int faceAss, IntVect& liste_som,
                         DoubleTab& gradient0, DoubleTab& gradient1,
@@ -2045,7 +2040,7 @@ coeff_matrice_som_perio(const int face,const int faceAss, IntVect& liste_som,
   double coeff_conv=1.;
   if (alphaE) coeff_conv=(1.-convexite_);
 
-  //Quelques verifications
+  //Some checks
   assert(gradient0.nb_dim()==2);
   assert(gradient0.dimension(0)==dimension);
   assert(gradient0.dimension(1)==dimension+2);
@@ -2054,15 +2049,15 @@ coeff_matrice_som_perio(const int face,const int faceAss, IntVect& liste_som,
   assert(liste_som.size()==dimension+2);
 
   //
-  //Partie P1 du laplacien discret
+  //P1 part of the discrete Laplacian
   //
   liste_som=-1;
   gradient0=0.;
   gradient_som(face,nnz,liste_som,gradient0);
 
 
-  /* gradient associe a "face" : calcul du coefficient */
-  /* diagonal de la matrice associee a l'inconnue */
+  /* gradient associated with "face": compute the diagonal */
+  /* coefficient of the matrix for the unknown */
   coeff_mat=0.;
   for (som_loc=0; som_loc<nnz; som_loc++)
     {
@@ -2088,20 +2083,20 @@ coeff_matrice_som_perio(const int face,const int faceAss, IntVect& liste_som,
     }
 
 
-  /* calcul des coefficients extra-diagonaux de la matrice laplacien */
-  /* la matrice etant diagonale par bloc, on effectue le calcul du */
-  /* produit scalaire une seule fois avant de l'affecter aux differentes */
-  /* composantes de la matrice */
+  /* compute the off-diagonal coefficients of the Laplacian matrix */
+  /* since the matrix is block diagonal, compute the dot product */
+  /* only once before assigning it to the different */
+  /* components of the matrix */
   face_C=face*dim_ch_;
   auto debut=tab1[face_C]-1;
   auto size=tab1[face_C+1]-tab1[face_C];
 
-  for (i=1; i<size; i++) //i=0 -> face2_C=face_C -> deja rempli
+  for (i=1; i<size; i++) //i=0 -> face2_C=face_C -> already filled
     {
       face2_C=tab2[debut+i]-1;
-      face2=face2_C/dim_ch_;//division euclidienne
+      face2=face2_C/dim_ch_;//integer division
 
-      if (face2>face)//pour la symetrie de l'operateur
+      if (face2>face)//for operator symmetry
         {
           coeff_mat=0.;
           for (som_loc=0; som_loc<nnz; som_loc++)
@@ -2110,7 +2105,7 @@ coeff_matrice_som_perio(const int face,const int faceAss, IntVect& liste_som,
               coeff_som=volume_aux_sommets(som)*coeff_;
               isInStencil(face2,som,elem0,som_loc0,elem1,som_loc1);
 
-              if (elem0!=-1)//les deux faces se "voient"
+              if (elem0!=-1)//the two faces "see" each other
                 {
                   assert(som_loc0!=-1);
                   gradient1=0.;
@@ -2153,20 +2148,20 @@ ajouter_contribution(const DoubleTab& inconnue,Matrice_Morse& matrice) const
   const Domaine_VEF& domaine_VEF=domaine_vef();
   const Domaine& domaine=domaine_VEF.domaine();
 
-  //Marqueur pour tenir compte de la porosite
+  //Flag to account for porosity
   const int marq=phi_psi_diffuse(equation());
 
-  //Lignes pour tenir compte de la porosite
+  //Lines to account for porosity
   const DoubleVect& porosite_elem=equation().milieu().porosite_elem();
   DoubleVect porosite_face(equation().milieu().porosite_face());
   if (!marq) porosite_face=1.;
 
-  //Lignes pour tenir compte de la diffusivite
+  //Lines to account for diffusivity
   DoubleTab nu,nu_p1,nu_pA;
   remplir_nu(nu_);
   modif_par_porosite_si_flag(nu_,nu,!marq,porosite_elem);
 
-  //RESTE juste a gerer la porosite a la face
+  //REMAINING: handle face porosity
   if (alphaE)
     ajouter_contribution_elem(inconnue,porosite_face,nu,matrice);
   if (alphaS)
@@ -2185,14 +2180,14 @@ ajouter_contribution(const DoubleTab& inconnue,Matrice_Morse& matrice) const
   if (test_) test();
 }
 
-/*! @brief Calcule la diffusivite "nu_p1" aux sommets du maillage en fonction de la diffusivite "nu_elem" aux elements.
+/*! @brief Compute the diffusivity "nu_p1" at mesh vertices from the element diffusivity "nu_elem".
  *
- *  On suppose que nu_elem a son espace virtuel a jour,
- *  que nu_p1 est dimensionne nb_dim==1 avec la structure domaine.md_vector_sommets()
- *  En sortie l'espace virtuel de nu_p1 est mis a jour
+ *  Assumes that nu_elem has its virtual space up to date,
+ *  that nu_p1 is sized with nb_dim==1 using the domaine.md_vector_sommets() structure.
+ *  On exit the virtual space of nu_p1 is updated.
  *
- *  L'interpolateur calculs pour un sommet la moyenne (non ponderee) des
- *  diffusivites sur les elements adjacents a ce sommet.
+ *  The interpolator computes for each vertex the (unweighted) average of
+ *  the diffusivities over the elements adjacent to that vertex.
  *
  */
 void Op_Diff_VEFP1NCP1B_Face::
@@ -2211,14 +2206,14 @@ remplir_nu_p1(const DoubleTab& nu_elem,DoubleTab& nu_p1) const
 
   const IntTab& elem_som=domaine.les_elems();
 
-  ArrOfInt nb_elem_per_som(nb_som); // Intialise a zero par defaut
+  ArrOfInt nb_elem_per_som(nb_som); // Initialised to zero by default
 
   assert(nu_elem.get_md_vector() == domaine.md_vector_elements());
   assert(nu_p1.get_md_vector() == dom.md_vector_sommets());
-  // On a besoin que l'espace virtuel de nu_elem soit a jour.
+  // The virtual space of nu_elem must be up to date.
   assert_espace_virtuel_vect(nu_elem);
 
-  //Calcul effectif de "nu_som"
+  //Effective computation of "nu_som"
 
   nu_p1=0.;
 
@@ -2228,8 +2223,8 @@ remplir_nu_p1(const DoubleTab& nu_elem,DoubleTab& nu_p1) const
       for (som_loc=0; som_loc<nb_som_elem; som_loc++)
         {
           som=elem_som(elem,som_loc);
-          // Ne pas calculer les valeurs pour les sommets virtuels
-          // note BM: l'algo precedent ne calculait pas correctement les valeurs non plus
+          // Do not compute values for virtual vertices
+          // note BM: the previous algorithm did not compute those values correctly either
           if (som < nb_som)
             {
               som=dom.get_renum_som_perio(som);
@@ -2245,37 +2240,35 @@ remplir_nu_p1(const DoubleTab& nu_elem,DoubleTab& nu_p1) const
       int nvoisins = nb_elem_per_som[som_perio];
       if (nvoisins > 0)
         {
-          // La premiere fois qu'on tombe sur ce sommet on fait la division.
-          // On traite du meme coup le cas ou le sommet n'a pas d'elements voisins.
+          // The first time we encounter this vertex, perform the division.
+          // This also handles the case where the vertex has no neighbouring elements.
           nu_p1(som_perio) /= nvoisins;
           nb_elem_per_som[som_perio] = 0;
         }
       if (som != som_perio)
         nu_p1(som) = nu_p1(som_perio);
     }
-  // Le codage precedent n'avait apparemment pas besoin d'echange espace virtuel.
-  // A mon avis (BM) c'est un miracle du au fait qu'on fait les calculs avec epaisseur2
-  // (calcul sur nb_som_tot, donc les sommets des elements d'epaisseur 1 sont ok mais
-  //  pas ceux d'epaisseur 2)
-  // Je prefere ce codage: (si on enleve, ca fait des ecarts en parallele)
+  // The previous code apparently did not need virtual space exchange.
+  // In my opinion (BM) this was a coincidence due to computing with epaisseur2
+  // (computation on nb_som_tot, so vertices of thickness-1 elements are fine but
+  //  not those of thickness-2 elements)
+  // I prefer this code: (removing it causes discrepancies in parallel)
   nu_p1.echange_espace_virtuel();
 }
 
-//Fonction qui calcule la diffusivite aux aretes du maillage
-//a partir de la diffusivite aux elements
-//CONTRAINTE : la diffusivite aux elements "nu_elem" doit
-//             deja avoir ete calculee et est consideree
-//             comme un parametre d'entree
-//CONTRAINTE : la diffusivite aux sommets "nu_som" doit
-//            deja avoir ete DIMENSIONNEE a la bonne
-//            taille et est consideree comme un parametre
-//           de sortie
-//CONTRAINTE : l'interpolateur choisi pour le calcul de
-//            "nu_som" est tel que pour un sommet s
-//            donne nous avons
-//            * une liste L des elements possedant le sommet s
-//            * la diffusivite en s est la moyenne geometrique
-//              des "nu_elem" de L
+//Function that computes the diffusivity at mesh edges
+//from the element diffusivity
+//CONSTRAINT: the element diffusivity "nu_elem" must
+//            already have been computed and is treated
+//            as an input parameter
+//CONSTRAINT: the vertex diffusivity "nu_som" must
+//            already have been SIZED to the correct
+//            size and is treated as an output parameter
+//CONSTRAINT: the interpolator chosen for computing
+//            "nu_som" is such that for a given vertex s
+//            * L is the list of elements containing vertex s
+//            * the diffusivity at s is the geometric mean
+//              of the "nu_elem" values of L
 void Op_Diff_VEFP1NCP1B_Face::
 remplir_nu_pA(const DoubleTab& nu_elem,DoubleTab& nu_pA) const
 {
@@ -2285,11 +2278,11 @@ remplir_nu_pA(const DoubleTab& nu_elem,DoubleTab& nu_pA) const
 }
 
 
-//Creation d'une liste qui a une face donnee associe les faces
-//voisines au sens du support de l'operateur de diffusion P1B
-//On passe par une liste intermediaire qui donne pour un sommet
-//donnee, la liste des faces "voyant" le sommet au sens de l'operateur
-//de diffusion P1B
+//Build a list associating, for each given face, the neighbouring faces
+//in the sense of the support of the P1B diffusion operator.
+//An intermediate list is used that gives, for a given vertex,
+//the list of faces "seeing" that vertex in the sense of the P1B
+//diffusion operator.
 void Op_Diff_VEFP1NCP1B_Face::liste_face(IntLists& liste,int& nnz) const
 {
   const Domaine_VEF& domaine_VEF = domaine_vef();
@@ -2323,8 +2316,8 @@ void Op_Diff_VEFP1NCP1B_Face::liste_face(IntLists& liste,int& nnz) const
   ArrOfBit fait(nb_faces_tot);
   IntLists sommets_faces(nb_som_tot);
 
-  //Il faut creer un second tableau travaillant sur les faces periodiques
-  //sinon la matrice pourrait ne pas etre homogene a l'operateur explicite
+  //A second array working on periodic faces must be created;
+  //otherwise the matrix might not be consistent with the explicit operator
   for (face=0; face<nb_faces_tot; face++)
     faces_perio(face)=face;
 
@@ -2347,10 +2340,10 @@ void Op_Diff_VEFP1NCP1B_Face::liste_face(IntLists& liste,int& nnz) const
               faceAss=la_cl_perio.face_associee(ind_face);
               faceAss=le_bord.num_face(faceAss);
 
-              //Test afin de ne parcourir que la moitie des faces periodiques
-              //sachant que l'algorithme qui suit tient compte de ce choix
-              //REMARQUE : ce test marche aussi en parallele ou les faces
-              //virtuelles ne sont pas classees
+              // Test to iterate over only half the periodic faces,
+              // since the following algorithm accounts for this choice.
+              // NOTE: this test also works in parallel where virtual faces
+              // are not sorted.
               if (face<faceAss)
                 {
                   faces_perio(face)=faceAss;
@@ -2360,7 +2353,7 @@ void Op_Diff_VEFP1NCP1B_Face::liste_face(IntLists& liste,int& nnz) const
         }
     }
 
-  //Connectivite liee aux sommets
+  //Connectivity related to vertices
   for (elem=0; elem<nb_elem_tot; elem++)
     for (som_loc=0; som_loc<nb_som_elem; som_loc++)
       {
@@ -2379,10 +2372,9 @@ void Op_Diff_VEFP1NCP1B_Face::liste_face(IntLists& liste,int& nnz) const
 
   nnz=0;
   liste.dimensionner(nb_faces_tot);
-  //REMARQUE IMPORTANTE : IL FAUT ABSOLUMENT COMMENCER
-  //PAR REMPLIR LES FACES PERIODIQUES SINON :
-  //-LA MATRICE NE POURRA PAS ETRE PERIODIQUE
-  //-ET DES COEFFICIENTS POURRAIENT ETRE OUBLIES
+  //IMPORTANT NOTE: PERIODIC FACES MUST ABSOLUTELY BE FILLED FIRST, OTHERWISE:
+  //-THE MATRIX WILL NOT BE PERIODIC
+  //-SOME COEFFICIENTS COULD BE MISSED
   for (n_bord=0; n_bord<nb_bords; n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -2402,22 +2394,22 @@ void Op_Diff_VEFP1NCP1B_Face::liste_face(IntLists& liste,int& nnz) const
               faceAss=la_cl_perio.face_associee(ind_face);
               faceAss=le_bord.num_face(faceAss);
 
-              //Test afin de ne parcourir que la moitie des faces periodiques
-              //sachant que l'algorithme qui suit tient compte de ce choix
-              //REMARQUE : ce test marche aussi en parallele ou les faces
-              //virtuelles ne sont pas classees
+              // Test to iterate over only half the periodic faces,
+              // since the following algorithm accounts for this choice.
+              // NOTE: this test also works in parallel where virtual faces
+              // are not sorted.
               if (face<faceAss)
                 {
-                  //RAZ du tableau fait
+                  //Reset the fait array
                   fait=0;
 
-                  //pour la periodicite
+                  //for periodicity
                   size=liste[face].size();
                   for (i=0; i<size; i++)
                     fait.setbit(liste[face][i]);
 
-                  //Pour que le premier element de la liste soit "face"
-                  //Tient compte de la periodicite
+                  //So that the first element of the list is "face"
+                  //accounting for periodicity
                   if (size!=0)
                     {
                       tmp=liste[face][0];
@@ -2435,7 +2427,7 @@ void Op_Diff_VEFP1NCP1B_Face::liste_face(IntLists& liste,int& nnz) const
 
                   fait.setbit(face);
                   fait.setbit(faceAss);
-                  nnz+=2;//car on ajoute 2 coefficients
+                  nnz+=2;//because 2 coefficients are added
 
                   for (elem_loc=0; elem_loc<2; elem_loc++)
                     {
@@ -2459,18 +2451,18 @@ void Op_Diff_VEFP1NCP1B_Face::liste_face(IntLists& liste,int& nnz) const
                                   liste[faceAss].add(face2);
                                   liste[face2].add(face);
                                   liste[face2].add(faceAss);
-                                  nnz+=4;//car on ajoute 4 coefficients
+                                  nnz+=4;//because 4 coefficients are added
                                 }
 
-                            }//fin du for sur "i"
-                        }//fin du for sur "som_loc"
-                    }//fin du for sur "elem_loc"
-                }//fin du if sur "face<faceAss"
-            }//fin du for sur "ind_face"
-        }//fin Periodique
-    }//fin n_bord
+                            }//end loop over "i"
+                        }//end loop over "som_loc"
+                    }//end loop over "elem_loc"
+                }//end if on "face<faceAss"
+            }//end loop over "ind_face"
+        }//end Periodique
+    }//end loop over n_bord
 
-  //Autres conditions aux limites
+  //Other boundary conditions
   for (n_bord=0; n_bord<nb_bords; n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -2484,16 +2476,16 @@ void Op_Diff_VEFP1NCP1B_Face::liste_face(IntLists& liste,int& nnz) const
           {
             face=le_bord.num_face(ind_face);
 
-            //RAZ du tableau fait
+            //Reset the fait array
             fait=0;
 
-            //pour la periodicite
+            //for periodicity
             size=liste[face].size();
             for (i=0; i<size; i++)
               fait.setbit(liste[face][i]);
 
-            //Pour que le premier element de la liste soit "face"
-            //Tient compte de la periodicite
+            //So that the first element of the list is "face"
+            //accounting for periodicity
             if (size!=0)
               {
                 tmp=liste[face][0];
@@ -2526,24 +2518,24 @@ void Op_Diff_VEFP1NCP1B_Face::liste_face(IntLists& liste,int& nnz) const
                         nnz++;
                       }
 
-                  }//fin du for sur "i"
-              }//fin du for sur "som_loc"
-          }//fin du else sur !Periodique
-    }//fin du for sur n_bord
+                  }//end loop over "i"
+              }//end loop over "som_loc"
+          }//end else on !Periodique
+    }//end loop over n_bord
 
   for (face=firstFaceInt; face<nb_faces_tot; face++)
     if (!domaine_VEF.est_une_face_virt_bord(face))
       {
-        //RAZ du tableau fait
+        //Reset the fait array
         fait=0;
 
-        //pour la periodicite
+        //for periodicity
         size=liste[face].size();
         for (i=0; i<size; i++)
           fait.setbit(liste[face][i]);
 
-        //Pour que le premier element de la liste soit "face"
-        //Tient compte de la periodicite
+        //So that the first element of the list is "face"
+        //accounting for periodicity
         if (size!=0)
           {
             tmp=liste[face][0];
@@ -2560,7 +2552,7 @@ void Op_Diff_VEFP1NCP1B_Face::liste_face(IntLists& liste,int& nnz) const
           {
             elem=face_voisins(face,elem_loc);
 
-            if (elem!=-1) //pour face interne de joint
+            if (elem!=-1) //for internal joint face
               for (som_loc=0; som_loc<nb_som_elem; som_loc++)
                 {
                   som=som_elem(elem,som_loc);
@@ -2578,35 +2570,31 @@ void Op_Diff_VEFP1NCP1B_Face::liste_face(IntLists& liste,int& nnz) const
                           nnz++;
                         }
 
-                    }//fin du for sur "i"
-                }//fin du for sur "som_loc"
-          }//fin du for sur "elem_loc"
-      }//fin du for sur "face"
+                    }//end loop over "i"
+                }//end loop over "som_loc"
+          }//end loop over "elem_loc"
+      }//end loop over "face"
 }
 
-//Fonction qui calcule pour une face "face" donnee et un sommet "som"
-//du stencil de "face", le gradient associe a "face" pour le sommet "som"
-//ATTENTION : cette fonction ne doit etre utilisee que pour le calcul
-//            des gradients pour remplir une COLONNE de la matrice
-//CONTRAINTE : "face" est le numero de la face sur laquelle on veut
-//             calculer le gradient. La face "face" est une face
-//             INTERNE ou PERIODIQUE.
-//CONTRAINTE : le sommet "som" en parametre est suppose etre le
-//             numero d'un sommet APRES renumerotation periodique
-//CONTRAINTE : le sommet "som" DOIT appartenir au stencil de "face"
-//CONTRAINTE : "elem0" et "elem1" sont les numeros des elements
-//             qui contiennent "face" ET "som". Si l'un des elements
-//             est a -1, c'est que "face" et "som" n'appartiennent
-//             pas a un meme element. REMARQUE : l'element elem0
-//             est toujours suppose different de -1.
-//CONTRAINTE : "som_loc0" et "som_loc1" sont les numeros locaux
-//             de "sim_glob" dans repectivement "elem0" et "elem1".
-//             Si l'un des elements est a -1, alors le numero local
-//             de sommet correspondant est a -1
-//CONTRAINTE : le parametre de sortie "grad" contenant l'evaluation
-//             du gradient associe a "face" au sommet "som" est
-//             sense etre CORRECTEMENT dimensionne AVANT l'appel
-//             de cette fonction
+//Function that computes, for a given face "face" and a vertex "som"
+//in the stencil of "face", the gradient associated with "face" at vertex "som"
+//WARNING: this function must only be used for gradient computation
+//         to fill a COLUMN of the matrix
+//CONSTRAINT: "face" is the index of the face at which the gradient is to be
+//            computed. Face "face" is an INTERNAL or PERIODIC face.
+//CONSTRAINT: the vertex "som" parameter is assumed to be the
+//            index of a vertex AFTER periodic renumbering
+//CONSTRAINT: vertex "som" MUST belong to the stencil of "face"
+//CONSTRAINT: "elem0" and "elem1" are the indices of elements
+//            containing both "face" AND "som". If one element index
+//            is -1, then "face" and "som" do not belong to the same element.
+//            NOTE: elem0 is always assumed to be different from -1.
+//CONSTRAINT: "som_loc0" and "som_loc1" are the local indices
+//            of "som_glob" in "elem0" and "elem1" respectively.
+//            If one element is -1, the corresponding local vertex index is -1.
+//CONSTRAINT: the output parameter "grad" containing the evaluation
+//            of the gradient associated with "face" at vertex "som" is
+//            assumed to be CORRECTLY sized BEFORE calling this function
 void Op_Diff_VEFP1NCP1B_Face::
 gradient_som(const int face,const int som_glob,
              const int elem0, const int som_loc0,
@@ -2631,14 +2619,14 @@ gradient_som(const int face,const int som_glob,
   assert(grad.nb_dim()==1);
 
   //
-  //Calcul du gradient
+  //Gradient computation
   //
 
-  /* On regarde le premier element voisin */
+  /* Look at the first neighbouring element */
   assert(elem0!=-1);
   assert(som_loc0!=-1);
 
-  //Calcul du gradient local
+  //Compute the local gradient
   face_opp = elem_faces(elem0,som_loc0);
   signe=1.;
   if(elem0!=face_voisins(face_opp,0)) signe=-1.;
@@ -2647,20 +2635,20 @@ gradient_som(const int face,const int som_glob,
     grad(compj)=coeff_som*signe*
                 face_normales(face_opp,compj);
 
-  /* On regarde le deuxieme element voisin */
+  /* Look at the second neighbouring element */
   if (elem1==-1)
     {
-      /* Plusieurs possibilite :
-         - "face" est interne reel
-         - "face" est interne virtuel
-         - "face" est de bord reel
-         - "face" est de bord virtuel
-         - "face" une face de joint */
+      /* Several possibilities:
+         - "face" is a real internal face
+         - "face" is a virtual internal face
+         - "face" is a real boundary face
+         - "face" is a virtual boundary face
+         - "face" is a joint face */
       assert(som_loc1==-1);
       elem=face_voisins(face,1);
       assert(face_voisins(face,0)!=-1);
 
-      /* "face" est de bord */
+      /* "face" is a boundary face */
       if (elem==-1 && face_opp!=face)
         for (compj=0; compj<dimension; compj++)
           grad(compj)+=coeff*face_normales(face,compj) ;
@@ -2672,7 +2660,7 @@ gradient_som(const int face,const int som_glob,
       signe=1.;
       if(elem1!=face_voisins(face_opp,0)) signe=-1.;
 
-      //Calcul du gradient local
+      //Compute the local gradient
       for(compj=0; compj<dimension; compj++)
         grad(compj)+=coeff_som*signe*
                      face_normales(face_opp,compj);
@@ -2681,18 +2669,18 @@ gradient_som(const int face,const int som_glob,
   grad/=(coeff_*volume_aux_sommets(som_glob));
 }
 
-//Pour une face donnee, calcule le gradient associee a cette face
-//pour chacun des sommets ou le gradient est non nul
-//ATTENTION : cette fonction ne doit etre utilisee que pour le calcul
-//            des gradients pour remplir une LIGNE de la matrice
-//CONTRAINTE : le tableau "grad" est sense etre correctement
-//             dimensionne AVANT l'appel de cette fonction
-//ENTREE : "face" est le numero global de la face INTERNE
-//         ou PERIODIQUE dont on veut calculer le gradient
-//SORTIE : "som_glob" est une liste qui contient tous les sommets
-//          inclus dans le stencil de "face"
-//SORTIE : "nnz" est le nombre de sommets inclus dans le stencil
-//         de face
+//For a given face, compute the gradient associated with that face
+//for each vertex where the gradient is nonzero.
+//WARNING: this function must only be used to compute
+//         gradients when filling a LINE of the matrix.
+//CONSTRAINT: the array "grad" must be correctly
+//            dimensioned BEFORE calling this function.
+//INPUT : "face" is the global index of the INTERNAL
+//         or PERIODIC face whose gradient is to be computed.
+//OUTPUT: "som_glob" is a list containing all vertices
+//         included in the stencil of "face".
+//OUTPUT: "nnz" is the number of vertices included in the stencil
+//        of face.
 void Op_Diff_VEFP1NCP1B_Face::
 gradient_som(const int face,int& nnz, IntVect& som_glob,DoubleTab& grad) const
 {
@@ -2725,11 +2713,11 @@ gradient_som(const int face,int& nnz, IntVect& som_glob,DoubleTab& grad) const
   assert(grad.dimension(1)==dimension+2);
 
   //
-  //Calcul du gradient
+  //Gradient computation
   //
 
   nnz=0;
-  /* On regarde le premier element voisin */
+  /* Look at the first neighbouring element */
   elem=face_voisins(face,0);
   assert(elem!=-1);
 
@@ -2742,18 +2730,18 @@ gradient_som(const int face,int& nnz, IntVect& som_glob,DoubleTab& grad) const
       signe=1.;
       if(elem!=face_voisins(face_opp,0)) signe=-1.;
 
-      //ajout a la liste et incrementation du repere
+      //Add to the list and increment the counter
       som_glob(som_loc)=som;
       nnz++;
 
-      //Calcul du gradient local
+      //Compute the local gradient
       for(compj=0; compj<dimension; compj++)
         grad(compj,som_loc)=coeff_som*signe*
                             face_normales(face_opp,compj);
     }
   assert(nnz==nb_som_elem);
 
-  /* On regarde le deuxieme element voisin */
+  /* Look at the second neighbouring element */
   elem=face_voisins(face,1);
   assert(elem!=-1);
 
@@ -2766,19 +2754,19 @@ gradient_som(const int face,int& nnz, IntVect& som_glob,DoubleTab& grad) const
       signe=1.;
       if(elem!=face_voisins(face_opp,0)) signe=-1.;
 
-      //Localisation dans la liste deja construite
+      //Locate in the already-built list
       for (loc=0; loc<nnz; loc++)
         if (som_glob[loc]==som)
           break;
 
-      //ajout a la liste et incrementation du repere
+      //Add to the list and increment the counter
       if (loc==nnz)
         {
           som_glob(nnz)=som;
           nnz++;
         }
 
-      //Calcul du gradient local
+      //Compute the local gradient
       for(compj=0; compj<dimension; compj++)
         grad(compj,loc)+=coeff_som*signe*
                          face_normales(face_opp,compj);
@@ -2790,24 +2778,24 @@ gradient_som(const int face,int& nnz, IntVect& som_glob,DoubleTab& grad) const
       som=som_glob(som_loc);
       volume=coeff_*volume_aux_sommets(som);
 
-      //On divise par la matrice de masse lumpee
+      //Divide by the lumped mass matrix
       for(compj=0; compj<dimension; compj++)
         grad(compj,som_loc)/=volume;
     }
 }
 
-//Pour une face donnee, calcule le gradient associee a cette face
-//pour chacun des sommets ou le gradient est non nul
-//ATTENTION : cette fonction ne doit etre utilisee que pour le calcul
-//            des gradients pour remplir une LIGNE de la matrice
-//CONTRAINTE : le tableau "grad" est sense etre correctement
-//             dimensionne AVANT l'appel de cette fonction
-//ENTREE : "face" est le numero global de la face de BORD
-//         NON PERIODIQUE dont on veut calculer le gradient
-//SORTIE : "som_glob" est une liste qui contient tous les sommets
-//          inclus dans le stencil de "face"
-//SORTIE : "nnz" est le nombre de sommets inclus dans le stencil
-//         de face
+//For a given face, compute the gradient associated with that face
+//for each vertex where the gradient is nonzero.
+//WARNING: this function must only be used to compute
+//         gradients when filling a LINE of the matrix.
+//CONSTRAINT: the array "grad" must be correctly
+//            dimensioned BEFORE calling this function.
+//INPUT : "face" is the global index of the NON-PERIODIC
+//        BOUNDARY face whose gradient is to be computed.
+//OUTPUT: "som_glob" is a list containing all vertices
+//         included in the stencil of "face".
+//OUTPUT: "nnz" is the number of vertices included in the stencil
+//        of face.
 void Op_Diff_VEFP1NCP1B_Face::
 gradient_som_CL(const int face,int& nnz, IntVect& som_glob,DoubleTab& grad) const
 {
@@ -2842,11 +2830,11 @@ gradient_som_CL(const int face,int& nnz, IntVect& som_glob,DoubleTab& grad) cons
   assert(grad.dimension(1)==dimension+2);
 
   //
-  //Calcul du gradient
+  //Gradient computation
   //
 
   nnz=0;
-  /* On regarde le premier element voisin */
+  /* Look at the first neighbouring element */
   elem=face_voisins(face,0);
   assert(elem!=-1);
 
@@ -2859,21 +2847,21 @@ gradient_som_CL(const int face,int& nnz, IntVect& som_glob,DoubleTab& grad) cons
       signe=1.;
       if(elem!=face_voisins(face_opp,0)) signe=-1.;
 
-      //ajout a la liste et incrementation du repere
+      //Add to the list and increment the counter
       som_glob(som_loc)=som;
       nnz++;
 
-      //Calcul du gradient local
+      //Compute the local gradient
       for(compj=0; compj<dimension; compj++)
         grad(compj,som_loc)=coeff_som*signe*
                             face_normales(face_opp,compj);
     }
   assert(nnz==nb_som_elem);
 
-  /* On regarde le deuxieme element voisin */
+  /* Look at the second neighbouring element */
   assert(face_voisins(face,1)==-1);
 
-  for (som_loc=0; som_loc<nb_som_face; som_loc++) //sommets de "face"
+  for (som_loc=0; som_loc<nb_som_face; som_loc++) //vertices of "face"
     {
       som=face_sommets(face,som_loc);
       som=dom.get_renum_som_perio(som);
@@ -2893,24 +2881,23 @@ gradient_som_CL(const int face,int& nnz, IntVect& som_glob,DoubleTab& grad) cons
       som=som_glob(som_loc);
       volume=coeff_*volume_aux_sommets(som);
 
-      //On divise par la matrice de masse lumpee
+      //Divide by the lumped mass matrix
       for(compj=0; compj<dimension; compj++)
         grad(compj,som_loc)/=volume;
     }
 }
 
 
-//Fonction verifiant si "som_glob" est dans le stencil de "face"
-//CONTRAINTE : "som_glob" DOIT etre un numero PERIODIQUE de sommet
-//SORTIE : le numero des elements du stencil de "face" qui contiennent
-//         le sommet "som_glob". Si le sommet n'est pas contenu
-//         dans un des elements du stencil de "face" alors le numero
-//         de l'element considere est mis a -1
-//SORTIE : som_loc0 et som_loc1 sont les numeros locaux de som_glob
-//         dans respectivement elem0 et elem1.
-//         Si les sommet n'est pas contenu dans un des elements du
-//         stencil de "face" alors le numero local du sommet
-//         correspondant est mis a -1
+//Function checking whether "som_glob" is in the stencil of "face".
+//CONSTRAINT: "som_glob" MUST be a PERIODIC vertex index.
+//OUTPUT: the indices of the elements in the stencil of "face" that contain
+//        vertex "som_glob". If the vertex is not contained
+//        in one of the stencil elements of "face", the index of
+//        that element is set to -1.
+//OUTPUT: som_loc0 and som_loc1 are the local indices of som_glob
+//        in elem0 and elem1 respectively.
+//        If the vertex is not contained in one of the stencil elements of "face",
+//        the corresponding local vertex index is set to -1.
 void Op_Diff_VEFP1NCP1B_Face::isInStencil(int face,int som_glob,
                                           int& elem0, int& som_loc0,
                                           int& elem1, int& som_loc1) const
@@ -2973,7 +2960,7 @@ void Op_Diff_VEFP1NCP1B_Face::isInStencil(int face,int som_glob,
       som_loc1=-1;
     }
 
-  //On ordonne
+  //Sort the output
   if (elem0==-1 && elem1!=-1)
     {
       elem0=elem1;
@@ -3008,19 +2995,18 @@ void Op_Diff_VEFP1NCP1B_Face::dimensionner(Matrice_Morse& matrice) const
 
   if (alphaS)
     {
-      //Calcul de la liste des faces
+      //Compute the face list
       liste_face(faces_faces,nnz);
       isFaceOfSymetry(is_symetry,nb_faces_of_symetry);
 
-      //Dimensionnement des tableaux de la matrice
-      //REMARQUE : par essence, ce dimensionnement sera toujours plus GRAND
-      //que le dimensionnement par defaut issu de OP_VEF_FACE
-      //REMARQUE : pour tenir compte des contraintes dues aux faces de
-      //symetrie, le dimensionnement de la matrice doit etre legerement
-      //elargie
-      size=nnz*nb_comp;//dimensionnement sans face de symetrie
-      //      size+=nb_faces_of_symetry*(nb_comp-1)*nb_comp;//dimensionnement avec faces de symetrie
-      // pour chaque face de symetrie pour chaque composante on ajoute nb_comp coeffs pour chaque face liee
+      //Size the matrix arrays
+      //NOTE: by construction, this sizing will always be LARGER
+      //than the default sizing from OP_VEF_FACE.
+      //NOTE: to account for constraints due to symmetry faces,
+      //the matrix sizing must be slightly enlarged.
+      size=nnz*nb_comp;//sizing without symmetry faces
+      //      size+=nb_faces_of_symetry*(nb_comp-1)*nb_comp;//sizing with symmetry faces
+      // for each symmetry face, for each component, add nb_comp coefficients for each linked face
       for (face=0; face<nb_faces_tot; face++)
         if (is_symetry[face])
           {
@@ -3030,13 +3016,13 @@ void Op_Diff_VEFP1NCP1B_Face::dimensionner(Matrice_Morse& matrice) const
 
       matrice.dimensionner(nb_faces_tot*nb_comp,size);
 
-      //Initialisation des grandeurs connues pour tab1
+      //Initialise the known values for tab1
       tab1[nb_faces_tot*nb_comp]=size+1;
       tab1[0]=1;
 
-      //Remplissage de tab1
+      //Fill tab1
 
-      /* pour les autres composantes de la face 0 */
+      /* for the other components of face 0 */
       size=faces_faces[0].size();
       if (is_symetry[0]) size*=(nb_comp);
       for (comp=1; comp<nb_comp; comp++)
@@ -3045,7 +3031,7 @@ void Op_Diff_VEFP1NCP1B_Face::dimensionner(Matrice_Morse& matrice) const
           tab1[face_C]=tab1[face_C-1]+size;
         }
 
-      /* pour les autres faces */
+      /* for the other faces */
       for (face=1; face<nb_faces_tot; face++)
         {
           size=faces_faces[face-1].size();
@@ -3059,7 +3045,7 @@ void Op_Diff_VEFP1NCP1B_Face::dimensionner(Matrice_Morse& matrice) const
             }
         }
 
-      //Remplissage de tab2
+      //Fill tab2
       for (face=0; face<nb_faces_tot; face++)
         {
           size=faces_faces[face].size();
@@ -3073,11 +3059,11 @@ void Op_Diff_VEFP1NCP1B_Face::dimensionner(Matrice_Morse& matrice) const
                   face_C=faces_faces[face][i]*nb_comp+comp;
                   face_f77=face_C+1;
                   tab2[debut+i]=face_f77;
-                }//fin du for sur "i"
+                }//end loop over "i"
 
-            }//fin du for sur "comp"
+            }//end loop over "comp"
 
-        }//fin du for sur "face"
+        }//end loop over "face"
 
       for (face=0; face<nb_faces_tot; face++)
         if (is_symetry[face])
@@ -3093,7 +3079,7 @@ void Op_Diff_VEFP1NCP1B_Face::dimensionner(Matrice_Morse& matrice) const
                     int face2=faces_faces[face][voi];
                     for (i=0; i<nb_comp-1; i++)
                       {
-                        //reste de la division euclidienne
+                        //remainder of the integer division
                         next=(comp+i+1)%nb_comp;
                         face_C=face2*nb_comp+next;
                         face_f77=face_C+1;
@@ -3139,11 +3125,11 @@ void Op_Diff_VEFP1NCP1B_Face::isFaceOfSymetry(ArrOfBit& is_symetry,int& nnz) con
 
   assert(is_symetry.size_array()==domaine_VEF.nb_faces_tot());
 
-  //Preinitialisation
+  //Pre-initialisation
   nnz=0;
   is_symetry=0;
 
-  //Modification pour les faces de symetrie
+  //Modification for symmetry faces
   for (n_bord=0; n_bord<nb_bords; n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -3165,7 +3151,7 @@ void Op_Diff_VEFP1NCP1B_Face::isFaceOfSymetry(ArrOfBit& is_symetry,int& nnz) con
 
 
 //////////////////////////////////////////////////////////
-//Fonctions de test
+//Test functions
 /////////////////////////////////////////////////////////
 
 void Op_Diff_VEFP1NCP1B_Face::test() const
@@ -3200,15 +3186,15 @@ void Op_Diff_VEFP1NCP1B_Face::test() const
 
   IntVect som_glob(dimension+2);
 
-  //Marqueur pour tenir compte de la porosite
+  //Flag to account for porosity
   const int marq=phi_psi_diffuse(equation());
 
-  //Lignes pour tenir compte de la porosite
+  //Lines to account for porosity
   const DoubleVect& poroE=equation().milieu().porosite_elem();
   DoubleVect poroF(equation().milieu().porosite_face());
   if (!marq) poroF=1.;
 
-  //Lignes pour tenir compte de la diffusivite
+  //Lines to account for diffusivity
   DoubleTab nu;
   remplir_nu(nu_);
   modif_par_porosite_si_flag(nu_,nu,!marq,poroE);
@@ -3217,7 +3203,7 @@ void Op_Diff_VEFP1NCP1B_Face::test() const
   dom.creer_tableau_sommets(nu_p1);
   remplir_nu_p1(nu,nu_p1);
 
-  //Diverses variables utiles
+  //Various useful variables
   int face=0;
   int faceAss=0;
   int comp=0;
@@ -3360,7 +3346,7 @@ void Op_Diff_VEFP1NCP1B_Face::test() const
       gradient_p1_=0.;
       calculer_gradient_som(inco);
 
-      //Controle des gradients
+      //Check the gradients
       grad<<"Face interne : "<<face*size1+comp<<endl;
       grad<<"(";
       for (i=0; i<dimension; i++)
@@ -3456,10 +3442,10 @@ void Op_Diff_VEFP1NCP1B_Face::test() const
           resMat<<")"<<endl;
         }
 
-      //Difference entre les resultat
+      //Difference between the results
       resu-=resuMat;
 
-      //Affichage des differences
+      //Display of differences
       max=resu.local_max_abs_vect();
       if (max>1.e-14)
         {
@@ -3505,11 +3491,11 @@ void Op_Diff_VEFP1NCP1B_Face::test() const
       num1=0;
       num2=le_bord.nb_faces_tot();
 
-      //Modif pour tenir compte des conditions de Dirichlet
-      //-> la matrice de masse doit tout annuler
+      //Modification to account for Dirichlet boundary conditions
+      //-> the mass matrix must zero everything out
       if (sub_type(Dirichlet_homogene,la_cl.valeur()))
         {
-          //Il ne sert a rien de faire un test dans ce cas
+          //Testing is pointless in this case
         }
 
       else if (sub_type(Dirichlet,la_cl.valeur()))
@@ -3521,7 +3507,7 @@ void Op_Diff_VEFP1NCP1B_Face::test() const
             gradient_p1_=0.;
             calculer_gradient_som(inco);
 
-            //Controle des gradients
+            //Check the gradients
             grad<<"Face Dirichlet : "<<face*size1+comp<<endl;
             grad<<"(";
             for (i=0; i<dimension; i++)
@@ -3582,7 +3568,7 @@ void Op_Diff_VEFP1NCP1B_Face::test() const
               gradient_p1_=0.;
               calculer_gradient_som(inco);
 
-              //Controle des gradients
+              //Check the gradients
               grad <<"Face perio : "<<face*size1+comp<<endl;
               grad<<"(";
               for (i=0; i<dimension; i++)
@@ -3678,10 +3664,10 @@ void Op_Diff_VEFP1NCP1B_Face::test() const
                   resMat<<")"<<endl;
                 }
 
-              //Difference entre les resultat
+              //Difference between the results
               resu-=resuMat;
 
-              //Affichage des differences
+              //Display of differences
               max=resu.local_max_abs_vect();
               if (max>1.e-14)
                 {
@@ -3718,7 +3704,7 @@ void Op_Diff_VEFP1NCP1B_Face::test() const
               if (Process::je_suis_maitre()) incoV[faceAss*size1+comp]=0.;
               inco.echange_espace_virtuel();
             }
-        }//fin Perio
+        }//end Perio
       else
         for (ind_face=num1; ind_face<num2; ind_face++)
           {
@@ -3730,7 +3716,7 @@ void Op_Diff_VEFP1NCP1B_Face::test() const
             gradient_p1_=0.;
             calculer_gradient_som(inco);
 
-            //Controle des gradients
+            //Check the gradients
             grad <<"Face CL : "<<face*size1+comp<<endl;
             grad<<"(";
             for (i=0; i<dimension; i++)
@@ -3833,10 +3819,10 @@ void Op_Diff_VEFP1NCP1B_Face::test() const
                 resMat<<")"<<endl;
               }
 
-            //Difference entre les resultat
+            //Difference between the results
             resu-=resuMat;
 
-            //Affichage des differences
+            //Display of differences
             max=resu.local_max_abs_vect();
             if (max>1.e-14)
               {
@@ -3871,8 +3857,8 @@ void Op_Diff_VEFP1NCP1B_Face::test() const
 
             if (Process::je_suis_maitre()) incoV[face*size1+comp]=0.;
             inco.echange_espace_virtuel();
-          }//fin autres CL
-    }//fin du for sur n_bord
+          }//end other CLs
+    }//end loop over n_bord
   exit();
 }
 

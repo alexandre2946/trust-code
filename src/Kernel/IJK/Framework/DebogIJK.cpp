@@ -65,17 +65,16 @@ Entree& DebogIJK::interpreter(Entree& is)
   return is;
 }
 
-// Calcule une signature numerique du champ. On veut une signature qui varie
-// lineairement avec les valeurs du champ et qui detecte de petites variations.
-// On va calculer quelques sommes ponderees des valeurs du champ avec des
-// ponderations pseudo-aleatoires.
+// Computes a numerical signature of the field. We want a signature that varies
+// linearly with the field values and detects small variations.
+// A few weighted sums of the field values are computed with pseudo-random weights.
 void DebogIJK::compute_signature(const IJK_Field_float& field, ArrOfDouble& signature)
 {
   const int sig_size = 5;
   signature.resize_array(sig_size);
   ArrOfDouble facteurs(sig_size);
 
-  // Generation de facteurs, nombres irrationnels et non multiples entre eux
+  // Generate factors: irrational numbers that are not multiples of each other
   facteurs[0] = 1.35914091422952;
   for (int i = 1; i < sig_size; i++)
     facteurs[i] = facteurs[i-1] * facteurs[0];

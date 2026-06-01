@@ -27,20 +27,20 @@ public :
   void discretiser() override;
   void calculer_volumes_entrelaces() override;
 
-  //pour chaque element, normale * surface duale liee a chacune de ses aretes (orientee comme l'arete)
+  //for each element, normal * dual area associated with each of its edges (oriented like the edge)
   const DoubleTab& surf_elem_arete() const;
 
-  //matrices locales par elements (operateurs de Hodge) permettant de faire des interpolations :
-  void M1(const DoubleTab *nu, int e, DoubleTab& m1) const; //normales aux aretes duales -> tangentes aux aretes : (nu|a|t_a.v)   = m1 (S_ea.v)
-  void W1(const DoubleTab *nu, int e, DoubleTab& w1, DoubleTab& v_e, DoubleTab& v_ea) const; //tangentes aux aretes -> normales aux aretes duales : (nu S_ea.v)    = w1 (|a|t_a.v)
-  //possibilite pour le tenseur nu :
-  //nul -> nu = Id ci-dessous
-  //isotrope -> nu(n_e, N) avec n_e = 1 (tenseur constant) / nb_elem_tot() (tenseur par element), et N un nombre de composantes
-  //anisotrope -> nu(n_e, N, D) (anisotrope diagonal) ou nu(n_e, N, D, D) (anisotrope complet)
-  //la matrice en sortie est de taile (n_f, n_f, N) (pour M2/W2) ou (n_a, n_a, N) (pour M1 / W1)
+  //local matrices per element (Hodge operators) for performing interpolations:
+  void M1(const DoubleTab *nu, int e, DoubleTab& m1) const; //dual edge normals -> edge tangentials: (nu|a|t_a.v)   = m1 (S_ea.v)
+  void W1(const DoubleTab *nu, int e, DoubleTab& w1, DoubleTab& v_e, DoubleTab& v_ea) const; //edge tangentials -> dual edge normals: (nu S_ea.v)    = w1 (|a|t_a.v)
+  //options for the nu tensor:
+  //null -> nu = Id below
+  //isotropic -> nu(n_e, N) with n_e = 1 (constant tensor) / nb_elem_tot() (per-element tensor), and N a number of components
+  //anisotropic -> nu(n_e, N, D) (diagonal anisotropic) or nu(n_e, N, D, D) (full anisotropic)
+  //the output matrix is of size (n_f, n_f, N) (for M2/W2) or (n_a, n_a, N) (for M1/W1)
 
 private:
-  mutable DoubleTab surf_elem_arete_; // vecteur normale * surface duale
+  mutable DoubleTab surf_elem_arete_; // normal * dual area vector
 };
 
 #endif /* Domaine_PolyMAC_HFV_included */

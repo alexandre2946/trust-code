@@ -104,9 +104,9 @@ int Paroi_negligeable_VDF::calculer_hyd(DoubleTab& tab_k_eps)
 
                 } // loop on faces
 
-            } // Fin paroi fixe
+            } // End fixed wall
 
-        } // Fin boucle sur les bords
+        } // End loop over boundaries
 
     }
   return 1;
@@ -180,9 +180,9 @@ int Paroi_negligeable_VDF::calculer_hyd(DoubleTab& tab_nu_t, DoubleTab& tab_k)
 
                 } // loop on faces
 
-            } // Fin paroi fixe
+            } // End fixed wall
 
-        } // Fin boucle sur les bords
+        } // End loop over boundaries
 
     }
   return 1;

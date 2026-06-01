@@ -40,7 +40,7 @@ bool Ch_front_var_stationnaire::has_valeurs_au_temps(double temps) const
   else return false;
 }
 
-/*! @brief Renvoie les valeurs sans s'occuper du temps puisque le champ est stationnaire.
+/*! @brief Returns the values without worrying about time since the field is stationary.
  *
  */
 DoubleTab& Ch_front_var_stationnaire::valeurs_au_temps(double temps)
@@ -48,7 +48,7 @@ DoubleTab& Ch_front_var_stationnaire::valeurs_au_temps(double temps)
   return les_valeurs->valeurs();
 }
 
-/*! @brief Renvoie les valeurs sans s'occuper du temps puisque le champ est stationnaire.
+/*! @brief Returns the values without worrying about time since the field is stationary.
  *
  */
 const DoubleTab& Ch_front_var_stationnaire::valeurs_au_temps(double temps) const
@@ -56,7 +56,7 @@ const DoubleTab& Ch_front_var_stationnaire::valeurs_au_temps(double temps) const
   return les_valeurs->valeurs();
 }
 
-/*! @brief Avance en temps : rien a faire pour un champ stationnaire !
+/*! @brief Advance in time: nothing to do for a stationary field!
  *
  */
 int Ch_front_var_stationnaire::avancer(double temps)
@@ -64,7 +64,7 @@ int Ch_front_var_stationnaire::avancer(double temps)
   return 1;
 }
 
-/*! @brief Recule en temps : rien a faire pour un champ stationnaire !
+/*! @brief Rewind in time: nothing to do for a stationary field!
  *
  */
 int Ch_front_var_stationnaire::reculer(double temps)
@@ -72,7 +72,7 @@ int Ch_front_var_stationnaire::reculer(double temps)
   return 1;
 }
 
-/*! @brief rien a faire pour un champ stationnaire !
+/*! @brief Nothing to do for a stationary field!
  *
  */
 void Ch_front_var_stationnaire::changer_temps_futur(double temps,int i)

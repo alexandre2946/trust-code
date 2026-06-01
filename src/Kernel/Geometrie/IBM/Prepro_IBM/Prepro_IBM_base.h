@@ -73,21 +73,21 @@ protected:
   Nom nom_fichier_med_IB_, nom_maillage_IB_ = "??";
   Domaine dom_med_IB_;
   MCAuto<MEDCoupling::MEDCouplingUMesh> aSkinUMesh_ = nullptr; // Mesh MedCoupling IBM
-  DoubleTab barySurf_; // Barycentres maillage Lagrangien
-  DoubleTab normalArr_; // Normales maillage Lagrangien
-  DoubleTab coordsSur3D_; // Coord maillage Lagrangien
+  DoubleTab barySurf_; // Barycenters of the Lagrangian mesh
+  DoubleTab normalArr_; // Normals of the Lagrangian mesh
+  DoubleTab coordsSur3D_; // Coordinates of the Lagrangian mesh
 
-  double eps_ = 1.0e-12; // precision geometrique
-  double eps_effec_ = 1.0e-12; // precision geometrique effective
-  double c_prepro_ = 0.; // facteur multiplicatif pour la recherche du ptr fluide
-  IntTab dimTab_ ; // choix des directions de recherche du pt fluide
-  bool save_prepro_ = false; // Sauvegarde des résultats dans un fichier MED
-  bool verify_results_prepro_ = false; // Verification champ calcules par prepro versus champs lu fichier MED (source_PDF)
+  double eps_ = 1.0e-12; // geometric precision
+  double eps_effec_ = 1.0e-12; // effective geometric precision
+  double c_prepro_ = 0.; // multiplicative factor for the search of the fluid point
+  IntTab dimTab_ ; // choice of search directions for the fluid point
+  bool save_prepro_ = false; // Save results to a MED file
+  bool verify_results_prepro_ = false; // Verification of fields computed by prepro versus fields read from MED file (source_PDF)
 
-  // Champs produits par les prepro_IBM
-  OWN_PTR(Champ_Don_base) champ_rotation_, champ_aire_; // Rotation et Aire IBM maillage Eulerien
-  OWN_PTR(Champ_Don_base) champ_bary_; // Barycentres IBM maillage Eulerien
-  OWN_PTR(Champ_Don_base) champ_normal_; // Normales IBM maillage Eulerien
+  // Fields produced by the prepro_IBM
+  OWN_PTR(Champ_Don_base) champ_rotation_, champ_aire_; // IBM rotation and area on the Eulerian mesh
+  OWN_PTR(Champ_Don_base) champ_bary_; // IBM barycenters on the Eulerian mesh
+  OWN_PTR(Champ_Don_base) champ_normal_; // IBM normals on the Eulerian mesh
 
   OWN_PTR(Champ_Don_base) isNodeDirichlet_ ;
   OWN_PTR(Champ_Don_base) fluid_points_;

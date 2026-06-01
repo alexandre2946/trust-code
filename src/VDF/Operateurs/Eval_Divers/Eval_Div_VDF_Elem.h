@@ -59,7 +59,7 @@ public:
   template <typename Type_Double> inline void coeffs_face(const DoubleTab&, const int, const int, const int, const int, const Echange_externe_impose&, Type_Double& , Type_Double&  ) const { /* Do nothing */ }
   template <typename Type_Double> inline void coeffs_faces_interne(const int, Type_Double& , Type_Double&  ) const { /* Do nothing */ }
 
-  // A virer un jour .. voir avec le baltik Rayonnement
+  // To be removed eventually .. check with the Rayonnement baltik
   template <typename BC, typename Type_Double> inline void secmem_face(const int, const BC&, const int, Type_Double& ) const { throw; }
   template <typename Type_Double> inline void secmem_face(const int, const int, const int, const Echange_externe_impose&, const int, Type_Double& ) const { throw; }
   template <typename Type_Double> inline void secmem_faces_interne(const int, Type_Double& ) const { throw; }

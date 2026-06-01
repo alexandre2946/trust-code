@@ -21,7 +21,7 @@
 
 template <typename _SIZE_> struct IntBoxData;
 
-/*! @brief : Un octree permettant de retrouver des objets ponctuels ou parallelipipediques dans un espace 1D, 2D ou 3D et des coordonnees entieres
+/*! @brief : An octree allowing retrieval of point-like or parallelepiped-shaped objects in 1D, 2D or 3D space with integer coordinates
  */
 template <typename _SIZE_>
 class Octree_Int_32_64
@@ -44,9 +44,9 @@ public:
 
   inline const ArrOfInt_t& floor_elements() const { return floor_elements_; }
 
-  // Le plus grand int autorise pour les coordonnees (du type 2^n - 1)
+  // The largest int allowed for coordinates (of the form 2^n - 1)
   static const int coord_max_;
-  // Premier int de la moitie superieure de l'octree root (si coord_max_=2^n-1, half_width_=2^(n-1))
+  // First int of the upper half of the root octree (if coord_max_=2^n-1, half_width_=2^(n-1))
   static const int root_octree_half_width_;
 
 protected:
@@ -61,30 +61,30 @@ protected:
   void search_elements_box_floor(IntBoxData<_SIZE_>& boxdata, int_t octree_floor_id) const;
   void search_elements_box_recursively(IntBoxData<_SIZE_>& boxdata, int_t octree_id, int cx, int cy, int cz, int half_width) const;
 
-  // Un octree peut etre soit vide, soit subdivise en nb_octrees autres octrees,
-  // soit un octree_floor contenant une liste d'elements.
+  // An octree can be either empty, subdivided into nb_octrees other octrees,
+  // or an octree_floor containing a list of elements.
   enum Octree_Type { EMPTY, OCTREE, FLOOR };
 
   static inline int_t octree_id(int_t index, Octree_Type type);
   static inline int_t octree_index(int_t octree_id, Octree_Type type);
   static inline Octree_Type octree_type(int_t octree_id);
 
-  // Octree_id du cube principal : peut etre EMPTY, OCTREE ou FLOOR
+  // Octree_id of the root cube: can be EMPTY, OCTREE or FLOOR
   int_t root_octree_id_;
-  // Nombre d'elements stockes (dimension(0) du tableau elements_boxes)
+  // Number of stored elements (dimension(0) of the elements_boxes array)
   int_t nb_elements_;
-  // Tableau contenant tous les cubes qui sont divises en sous-cubes
-  //  octree_structure_(i, j) decrit le contenu du sous-cube j du cube d'index i.
-  //  pour 0 <= j < nombre de sous-cubes par cube.
-  //  On appelle "octree_id" une valeur X=octree_structure_(i,j) (identifiant octree)
-  //  L'octree id encode a la fois le type de l'octree et l'index ou
-  //  il se trouve dans les tableaux (voir octree_id(int, Octree_Type))
+  // Array containing all cubes that are divided into sub-cubes.
+  //  octree_structure_(i, j) describes the content of sub-cube j of cube i,
+  //  for 0 <= j < number of sub-cubes per cube.
+  //  An "octree_id" is a value X=octree_structure_(i,j) (octree identifier).
+  //  The octree id encodes both the octree type and the index where
+  //  it is stored in the arrays (see octree_id(int, Octree_Type))
   IntTab_t octree_structure_;
 
-  // Tableau contenant la liste des elements de chaque sous-cube final non subdivise.
-  // Si X < 0, on note i_debut = -X-1.
-  // floor_elements_(i_debut) = n = nombre d'elements dans ce sous-cube
-  // floor_elements_[i_debut+j] = numero d'un element qui coupe ce sous-cube pour 1 <= j <= n
+  // Array containing the list of elements of each final non-subdivided sub-cube.
+  // If X < 0, set i_debut = -X-1.
+  // floor_elements_(i_debut) = n = number of elements in this sub-cube
+  // floor_elements_[i_debut+j] = index of an element that crosses this sub-cube, for 1 <= j <= n
   ArrOfInt_t floor_elements_;
 };
 

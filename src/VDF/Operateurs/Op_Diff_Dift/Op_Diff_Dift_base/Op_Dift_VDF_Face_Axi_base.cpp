@@ -62,12 +62,12 @@ void Op_Dift_VDF_Face_Axi_base::mettre_a_jour(double )
   if (le_modele_turbulence->has_loi_paroi_hyd()) tau_tan.ref(le_modele_turbulence->loi_paroi().Cisaillement_paroi());
 }
 
-// XXX E Saikali : j'ai fait comme ca sinon nu_t est pas initialiser dans le cas var
+// XXX E Saikali : done this way otherwise nu_t is not initialized in the var case
 void Op_Dift_VDF_Face_Axi_base::associer_modele_turbulence(const Modele_turbulence_hyd_base& mod)
 {
   le_modele_turbulence = mod;
   associer_diffusivite_turbulente(le_modele_turbulence->viscosite_turbulente());
-  associer_loipar(le_modele_turbulence->loi_paroi()); /* on fait rien pour le moment ... */
+  associer_loipar(le_modele_turbulence->loi_paroi()); /* nothing to do for now ... */
 }
 
 void Op_Dift_VDF_Face_Axi_base::ajouter_elem(const DoubleVect& visco_turb, const DoubleTab& tau_diag, DoubleTab& resu) const
@@ -82,7 +82,7 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_elem(const DoubleVect& visco_turb, const
       resu(fy0) += flux_Y;
       resu(fy1) += flux_Y; // TODO FIXME EUH .?.?. Yannick help :/
 
-      // Termes supplementaires dans le laplacien en axi : Ils sont integres comme des termes sources
+      // Extra terms in the axisymmetric Laplacian: they are integrated as source terms
       const double coef_laplacien_axi = -0.5*(tau_diag(num_elem,1)*visc_elem);
       resu[fx0] += coef_laplacien_axi*volumes_entrelaces(fx0)*porosite(fx0)/xv(fx0,0);
       resu[fx1] += coef_laplacien_axi*volumes_entrelaces(fx1)*porosite(fx1)/xv(fx1,0);
@@ -114,14 +114,14 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_aretes_bords(const DoubleVect& visco_tur
             const int fac1 = Qdm(n_arete,0), fac2 = Qdm(n_arete,1), fac3 = Qdm(n_arete,2), ori3 = orientation(fac3);
             const int rang1 = (fac1 - le_dom_vdf->premiere_face_bord()), rang2 = (fac2-le_dom_vdf->premiere_face_bord());
             double coef;
-            if (is_var()) // XXX : E Saikali : sais pas quoi faire sinon ecarts ...
+            if (is_var()) // XXX : E Saikali : not sure what to do otherwise to avoid discrepancies ...
               {
-                // Calcul du frottement identique a celui de TRIOVF : On calcule la moyenne des u_star et on l'eleve au carre. On calcule la moyenne des surfaces
+                // Friction computation identical to TRIOVF: compute the average of u_star values and square it; compute the average of surfaces
                 const double tau_tan_1 = tau_tan(rang1,ori3), tau_tan_2 = tau_tan(rang2,ori3) ;
                 double tau = 0.5*(tau_tan_1 + tau_tan_2 ), surf = 0.5*(surface(fac1)+surface(fac2));
                 coef = tau*tau*surf;
               }
-            else // Autre solution pour le calcul du frottement : On calcule u_star*u_star*surf sur chaque partie de la facette de Qdm
+            else // Alternative friction computation: compute u_star*u_star*surf on each part of the momentum facet
               {
                 const double tau1 = tau_tan(rang1,ori3)*0.5*surface(fac1), tau2 = tau_tan(rang2,ori3)*0.5*surface(fac2);
                 coef = tau1+tau2;
@@ -137,7 +137,7 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_aretes_bords(const DoubleVect& visco_tur
             d_visco_turb = 0.5*(visco_turb(face_voisins(fac3,0)) + visco_turb(face_voisins(fac3,1)));
             d_visco_lam = nu_mean_2_pts_(face_voisins(fac3,0),face_voisins(fac3,1));
 
-            if (ori1b == 0) // bord d'equation R = cte
+            if (ori1b == 0) // boundary of equation R = const
               {
                 double flux1;
                 if (ori3b == 1)
@@ -154,7 +154,7 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_aretes_bords(const DoubleVect& visco_tur
 
                 resu[fac3] += signe*flux1;
               }
-            else if (ori1b == 1) // bord d'equation teta = cte
+            else if (ori1b == 1) // boundary of equation teta = const
               {
                 double flux2;
                 if (ori3b == 0)
@@ -162,7 +162,7 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_aretes_bords(const DoubleVect& visco_tur
                     const double tau21 = tau_croises(n_arete,0), tau12 = tau_croises(n_arete,1);
                     flux2 = (d_visco_lam*tau21 + d_visco_turb*(tau12+tau21))*0.25*(surface(fac1)+surface(fac2))*(porosite(fac1)+porosite(fac2));
 
-                    // Termes supplementaires dans le laplacien en axi : Ils sont integres comme des termes sources
+                    // Extra terms in the axisymmetric Laplacian: they are integrated as source terms
                     const double coef_laplacien_axi = 0.5*(d_visco_lam*tau21 + d_visco_turb*(tau12+tau21));
                     resu(fac1) += coef_laplacien_axi*volumes_entrelaces(fac1)*porosite(fac1)/xv(fac1,0);
                     resu(fac2) += coef_laplacien_axi*volumes_entrelaces(fac2)*porosite(fac2)/xv(fac2,0);
@@ -209,7 +209,7 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_aretes_bords(const DoubleVect& visco_tur
 
 void Op_Dift_VDF_Face_Axi_base::fill_resu_aretes_mixtes(const int i , const int j , const int k , const int l , const double d_visco_lam , const double tau , DoubleTab& resu) const
 {
-  // flux de mu_lam*tau sur la facette a cheval sur les faces i et j
+  // flux of mu_lam*tau on the facet straddling faces i and j
   const double flux = d_visco_lam*tau*0.25*(surface(i)+surface(j))*(porosite(i)+porosite(j));
   resu(k) += flux;
   resu(l) -= flux;
@@ -217,32 +217,32 @@ void Op_Dift_VDF_Face_Axi_base::fill_resu_aretes_mixtes(const int i , const int 
 
 void Op_Dift_VDF_Face_Axi_base::ajouter_aretes_mixtes(const DoubleTab& tau_croises, DoubleTab& resu) const
 {
-  // Sur les aretes mixtes les termes croises du tenseur de Reynolds sont nuls: il ne reste donc que la diffusion laminaire
+  // On mixed edges, the cross-terms of the Reynolds tensor are zero: only laminar diffusion remains
   const int ndeb = le_dom_vdf->premiere_arete_mixte(), nfin = le_dom_vdf->premiere_arete_interne();
   for (int n_arete = ndeb; n_arete < nfin; n_arete++)
     {
       const int fac1=Qdm(n_arete,0), fac2=Qdm(n_arete,1), fac3=Qdm(n_arete,2), fac4=Qdm(n_arete,3), ori1 = orientation(fac1), ori3 = orientation(fac3);
-      const double d_visco_lam = nu_mean_4_pts_(fac3,fac4); // XXX : BUG corrige dans cette fonction si ecart ...
+      const double d_visco_lam = nu_mean_4_pts_(fac3,fac4); // XXX : BUG fixed in this function if discrepancy ...
 
-      if (ori1 == 1)  // (seule possibilite : ori3 =0)  Arete XY
+      if (ori1 == 1)  // (only possibility: ori3 =0)  XY edge
         {
           const double tau12 = tau_croises(n_arete,0), tau21 = tau_croises(n_arete,1);
           fill_resu_aretes_mixtes(fac1,fac2,fac3,fac4,d_visco_lam,tau21,resu);
 
-          // Termes supplementaires dans le laplacien en axi : Ils sont integres comme des termes sources
+          // Extra terms in the axisymmetric Laplacian: they are integrated as source terms
           const double coef_laplacien_axi = 0.5*d_visco_lam*tau21;
           resu(fac1) += coef_laplacien_axi*volumes_entrelaces(fac1)*porosite(fac1)/xv(fac1,0);
           resu(fac2) += coef_laplacien_axi*volumes_entrelaces(fac2)*porosite(fac2)/xv(fac2,0);
 
           fill_resu_aretes_mixtes(fac3,fac4,fac1,fac2,d_visco_lam,tau12,resu);
         }
-      else if (ori3 == 1) // (seule possibilite ori1 = 2) arete YZ
+      else if (ori3 == 1) // (only possibility: ori1 = 2) YZ edge
         {
           const double tau23 = tau_croises(n_arete,0), tau32 = tau_croises(n_arete,1);
           fill_resu_aretes_mixtes(fac1,fac2,fac3,fac4,d_visco_lam,tau32,resu);
           fill_resu_aretes_mixtes(fac3,fac4,fac1,fac2,d_visco_lam,tau23,resu);
         }
-      else // seule possibilite ori1 = 2 et ori3 = 0:  arete XZ
+      else // only possibility: ori1 = 2 and ori3 = 0: XZ edge
         {
           const double tau13 = tau_croises(n_arete,0), tau31 = tau_croises(n_arete,1);
           fill_resu_aretes_mixtes(fac1,fac2,fac3,fac4,d_visco_lam,tau31,resu);
@@ -253,7 +253,7 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_aretes_mixtes(const DoubleTab& tau_crois
 
 void Op_Dift_VDF_Face_Axi_base::fill_resu_aretes_internes(const int i, const int j, const int k, const int l, const double v_lam, const double v_turb, const double tau1, const double tau2, DoubleTab& resu) const
 {
-  // flux de v_lam*tau2 + v_turb*(tau2+tau1) sur la facette a cheval sur les faces i et j
+  // flux of v_lam*tau2 + v_turb*(tau2+tau1) on the facet straddling faces i and j
   const double flux = (v_lam*tau2 + v_turb*(tau2+tau1))*0.25*(surface(i)+surface(j))*(porosite(i)+porosite(j));
   resu(k) += flux;
   resu(l) -= flux;
@@ -266,29 +266,29 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_aretes_internes(const DoubleVect& visco_
     {
       const int fac1 = Qdm(n_arete,0), fac2 = Qdm(n_arete,1), fac3 = Qdm(n_arete,2), fac4 = Qdm(n_arete,3), ori1 = orientation(fac1), ori3 = orientation(fac3);
 
-      // Calcul de la viscosite turbulente au milieu de l'arete
+      // Compute the turbulent viscosity at the midpoint of the edge
       const double d_visco_turb = 0.25*(visco_turb(face_voisins(fac3,0)) + visco_turb(face_voisins(fac3,1)) + visco_turb(face_voisins(fac4,0)) + visco_turb(face_voisins(fac4,1)));
       const double d_visco_lam = nu_mean_4_pts_(face_voisins(fac3,0), face_voisins(fac3,1), face_voisins(fac4,0), face_voisins(fac4,1));
 
-      if (ori1 == 1)  // (seule possibilite : ori3 =0)  Arete XY
+      if (ori1 == 1)  // (only possibility: ori3 =0)  XY edge
         {
           const double tau12 = tau_croises(n_arete,0), tau21 = tau_croises(n_arete,1);
           fill_resu_aretes_internes(fac1,fac2,fac3,fac4,d_visco_lam,d_visco_turb,tau12,tau21,resu);
 
-          // Termes supplementaires dans le laplacien en axi : Ils sont integres comme des termes sources
+          // Extra terms in the axisymmetric Laplacian: they are integrated as source terms
           const double coef_laplacien_axi = 0.5*(d_visco_lam*tau21 + d_visco_turb*(tau21+tau12));
           resu(fac1) += coef_laplacien_axi*volumes_entrelaces(fac1)*porosite(fac1)/xv(fac1,0);
           resu(fac2) += coef_laplacien_axi*volumes_entrelaces(fac2)*porosite(fac2)/xv(fac2,0);
 
           fill_resu_aretes_internes(fac3,fac4,fac1,fac2,d_visco_lam,d_visco_turb,tau21,tau12,resu);
         }
-      else if (ori3 == 1) // (seule possibilite ori1 = 2) arete YZ
+      else if (ori3 == 1) // (only possibility: ori1 = 2) YZ edge
         {
           const double tau23 = tau_croises(n_arete,0), tau32 = tau_croises(n_arete,1);
           fill_resu_aretes_internes(fac1,fac2,fac3,fac4,d_visco_lam,d_visco_turb,tau23,tau32,resu);
           fill_resu_aretes_internes(fac3,fac4,fac1,fac2,d_visco_lam,d_visco_turb,tau32,tau23,resu);
         }
-      else // seule possibilite ori1 = 2 et ori3 = 0:  arete XZ
+      else // only possibility: ori1 = 2 and ori3 = 0: XZ edge
         {
           const double tau13 = tau_croises(n_arete,0), tau31 = tau_croises(n_arete,1);
           fill_resu_aretes_internes(fac1,fac2,fac3,fac4,d_visco_lam,d_visco_turb,tau13,tau31,resu);
@@ -301,18 +301,18 @@ DoubleTab& Op_Dift_VDF_Face_Axi_base::ajouter(const DoubleTab& inco, DoubleTab& 
 {
   if (inco.line_size() > 1) not_implemented(__func__);
   const double temps = equation().schema_temps().temps_courant();
-  mettre_a_jour_var(temps); // seulement pour var_axi !
+  mettre_a_jour_var(temps); // only for var_axi!
 
   const Domaine_Cl_VDF& zclvdf = la_zcl_vdf.valeur();
   const DoubleVect& visco_turb = diffusivite_turbulente().valeurs();
   const DoubleTab& tau_diag = inconnue->tau_diag(), &tau_croises = inconnue->tau_croises();
   ref_cast_non_const(Champ_Face_VDF,inconnue.valeur()).calculer_dercov_axi(zclvdf);
 
-  ajouter_elem(visco_turb,tau_diag,resu); // Boucle sur les elements pour traiter les facettes situees a l'interieur des elements
+  ajouter_elem(visco_turb,tau_diag,resu); // Loop over elements to process facets located inside the elements
   if (dimension == 3) ajouter_elem_3D(visco_turb,tau_diag,resu);
-  ajouter_aretes_bords(visco_turb,tau_croises,resu); // Boucle sur les aretes bord
-  ajouter_aretes_mixtes(tau_croises,resu); // Boucle sur les aretes mixtes
-  ajouter_aretes_internes(visco_turb,tau_croises,resu); // Boucle sur les aretes internes
+  ajouter_aretes_bords(visco_turb,tau_croises,resu); // Loop over boundary edges
+  ajouter_aretes_mixtes(tau_croises,resu); // Loop over mixed edges
+  ajouter_aretes_internes(visco_turb,tau_croises,resu); // Loop over internal edges
 
   return resu;
 }
@@ -365,10 +365,10 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_contribution_elem(const DoubleVect& visc
       fill_coeff_matrice_morse(fx0,fx1,flux_X,matrice);
       fill_coeff_matrice_morse(fy0,fy1,flux_Y,matrice);
 
-      // Termes supplementaires dans le laplacien en axi : Ils sont integres comme des termes sources
+      // Extra terms in the axisymmetric Laplacian: they are integrated as source terms
       double coef_laplacien_axi;
       if (is_var()) coef_laplacien_axi = -0.5*(tau_diag(num_elem,1)*visc_elem);
-      else coef_laplacien_axi = -0.5*visc_elem; // XXX : comprends rien la
+      else coef_laplacien_axi = -0.5*visc_elem; // XXX : not sure what is happening here
 
       for (auto l = tab1[fx0]-1; l < tab1[fx0+1]-1; l++)
         if (tab2[l]-1 == fx0) coeff[l] += coef_laplacien_axi*volumes_entrelaces(fx0)*porosite(fx0)/xv(fx0,0);
@@ -413,14 +413,14 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_contribution_aretes_bords(const DoubleVe
             const double d_visco_turb = 0.5*(visco_turb(face_voisins(fac3,0))+ visco_turb(face_voisins(fac3,1)));
             const double d_visco_lam = nu_mean_2_pts_(face_voisins(fac3,0),face_voisins(fac3,1));
 
-            if (ori1b == 0) // bord d'equation R = cte
+            if (ori1b == 0) // boundary of equation R = const
               {
                 // XXX j'ai supprime le if
                 const double flux1 = (d_visco_lam+ d_visco_turb)*0.25*(surface(fac1)+surface(fac2))*(porosite(fac1)+porosite(fac2));
                 for (auto l = tab1[fac3]-1; l < tab1[fac3+1]-1; l++)
                   if (tab2[l]-1 == fac3) coeff[l] += signe*flux1;
               }
-            else if (ori1b == 1) // bord d'equation teta = cte
+            else if (ori1b == 1) // boundary of equation teta = const
               {
                 if (ori3b == 0)
                   {
@@ -428,7 +428,7 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_contribution_aretes_bords(const DoubleVe
                     for (auto l = tab1[fac3]-1; l < tab1[fac3+1]-1; l++)
                       if (tab2[l]-1 == fac3) coeff[l] += signe*flux2;
 
-                    // Termes supplementaires dans le laplacien en axi : Ils sont integres comme des termes sources
+                    // Extra terms in the axisymmetric Laplacian: they are integrated as source terms
                     const double coef_laplacien_axi = 0.5*(d_visco_lam + d_visco_turb);
 
                     for (auto l = tab1[fac1]-1; l < tab1[fac1+1]-1; l++)
@@ -469,21 +469,21 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_contribution_aretes_mixtes(Matrice_Morse
   auto& tab1 = matrice.get_set_tab1();
   auto& tab2 = matrice.get_set_tab2();
   auto& coeff = matrice.get_set_coeff();
-  // Sur les aretes mixtes les termes croises du tenseur de Reynolds sont nuls: il ne reste donc que la diffusion laminaire
+  // On mixed edges, the cross-terms of the Reynolds tensor are zero: only laminar diffusion remains
   const int ndeb = le_dom_vdf->premiere_arete_mixte(), nfin = le_dom_vdf->premiere_arete_interne();
   for (int n_arete = ndeb; n_arete < nfin; n_arete++)
     {
       const int fac1 = Qdm(n_arete,0), fac2 = Qdm(n_arete,1), fac3 = Qdm(n_arete,2), fac4 = Qdm(n_arete,3), ori1 = orientation(fac1);
-      const double d_visco_lam = nu_mean_4_pts_(fac3,fac4); // XXX : BUG corrige dans cette fonction si ecart ...
+      const double d_visco_lam = nu_mean_4_pts_(fac3,fac4); // XXX : BUG fixed in this function if discrepancy ...
 
-      if (ori1 == 1)  // (seule possibilite : ori3 =0)  Arete XY
+      if (ori1 == 1)  // (only possibility: ori3 =0)  XY edge
         {
           double flux1;
-          // flux de mu_lam*tau21 sur la facette a cheval sur les faces fac1 et fac2
+          // flux of mu_lam*tau21 on the facet straddling faces fac1 and fac2
           flux1 = d_visco_lam*0.25*(surface(fac1)+surface(fac2))*(porosite(fac1)+porosite(fac2));
           fill_coeff_matrice_morse(fac3,fac4,flux1,matrice);
 
-          // Termes supplementaires dans le laplacien en axi : Ils sont integres comme des termes sources
+          // Extra terms in the axisymmetric Laplacian: they are integrated as source terms
           const double coef_laplacien_axi = 0.5*d_visco_lam;
 
           for (auto l = tab1[fac1]-1; l < tab1[fac1+1]-1; l++)
@@ -492,21 +492,21 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_contribution_aretes_mixtes(Matrice_Morse
           for (auto l = tab1[fac2]-1; l < tab1[fac2+1]-1; l++)
             if (tab2[l]-1 == fac2) coeff[l] += coef_laplacien_axi*volumes_entrelaces(fac2)*porosite(fac2)/xv(fac2,0);
 
-          // flux de mu_lam*tau12 sur la facette a cheval sur les faces fac3 et fac4
+          // flux of mu_lam*tau12 on the facet straddling faces fac3 and fac4
           flux1 = d_visco_lam*0.25*(surface(fac3)+surface(fac4))*(porosite(fac3)+porosite(fac4));
           fill_coeff_matrice_morse(fac1,fac2,flux1,matrice);
         }
-      else  // 2 possibilites : ori1 = 2 et ori3 == 1: arete YZ OU  ori1 = 2 et ori3 = 0:  arete XZ
+      else  // 2 possibilities: ori1 = 2 and ori3 == 1: YZ edge OR  ori1 = 2 and ori3 = 0: XZ edge
         {
-          // flux de mu_lam*tau32 sur la facette a cheval sur les faces fac1 et fac2 ou
-          // flux de mu_lam*tau31 sur la facette a cheval sur les faces fac1 et fac2
+          // flux of mu_lam*tau32 on the facet straddling faces fac1 and fac2 or
+          // flux of mu_lam*tau31 on the facet straddling faces fac1 and fac2
 
           double flux2;
           flux2 = d_visco_lam*0.25*(surface(fac1)+surface(fac2))*(porosite(fac1)+porosite(fac2));
           fill_coeff_matrice_morse(fac3,fac4,flux2,matrice);
 
-          // flux de mu_lam*tau23 sur la facette a cheval sur les faces fac3 et fac4 ou
-          // flux de mu_lam*tau13 sur la facette a cheval sur les faces fac3 et fac4
+          // flux of mu_lam*tau23 on the facet straddling faces fac3 and fac4 or
+          // flux of mu_lam*tau13 on the facet straddling faces fac3 and fac4
           flux2 = d_visco_lam*0.25*(surface(fac3)+surface(fac4))*(porosite(fac3)+porosite(fac4));
           fill_coeff_matrice_morse(fac1,fac2,flux2,matrice);
         }
@@ -522,18 +522,18 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_contribution_aretes_internes(const Doubl
   for (int n_arete = ndeb; n_arete < nfin; n_arete++)
     {
       const int fac1 = Qdm(n_arete,0), fac2 = Qdm(n_arete,1), fac3 = Qdm(n_arete,2), fac4 = Qdm(n_arete,3), ori1 = orientation(fac1);
-      // Calcul de la viscosite turbulente au milieu de l'arete
+      // Compute the turbulent viscosity at the midpoint of the edge
       const double d_visco_turb = 0.25*(visco_turb(face_voisins(fac3,0)) + visco_turb(face_voisins(fac3,1)) + visco_turb(face_voisins(fac4,0)) + visco_turb(face_voisins(fac4,1)));
       const double d_visco_lam = nu_mean_4_pts_(face_voisins(fac3,0), face_voisins(fac3,1), face_voisins(fac4,0), face_voisins(fac4,1));
 
-      if (ori1 == 1)  // (seule possibilite : ori3 =0)  Arete XY
+      if (ori1 == 1)  // (only possibility: ori3 =0)  XY edge
         {
-          // flux de mu_lam*tau21 + mu_turb*(tau21+tau12) sur la facette a cheval sur les faces fac1 et fac2
+          // flux of mu_lam*tau21 + mu_turb*(tau21+tau12) on the facet straddling faces fac1 and fac2
           double flux1;
           flux1 = (d_visco_lam + d_visco_turb)*0.25*(surface(fac1)+surface(fac2))*(porosite(fac1)+porosite(fac2));
           fill_coeff_matrice_morse(fac3,fac4,flux1,matrice);
 
-          // Termes supplementaires dans le laplacien en axi : Ils sont integres comme des termes sources
+          // Extra terms in the axisymmetric Laplacian: they are integrated as source terms
           const double coef_laplacien_axi = 0.5*(d_visco_lam + d_visco_turb);
 
           for (auto l = tab1[fac1]-1; l < tab1[fac1+1]-1; l++)
@@ -542,18 +542,18 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_contribution_aretes_internes(const Doubl
           for (auto l = tab1[fac2]-1; l < tab1[fac2+1]-1; l++)
             if (tab2[l]-1 == fac2) coeff[l] += coef_laplacien_axi*volumes_entrelaces(fac2)*porosite(fac2)/xv(fac2,0);
 
-          // flux de mu_lam*tau12 + mu_turb*(tau21+tau12) sur la facette a cheval sur les faces fac3 et fac4
+          // flux of mu_lam*tau12 + mu_turb*(tau21+tau12) on the facet straddling faces fac3 and fac4
           flux1 = (d_visco_lam + d_visco_turb)*0.25*(surface(fac3)+surface(fac4))*(porosite(fac3)+porosite(fac4));
           fill_coeff_matrice_morse(fac1,fac2,flux1,matrice);
         }
-      else // 2 possibilites : ori1 = 2 et ori3 == 1: arete YZ OU  ori1 = 2 et ori3 = 0:  arete XZ
+      else // 2 possibilities: ori1 = 2 and ori3 == 1: YZ edge OR  ori1 = 2 and ori3 = 0: XZ edge
         {
           double flux2;
-          // flux de  mu_lam*tau31 + mu_turb*(tau31+tau13) sur la facette a cheval sur les faces fac1 et fac2
+          // flux of mu_lam*tau31 + mu_turb*(tau31+tau13) on the facet straddling faces fac1 and fac2
           flux2 = (d_visco_lam+ d_visco_turb)*0.25*(surface(fac1)+surface(fac2))*(porosite(fac1)+porosite(fac2));
           fill_coeff_matrice_morse(fac3,fac4,flux2,matrice);
 
-          // flux de mu_lam*tau13 + mu_turb*(tau13+tau31) sur la facette a cheval sur les faces fac3 et fac4
+          // flux of mu_lam*tau13 + mu_turb*(tau13+tau31) on the facet straddling faces fac3 and fac4
           flux2 = (d_visco_lam + d_visco_turb)*0.25*(surface(fac3)+surface(fac4))*(porosite(fac3)+porosite(fac4));
           fill_coeff_matrice_morse(fac1,fac2,flux2,matrice);
         }
@@ -564,25 +564,25 @@ void Op_Dift_VDF_Face_Axi_base::ajouter_contribution(const DoubleTab& inco, Matr
 {
   if (inco.line_size() > 1) not_implemented(__func__);
   const double temps = equation().schema_temps().temps_courant();
-  mettre_a_jour_var(temps); // seulement pour var_axi !
+  mettre_a_jour_var(temps); // only for var_axi!
 
   const Domaine_Cl_VDF& zclvdf = la_zcl_vdf.valeur();
   const DoubleVect& visco_turb = diffusivite_turbulente().valeurs();
   const DoubleTab& tau_diag = inconnue->tau_diag();
   ref_cast_non_const(Champ_Face_VDF,inconnue.valeur()).calculer_dercov_axi(zclvdf);
 
-  ajouter_contribution_elem(visco_turb,tau_diag,matrice); // Boucle sur les elements pour traiter les facettes situees a l'interieur des elements
+  ajouter_contribution_elem(visco_turb,tau_diag,matrice); // Loop over elements to process facets located inside the elements
   if (dimension == 3) ajouter_contribution_elem_3D(visco_turb,tau_diag,matrice);
-  ajouter_contribution_aretes_bords(visco_turb,tau_diag,matrice); // Boucle sur les aretes bord
-  ajouter_contribution_aretes_mixtes(matrice); // Boucle sur les aretes mixtes
-  ajouter_contribution_aretes_internes(visco_turb,matrice); // Boucle sur les aretes internes
+  ajouter_contribution_aretes_bords(visco_turb,tau_diag,matrice); // Loop over boundary edges
+  ajouter_contribution_aretes_mixtes(matrice); // Loop over mixed edges
+  ajouter_contribution_aretes_internes(visco_turb,matrice); // Loop over internal edges
 }
 
 void Op_Dift_VDF_Face_Axi_base::contribue_au_second_membre(DoubleTab& resu ) const
 {
   if (resu.line_size() > 1) not_implemented(__func__);
   const double temps = equation().schema_temps().temps_courant();
-  mettre_a_jour_var(temps); // seulement pour var_axi !
+  mettre_a_jour_var(temps); // only for var_axi!
 
   const int ndeb = le_dom_vdf->premiere_arete_bord(), nfin = ndeb + le_dom_vdf->nb_aretes_bord();
   for (int n_arete = ndeb; n_arete < nfin; n_arete++)
@@ -597,11 +597,11 @@ void Op_Dift_VDF_Face_Axi_base::contribue_au_second_membre(DoubleTab& resu ) con
             double coef;
             if (is_var())
               {
-                // Calcul du frottement identique a celui de TRIOVF : On calcule la moyenne des u_star et on l'eleve au carre. On calcule la moyenne des surfaces
+                // Friction computation identical to TRIOVF: compute the average of u_star values and square it; compute the average of surfaces
                 const double tau = 0.5*(sqrt(tau_tan(rang1,ori3)) + sqrt(tau_tan(rang2,ori3))), surf = 0.5*(surface(fac1)+surface(fac2));
                 coef = tau*tau*surf;
               }
-            else // Autre solution pour le calcul du frottement : On calcule u_star*u_star*surf sur chaque partie de la facette de Qdm
+            else // Alternative friction computation: compute u_star*u_star*surf on each part of the momentum facet
               {
                 const double tau1 = tau_tan(rang1,ori3)*0.5*surface(fac1), tau2 = tau_tan(rang2,ori3)*0.5*surface(fac2);
                 coef = tau1+tau2;

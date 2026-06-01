@@ -19,7 +19,7 @@
 #include <TRUST_Vector.h>
 #include <Descripteur.h>
 
-/*! @brief Espace virtuel utilise dans la gestion des tableaux distribues.
+/*! @brief Virtual space used for managing distributed arrays.
  *
  */
 
@@ -30,7 +30,7 @@ public:
   Esp_Virt();
 
 private:
-  int PE_voisin_;        // Numero du PE possedant la partie reelle
+  int PE_voisin_;        // Number of the PE owning the real part
   VECT(Descripteur) desc_ev_;
 };
 #endif

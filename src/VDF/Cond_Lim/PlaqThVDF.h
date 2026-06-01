@@ -17,11 +17,10 @@
 #define PlaqThVDF_included
 
 
-/*! @brief PlaqThVDF
+/*! @brief class PlaqThVDF
  *
- *  Cette classe derive de Echange_global_impose ( voir Echange_impose )
- *
- *     Elle represente une plaque conductrice
+ *   This class derives from Echange_global_impose (see Echange_impose).
+ *   It represents a conducting plate.
  *
  *
  *

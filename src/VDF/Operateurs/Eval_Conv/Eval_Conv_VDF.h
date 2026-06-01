@@ -24,7 +24,7 @@
 class Champ_Inc_base;
 class Champ_Face_VDF;
 
-/*! @brief class Eval_Conv_VDF classe de base des evaluateurs de convection VDF
+/*! @brief class Eval_Conv_VDF Base class for VDF convection evaluators
  *
  */
 
@@ -40,7 +40,7 @@ public:
   inline const Champ_Inc_base& vitesse() const { return vitesse_.valeur(); }
   inline Champ_Inc_base& vitesse() { return vitesse_.valeur(); }
 
-  // pour CRTP
+  // for CRTP
   inline int get_elem(int i, int j) const { return elem_(i,j); }
   inline int get_orientation(int i ) const { return orientation(i); }
   inline int get_premiere_face_bord() const { return premiere_face_bord; }

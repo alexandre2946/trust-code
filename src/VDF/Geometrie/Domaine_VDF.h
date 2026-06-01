@@ -26,35 +26,32 @@ class Geometrie;
 
 /*! @brief class Domaine_VDF
  *
- *          Classe instanciable qui derive de Domaine_VF.
- *          Cette classe contient les informations geometriques que demande
- *          la methode des Volumes Differences Finis.
- *          La classe porte un certain nombre d'informations concernant les faces
- *       L'ensemble des faces est numerote comme suit:
- *            - les faces qui sont sur un Domaine_joint apparaissent en premier
- *                    (dans l'ordre du vecteur les_joints)
- *                 - les faces qui sont sur un Domaine_bord apparaissent ensuite
- *                (dans l'ordre du vecteur les_bords)
- *                - les faces internes apparaissent ensuite
- *       A chaque face on fait correspondre un int qui indique son orientation.
- *       On suppose qu'a l'interieur de chaque famille de faces (bord,joint,interne)
- *       on trouve:
- *            - le bloc des faces d'equation x = cte (faces d'orientation 0)
- *            - le bloc des faces d'equation y = cte (faces d'orientation 1)
- *            - le bloc des faces d'equation z = cte (faces d'orientation 2)
- *       Pour le bloc des faces de bord on conserve les sous-blocs constitues par
- *       les faces d'un meme bord.
- *       On n'a pas besoin d'une numerotation particuliere des elements.
- *       On a introduit la notion d'arete pour le calcul des flux diffusifs et
- *       convectifs dans la conservation de la quantite de mouvement.
- *       Le tableau Qdm contient la connectivite arete/faces. Dans le tableau
- *       Qdm les aretes apparaissent dans l'ordre suivant:
- *            - bloc des aretes joints
- *            - bloc des aretes bord
- *            - bloc des aretes mixtes
- *            - bloc des aretes internes
- *       A l'interieur de chaque bloc les aretes apparaissent dans l'ordre
- *       suivant: aretes XY, aretes XZ et aretes YZ.
+ * @brief Instantiable class derived from Domaine_VF.
+ *          This class contains the geometric information required by the
+ *          Finite Difference Volume (VDF) method.
+ *          The class holds a number of face-related data.
+ *       All faces are numbered as follows:
+ *            - faces on a Domaine_joint appear first
+ *                    (in the order of the les_joints vector)
+ *                 - faces on a Domaine_bord appear next
+ *                (in the order of the les_bords vector)
+ *                - internal faces appear last
+ *       Each face is associated with an integer indicating its orientation.
+ *       Within each face family (boundary, joint, internal) it is assumed that:
+ *            - the block of faces with equation x = const (orientation 0) comes first
+ *            - the block of faces with equation y = const (orientation 1) comes next
+ *            - the block of faces with equation z = const (orientation 2) comes last
+ *       For the boundary face block, sub-blocks corresponding to each boundary are preserved.
+ *       No particular element numbering is required.
+ *       The notion of edge is introduced for computing diffusive and convective fluxes
+ *       in the momentum conservation equation.
+ *       The Qdm array contains the edge/face connectivity. In this array,
+ *       edges appear in the following order:
+ *            - block of joint edges
+ *            - block of boundary edges
+ *            - block of mixed edges
+ *            - block of internal edges
+ *       Within each block, edges appear in the order: XY edges, XZ edges, YZ edges.
  *
  *
  *
@@ -134,7 +131,7 @@ public :
   void creer_elements_fictifs(const Domaine_Cl_dis_base& ) override;
   DoubleVect& dist_norm_bord(DoubleVect& , const Nom& nom_bord) const;
 
-  //std::map permettant de retrouver le couple (proc, item local) associe a un item virtuel pour le mdv_elem
+  //std::map to retrieve the (proc, local item) pair associated with a virtual item for mdv_elem
   void init_virt_e_map() const;
   mutable std::map<std::array<int, 2>, int> virt_e_map;
 
@@ -145,28 +142,25 @@ protected:
 
 private:
 
-  IntVect orientation_;                    // orientation des faces
-  // 0 si face perpendiculaire a l'axe des X
-  // 1 si face perpendiculaire a l'axe des Y
-  // 2 si face perpendiculaire a l'axe des Z
-  int nb_faces_X_ = -1;                         // nombre de faces perpendiculaires a l'axe des X
-  int nb_faces_Y_ = -1;                         // nombre de faces perpendiculaires a l'axe des Y
-  int nb_faces_Z_ = -1;                         // nombre de faces perpendiculaires a l'axe des Z
-  int nb_aretes_ = -1;                          // nombre d'aretes tous types confondus
-  int nb_aretes_joint_ = -1;                    // nombre d'aretes joint
-  int nb_aretes_coin_ = -1;                     // nombre d'aretes coin
-  int nb_aretes_bord_ = -1;                     // nombre d'aretes bord
-  int nb_aretes_mixtes_ = -1;                   // nombre d'aretes mixtes
-  int nb_aretes_internes_ = -1;                 // nombre d'aretes internes
-  IntTab Qdm_;                            // connectivites aretes/faces
-  // DoubleVect porosite_elem_;               // Porosites volumiques pour les volumes de
-  // controle de masse
-  // DoubleVect porosite_face_;               // Porosites surfaciques en masse et volumiques
-  // en quantite de mouvement
-  double h_x_ = 1.e30 , h_y_ = 1.e30 ,h_z_ = 1.e30;                   // pas du maillage dans les trois directions
-  // d'espace;h_x_ (resp h_y_) est la plus petite
-  // distance entre deux centres de faces d'equation
-  // X = cte (resp Y= cte)
+  IntVect orientation_;                    // face orientation
+  // 0 if face perpendicular to the X axis
+  // 1 if face perpendicular to the Y axis
+  // 2 if face perpendicular to the Z axis
+  int nb_faces_X_ = -1;                         // number of faces perpendicular to the X axis
+  int nb_faces_Y_ = -1;                         // number of faces perpendicular to the Y axis
+  int nb_faces_Z_ = -1;                         // number of faces perpendicular to the Z axis
+  int nb_aretes_ = -1;                          // total number of edges of all types
+  int nb_aretes_joint_ = -1;                    // number of joint edges
+  int nb_aretes_coin_ = -1;                     // number of corner edges
+  int nb_aretes_bord_ = -1;                     // number of boundary edges
+  int nb_aretes_mixtes_ = -1;                   // number of mixed edges
+  int nb_aretes_internes_ = -1;                 // number of internal edges
+  IntTab Qdm_;                            // edge/face connectivity
+  // DoubleVect porosite_elem_;               // volumetric porosities for mass control volumes
+  // DoubleVect porosite_face_;               // surface porosities for mass and volumetric momentum control
+  double h_x_ = 1.e30 , h_y_ = 1.e30 ,h_z_ = 1.e30;                   // mesh step sizes in the three spatial directions
+  // h_x_ (resp. h_y_) is the smallest distance between two face centers
+  // with equation X = const (resp. Y = const)
 
   // void calculer_porosites();
   void genere_aretes();
@@ -174,7 +168,7 @@ private:
   void remplir_face_normales();
 };
 
-// Fonctions inline
+// Inline functions
 
 /*! @brief
  *
@@ -299,24 +293,32 @@ inline int Domaine_VDF::orientation(int i) const
   return orientation_[i];
 }
 
-// Fonction de calcul utilisable uniquement en coordonnees cartesiennes
-// de la distance entre les centres de 2 faces dans la direction k
+// Compute function usable only in Cartesian coordinates:
+// distance between the centers of 2 faces in direction k.
 
-/*! @brief
+/*! @brief Returns the distance between two face centers in direction k (Cartesian only).
  *
+ * @param fac1 Index of the first face.
+ * @param fac2 Index of the second face.
+ * @param k Direction index.
+ * @return Distance xv(fac2,k) - xv(fac1,k).
  */
 inline double Domaine_VDF::dist_face(int fac1, int fac2, int k) const
 {
-  // Attention cette methode n'est plus appelee par les methodes dist_face de
-  // Eval_Diff_VDF_Multi_inco_const.cpp et Eval_Diff_VDF_const.cpp pour optimiser les evaluateurs
+  // Note: this method is no longer called by dist_face in
+  // Eval_Diff_VDF_Multi_inco_const.cpp and Eval_Diff_VDF_const.cpp for evaluator optimization
   return xv_(fac2,k) - xv_(fac1,k);
 }
 
-// Fonction de calcul utilisable uniquement en coordonnees cylindriques
-// de la distance entre les centres de 2 faces dans la direction k
+// Compute function usable only in cylindrical coordinates:
+// distance between the centers of 2 faces in direction k.
 
-/*! @brief
+/*! @brief Returns the distance between two face centers in direction k (cylindrical coordinates).
  *
+ * @param fac1 Index of the first face.
+ * @param fac2 Index of the second face.
+ * @param k Direction index.
+ * @return Arc-length distance (in direction k) between the two face centers.
  */
 inline double Domaine_VDF::dist_face_axi(int fac1, int fac2, int k) const
 {
@@ -331,13 +333,15 @@ inline double Domaine_VDF::dist_face_axi(int fac1, int fac2, int k) const
     }
 }
 
-// Fonction de calcul utilisable uniquement en coordonnees cartesiennes
-// de la distance normale pour une face interne
-// Pour une face interne distance normale = distance entre les centres des
-// deux mailles voisines.
+// Compute function usable only in Cartesian coordinates:
+// normal distance for an internal face.
+// For an internal face the normal distance equals the distance between
+// the centers of the two neighboring cells.
 
-/*! @brief
+/*! @brief Returns the normal distance for an internal face (Cartesian coordinates).
  *
+ * @param num_face Face index.
+ * @return Distance between the centers of the two neighboring cells.
  */
 inline double Domaine_VDF::dist_norm(int num_face) const
 {
@@ -347,11 +351,13 @@ inline double Domaine_VDF::dist_norm(int num_face) const
   return (xp_(n2,k) - xp_(n1,k));
 }
 
-// Fonction de calcul utilisable uniquement en coordonnees cylindriques
-// de la distance normale pour une face interne
+// Compute function usable only in cylindrical coordinates:
+// normal distance for an internal face.
 
-/*! @brief
+/*! @brief Returns the normal distance for an internal face (cylindrical coordinates).
  *
+ * @param num_face Face index.
+ * @return Arc-length normal distance between the two neighboring cell centers.
  */
 inline double Domaine_VDF::dist_norm_axi(int num_face) const
 {
@@ -371,19 +377,21 @@ inline double Domaine_VDF::dist_norm_axi(int num_face) const
   return dist;
 }
 
-// Fonction de calcul utilisable uniquement en coordonnees cartesiennes
-// de la distance normale pour une face de bord
-// Pour une face de bord distance normale est egale a la distance entre le
-// centre de la maille voisine et le bord.
+// Compute function usable only in Cartesian coordinates:
+// normal distance for a boundary face.
+// For a boundary face the normal distance equals the distance between
+// the center of the neighboring cell and the boundary.
 
-/*! @brief
+/*! @brief Returns the normal distance for a boundary face (Cartesian coordinates).
  *
+ * @param num_face Face index.
+ * @return Distance between the neighboring cell center and the boundary face.
  */
 inline double Domaine_VDF::dist_norm_bord(int num_face) const
 {
   int n1 = face_voisins_(num_face,0);
   int n2 = face_voisins_(num_face,1);
-  assert(num_face<nb_faces_bord() || n1==-1 || n2==-1); // Verifie que num_face est bien une face de bord reelle ou virtuelle
+  assert(num_face<nb_faces_bord() || n1==-1 || n2==-1); // Check that num_face is a real or virtual boundary face
   int k = orientation_[num_face];
   if (n1!=-1)
     return (xv_(num_face,k) - xp_(n1,k));
@@ -391,17 +399,19 @@ inline double Domaine_VDF::dist_norm_bord(int num_face) const
     return (xp_(n2,k) - xv_(num_face,k));
 }
 
-// Fonction de calcul utilisable uniquement en coordonnees cylindriques
-// de la distance normale pour une face de bord
+// Compute function usable only in cylindrical coordinates:
+// normal distance for a boundary face.
 
-/*! @brief
+/*! @brief Returns the normal distance for a boundary face (cylindrical coordinates).
  *
+ * @param num_face Face index.
+ * @return Arc-length normal distance between the neighboring cell center and the boundary face.
  */
 inline double Domaine_VDF::dist_norm_bord_axi(int num_face) const
 {
   int n1 = face_voisins_(num_face,0);
   int n2 = face_voisins_(num_face,1);
-  assert(num_face<nb_faces_bord() || n1==-1 || n2==-1); // Verifie que num_face est bien une face de bord reelle ou virtuelle
+  assert(num_face<nb_faces_bord() || n1==-1 || n2==-1); // Check that num_face is a real or virtual boundary face
   int k = orientation_[num_face];
   double dist;
   if (n1!=-1)
@@ -426,11 +436,15 @@ inline double Domaine_VDF::dist_norm_bord_axi(int num_face) const
   return dist;
 }
 
-// Fonction de calcul de la distance entre les centres de 2 faces
-// de meme orientation utilisable en coordonnees cylindriques et cartesiennes
+// Compute function for the distance between the centers of 2 faces
+// of the same orientation, usable in cylindrical and Cartesian coordinates.
 
-/*! @brief
+/*! @brief Returns the distance between the centers of two same-orientation faces.
  *
+ * @param n1 Index of the first face.
+ * @param n2 Index of the second face.
+ * @param k Direction index.
+ * @return Distance between the two face centers (arc-length in cylindrical, Euclidean in Cartesian).
  */
 inline double Domaine_VDF::distance_face(int n1, int n2, int k) const
 {
@@ -448,11 +462,13 @@ inline double Domaine_VDF::distance_face(int n1, int n2, int k) const
   return dist;
 }
 
-// Fonction de calcul de la distance normale pour une face quelconque
-// utilisable en coordonnees cylindriques et cartesiennes
+// Compute function for the normal distance for any face,
+// usable in cylindrical and Cartesian coordinates.
 
-/*! @brief
+/*! @brief Returns the normal distance for any face (cylindrical or Cartesian coordinates).
  *
+ * @param num_face Face index.
+ * @return Normal distance between the two neighboring cell centers, or between a cell center and the boundary.
  */
 inline double Domaine_VDF::distance_normale(int num_face) const
 {
@@ -707,8 +723,12 @@ inline int Domaine_VDF::face_amont_conj(int num_face, int k, int i) const
   return face_conj;
 }
 
-/*! @brief Determine la face voisine de notre face en prevoyant que cette derniere puisse etre de type bord.
+/*! @brief Returns the neighboring face, accounting for the possibility that it may be a boundary face.
  *
+ * @param num_face Face index.
+ * @param k Direction index of the conjugate face.
+ * @param i Side index (0 or 1).
+ * @return Index of the neighboring face element.
  */
 inline int Domaine_VDF::face_bord_amont(int num_face, int k, int i) const
 {
@@ -748,10 +768,11 @@ inline int Domaine_VDF::elem_voisin(int elem, int face , int indic) const
   return face_voisins_(elem_faces_(elem,ori+indic*dimension),indic);
 }
 
-/*! @brief Fonction de calcul utilisable uniquement en coordonnees cartesiennes de la distance entre le centre d'une face et
+/*! @brief Returns the distance between the center of a face and the center of face_voisins(face,0) (Cartesian coordinates only).
  *
- *  le centre de face_voisins(face,0)
- *
+ * @param num_face Face index.
+ * @param n0 Index of the element on side 0.
+ * @return Distance from the face center to the element center.
  */
 inline double Domaine_VDF::dist_face_elem0(int num_face,int n0) const
 
@@ -760,10 +781,11 @@ inline double Domaine_VDF::dist_face_elem0(int num_face,int n0) const
   return xv_(num_face,ori) - xp_(n0,ori);
 }
 
-/*! @brief Fonction de calcul utilisable uniquement en coordonnees cartesiennes de la distance entre le centre d'une face et
+/*! @brief Returns the distance between the center of a face and the center of face_voisins(face,1) (Cartesian coordinates only).
  *
- *  le centre de face_voisins(face,1)
- *
+ * @param num_face Face index.
+ * @param n1 Index of the element on side 1.
+ * @return Distance from the element center to the face center.
  */
 inline double Domaine_VDF::dist_face_elem1(int num_face,int n1) const
 {
@@ -771,10 +793,11 @@ inline double Domaine_VDF::dist_face_elem1(int num_face,int n1) const
   return xp_(n1,ori) - xv_(num_face,ori);
 }
 
-/*! @brief Fonction de calcul utilisable uniquement en coordonnees cylindriques de la distance entre le centre d'une face et
+/*! @brief Returns the distance between the center of a face and the center of face_voisins(face,0) (cylindrical coordinates only).
  *
- *  le centre de face_voisins(face,0)
- *
+ * @param num_face Face index.
+ * @param n0 Index of the element on side 0.
+ * @return Arc-length or Euclidean distance from the face center to the element center.
  */
 inline double Domaine_VDF::dist_face_elem0_axi(int num_face,int n0) const
 {
@@ -792,10 +815,11 @@ inline double Domaine_VDF::dist_face_elem0_axi(int num_face,int n0) const
   return dist;
 }
 
-/*! @brief Fonction de calcul utilisable uniquement en coordonnees cylindriques de la distance entre le centre d'une face et le centre
+/*! @brief Returns the distance between the center of a face and the center of face_voisins(face,1) (cylindrical coordinates only).
  *
- *  de face_voisins(face,1)
- *
+ * @param num_face Face index.
+ * @param n1 Index of the element on side 1.
+ * @return Arc-length or Euclidean distance from the element center to the face center.
  */
 inline double Domaine_VDF::dist_face_elem1_axi(int num_face,int n1) const
 {

@@ -30,7 +30,7 @@
 
 void Ecrire_CGNS::cgns_set_base_name(const Nom& fn)
 {
-  // See if root is set ... utile pour champ parametrique ... on fait comme dan sla methode cgns_resetTime
+  // See if root is set ... useful for parametric fields ... same approach as in cgns_resetTime
   std::string dir_to_use = Sortie_Fichier_base::root;
 
   if (dir_to_use == "." || dir_to_use == "./")
@@ -76,11 +76,11 @@ void Ecrire_CGNS::cgns_resetTime(const double t, const std::string& dirname, con
 
   std::string dir_to_use(dirname);
 
-  // evite ./basefile et .//basefile ...
+  // avoid ./basefile and .//basefile ...
   if (dir_to_use == "." || dir_to_use == "./")
     dir_to_use.clear();
 
-  // Supprimer les / a la fin (sauf si dir_to_use devient vide haha)
+  // Remove trailing slashes (unless dir_to_use becomes empty)
   while (!dir_to_use.empty() && dir_to_use.back() == '/')
     dir_to_use.pop_back();
 
@@ -131,14 +131,14 @@ void Ecrire_CGNS::cgns_init_MPI()
 
 void Ecrire_CGNS::cgns_open_file()
 {
-  if (Process::is_parallel()) cgns_init_MPI(); // 1er truc a faire
+  if (Process::is_parallel()) cgns_init_MPI(); // first thing to do
 
   fill_infos_loc();
 
   if (is_lagrangian_) return; /* for FT post and since we have a change of topology => one file per dt post */
 
   if (Option_CGNS::USE_LINKS && !postraiter_domaine_)
-    return; /* rien a faire si USE_LINKS ou LINKED_FILES_PER_COMM_GROUP */
+    return; /* nothing to do if USE_LINKS or LINKED_FILES_PER_COMM_GROUP */
 
   std::string fn = baseFile_name_ + ".cgns"; // file name
 
@@ -195,7 +195,7 @@ void Ecrire_CGNS::fill_infos_loc()
       Process::exit();
     }
 
-  // j'ajoute ce test pour le moment ...
+  // adding this check for now ...
   if (Process::is_parallel() && Option_CGNS::PARALLEL_OVER_ZONE && is_deformable_)
     {
       Cerr << "Error in Ecrire_CGNS::" << __func__ << " !!! You can not use the CGNS option PARALLEL_OVER_ZONE with your problem ..." << finl;
@@ -206,7 +206,7 @@ void Ecrire_CGNS::fill_infos_loc()
 
 void Ecrire_CGNS::finir_ecriture(double temps)
 {
-  if (postraiter_domaine_) return; /* rien a faire */
+  if (postraiter_domaine_) return; /* nothing to do */
 
   if (Option_CGNS::USE_LINKS || is_lagrangian_)
     {
@@ -231,7 +231,7 @@ void Ecrire_CGNS::finir_ecriture(double temps)
           /* single but SAFE file => update iterateurs + close to force flush on disc so you can visualize during simulation !!! */
           if (will_flush || will_close)
             {
-              if (!first_time_post_ && !is_single_file_comm_group_mode()) /* write iters */
+              if (!first_time_post_ && !is_single_file_comm_group_mode()) /* write iteration data */
                 cgns_write_iters();
 
               if (!will_close)
@@ -241,9 +241,9 @@ void Ecrire_CGNS::finir_ecriture(double temps)
           if (will_close)
             {
               if (Process::is_parallel())
-                cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::PAR>(baseFile_name_ /* inutile */, fileId_, false /* print */);
+                cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::PAR>(baseFile_name_ /* unused */, fileId_, false /* print */);
               else
-                cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::SEQ>(baseFile_name_ /* inutile */, fileId_, false /* print */);
+                cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::SEQ>(baseFile_name_ /* unused */, fileId_, false /* print */);
 
               singlefile_open_ = false;
             }
@@ -274,7 +274,7 @@ void Ecrire_CGNS::cgns_finir()
     {
       if (is_single_file_comm_group_mode())
         {
-          cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::PAR>(fn /* inutile */, fileId_, false);
+          cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::PAR>(fn /* unused */, fileId_, false);
           Cerr << "**** Multiple parallel CGNS files " << baseFile_name_ << "_XXXX.cgns closed !" << finl;
         }
       else
@@ -290,10 +290,10 @@ void Ecrire_CGNS::cgns_add_time(const double t)
     first_time_post_ = false;
 
   if (is_lagrangian_)
-    cgns_open_solution_link_file(t); /* FT toujours un fichier par post ... */
+    cgns_open_solution_link_file(t); /* FT always one file per post time ... */
   else if (Option_CGNS::USE_LINKS && !postraiter_domaine_)
     {
-      if (!first_time_post_ || is_deformable_) /* Si pas deformable, la 1er fois dans cgns_write_field (fill field_loc_map) */
+      if (!first_time_post_ || is_deformable_) /* If not deformable, the first time is handled in cgns_write_field (fill field_loc_map) */
         cgns_open_solution_link_file(t);
     }
 
@@ -353,9 +353,9 @@ void Ecrire_CGNS::ensure_modify_open_singlefile()
 
   /* Close file for first time */
   if (Process::is_parallel())
-    cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::PAR>(fn /* inutile */, fileId_, /*print*/ false);
+    cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::PAR>(fn /* unused */, fileId_, /*print*/ false);
   else
-    cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::SEQ>(fn /* inutile */, fileId_, /*print*/ false);
+    cgns_helper_.cgns_close_file<TYPE_RUN_CGNS::SEQ>(fn /* unused */, fileId_, /*print*/ false);
 
   /* Reopen file for first time with MODIFY mode */
   if (Process::is_parallel())
@@ -378,7 +378,7 @@ void Ecrire_CGNS::update_grid_name()
 {
   grid_name_loc_ = "GridCoordinates";
 
-  if (!first_time_post_) // Pas la premiere fois
+  if (!first_time_post_) // Not the first time
     {
       grid_name_loc_ += "_itr_";
       grid_name_loc_ += std::to_string(static_cast<int>(time_post_.size() - 1));
@@ -418,11 +418,11 @@ void Ecrire_CGNS::cgns_write_field(const Domaine& domaine, const Noms& noms_comp
                                    const DoubleTab& valeurs)
 {
   assert (need_post_field_);
-  /* Gestion multi-loc support */
+  /* Multi-location support management */
   if (fld_loc_map_.empty()) /* Build different links to support mixed locations : just once for all ! */
     cgns_fill_field_loc_map(domaine.le_nom());
 
-  if (is_deformable_ && !multi_loc_deformable_support_linked_) /* si link et deformable et multi-loc : at each time step ! */
+  if (is_deformable_ && !multi_loc_deformable_support_linked_) /* if linked files and deformable and multi-loc : at each time step ! */
     link_multi_loc_support_pb_deformable();
 
   /* Write fields */
@@ -462,14 +462,14 @@ void Ecrire_CGNS::cgns_write_field(const Domaine& domaine, const Noms& noms_comp
 
 /*
  * *********************************** *
- * METHODES PRIVEES CLASSE Ecrire_CGNS *
+ * PRIVATE METHODS OF CLASS Ecrire_CGNS *
  * *********************************** *
  */
 void Ecrire_CGNS::cgns_fill_field_loc_map(const Nom& nom_dom_init)
 {
   assert (static_cast<int>(time_post_.size()) == 1 && first_time_post_);
 
-  /* helplers juste pour cette methode */
+  /* helpers local to this method */
   enum class InitMode { SOLUTIONLINK, LINKEDBASE };
 
   auto modify_name_for_support = [&](const std::string& loc)
@@ -491,11 +491,11 @@ void Ecrire_CGNS::cgns_fill_field_loc_map(const Nom& nom_dom_init)
       add_new_linked_base(loc, nom_dom);
   };
 
-  /* pour les champs aux faces, il faut un support ! */
+  /* for face fields, a support zone is required ! */
   if (has_faces_field_ && !is_dual_)
     {
       Cerr << "###  Building a new CGNS zone to host the fields located at FACES !" << finl;
-      cgns_write_domaine_dual(nom_dom_init, 0 /* inutile */, modify_name_for_support("FACES"));
+      cgns_write_domaine_dual(nom_dom_init, 0 /* unused */, modify_name_for_support("FACES"));
     }
 
   if (is_lagrangian_)
@@ -521,7 +521,7 @@ void Ecrire_CGNS::cgns_fill_field_loc_map(const Nom& nom_dom_init)
     {
       assert(Option_CGNS::USE_LINKS);
       if (grid_file_opened_ && !is_deformable_)
-        cgns_close_grid_or_solution_link_file(0. /* inutile */, TYPE_LINK_CGNS::GRID, false);
+        cgns_close_grid_or_solution_link_file(0. /* unused */, TYPE_LINK_CGNS::GRID, false);
 
       if (!solution_file_opened_ || (is_deformable_ && !multi_loc_deformable_support_linked_))
         {
@@ -532,7 +532,7 @@ void Ecrire_CGNS::cgns_fill_field_loc_map(const Nom& nom_dom_init)
           if (has_faces_field_) insert_loc_map_and_init("FACES", InitMode::SOLUTIONLINK);
 
           if (!is_deformable_)
-            cgns_open_solution_link_file(time_post_.back()); // 1ere ouverture sol file ici ! puis dans cgns_add_time
+            cgns_open_solution_link_file(time_post_.back()); // first opening of sol file here ! then in cgns_add_time
         }
     }
 }
@@ -575,7 +575,7 @@ void Ecrire_CGNS::cgns_write_iters()
 
 /*
  * ******************** *
- * VERSION SEQUENTIELLE *
+ * SEQUENTIAL VERSION *
  * ******************** *
  */
 void Ecrire_CGNS::cgns_write_domaine_seq(const Domaine * domaine,const Nom& nom_dom, const DoubleTab& les_som, const IntTab& les_elem, const Motcle& type_elem)
@@ -601,7 +601,7 @@ void Ecrire_CGNS::cgns_write_domaine_seq(const Domaine * domaine,const Nom& nom_
 
   CGNS_TYPE cgns_type_elem = TRUST2CGNS.convert_elem_type(type_elem);
   const bool is_polyedre = (type_elem == "POLYEDRE" || type_elem == "PRISME" || type_elem == "PRISME_HEXAG");
-  const int icelldim = TRUST2CGNS.topo_dim_from_elem(cgns_type_elem, is_polyedre); // avant ca : icelldim = les_som.dimension(1)
+  const int icelldim = TRUST2CGNS.topo_dim_from_elem(cgns_type_elem, is_polyedre); // previously: icelldim = les_som.dimension(1)
   const int iphysdim = Objet_U::dimension, nb_som = les_som.dimension(0), nb_elem = les_elem.dimension(0);
 
   /* 2 : Fill coords */
@@ -611,7 +611,7 @@ void Ecrire_CGNS::cgns_write_domaine_seq(const Domaine * domaine,const Nom& nom_
   int coordsId;
 
   /* 3 : Base write */
-  baseId_.push_back(-123); // pour chaque dom, on a une baseId
+  baseId_.push_back(-123); // one baseId per domain
   char basename[CGNS_STR_SIZE];
   strcpy(basename, nom_dom.getChar()); // dom name
 
@@ -636,7 +636,7 @@ void Ecrire_CGNS::cgns_write_domaine_seq(const Domaine * domaine,const Nom& nom_
       int sectionId;
       cgsize_t start = 1, end;
 
-      if (cgns_type_elem == CGNS_ENUMV(NGON_n)) // cas polyedre
+      if (cgns_type_elem == CGNS_ENUMV(NGON_n)) // polyhedron case
         {
           assert (domaine != nullptr);
           std::vector<cgsize_t> sf, sf_offset;
@@ -646,7 +646,7 @@ void Ecrire_CGNS::cgns_write_domaine_seq(const Domaine * domaine,const Nom& nom_
           if (cg_poly_section_write(fileId_, baseId_.back(), zoneId_.back(), "NGON_n", CGNS_ENUMV(NGON_n), start, end, 0, sf.data(), sf_offset.data(), &sectionId))
             TRUST_CGNS_ERROR();
 
-          if (is_polyedre) // Pas pour polygone
+          if (is_polyedre) // Not for polygon
             {
               std::vector<cgsize_t> ef, ef_offset;
 
@@ -711,7 +711,7 @@ void Ecrire_CGNS::cgns_write_field_seq(const int comp, const double temps, const
     }
 }
 
-/* cas deformable : 2eme passage ici ! */
+/* deformable case: second pass here ! */
 void Ecrire_CGNS::cgns_write_domaine_deformable_seq(const Domaine * domaine,const Nom& nom_dom, const DoubleTab& les_som, const IntTab& les_elem, const Motcle& type_elem)
 {
   const int ind = TRUST_2_CGNS::get_index_nom_vector(doms_written_, nom_dom);
@@ -721,7 +721,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_seq(const Domaine * domaine,cons
 
   CGNS_TYPE cgns_type_elem = TRUST2CGNS.convert_elem_type(type_elem);
   const bool is_polyedre = (type_elem == "POLYEDRE" || type_elem == "PRISME" || type_elem == "PRISME_HEXAG");
-  const int icelldim = TRUST2CGNS.topo_dim_from_elem(cgns_type_elem, is_polyedre); // avant ca : icelldim = les_som.dimension(1)
+  const int icelldim = TRUST2CGNS.topo_dim_from_elem(cgns_type_elem, is_polyedre); // previously: icelldim = les_som.dimension(1)
   const int iphysdim = Objet_U::dimension, nb_som = les_som.dimension(0), nb_elem = les_elem.dimension(0);
 
   std::vector<double> xCoords, yCoords, zCoords;
@@ -780,7 +780,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_seq(const Domaine * domaine,cons
               int sectionId;
               cgsize_t start = 1, end;
 
-              if (cgns_type_elem == CGNS_ENUMV(NGON_n)) // cas polyedre
+              if (cgns_type_elem == CGNS_ENUMV(NGON_n)) // polyhedron case
                 throw std::runtime_error("Ecrire_CGNS::cgns_write_domaine_deformable_seq => You should not be here !!! ");
               else
                 {
@@ -830,7 +830,7 @@ void Ecrire_CGNS::cgns_write_domaine_par_over_zone(const Domaine * domaine,const
     }
   CGNS_TYPE cgns_type_elem = TRUST2CGNS.convert_elem_type(type_elem);
   const bool is_polyedre = (type_elem == "POLYEDRE" || type_elem == "PRISME" || type_elem == "PRISME_HEXAG");
-  const int icelldim = TRUST2CGNS.topo_dim_from_elem(cgns_type_elem, is_polyedre); // avant ca : icelldim = les_som.dimension(1)
+  const int icelldim = TRUST2CGNS.topo_dim_from_elem(cgns_type_elem, is_polyedre); // previously: icelldim = les_som.dimension(1)
   const int iphysdim = Objet_U::dimension, proc_me = Process::me(),
             nb_som = les_som.dimension(0), nb_elem = les_elem.dimension(0);
 
@@ -840,7 +840,7 @@ void Ecrire_CGNS::cgns_write_domaine_par_over_zone(const Domaine * domaine,const
 
 
   /* 3 : Base write */
-  baseId_.push_back(-123); // pour chaque dom, on a une baseId
+  baseId_.push_back(-123); // one baseId per domain
   char basename[CGNS_STR_SIZE];
   strcpy(basename, nom_dom.getChar()); // dom name
 
@@ -853,7 +853,7 @@ void Ecrire_CGNS::cgns_write_domaine_par_over_zone(const Domaine * domaine,const
 
   TRUST2CGNS.fill_global_infos(); // XXX
 
-  if (cgns_type_elem == CGNS_ENUMV(NGON_n)) /*cas polygone/polyedre */
+  if (cgns_type_elem == CGNS_ENUMV(NGON_n)) /* polygon/polyhedron case */
     TRUST2CGNS.fill_global_infos_poly(is_polyedre);
 
   /* 5 : CREATION OF FILE STRUCTURE : zones, coords & sections
@@ -878,8 +878,8 @@ void Ecrire_CGNS::cgns_write_domaine_par_over_zone(const Domaine * domaine,const
   if (cgns_type_elem == CGNS_ENUMV(NGON_n) && is_polyedre)
     sectionId2.reserve(nb_zones_to_write);
 
-  // on boucle seulement sur les procs qui n'ont pas des nb_elem 0
-  zoneId_.clear(); // XXX commencons par ca
+  // loop only over procs that have non-zero nb_elem
+  zoneId_.clear(); // XXX start fresh
   const std::vector<int>& global_nb_elem = TRUST2CGNS.get_global_nb_elem(),
                           &global_nb_som = TRUST2CGNS.get_global_nb_som(),
                            &proc_non_zero_elem = TRUST2CGNS.get_proc_non_zero_elem();
@@ -909,9 +909,9 @@ void Ecrire_CGNS::cgns_write_domaine_par_over_zone(const Domaine * domaine,const
       /* 5.2 : Construct the sections to host connectivity later */
       sectionId.push_back(-123);
 
-      if (cgns_type_elem == CGNS_ENUMV(NGON_n)) // cas polyedre
+      if (cgns_type_elem == CGNS_ENUMV(NGON_n)) // polyhedron case
         {
-          if (is_polyedre) // Pas pour polygone
+          if (is_polyedre) // Not for polygon
             {
               end = start + static_cast<cgsize_t>(TRUST2CGNS.get_global_nb_face_som()[indZ]) -1;
               cgsize_t maxoffset = static_cast<cgsize_t>(TRUST2CGNS.get_global_nb_face_som_offset()[indZ]);
@@ -930,7 +930,7 @@ void Ecrire_CGNS::cgns_write_domaine_par_over_zone(const Domaine * domaine,const
             }
           else // polygon
             {
-              end = start + static_cast<cgsize_t>(TRUST2CGNS.get_global_nb_elem()[indZ]) -1; /* ici pareil comme get_global_nb_elem_som ... fais moi confiance ... */
+              end = start + static_cast<cgsize_t>(TRUST2CGNS.get_global_nb_elem()[indZ]) -1; /* same as get_global_nb_elem_som here ... trust me ... */
               cgsize_t maxoffset = static_cast<cgsize_t>(TRUST2CGNS.get_global_nb_elem_som_offset()[indZ]);
 
               if (cgp_poly_section_write(fileId_, baseId_.back(), zoneId_.back(), "NGON_n", CGNS_ENUMV(NGON_n), start, end, maxoffset, 0, &sectionId.back()) != CG_OK)
@@ -966,9 +966,9 @@ void Ecrire_CGNS::cgns_write_domaine_par_over_zone(const Domaine * domaine,const
                                                                             min, max, xCoords, yCoords, zCoords);
 
       /* 6.2 : Set element connectivity */
-      if (cgns_type_elem == CGNS_ENUMV(NGON_n)) // cas polyedre
+      if (cgns_type_elem == CGNS_ENUMV(NGON_n)) // polyhedron case
         {
-          if (is_polyedre) // Pas pour polygone
+          if (is_polyedre) // Not for polygon
             {
               const std::vector<cgsize_t>& fs = TRUST2CGNS.get_local_fs(),
                                            &fs_offset = TRUST2CGNS.get_local_fs_offset();
@@ -1113,7 +1113,7 @@ void Ecrire_CGNS::cgns_write_domaine_par_in_zone(const Domaine * domaine,const N
 
   CGNS_TYPE cgns_type_elem = TRUST2CGNS.convert_elem_type(type_elem);
   const bool is_polyedre = (type_elem == "POLYEDRE" || type_elem == "PRISME" || type_elem == "PRISME_HEXAG");
-  const int icelldim = TRUST2CGNS.topo_dim_from_elem(cgns_type_elem, is_polyedre); // avant ca : icelldim = les_som.dimension(1)
+  const int icelldim = TRUST2CGNS.topo_dim_from_elem(cgns_type_elem, is_polyedre); // previously: icelldim = les_som.dimension(1)
   const int nb_elem = les_elem.dimension(0), iphysdim = Objet_U::dimension;
 
   /* 2 : Fill coords */
@@ -1126,7 +1126,7 @@ void Ecrire_CGNS::cgns_write_domaine_par_in_zone(const Domaine * domaine,const N
 
   const int proc_me = enter_group_comm ? TRUST2CGNS.get_proc_me_local_comm() : Process::me();
 
-  if (cgns_type_elem == CGNS_ENUMV(NGON_n)) /*cas polygone/polyedre */
+  if (cgns_type_elem == CGNS_ENUMV(NGON_n)) /* polygon/polyhedron case */
     TRUST2CGNS.fill_global_infos_poly(is_polyedre);
 
   const int ns_tot = TRUST2CGNS.get_ns_tot(), ne_tot = TRUST2CGNS.get_ne_tot();
@@ -1144,11 +1144,11 @@ void Ecrire_CGNS::cgns_write_domaine_par_in_zone(const Domaine * domaine,const N
    *  - XXX XXX XXX Only ONE zone meta-data is written to the library at this stage ...
    */
 
-  // XXX on touche pas, avant le return oui .
-  baseId_.push_back(-123); // pour chaque dom, on a une baseId
-  zoneId_.push_back(-123); // pareil, pour chaque dom, on a une zoneId
+  // XXX do not touch, but before the return yes .
+  baseId_.push_back(-123); // one baseId per domain
+  zoneId_.push_back(-123); // similarly, one zoneId per domain
 
-  // XXX Elie Saikali : zone vide, rien a ecrire (base aussi !) ... (cas LINKED_FILES_PER_COMM_GROUP !!!)
+  // XXX Elie Saikali : empty zone, nothing to write (base too !) ... (LINKED_FILES_PER_COMM_GROUP case !!!)
   if (ne_tot == 0 && ns_tot == 0)
     return;
 
@@ -1168,7 +1168,7 @@ void Ecrire_CGNS::cgns_write_domaine_par_in_zone(const Domaine * domaine,const N
   cgns_build_connectivity_sections_par_in_zone(cgns_type_elem, is_polyedre, TRUST2CGNS, ind_base_zone, ne_tot, sectionId, sectionId2);
 
   /* 5 : Write grid coordinates & set connectivity */
-  if (nb_elem > 0) // seulement si le proc a qlq chose a ecrire
+  if (nb_elem > 0) // only if the proc has something to write
     {
       const std::vector<int>& incr_max_som = TRUST2CGNS.get_global_incr_max_som(),
                               &incr_min_som = TRUST2CGNS.get_global_incr_min_som();
@@ -1195,11 +1195,11 @@ void Ecrire_CGNS::cgns_build_connectivity_sections_par_in_zone(const CGNS_TYPE c
 {
 #ifdef MPI_
   cgsize_t start = -123, end = -123;
-  if (cgns_type_elem == CGNS_ENUMV(NGON_n)) // cas polyedre
+  if (cgns_type_elem == CGNS_ENUMV(NGON_n)) // polyhedron case
     {
       cgsize_t maxoffset = -123;
 
-      if (is_polyedre) // Pas pour polygone
+      if (is_polyedre) // Not for polygon
         {
           const int nb_fs = TRUST2CGNS.get_nfs_tot();
           const int nb_fs_offset = TRUST2CGNS.get_nfs_offset_tot();
@@ -1254,7 +1254,7 @@ void Ecrire_CGNS::cgns_write_connectivity_par_in_zone(const CGNS_TYPE cgns_type_
   const int proc_me = enter_group_comm ? TRUST2CGNS.get_proc_me_local_comm() : Process::me();
   cgsize_t min, max;
 
-  if (cgns_type_elem == CGNS_ENUMV(NGON_n)) // cas polyedre
+  if (cgns_type_elem == CGNS_ENUMV(NGON_n)) // polyhedron case
     {
       if (is_polyedre)
         {
@@ -1388,7 +1388,7 @@ void Ecrire_CGNS::cgns_write_field_par_in_zone(const int comp, const double temp
 #endif
 }
 
-/* cas deformable : 2eme passage ici ! */
+/* deformable case: second pass here ! */
 void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * domaine,const Nom& nom_dom, const DoubleTab& les_som, const IntTab& les_elem, const Motcle& type_elem)
 {
 #ifdef MPI_
@@ -1399,7 +1399,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
 
   CGNS_TYPE cgns_type_elem = TRUST2CGNS.convert_elem_type(type_elem);
   const bool is_polyedre = (type_elem == "POLYEDRE" || type_elem == "PRISME" || type_elem == "PRISME_HEXAG");
-  const int icelldim = TRUST2CGNS.topo_dim_from_elem(cgns_type_elem, is_polyedre); // avant ca : icelldim = les_som.dimension(1)
+  const int icelldim = TRUST2CGNS.topo_dim_from_elem(cgns_type_elem, is_polyedre); // previously: icelldim = les_som.dimension(1)
   const int nb_elem = les_elem.dimension(0), iphysdim = Objet_U::dimension;
 
   std::vector<double> xCoords, yCoords, zCoords;
@@ -1410,8 +1410,8 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
 
   if (is_lagrangian_)
     {
-      TRUST2CGNS.fill_global_infos(); // XXX utile car info change en //
-      if (cgns_type_elem == CGNS_ENUMV(NGON_n)) /*cas polygone/polyedre */
+      TRUST2CGNS.fill_global_infos(); // XXX needed because info changes in parallel
+      if (cgns_type_elem == CGNS_ENUMV(NGON_n)) /* polygon/polyhedron case */
         TRUST2CGNS.fill_global_infos_poly(is_polyedre);
     }
 
@@ -1424,7 +1424,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
   /* If deformable only and single_file, connectivity is already seen in same file. we just write new coords */
   if (!Option_CGNS::USE_LINKS && !is_lagrangian_)
     {
-      // XXX Elie Saikali : zone vide, rien a ecrire (base aussi !) ... (cas SINGLE_FILE_PER_COMM_GROUP !!!)
+      // XXX Elie Saikali : empty zone, nothing to write (base too !) ... (SINGLE_FILE_PER_COMM_GROUP case !!!)
       if (ne_tot == 0 && ns_tot == 0)
         return;
 
@@ -1448,7 +1448,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
         if (cgp_array_write("CoordinateZ", CGNS_ENUMV(RealDouble), 1, dims, &coordsIdz) != CG_OK)
           Cerr << "Error Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone : cgp_array_write CoordinateZ !" << finl, TRUST_CGNS_ERROR();
 
-      if (nb_elem > 0) // seulement si le proc a qlq chose a ecrire
+      if (nb_elem > 0) // only if the proc has something to write
         {
           const std::vector<int>& incr_max_som = TRUST2CGNS.get_global_incr_max_som(),
                                   &incr_min_som = TRUST2CGNS.get_global_incr_min_som();
@@ -1474,9 +1474,9 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
      *  - Lagrangian => We write new conn in the considered file
      */
     {
-      int glob_min_nb_elem = Process::mp_min(nb_elem); // XXX avant sinon blocage !
+      int glob_min_nb_elem = Process::mp_min(nb_elem); // XXX must happen before, otherwise deadlock !
 
-      // XXX Elie Saikali : zone vide, rien a ecrire (base aussi !) ... (cas LINKED_FILES_PER_COMM_GROUP !!!)
+      // XXX Elie Saikali : empty zone, nothing to write (base too !) ... (LINKED_FILES_PER_COMM_GROUP case !!!)
       if (ne_tot == 0 && ns_tot == 0)
         return;
 
@@ -1499,7 +1499,7 @@ void Ecrire_CGNS::cgns_write_domaine_deformable_par_in_zone(const Domaine * doma
       if (should_write_conn)
         cgns_build_connectivity_sections_par_in_zone(cgns_type_elem, is_polyedre, TRUST2CGNS, ind, ne_tot, sectionId, sectionId2);
 
-      if (nb_elem > 0) // seulement si le proc a qlq chose a ecrire
+      if (nb_elem > 0) // only if the proc has something to write
         {
           const std::vector<int>& incr_max_som = TRUST2CGNS.get_global_incr_max_som(),
                                   &incr_min_som = TRUST2CGNS.get_global_incr_min_som();
@@ -1605,23 +1605,23 @@ void Ecrire_CGNS::cgns_write_domaine_dual(const Nom& nom_dom_init, const int est
       int face=0, node = 0;
       for (int i = 0; i < ncells; i++)
         {
-          polyhedronIndex[i] = face; // Index des polyedres
+          polyhedronIndex[i] = face; // Index of polyhedra
 
           const int index = connIndex[i] + 1;
           const int nb_som = static_cast<int>(connIndex[i + 1] - index);
           for (int j = 0; j < nb_som; j++)
             {
               if (j==0 || conn[index + j]<0)
-                facesIndex[face++] = node; // Index des faces:
+                facesIndex[face++] = node; // Index of faces:
               if (conn[index + j]>=0)
-                nodes[node++] = conn[index + j]; // Index local des sommets de la face
+                nodes[node++] = conn[index + j]; // Local index of face vertices
             }
         }
       facesIndex[nfaces] = node;
       polyhedronIndex[ncells] = face;
       ref_cast(Polyedre,type_elem.valeur()).affecte_connectivite_numero_global(nodes, facesIndex, polyhedronIndex, les_elems);
     }
-  else // Tous les autres types
+  else // All other types
     {
       for (int i = 0; i < ncells; i++)
         {
@@ -1644,7 +1644,7 @@ void Ecrire_CGNS::cgns_write_domaine_dual(const Nom& nom_dom_init, const int est
 
   // write dual_mesh
   is_dual_ = true;
-  // we fill face/som & elem faces conn ET seulement si poly !!!
+  // we fill face/som & elem faces conn only if poly !!!
   if (Objet_U::dimension == 3)
     fill_connectivity_from_mc_mesh(dual_m, fs_dual_, ef_dual_);
 

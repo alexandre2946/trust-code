@@ -20,7 +20,7 @@
 #include <assert.h>
 
 
-/*! @brief Pointeur dans la Memoire de TRUST pour un Objet_U
+/*! @brief Pointer within the TRUST memory for an Objet_U.
  *
  * @sa Objet_U Memoire
  */
@@ -39,27 +39,27 @@ private :
   Objet_U* o_ptr;
 };
 
-/*! @brief Indique si le pointeur memoire est libre, c'est-a-dire s'il pointe sur un Objet_U non nul
+/*! @brief Indicates whether the memory pointer is free, i.e. whether it points to a non-null Objet_U.
  *
- * @return (int) 1 si le pointeur est libre
+ * @return (int) 1 if the pointer is free
  */
 inline int Memoire_ptr::libre() const
 {
   return o_ptr==0;
 }
 
-/*! @brief Affecte un Objet_U a un pointeur memoire
+/*! @brief Assigns an Objet_U to a memory pointer.
  *
- * @param (Objet_U* ptr) pointeur sur un Objet_U
+ * @param (Objet_U* ptr) pointer to an Objet_U
  */
 inline void Memoire_ptr::set(Objet_U* ptr)
 {
   o_ptr=ptr;
 }
 
-/*! @brief Retourne une reference sur l'Objet_U pointe par le pointeur memoire
+/*! @brief Returns a reference to the Objet_U pointed to by the memory pointer.
  *
- * @return (Objet_U&) reference sur l'Objet_U pointe
+ * @return (Objet_U&) reference to the pointed-to Objet_U
  */
 inline Objet_U& Memoire_ptr::obj()
 {
@@ -68,10 +68,10 @@ inline Objet_U& Memoire_ptr::obj()
 }
 
 
-/*! @brief Operateur d'affectation entre pointeurs memoire Dans le cas A=B, l'Objet_U pointe par A est l'Objet_U pointe par B
+/*! @brief Assignment operator between memory pointers. In the case A=B, the Objet_U pointed to by A becomes the Objet_U pointed to by B.
  *
- * @param (const Memoire_ptr& mptr) le pointeur memoire B
- * @return (Memoire_ptr&) le pointeur memoire A
+ * @param (const Memoire_ptr& mptr) the memory pointer B
+ * @return (Memoire_ptr&) the memory pointer A
  */
 inline Memoire_ptr& Memoire_ptr::operator=(const Memoire_ptr& mptr)
 {

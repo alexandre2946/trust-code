@@ -35,8 +35,8 @@ public :
   void set_incompressible(const int flag) override;
 
 protected :
-  double alpha_ = 1; //alpha = 0 -> centre, alpha = 1 -> amont (par defaut, on fait l'amont)
-  DoubleVect porosite_f, porosite_e; // pour F5, op sans porosite
+  double alpha_ = 1; //alpha = 0 -> centered, alpha = 1 -> upwind (default: upwind)
+  DoubleVect porosite_f, porosite_e; // for F5, operator without porosity
 };
 
 class Op_Conv_Amont_PolyMAC_CDO_Face : public Op_Conv_EF_Stab_PolyMAC_CDO_Face

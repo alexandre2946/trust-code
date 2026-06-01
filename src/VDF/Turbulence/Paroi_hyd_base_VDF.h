@@ -33,22 +33,23 @@ public:
   void init_lois_paroi_();
 
   /**
-   * OC 09/2004 :
-   * Finalement, certaines classes du code, en VDF, demande le calcul de tab_u_star a la loi de paroi ;
-   *  Or seul qques classes  de loi de paroi calcule reellement le tab_u_star d'ou des pbs de compatibilites
-   * entre certaines fonctionnalites du code. Donc soit on met tab_u_star() en methode virtuelle pure
-   * (mais ca fait doublon avec cisaillement_paroi(), soit on recalcule tab_u_star a partir de cisaillement_paroi()
-   * dans les classes qui en ont besoin : c est el choix fait actuellement (cf.Paroi_ODVM_scal_VDF).
+   * OC 09/2004:
+   * Some classes in the VDF code request the computation of tab_u_star from the wall law;
+   * however, only a few wall law classes actually compute tab_u_star, leading to compatibility
+   * issues between certain code features. The options are either to make tab_u_star() a pure
+   * virtual method (which would duplicate cisaillement_paroi()), or to recompute tab_u_star
+   * from cisaillement_paroi() in the classes that need it: this is the approach currently
+   * taken (cf. Paroi_ODVM_scal_VDF).
    */
   //virtual const DoubleVect& tab_u_star() const =0 ;
 
   /**
    * O.C. 09/2004:
-   * Calcule le tableau des vitesses de frottements a partir du tableau de cisaillement.
-   * Cette methode peut etre appelee si besoin par d'autres classes  afin de calculer u_star
-   * ,une fois le cisaillement rempli toutefois!
+   * Computes the array of friction velocities from the shear stress array.
+   * This method can be called as needed by other classes to compute u_star,
+   * once the shear stress has been filled in.
    */
-  /* Cette methode n'est pas correcte quand le calcul est QC. Voir Paroi_hyd_base_VDF.cpp
+  /* This method is not correct when the computation is quasi-compressible (QC). See Paroi_hyd_base_VDF.cpp
      void calculer_u_star_avec_cisaillement(DoubleVect& tab_u_star) const ;
   */
 protected:

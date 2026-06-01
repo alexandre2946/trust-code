@@ -18,7 +18,7 @@
 
 Implemente_instanciable_sans_constructeur(Parametre_diffusion_implicite,"Parametre_diffusion_implicite",Parametre_equation_base);
 
-// Par defaut les seuils sont negatifs (donc pas utilisables!!)
+// By default the thresholds are negative (therefore unusable!!)
 Parametre_diffusion_implicite::Parametre_diffusion_implicite()
 {
   preconditionnement_diag_=0;

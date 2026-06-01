@@ -24,21 +24,21 @@ class Postraitement_base;
 
 /*! @brief class Champ_Generique_Correlation
  *
- *  Champ destine a post-traiter une correlation d un champ generique
- *  La classe porte un operateur statistique "Op_Correlation"
+ *  Field intended to post-process a correlation of a generic field
+ *  The class carries a statistical operator "Op_Correlation"
  *
  */
 
-//// Syntaxe a respecter pour jdd
+//// Data file syntax to follow
 //
-// "nom_champ" correlation { t_deb "val_tdeb" t_fin "val_tfin"
-//                source "type_champ_gen" { ...source ref_Champ { Pb_champ "nom_pb" "nom_champ_discret1" } }
-//                source "type_champ_gen" { ...source ref_Champ { Pb_champ "nom_pb" "nom_champ_discret2" } }
+// "field_name" correlation { t_deb "val_tdeb" t_fin "val_tfin"
+//                source "generic_field_type" { ...source ref_Champ { Pb_champ "pb_name" "discrete_field_name1" } }
+//                source "generic_field_type" { ...source ref_Champ { Pb_champ "pb_name" "discrete_field_name2" } }
 //               }
-// "nom_champ" fixe par utilisateur sera le nom du champ generique
-// "val_tdeb" et "val_tfin" valeur de debut et fin des statistiques pour ce champ
-// "type_champ_gen" type d'un champ generique
-// Deux sources sont a specifier pour ce type de champ
+// "field_name" set by the user will be the name of the generic field
+// "val_tdeb" and "val_tfin" value of the start and end of statistics for this field
+// "generic_field_type" type of a generic field
+// Two sources are to be specified for this type of field
 
 class Champ_Generique_Correlation : public Champ_Generique_Statistiques_base
 {

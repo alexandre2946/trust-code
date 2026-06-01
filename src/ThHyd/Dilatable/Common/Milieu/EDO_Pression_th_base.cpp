@@ -26,9 +26,9 @@ Sortie& EDO_Pression_th_base::printOn(Sortie& os) const { return os; }
 
 Entree& EDO_Pression_th_base::readOn(Entree& is) { return is; }
 
-/*! @brief Associe le fluide a l'EDO
+/*! @brief Associates the fluid with the ODE.
  *
- * @param (Fluide_Dilatable_base& fl) le fluide associe
+ * @param fl The dilatable fluid to associate.
  */
 void EDO_Pression_th_base::associer_fluide(const Fluide_Dilatable_base& fl)
 {

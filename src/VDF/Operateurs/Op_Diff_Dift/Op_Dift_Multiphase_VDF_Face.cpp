@@ -22,7 +22,7 @@ Implemente_instanciable_sans_constructeur(Op_Dift_Multiphase_VDF_Face,"Op_Diff_V
 Sortie& Op_Dift_Multiphase_VDF_Face::printOn(Sortie& s ) const { return s << que_suis_je() ; }
 Entree& Op_Dift_Multiphase_VDF_Face::readOn(Entree& is)
 {
-  //lecture de la correlation de viscosite turbulente
+  //reading the turbulent viscosity correlation
   Correlation_base::typer_lire_correlation(corr_, equation().probleme(), "viscosite_turbulente", is);
   associer_corr_impl<Type_Operateur::Op_DIFT_MULTIPHASE_FACE, Eval_Dift_Multiphase_VDF_Face>(corr_);
   associer_proto(equation().probleme(), champs_compris_);

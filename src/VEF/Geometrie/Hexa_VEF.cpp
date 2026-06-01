@@ -19,7 +19,7 @@
 
 Implemente_instanciable_sans_constructeur(Hexa_VEF,"Hexa_VEF",Elem_VEF_base);
 
-// printOn et readOn
+// printOn and readOn
 
 Sortie& Hexa_VEF::printOn(Sortie& s ) const
 {
@@ -31,9 +31,9 @@ Entree& Hexa_VEF::readOn(Entree& s )
   return s ;
 }
 
-/*! @brief KEL_(0,fa7),KEL_(1,fa7) sont  les numeros locaux des 2 faces qui entourent la facette de numero local fa7
+/*! @brief KEL_(0,fa7),KEL_(1,fa7) are the local indices of the 2 faces surrounding the sub-facet of local index fa7.
  *
- *  le numero local de la fa7 est celui du sommet qui la porte
+ *  The local index of the sub-facet fa7 is that of the vertex it belongs to.
  *
  */
 Hexa_VEF::Hexa_VEF()
@@ -51,7 +51,7 @@ Hexa_VEF::Hexa_VEF()
       KEL_(i,j)=tmp[i][j];
 }
 
-/*! @brief remplit le tableau face_normales dans le Domaine_VEF
+/*! @brief Fills the face_normales array in the Domaine_VEF.
  *
  */
 
@@ -70,20 +70,20 @@ void Hexa_VEF::creer_face_normales(DoubleTab& Face_normales,
       int f0, no4;
       int elem1;
 
-      // on a les 4 sommets de la face
+      // we have the 4 vertices of the face
       int n0 = Face_sommets(num_Face, 0);
       int n1 = Face_sommets(num_Face, 1);
       int n2 = Face_sommets(num_Face, 2);
       int n3 = Face_sommets(num_Face, 3);
 
-      // on va decouper la face en deux triangles
-      // on initialise Face_normales(num_face,dimension) a 0
-      // car on va sommer les deux face_normale des triangles
+      // split the face into two triangles
+      // initialize Face_normales(num_face,dimension) to 0
+      // since we will sum the two triangle face normals
       Face_normales(num_Face, 0) = 0;
       Face_normales(num_Face, 1) = 0;
       Face_normales(num_Face, 2) = 0;
 
-      // on prend les sommet S1,S2 et S4
+      // take vertices S1, S2 and S4
 
       x1 = les_coords(n0, 0) - les_coords(n1, 0);
       y1 = les_coords(n0, 1) - les_coords(n1, 1);
@@ -97,8 +97,8 @@ void Hexa_VEF::creer_face_normales(DoubleTab& Face_normales,
       ny = (-x1 * z2 + x2 * z1) / 2;
       nz = (x1 * y2 - x2 * y1) / 2;
 
-      // Orientation de la normale de elem1 vers elem2
-      // pour cela recherche du sommet de elem1 qui n'est pas sur la Face
+      // Orientation of the normal from elem1 to elem2:
+      // find the vertex of elem1 that does not lie on the face
 
       elem1 = Face_voisins(num_Face, 0);
 
@@ -131,7 +131,7 @@ void Hexa_VEF::creer_face_normales(DoubleTab& Face_normales,
           Face_normales(num_Face, 2) += nz;
         }
 
-      // on prend les sommet S1,S4 et S3
+      // take vertices S1, S4 and S3
 
       x1 = les_coords(n0, 0) - les_coords(n2, 0);
       y1 = les_coords(n0, 1) - les_coords(n2, 1);
@@ -145,8 +145,8 @@ void Hexa_VEF::creer_face_normales(DoubleTab& Face_normales,
       ny = (-x1 * z2 + x2 * z1) / 2;
       nz = (x1 * y2 - x2 * y1) / 2;
 
-      // Orientation de la normale de elem1 vers elem2
-      // pour cela recherche du sommet de elem1 qui n'est pas sur la Face
+      // Orientation of the normal from elem1 to elem2:
+      // find the vertex of elem1 that does not lie on the face
 
       elem1 = Face_voisins(num_Face, 0);
 
@@ -182,7 +182,7 @@ void Hexa_VEF::creer_face_normales(DoubleTab& Face_normales,
 }
 
 
-/*! @brief // calcule les normales des facettes pour des elem standards
+/*! @brief Computes the facet normals for standard elements.
  *
  */
 void Hexa_VEF::creer_facette_normales(const Domaine_VEF& dom_VEF,
@@ -254,8 +254,8 @@ void Hexa_VEF::creer_facette_normales(const Domaine_VEF& dom_VEF,
 
           for (fa7=0; fa7<nb_facette(); fa7++)
             {
-              // la fa7 d'un element standard a pour sommets
-              // fa7 et G de coordonnees xg :
+              // the sub-facet fa7 of a standard element has vertices:
+              // fa7 and G with coordinates xg:
               u[0]=x[KEL_(2,fa7)][0]-xg[0];
               u[1]=x[KEL_(2,fa7)][1]-xg[1];
               u[2]=x[KEL_(2,fa7)][2]-xg[2];
@@ -264,9 +264,9 @@ void Hexa_VEF::creer_facette_normales(const Domaine_VEF& dom_VEF,
               v[2]=x[KEL_(3,fa7)][2]-xg[2];
               prodvect(u,v,pv);
 
-              // Orientation des normales :
+              // Normal orientation:
 
-              // recuperation du numero de la face, puis de sommets et calcul du centre de gravite de la face
+              // retrieve the face index, then the vertex indices, and compute the face center of gravity
 
               int num1 = KEL_(0,fa7);
               int num2 = KEL_(1,fa7);
@@ -465,9 +465,9 @@ void Hexa_VEF::creer_normales_facettes_Cl(DoubleTab& normales_facettes_Cl,
 
   prodvect(u,v,pv);
 
-  // Orientation des normales :
+  // Normal orientation:
 
-  // recuperation du numero de la face, puis de sommets et calcul du centre de gravite de la face
+  // retrieve the face index, then the vertex indices, and compute the face center of gravity
 
   int num1 = KEL_(0,fa7);
   int num2 = KEL_(1,fa7);
@@ -641,7 +641,7 @@ void Hexa_VEF::creer_normales_facettes_Cl(DoubleTab& normales_facettes_Cl,
     }
 }
 
-/*! @brief modifie les volumes entrelaces pour la face j d'un elem non standard
+/*! @brief Modifies the interlaced volumes for face j of a non-standard element.
  *
  */
 void Hexa_VEF::modif_volumes_entrelaces(int j,int elem,
@@ -678,9 +678,10 @@ void Hexa_VEF::calcul_vc(const ArrOfInt& Face,ArrOfDouble& vc,
   vc[2] = vs[2]/6;
 }
 
-/*! @brief calcule les coord xg du centre d'un element non standard calcule aussi idirichlet=nb de faces de Dirichlet de l'element
+/*! @brief Computes the coordinates xg of the center of a non-standard element.
  *
- *  si idirichlet=2, n1 est le numero du sommet confondu avec G
+ *  Also computes idirichlet = number of Dirichlet faces of the element.
+ *  If idirichlet=2, n1 is the index of the vertex coinciding with G.
  *
  */
 void Hexa_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
@@ -693,9 +694,10 @@ void Hexa_VEF::calcul_xg(DoubleVect& xg, const DoubleTab& x,
 }
 
 
-/*! @brief modifie normales_facettes_Cl quand idirichlet=3 idirichlet=nb de faces de Dirichlet de l'element
+/*! @brief Modifies normales_facettes_Cl when idirichlet=3.
  *
- *  si idirichlet=3, n1 est le numero du sommet confondu avec G
+ *  idirichlet = number of Dirichlet faces of the element.
+ *  If idirichlet=3, n1 is the index of the vertex coinciding with G.
  *
  */
 void Hexa_VEF::modif_normales_facettes_Cl(DoubleTab& normales_facettes_Cl,

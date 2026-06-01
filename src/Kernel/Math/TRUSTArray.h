@@ -180,7 +180,7 @@ public:
   inline _TYPE_& operator()(_SIZE_ i) { return operator[](i); }
   inline const _TYPE_& operator()(_SIZE_ i) const { return operator[](i); }
 
-  // Ces methodes renvoient un pointeur vers le premier element du tableau pour une utilisation sur le host
+  // These methods return a pointer to the first element of the array for use on the host
   inline _TYPE_ * addr();
   inline const _TYPE_ * addr() const;
   // Les memes methodes pour une utilisation sur le device
@@ -204,22 +204,22 @@ public:
   /*! Assign 'x' to all slots in the array */
   TRUSTArray& operator=(_TYPE_ x);
 
-  /*! Addition case a case sur toutes les cases du tableau : la taille de y doit etre au moins egale a la taille de this */
+  /*! Element-wise addition over all entries: the size of y must be at least equal to the size of *this */
   TRUSTArray& operator+=(const TRUSTArray& y);
 
-  /*! ajoute la meme valeur a toutes les cases du tableau */
+  /*! Adds the same value to all entries of the array */
   TRUSTArray& operator+=(const _TYPE_ dy);
 
-  /*! Soustraction case a case sur toutes les cases du tableau : tableau de meme taille que *this */
+  /*! Element-wise subtraction over all entries: array must have the same size as *this */
   TRUSTArray& operator-=(const TRUSTArray& y);
 
-  /*! soustrait la meme valeur a toutes les cases */
+  /*! Subtracts the same value from all entries */
   TRUSTArray& operator-=(const _TYPE_ dy);
 
-  /*! muliplie toutes les cases par dy */
+  /*! Multiplies all entries by dy */
   TRUSTArray& operator*= (const _TYPE_ dy);
 
-  /*! divise toutes les cases par dy (pas pour TRUSTArray<int>) */
+  /*! Divides all entries by dy (not for TRUSTArray<int>) */
   TRUSTArray& operator/= (const _TYPE_ dy);
 
   TRUSTArray& inject_array(const TRUSTArray& source, _SIZE_ nb_elements=-1,  _SIZE_ first_element_dest=0, _SIZE_ first_element_source=0);
@@ -232,11 +232,11 @@ public:
 
   inline void ordonne_array();
 
-  // methodes virtuelles
+  // Virtual methods
 
-  /*! Construction de tableaux qui pointent vers des donnees existantes !!! Utiliser ref_data avec precaution */
+  /*! Constructs an array pointing to existing data !!! Use ref_data with caution */
   inline virtual void ref_data(_TYPE_* ptr, _SIZE_ size);
-  /*! Remet le tableau dans l'etat obtenu avec le constructeur par defaut (libere la memoire mais conserve le mode d'allocation memoire actuel) */
+  /*! Resets the array to the state obtained by the default constructor (frees memory but keeps the current memory allocation mode) */
   inline virtual void reset() { detach_array(); }
   inline virtual void ref_array(TRUSTArray&, _SIZE_ start=0, _SIZE_ sz=-1);
   inline virtual void resize_tab(_SIZE_ n, RESIZE_OPTIONS opt=RESIZE_OPTIONS::COPY_INIT);
@@ -354,15 +354,15 @@ private:
   /*! Actual view on the data. See comments at the top of the class */
   Span_ span_;
 
-  /*! Drapeau indiquant si l'allocation memoire a lieu avec un new classique ou dans le pool de memoire temporaire de TRUST */
+  /*! Flag indicating whether memory allocation uses a standard new or the TRUST temporary memory pool */
   STORAGE storage_type_;
 
-  // Drapeau du statut du data sur le Device:
-  // HostOnly  : Non alloue sur le device encore
-  // Host      : A jour sur le host pas sur le device
-  // Device    : A jour sur le device pas sur le host
-  // HostDevice: A jour sur le host et le device
-  // PartialHostDevice : Etat temporaire: certaines valeurs sont plus a jour sur le host que le device (ex: faces frontieres ou items distants)
+  // Flag for the data status on the Device:
+  // HostOnly  : Not yet allocated on the device
+  // Host      : Up to date on the host, not on the device
+  // Device    : Up to date on the device, not on the host
+  // HostDevice: Up to date on both host and device
+  // PartialHostDevice : Temporary state: some values are more up to date on the host than on the device (e.g. boundary faces or distant items)
   // In a shared_ptr because this state has the same status as mem_ (same sharing properties)
   mutable std::shared_ptr<DataLocation> data_location_;
 
@@ -405,13 +405,13 @@ using BigArrOfTID = BigTRUSTArray<trustIdType>;
 
 
 /* *********************************** *
- * FONCTIONS NON MEMBRES DE TRUSTArray *
+ * NON-MEMBER FUNCTIONS OF TRUSTArray  *
  * *********************************** */
 
 #include <TRUSTArray_tools.tpp> // external templates function specializations ici ;)
 
 /* ******************************* *
- * FONCTIONS MEMBRES DE TRUSTArray *
+ * MEMBER FUNCTIONS OF TRUSTArray  *
  * ******************************* */
 
 #include <TRUSTArray_device.tpp> // OMP stuff

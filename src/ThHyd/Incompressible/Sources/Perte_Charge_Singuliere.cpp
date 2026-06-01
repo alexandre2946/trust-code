@@ -30,11 +30,11 @@
 
 extern void convert_to(const char *s, double& ob);
 
-/*! @brief Lit les specifications d'une perte de charge singuliere a partir d'un flot d'entree.
+/*! @brief Reads the specifications of a singular pressure drop from an input stream.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws mot cle inattendu, on attendait "KX","KY", "KZ" ou "K"
+ * @param is an input stream
+ * @return the modified input stream
+ * @throws unexpected keyword, expected "KX","KY", "KZ" or "K"
  */
 // XD perte_charge_singuliere source_base perte_charge_singuliere BRACE Source term that is used to model a pressure
 // XD_CONT loss over a surface area (transition through a grid, sudden enlargement) defined by the faces of elements
@@ -413,13 +413,13 @@ double Perte_Charge_Singuliere::calculate_Q(const Equation_base& eqn, const IntV
   const Domaine_VF& zvf = ref_cast(Domaine_VF, eqn.domaine_dis());
   const DoubleTab& vit = eqn.inconnue().valeurs(),
                    &fac = sub_type(Pb_Multiphase, eqn.probleme()) ? ref_cast(Pb_Multiphase, eqn.probleme()).equation_masse().champ_conserve().passe()
-                          : eqn.probleme().get_champ("masse_volumique").valeurs(); // get_champ pour flica5 car la masse volumique n'est pas dans le milieu...
+                          : eqn.probleme().get_champ("masse_volumique").valeurs(); // get_champ for flica5 because masse_volumique is not in the milieu...
   const DoubleVect& pf = eqn.milieu().porosite_face(), &fs = zvf.face_surfaces();
   const IntTab& f_e = zvf.face_voisins();
   int cF = fac.dimension_tot(0) == 1, i, n, N = fac.line_size(), d, D = Objet_U::dimension;
 
   DoubleTrav deb_vect;
-  zvf.creer_tableau_faces(deb_vect); //pour bien sommer les debits en parallele
+  zvf.creer_tableau_faces(deb_vect); //to correctly sum flow rates in parallel
   for (i = 0; i < num_faces.size(); i++)
     {
       int f = num_faces(i), e = f_e(f, f_e(f, 0) < 0); //todo : evaluer fac du bon cote
@@ -427,7 +427,7 @@ double Perte_Charge_Singuliere::calculate_Q(const Equation_base& eqn, const IntV
         for (d = 0; d < D; d++)
           for (n = 0; n < N; n++) deb_vect(f) += zvf.face_normales(f, d) * vit(f, N * d + n) * fac(!cF * e, n); //vecteur complet : v . nf
       else for (n = 0; n < N; n++) deb_vect(f) += fs(f) * vit(f, n) * fac(!cF * e, n); //normale aux faces seule
-      deb_vect(f) *= pf(f) * (sgn.size() ? sgn(i) : deb_vect(f) > 0 ? 1 : -1) ; //produit par la porosite + orientation (si elle n'est pas definie, on compte tout en positif)
+      deb_vect(f) *= pf(f) * (sgn.size() ? sgn(i) : deb_vect(f) > 0 ? 1 : -1) ; //multiply by porosity + orientation (if not defined, count everything as positive)
     }
   return mp_somme_vect(deb_vect);
 }
@@ -444,6 +444,6 @@ void Perte_Charge_Singuliere::update_K(const Equation_base& eqn, double deb, Dou
       K_ += dt * alpha * error;
     }
 
-  //pour le fichier de suivi : seulement sur le maitre, car Source_base::imprimer() fait une somme sur les procs
+  //for the monitoring file: only on the master, because Source_base::imprimer() sums over all processes
   if (!Process::me()) bilan(0) = K_, bilan(1) = deb, bilan(2) = deb_cible;
 }

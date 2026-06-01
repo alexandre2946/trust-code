@@ -57,7 +57,7 @@ public:
     return diffusivite_impl<Eval_Dift_Multiphase_VDF_Elem>();
   }
 
-  int dimension_min_nu() const // pour que la correlation force l'anisotrope (cf. GGDH)
+  int dimension_min_nu() const // so that the correlation forces the anisotropic mode (cf. GGDH)
   {
     throw;
   }

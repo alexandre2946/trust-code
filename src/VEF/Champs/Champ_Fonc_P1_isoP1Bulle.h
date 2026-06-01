@@ -20,7 +20,7 @@
 #include <Domaine_VEF.h>
 #include <Champ_Fonc_base.h>
 
-/*! @brief classe Champ_Fonc_P1_isoP1Bulle
+/*! @brief class Champ_Fonc_P1_isoP1Bulle
  *
  * @sa Champ_Fonc_base OWN_PTR(Champ_base) P1NC
  */

@@ -27,13 +27,14 @@ class Domaine_VF;
 class Champ_base;
 class Motcles;
 
-/*! @brief : cet interprete permet, a la fin du calcul (apres "resoudre"), de calculer et de stocker dans un fichier lata le produit de convolution
+/*! @brief This interpreter computes and stores in a lata file the convolution product
  *
- *   de certains champs d'un probleme avec une fonction filtre arbitraire.
- *   On peut l'utiliser comme un interprete (voir Moyenne_volumique::interpreter())
- *   ou n'importe ou a l'interieur du code comme ceci:
+ *   of certain fields of a problem with an arbitrary filter function,
+ *   after the computation (i.e. after "resoudre").
+ *   It can be used as an interpreter (see Moyenne_volumique::interpreter())
+ *   or anywhere inside the code as follows:
  *    Moyenne_volumique moy;
- *    is >> moy; // lecture de la fonction filtre
+ *    is >> moy; // reading of the filter function
  *    moy.calculer_convolution_champ_elem/face(...)
  *
  */
@@ -60,7 +61,7 @@ protected:
   virtual void calculer_convolution(const Domaine_VF& domaine_source, const DoubleTab& champ_source, const DoubleTab& coords_to_compute, DoubleTab& resu) const;
 
   enum Type { ERROR, BOITE, CHAPEAU, GAUSSIENNE, PARSER, QUADRA };
-  // Si type_ != parser, il faut renseigner l_, sinon il faut renseigner expression_parser_
+  // If type_ != PARSER, l_ must be set; otherwise expression_parser_ must be set.
   Type type_ = ERROR;
   // parametre du filtre (largeur de boite, chapeau ou gaussienne)
   double l_= -1.;

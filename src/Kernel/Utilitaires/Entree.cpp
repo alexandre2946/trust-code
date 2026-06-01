@@ -68,7 +68,7 @@ Entree& Entree::operator >>(ios& (*f)(ios&))
   return *this;
 }
 
-// Operateurs d'affectation
+// Assignment operators
 Entree& Entree::operator=(istream& is)
 {
   if(istream_)
@@ -85,19 +85,19 @@ Entree& Entree::operator=(Entree& is)
   return *this;
 }
 
-/*! @brief Lecture d'une chaine dans ostream_ bufsize est la taille du buffer alloue pour ob (y compris
+/*! @brief Reads a string from ostream_. bufsize is the size of the buffer allocated for ob (including
  *
- *   le caractere 0 final).
- *   La chaine contient toujours un 0 meme en cas d'echec.
- *   La methode renvoie 1 si la lecture est bonne, 0 sinon.
- *   Si le buffer est trop petit, pour l'instant on fait exit() mais
- *   par la suite on pourra tester: si strlen(ob)==bufsize-1, alors
- *   refaire lire() jusqu'a arriver au bout. Si le lire() suivant
- *   renvoie une chaine de longueur nulle, cela signifie que la taille de la
- *   chaine etait exactement bufsize-1.
- *   Attention: le comportement est different en binaire et en ascii.
- *    En binaire, on lit la chaine jusqu'au prochain '\0'.
- *    En ascii, on lit la chaine jusqu'au prochain separateur (espace, tab, fin ligne)
+ *   the final null character).
+ *   The string always contains a null character even on failure.
+ *   The method returns 1 if reading is successful, 0 otherwise.
+ *   If the buffer is too small, we currently call exit(), but
+ *   in the future we could test: if strlen(ob)==bufsize-1, then
+ *   call lire() again until the end is reached. If the next lire()
+ *   returns a string of length zero, it means the string length was
+ *   exactly bufsize-1.
+ *   Warning: the behaviour differs between binary and ASCII mode.
+ *    In binary mode, the string is read until the next '\0'.
+ *    In ASCII mode, the string is read until the next separator (space, tab, newline).
  *
  */
 int Entree::get(char* ob, std::streamsize bufsize)
@@ -107,8 +107,8 @@ int Entree::get(char* ob, std::streamsize bufsize)
   ob[bufsize-1] = 1;
   if(bin_)
     {
-      // En binaire, on lit jusqu'au prochain caractere 0
-      // (y compris espaces, retours a la ligne etc)
+      // In binary mode, read until the next null character
+      // (including spaces, newlines, etc.)
       std::streamsize i;
       for (i = 0; i < bufsize-1; i++)
         {
@@ -122,7 +122,7 @@ int Entree::get(char* ob, std::streamsize bufsize)
     }
   else
     {
-      // Solution C++20 : utiliser std::string puis copier
+      // C++20 solution: use std::string then copy
       std::string temp;
       (*istream_) >> temp;
       if (!error_handle(istream_->fail()))
@@ -139,12 +139,12 @@ int Entree::get(char* ob, std::streamsize bufsize)
   if (ob[bufsize-1] == 0)
     {
       // Note Benoit Mathieu:
-      // Si on a rempli le buffer jusqu'au bout, c'est qu'il est probablement
-      // trop petit. Lire la suite est dangereux car en ascii on ne sait pas
-      // si on a pu lire pile poil la chaine (donc c'est ok), ou si la chaine
-      // n'a pas ete lue en int. Il faut tester tres serieusement la stl et
-      // ca depend sans doute de l'implementation. Donc, si le buffer est plein,
-      // on plante le code et tant pis.
+      // If the buffer was filled to the end, it is probably too small.
+      // Continuing to read is dangerous because in ASCII mode we cannot know
+      // whether the string was read exactly (which would be fine) or whether
+      // it was not fully read as an int. Thorough testing of the STL would be
+      // needed, and the result likely depends on the implementation. Therefore,
+      // if the buffer is full, we abort the code.
       Cerr << "Error in Entree::lire(char* ob, int bufsize) : buffer too small" << finl;
       Process::exit();
     }
@@ -157,14 +157,14 @@ void error_convert(const char * s, const char * type)
   Process::exit();
 }
 
-/*! @brief methode de conversion
+/*! @brief Conversion method.
  *
  */
 void convert_to(const char *s, int& ob)
 {
   errno = 0;
   char * errorptr = 0;
-  ob = (int)strtol(s, &errorptr, 0 /* base 10 par defaut */);
+  ob = (int)strtol(s, &errorptr, 0 /* base 10 by default */);
   if (errno || *errorptr != 0) error_convert(s,"int");
 }
 
@@ -172,7 +172,7 @@ void convert_to(const char *s, long& ob)
 {
   errno = 0;
   char * errorptr = 0;
-  ob = strtol(s, &errorptr, 0 /* base 10 par defaut */);
+  ob = strtol(s, &errorptr, 0 /* base 10 by default */);
   if (errno || *errorptr != 0)  error_convert(s,"long");
 }
 
@@ -181,12 +181,12 @@ void convert_to(const char *s, long long& ob)
   errno = 0;
   char * errorptr = 0;
 #ifdef HPPA_11 /* NO_PROCESS */
-  ob = strtol(s, &errorptr, 0 /* base 10 par defaut */);
+  ob = strtol(s, &errorptr, 0 /* base 10 by default */);
 #else /* NO_PROCESS */
 #ifdef MICROSOFT
-  ob = _strtoi64(s, &errorptr, 0 /* base 10 par defaut */);
+  ob = _strtoi64(s, &errorptr, 0 /* base 10 by default */);
 #else
-  ob = strtoll(s, &errorptr, 0 /* base 10 par defaut */);
+  ob = strtoll(s, &errorptr, 0 /* base 10 by default */);
 #endif
 #endif /* NO_PROCESS */
   if (errno || *errorptr != 0)  error_convert(s,"long long");
@@ -208,14 +208,14 @@ void convert_to(const char *s, double& ob)
   if (errno || *errorptr != 0)  error_convert(s,"double");
 }
 
-// methode virtuelle pour lire un int ou un reel. Dans cette classe de base, on lit dans le istream avec read() (si is_bin() == 1)
-//   ou avec operator>>() (si is_bin() == 0). Si le drapeau check_types est mis, on appelle convert_to() pour verifier les types des objets lus.
-//   Dans ce cas, pour les ints on comprend les formats 123 (decimal), 0xa345 (hexa) et autres.
-//  Si une erreur se produit, on appelle error_handle_()
-//  Note pour les programmeurs des classes derivees:  L'implementation de cette methode doit toujours passer par hande_error()
+// Virtual method to read an int or a real number. In this base class, reading is done from istream using read() (if is_bin() == 1)
+// or using operator>>() (if is_bin() == 0). If the check_types flag is set, convert_to() is called to verify the types of the objects read.
+// In that case, for ints, the formats 123 (decimal), 0xa345 (hexadecimal) and others are accepted.
+// If an error occurs, error_handle_() is called.
+// Note for developers of derived classes: the implementation of this method must always go through error_handle_().
 Entree& Entree::operator>>(double& ob) { return operator_template<double>(ob); }
 
-// methode virtuelle pour lire un tableau d'ints ou reels (le tableau doit avoir la bonne dimension: attention pas de verification possible)
+// Virtual method to read an array of ints or reals (the array must have the correct size: no verification is possible)
 int Entree::get(double * ob, std::streamsize n) { return get_template<double>(ob,n); }
 
 Entree& Entree::operator>>(int& ob) { return operator_template<int>(ob); }
@@ -283,9 +283,9 @@ Entree::~Entree()
   istream_=nullptr;
 }
 
-/*! @brief Change le mode d'ecriture du fichier.
+/*! @brief Changes the file write mode.
  *
- * Cette methode peut etre appelee n'importe quand.
+ * This method can be called at any time.
  *
  */
 void Entree::set_bin(bool bin)
@@ -299,15 +299,15 @@ void Entree::set_bin(bool bin)
     }
 }
 
-/*! @brief indique si le stream doit verifier les types des objets lus (ints et nombres flottants).
+/*! @brief Indicates whether the stream should verify the types of read objects (ints and floating-point numbers).
  *
- * Exemple : l'entree contient 123.456 123.456
+ * Example: the input contains 123.456 123.456
  *   int i;
  *   check_types(0);
- *   is >> i;   // i contient 123
+ *   is >> i;   // i contains 123
  *   check_types(1);
- *   is >> i;   // Erreur : on lit la chaine 123.456 et on essaye de la convertir en int
- *   Voir operator>>(int &)
+ *   is >> i;   // Error: reads the string 123.456 and tries to convert it to int
+ *   See operator>>(int &)
  *
  */
 void Entree::set_check_types(bool flag)
@@ -316,25 +316,22 @@ void Entree::set_check_types(bool flag)
 }
 
 
-/*! @brief Cette fonction est appellee par operateur>>, get, get_nom ouvrir, fermer, lire, etc.
+/*! @brief This function is called by operator>>, get, get_nom, ouvrir, fermer, lire, etc.
  *
- * .. en cas d'echec (lorsque fail() est mis)
- *   Elle renvoie 0 s'il y a eu une erreur (passer par error_handle() qui
- *   traite en inline le cas ou il n'y a pas d'erreur), et 1 s'il n'y a pas
- *   d'erreur.
- *   (par commodite de codage des methodes qui l'utilisent, on
- *    ecrira "return error_handle(fail());"
- *   Elle peut etre configuree pour
- *    - renvoyer "0" en cas d'erreur et continuer l'execution du code
- *      (cas d'un ancien code qui ne gere pas les exceptions mais teste
- *       le drapeau fail() de temps en temps)
- *      Dans ce cas les methodes operator>> continuent l'execution du code
- *      meme en cas d'echec, le contenu des variables lues est indefini !
- *    - faire Process::exit() (cas d'une portion de code dans laquelle
- *      on ne veut pas faire de gestion d'erreur du tout et ou on suppose
- *      que tout va toujours bien)
- *    - lever une exception (permet une gestion rigoureuse des erreurs
- *      et une information utilisateur optimale en fonction du contexte)
+ * .. on failure (when fail() is set).
+ *   It returns 0 if an error occurred (go through error_handle() which
+ *   handles inline the case where there is no error), and 1 if there is no error.
+ *   (for coding convenience, one writes "return error_handle(fail());"
+ *   It can be configured to:
+ *    - return "0" on error and continue code execution
+ *      (case of legacy code that does not handle exceptions but periodically
+ *       tests the fail() flag)
+ *      In this case, operator>> methods continue execution even on failure,
+ *      and the content of the read variables is undefined!
+ *    - call Process::exit() (case of a code section where no error handling
+ *      is desired and everything is assumed to succeed)
+ *    - throw an exception (allows rigorous error handling and optimal
+ *      user feedback depending on context)
  *
  *   @sa set_error_action()
  *
@@ -352,8 +349,8 @@ int Entree::error_handle_(int fail_flag)
       Cerr << "Error while reading in Entree object. Exiting.\n";
       if (istream_)
         {
-          // On n'utilise pas Entree::eof() car dans le cas d'un Lec_Fic_Dif
-          // eof() est parallele et ca peut bloquer.
+          // We do not use Entree::eof() because in the case of a Lec_Fic_Dif,
+          // eof() is parallel and could block.
           if (get_istream().eof())
             Cerr << " End of file reached." << finl;
           else
@@ -368,7 +365,7 @@ int Entree::error_handle_(int fail_flag)
   return 0;
 }
 
-/*! @brief renvoie error_action_ pour cette entree (permet de la modifier et de restaurer ensuite la valeur anterieure)
+/*! @brief Returns error_action_ for this input (allows modifying it and restoring the previous value afterwards).
  *
  */
 Entree::Error_Action Entree::get_error_action()
@@ -376,7 +373,7 @@ Entree::Error_Action Entree::get_error_action()
   return error_action_;
 }
 
-/*! @brief Change le comportement en cas d'erreur de l'entree, voir error_handle_() et get_error_action()
+/*! @brief Changes the error behaviour of the input; see error_handle_() and get_error_action().
  *
  */
 void Entree::set_error_action(Entree::Error_Action action)
@@ -384,28 +381,30 @@ void Entree::set_error_action(Entree::Error_Action action)
   error_action_ = action;
 }
 
-// Detection sur un fichier de nom filename
-// est de type binaire
+// Detects whether a file with name filename
+// is of binary type
 int is_a_binary_file(Nom& filename)
 {
-  // On parcourt les 1000 premiers octets
-  // Detection tres imparfaite donc limite
-  // aux fichiers geom de TRUST
+  // Scan the first 1000 bytes
+  // Very imperfect detection, therefore limited
+  // to TRUST geometry files
   int n=0;
   int c;
   std::ifstream fic(filename.getChar());
-  // Si on rencontre un caractere ASCII>127
-  // alors le fichier est de type binaire
+  // If a character with ASCII value > 127 is encountered,
+  // the file is of binary type
   while((c = fic.get()) != EOF && n++<1000)
     if ((c>127)||(c<9))
       return 1;
-  // GF sous windows les caracteres binaire sont surtout <9
+  // GF on windows, binary characters are mostly <9
   //  else printf("ici %d %c \n",c,c);
   return 0;
 }
 
-/*! @brief ToDo TMA : commenter
+/*! @brief Sets the diffuse flag for this input stream.
  *
+ * This virtual method does nothing in the base class; see override in Lec_Diffuse_base.
+ * @param diffuse Whether to diffuse data to other processes.
  */
 void Entree::set_diffuse(bool diffuse)
 {
@@ -438,8 +437,8 @@ int Entree::get_template(_TYPE_ *ob, std::streamsize n)
     }
   else
     {
-      // En ascii : on passe par operator>> pour verifier les conversions
-      // Attention : on appelle celui de cette classe, pas de la classe derivee
+      // In ASCII mode: use operator>> to verify conversions
+      // Warning: we call the one from this class, not from a derived class
       for (int i = 0; i < n; i++) Entree::operator>>(ob[i]);
     }
   return (!istream_->fail());
@@ -498,7 +497,7 @@ Entree& Entree::operator_template(_TYPE_& ob)
       if (check_types_)
         {
           char buffer[100];
-          int ok = Entree::get(buffer, 100); // Bien appeler get de cette classe
+          int ok = Entree::get(buffer, 100); // Must call get() from this class, not a derived one
           if (ok)
             convert_to(buffer, ob);
         }

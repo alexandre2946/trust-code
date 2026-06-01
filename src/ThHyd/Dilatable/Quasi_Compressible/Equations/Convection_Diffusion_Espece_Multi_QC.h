@@ -19,10 +19,7 @@
 #include <Convection_Diffusion_Espece_Multi_base.h>
 #include <Espece.h>
 
-/*! @brief classe Convection_Diffusion_Espece_Multi_QC Cas particulier de Convection_Diffusion_Espece_Multi_base
- *
- *      pour un fluide quasi conpressible quand le scalaire subissant le transport est
- *      la fraction massique
+/*! @brief Particular case of Convection_Diffusion_Espece_Multi_base for a quasi-compressible fluid when the transported scalar is the mass fraction.
  *
  * @sa Convection_Diffusion_Espece_Multi_base
  */
@@ -39,7 +36,7 @@ public :
   void assembler_blocs_avec_inertie(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) override;
   DoubleTab& derivee_en_temps_inco(DoubleTab& ) override;
 
-  // Methodes inlines
+  // Inline methods
   inline const Espece& espece() const { return mon_espece_; }
   inline Espece& espece() { return mon_espece_; }
 

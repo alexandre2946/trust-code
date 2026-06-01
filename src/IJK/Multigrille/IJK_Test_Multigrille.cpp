@@ -49,7 +49,7 @@ Entree& IJK_Test_Multigrille::interpreter(Entree& is)
   param.ajouter("name_of_dom", &name_of_dom_);
   param.lire_avec_accolades(is);
 
-  // Recuperation des donnees de maillage
+  // Retrieve mesh data
   split = ref_cast(Domaine_IJK, Interprete_bloc::objet_global(ijk_splitting_name));
   statistics().create_custom_counter("timing_init",1,"IJK");
   statistics().begin_count("timing_init",statistics().get_last_opened_counter_level()+1);

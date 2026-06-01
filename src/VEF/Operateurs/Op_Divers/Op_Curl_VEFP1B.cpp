@@ -65,26 +65,26 @@ DoubleTab& Op_Curl_VEFP1B::ajouter(const DoubleTab& vitesse, DoubleTab& curl) co
   DoubleTab vecteur_normal1(dimension);
   DoubleTab vecteur_normal2(dimension);
 
-  // On traite les faces internes i.e. sans conditions aux limites
-  // ATTENTION: la base de la vorticite c'est: l'ensemble des
-  // fonctions indicatrices des elements + l'ensemble des fonctions
-  // chapeaux du P1 moins la derniere de ces fonctions de forme
+  // Process internal faces i.e. without boundary conditions
+  // NOTE: the vorticity basis consists of: the set of indicator
+  // functions of elements + the set of hat functions of P1
+  // minus the last of these shape functions
 
-  //Partie P0 de la vorticite
+  //P0 part of the vorticity
   for (int numero_elem = 0; numero_elem < domaine.nb_elem(); numero_elem++)
     {
 
-      //REM: on peut generaliser cette partie a la 3D en
-      //faisant une boucle avec domaine.nb_faces_element()
+      //REM: this part can be generalized to 3D
+      //by using a loop with domaine.nb_faces_element()
 
-      //Il nous faut d'abord les numeros des 3 faces
-      //qui appartiennent a cet element K
+      //First we need the indices of the 3 faces
+      //belonging to element K
       face0 = domaine_VEF.elem_faces(numero_elem, 0);
       face1 = domaine_VEF.elem_faces(numero_elem, 1);
       face2 = domaine_VEF.elem_faces(numero_elem, 2);
 
-      //Ensuite, il nous faut les vecteurs tangents de
-      //ces trois faces.
+      //Then we need the tangent vectors of
+      //these three faces.
       vecteur_normal0 = vecteur_normal(face0, numero_elem);
       vecteur_normal1 = vecteur_normal(face1, numero_elem);
       vecteur_normal2 = vecteur_normal(face2, numero_elem);
@@ -92,9 +92,9 @@ DoubleTab& Op_Curl_VEFP1B::ajouter(const DoubleTab& vitesse, DoubleTab& curl) co
       int modulo;
       for (int composante = 0; composante < dimension; composante++)
         {
-          //La partie P0 a ete teste avec les fonctions (1,0);
-          //(0,1);(x,0) et (0,x).
-          //Tous les resultats sont corrects
+          //The P0 part has been tested with functions (1,0);
+          //(0,1);(x,0) and (0,x).
+          //All results are correct
 
           modulo = (composante + 1) % 2;
           curl(numero_elem) += pow(-1., modulo)
@@ -105,7 +105,7 @@ DoubleTab& Op_Curl_VEFP1B::ajouter(const DoubleTab& vitesse, DoubleTab& curl) co
 //      Cerr << "Element curl(" << numero_elem << ") " << curl(numero_elem) << finl;
     }
 
-  //Partie P1 de la vorticite
+  //P1 part of the vorticity
 
   for (int numero_som = 0; numero_som < domaine.nb_som() - 1; numero_som++)
     {
@@ -114,15 +114,15 @@ DoubleTab& Op_Curl_VEFP1B::ajouter(const DoubleTab& vitesse, DoubleTab& curl) co
         {
           // for num_loc_elem
 
-          //On recupere le numero global du triangle
+          //Retrieve the global index of the triangle
           numero_triangle = elements_pour_sommet(numero_som, num_loc_elem);
 
-          //On recupere le numero global de la face opposee a "numero_som"
-          //dans le triangle "numero_triangle"
+          //Retrieve the global index of the face opposite to "numero_som"
+          //in triangle "numero_triangle"
           face_opp = domaine_VEF.numero_sommet_local(numero_som, numero_triangle);
           face_opp = domaine_VEF.elem_faces(numero_triangle, face_opp);
 
-          //On recupere le vecteur normal de cette face opposee.
+          //Retrieve the normal vector of this opposite face.
           vecteur_normal1 = vecteur_normal(face_opp, numero_triangle);
 
           for (int num_loc_face = 0; num_loc_face < domaine.nb_faces_elem(); num_loc_face++)
@@ -130,24 +130,24 @@ DoubleTab& Op_Curl_VEFP1B::ajouter(const DoubleTab& vitesse, DoubleTab& curl) co
             {
               // for num_loc_face
 
-              //On recupere le numero global de la face "num_loc_face"
+              //Retrieve the global index of face "num_loc_face"
               face_globale = domaine_VEF.elem_faces(numero_triangle, num_loc_face);
 
-              //               //Si "face_globale" est une arete interne alors on effectue le bon
+              //               //If "face_globale" is an internal edge, perform the correct
               //               //traitement
               //               if (face_globale >= domaine_VEF.premiere_face_int() )
               {
-                //On calcule les vecteurs normaux associes a ces faces.
+                //Compute the normal vectors associated with these faces.
                 vecteur_normal0 = vecteur_normal(face_globale, numero_triangle);
 
-                //Enfin on calcule la contribution au curl de chacune de
-                //ces faces pour chacun des 2 triangles.
+                //Finally compute the curl contribution of each of
+                //these faces for each of the 2 triangles.
                 int modulo;
                 for (int composante = 0; composante < dimension; composante++)
                   {
-                    //Partie P1 teste avec les fonctions (1,0);(0,1)
-                    //(x,0) et (0,x).
-                    //Tous les tests sont corrects
+                    //P1 part tested with functions (1,0);(0,1)
+                    //(x,0) and (0,x).
+                    //All tests are correct
 
                     modulo = (composante + 1) % 2;
 
@@ -191,7 +191,7 @@ DoubleTab Op_Curl_VEFP1B::vecteur_normal(const int face, const int elem) const
   return le_vecteur_normal;
 }
 
-// Tableau qui stocke a la place "i", tous les elements du maillage qui contiennent le sommet de numero global "i"
+// Array that stores at position "i" all mesh elements containing the vertex with global index "i"
 int Op_Curl_VEFP1B::elements_pour_sommet()
 {
   const Domaine& domaine = le_dom_vef->domaine();
@@ -208,13 +208,13 @@ int Op_Curl_VEFP1B::elements_pour_sommet()
   return 1;
 }
 
-// Fonction qui renvoie le numero global de l'element qui contient "sommet" et qui est situe a la place "indice" de la liste "elements_pour_sommet_"
+// Function returning the global index of the element containing "sommet" located at position "indice" in the "elements_pour_sommet_" list
 int Op_Curl_VEFP1B::elements_pour_sommet(const int sommet, const int indice) const
 {
   return elements_pour_sommet_[sommet][indice];
 }
 
-// Fonction qui renvoie la taille de la liste situe a l'emplacement "sommet" du tableau "elements_pour_sommet_"
+// Function returning the size of the list at position "sommet" in the "elements_pour_sommet_" array
 int Op_Curl_VEFP1B::elem_som_size(const int sommet) const
 {
   return elements_pour_sommet_[sommet].size();

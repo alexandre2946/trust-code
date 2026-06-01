@@ -32,21 +32,21 @@ class Domaine_dis_base;
 class MD_Vector;
 class YAML_data;
 
-/*! @brief Classe Champ_Inc_base
+/*! @brief Class Champ_Inc_base
  *
- *      Classe de base des champs inconnues qui sont les champs calcules par une equation.
- *      Un objet de type Roue est associe au Champ_Inc, cette roue permet de gerer le nombre de valeurs du temps pour lesquels le champ
- *      doit rester en memoire. C'est le schema en temps qui guide le nombre de valeurs a garder.
- *      Cette classe peut aussi servir a stocker des champs calcules a partir d'autres Champ_Inc. Dans ce cas, une fonction calculer_valeurs(...)
- *      est appellee lors de mettre_a_jour() et doit remplir :
- *       - les valeurs du champ a l'instant courant;
- *       - les derivees de ces valeurs par rapport aux inconnues;
- *       - ses valeurs aux bords (stockees dans un tableau, car le champ n'a pas
- *         de CL associee);
+ *      Base class of unknown fields which are fields calculated by an equation.
+ *      A Roue type object is associated with Champ_Inc, this wheel allows managing the number of time values for which the field
+ *      must remain in memory. It is the time scheme that guides the number of values to keep.
+ *      This class can also be used to store fields calculated from other Champ_Inc. In this case, a function calculer_valeurs(...)
+ *      is called during mettre_a_jour() and must fill:
+ *       - the field values at the current time;
+ *       - the derivatives of these values with respect to the unknowns;
+ *       - its values at the boundaries (stored in an array, because the field has no
+ *         associated BC);
  *
- *      OWN_PTR(Champ_Inc_base) est un morceaux d'equation car il herite de MorEqn.
+ *      OWN_PTR(Champ_Inc_base) is a piece of equation because it inherits from MorEqn.
  *
- * @sa MorEqn OWN_PTR(Champ_Inc_base) Champ_base Ch_proto Equation_base, Classe abstraite, Methodes abstraites:, const Domaine_dis_base& associer_domaine_dis_base(const Domaine_dis_base&), const Domaine_dis_base& domaine_dis_base() const, DoubleTab& remplir_coord_noeuds(DoubleTab& ) const
+ * @sa MorEqn OWN_PTR(Champ_Inc_base) Champ_base Ch_proto Equation_base, Abstract class, Abstract methods:, const Domaine_dis_base& associer_domaine_dis_base(const Domaine_dis_base&), const Domaine_dis_base& domaine_dis_base() const, DoubleTab& remplir_coord_noeuds(DoubleTab& ) const
  */
 
 class Champ_Inc_base : public Champ_base, public MorEqn
@@ -54,9 +54,9 @@ class Champ_Inc_base : public Champ_base, public MorEqn
   Declare_base_sans_constructeur(Champ_Inc_base);
 
 public:
-  Champ_Inc_base() : fonc_calc_(nullptr) { } // par defaut : pas de fonc_calc_
+  Champ_Inc_base() : fonc_calc_(nullptr) { } // by default: no fonc_calc_
 
-  // Methode reimplementees
+  // Reimplemented methods
   int fixer_nb_valeurs_nodales(int) override;
   double changer_temps(const double temps) override;
   void mettre_a_jour(double temps) override;
@@ -66,13 +66,13 @@ public:
   Champ_base& affecter_compo(const Champ_base&, int compo) override;
   void resetTime(double time) override;
 
-  // Methodes viruelles pures implementees ici
+  // Pure virtual methods implemented here
   Champ_base& affecter_(const Champ_base&) override;
   virtual void verifie_valeurs_cl();
 
-  /*! @brief Renvoie le tableau des valeurs du champ au temps courant.
+  /*! @brief Returns the array of field values at the current time.
    *
-   * @return (DoubleTab&) le tableau des valeurs du champ
+   * @return (DoubleTab&) the array of field values
    */
   inline DoubleTab& valeurs() override { return les_valeurs->valeurs(); }
   inline const DoubleTab& valeurs() const override { return les_valeurs->valeurs(); }
@@ -81,7 +81,7 @@ public:
   DoubleTab& valeur_aux(const DoubleTab& positions, DoubleTab& valeurs) const override;
   DoubleVect& valeur_aux_compo(const DoubleTab& positions, DoubleVect& valeurs, int ncomp) const override;
 
-  // Nouvelles methodes
+  // New methods
   int nb_valeurs_nodales() const override;
   virtual int fixer_nb_valeurs_temporelles(int);
   virtual int nb_valeurs_temporelles() const;
@@ -92,22 +92,22 @@ public:
   DoubleTab& valeurs(double temps) override;
   const DoubleTab& valeurs(double temps) const override;
 
-  // Operateurs de conversion implicite
+  // Implicit conversion operators
   operator DoubleTab& () = delete;
   operator const DoubleTab& () const = delete;
 
-  /*! @brief Renvoie les valeurs du champs a l'instant t+i.
+  /*! @brief Returns field values at instant t+i.
    *
-   * @param (int i) le pas de temps futur auquel on veut les valeurs du champ
-   * @return (DoubleTab&) les valeurs du champs a l'instant t+i
+   * @param (int i) the future time step at which we want the field values
+   * @return (DoubleTab&) the field values at instant t+i
    */
   inline DoubleTab& futur(int i = 1) override { return les_valeurs->futur(i).valeurs(); }
   inline const DoubleTab& futur(int i = 1) const override { return les_valeurs->futur(i).valeurs(); }
 
-  /*! @brief Renvoie les valeurs du champs a l'instant t-i.
+  /*! @brief Returns field values at instant t-i.
    *
-   * @param (int i) le pas de temps passe auquel on veut les valeurs du champ
-   * @return (DoubleTab&) les valeurs du champs a l'instant t-i
+   * @param (int i) the past time step at which we want the field values
+   * @return (DoubleTab&) the field values at instant t-i
    */
   inline DoubleTab& passe(int i = 1) override { return les_valeurs->passe(i).valeurs(); }
   inline const DoubleTab& passe(int i = 1) const override { return les_valeurs->passe(i).valeurs(); }
@@ -137,22 +137,22 @@ public:
   virtual double integrale_espace(int ncomp) const;
   const Domaine& domaine() const;
 
-  //derivees du champ en les inconnues :
-  //renvoie les derivees calcules par fonc_calc_ si champ_calcule, deriv[nom de l'inco] = 1 si vraie inconnue
+  //derivatives of the field with respect to unknowns:
+  //returns derivatives calculated by fonc_calc_ if calculated field, deriv[unknown name] = 1 if true unknown
   const tabs_t& derivees() const { return deriv_; }
   tabs_t& derivees() { return deriv_; }
   DoubleTab& val_bord() { return val_bord_; }
 
-  //champ dependant d'autres OWN_PTR(Champ_Inc_base) : reglage de la fonciton de calcul, initialisation de val_bord_
+  //field depending on other OWN_PTR(Champ_Inc_base) : setting the calculation function, initialization of val_bord_
   void init_champ_calcule(const Objet_U& obj, fonc_calc_t fonc);
-  //pour forcer le calcul de toutes les cases au prochain mettre_a_jour() (normalement fait une seule fois)
+  //to force the calculation of all cases on the next mettre_a_jour() (normally done only once)
   void reset_champ_calcule() { fonc_calc_init_ = 0; }
 
   void resize_val_bord();
   void set_val_bord_fluide_multiphase(const bool flag) { bord_fluide_multiphase_ = flag; }
 
-  //utilise les conditions aux limites (au lieu de valeur_aux() dans Champ_base)
-  //result n'est rempli que pour les faces de bord dont la CL impose une valeur (val_imp ou val_ext)
+  //uses boundary conditions (instead of valeur_aux() in Champ_base)
+  //result is filled only for boundary faces where the BC imposes a value (val_imp or val_ext)
   DoubleTab valeur_aux_bords() const override;
 
   // Obsolete method: signature changed in order to generate a compiler error if old code is not removed
@@ -167,7 +167,7 @@ public:
   void set_PDI_dname(const Nom& name) { PDI_dname_ = (Motcle)name; }
 
 protected:
-  // Par defaut on initialise les valeurs a zero
+  // By default we initialize values to zero
   virtual void creer_tableau_distribue(const MD_Vector&, RESIZE_OPTIONS = RESIZE_OPTIONS::COPY_INIT);
 
 
@@ -175,12 +175,12 @@ protected:
   OBS_PTR(Domaine_Cl_dis_base) mon_dom_cl_dis;
   OBS_PTR(Domaine_VF) le_dom_VF;
 
-  /* pour les champs dependant d'autres OWN_PTR(Champ_Inc_base) */
-  fonc_calc_t fonc_calc_;  //fonction de calcul
-  int fonc_calc_init_ = 0; //1 une fois qu'on a calcule le champ au moins une fois
-  RefObjU obj_calc_; //un objet a passer en argument
-  DoubleTab val_bord_;   //valeurs aux bords au temps courant
-  tabs_t deriv_;        //derivees au temps courant
+  /* for fields depending on other OWN_PTR(Champ_Inc_base) */
+  fonc_calc_t fonc_calc_;  //calculation function
+  int fonc_calc_init_ = 0; //1 once the field has been calculated at least once
+  RefObjU obj_calc_; //an object to pass as argument
+  DoubleTab val_bord_;   //boundary values at current time
+  tabs_t deriv_;        //derivatives at current time
   bool bord_fluide_multiphase_ = false, via_ch_fonc_reprise_ = false;
 
   bool PDI_save_type_ = false; // do we save the type of the unknown in pdi format?

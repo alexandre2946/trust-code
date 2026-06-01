@@ -21,11 +21,11 @@
 
 class Equation_base;
 
-/*! @brief classe Source Classe generique de la hierarchie des sources, un objet Source peut
+/*! @brief Source Generic class of the source term hierarchy. A Source object can
  *
- *      referencer n'importe quel d'objet derivant de Source_base.
- *      La plupart des methodes appellent les methodes de l'objet Probleme
- *      sous-jacent via la methode valeur() declaree grace a la macro
+ *      reference any object derived from Source_base.
+ *      Most methods call the methods of the underlying Problem
+ *      object via the valeur() method declared through the macro
  *
  * @sa Source_base
  */

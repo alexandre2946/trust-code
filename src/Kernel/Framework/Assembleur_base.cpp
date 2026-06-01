@@ -18,7 +18,7 @@
 Implemente_base_sans_constructeur(Assembleur_base,"Assembleur_base",Objet_U);
 
 Assembleur_base::Assembleur_base() :
-  resoudre_increment_pression_(-1),resoudre_en_u_(-1) // -1 signifie "non initialise"
+  resoudre_increment_pression_(-1),resoudre_en_u_(-1) // -1 means "not initialized"
 
 {
 }
@@ -38,13 +38,13 @@ Entree& Assembleur_base::readOn(Entree& is )
   return is;
 }
 
-/*! @brief Definit la valeur du drapeau resoudre_increment_pression_.
+/*! @brief Sets the value of the resoudre_increment_pression_ flag.
  *
- * Ce drapeau determine si le solveur en pression calcule un increment de
- *  pression entre deux pas de temps ou la pression totale (cela affecte
- *  en particulier le calcul des conditions aux limites).
- *  flag = 0 : resolution en pression
- *  flag = 1 : resolution en increment de pression
+ * This flag determines whether the pressure solver calculates an increment of
+ *  pressure between two time steps or the total pressure (this affects
+ *  in particular the calculation of boundary conditions).
+ *  flag = 0: pressure resolution
+ *  flag = 1: pressure increment resolution
  *
  */
 int Assembleur_base::set_resoudre_increment_pression(int flag)
@@ -54,7 +54,7 @@ int Assembleur_base::set_resoudre_increment_pression(int flag)
   return flag;
 }
 
-/*! @brief Renvoie la valeur du drapeau resoudre_increment_pression_ (0 ou 1) Renvoie -1 si le drapeau n'a pas ete initialise
+/*! @brief Returns the value of the resoudre_increment_pression_ flag (0 or 1) Returns -1 if the flag has not been initialized
  *
  */
 int Assembleur_base::get_resoudre_increment_pression() const
@@ -62,13 +62,13 @@ int Assembleur_base::get_resoudre_increment_pression() const
   return resoudre_increment_pression_;
 }
 
-/*! @brief Definit la valeur du drapeau resoudre_en_u__.
+/*! @brief Sets the value of the resoudre_en_u__ flag.
  *
- * Ce drapeau determine si le solveur en pression resou en u ou en rho*u
- *   (cela affecte
- *  en particulier le calcul des conditions aux limites Dirichlet).
- *  flag = 1 : resolution en u
- *  flag = 0 : resolution en rho_u
+ * This flag determines whether the pressure solver solves for u or for rho*u
+ *   (this affects
+ *  in particular the calculation of Dirichlet boundary conditions).
+ *  flag = 1: u resolution
+ *  flag = 0: rho_u resolution
  *
  */
 int Assembleur_base::set_resoudre_en_u(int flag)
@@ -78,7 +78,7 @@ int Assembleur_base::set_resoudre_en_u(int flag)
   return flag;
 }
 
-/*! @brief Renvoie la valeur du drapeau resoudre_en_u_ (0 ou 1) Renvoie -1 si le drapeau n'a pas ete initialise
+/*! @brief Returns the value of the resoudre_en_u_ flag (0 or 1) Returns -1 if the flag has not been initialized
  *
  */
 int Assembleur_base::get_resoudre_en_u() const
@@ -86,10 +86,10 @@ int Assembleur_base::get_resoudre_en_u() const
   return resoudre_en_u_;
 }
 
-/*! @brief Assemblage de la matrice div( porosite/rho * grad P ) Le type du champ "rho" a fournir depend de la discretisation (vdf, vef, p1b, .
+/*! @brief Assembly of the matrix div(porosity/rho * grad P) The type of the "rho" field to be provided depends on the discretization (vdf, vef, p1b, .
  *
  * ..)
- *  Pour le front-tracking par exemple.
+ *  For front-tracking for example.
  *
  */
 int Assembleur_base::assembler_rho_variable(Matrice& mat, const Champ_Don_base& rho)

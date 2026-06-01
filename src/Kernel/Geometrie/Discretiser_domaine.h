@@ -18,9 +18,9 @@
 
 
 
-/*! @brief class Discretiser_domaine discrtise le domaine
+/*! @brief class Discretiser_domaine discretises the domain
  *
- *  utile pour tester les geometries
+ *  useful for testing geometries
  *
  */
 

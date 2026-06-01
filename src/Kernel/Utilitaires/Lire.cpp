@@ -23,7 +23,7 @@ Implemente_instanciable(Lire,"Lire|Read",Interprete);
 // XD attr bloc chaine bloc REQ Definition of the object.
 
 
-/*! @brief appel a la methode printOn de la classe Interprete
+/*! @brief Calls the printOn method of the Interprete class.
  *
  */
 Sortie& Lire::printOn(Sortie& os) const
@@ -31,7 +31,7 @@ Sortie& Lire::printOn(Sortie& os) const
   return Interprete::printOn(os);
 }
 
-/*! @brief appel a la methode readOn de la classe Interprete
+/*! @brief Calls the readOn method of the Interprete class.
  *
  */
 Entree& Lire::readOn(Entree& is)
@@ -49,20 +49,20 @@ Entree& Lire::interpreter(Entree& is)
   Nom name;
   is >> name; // The object name is read from the input stream is
 
-  if (objet_existant(name)) //nom d'un objet existant -> on le lit
+  if (objet_existant(name)) //name of an existing object -> read it
     {
       Objet_U& object=objet(name);
       return is >> object; // Then "{ ... }" is read by the object readOn
     }
-  else //pas le nom d'un objet existant -> on lit le type, on cree l'objet, puis on le lit
+  else //not the name of an existing object -> read the type, create the object, then read it
     {
       DerObjU ref;
       Nom type;
       is >> type;
       ref.typer(type);
-      //on ajoute l'objet a l'interprete courant...
+      //add the object to the current interpreter...
       Objet_U& obj = Interprete_bloc::interprete_courant().ajouter(name, ref);
-      return is >> obj;           //et on lit
+      return is >> obj;           // then read it
     }
 }
 

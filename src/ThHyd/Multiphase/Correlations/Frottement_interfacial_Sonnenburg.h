@@ -17,11 +17,9 @@
 #define Frottement_interfacial_Sonnenburg_included
 #include <Frottement_interfacial_base.h>
 
-/*! @brief classe Frottement_interfacial_Sonnenburg coefficients de frottement interfacial correspondant a la correlation
- *
- *       de "drift flux" de Sonnenburg, modifiee par Bissen, Alpy et Medale
- *       pour presenter les bonnes limites en alpha -> 0 et alpha -> 1
- *       parametres : non!
+/*! @brief Interfacial friction coefficients corresponding to the Sonnenburg drift-flux correlation,
+ *         modified by Bissen, Alpy and Medale to exhibit correct limits as alpha -> 0 and alpha -> 1.
+ *         Parameters: none.
  *
  *
  */
@@ -34,7 +32,7 @@ public:
                    const DoubleTab& rho, const DoubleTab& mu, const DoubleTab& sigma, double Dh,
                    const DoubleTab& ndv, const DoubleTab& d_bulles, DoubleTab& coeff) const override;
 protected:
-  int n_l = -1, n_g = -1; //phases traitees : liquide / gaz continu
+  int n_l = -1, n_g = -1; // treated phases: liquid / continuous gas
 };
 
 #endif

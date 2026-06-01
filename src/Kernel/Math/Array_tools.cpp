@@ -15,32 +15,32 @@
 
 #include <Array_tools.h>
 
-/*! @brief Trie le tableau array dans l'ordre croissant et retire les doublons.
+/*! @brief Sorts the array in ascending order and removes duplicates.
  *
  */
 template <typename _TYPE_, typename _SIZE_>
 void array_trier_retirer_doublons(TRUSTArray<_TYPE_,_SIZE_>& array)
 {
-  // IntVect n'est pas traite correctement car on ne fait pas un resize() mais un resize_array().
+  // IntVect is not handled correctly because we use resize_array() instead of resize().
   assert(typeid(array) != typeid(TRUSTVect<_TYPE_, _SIZE_>));
   const _SIZE_ size = array.size_array();
   if (size == 0)
     return;
-  // Tri dans l'ordre croissant
+  // Sort in ascending order
   array.ordonne_array();
 
-  // Retire les doublons
+  // Remove duplicates
   auto last = std::unique(array.addr(), array.addr()+size);
   _SIZE_ new_size =  static_cast<_SIZE_>(std::distance(array.addr(), last));
   array.resize_array(new_size);
 }
 
 
-/*! @brief calcule l'intersection entre les deux listes d'entiers liste1 et liste2.
+/*! @brief Computes the intersection of the two integer lists liste1 and liste2.
  *
- * Le resultat est mis dans liste1.
- *   Les deux listes doivent etre triees et sans doublons. liste1 est
- *   triee en sortie.
+ * The result is stored in liste1.
+ *   Both lists must be sorted and without duplicates. liste1 is
+ *   sorted on output.
  *
  */
 template <typename _TYPE_, typename _SIZE_>
@@ -48,41 +48,41 @@ void array_calculer_intersection(TRUSTArray<_TYPE_,_SIZE_>& liste1, const TRUSTA
 {
   const _SIZE_ sz1 = liste1.size_array();
   const _SIZE_ sz2 = liste2.size_array();
-  _SIZE_ j = 0; // Pointeur en lecture dans liste2
-  _SIZE_ k = 0; // Pointeur en ecriture
+  _SIZE_ j = 0; // Read pointer in liste2
+  _SIZE_ k = 0; // Write pointer
   for (_SIZE_ i = 0; i < sz1; i++)
     {
-      // On verifie que les listes sont triees dans l'ordre croissant
+      // Check that the lists are sorted in ascending order
       assert((i >= sz1-1) || (liste1[i] < liste1[i+1]));
       assert((j >= sz2-1) || (liste2[j] < liste2[j+1]));
       const _TYPE_ valeur_i = liste1[i];
-      // Avancer dans liste2 jusqu'a trouver ou depasser liste1[i]
+      // Advance in liste2 until we find or exceed liste1[i]
       while (j < sz2 && liste2[j] < valeur_i)
         j++;
       if (j == sz2)
-        break; // Bout de liste, on a fini
+        break; // End of list, we are done
       if (liste2[j] == valeur_i)
         {
           liste1[k] = valeur_i;
-          k++; // On garde cette valeur
+          k++; // Keep this value
         }
     }
   liste1.resize_array(k);
 }
 
-/*! @brief Retire de "sorted_array" les elements qui figurent dans "sorted_elements".
+/*! @brief Removes from "sorted_array" the elements that appear in "sorted_elements".
  *
- * Les deux tableaux doivent etre initialement ordonnes dans l'ordre croissant.
- *   Exemple:
- *    En entree sorted_array=[1,4,9,10,12,18], sorted_elements=[3,5,9,10,18,25]
- *    En sortie sorted_array=[1,4,12]
+ * Both arrays must initially be sorted in ascending order.
+ *   Example:
+ *    Input:  sorted_array=[1,4,9,10,12,18], sorted_elements=[3,5,9,10,18,25]
+ *    Output: sorted_array=[1,4,12]
  *
  */
 void array_retirer_elements(ArrOfInt& sorted_array, const ArrOfInt& sorted_elements_list)
 {
-  int i_read;      // Index dans sorted_array (en lecture)
-  int i_write = 0; // Index dans sorted_array (la ou on ecrit)
-  int j = 0;       // Index dans sorted_elements
+  int i_read;      // Index in sorted_array (reading)
+  int i_write = 0; // Index in sorted_array (writing position)
+  int j = 0;       // Index in sorted_elements
   const int n = sorted_array.size_array();
   const int m = sorted_elements_list.size_array();
   if (m == 0)
@@ -91,24 +91,24 @@ void array_retirer_elements(ArrOfInt& sorted_array, const ArrOfInt& sorted_eleme
   int j_value = sorted_elements_list[j];
   for (i_read = 0; i_read < n; i_read++)
     {
-      // Tableau trie ?
+      // Array sorted?
       assert(i_read == 0 || sorted_array[i_read] > sorted_array[i_read-1]);
       const int i_value = sorted_array[i_read];
 
-      // On avance dans la liste sorted_elements jusqu'a trouver ou depasser
-      // l'element i_value
+      // Advance in the sorted_elements list until we find or exceed
+      // element i_value
       while ((j_value < i_value) && (j < m))
         {
           j++;
           if (j == m)
             break;
-          assert(sorted_elements_list[j] > j_value); // Tableau trie ?
+          assert(sorted_elements_list[j] > j_value); // Array sorted?
           j_value = sorted_elements_list[j];
         }
 
       if (j == m || j_value != i_value)
         {
-          // i_value ne figure pas dans le tableau sorted_elements, on le garde
+          // i_value does not appear in the sorted_elements array, keep it
           sorted_array[i_write] = i_value;
           i_write++;
         }
@@ -126,17 +126,17 @@ static inline int same_line(const IntTab_T<_SIZE_>& v, _SIZE_ i, _SIZE_ j)
   return 1;
 }
 
-/*! @brief tri lexicographique du tableau tab (par ordre croissant de la premiere colonne, si premiere colonne identique, ordre croissant
+/*! @brief Lexicographic sort of the array tab (ascending order of the first column; if the first column is identical, ascending order
  *
- *   de la deuxieme, etc).
- *   Le tableau ne doit pas etre un tableau distribue.
- *   Valeur de retour: nombre de colonnes du tableau (produit des tab.dimension(i) pour i>0)
+ *   of the second column, etc.).
+ *   The array must not be a distributed array.
+ *   Return value: number of columns of the array (product of tab.dimension(i) for i>0).
  *
  */
 template <typename _TYPE_, typename _SIZE_>
 int tri_lexicographique_tableau(TRUSTTab<_TYPE_,_SIZE_>& tab)
 {
-  // On verifie que le tableau n'est pas un tableau distribue:
+  // Check that the array is not a distributed array:
   assert(!tab.get_md_vector());
 
   const _SIZE_ nb_lignes = tab.dimension(0);
@@ -176,19 +176,19 @@ int tri_lexicographique_tableau(TRUSTTab<_TYPE_,_SIZE_>& tab)
   return nb_colonnes;
 }
 
-/*! @brief Idem que tri_lexicographique_tableau mais on trie le tableau index qui contient les indices de lignes du tableau tab tel que tab(index[i], *) soit
+/*! @brief Same as tri_lexicographique_tableau but sorts the index array which contains row indices of tab such that tab(index[i], *) is
  *
- *   croissant quant i augmente. Tri de tous les indices de index...
- *   Si le tableau index est de taille nulle, on en cree un de taille tab.dimension_tot(0)
- *   Sinon on suppose qu'il contient deja des indices de lignes dans tab.
- *   Valeur de retour: nombre de colonnes du tableau (produit des tab.dimension(i) pour i>0)
+ *   increasing as i increases. Sorts all indices in index...
+ *   If the index array has zero size, one of size tab.dimension_tot(0) is created.
+ *   Otherwise it is assumed to already contain row indices into tab.
+ *   Return value: number of columns of the array (product of tab.dimension(i) for i>0).
  *
  */
 template <typename _TYPE_, typename _SIZE_>
 int tri_lexicographique_tableau_indirect(const TRUSTTab<_TYPE_,_SIZE_>& tab, ArrOfInt_T<_SIZE_>& index)
 {
   using int_t = _SIZE_;
-  // On verifie que le tableau n'est pas un tableau distribue:
+  // Check that the array is not a distributed array:
   assert(!tab.get_md_vector());
 
   const int_t dimtab = tab.dimension_tot(0);
@@ -221,7 +221,7 @@ int tri_lexicographique_tableau_indirect(const TRUSTTab<_TYPE_,_SIZE_>& tab, Arr
   return nb_colonnes;
 }
 
-/*! @brief Trie le tableau tab dans l'ordre lexicographique et retire les doublons (attention [1,2] n'est pas egal a [2,1])
+/*! @brief Sorts the array tab in lexicographic order and removes duplicates (note: [1,2] is not equal to [2,1]).
  *
  */
 template <typename _SIZE_>
@@ -238,7 +238,7 @@ void tableau_trier_retirer_doublons(IntTab_T<_SIZE_>& tab)
       nb_colonnes = tri_lexicographique_tableau(tab);
       if (nb_colonnes == 2)
         {
-          _SIZE_ j = 1; // Taille du tableau apres suppression
+          _SIZE_ j = 1; // Array size after removal
           _SIZE_ last_x = tab(0, 0);
           _SIZE_ last_y = tab(0, 1);
           for (_SIZE_ i = 1; i < nb_lignes; i++)
@@ -256,10 +256,10 @@ void tableau_trier_retirer_doublons(IntTab_T<_SIZE_>& tab)
         }
       else
         {
-          _SIZE_ j = 0; // Derniere ligne retenue
+          _SIZE_ j = 0; // Last retained row
           for (_SIZE_ i = 1; i < nb_lignes; i++)
             {
-              // Si la ligne i est differente de la ligne j, on la conserve:
+              // If row i differs from row j, keep it:
               if (!same_line(tab, i, j))
                 {
                   j++;
@@ -356,86 +356,86 @@ void tableau_trier_retirer_doublons(BigIntTab& tab)
 #endif
 
 
-/*! @brief cherche par un tri lexicographique les lignes identiques de "tab" et initialise les tailles et contenus de renum et renum_inverse.
+/*! @brief Finds identical rows in "tab" by lexicographic sort and initializes the sizes and contents of renum and renum_inverse.
  *
- *    renum est de taille tab.dimension_tot(0).
- *     renum[i] contiendra l'indice de la ligne i dans le tableau reduit trie (contenant les lignes uniques)
- *    renum_inverse contient, pour chaque ligne du tableau reduit trie, le plus petit indice de la ligne
- *     correspondante dans tab.
- *     on peut construire le tableau reduit trie en extayant les lignes tab( renum_inverse[i], ...)
+ *    renum has size tab.dimension_tot(0).
+ *     renum[i] will contain the index of row i in the reduced sorted array (containing unique rows).
+ *    renum_inverse contains, for each row of the reduced sorted array, the smallest index of the
+ *     corresponding row in tab.
+ *     The reduced sorted array can be constructed by extracting rows tab( renum_inverse[i], ...).
  *
  */
 void calculer_renum_sans_doublons(const IntTab& tab, ArrOfInt& renum, ArrOfInt& renum_inverse)
 {
-  // MODIF ELI LAUCOIN 31/01/2012 :
-  // Je re-ecris completement cette fonction
+  // MODIF ELI LAUCOIN 31/01/2012:
+  // Completely rewriting this function
 
-  // index permet de parcourir le tableau tab dans l'ordre
+  // index allows traversal of tab in order
   ArrOfInt index;
   tri_lexicographique_tableau_indirect(tab, index);
   const int n = index.size_array();
 
-  // on redimensionne renum et renum_index
+  // resize renum and renum_index
   renum.resize_array(n, RESIZE_OPTIONS::NOCOPY_NOINIT);
   renum_inverse.resize_array(n, RESIZE_OPTIONS::NOCOPY_NOINIT);
 
-  int count  = -1; // compteur de lignes dans le tableau reduit
-  int latest = -1; // indice dans le tableau initial de la derniere ligne ajoutee dans le tableau reduit
+  int count  = -1; // row counter in the reduced array
+  int latest = -1; // index in the original array of the last row added to the reduced array
 
   for (int i=0; i<n; ++i)
     {
-      // on parcourt tab dans l'ordre croissant donne par index.
-      // si la ligne courante est differente de la derniere ligne ajoutee dans le tableau reduit,
-      // on incremente count et on met a jour latest.
+      // traverse tab in ascending order given by index.
+      // if the current row differs from the last row added to the reduced array,
+      // increment count and update latest.
       if ( ( latest < 0 ) || ( !(same_line(tab,index[i],index[latest]))) )
         {
           ++count;
           latest=i;
         }
 
-      // on indique dans renum ou se trouve la ligne courante dans le tableau reduit
+      // record in renum where the current row is in the reduced array
       renum[index[i]]      = count;
 
-      // on ajoute la derniere ligne traitee au tableau reduit
+      // add the last processed row to the reduced array
       renum_inverse[count] = index[latest];
     }
 
-  // on redimensionne renum_inverse a la taille du tableau reduit
+  // resize renum_inverse to the size of the reduced array
 
   renum_inverse.resize_array(count+1);
-  // FIN MODIF ELI LAUCOIN 31/01/2012
+  // END MODIF ELI LAUCOIN 31/01/2012
 }
 
-/*! @brief cherche la "valeur" dans le tableau tab par recherche binaire Le tableau tab doit etre trie dans l'ordre croissant
+/*! @brief Searches for "valeur" in the array tab by binary search. The array tab must be sorted in ascending order.
  *
-*   Si elle n'est pas trouvee, renvoie -1 (y compris si tab est vide),
- *   sinon, renvoie un index i tel que tab[i] == valeur
- *   (si la valeur figure plusieurs fois dans le tableau, on ne renvoie
- *   pas forcement la premiere occurence).
+*   If not found, returns -1 (including if tab is empty),
+ *   otherwise returns an index i such that tab[i] == valeur
+ *   (if the value appears multiple times in the array, the first occurrence
+ *   is not necessarily returned).
  *
- *  Utilise dans Trio !
+ *  Used in Trio!
  */
 int array_bsearch(const ArrOfInt& tab, int valeur)
 {
-  // attention tout est important !
+  // attention: all details matter!
   int i = 0;
-  int j = tab.size_array(); // j = fin de tableau + 1 (important)
+  int j = tab.size_array(); // j = end of array + 1 (important)
   while (j > i)
     {
-      // Le tableau doit etre trie
+      // The array must be sorted
       assert(j == tab.size_array() || tab[i] <= tab[j]);
       const int milieu = (i + j) / 2;
       const int val = tab[milieu];
       if (val > valeur)
-        j = milieu; // prendre la valeur milieu et pas milieu - 1
+        j = milieu; // take the middle value, not milieu - 1
       else if (val < valeur)
-        i = milieu + 1; // prendre la valeur milieu + 1 et pas milieu
+        i = milieu + 1; // take milieu + 1, not milieu
       else
         return milieu;
     }
-  // Si on arrive ici, c'est que i==j, donc
-  // - soit j == fin de tableau + 1 et on n'a pas trouve la valeur
-  // - soit tab[j] a ete teste et n'est pas egale a valeur
-  // Dans les deux cas, valeur n'est pas dans le tableau
+  // If we reach here, i==j, so either:
+  // - j == end of array + 1 and the value was not found
+  // - tab[j] was tested and is not equal to valeur
+  // In both cases, valeur is not in the array
   return -1;
 }

@@ -18,13 +18,13 @@
 
 #include <Interprete.h>
 
-/*! @brief Classe Axi Cette classe est un interprete qui sert a lire l'attribut axi.
+/*! @brief Class Axi This class is an interpreter that serves to read the axi attribute.
  *
  *     Directive:
  *         Axi
- *     Cette directive optionelle permets de faire les calculs en
- *     coordonnees cylindriques. En l'absence de cette directive les calculs
- *     se font en coordonnees cartesiennes.
+ *     This optional directive allows calculations to be done in
+ *     cylindrical coordinates. In the absence of this directive the calculations
+ *     are done in Cartesian coordinates.
  *
  * @sa Interprete Objet_U
  */

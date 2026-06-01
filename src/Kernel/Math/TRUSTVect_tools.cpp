@@ -32,7 +32,13 @@
  * You are warned.
  */
 
-/*! Determine which blocks of indices should be used to perform an operation.
+/*! @brief Determine which blocks of indices should be used to perform an operation.
+ * @param opt option specifying which vector items to process (all, sequential, real)
+ * @param md the parallel metadata vector describing the distributed structure
+ * @param vect_size_tot total size of the vector
+ * @param line_size number of components per item (line size)
+ * @param nblocs_left output: number of blocks to iterate over
+ * @return a block iterator over the selected index ranges
  */
 template <typename _SIZE_>
 Block_Iter<_SIZE_> determine_blocks(Mp_vect_options opt, const MD_Vector& md, const _SIZE_ vect_size_tot, const int line_size, int& nblocs_left)
@@ -194,7 +200,7 @@ void operation_speciale_tres_generic(TRUSTVect<_TYPE_, _SIZE_>& resu, const TRUS
   // get info for computation
   const int line_size = resu.line_size(), line_size_vx = vx.line_size(), vect_size_tot = resu.size_totale();
   const MD_Vector& md = resu.get_md_vector();
-  // Le line_size du vecteur resu doit etre un multiple du line_size du vecteur vx
+  // The line_size of vector resu must be a multiple of the line_size of vector vx
   assert(line_size > 0 && line_size_vx > 0 && line_size % line_size_vx == 0);
   const int delta_line_size = line_size / line_size_vx;
   assert(vx.size_totale() * delta_line_size == vect_size_tot); // this test is necessary if md is null

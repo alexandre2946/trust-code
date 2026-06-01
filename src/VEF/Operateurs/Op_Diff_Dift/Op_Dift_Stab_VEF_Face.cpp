@@ -181,7 +181,7 @@ void ajouter_operateur_centre__(const Op_Dift_Stab_VEF_Face& z_class, const Doub
         {
           const int facei = elem_faces(elem, facei_loc);
 
-          // Ajout de la partie diagonale : on tient compte de la symetrie de la matrice Aij_diag
+          // Add the diagonal part: taking into account the symmetry of matrix Aij_diag
           for (int facej_loc = facei_loc + 1; facej_loc < nb_faces_elem; facej_loc++)
             {
               const int facej = elem_faces(elem, facej_loc);
@@ -198,7 +198,7 @@ void ajouter_operateur_centre__(const Op_Dift_Stab_VEF_Face& z_class, const Doub
                 }
             }
 
-          //Ajout de la partie extra-diagonale : on tient compte de la symetrie de la partie extradiagonale de la matrice du laplacien
+          //Add the off-diagonal part: accounting for the symmetry of the off-diagonal part of the Laplacian matrix
           if (is_VECT)
             for (int facej_loc = 0; facej_loc < nb_faces_elem; facej_loc++)
               if (facej_loc != facei_loc)
@@ -433,17 +433,17 @@ void Op_Dift_Stab_VEF_Face::ajouter_antidiffusion(const DoubleTab& Aij, const Do
                     muij = calculer_gradients(facei, rij);
                     muji = calculer_gradients(facej, rji);
 
-                    sij = 0.; //reste a 0 si que des faces de Dirichlet
+                    sij = 0.; //remains 0 if only Dirichlet faces
                     if (delta_ij > 0.)
                       {
                         muij *= delta_imax;
                         muji *= -delta_jmin;
 
-                        if (!ok_facei && !ok_facej) //pas de face de Dirichlet
+                        if (!ok_facei && !ok_facej) //no Dirichlet face
                           sij = my_minimum(muij, delta_ij, muji);
-                        if (!ok_facei && ok_facej) //facej Dirichlet et pas facei
+                        if (!ok_facei && ok_facej) //facej is Dirichlet, facei is not
                           sij = my_minimum(muij, delta_ij);
-                        if (ok_facei && !ok_facej) //facei Dirichlet et pas facej
+                        if (ok_facei && !ok_facej) //facei is Dirichlet, facej is not
                           sij = my_minimum(delta_ij, muji);
                       }
                     else if (delta_ij < 0.)
@@ -451,11 +451,11 @@ void Op_Dift_Stab_VEF_Face::ajouter_antidiffusion(const DoubleTab& Aij, const Do
                         muij *= delta_imin;
                         muji *= -delta_jmax;
 
-                        if (!ok_facei && !ok_facej) //pas de face de Dirichlet
+                        if (!ok_facei && !ok_facej) //no Dirichlet face
                           sij = my_maximum(muij, delta_ij, muji);
-                        if (!ok_facei && ok_facej) //facej Dirichlet et pas facei
+                        if (!ok_facei && ok_facej) //facej is Dirichlet, facei is not
                           sij = my_maximum(muij, delta_ij);
-                        if (ok_facei && !ok_facej) //facei Dirichlet et pas facej
+                        if (ok_facei && !ok_facej) //facei is Dirichlet, facej is not
                           sij = my_maximum(delta_ij, muji);
                       }
 
@@ -685,14 +685,14 @@ DoubleTab& Op_Dift_Stab_VEF_Face::ajouter(const DoubleTab& inconnue_org, DoubleT
   const DoubleVect& porosite_face = equation().milieu().porosite_face(), &porosite_elem = equation().milieu().porosite_elem();
   const int nb_comp = resu.line_size();
 
-  // On dimensionne et initialise le tableau des bilans de flux:
+  // Size and initialize the flux balance array:
   flux_bords_.resize(le_dom_vef->nb_faces_bord(), nb_comp);
   flux_bords_ = 0.;
 
   DoubleTab resu2(resu);
   resu2 = 0.;
 
-  // soit on a div(phi nu grad inco) OU div(nu grad phi inco) : cela depend si on diffuse phi_psi ou psi
+  // either div(phi nu grad inco) OR div(nu grad phi inco): depends on whether phi_psi or psi is diffused
   DoubleTab nu, nu_turb_m, tab_inconnue_;
 
   const int marq = phi_psi_diffuse(equation());
@@ -717,7 +717,7 @@ DoubleTab& Op_Dift_Stab_VEF_Face::ajouter(const DoubleTab& inconnue_org, DoubleT
 
   modifie_pour_cl_gen<true /* _IS_STAB_ */>(inconnue, resu2, flux_bords_);
 
-  resu -= resu2;  // -= car le laplacien est place en terme source dans l'equation
+  resu -= resu2;  // -= because the Laplacian is placed as a source term in the equation
   modifier_flux(*this);
   return resu;
 }
@@ -725,7 +725,7 @@ DoubleTab& Op_Dift_Stab_VEF_Face::ajouter(const DoubleTab& inconnue_org, DoubleT
 void Op_Dift_Stab_VEF_Face::contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& matrice) const
 {
   modifier_matrice_pour_periodique_avant_contribuer(matrice, equation());
-  remplir_nu(nu_); // On remplit le tableau nu car l'assemblage d'une matrice avec ajouter_contribution peut se faire avant le premier pas de temps
+  remplir_nu(nu_); // Fill the nu array because matrix assembly with ajouter_contribution may be performed before the first time step
 
   const DoubleTab& nu_turb_ = diffusivite_turbulente().valeurs();
   DoubleTab nu, nu_turb;
@@ -733,7 +733,7 @@ void Op_Dift_Stab_VEF_Face::contribuer_a_avec(const DoubleTab& inco, Matrice_Mor
   int marq = phi_psi_diffuse(equation());
   const DoubleVect& porosite_elem = equation().milieu().porosite_elem();
 
-  // soit on a div(phi nu grad inco) OU on a div(nu grad phi inco) : cela depend si on diffuse phi_psi ou psi
+  // either div(phi nu grad inco) or div(nu grad phi inco): depending on whether phi_psi or psi is diffused
   modif_par_porosite_si_flag(nu_, nu, !marq, porosite_elem);
   modif_par_porosite_si_flag(nu_turb_, nu_turb, !marq, porosite_elem);
 

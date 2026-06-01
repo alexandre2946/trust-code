@@ -19,7 +19,7 @@
 
 #include <Schema_Temps_base.h>
 
-/*! @brief class Pred_Cor Le schema doit etre utilise avec un schema d'espace alternant
+/*! @brief class Pred_Cor The scheme must be used with an alternating spatial scheme.
  *
  * @sa Schema_Temps_base
  */
@@ -33,7 +33,7 @@ public :
 
   ////////////////////////////////
   //                            //
-  // Caracteristiques du schema //
+  // Schema characteristics     //
   //                            //
   ////////////////////////////////
 
@@ -44,7 +44,7 @@ public :
 
   /////////////////////////////////////////
   //                                     //
-  // Fin des caracteristiques du schema  //
+  // End of schema characteristics       //
   //                                     //
   /////////////////////////////////////////
 

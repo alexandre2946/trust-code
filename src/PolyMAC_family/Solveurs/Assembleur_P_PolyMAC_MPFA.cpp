@@ -58,13 +58,13 @@ int  Assembleur_P_PolyMAC_MPFA::assembler_mat(Matrice& la_matrice,const DoubleVe
   const DoubleVect& pf = equation().milieu().porosite_face(), &fs = domaine.face_surfaces();
   int i, j, e, eb, f, ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot();
 
-  //en l'absence de CLs en pression, on ajoute P(0) = 0 sur le process 0
+  //in the absence of pressure BCs, we add P(0) = 0 on process 0
   has_P_ref=0;
   for (int n_bord=0; n_bord<le_dom_PolyMAC_CDO->nb_front_Cl(); n_bord++)
     if (sub_type(Neumann_sortie_libre, le_dom_Cl_PolyMAC_CDO->les_conditions_limites(n_bord).valeur()) )
       has_P_ref=1;
 
-  /* 1. stencil de la matrice en pression : seulement au premier passage */
+  /* 1. pressure matrix stencil: only on the first pass */
   if (!stencil_done)
     {
       Stencil stencil(0, 2);
@@ -81,7 +81,7 @@ int  Assembleur_P_PolyMAC_MPFA::assembler_mat(Matrice& la_matrice,const DoubleVe
       tab1.ref_array(mat.get_set_tab1()), tab2.ref_array(mat.get_set_tab2());
       stencil_done = 1;
     }
-  else //sinon, on recycle
+  else //otherwise, recycle
     {
       mat.get_set_tab1().ref_array(tab1);
       mat.get_set_tab2().ref_array(tab2);
@@ -89,7 +89,7 @@ int  Assembleur_P_PolyMAC_MPFA::assembler_mat(Matrice& la_matrice,const DoubleVe
       mat.set_nb_columns(ne_tot);
     }
 
-  /* 2. remplissage des coefficients : style Op_Diff_PolyMAC_HFV_Elem */
+  /* 2. fill coefficients: style Op_Diff_PolyMAC_HFV_Elem */
   for (f = 0; f < domaine.nb_faces(); f++)
     for (i = 0; i < 2 && (e = f_e(f, i)) >= 0; i++)
       if (e < ne)
@@ -106,7 +106,7 @@ int  Assembleur_P_PolyMAC_MPFA::assembler_mat(Matrice& la_matrice,const DoubleVe
 /* equation sum_k alpha_k = 1 en Pb_Multiphase */
 void Assembleur_P_PolyMAC_MPFA::dimensionner_continuite(matrices_t matrices, int aux_only) const
 {
-  if (aux_only) return; //rien a faire
+  if (aux_only) return; //nothing to do
   int e, n, N = ref_cast(Pb_Multiphase, equation().probleme()).nb_phases(), ne_tot = le_dom_PolyMAC_CDO->nb_elem_tot();
   Stencil stencil(0, 2);
 
@@ -122,7 +122,7 @@ void Assembleur_P_PolyMAC_MPFA::assembler_continuite(matrices_t matrices, Double
   Matrice_Morse& mat = *matrices.at("alpha");
   const DoubleVect& ve = le_dom_PolyMAC_CDO->volumes(), &pe = equation().milieu().porosite_elem();
   int e, n, N = alpha.line_size();
-  /* second membre : on multiplie par porosite * volume pour que le systeme en P soit symetrique en cartesien */
+  /* right-hand side: multiply by porosity * volume so that the system in P is symmetric in Cartesian */
   for (e = 0; e < le_dom_PolyMAC_CDO->nb_elem(); e++)
     for (secmem(e) = -pe(e) * ve(e), n = 0; n < N; n++) secmem(e) += pe(e) * ve(e) * alpha(e, n);
   /* matrice */

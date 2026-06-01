@@ -17,7 +17,7 @@
 #define Frottement_interfacial_Tomiyama_included
 #include <Frottement_interfacial_base.h>
 
-/*! @brief classe Frottement_interfacial_Tomiyama coefficients de frottement interfacial d'un ecoulement a bulles
+/*! @brief Interfacial friction coefficients for a bubbly flow using the Tomiyama correlation.
  *
  *
  *

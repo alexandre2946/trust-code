@@ -66,7 +66,7 @@ void Pb_rayo_semi_transp::get_noms_champs_postraitables(Noms& noms,Option opt) c
 
 void Pb_rayo_semi_transp::discretise_longueur_rayo()
 {
-  // Association du fluide + diverses operations
+  // Associate the fluid + various operations
   if (sub_type(Fluide_base, pb_fluide_->milieu()))
     {
       Fluide_base& fluide = ref_cast(Fluide_base, pb_fluide_->milieu());
@@ -119,7 +119,7 @@ void Pb_rayo_semi_transp::preparer_calcul()
   for (int j = 0; j < pb_fluide_->nombre_d_equations(); j++)
     {
 
-      // Associer le pb au CL rayonnantes.
+      // Associate the problem to the radiation boundary conditions.
       Domaine_Cl_dis_base& la_zcl = pb_fluide_->equation(j).domaine_Cl_dis();
       for (int num_cl = 0; num_cl < la_zcl.nb_cond_lim(); num_cl++)
         {
@@ -131,12 +131,12 @@ void Pb_rayo_semi_transp::preparer_calcul()
               la_cl_rayo_semi_transp->associer_pb_rayo_semi_transp(*this);
               la_cl_rayo_semi_transp->recherche_emissivite_et_A();
 
-              // Dans le cas d'un echange contact, il faut aussi completer la CL opposee
+              // In the case of a contact exchange, the opposite BC must also be completed
               la_cl_rayo_semi_transp->completer_Cl_opposee_si_contact();
             }
         }
 
-      // Associer le pb au terme source de rayonnement de l'equation de temperature
+      // Associate the problem to the radiation source term of the temperature equation
       Sources& les_sources = pb_fluide_->equation(j).sources();
       for (int num_source = 0; num_source < les_sources.size(); num_source++)
         if ((sub_type(Source_rayo_semi_transp_base, les_sources[num_source].valeur())))
@@ -155,11 +155,11 @@ void Pb_rayo_semi_transp::preparer_calcul()
 
 void Pb_rayo_semi_transp::typer_lire_milieu(Entree& is)
 {
-  // On discretise juste les equations
+  // Only discretise the equations
   discretiser_equations();
 }
 
-// On met a jour le flux radiatif pour tous les bords du probleme
+// Update the radiative flux for all boundaries of the problem
 void Pb_rayo_semi_transp::calculer_flux_radiatif()
 {
   Conds_lim& les_cl_rayo = eq_rayo().domaine_Cl_dis().les_conditions_limites();
@@ -188,7 +188,7 @@ void Pb_rayo_semi_transp::calculer_flux_radiatif()
 
 const Champ_front_base& Pb_rayo_semi_transp::flux_radiatif(const Nom& nom_bord) const
 {
-  // On fait une boucle sur les bords pour trouver celui dont le nom est nom_bord
+  // Loop over the boundaries to find the one whose name is nom_bord
   const Conds_lim& les_cl_rayo = eq_rayo().domaine_Cl_dis().les_conditions_limites();
 
   for (int num_cl_rayo = 0; num_cl_rayo < les_cl_rayo.size(); num_cl_rayo++)

@@ -78,16 +78,16 @@ protected:
 
 private:
   /* si operateur de convection de Masse_Multiphase */
-  std::vector<OWN_PTR(Champ_Inc_base)> cc_phases_; //flux massiques (kg/m2/s)
-  Motcles noms_cc_phases_; //leurs noms
-  std::vector<OWN_PTR(Champ_Inc_base)> vd_phases_; //vitesses debitantes
-  Motcles noms_vd_phases_; //leurs noms
-  std::vector<OWN_PTR(Champ_Inc_base)> x_phases_; //titres par phase
-  Motcles noms_x_phases_; //leurs noms
+  std::vector<OWN_PTR(Champ_Inc_base)> cc_phases_; //mass fluxes (kg/m2/s)
+  Motcles noms_cc_phases_; //their names
+  std::vector<OWN_PTR(Champ_Inc_base)> vd_phases_; //flow velocities
+  Motcles noms_vd_phases_; //their names
+  std::vector<OWN_PTR(Champ_Inc_base)> x_phases_; //quality per phase
+  Motcles noms_x_phases_; //their names
   mutable DoubleTab fluent_;
 };
 
-// Fonction utile pour le calcul du pas de temps de stabilite
+// Utility function for computing the stability time step
 inline void eval_fluent(const double , const int , const int , const int , DoubleTab& );
 
 #endif /* Op_Conv_VDF_base_included */

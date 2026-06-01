@@ -20,9 +20,9 @@
 #include <Traitement_particulier_NS_Pression.h>
 #include <Champ_P0_VDF.h>
 
-/*! @brief classe Traitement_particulier_NS_Pression_VDF Cette classe permet de faire les traitements particuliers
+/*! @brief Traitement_particulier_NS_Pression_VDF class
  *
- *      pour les calculs de la pression
+ *  @brief This class performs special post-processing operations for pressure computations.
  *
  *
  * @sa Navier_Stokes, Traitement_particulier_base, Traitement_particulier_Pression

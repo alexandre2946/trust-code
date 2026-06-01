@@ -30,17 +30,17 @@ void Coloc_discretisation::discretiser_champ(const Motcle& directive, const Doma
                                              double temps, OWN_PTR(Champ_Inc_base)& champ, const Nom& sous_type) const
 {
   Motcles motcles(6);
-  motcles[0] = "vitesse";     // Choix standard pour la vitesse
-  motcles[1] = "pression";    // Choix standard pour la pression
-  motcles[2] = "temperature"; // Choix standard pour la temperature
-  motcles[3] = "divergence_vitesse"; // Le type de champ obtenu en calculant div v
-  motcles[4] = "gradient_pression";  // Le type de champ obtenu en calculant grad P
-  motcles[5] = "champ_elem";    // Creer un champ aux elements (de type P0)
+  motcles[0] = "vitesse";     // Standard choice for velocity
+  motcles[1] = "pression";    // Standard choice for pressure
+  motcles[2] = "temperature"; // Standard choice for temperature
+  motcles[3] = "divergence_vitesse"; // Field type obtained by computing div v
+  motcles[4] = "gradient_pression";  // Field type obtained by computing grad P
+  motcles[5] = "champ_elem";    // Create a field at elements (type P0)
 
   Nom type_champ_vec("Champ_Vect_Elem_Coloc");
   Nom type_champ_elem("Champ_Elem_Coloc");
   Nom type;
-  int default_nb_comp = 0; // Valeur par defaut du nombre de composantes
+  int default_nb_comp = 0; // Default value for the number of components
   int rang = motcles.search(directive);
 
   switch(rang)
@@ -68,8 +68,8 @@ void Coloc_discretisation::discretiser_champ(const Motcle& directive, const Doma
   if (sous_type != NOM_VIDE)
     rang = verifie_sous_type(type, sous_type, directive);
 
-  // Si on n'a pas compris la directive (ou si c'est une demande_description)
-  // alors on appelle l'ancetre :
+  // If the directive was not understood (or if it is a description request),
+  // call the parent class:
   if (rang < 0)
     {
       Discret_Thyd::discretiser_champ(directive, z, nature, noms, unites, nb_comp, nb_pas_dt, temps, champ);
@@ -138,19 +138,19 @@ Nom Coloc_discretisation::get_name_of_type_for(const Nom& class_operateur, const
 void Coloc_discretisation::discretiser_champ_fonc_don(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp,
                                                       double temps, Objet_U& champ) const
 {
-// Deux pointeurs pour acceder facilement au champ_don ou au champ_fonc, suivant le type de l'objet champ.
+// Two pointers for easy access to champ_don or champ_fonc, depending on the type of the champ object.
   OWN_PTR(Champ_Fonc_base) *champ_fonc = dynamic_cast<OWN_PTR(Champ_Fonc_base)*>(&champ);
   OWN_PTR(Champ_Don_base) *champ_don = dynamic_cast<OWN_PTR(Champ_Don_base)*>(&champ);
 
   Motcles motcles(6);
-  motcles[0] = "pression";    // Choix standard pour la pression
-  motcles[1] = "temperature"; // Choix standard pour la temperature
-  motcles[2] = "divergence_vitesse"; // Le type de champ obtenu en calculant div v
-  motcles[3] = "champ_elem";  // Creer un champ aux elements (de type P0)
-  motcles[4] = "vitesse";     // Choix standard pour la vitesse
-  motcles[5] = "gradient_pression";  // Le type de champ obtenu en calculant grad P
+  motcles[0] = "pression";    // Standard choice for pressure
+  motcles[1] = "temperature"; // Standard choice for temperature
+  motcles[2] = "divergence_vitesse"; // Field type obtained by computing div v
+  motcles[3] = "champ_elem";  // Create a field at elements (type P0)
+  motcles[4] = "vitesse";     // Standard choice for velocity
+  motcles[5] = "gradient_pression";  // Field type obtained by computing grad P
 
-// Le type de champ de vitesse depend du type d'element :
+// The velocity field type depends on the element type:
   int default_nb_comp = 0,
       rang = motcles.search(directive);
 
@@ -180,8 +180,8 @@ void Coloc_discretisation::discretiser_champ_fonc_don(const Motcle& directive, c
   if (directive == DEMANDE_DESCRIPTION)
     Cerr << "Coloc_discretisation : " << motcles;
 
-// Si on n'a pas compris la directive (ou si c'est une demande_description)
-// alors on appelle l'ancetre :
+// If the directive was not understood (or if it is a description request),
+// call the parent class:
   if (rang < 0)
     {
       if (champ_fonc)
@@ -191,14 +191,14 @@ void Coloc_discretisation::discretiser_champ_fonc_don(const Motcle& directive, c
       return;
     }
 
-// Calcul du nombre de ddl
+// Compute the number of degrees of freedom
   int nb_ddl = 0;
-  if ((type == "Champ_Fonc_Elem_Coloc") || (type == "Champ_Fonc_Vect_Coloc"))    // a remplacer par debute_par("Champ_Elem")
+  if ((type == "Champ_Fonc_Elem_Coloc") || (type == "Champ_Fonc_Vect_Coloc"))    // to be replaced by debute_par("Champ_Elem")
     nb_ddl = z.nb_elem();
   else
     assert(0);
 
-// Si c'est un champ multiscalaire, uh !
+// If it is a multi-scalar field, handle accordingly
   if (nb_comp < 0)
     nb_comp = default_nb_comp;
   if (champ_fonc)

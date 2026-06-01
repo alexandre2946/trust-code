@@ -28,18 +28,18 @@ Sortie& Operateur::ecrire(Sortie& os) const
 }
 
 
-/*! @brief Lit un operateur sur un flot d'entree.
+/*! @brief Reads an operator from an input stream.
  *
- * Type l'operateur et lui associe son equation.
+ * Types the operator and associates its equation with it.
  *     Format:
  *       {
- *        [UN Motcle REPRESENTANT UN TYPE]
+ *        [A KEYWORD REPRESENTING A TYPE]
  *       }
  *
- * @param (Entree& is) le flot d'entree ou lire l'operateur
- * @return (Entree&) le flot d'entree modifie
- * @throws accolade ouvrante attendue
- * @throws accolade fermante attendue
+ * @param (Entree& is) the input stream from which to read the operator
+ * @return (Entree&) the modified input stream
+ * @throws opening brace expected
+ * @throws closing brace expected
  */
 Entree& Operateur::lire(Entree& is)
 {
@@ -117,28 +117,28 @@ Entree& Operateur::lire(Entree& is)
   return is;
 }
 
-/*! @brief Renvoie le champ representant l'inconnue de l'equation dont l'operateur fait partie.
+/*! @brief Returns the field representing the unknown of the equation to which the operator belongs.
  *
- * @return (Champ_Inc_base&) le champ inconuu de l'equation associee
+ * @return (Champ_Inc_base&) the unknown field of the associated equation
  */
 const Champ_Inc_base& Operateur::mon_inconnue() const
 {
   return le_champ_inco.valeur();
 }
 
-/*! @brief Renvoie la discretisation de l'equation dont l'operateur fait partie.
+/*! @brief Returns the discretization of the equation to which the operator belongs.
  *
- * @return (Discretisation_base&) la discretisation de l'equation associee
+ * @return (Discretisation_base&) the discretization of the associated equation
  */
 const Discretisation_base& Operateur::discretisation() const
 {
   return mon_equation->discretisation();
 }
 
-/*! @brief Met a jour les references des objets associes a l'operateur.
+/*! @brief Updates the references of the objects associated with the operator.
  *
  * Operateur::le_champ_inco, Operateur::champ_inco
- *     Appelle Operateur_base::completer()
+ *     Calls Operateur_base::completer()
  *
  */
 void Operateur::completer()
@@ -156,28 +156,28 @@ void Operateur::associer_champ(const Champ_Inc_base& ch, const std::string& nom_
   l_op_base().associer_champ(ch, nom_ch);
 }
 
-/*! @brief Effecttue une mise a jour en temps de l'operateur.
+/*! @brief Performs a time update of the operator.
  *
- * Appelle Operateur_base::mettre_a_jour(double)
+ * Calls Operateur_base::mettre_a_jour(double)
  *
- * @param (double temps) le pas de temps de mise a jour
+ * @param (double temps) the time step for update
  */
 void Operateur::mettre_a_jour(double temps)
 {
   l_op_base().mettre_a_jour(temps);
 }
-/*! @brief Calcule le prochain pas de temps.
+/*! @brief Computes the next time step.
  *
  */
 double Operateur::calculer_pas_de_temps() const
 {
-  // Si l'equation de l'operateur n'est pas resolue, on ne calcule pas son pas de temps de stabilite
+  // If the operator's equation is not solved, we do not compute its stability time step
   if (equation().equation_non_resolue())
     return DMAXFLOAT;
   statistics().begin_count(STD_COUNTERS::compute_dt,statistics().get_last_opened_counter_level()+1);
   double dt_stab = l_op_base().calculer_dt_stab();
   statistics().end_count(STD_COUNTERS::compute_dt);
-  // Verification que l'operateur a bien un mp_min de fait:
+  // Check that the operator did perform an mp_min:
   assert(dt_stab==Process::mp_min(dt_stab));
   return dt_stab;
 }
@@ -188,20 +188,20 @@ void Operateur::calculer_pas_de_temps_locaux(DoubleTab& dt_locaux) const
 {
   l_op_base().calculer_dt_local(dt_locaux);
 }
-/*! @brief Demande a l'equation si une impression est necessaire Renvoie 1 pour OUI, 0 sinon.
+/*! @brief Asks the equation whether printing is needed. Returns 1 for YES, 0 otherwise.
  *
- * @return (int) 1 si une impression est necessaire 0 sinon
+ * @return (int) 1 if printing is needed, 0 otherwise
  */
 int  Operateur::limpr() const
 {
   return mon_equation->limpr();
 }
 
-/*! @brief Imprime l'operateur sur un flot de sortie, si c'est necessaire.
+/*! @brief Prints the operator to an output stream, if necessary.
  *
- * (voir Schema_Temp_base::limpr())
+ * (see Schema_Temp_base::limpr())
  *
- * @param (Sortie& os) le flot de sortie pour l'impression
+ * @param (Sortie& os) the output stream for printing
  */
 void  Operateur::imprimer(Sortie& os) const
 {
@@ -209,10 +209,10 @@ void  Operateur::imprimer(Sortie& os) const
 }
 
 
-/*! @brief Imprime l'operateur sur un flot de sortie de facon inconditionnelle.
+/*! @brief Prints the operator to an output stream unconditionally.
  *
- * @param (Sortie& os) le flot de sortie pour l'impression
- * @return (int) code de Operateur_base::impr(Sortie&)
+ * @param (Sortie& os) the output stream for printing
+ * @return (int) return code of Operateur_base::impr(Sortie&)
  */
 int Operateur::impr(Sortie& os) const
 {
@@ -220,13 +220,13 @@ int Operateur::impr(Sortie& os) const
   return 1;
 }
 
-/*! @brief Calcule et ajoute la contribution de l'operateur au second membre de l'equation.
+/*! @brief Computes and adds the contribution of the operator to the right-hand side of the equation.
  *
- *     Appelle Operateur::ajouter(const DoubleTab&, DoubleTab& )
+ *     Calls Operateur::ajouter(const DoubleTab&, DoubleTab& )
  *
- * @param (Champ_Inc_base& ch) le champ inconnu sur lequel l'operateur agit
- * @param[in,out] (DoubleTab& resu) le tableau stockant les valeurs du second membre auquel on ajoute la contribution de l'operateur
- * @return (DoubleTab&) le second membre auquel on a ajoute la contribution de l'operateur
+ * @param (Champ_Inc_base& ch) the unknown field on which the operator acts
+ * @param[in,out] (DoubleTab& resu) the array storing the right-hand side values to which the operator contribution is added
+ * @return (DoubleTab&) the right-hand side to which the operator contribution has been added
  */
 DoubleTab& Operateur::ajouter(const Champ_Inc_base& ch, DoubleTab& resu) const
 {
@@ -252,9 +252,9 @@ DoubleTab& Operateur::ajouter(const Champ_Inc_base& ch, DoubleTab& resu) const
   return resu;
 }
 
-/*! @brief Renvoie le (nom du) type de l'operateur a creer.
+/*! @brief Returns the (name of the) type of operator to create.
  *
- * @return (Nom&) le nom du type de l'operateur a creer
+ * @return (Nom&) the name of the type of operator to create
  */
 const Nom& Operateur::type() const
 {
@@ -262,35 +262,35 @@ const Nom& Operateur::type() const
 }
 
 
-/*! @brief Calcule la contribution de l'operateur, et renvoie le tableau des valeurs.
+/*! @brief Computes the contribution of the operator and returns the array of values.
  *
- * @param (Champ_Inc_base& ch) le champ inconnu sur lequel l'operateur agit
- * @param (DoubleTab& resu) le tableau stockant les valeurs resultant de l'application de l'operateur sur le champ inconnu.
- * @return (DoubleTab&) le resultat de l'application de l'operateur sur le champ inconnu
+ * @param (Champ_Inc_base& ch) the unknown field on which the operator acts
+ * @param (DoubleTab& resu) the array storing the values resulting from applying the operator to the unknown field.
+ * @return (DoubleTab&) the result of applying the operator to the unknown field
  */
 DoubleTab& Operateur::calculer(const Champ_Inc_base& ch,DoubleTab& resu) const
 {
   return calculer(ch.valeurs(), resu);
 }
 
-/*! @brief Ajoute la contribution de l'operateur au tableau passe en parametre.
+/*! @brief Adds the contribution of the operator to the array passed as parameter.
  *
- *     Appelle Operateur::ajouter(const Champ_Inc_base&, DoubleTab& )
+ *     Calls Operateur::ajouter(const Champ_Inc_base&, DoubleTab& )
  *
- * @param (DoubleTab& resu) le tableau stockant les valeurs du second membre auquel on ajoute la contribution de l'operateur
- * @return (DoubleTab&) le second membre auquel on a ajoute la contribution de l'operateur
+ * @param (DoubleTab& resu) the array storing the right-hand side values to which the operator contribution is added
+ * @return (DoubleTab&) the right-hand side to which the operator contribution has been added
  */
 DoubleTab& Operateur::ajouter(DoubleTab& resu) const
 {
   return ajouter(le_champ_inco->valeurs(), resu);
 }
 
-/*! @brief Applique l'operateur au champ inconnu et renvoie le resultat.
+/*! @brief Applies the operator to the unknown field and returns the result.
  *
- * Appelle Operateur::calculer(const Champ_Inc_base&, DoubleTab& );
+ * Calls Operateur::calculer(const Champ_Inc_base&, DoubleTab& );
  *
- * @param (DoubleTab& resu) le tableau stockant les valeurs resultant de l'application de l'operateur sur le champ inconnu.
- * @return (DoubleTab&) le resultat de l'application de l'operateur sur le champ inconnu
+ * @param (DoubleTab& resu) the array storing the values resulting from applying the operator to the unknown field.
+ * @return (DoubleTab&) the result of applying the operator to the unknown field
  */
 DoubleTab& Operateur::calculer(DoubleTab& resu) const
 {

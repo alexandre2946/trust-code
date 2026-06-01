@@ -31,25 +31,25 @@
 #include <Perf_counters.h>
 #define CHECK_ALLOCATE 0
 #ifdef CHECK_ALLOCATE
-#include <unistd.h> // Pour acces a int close(int fd); avec PGI
+#include <unistd.h> // For access to int close(int fd); with PGI
 #include <fcntl.h>
 #include <errno.h>
 #endif
 
-// Retourne la version du format de sauvegarde
-// 151 pour dire que c'est la version initiee a la version 1.5.1 de TRUST
+// Returns the version of the save format
+// 151 to say that it is the version initiated at version 1.5.1 of TRUST
 inline int version_format_sauvegarde() { return 184; }
 
 // Version using PDI library
 inline int version_format_PDI() { return 196; }
 
-/*! @brief Initialisation de file_size, bad_allocate, nb_pb_total, num_pb
+/*! @brief Initialization of file_size, bad_allocate, nb_pb_total, num_pb
  *
  */
-long int Save_Restart::File_size_=0;        // file_size est l'espace disque en octet necessaire pour ecrire les fichiers XYZ
-int Save_Restart::Bad_allocate_=1;        // bad_allocate est un int qui permet de savoir si l'allocation a deja eut lieu
-int Save_Restart::Nb_pb_total_=0;        // nb_pb_total est le nombre total de probleme
-int Save_Restart::Num_pb_=1;                // num_pb est le numero du probleme courant
+long int Save_Restart::File_size_=0;        // file_size is the disk space in bytes necessary to write the XYZ files
+int Save_Restart::Bad_allocate_=1;        // bad_allocate is an int that tells us if the allocation has already taken place
+int Save_Restart::Nb_pb_total_=0;        // nb_pb_total is the total number of problems
+int Save_Restart::Num_pb_=1;                // num_pb is the number of the current problem
 
 void Save_Restart::assoscier_pb_base(const Probleme_base& pb)
 {
@@ -95,15 +95,15 @@ void Save_Restart::allocation() const
               Process::barrier();
               Process::exit();
             }
-          Num_pb_+=1;                                                // j'incremente le numero de probleme
+          Num_pb_+=1;                                                // I increment the problem number
         }
     }
 }
 
-/*! @brief Verifie que la place necessaire existe sur le disque dur.
+/*! @brief Verifies that the necessary space exists on the hard disk.
  *
- * @param l'espace disque requis
- * @return (int) retourne 1 si l'espace disque est suffisant, 0 sinon
+ * @param the required disk space
+ * @return (int) returns 1 if disk space is sufficient, 0 otherwise
  */
 int Save_Restart::allocate_file_size(long int& size) const
 {
@@ -113,35 +113,35 @@ int Save_Restart::allocate_file_size(long int& size) const
 #ifdef CHECK_ALLOCATE
   Nom Fichier_File_size(Objet_U::nom_du_cas());
   Fichier_File_size+="_File_size";
-  const char *file = Fichier_File_size;                        // Fichier d'allocation
-  //  if (size<1048576)                                        // Si size est trop petit on le fixe a 1 Mo
+  const char *file = Fichier_File_size;                        // Allocation file
+  //  if (size<1048576)                                        // If size is too small we set it to 1 MB
   //     size=1048576;
-  off_t taille = off_t(size+size);                        // Convertion de la taille du fichier 2*size
+  off_t taille = off_t(size+size);                        // Conversion of file size 2*size
 
-  int fichier = open(file, O_WRONLY | O_CREAT, 0666);        // Ouverture du fichier File_size
-  if (fichier == -1)                                        // Erreur d'ouverture
+  int fichier = open(file, O_WRONLY | O_CREAT, 0666);        // Opening of File_size file
+  if (fichier == -1)                                        // Opening error
     {
       error_="Open of ";
       error_+=file;
       error_+=" : ";
-      error_+=strerror(errno);                                // Erreur sur l'ouverture
-      close(fichier);                                        // fermeture du fichier
-      remove(file);                                        // Destruction du fichier File_size
-      return 0;                                                // Echec d'allocation car fichier pas ouvert
+      error_+=strerror(errno);                                // Error on opening
+      close(fichier);                                        // file closing
+      remove(file);                                        // Destruction of File_size file
+      return 0;                                                // Allocation failure because file not opened
     }
 
-  if (posix_fallocate(fichier, 0, taille) != 0)                // Erreur d'allocation de l'espace disque
+  if (posix_fallocate(fichier, 0, taille) != 0)                // Disk space allocation error
     {
       error_="Allocation of ";
       error_+=file;
       error_+=" : ";
-      error_+=strerror(errno);                                // Erreur sur l'allocation
-      close(fichier);                                        // fermeture du fichier
-      remove(file);                                        // Destruction du fichier File_size
-      return 0;                                                // Echec d'allocation car pas assez de place
+      error_+=strerror(errno);                                // Error on allocation
+      close(fichier);                                        // file closing
+      remove(file);                                        // Destruction of File_size file
+      return 0;                                                // Allocation failure because not enough space
     }
-  close(fichier);                                        // fermeture du fichier
-  remove(file);                                                // Destruction du fichier File_size
+  close(fichier);                                        // file closing
+  remove(file);                                                // Destruction of File_size file
 #endif
 #endif
 #endif
@@ -158,13 +158,13 @@ void Save_Restart::preparer_calcul()
       sauver_xyz(0);
       if (Process::je_suis_maitre())
         {
-          ifstream fichier(nom_fich_xyz); // Calcul de l'espace disque pris par le fichier XYZ du probleme courant
+          ifstream fichier(nom_fich_xyz); // Calculation of disk space taken by XYZ file of current problem
           fichier.seekg(0, std::ios_base::end);
-          File_size_ += fichier.tellg(); // Incremente l'espace disque deja necessaire
+          File_size_ += fichier.tellg(); // Increments the disk space already necessary
           fichier.close();
           remove(nom_fich_xyz);
         }
-      Nb_pb_total_ += 1; // Permet de connaitre le nombre de probleme total a la fin du preparer_calcul
+      Nb_pb_total_ += 1; // Allows knowing the total number of problems at the end of preparer_calcul
     }
 #endif
 
@@ -202,7 +202,7 @@ void Save_Restart::checkVersion(const Nom& nomfic)
       Process::exit();
     }
 
-  // Ecriture du format de reprise
+  // Writing of restart format
   Cerr << "The version of the resumption format of file " << nomfic << " is " << restart_version_ << finl;
 }
 
@@ -247,10 +247,10 @@ void Save_Restart::sauver_xyz(int verbose) const
     {
       nom_fich_xyz = ".xyz";
     }
-  // Creation du fichier XYZ du probleme courant
+  // Create the XYZ file for the current problem
   ficsauv_.typer(EcritureLectureSpecial::get_Output());
   ficsauv_->ouvrir(nom_fich_xyz);
-  // Nouveau pour le xyz depuis la 155: on note en en-tete le format de sauvegarde
+  // New for xyz since version 155: the backup format is written in the header
   if (Process::je_suis_maitre())
     ficsauv_.valeur() << "format_sauvegarde:" << finl << version_format_sauvegarde() << finl;
 
@@ -316,12 +316,12 @@ void Save_Restart::lire_pdi_sauvegarde_reprise(Entree& is, Motcle& motlu, Nom& r
 
 
 /////////////////////////////////////////////
-// Lecture des options de reprise d'un calcul
+// Reading restart options for a computation
 /////////////////////////////////////////////
 void Save_Restart::lire_reprise(Entree& is, Motcle& motlu)
 {
   int resume_last_time = (motlu == "resume_last_time" ? 1 : 0);
-  // remise a defaut a zero pour pouvoir faire une reprise std apres une reprise xyz
+  // reset to zero to allow a standard restart after an xyz restart
   EcritureLectureSpecial::mode_lec = 0;
   Motcle format_rep;
   is >> format_rep;
@@ -349,7 +349,7 @@ void Save_Restart::lire_reprise(Entree& is, Motcle& motlu)
     }
   else
     is >> restart_filename_;
-  // Force reprise hdf au dela d'un certain nombre de rangs MPI:
+  // Force hdf restart beyond a certain number of MPI ranks:
   if (format_rep != "xyz" && Process::force_single_file(Process::nproc(), restart_filename_))
     format_rep = "pdi";
 
@@ -447,14 +447,13 @@ void Save_Restart::lire_reprise(Entree& is, Motcle& motlu)
           fic->ouvrir(restart_filename_);
         }
 
-      // Lecture de la version du format de sauvegarde si c'est une reprise classique
-      // Depuis la 1.5.1, on marque le format de sauvegarde en tete des fichiers de sauvegarde
-      // afin de pouvoir faire evoluer plus facilement ce format dans le futur
-      // En outre avec la 1.5.1, les faces etant numerotees differemment, il est faux
-      // de faire une reprise d'un fichier de sauvegarde anterieur et c'est donc un moyen
-      // de prevenir les utilisateurs: il leur faudra faire une reprise xyz pour poursuivre
-      // avec la 1.5.1 un calcul lance avec une version anterieure
-      // Depuis la 1.5.5, Il y a pas une version de format pour le xyz
+      // Read the backup format version if this is a standard restart
+      // Since 1.5.1, the backup format is marked at the header of backup files
+      // to allow easier evolution of the format in the future.
+      // Moreover with 1.5.1, faces are numbered differently, so restarting
+      // from an older backup file is incorrect; this is a way to warn users:
+      // they must perform an xyz restart to continue a computation started with an older version.
+      // Since 1.5.5, there is no format version for xyz
       fic.valeur() >> motlu;
       if (motlu != "FORMAT_SAUVEGARDE:")
         {
@@ -494,11 +493,11 @@ void Save_Restart::lire_reprise(Entree& is, Motcle& motlu)
 }
 
 ////////////////////////////////////////////////
-// Lecture des options de sauvegarde d'un calcul
+// Reading save options for a computation
 ////////////////////////////////////////////////
 void Save_Restart::lire_sauvegarde(Entree& is, Motcle& motlu)
 {
-  // restart_file=1: le fichier est ecrasee a chaque sauvegarde (et ne donc contient qu'un seul instant)
+  // restart_file=1: the file is overwritten at each backup (and thus contains only one instant)
   if (motlu == "sauvegarde_simple")
     simple_restart_ = true;
   is >> checkpoint_format_;
@@ -564,7 +563,7 @@ void Save_Restart::lire_sauvegarde_reprise(Entree& is, Motcle& motlu)
     }
 
   ficsauv_.detach();
-  // Force sauvegarde hdf au dela d'un certain nombre de rangs MPI:
+  // Force hdf backup beyond a certain number of MPI ranks:
   if (checkpoint_format_ != "xyz" && Process::force_single_file(Process::nproc(), checkpoint_filename_))
     checkpoint_format_ = "pdi";
 
@@ -584,8 +583,8 @@ void Save_Restart::lire_sauvegarde_reprise(Entree& is, Motcle& motlu)
 
   if (reprise_effectuee())
     {
-      // on teste si dt_ev existe sinon on met reprise a 2
-      // on recrera l'entete dans dt_ev sinon l'entete est fausse en reprise de pb_couple
+      // check if dt_ev exists, otherwise set reprise to 2
+      // we will recreate the header in dt_ev otherwise the header is wrong on pb_couple restart
       Nom fichier(Objet_U::nom_du_cas());
       fichier += ".dt_ev";
       struct stat f;
@@ -594,7 +593,7 @@ void Save_Restart::lire_sauvegarde_reprise(Entree& is, Motcle& motlu)
     }
 }
 
-/*! @brief Ecriture sur fichier en vue d'une reprise (sauvegarde)
+/*! @brief Writes to file for restart (backup).
  *
  */
 int Save_Restart::sauver() const
@@ -659,7 +658,7 @@ int Save_Restart::sauver() const
     }
   else if (!ficsauv_ && !osauv_hdf_)
     {
-      // Si le fichier de sauvegarde n'a pas ete ouvert alors on cree le fichier de sauvegarde:
+      // If the backup file has not been opened yet, create the backup file:
       if (Motcle(checkpoint_format_) == "formatte")
         {
           ficsauv_.typer("EcrFicCollecte");
@@ -692,7 +691,7 @@ int Save_Restart::sauver() const
           Cerr << "But it is :" << checkpoint_format_ << finl;
           Process::exit();
         }
-      // Si c'est la premiere sauvegarde, on note en en-tete le format de sauvegarde
+      // If this is the first backup, write the backup format in the header
       if (Motcle(checkpoint_format_) == "xyz")
         {
           if (Process::je_suis_maitre())
@@ -704,7 +703,7 @@ int Save_Restart::sauver() const
         ficsauv_.valeur() << "format_sauvegarde:" << finl << version_format_sauvegarde() << finl;
     }
 
-  // On realise l'ecriture de la sauvegarde
+  // Perform the backup writing
   int bytes;
   EcritureLectureSpecial::mode_ecr = (Motcle(checkpoint_format_) == "xyz");
   TRUST_2_PDI::set_PDI_checkpoint(pdi_format);
@@ -739,7 +738,7 @@ int Save_Restart::sauver() const
   EcritureLectureSpecial::mode_ecr = -1;
   TRUST_2_PDI::set_PDI_checkpoint(0);
 
-  // Si c'est une sauvegarde simple, on referme immediatement et proprement le fichier
+  // If this is a simple backup, close the file immediately and properly
   if (simple_restart_ && !pdi_format)
     {
       if (Motcle(checkpoint_format_) == "xyz")
@@ -771,8 +770,8 @@ int Save_Restart::sauver() const
 
 void Save_Restart::finir()
 {
-  // On ferme proprement le fichier de sauvegarde
-  // Si c'est une sauvegarde_simple, le fin a ete mis a chaque appel a ::sauver()
+  // Close the backup file properly
+  // If it is a simple backup, fin was written at each call to ::sauver()
   if(Motcle(checkpoint_format_) == "pdi" && TRUST_2_PDI::is_PDI_initialized())
     TRUST_2_PDI::finalize();
   else  if (!simple_restart_ && (ficsauv_ || osauv_hdf_) )
@@ -802,8 +801,8 @@ void Save_Restart::finir()
 
       ficsauv_.detach();
     }
-  // Si la sauvegarde est classique et que l'utilisateur n'a pas desactive la sauvegarde finale xyz
-  // alors on effectue la sauvegarde finale xyz
+  // If the backup is a standard one and the user has not disabled the final xyz backup,
+  // then perform the final xyz backup
   if (Motcle(checkpoint_format_) != "xyz")
     {
       if (EcritureLectureSpecial::Active)

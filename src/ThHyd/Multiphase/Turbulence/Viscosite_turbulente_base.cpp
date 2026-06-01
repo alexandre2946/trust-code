@@ -33,16 +33,16 @@ void Viscosite_turbulente_base::modifier_mu(DoubleTab& mu) const
   const DoubleTab& rho = pb_->get_champ("masse_volumique").passe(),
                    *alpha = pb_->has_champ("alpha") ? &(pb_->get_champ("alpha").passe()) : nullptr;
   int i, nl = mu.dimension(0), n, N = rho.line_size(), cR = rho.dimension(0) == 1, d, D = dimension;
-  DoubleTrav nu_t(nl, N); //viscosite turbulente : toujours scalaire
-  eddy_viscosity(nu_t); //remplissage par la correlation
-  if (mu.nb_dim() == 2) //nu scalaire
+  DoubleTrav nu_t(nl, N); //turbulent viscosity: always scalar
+  eddy_viscosity(nu_t); //filled by the correlation
+  if (mu.nb_dim() == 2) //scalar nu
     for (i = 0; i < nl; i++)
       for (n = 0; n < N; n++) mu(i, n) += (alpha ? (*alpha)(i, n) * rho(!cR * i, n) : 1) * nu_t(i, n);
-  else if (mu.nb_dim() == 3) //nu anisotrope diagonal
+  else if (mu.nb_dim() == 3) //diagonal anisotropic nu
     for (i = 0; i < nl; i++)
       for (n = 0; n < N; n++)
         for (d = 0; d < D; d++) mu(i, n, d) += (alpha ? (*alpha)(i, n) : 1) * rho(!cR * i, n) * nu_t(i, n);
-  else if (mu.nb_dim() == 4) //nu anisotrope complet
+  else if (mu.nb_dim() == 4) //full anisotropic nu
     for (i = 0; i < nl; i++)
       for (n = 0; n < N; n++)
         for (d = 0; d < D; d++) mu(i, n, d, d) += (alpha ? (*alpha)(i, n) : 1) * rho(!cR * i, n) * nu_t(i, n);

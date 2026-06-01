@@ -21,9 +21,9 @@
 
 #include <SFichier.h>
 
-/*! @brief classe Traitement_particulier_chmoy_faceperio Cette classe permet de faire les traitements particuliers
+/*! @brief Traitement_particulier_chmoy_faceperio This class performs specific post-processing treatments
  *
- *      pour les calculs de  l'energie cinetique totale
+ *      for computing mean fields on periodic faces.
  *
  *
  * @sa Navier_Stokes_Turbulent, Traitement_particulier_base, Traitement_particulier_VEF

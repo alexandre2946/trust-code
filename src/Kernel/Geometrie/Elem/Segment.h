@@ -18,9 +18,9 @@
 
 #include <Elem_geom_base.h>
 
-/*! @brief Classe Segment Cette classe represente l'element geometrique segment.
+/*! @brief Class Segment: represents the geometric element segment.
  *
- *     Un segment a 1 face et 2 sommets.
+ *     A segment has 1 face and 2 vertices.
  *
  * @sa Elem_geom_base Elem_geom
  */
@@ -61,11 +61,11 @@ protected:
 };
 
 
-/*! @brief Renvoie le numero du j-ieme sommet de la i-ieme face de l'element.
+/*! @brief Returns the index of the j-th vertex of the i-th face of the element.
  *
- * @param (int i) un numero de face
- * @param (int j) un numero de sommet
- * @return (int) le numero du j-ieme sommet de la i-ieme face
+ * @param i a face index
+ * @param j a vertex index
+ * @return the index of the j-th vertex of the i-th face
  */
 template <typename _SIZE_>
 inline int Segment_32_64<_SIZE_>::face_sommet(int i, int j) const
@@ -81,10 +81,10 @@ inline int Segment_32_64<_SIZE_>::face_sommet(int i, int j) const
 }
 
 
-/*! @brief Renvoie le numero du i-ieme sommet de la face 0 LE CODE NE FAIT PAS CE QU'ON ATTENDRAIT.
+/*! @brief Returns the index of the i-th vertex of face 0. NOTE: THE CODE DOES NOT DO WHAT ONE WOULD EXPECT.
  *
- * @param (int i) le numero du sommet a renvoyer
- * @return (int) renvoie toujours 0 (si i=0)
+ * @param i the index of the vertex to return
+ * @return always returns 0 (if i=0)
  */
 template <typename _SIZE_>
 inline int Segment_32_64<_SIZE_>::face_sommet0(int i) const
@@ -95,10 +95,10 @@ inline int Segment_32_64<_SIZE_>::face_sommet0(int i) const
 }
 
 
-/*! @brief Renvoie le nombre de faces du type specifie que possede l'element geometrique.
+/*! @brief Returns the number of faces of the specified type that the geometric element has.
  *
- * @param (int i) le type de face
- * @return (int) le nombre de faces de type i
+ * @param i the face type
+ * @return the number of faces of type i
  */
 template <typename _SIZE_>
 inline int Segment_32_64<_SIZE_>::nb_faces(int i) const
@@ -108,12 +108,12 @@ inline int Segment_32_64<_SIZE_>::nb_faces(int i) const
 }
 
 
-/*! @brief Renvoie le nombre de sommets des faces du type specifie.
+/*! @brief Returns the number of vertices of faces of the specified type.
  *
- *     LE CODE NE FAIT PAS CE QU'ON ATTENDRAIT.
+ *     NOTE: THE CODE DOES NOT DO WHAT ONE WOULD EXPECT.
  *
- * @param (int i) le type de face
- * @return (int) le nombre de sommets des faces de type i
+ * @param i the face type
+ * @return the number of vertices of faces of type i
  */
 template <typename _SIZE_>
 inline int Segment_32_64<_SIZE_>::nb_som_face(int i) const
@@ -122,12 +122,12 @@ inline int Segment_32_64<_SIZE_>::nb_som_face(int i) const
   return 1;
 }
 
-/*! @brief Renvoie le i-ieme type de face.
+/*! @brief Returns the i-th face type.
  *
- * Un segment n'a qu'un seul type de face.
+ * A segment has only one face type.
  *
- * @param (int i) le rang du type de face a renvoyer
- * @return (Type_Face) un type de face
+ * @param i the rank of the face type to return
+ * @return a face type
  */
 template <typename _SIZE_>
 inline Type_Face Segment_32_64<_SIZE_>::type_face(int i) const

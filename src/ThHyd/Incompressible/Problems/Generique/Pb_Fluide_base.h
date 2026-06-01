@@ -19,9 +19,9 @@
 #include <Modele_rayo_transp.h>
 #include <Probleme_base.h>
 
-/*! @brief classe  Pb_Fluide_base Cette classe a pour but de disposer d une classe amont pour
+/*! @brief Pb_Fluide_base This class provides a base class for
  *
- *      la hierarchie des problemes portant une equation de Navier_Stokes
+ *      the hierarchy of problems carrying a Navier-Stokes equation.
  *
  * @sa Probleme_base
  */

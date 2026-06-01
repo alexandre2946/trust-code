@@ -18,11 +18,11 @@
 
 #include <Hexaedre.h>
 
-/*! @brief Classe Hexaedre_axi Cette classe represente la deformee de l'hexaedre dans
+/*! @brief Class Hexaedre_axi: represents the deformed hexahedron in
  *
- *     le cas d'un maillage en coordonnees cylindriques
- *     Les methodes de la classe Hexaedre dont Hexaedre_axi derive sont
- *     surchargees pour effectuer les calculs en coordonnees cylindrique.
+ *     the case of a mesh in cylindrical coordinates.
+ *     The methods of the Hexaedre class from which Hexaedre_axi derives are
+ *     overridden to perform calculations in cylindrical coordinates.
  *
  * @sa Hexaedre Elem_geom_base Elem_geom
  */
@@ -49,12 +49,12 @@ public :
 };
 
 
-/*! @brief Renvoie le i-ieme type de face.
+/*! @brief Returns the i-th face type.
  *
- * Un Hexaedre (Axi) n'a qu'un seul type de face.
+ * A hexahedron (Axi) has only one face type.
  *
- * @param (int i) le rang du type de face a renvoyer
- * @return (Type_Face) un type de face
+ * @param i the rank of the face type to return
+ * @return a face type
  */
 template <typename _SIZE_>
 inline Type_Face Hexaedre_axi_32_64<_SIZE_>::type_face(int i) const

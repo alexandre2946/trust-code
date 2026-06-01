@@ -38,7 +38,7 @@ Entree& Convection_Diffusion_Chaleur_Fluide_Dilatable_base::readOn(Entree& is)
   terme_convectif.set_description((Nom)"Convective heat transfer rate=Integral(-rho*cp*T*u*ndS) [W] if SI units used");
   terme_diffusif.set_fichier("Diffusion_chaleur");
   terme_diffusif.set_description((Nom)"Conduction heat transfer rate=Integral(lambda*grad(T)*ndS) [W] if SI units used");
-  //On modifie le nom ici pour que le champ puisse etre reconnu si une sonde d enthalpie est demandee
+  // Rename the field here so it can be recognized if an enthalpy probe is requested.
   if (le_fluide->type_fluide()=="Gaz_Reel") l_inco_ch->nommer("enthalpie");
   return is;
 }
@@ -110,7 +110,7 @@ int Convection_Diffusion_Chaleur_Fluide_Dilatable_base::sauvegarder(Sortie& os) 
 {
   int bytes=0;
   bytes += Equation_base::sauvegarder(os);
-  // en mode ecriture special seul le maitre ecrit
+  // in special write mode only the master writes
   int a_faire,special;
   EcritureLectureSpecial::is_ecriture_special(special,a_faire);
 
@@ -135,14 +135,12 @@ int Convection_Diffusion_Chaleur_Fluide_Dilatable_base::sauvegarder(Sortie& os) 
   return bytes;
 }
 
-/*! @brief Effectue une reprise a partir d'un flot d'entree.
+/*! @brief Resumes computation from an input stream.
  *
- * Appelle Equation_base::reprendre()
- *      et reprend l'inconnue de la chaleur et la pression thermodynamique
+ * Calls Equation_base::reprendre() and resumes the heat unknown and the thermodynamic pressure.
  *
- * @param (Entree& is) un flot d'entree
- * @return (int) renvoie toujours 1
- * @throws la reprise a echoue, identificateur de la pression non trouve
+ * @param is Input stream.
+ * @return Always returns 1.
  */
 int Convection_Diffusion_Chaleur_Fluide_Dilatable_base::reprendre(Entree& is)
 {
@@ -180,9 +178,7 @@ int Convection_Diffusion_Chaleur_Fluide_Dilatable_base::preparer_calcul()
   return 1;
 }
 
-/*! @brief remplissage du domaine cl modifiee avec 1 partout au bord.
- *
- * ..
+/*! @brief @brief Fills the modified boundary condition domain with 1 everywhere on the boundary.
  *
  */
 int Convection_Diffusion_Chaleur_Fluide_Dilatable_base::remplir_cl_modifiee()
@@ -190,8 +186,8 @@ int Convection_Diffusion_Chaleur_Fluide_Dilatable_base::remplir_cl_modifiee()
   zcl_modif_= domaine_Cl_dis();
   Conds_lim& condlims=zcl_modif_->les_conditions_limites();
   int nb=condlims.size();
-  // pour chaque condlim on recupere le champ_front et on met 1
-  // meme si la cond lim est un flux (dans ce cas la convection restera nullle.)
+  // for each boundary condition, retrieve the front field and set it to 1
+  // even if the boundary condition is a flux (in that case convection will remain zero)
   for (int i=0; i<nb; i++)
     {
       DoubleTab& T=condlims[i]->champ_front().valeurs();
@@ -203,11 +199,11 @@ int Convection_Diffusion_Chaleur_Fluide_Dilatable_base::remplir_cl_modifiee()
   return 1;
 }
 
-/*! @brief Renvoie le nom du domaine d'application de l'equation.
+/*! @brief Returns the name of the equation's application domain.
  *
- * Ici "Thermique".
+ * Here "Thermique".
  *
- * @return (Motcle&) le nom du domaine d'application de l'equation
+ * @return Name of the equation's application domain.
  */
 const Motcle& Convection_Diffusion_Chaleur_Fluide_Dilatable_base::domaine_application() const
 {

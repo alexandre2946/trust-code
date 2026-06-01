@@ -32,7 +32,7 @@ void Force_Tchen_PolyMAC_MPFA::dimensionner_blocs_aux(Stencil& stencil) const
   for (int e = 0; e < domaine.nb_elem_tot(); e++)
     for (int d = 0 ; d <D ; d++)
       for (int k = 0 ; k<N ; k++)
-        if (k != n_l) //phase gazeuse
+        if (k != n_l) //gas phase
           stencil.append_line(  N *(nf_tot + D * e + d) + k  , N *(nf_tot + D * e + d) + n_l) ;
 }
 
@@ -52,7 +52,7 @@ void Force_Tchen_PolyMAC_MPFA::ajouter_blocs_aux(matrices_t matrices, DoubleTab&
   for (int e = 0; e < domaine.nb_elem_tot(); e++)
     for (int d = 0 ; d <D ; d++)
       for (int k = 0 ; k<N ; k++)
-        if (k != n_l) //phase gazeuse
+        if (k != n_l) //gas phase
           {
             double fac = pe(e) * ve(e) * alpha(e, k) * rho(e, n_l) ;
 

@@ -20,7 +20,7 @@
 #include <Champ_Fonc_base.h>
 #include <Domaine_VDF.h>
 
-/*! @brief classe Champ_Fonc_Face_VDF
+/*! @brief class Champ_Fonc_Face_VDF
  *
  * @sa Champ_Fonc_base Champ_Face_VDF
  */
@@ -35,7 +35,7 @@ public:
   Champ_base& affecter_(const Champ_base&) override;
   DoubleVect& valeur_aux_compo(const DoubleTab& positions, DoubleVect& tab_valeurs, int ncomp) const override;
 
-  // Methodes inlines
+  // Inline methods
   inline const Domaine_VDF& domaine_vdf() const override { return ref_cast(Domaine_VDF, le_dom_VF.valeur()); }
 
   inline DoubleVect& valeur_a_elem(const DoubleVect& position, DoubleVect& val, int le_poly) const override

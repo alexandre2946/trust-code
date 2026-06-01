@@ -38,7 +38,7 @@ Entree& Perte_Charge_Singuliere_VEF_Face::readOn(Entree& s)
 {
   Perte_Charge_Singuliere::lire_donnees(s);
   remplir_num_faces(s);
-  if (regul_) //fichier de sortie si regulation
+  if (regul_) //output file if regulation is active
     {
       bilan().resize(3); //K deb cible
       set_fichier(Nom("K_") + identifiant_);
@@ -50,9 +50,9 @@ Entree& Perte_Charge_Singuliere_VEF_Face::readOn(Entree& s)
 
 /////////////////////////////////////////////////////////////////////
 //
-//                    Implementation des fonctions
+//                    Implementation of member functions
 //
-//               de la classe Perte_Charge_Singuliere_VEF_Face
+//               of class Perte_Charge_Singuliere_VEF_Face
 //
 ////////////////////////////////////////////////////////////////////
 
@@ -89,7 +89,7 @@ DoubleTab& Perte_Charge_Singuliere_VEF_Face::ajouter(DoubleTab& resu) const
 
   int nb_faces = num_faces.size();
   int numfa;
-  double Ud; // vitesse debitante
+  double Ud; // bulk velocity
   double area;
   double coefK; // pressure loss
 
@@ -118,7 +118,7 @@ void Perte_Charge_Singuliere_VEF_Face::contribuer_a_avec(const DoubleTab& inco, 
 
   int nb_faces = num_faces.size();
   int numfa;
-  double Ud; // vitesse debitante
+  double Ud; // bulk velocity
   double area;
   double coefK; // pressure loss
 

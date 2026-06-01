@@ -24,8 +24,8 @@
 
 /*! @brief class Op_Grad_VEF_P1B_Face
  *
- *   Cette classe represente l'operateur de gradient. La discretisation est VEF
- *   On calcule le gradient d'un champ_P1B_VEF (la pression)
+ *   This class represents the gradient operator with VEF discretization.
+ *   It computes the gradient of a champ_P1B_VEF field (the pressure).
  *
  * @sa Operateur_Grad_base
  */

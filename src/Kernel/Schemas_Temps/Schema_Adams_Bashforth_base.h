@@ -19,7 +19,7 @@
 #include <Schema_Explicite_Multi_TimeStep_base.h>
 #include <TRUSTTabs_forward.h>
 
-/*! @brief classe Schema_Adams_Bashforth_base
+/*! @brief Schema_Adams_Bashforth_base
  *
  * @sa Schema_Temps_base
  */

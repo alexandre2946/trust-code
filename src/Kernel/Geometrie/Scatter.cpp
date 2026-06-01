@@ -46,10 +46,10 @@ Implemente_instanciable(Scatter,"Scatter",Interprete);
 // XD attr file chaine file REQ Name of file.
 // XD attr domaine ref_domaine domaine REQ Name of domain.
 
-/*! @brief Simple appel a: Interprete::printOn(Sortie&)
+/*! @brief Simple call to: Interprete::printOn(Sortie&)
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param os Output stream.
+ * @return The modified output stream.
  */
 Sortie& Scatter::printOn(Sortie& os) const
 {
@@ -57,18 +57,19 @@ Sortie& Scatter::printOn(Sortie& os) const
 }
 
 
-/*! @brief Simple appel a: Interprete::readOn(Entree&)
+/*! @brief Simple call to: Interprete::readOn(Entree&)
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param is Input stream.
+ * @return The modified input stream.
  */
 Entree& Scatter::readOn(Entree& is)
 {
   return Interprete::readOn(is);
 }
 
-/*! @brief Renvoi le domaine associe
+/*! @brief Returns the associated domain.
  *
+ * @return The associated domain.
  */
 Domaine& Scatter::domaine()
 {
@@ -106,28 +107,28 @@ void dump_lata(const Domaine& dom)
                         units,
                         noms_compo,
                         1,           // ncomp,
-                        0.0,         // temps,
-                        Nom("partition") + Nom(dom.joint(ij).PEvoisin()), // id_du_champ,
-                        dom.le_nom(), // id_du_domaine
+                        0.0,         // time,
+                        Nom("partition") + Nom(dom.joint(ij).PEvoisin()), // field_id,
+                        dom.le_nom(), // domain_id
                         "ELEM",       // localisation,
                         "scalar",     // nature,
-                        data          // valeurs
+                        data          // values
                        );
     }
 }
 } // end anonymous namespace
 
-/*! @brief Lit et complete un domaine parallele selon les motcles lus dans le jeu de donnees.
+/*! @brief Reads and completes a parallel domain according to the keywords read in the data set.
  *
  * Format:
  *    Scatter [debug] file_name domain_name
- *   On lit les sommets, les elements et les sommets et faces de joint,
- *   On construit les espaces distants et virtuels en fonction
- *   de l'epaisseur de joint.
+ *   Reads the vertices, elements and joint vertices and faces,
+ *   builds the distant and virtual spaces according to
+ *   the joint layer thickness.
  */
 Entree& Scatter::interpreter(Entree& is)
 {
-  // Nom des fichiers de decoupage : nomentree.xxxx
+  // Name of partition files: nomentree.xxxx
   Nom nomentree;
   is >> nomentree;
   if (Process::is_sequential())
@@ -155,7 +156,7 @@ Entree& Scatter::interpreter(Entree& is)
         uninit_sequential_domain(dom);
       return is;
     }
-  // Pour debugger sur linux en parallele
+  // For debugging on linux in parallel
 #ifdef linux
   static int gdb_non_lance=1;
   char* TRUST_GDB=getenv("TRUST_GDB");
@@ -199,7 +200,7 @@ Entree& Scatter::interpreter(Entree& is)
     Cerr << "Execution of the Scatter module." << finl;
 
   statistics().begin_count(STD_COUNTERS::interprete_scatter,statistics().get_last_opened_counter_level()+1);
-  // On recupere le domaine:
+  // Retrieve the domain:
   Nom nomdomaine;
   is >> nomdomaine;
   Objet_U& obj = objet(nomdomaine);
@@ -211,7 +212,7 @@ Entree& Scatter::interpreter(Entree& is)
   Domaine& dom = ref_cast(Domaine, obj);
   le_domaine = dom;
 
-  // Lecture des fichiers de decoupage :
+  // Read the partition files:
   barrier();
   if (Process::je_suis_maitre())
     Cerr << "Reading the domain" << finl;
@@ -222,8 +223,8 @@ Entree& Scatter::interpreter(Entree& is)
   Cerr << "Calculation of renum_items_communs for the nodes" << finl;
   calculer_renum_items_communs(dom.faces_joint(), JOINT_ITEM::SOMMET);
 
-  // Pas encore code: on verifie que les sommets communs ont des coordonnees identiques
-  // sur tous les processeurs.
+  // Not yet coded: verify that common vertices have identical coordinates
+  // on all processors.
   // check_sommets_joints(dom);
 
   barrier();
@@ -318,7 +319,7 @@ void Scatter::check_consistancy_remote_items(Domaine& dom, const ArrOfInt& merge
           coord(i,j) = coords(items_communs[i], j);
     }
 
-  // Envoi des coordonnees locales au processeur voisin
+  // Send local coordinates to the neighbouring processor
   {
     Schema_Comm schema_comm;
     schema_comm.set_send_recv_pe_list(liste_send, liste_recv);
@@ -461,16 +462,16 @@ void Scatter::read_domain_no_comm(Entree& fic, bool& read_perio)
     }
 }
 
-/*! @brief Lit le domaine dans le fichier de nom "nomentree", de type LecFicDistribueBin ou LecFicDistribue
+/*! @brief Reads the domain from the file named "nomentree", of type LecFicDistribueBin or LecFicDistribue
  *
- *   Format attendu : Domaine::ReadOn
+ *   Expected format: Domaine::ReadOn
  */
 void Scatter::lire_domaine(Nom& nomentree)
 {
-  // On determine si le fichier est au nouveau format ou a l'ancien
+  // Determine whether the file is in the new or old format
   if (Process::je_suis_maitre())
     Cerr << "Reading geometry from .Zones file(s) ..." << finl;
-  barrier(); // Attendre que le message soit affiche
+  barrier(); // Wait for the message to be displayed
 
   Domaine& dom = domaine();
   Noms& liste_bords_periodiques = dom.bords_perio();
@@ -520,7 +521,7 @@ void Scatter::lire_domaine(Nom& nomentree)
                   fic_hdf.read_dataset(dataset_name, i, data_part);
                   read_domain_no_comm(data_part, read_perio);
 
-                  // Renseigne dans quel fichier le domaine a ete lu
+                  // Record which file the domain was read from
                   dom.set_fichier_lu(nomentree);
                   if (!read_perio)  // are the periodic boundaries read from the Domain (new format) or after it?
                     data_part >> liste_bords_periodiques;
@@ -567,7 +568,7 @@ void Scatter::lire_domaine(Nom& nomentree)
                 {
                   read_domain_no_comm(fichier_binaire_part, read_perio);
 
-                  // Renseigne dans quel fichier le domaine a ete lu
+                  // Record which file the domain was read from
                   dom.set_fichier_lu(nomentree);
                   if (!read_perio)  // are the periodic boundaries read from the Domain (new format) or after it?
                     fichier_binaire_part >> liste_bords_periodiques;
@@ -582,7 +583,7 @@ void Scatter::lire_domaine(Nom& nomentree)
         {
           read_domain_no_comm(fichier_binaire, read_perio);
 
-          // Renseigne dans quel fichier le domaine a ete lu
+          // Record which file the domain was read from
           dom.set_fichier_lu(nomentree);
           if (!read_perio)  // are the periodic boundaries read from the Domain (new format) or after it?
             fichier_binaire >> liste_bords_periodiques;
@@ -599,10 +600,10 @@ void Scatter::lire_domaine(Nom& nomentree)
       Process::exit();
     }
 
-  // Verification sanitaire: nombre de processeurs = nombre de domaines
-  // (on verifie qu'il n'y a pas de joint avec un processeur inexistant)
-  // (le check precedent n'est pas suffisant:
-  // il verifie seulement que le nombre de processeurs n'est pas superieur au nombre de domaines)
+  // Sanity check: number of processors = number of domains
+  // (verify that there is no joint with a non-existent processor)
+  // (the previous check is insufficient:
+  // it only verifies that the number of processors does not exceed the number of domains)
   {
 
     const Joints& joints = dom.faces_joint();
@@ -628,14 +629,14 @@ void Scatter::lire_domaine(Nom& nomentree)
       }
   }
 
-  //tri des joints dans l'ordre croissant des procs
+  // sort joints in increasing processor order
   Joints& joints = dom.faces_joint();
   trier_les_joints(joints);
   envoyer_all_to_all(mergedDomaines, mergedDomaines);
   check_consistancy_remote_items( dom, mergedDomaines );
   dom.check_domaine();
 
-  // PL : pas tout a fait exact le nombre affiche de sommets, on compte plusieurs fois les sommets des joints...
+  // PL: not entirely exact: the displayed vertex count counts joint vertices multiple times...
   trustIdType nbsom = mp_sum(dom.les_sommets().dimension(0));
   Cerr << " Number of nodes: " << nbsom << finl;
 
@@ -663,15 +664,15 @@ void Scatter::lire_domaine(Nom& nomentree)
   barrier();
 }
 
-/*! @brief Construction des structures paralleles du domaine et du domaine (determination des elements distants en fonction de l'epaisseur de joint,
+/*! @brief Builds the parallel structures of the domain (determination of distant elements as a function of joint thickness,
  *
- *    determination des sommets distants,
- *    creation des sommets et des elements virtuels)
+ *    determination of distant vertices,
+ *    creation of virtual vertices and elements)
  *
  */
 void Scatter::construire_structures_paralleles(Domaine& dom)
 {
-  // D'abord: supprimer les structures "sequentielles" associees aux sommets et elements lors de la lecture:
+  // First: remove the "sequential" structures associated with vertices and elements during reading:
   {
     MD_Vector md_nul;
     dom.les_sommets().set_md_vector(md_nul);
@@ -680,7 +681,7 @@ void Scatter::construire_structures_paralleles(Domaine& dom)
 
   const Noms& liste_bords_periodiques = dom.bords_perio();
 
-  // L'ordre d'appel est important:
+  // The call order is important:
   calculer_espace_distant_elements(dom);
 
   if (liste_bords_periodiques.size() > 0)
@@ -688,11 +689,10 @@ void Scatter::construire_structures_paralleles(Domaine& dom)
 
   calculer_nb_items_virtuels(dom.faces_joint(), JOINT_ITEM::ELEMENT);
 
-  // Determination des sommets distants en fonction des elements distants
+  // Determination of distant vertices from distant elements
   calculer_espace_distant_sommets(dom);
 
-  // Creation des espaces distants virtuels et items communs pour les tableaux
-  // sommets et elements:
+  // Creation of distant/virtual spaces and common items for vertex and element arrays:
   DoubleTab& sommets = dom.les_sommets();
   IntTab& elements = dom.les_elems();
   MD_Vector md_sommets, md_elements;
@@ -703,7 +703,7 @@ void Scatter::construire_structures_paralleles(Domaine& dom)
   construire_espace_virtuel_traduction(md_elements /* type index */,
                                        md_sommets /* type valeur */,
                                        elements);
-  // Reordonner les faces de joint (correspondance implicite avec le pe voisin)
+  // Reorder the joint faces (implicit correspondence with the neighboring pe)
   reordonner_faces_de_joint(dom);
 }
 
@@ -716,13 +716,13 @@ void Scatter::trier_les_joints(Joints& joints)
   for (int i = 0; i < nb_joints; i++)
     pe_voisins[i] = joints[i].PEvoisin();
   pe_voisins.ordonne_array();
-  // Copie la liste des joints
+  // Copy the joint list
   Joints anciens_joints(joints);
   for (int i = 0; i < nb_joints; i++)
     {
-      // On traite le processeur pe_voisin:
+      // Process the neighbor processor pe_voisin:
       const int pe_voisin = pe_voisins[i];
-      // Ou est le joint avec ce processeur dans l'ancienne liste ?
+      // Where is the joint with this processor in the old list?
       int i_old;
       for (i_old = 0; i_old < nb_joints; i_old++)
         if (anciens_joints[i_old].PEvoisin() == pe_voisin)
@@ -732,8 +732,8 @@ void Scatter::trier_les_joints(Joints& joints)
     }
 }
 
-// Si un joint avec le "pe" existe, renvoie son indice,
-// sion cree un nouveau joint et renvoie son indice.
+// If a joint with "pe" exists, return its index,
+// otherwise create a new joint and return its index.
 static int ajouter_joint(Domaine& domaine, int pe)
 {
   Joints& joints = domaine.faces_joint();
@@ -752,10 +752,10 @@ static int ajouter_joint(Domaine& domaine, int pe)
   joint.affecte_epaisseur(ep);
   joint.affecte_PEvoisin(pe);
 
-  // Initialiser tous les tableaux des joints supplementaires.
-  // Note BM: pour bien faire, il faudrait initialiser uniquement
-  // certains tableaux (ceux qui sont deja initialises pour les
-  // joints existants), mais c'est plus complique a faire...
+  // Initialise all arrays of additional joints.
+  // Note BM: to be thorough, only
+  // certain arrays should be initialised (those already initialised for
+  // existing joints), but that is more complex to do...
   {
     for (int t = 0; t < 5; t++)
       {
@@ -779,7 +779,7 @@ static int ajouter_joint(Domaine& domaine, int pe)
             break;
           default:
             Cerr << "Error in Scatter.cpp : ajouter_joint" << finl;
-            // Pour eviter le warning suivant sur gcc 3.4:
+            // To avoid the following warning on gcc 3.4:
             // Scatter.cpp:416: warning: 'type' might be used uninitialized in this function
             type = JOINT_ITEM::SOMMET;
             Process::exit();
@@ -796,25 +796,25 @@ static int ajouter_joint(Domaine& domaine, int pe)
 }
 
 
-/*! @brief Determination des items distants en fonction d'une liste d'items a envoyer et de listes d'items communs.
+/*! @brief Determines the distant items from a list of items to send and lists of common items.
  *
- *   exemple:
+ *   Example:
  *    calculer_espace_distant_sommets
  *    calculer_espace_distant_faces
- *   Pour les sommets: les "items_to_send" sont les sommets des elements distants,
- *    Si le processeur A veut que le processeur B connaisse le sommet i,
- *    il faut que le processeur qui possede le sommet l'envoie a B.
- *    Le processeur qui "possede" le sommet est le plus petit parmi les PEs
- *    qui partagent ce sommet (item commun) (requis pour pouvoir faire
- *    echange_item_commun et echange_espace_virtuel en une seule passe).
- *    De plus, si plusieurs processeurs demandent a envoyer le meme sommet
- *    au meme processeur, il ne faut l'inserer qu'une seule fois dans l'espace
- *    distant.
+ *   For vertices: the "items_to_send" are the vertices of distant elements.
+ *    If processor A wants processor B to know vertex i,
+ *    the processor that owns the vertex must send it to B.
+ *    The "owning" processor is the smallest among the PEs
+ *    sharing this vertex (common item) (required to perform
+ *    echange_item_commun and echange_espace_virtuel in a single pass).
+ *    Furthermore, if several processors request that the same vertex
+ *    be sent to the same processor, it must only be inserted once in the
+ *    distant space.
  *
- * @param (joints) les joints dans lesquels on veut calculer un espace distant
- * @param (nb_items_reels) le nombre d'items reels (sommets, faces, ...)
- * @param (items_to_send) un vecteur de "nproc()" tableaux, pour chaque processeur, la liste des items qu'on veut lui envoyer (exemple:tous les sommets des elements distants, ou toutes les faces)
- * @param (type_item) les items dont on veut calculer l'espace distant
+ * @param (joints) the joints in which the distant space is to be computed
+ * @param (nb_items_reels) the number of real items (vertices, faces, ...)
+ * @param (items_to_send) a vector of "nproc()" arrays, for each processor, the list of items to send (e.g. all vertices of distant elements, or all faces)
+ * @param (type_item) the items whose distant space is to be computed
  */
 void Scatter::calculer_espace_distant(Domaine&                  domaine,
                                       const int           nb_items_reels,
@@ -828,10 +828,10 @@ void Scatter::calculer_espace_distant(Domaine&                  domaine,
 
   Joints& joints = domaine.faces_joint();
 
-  // D'abord, on determine pour tous les items le numero du PE proprietaire:
-  //  Pour chaque item du domaine:
-  //   colonne 0 : indice du item sur le PE proprietaire (index_on_pe_owner)
-  //   colonne 1 : numero du PE proprietaire (le plus petit pe qui partage l'item)
+  // First, determine for all items the PE owner number:
+  //  For each item of the domain:
+  //   column 0: index of the item on the owning PE (index_on_pe_owner)
+  //   column 1: number of the owning PE (the smallest PE sharing this item)
   IntTab num_global_items(nb_items_reels, 2);
   {
     int i;
@@ -865,18 +865,18 @@ void Scatter::calculer_espace_distant(Domaine&                  domaine,
   Schema_Comm schema_comm;
   const int nproc = Process::nproc();
 
-  // Premiere etape : on envoie au processeur proprietaire des items
-  // la liste des items qu'il faut envoyer et a quel processeur il
-  // faut les envoyer.
-  // Si le processeur A doit envoyer l'element E au processeur B,
-  // et que cet element utilise un item S qui appartient au processeur C,
-  // alors on envoie a C le message :
-  // "tu dois mettre le item S dans l'espace distant du processeur B"
+  // First step: send to the owning processor of the items
+  // the list of items to be sent and to which processor they
+  // must be sent.
+  // If processor A must send element E to processor B,
+  // and that element uses item S belonging to processor C,
+  // then send to C the message:
+  // "put item S in the distant space of processor B"
 
-  // On prepare un schema de communication entre les voisins:
-  //  Processeur emetteur : le processeur qui possede l'element distant,
-  //  Processeur recepteur: le processeur qui possede un item de l'element.
-  // Ces processeurs sont voisins par les joints existants.
+  // Prepare a communication scheme between neighbors:
+  //  Sending processor: the processor that owns the distant element,
+  //  Receiving processor: the processor that owns an item of the element.
+  // These processors are neighbors through existing joints.
   const int nb_joints = joints.size();
   ArrOfInt liste_voisins(nb_joints);
   //int i_joint;
@@ -886,9 +886,9 @@ void Scatter::calculer_espace_distant(Domaine&                  domaine,
   schema_comm.set_send_recv_pe_list(liste_voisins, liste_voisins, 1 /* me_to_me */);
   schema_comm.begin_comm();
   {
-    // et pour chaque item a envoyer, on envoie au processeur qui possede l'item (pe_item_owner):
-    //  - l'indice local du item chez lui (item_distant),
-    //  - le numero du processeur a qui il doit l'envoyer (pe_destination)
+    // and for each item to be sent, send to the processor owning the item (pe_item_owner):
+    //  - its local index on that processor (item_distant),
+    //  - the number of the processor to which it must be sent (pe_destination)
     const int nb_procs = Process::nproc();
     for (int pe_destination = 0; pe_destination < nb_procs; pe_destination++)
       {
@@ -899,37 +899,37 @@ void Scatter::calculer_espace_distant(Domaine&                  domaine,
             const int item          = items[i_item];
             const int item_distant  = num_global_items(item, 0);
             const int pe_item_owner = num_global_items(item, 1);
-            // On envoie le numero du item distant et dans quel joint il
-            // faut le mettre.
-            // Si pe_joint == pe_destination, litem est forcement deja
-            // connu par l'autre processeur, inutile de l'envoyer
+            // Send the index of the distant item and which joint it
+            // must be placed in.
+            // If pe_joint == pe_destination, the item is necessarily already
+            // known by the other processor; no need to send it
             if (pe_item_owner != pe_destination)
               schema_comm.send_buffer(pe_item_owner) << item_distant << pe_destination;
           }
       }
   }
 
-  // Echange des messages
+  // Exchange messages
   schema_comm.echange_taille_et_messages();
 
-  // Reception des items distants. On lit tous les buffers et on
-  // range les items dans "items_distants" par processeur destination.
-  // Pour chaque processeur voisin, la liste des items distants a envoyer:
+  // Receive the distant items. Read all buffers and
+  // store items in "items_distants" by destination processor.
+  // For each neighbor processor, the list of distant items to send:
   ArrsOfInt items_distants(nproc);
 
-  // Boucle sur tous les processeurs (pe_source) qui m'ont envoye des messages:
-  // On boucle sur les processeurs voisins, plus moi-meme:
+  // Loop over all processors (pe_source) that sent me messages:
+  // Loop over neighbor processors plus myself:
   for (int i_source = 0; i_source < nb_joints + 1; i_source++)
     {
       const int pe_source =
         (i_source < nb_joints) ? liste_voisins[i_source] : Process::me();
 
       Entree& buffer = schema_comm.recv_buffer(pe_source);
-      // Boucle "tant que le buffer n'est pas vide"
+      // Loop "while the buffer is not empty"
       while(1)
         {
-          int item_distant; // Indice du item distant
-          int pe_distant;   // Numero du pe a qui il faut envoyer le item
+          int item_distant; // Index of the distant item
+          int pe_distant;   // Number of the pe to which the item must be sent
           buffer >> item_distant >> pe_distant;
           if (buffer.eof())
             break;
@@ -940,9 +940,9 @@ void Scatter::calculer_espace_distant(Domaine&                  domaine,
     }
   schema_comm.end_comm();
 
-  // On retire les doublons et les items deja connus par le processeur voisin:
+  // Remove duplicates and items already known by the neighbor processor:
   {
-    // Liste des joints correspondant a chaque pe
+    // List of joints corresponding to each pe
     ArrOfInt joint_of_pe(nproc);
     joint_of_pe = -1;
     for (int i_joint = 0; i_joint < nb_joints; i_joint++)
@@ -950,16 +950,16 @@ void Scatter::calculer_espace_distant(Domaine&                  domaine,
         const int pe = joints[i_joint].PEvoisin();
         joint_of_pe[pe] = i_joint;
       }
-    // Liste des items deja connus par le processeur voisin (items communs)
-    // tries dans l'ordre croissant
+    // List of items already known by the neighbor processor (common items)
+    // sorted in increasing order
     ArrOfInt items_communs_tri;
 
     for (int pe = 0; pe < nproc; pe++)
       {
         ArrOfInt& items = items_distants[pe];
-        // Retirer les doublons:
+        // Remove duplicates:
         array_trier_retirer_doublons(items);
-        // Retirer les items deja connus:
+        // Remove items already known:
         const int i_joint = joint_of_pe[pe];
         if (i_joint >= 0)
           {
@@ -970,13 +970,13 @@ void Scatter::calculer_espace_distant(Domaine&                  domaine,
           }
         else
           {
-            // Pas d'item commun avec ce pe.
+            // No common item with this pe.
           }
       }
   }
 
-  // Des espaces distants peuvent etre crees sur des processeurs avec
-  // qui il n'existe pas encore de joint. On ajoute les nouveaux joints.
+  // Distant spaces may be created on processors with
+  // which no joint exists yet. Add the new joints.
   {
     ArrOfInt nouveaux_voisins;
 
@@ -985,7 +985,7 @@ void Scatter::calculer_espace_distant(Domaine&                  domaine,
       if (items_distants[i].size_array() > 0)
         nouveaux_voisins.append_array(i);
 
-    // On ajoute les nouveaux joints
+    // Add the new joints
     ajouter_joints(domaine, nouveaux_voisins);
     Process::Journal() << " News joints created : (ArrOfInt) "
                        << nouveaux_voisins << finl;
@@ -993,7 +993,7 @@ void Scatter::calculer_espace_distant(Domaine&                  domaine,
 
   Joints& joints_non_const = domaine.faces_joint();
   const int nb_new_joints = joints_non_const.size();
-  // Remplissage des tableaux d'items distants
+  // Fill the distant items arrays
   for (int i_joint = 0; i_joint < nb_new_joints; i_joint++)
     {
       Joint& joint = joints_non_const[i_joint];
@@ -1004,7 +1004,7 @@ void Scatter::calculer_espace_distant(Domaine&                  domaine,
                          << " Number of remote items : "
                          << joint_items_distants.size_array() << finl;
     }
-  // Remplissage du nombre d'items virtuels
+  // Fill the number of virtual items
   calculer_nb_items_virtuels(joints_non_const, type_item);
 }
 inline Nom endian()
@@ -1015,14 +1015,14 @@ inline Nom endian()
   else
     return "big-endian";
 }
-/*! @brief Ajoute des joints avec tous les pe de pe_voisins.
+/*! @brief Adds joints with all PEs in pe_voisins.
  *
- * Pour que l'ensemble des joints soit symetrique,
- *   on en cree aussi un joint sur le processeur destination:
- *    Si A ajoute un joint avec B, alors B ajoute un joint avec A.
- *   On trie les joints par ordre croissant du numero de PE.
- *   ATTENTION: les joints sont donc reordonnes !
- *   On met dans pe_voisins la liste des joints effectivement crees.
+ * To make the set of joints symmetric,
+ *   a joint is also created on the destination processor:
+ *    If A adds a joint with B, then B adds a joint with A.
+ *   Joints are sorted in ascending order of PE number.
+ *   WARNING: joints are therefore reordered!
+ *   pe_voisins is updated with the list of joints actually created.
  *
  */
 void Scatter::ajouter_joints(Domaine& domaine,
@@ -1032,19 +1032,19 @@ void Scatter::ajouter_joints(Domaine& domaine,
   ArrOfInt liste_pe;
 
 
-  // Rendre les joints symetriques (si A->B alors B->A) :
+  // Make joints symmetric (if A->B then B->A):
   {
-    // On met dans liste pe la "transposee" de la liste des pe_voisins:
-    // liste des processeurs chez qui mon numero est dans "pe_voisins".
+    // Put in liste_pe the "transpose" of the pe_voisins list:
+    // list of processors that have my number in their "pe_voisins".
     reverse_send_recv_pe_list(pe_voisins, liste_pe);
     const int n = liste_pe.size_array();
-    // On concatene les deux listes.
+    // Concatenate the two lists.
     for (int i = 0; i < n; i++)
       pe_voisins.append_array(liste_pe[i]);
     array_trier_retirer_doublons(pe_voisins);
     liste_pe.resize_array(0);
   }
-  // On retire de pe_voisins les pe pour lesquels un joint existe deja
+  // Remove from pe_voisins the PEs for which a joint already exists
   {
     const int n = joints.size();
     liste_pe.resize_array(n);
@@ -1052,9 +1052,9 @@ void Scatter::ajouter_joints(Domaine& domaine,
       liste_pe[i] = joints[i].PEvoisin();
     array_retirer_elements(pe_voisins, liste_pe);
   }
-  // Ajouter les nouveaux joints et trier par ordre croissant
-  // Aujourd'hui (2/11/2005) Liste::inserer ne permet pas d'inserer
-  // en debut de liste. Donc inutilisable. Methode bourrin:
+  // Add new joints and sort in ascending order
+  // As of 2/11/2005, Liste::inserer does not allow inserting
+  // at the beginning of the list. Unusable. Brute-force method:
   {
     const int n = pe_voisins.size_array();
     for (int i = 0; i < n; i++)
@@ -1063,21 +1063,20 @@ void Scatter::ajouter_joints(Domaine& domaine,
   }
 }
 
-/*! @brief Methode generique pour calculer l'espace distant d'un type d'items geometrique (sommet, face, arete) en fonction de l'espace distant des elements:
+/*! @brief Generic method to compute the remote space of a geometric item type (vertex, face, edge) based on the remote space of elements:
  *
- *   Les "type_item" distants (pour type_item = sommet face ou arete) sont
- *   les "type_item" attaches aux elements distants.
- *   Exemple : les sommets distants sont tous les sommets de tous les elements
- *   distants.
+ *   The remote "type_item" items (for type_item = vertex, face or edge) are
+ *   the "type_item" items attached to remote elements.
+ *   Example: remote vertices are all vertices of all remote elements.
  *  @sa
  *   Scatter::calculer_espace_distant_sommets
  *   Scatter::calculer_espace_distant_faces
  *
- * @param (domaine) bah, le domaine quoi...
- * @param (type_item) le type des items dont on veut calculer l'espace distant
- * @param (connectivite_elem_item) le tableau qui donne pour chaque element du domaine les indices des items de cet element. On n'utilise que la partie reele du tableau (logiquement, la partie virtuelle n'existe pas encore). (exemple: domaine().les_elems() pour type_item==SOMMET ou domaine_VF().face_sommets() pour type_item==FACE)
- * @param (nb_items_reels) le nombre de "type_item" reels
- * @param (items_lies) si le tableau est non vide, il doit etre de taille nb_items_reels. Dans ce cas, il permet de forcer la propriete suivante : "si l'item i est distant, alors l'item items_lies[i] est distant aussi". Ce tableau est utilise pour inclure les sommets periodiques virtuels associes. (voir calculer_espace_distant_sommets).
+ * @param (domaine) the domain
+ * @param (type_item) the type of items whose remote space is to be computed
+ * @param (connectivite_elem_item) the array giving for each domain element the indices of its items. Only the real part of the array is used (logically, the virtual part does not exist yet). (e.g. domaine().les_elems() for type_item==SOMMET or domaine_VF().face_sommets() for type_item==FACE)
+ * @param (nb_items_reels) the number of real "type_item" items
+ * @param (items_lies) if the array is non-empty, it must have size nb_items_reels. In that case, it enforces the property: "if item i is remote, then item items_lies[i] is remote too". This array is used to include associated virtual periodic vertices. (see calculer_espace_distant_sommets).
  */
 static void calculer_espace_distant_item(Domaine& le_dom,
                                          const JOINT_ITEM type_item,
@@ -1092,13 +1091,13 @@ static void calculer_espace_distant_item(Domaine& le_dom,
   const int   nb_joints              = joints.size();
   const int   nproc                  = Process::nproc();
   const int   nb_items_par_element   = connectivite_elem_item.dimension(1);
-  // Les type_item a envoyer a chaque processeur:
+  // The type_item items to send to each processor:
   ArrsOfInt items_to_send(nproc);
-  // Un tableau temporaire;
+  // A temporary array;
   ArrOfInt liste_items;
 
 
-  // Est-ce qu'il y a des items lies ?
+  // Are there linked items?
   const int flag_items_lies = (items_lies.size_array() > 0);
   assert(flag_items_lies == 0 || items_lies.size_array() == nb_items_reels);
 
@@ -1110,8 +1109,8 @@ static void calculer_espace_distant_item(Domaine& le_dom,
       const ArrOfInt& esp_dist_elems = joint.joint_item(JOINT_ITEM::ELEMENT).items_distants();
       const int     nb_elems_dist  = esp_dist_elems.size_array();
       liste_items.resize_array(0);
-      // On met dans liste_items tous les items de tous les elements
-      // qui sont dans esp_dist_elems:
+      // Put in liste_items all items of all elements
+      // that are in esp_dist_elems:
       for (int i_elem = 0; i_elem < nb_elems_dist; i_elem++)
         {
           const int elem = esp_dist_elems[i_elem];
@@ -1121,14 +1120,14 @@ static void calculer_espace_distant_item(Domaine& le_dom,
               if (item>-1)
                 {
                   liste_items.append_array(item);
-                  // Si un item est lie a l'item courant, on envoie aussi l'item lie.
+                  // If an item is linked to the current item, also send the linked item.
                   if (flag_items_lies)
                     {
                       const int item_lie = items_lies[item];
                       if (item_lie != item)
                         {
                           assert(item_lie >= 0 && item_lie < nb_items_reels);
-                          assert(items_lies[item_lie] == item_lie); // chaine de liaisons interdite
+                          assert(items_lies[item_lie] == item_lie); // chaining of links is forbidden
                           liste_items.append_array(item_lie);
                         }
                     }
@@ -1136,21 +1135,20 @@ static void calculer_espace_distant_item(Domaine& le_dom,
             }
         }
       array_trier_retirer_doublons(liste_items);
-      // Ces items doivent etre envoyes au processeur voisin:
+      // These items must be sent to the neighboring processor:
       items_to_send[pe_voisin] = liste_items;
     }
-  // Calcul des espaces distants en fonction de "items_to_send"
+  // Compute remote spaces based on "items_to_send"
   Scatter::calculer_espace_distant(le_dom, nb_items_reels, items_to_send, type_item);
 }
 
-/*! @brief En fonction de l'espace distant des elements, calcule l'espace distant des sommets.
+/*! @brief Based on the remote space of elements, computes the remote space of vertices.
  *
- * Pour chaque joint, on envoie au processeur voisin
- *   l'ensemble des sommets de tous les elements du joint.
- *   C'est le processeur proprietaire du sommet
- *   (plus petit pe qui le possede) qui le met dans son espace distant.
- *   Attention, on cree de nouveaux joints.
- *   On remplit les tableaux
+ * For each joint, the set of vertices of all joint elements is sent to the neighboring processor.
+ *   It is the processor that owns the vertex
+ *   (the smallest PE that holds it) that puts it in its remote space.
+ *   Warning: new joints are created.
+ *   The following arrays are filled:
  *    dom.faces_joint(i).joint_item(JOINT_ITEM::SOMMET).items_distants();
  *
  */
@@ -1163,11 +1161,11 @@ void Scatter::calculer_espace_distant_sommets(Domaine& dom)
   const int   nb_sommets_reels      = dom.nb_som();
 
   ArrOfInt renum_som_perio(nb_sommets_reels);
-  // Initialisation du tableau renum_som_perio
+  // Initialize the renum_som_perio array
   for (int i = 0; i < nb_sommets_reels; i++)
     renum_som_perio[i] = i;
   Reordonner_faces_periodiques::renum_som_perio(dom, renum_som_perio,
-                                                0 /* ne pas calculer pour les sommets virtuels */);
+                                                0 /* do not compute for virtual vertices */);
 
   calculer_espace_distant_item(dom,
                                JOINT_ITEM::SOMMET,
@@ -1176,7 +1174,7 @@ void Scatter::calculer_espace_distant_sommets(Domaine& dom)
                                renum_som_perio);
 }
 
-/*! @brief Idem que Scatter::calculer_espace_distant_sommets pour les faces
+/*! @brief Same as Scatter::calculer_espace_distant_sommets for faces.
  *
  */
 void Scatter::calculer_espace_distant_faces(Domaine& domaine,
@@ -1195,7 +1193,7 @@ void Scatter::calculer_espace_distant_faces(Domaine& domaine,
                                tableau_vide);
 }
 
-/*! @brief Idem que Scatter::calculer_espace_distant_sommets pour les aretes
+/*! @brief Same as Scatter::calculer_espace_distant_sommets for edges.
  *
  */
 void Scatter::calculer_espace_distant_aretes(Domaine& domaine,
@@ -1212,18 +1210,18 @@ void Scatter::calculer_espace_distant_aretes(Domaine& domaine,
                                tableau_vide);
 }
 
-/*! @brief On suppose que chaque joint[i].joint_item(type_item).items_communs() contient les indices locaux des items de joint communs dans le meme
- *   ordre sur les deux processeurs (local et voisin)
- *   On remplit renum_items_communs :
- *    colonne 0=contenu du tableau items_communs sur le PE voisin
- *    colonne 1=contenu du tableau items_communs sur le PE local
+/*! @brief Assumes that each joint[i].joint_item(type_item).items_communs() contains the local indices of common joint items in the same
+ *   order on both processors (local and neighbor).
+ *   Fills renum_items_communs:
+ *    column 0 = content of the items_communs array on the neighboring PE
+ *    column 1 = content of the items_communs array on the local PE
  *
  */
 void Scatter::calculer_renum_items_communs(Joints& joints,
                                            const JOINT_ITEM type_item)
 {
-  // Il suffit d'envoyer au voisin le tableau _faces dans l'ordre
-  // pour qu'il ait les indices des faces sur l'autre pe.
+  // It suffices to send the _faces array to the neighbor in order
+  // so it has the face indices on the other PE.
 
   const int nb_joints = joints.size();
   int       i_joint;
@@ -1246,7 +1244,7 @@ void Scatter::calculer_renum_items_communs(Joints& joints,
 
   schema_comm.echange_taille_et_messages();
 
-  // Le tableau items communs recu du pe voisin:
+  // The common items array received from the neighboring PE:
   ArrOfInt items_communs_voisin;
 
 
@@ -1262,7 +1260,7 @@ void Scatter::calculer_renum_items_communs(Joints& joints,
 
       IntTab& renum_items_communs = joint.set_joint_item(type_item).set_renum_items_communs();
       renum_items_communs.resize(nb_items, 2);
-      // L'indice de la face de joint sur l'autre PE est dans tmp(i,1)
+      // The index of the joint face on the other PE is in tmp(i,1)
       for (int i = 0; i < nb_items; i++)
         {
           renum_items_communs(i,0) = items_communs_voisin[i];
@@ -1273,7 +1271,7 @@ void Scatter::calculer_renum_items_communs(Joints& joints,
   schema_comm.end_comm();
 }
 
-/*! @brief construction d'un MD_Vector_std a partir des informations de joint du domaine pour le type d'item demande.
+/*! @brief Builds an MD_Vector_std from the joint information of the domain for the requested item type.
  *
  */
 void Scatter::construire_md_vector(const Domaine& dom, int nb_items_reels, const JOINT_ITEM type_item, MD_Vector& md_vector)
@@ -1293,7 +1291,7 @@ void Scatter::construire_md_vector(const Domaine& dom, int nb_items_reels, const
   ArrsOfInt items_to_recv(nb_joints);
   ArrsOfInt blocs_to_recv(nb_joints);
 
-  // drapeau indique si l'item (commun) est recu d'un processeur
+  // flag indicating whether the (common) item is received from a processor
   ArrOfBit flags(nb_items_reels);
   flags = 0;
 
@@ -1306,16 +1304,16 @@ void Scatter::construire_md_vector(const Domaine& dom, int nb_items_reels, const
       pe_voisins[i_joint] = pe;
       const Joint_Items& joint = joints[i_joint].joint_item(type_item);
       {
-        // Traitement des items communs
+        // Processing common items
         const ArrOfInt& items_communs = joint.items_communs();
         const int n = items_communs.size_array();
 
-        // Les joints doivent arriver dans l'ordre croissant du numero de pe
-        // sinon l'algo suivant ne marche pas:
+        // Joints must arrive in ascending PE number order,
+        // otherwise the following algorithm does not work:
         assert((i_joint == 0) || (pe > joints[i_joint-1].PEvoisin()));
         if (pe > moi)
           {
-            // Je dois envoyer ces items au processeur voisin
+            // I must send these items to the neighboring processor
             ArrOfInt& dest = items_to_send[i_joint];
 
             for (int i = 0; i < n; i++)
@@ -1323,14 +1321,14 @@ void Scatter::construire_md_vector(const Domaine& dom, int nb_items_reels, const
                 const int item = items_communs[i];
                 if (!flags[item])
                   {
-                    // item pas recu d'un processeur
+                    // item not received from a processor
                     dest.append_array(item);
                   }
               }
           }
         else
           {
-            // Je recois cet item d'un autre processeur
+            // I receive this item from another processor
             ArrOfInt& dest = items_to_recv[i_joint];
 
             for (int i = 0; i < n; i++)
@@ -1338,20 +1336,20 @@ void Scatter::construire_md_vector(const Domaine& dom, int nb_items_reels, const
                 const int item = items_communs[i];
                 if (!flags.testsetbit(item))
                   {
-                    // item pas encore recu d'un processeur
+                    // item not yet received from a processor
                     dest.append_array(item);
                   }
               }
           }
       }
-      // Traitement des items distants et virtuels
+      // Processing remote and virtual items
       {
         const int nitems_virt = joint.nb_items_virtuels();
         ArrOfInt& dest = blocs_to_recv[i_joint];
         if (nitems_virt > 0)
           {
             dest.resize_array(2, RESIZE_OPTIONS::NOCOPY_NOINIT);
-            // Definition du bloc d'items virtuels pour le processeur voisin
+            // Definition of the virtual items block for the neighboring processor
             dest[0] = nitems_tot;
             dest[1] = nitems_tot + nitems_virt;
             nitems_tot += nitems_virt;
@@ -1362,7 +1360,7 @@ void Scatter::construire_md_vector(const Domaine& dom, int nb_items_reels, const
         const int n = items_distants.size_array();
         ArrOfInt& dest = items_to_send[i_joint];
         const int index = dest.size_array();
-        dest.resize_array(index + n, RESIZE_OPTIONS::COPY_NOINIT); // copier les anciennes valeurs !
+        dest.resize_array(index + n, RESIZE_OPTIONS::COPY_NOINIT); // copy the old values!
         dest.inject_array(items_distants, n, index /* dest index */, 0 /* src index */);
       }
     }
@@ -1370,7 +1368,7 @@ void Scatter::construire_md_vector(const Domaine& dom, int nb_items_reels, const
   MD_Vector_std md(nitems_tot, nb_items_reels, pe_voisins, items_to_send, items_to_recv, blocs_to_recv);
   md_vector.copy(md);
 
-  // Verification que le md_vector est valide (tailles en send correspondant aux tailles en recv)
+  // Verify that the md_vector is valid (send sizes match receive sizes)
   if (comm_check_enabled())
     {
       IntVect toto;
@@ -1380,10 +1378,10 @@ void Scatter::construire_md_vector(const Domaine& dom, int nb_items_reels, const
     }
 }
 
-/*! @brief Cette classe fournit les outils pour construire l'espace virtuel d'un tableau contenant des indices d'entites geometriques
+/*! @brief This class provides tools to build the virtual space of an array containing indices of geometric entities
  *
- *   (sommets, elements, faces). Elle gere en particulier la
- *   renumerotation des elements virtuels.
+ *   (vertices, elements, faces). It handles in particular the
+ *   renumbering of virtual elements.
  *
  */
 class Traduction_Indice_Global_Local
@@ -1399,34 +1397,33 @@ public:
   int chercher_table_inverse(const trustIdType sommet_global) const;
 
 private:
-  // Metadata des indices qu'on va renumeroter :
+  // Metadata of the indices to be renumbered:
   MD_Vector md_items_;
   trustIdType premier_indice_global_ = -100;
-  // Tableau distribue (avec espaces virtuels et items communs)
-  // contenant pour toutes les entites a indexer  (reelles et virtuelles)
-  // un indice global.
-  // (si type_table_==SOMMETS, table_[i] est l'indice global du sommet i)
+  // Distributed array (with virtual spaces and common items)
+  // containing a global index for all entities to be indexed (real and virtual).
+  // (if type_table_==SOMMETS, table_[i] is the global index of vertex i)
   TIDVect table_;
-  // Table permettant d'inverser la numerotation, classee par ordre
-  // croissant de l'indice global :
-  // * colonne 0 : l'indice global de l'entite
-  // * colonne 1 : l'indice local de l'entite
+  // Table for inverting the numbering, sorted in ascending order
+  // of the global index:
+  // * column 0: the global index of the entity
+  // * column 1: the local index of the entity
   TIDTab table_inverse_;
 };
 
-/*! @brief Initialise le dictionnaire Precontition:
+/*! @brief Initializes the dictionary. Precondition:
  *
- *   Les espaces distants des entites utilisees doivent avoir ete calculees
+ *   The remote spaces of the entities used must have been computed.
  *
  */
 void Traduction_Indice_Global_Local::initialiser(const MD_Vector& md_items)
 {
   md_items_ = md_items;
 
-  // Construction de "table" : on cree un numero global pour les entites reelles
-  // (indice de l'entite + nombre total d'entites sur les processeurs de rang inferieur)
-  // puis on echange l'espace virtuel de ce tableau, on obtient pour chaque entite
-  // reelle ou virtuelle son numero global.
+  // Build "table": create a global number for real entities
+  // (entity index + total number of entities on lower-rank processors)
+  // then exchange the virtual space of this array, obtaining for each
+  // real or virtual entity its global number.
 
   table_.reset();
   MD_Vector_tools::creer_tableau_distribue(md_items, table_);
@@ -1439,9 +1436,9 @@ void Traduction_Indice_Global_Local::initialiser(const MD_Vector& md_items)
     table_[i] = i + decal;
   table_.echange_espace_virtuel();
 
-  // Construction de la table_inverse contenant les indices non triviaux
-  // (pour lesquels table_[i] != i + decal apres l'echange)
-  // tri par ordre croissant du numero global.
+  // Build table_inverse containing non-trivial indices
+  // (for which table_[i] != i + decal after the exchange)
+  // sorted in ascending order of the global number.
   const int nb_entites_tot = table_.size_totale();
   table_inverse_.resize(0, 2);
 
@@ -1450,7 +1447,7 @@ void Traduction_Indice_Global_Local::initialiser(const MD_Vector& md_items)
       if (table_[i] != i + decal)
         table_inverse_.append_line(table_[i], i);
     }
-  // insure se plaint .. regarder si il a raison
+  // insure complains.. check if it is right
   if (table_inverse_.size_array()>0)
     {
       tri_lexicographique_tableau(table_inverse_);
@@ -1464,22 +1461,22 @@ void Traduction_Indice_Global_Local::reset()
   table_inverse_.reset();
 }
 
-/*! @brief Cherche i tel que table_inverse(i, 0) == sommet_global, et renvoie table_inverse(i, 1) (l'indice local du sommet).
+/*! @brief Searches for i such that table_inverse(i, 0) == sommet_global, and returns table_inverse(i, 1) (the local index of the vertex).
  *
- *   Si le sommet n'est pas trouve dans la table, renvoie -1.
- *   La table_inverse doit etre triee par ordre croissant de la colonne 0.
- *   La table_inverse ne doit pas avoir d'espace virtuel.
+ *   If the vertex is not found in the table, returns -1.
+ *   table_inverse must be sorted in ascending order of column 0.
+ *   table_inverse must not have a virtual space.
  *
  */
 int Traduction_Indice_Global_Local::chercher_table_inverse(const trustIdType sommet_global) const
 {
-  // Algorithme : recherche par dichotomie:
+  // Algorithm: binary search:
   int imin = 0;
   int imax = table_inverse_.dimension(0) - 1;
-  // Si un seul element dans la table, on ne passe pas dans while
-  //        (donc initialisation a table_inverse(0, 0))
-  // Sinon, si aucun element, il ne faut pas que valeur == sommet_global,
-  //        sinon, valeur quelconque, elle sera ecrasee dans le while.
+  // If only one element in the table, the while loop is not entered
+  //        (so initialize to table_inverse(0, 0))
+  // Otherwise, if no element, valeur must not equal sommet_global,
+  //        otherwise, any value will do as it will be overwritten in the while loop.
   trustIdType valeur;
   if (imax == 0)
     valeur = table_inverse_(0, 0);
@@ -1505,12 +1502,12 @@ int Traduction_Indice_Global_Local::chercher_table_inverse(const trustIdType som
   return resu;
 }
 
-/*! @brief Transforme les indices locaux en indices globaux a l'aide la "table_" (voir initialiser).
+/*! @brief Transforms local indices into global indices using "table_" (see initialiser).
  *
- * On fait :
- *   Pour debut <= i < debut+nb
+ * Does:
+ *   For debut <= i < debut+nb
  *    indices_globaux[i] = table_[indices_locaux[i]]
- *    si indices_locaux[i] < 0 alors indices_globaux[i] = -1
+ *    if indices_locaux[i] < 0 then indices_globaux[i] = -1
  *
  */
 void Traduction_Indice_Global_Local::traduire_indice_local_vers_global(const ArrOfInt& indices_locaux,
@@ -1524,10 +1521,10 @@ void Traduction_Indice_Global_Local::traduire_indice_local_vers_global(const Arr
     }
 }
 
-/*! @brief Pour debut <= i < debut+nb indices_locaux[i] = chercher l'indice local de "indices_globaux[i]"
+/*! @brief For debut <= i < debut+nb, indices_locaux[i] = look up the local index of "indices_globaux[i]"
  *
- * @param (indices_globaux) le tableau des indices globaux a traduire
- * @param (indices_locaux) en sortie, les indices locaux ou -1 si l'indice global n'a pas ete trouve. Valeur de retour: nombre d'indices non trouves (indices globaux qui ne correspondent a aucun indice local).
+ * @param (indices_globaux) the array of global indices to translate
+ * @param (indices_locaux) on output, the local indices or -1 if the global index was not found. Return value: number of indices not found (global indices that do not correspond to any local index).
  */
 int Traduction_Indice_Global_Local::traduire_indice_global_vers_local(const ArrOfTID& indices_globaux,
                                                                       ArrOfInt& indices_locaux) const
@@ -1543,17 +1540,17 @@ int Traduction_Indice_Global_Local::traduire_indice_global_vers_local(const ArrO
       int i_loc;
       if (i_glob < 0)
         {
-          // Indice negatif, on considere que c'est normal,
-          // c'est un marqueur "indice vide".
+          // Negative index, considered normal,
+          // it is an "empty index" marker.
           i_loc = -1;
         }
       else
         {
-          // On teste si l'item n'est pas renumerote
+          // Check whether the item is not renumbered
           i_loc = static_cast<int>(i_glob - premier_indice_global_); // the diff is local, hence small
           if (i_loc < 0 || i_loc >= size_table || table_[i_loc] != i_glob)
             {
-              // non, il faut inverser la table:
+              // no, need to invert the table:
               i_loc = chercher_table_inverse(i_glob);
             }
           if (i_loc < 0)
@@ -1564,16 +1561,16 @@ int Traduction_Indice_Global_Local::traduire_indice_global_vers_local(const ArrO
   return nb_erreurs;
 }
 
-/*! @brief A partir d'un tableau dont la structure d'espace virtuel est initialisee (descripteurs elements distants et virtuels, items communs)
+/*! @brief Starting from an array whose virtual space structure is initialized (remote and virtual element descriptors, common items)
  *
- *   et contenant des indices compatibles avec le contenu des tables
- *   (indices de sommets ou d'elements selon type_table_),
- *   on remplit les elements virtuels du "tableau" en fonction des elements
- *   distants et on traduit les indices en indices locaux.
- *   (exemple, voir construire_espace_virtuel_elements et
+ *   and containing indices compatible with the content of the tables
+ *   (vertex or element indices depending on type_table_),
+ *   fills the virtual elements of "tableau" based on remote elements
+ *   and translates the indices to local indices.
+ *   (example, see construire_espace_virtuel_elements and
  *    construire_espace_virtuel_faces).
- *  Valeur de retour: nombre d'indices qui n'ont pas pu etre traduits
- *   (par exemple, le sommet reference n'existe pas sur le processeur voisin)
+ *  Return value: number of indices that could not be translated
+ *   (e.g. the referenced vertex does not exist on the neighboring processor)
  *
  */
 int Traduction_Indice_Global_Local::traduire_espace_virtuel(IntTab& tab) const
@@ -1594,12 +1591,12 @@ int Traduction_Indice_Global_Local::traduire_espace_virtuel(IntTab& tab) const
   const int nb_items_tot      = tableau.size_totale();
   const int nb_items_virtuels = nb_items_tot - nb_items_reels;
 
-  // On traduit les items reels en indices globaux:
+  // Translate real items to global indices:
   traduire_indice_local_vers_global(tableau, indices_globaux, nb_items_reels);
-  // On remplit les cases virtuelles
+  // Fill virtual slots
   indices_globaux.echange_espace_virtuel();
 
-  // On retraduit uniquement les items virtuels du "tableau" en indices locaux:
+  // Translate back only the virtual items of "tableau" to local indices:
   ArrOfTID src;
   ArrOfInt dest;
   src.ref_array(indices_globaux, nb_items_reels /*debut*/, nb_items_virtuels /*taille*/);
@@ -1608,17 +1605,17 @@ int Traduction_Indice_Global_Local::traduire_espace_virtuel(IntTab& tab) const
   return nb_erreurs;
 }
 
-/*! @brief Construit la structure items_communs + espaces virtuels d'un tableau contenant des indices d'items geometriques, indexe par un autre type d'item geometrique.
+/*! @brief Builds the items_communs + virtual space structure of an array containing indices of geometric items, indexed by another geometric item type.
  *
- *   Exemple: tableau indexe par md_indice, contenant des indices md_valeur:
- *      type_indice  type_valeur   exemple de tableau:
- *       element      sommet       domaine.les_elems()
- *       face         sommet       faces_sommets
+ *   Example: array indexed by md_indice, containing indices of md_valeur:
+ *      type_indice  type_valeur   example array:
+ *       element      vertex       domaine.les_elems()
+ *       face         vertex       faces_sommets
  *       element      face         elem_faces
  *       face         element      faces_voisins
  *       element      element      ?
- *       element      arete        elem_aretes
- *   Nb_valeurs_max est le nombre d'items reels de type "type_valeur".
+ *       element      edge         elem_aretes
+ *   Nb_valeurs_max is the number of real items of type "type_valeur".
  *
  */
 void Scatter::construire_espace_virtuel_traduction(const MD_Vector& md_indice,
@@ -1644,16 +1641,16 @@ void Scatter::construire_espace_virtuel_traduction(const MD_Vector& md_indice,
            << " the array does not have the good dimension on input" << finl;
       exit();
     }
-  // Construction du dictionnaire indice global/indice local
-  // pour les valeurs du tableau
+  // Build the global/local index dictionary
+  // for the values of the array
   Traduction_Indice_Global_Local dictionnaire_indices;
   dictionnaire_indices.initialiser(md_valeur);
 
-  // Construit la structure d'espaces virtuels du "tableau"
+  // Build the virtual space structure of "tableau"
   if (!(tableau.get_md_vector() == md_indice))
     MD_Vector_tools::creer_tableau_distribue(md_indice, tableau, RESIZE_OPTIONS::COPY_NOINIT);
 
-  // Remplissage des valeurs vituelles du "tableau"
+  // Fill the virtual values of "tableau"
   const int nb_erreurs = dictionnaire_indices.traduire_espace_virtuel(tableau);
 
   if (nb_erreurs > 0 && error_is_fatal)
@@ -1668,17 +1665,17 @@ void Scatter::construire_espace_virtuel_traduction(const MD_Vector& md_indice,
 }
 
 
-/*! @brief Reordonne les faces de joint de sorte qu'elles apparaissent dans le meme ordre sur chaque couple de processeur voisin.
+/*! @brief Reorders joint faces so that they appear in the same order on each pair of neighboring processors.
  *
- * En pratique, pour un couple
- *   pe1 < pe2, pe1 envoie ses faces de joint a pe2 et pe2 les traduit en indices
- *   de sommets locaux. Les faces de joint du PE2 ne sont donc pas utilisees.
+ * In practice, for a pair
+ *   pe1 < pe2, pe1 sends its joint faces to pe2 and pe2 translates them to local
+ *   vertex indices. The joint faces of PE2 are therefore not used.
  *
  */
 void Scatter::reordonner_faces_de_joint(Domaine& dom)
 {
-  // Construction du dictionnaire indice global/indice local
-  // pour les sommets du domaine:
+  // Build the global/local index dictionary
+  // for the vertices of the domain:
   Traduction_Indice_Global_Local dictionnaire_indices;
   dictionnaire_indices.initialiser(dom.les_sommets().get_md_vector());
 
@@ -1688,8 +1685,8 @@ void Scatter::reordonner_faces_de_joint(Domaine& dom)
   const int moi       = Process::me();
   int       i_joint;
 
-  // Remplissage des listes de destinataires:
-  //  on envoie aux voisins de rang superieur et on recoit des voisins de rang inf.
+  // Fill the recipient lists:
+  //  send to higher-rank neighbors and receive from lower-rank neighbors.
   ArrOfInt send_list;
   ArrOfInt recv_list;
 
@@ -1707,7 +1704,7 @@ void Scatter::reordonner_faces_de_joint(Domaine& dom)
   schema_comm.set_send_recv_pe_list(send_list, recv_list);
 
   schema_comm.begin_comm();
-  // Envoi des faces de joint, traduites en indices de sommets globaux
+  // Send joint faces translated to global vertex indices
   TIDTab faces_num_global;
 
   for (i_joint = 0; i_joint < nb_joints; i_joint++)
@@ -1731,7 +1728,7 @@ void Scatter::reordonner_faces_de_joint(Domaine& dom)
         }
     }
   schema_comm.echange_taille_et_messages();
-  // Reception des faces de joint et traduction en indices locaux
+  // Receive joint faces and translate to local indices
   for (i_joint = 0; i_joint < nb_joints; i_joint++)
     {
       Joint&       joint     = joints[i_joint];
@@ -1764,9 +1761,9 @@ void Scatter::reordonner_faces_de_joint(Domaine& dom)
   schema_comm.end_comm();
 }
 
-/*! @brief Methode outil: renvoie une liste complete de tous les sommets de joint (sommets des faces + sommets isoles), triee et
+/*! @brief Utility method: returns a complete list of all joint vertices (face vertices + isolated vertices), sorted and
  *
- *  sans doublons
+ *  without duplicates.
  *
  */
 static void calculer_liste_complete_sommets_joint(const Joint& joint, ArrOfInt& liste_sommets)
@@ -1774,15 +1771,15 @@ static void calculer_liste_complete_sommets_joint(const Joint& joint, ArrOfInt& 
   liste_sommets = joint.joint_item(JOINT_ITEM::SOMMET).items_communs();
 #if 0
 
-  // On prend tous les sommets des faces de joint:
+  // Take all vertices of the joint faces:
   const IntTab& som_faces = joint.faces().les_sommets();
   liste_sommets = ref_cast(ArrOfInt,som_faces);
-  // On ajoute tous les sommets isoles :
+  // Add all isolated vertices:
   const ArrOfInt& som_isoles = joint.sommets();
   const int n = som_isoles.size_array();
   for (int i = 0; i < n; i++)
     liste_sommets.append_array(som_isoles[i]);
-  // Retirer les doublons de la liste
+  // Remove duplicates from the list
   array_trier_retirer_doublons(liste_sommets);
 #endif
 }
@@ -1796,17 +1793,17 @@ inline int arete_de_sommets_Si_et_Sj(const int Si, const int Sj, const int arete
     return 0;
 }
 
-/*! @brief Methode outil: renvoie une liste complete de tous les aretes de joint (aretes des faces + aretes isolees), triee et
+/*! @brief Utility method: returns a complete list of all joint edges (face edges + isolated edges), sorted and
  *
- *  sans doublons
+ *  without duplicates.
  *
  */
 static void calculer_liste_complete_aretes_joint(const Joint& joint, ArrOfInt& liste_aretes)
 {
-  // Construction de la liste des aretes communes liste_aretes
+  // Build the list of common edges liste_aretes
 
   ///////////////////////////////////////////////////////
-  // Recherche des aretes de joint sur les faces de joint
+  // Search for joint edges on joint faces
   ///////////////////////////////////////////////////////
   int nb_faces_joint=joint.faces().nb_faces();
   int nb_som_faces=joint.faces().nb_som_faces();
@@ -1818,7 +1815,7 @@ static void calculer_liste_complete_aretes_joint(const Joint& joint, ArrOfInt& l
   int compteur=0;
   DoubleTab positions(1,Objet_U::dimension);
   ArrOfInt som_faces(nb_faces_joint*nb_som_faces);
-  // On parcourt 2 a 2 les sommets de chaque face du joint
+  // Traverse vertices of each joint face pairwise
   for (int face=0; face<nb_faces_joint; face++)
     for (int i=0; i<nb_som_faces; i++)
       {
@@ -1827,12 +1824,12 @@ static void calculer_liste_complete_aretes_joint(const Joint& joint, ArrOfInt& l
         for (int j=i; j<nb_som_faces; j++)
           {
             int Sj = sommet(face,j);
-            // Calcul du point C entre 2 sommets Si et Sj
+            // Compute midpoint C between vertices Si and Sj
             for (int comp=0; comp<Objet_U::dimension; comp++)
               positions(0,comp)=0.5*(coord(Si,comp)+coord(Sj,comp));
             dom.chercher_aretes(positions,aretes);
-            // Si on trouve une arete dont le centre coincide avec le point C
-            // et dont les sommets sont identiques a Si et Sj, on ajoute l'arete a la liste
+            // If an edge is found whose center coincides with point C
+            // and whose vertices are identical to Si and Sj, add the edge to the list
             if (aretes[0]>=0 && arete_de_sommets_Si_et_Sj(Si, Sj, aretes[0], aretes_som))
               {
                 compteur++;
@@ -1842,35 +1839,35 @@ static void calculer_liste_complete_aretes_joint(const Joint& joint, ArrOfInt& l
       }
   Process::Journal() << "common edges found on faces of joint with " << joint.PEvoisin() << " :" << compteur << finl;
   /////////////////////////////////////////////////////////////////////////
-  // Recherche des aretes de joint isolees sur les sommets de joints isoles
+  // Search for isolated joint edges on isolated joint vertices
   /////////////////////////////////////////////////////////////////////////
-  // joint.sommets() contient parfois tous les sommets !
-  // Donc on construit un tableau som_isoles
+  // joint.sommets() sometimes contains all vertices!
+  // So we build a som_isoles array
   ArrOfInt som_isoles;
-  // Met tous les sommets dans som_isoles (isoles+issus des faces de joint):
+  // Put all vertices in som_isoles (isolated + from joint faces):
   calculer_liste_complete_sommets_joint(joint, som_isoles);
-  // On trie som_faces et on supprime les doublons
+  // Sort som_faces and remove duplicates
   array_trier_retirer_doublons(som_faces);
-  // Supprime tous les sommets de som_isoles contenus dans som_faces
+  // Remove all vertices of som_isoles that are in som_faces
   array_retirer_elements(som_isoles, som_faces);
-  // Supprime les sommets des faces de joint
+  // Remove joint face vertices
   const int n = som_isoles.size_array();
   Process::Journal() << "number of isolated nodes: " << n << finl;
   Process::Journal() << "number of nodes of faces of joint: " << 3*sommet.dimension(0) << finl;
 
   compteur=0;
-  // On parcourt 2 a 2 les sommets isoles
+  // Traverse isolated vertices pairwise
   for (int i = 0; i < n; i++)
     for (int j = i; j < n; j++)
       {
-        // Calcul du point C entre 2 sommets Si et Sj
+        // Compute midpoint C between vertices Si and Sj
         int Si = som_isoles[i];
         int Sj = som_isoles[j];
         for (int comp=0; comp<Objet_U::dimension; comp++)
           positions(0,comp)=0.5*(coord(Si,comp)+coord(Sj,comp));
         dom.chercher_aretes(positions,aretes);
-        // Si on trouve une arete dont le centre coincide avec le point C
-        // et dont les sommets sont identiques a Si et Sj, on ajoute l'arete a la liste
+        // If an edge is found whose center coincides with point C
+        // and whose vertices are identical to Si and Sj, add the edge to the list
         if (aretes[0]>=0 && arete_de_sommets_Si_et_Sj(Si, Sj, aretes[0], aretes_som))
           {
             compteur++;
@@ -1878,7 +1875,7 @@ static void calculer_liste_complete_aretes_joint(const Joint& joint, ArrOfInt& l
           }
       }
   Process::Journal() << "common edges found isolated on joint with " << joint.PEvoisin() << " :" << compteur << finl;
-  // Retirer les doublons de la liste
+  // Remove duplicates from the list
   array_trier_retirer_doublons(liste_aretes);
 }
 
@@ -1899,13 +1896,13 @@ static void calculer_liste_complete_items_joint(const Joint& joint, const JOINT_
     }
 }
 
-/*! @brief Les algorithmes actuels pour le periodique (assembleur P1B, OpDivElem P1B) ont besoin que pour chaque face virtuelle periodique, la face opposee soit
+/*! @brief Current periodic algorithms (P1B assembler, OpDivElem P1B) require that for each virtual periodic face, the opposite face is
  *
- *   aussi virtuelle. Ceci n'est pas assure a la sortie de la methode
- *   calculer_elements_distants. Cette methode ajoute aux elements distants les
- *   elements manquants pour assurer cette condition:
- *   Si un element est distant pour un PE donne est voisin d'une face periodique,
- *   on ajoute a l'espace distant l'element adjacent a la face opposee.
+ *   also virtual. This is not guaranteed at the output of the
+ *   calculer_elements_distants method. This method adds the missing elements
+ *   to the remote spaces to ensure this condition:
+ *   If a remote element for a given PE is adjacent to a periodic face,
+ *   the element adjacent to the opposite face is added to the remote space.
  *
  */
 void Scatter::corriger_espace_distant_elements_perio(Domaine& dom)
@@ -1918,11 +1915,11 @@ void Scatter::corriger_espace_distant_elements_perio(Domaine& dom)
   const int nb_elem = dom.nb_elem();
   const IntTab& les_elems = dom.les_elems();
 
-  // Ce tableau contiendra pour un bord periodique donne:
-  //  si l'element i est adjacent a une face de ce bord,
-  //  element_oppose[i] est le numero de l'element adjacent a la face
-  //  opposee sur ce bord.
-  // -1 sinon.
+  // This array will contain, for a given periodic boundary:
+  //  if element i is adjacent to a face of this boundary,
+  //  element_oppose[i] is the number of the element adjacent to the
+  //  opposite face on this boundary.
+  // -1 otherwise.
   ArrOfInt element_oppose(nb_elem);
 
   Static_Int_Lists connectivite_som_elem;
@@ -1930,7 +1927,7 @@ void Scatter::corriger_espace_distant_elements_perio(Domaine& dom)
   construire_connectivite_som_elem(nb_sommets,
                                    les_elems,
                                    connectivite_som_elem,
-                                   0 /* ne pas inclure les sommets virtuels */);
+                                   0 /* do not include virtual vertices */);
 
   const int nb_som_face = dom.type_elem()->nb_som_face();
   ArrOfInt une_face(nb_som_face);
@@ -1939,14 +1936,14 @@ void Scatter::corriger_espace_distant_elements_perio(Domaine& dom)
 
   const int nb_joints = dom.nb_joints();
 
-  // Marqueurs des elements distants existants:
+  // Markers for existing remote elements:
   ArrOfBit marqueurs_elements_distants(nb_elem);
   marqueurs_elements_distants = 0;
 
-  // Le fait d'ajouter un element dans un espace distant pour un bord donne
-  // peut entrainer un probleme sur un autre bord (l'element oppose de l'element
-  // ainsi ajoute peut manquer pour une autre direction de periodicite).
-  // Il faut dont iterer jusqu'a ce que plus rien ne bouge
+  // Adding an element to a remote space for a given boundary
+  // may cause a problem on another boundary (the opposite element of the
+  // newly added element may be missing for another periodicity direction).
+  // We must therefore iterate until nothing changes.
   int nb_elements_ajoutes = 0;
   do
     {
@@ -1958,17 +1955,17 @@ void Scatter::corriger_espace_distant_elements_perio(Domaine& dom)
           const IntTab& faces_sommets = bord.les_sommets_des_faces();
           const int nb_faces = bord.nb_faces();
 
-          // Premiere etape, reperer les element opposes pour ce bord periodique
-          // On boucle sur la premiere moitie de la frontiere.
-          // ATTENTION: on suppose que les faces de bords sont ordonnees : d'abord toutes les faces
-          // d'un cote du domaine periodique, puis, dans le meme ordre, les faces opposees.
+          // First step: identify the opposite elements for this periodic boundary.
+          // Loop over the first half of the boundary.
+          // WARNING: assumes that boundary faces are ordered: first all faces
+          // on one side of the periodic domain, then, in the same order, the opposite faces.
           element_oppose = -1;
 
           for (int i_face = 0; i_face < nb_faces / 2; i_face++)
             {
-              // Pour chaque face, trouver l'element adjacent a cette face et a la face opposee
-              // Boucle sur la face et la face opposee
-              int elem0 = -1; // Les deux elements opposes de cette face periodique
+              // For each face, find the element adjacent to this face and to the opposite face.
+              // Loop over the face and the opposite face.
+              int elem0 = -1; // The two opposite elements of this periodic face
               int elem1 = -1;
               for (int quel_cote = 0; quel_cote < 2; quel_cote++)
                 {
@@ -1993,13 +1990,13 @@ void Scatter::corriger_espace_distant_elements_perio(Domaine& dom)
               element_oppose[elem0] = elem1;
               element_oppose[elem1] = elem0;
             }
-          // Deuxieme etape: parcourir les elements distants. Si un element distant est
-          // dans les elements jumeaux, ajouter l'autre jumeau dans les elements distants
+          // Second step: iterate over remote elements. If a remote element is
+          // among the paired elements, add the other pair member to the remote elements.
           for (int i_joint = 0; i_joint < nb_joints; i_joint++)
             {
               ArrOfInt& elements_distants = dom.joint(i_joint).set_joint_item(JOINT_ITEM::ELEMENT).set_items_distants();
               int n = elements_distants.size_array();
-              // Marquer les elements distants existants:
+              // Mark existing remote elements:
               int i;
               for (i = 0; i < n; i++)
                 {
@@ -2017,7 +2014,7 @@ void Scatter::corriger_espace_distant_elements_perio(Domaine& dom)
                       nb_elements_ajoutes++;
                     }
                 }
-              // Remettre a zero le tableau de marqueurs:
+              // Reset the markers array to zero:
               n = elements_distants.size_array();
               for (i = 0; i < n; i++)
                 {
@@ -2029,7 +2026,7 @@ void Scatter::corriger_espace_distant_elements_perio(Domaine& dom)
 
     }
   while (nb_elements_ajoutes > 0);
-  // Dernier tri des elements distants dans l'ordre croissant
+  // Final sort of remote elements in ascending order
   for (int i_joint = 0; i_joint < nb_joints; i_joint++)
     {
       ArrOfInt& elements_distants = dom.joint(i_joint).set_joint_item(JOINT_ITEM::ELEMENT).set_items_distants();
@@ -2038,24 +2035,24 @@ void Scatter::corriger_espace_distant_elements_perio(Domaine& dom)
     }
 }
 
-/*! @brief Remplissage du tableau "espace_distant()" des elements dans les joints.
+/*! @brief Fills the "espace_distant()" array of elements in the joints.
  *
- * C'est ici qu'on determine les elements de joint en fonction de l'epaisseur de joint.
- *  Le tableau espace_distant contient les
- *  indices locaux des elements distants (a envoyer aux processeurs voisins)
- *  Pour un joint d'epaisseur 1, ce sont tous les elements voisins d'un
- *  sommet de joint (sommet sur un face de joint ou sommet isole).
- *  Pour un joint d'epaisseur n>1, ce sont tous les elements voisins d'un
- *  sommet d'un element du joint d'epaisseur n-1.
- *  Le voisinage s'entend sur le domaine global (toutes domaines confondues)
- *  Historique: premiere version B.Mathieu le 16/01/2007.
- *    Il existe une methode qui determine les elements distants au moment du decoupage
+ * This is where joint elements are determined based on joint thickness.
+ *  The espace_distant array contains the
+ *  local indices of remote elements (to be sent to neighboring processors).
+ *  For a joint of thickness 1, these are all elements neighboring a
+ *  joint vertex (vertex on a joint face or isolated vertex).
+ *  For a joint of thickness n>1, these are all elements neighboring a
+ *  vertex of an element from the joint of thickness n-1.
+ *  Neighborhood is defined on the global domain (all subdomains combined).
+ *  History: first version by B.Mathieu on 16/01/2007.
+ *    A method that determines remote elements at partition time also exists
  *    (DomaineCutter::construire_elements_distants_ssdom).
- *    La methode ci-dessous a ete validee par comparaison avec la methode du decoupeur.
- *    Les sorties ont ete verifiees pour des epaisseurs jusqu'a 5 sur des maillages tetra.
- *  La difficulte de l'algorithme est d'obtenir les elements virtuels d'epaisseur > 1 qui se
- *  trouvent sur des sous-domaines qui ne sont pas en contact direct avec le sous-domaine
- *  local. Difficulte resolue par l'algorithme ci-dessous.
+ *    The method below has been validated by comparison with the partitioner method.
+ *    Outputs have been verified for thicknesses up to 5 on tetrahedral meshes.
+ *  The difficulty of the algorithm is to obtain virtual elements of thickness > 1 that
+ *  lie on subdomains not in direct contact with the local subdomain.
+ *  This difficulty is resolved by the algorithm below.
  *
  */
 void Scatter::calculer_espace_distant_elements(Domaine& dom)
@@ -2064,28 +2061,28 @@ void Scatter::calculer_espace_distant_elements(Domaine& dom)
   const int nb_som_elem  = dom.nb_som_elem();
   const IntTab& les_elems    = dom.les_elems();
   const int nproc        = Process::nproc();
-  // PL on doit avoir la meme epaisseur_joint sur chaque processeur pour l'algorithme suivant
-  // utilisant un echange de donnees avec schema_comm.begin_comm() schema_comm.end_comm()
-  // sinon il y'a un blocage en mode debug a cause de la sortie de la ligne 1866 (voir cas Quasi_Comp_Coupl_Incomp)
+  // PL: all processors must have the same epaisseur_joint for the following algorithm
+  // that uses data exchange with schema_comm.begin_comm() schema_comm.end_comm()
+  // otherwise there is a deadlock in debug mode due to the exit at line 1866 (see case Quasi_Comp_Coupl_Incomp)
   //const int epaisseur_joint = (nb_joints > 0) ? domaine.joint(0).epaisseur() : 1;
   const int epaisseur_joint = (int) mp_max((nbjoints > 0) ? dom.joint(0).epaisseur() : 1);
 
   if (Process::je_suis_maitre())
     Cerr << "Calculation of remote space of elements : thickness " << epaisseur_joint << finl;
 
-  // L'algorithme repose sur la construction progressive du tableau "liste_sommets".
-  // liste_sommets(pe) contient a un instant donne la liste des sommets possedes par me()
-  // dont le "pe" veut connaitre les elements voisins.
-  // Chaque pe commence par reclamer ses elements voisins directs, c'est a dire les elements
-  // voisins des sommets de joint. On sait qu'il voudra ensuite les elements voisins des elements
-  // ainsi trouves, donc on ajoutera aux listes les sommets des elements distants trouves
-  // a l'iteration precedente.
+  // The algorithm is based on the progressive construction of the "liste_sommets" array.
+  // liste_sommets(pe) contains at a given moment the list of vertices owned by me()
+  // for which "pe" wants to know the neighboring elements.
+  // Each PE starts by requesting its direct neighboring elements, i.e. the elements
+  // neighboring joint vertices. Knowing that it will subsequently want the elements
+  // neighboring those found, we add to the lists the vertices of the remote elements
+  // found in the previous iteration.
   ArrsOfInt liste_sommets(nproc);
 
-  // Pour chaque processeur, la liste des elements locaux qu'il faut lui envoyer
+  // For each processor, the list of local elements to send to it
   ArrsOfInt elements_distants(nproc);
   {
-    // smart_resize car on va faire append_array sur ces tableaux
+    // smart_resize because we will call append_array on these arrays
     for (int i = 0; i < nproc; i++)
       {
 
@@ -2101,17 +2098,17 @@ void Scatter::calculer_espace_distant_elements(Domaine& dom)
     construire_connectivite_som_elem(nb_sommets,
                                      les_elems,
                                      som_elem,
-                                     0 /* ne pas inclure les sommets virtuels */);
+                                     0 /* do not include virtual vertices */);
   }
 
   ArrOfInt liste_pe_voisins(nbjoints);
 
-  // Initialisation de liste_pe_voisins et
-  // initialisation de la liste de sommets: chaque processeur requiert tous les elements
-  // voisins de ses sommets de joint. Le processeur local sait que pour l'epaisseur 1,
-  // chaque processeur voisin par un joint veut connaitre tous les elements voisins
-  // des sommets de joint. Donc on met dans liste_sommets(pe) les sommets de joint avec ce pe,
-  // se sorte a lui envoyer les elements locaux voisins de ces sommets.
+  // Initialize liste_pe_voisins and
+  // initialize the vertex list: each processor requests all elements
+  // neighboring its joint vertices. The local processor knows that for thickness 1,
+  // each neighboring processor via a joint wants to know all elements neighboring
+  // the joint vertices. So we put in liste_sommets(pe) the joint vertices with that PE,
+  // so as to send it the local elements neighboring those vertices.
   {
     for (int i_joint = 0; i_joint < nbjoints; i_joint++)
       {
@@ -2123,23 +2120,23 @@ void Scatter::calculer_espace_distant_elements(Domaine& dom)
       }
   }
 
-  // On va avoir besoin d'un schema de communication ou chaque processeur envoie et recoit
-  // des donnees a ses voisins directs (voisins par un sommet)
+  // We will need a communication scheme where each processor sends and receives
+  // data to/from its direct neighbors (neighbors sharing a vertex)
   Schema_Comm schema_comm;
   schema_comm.set_send_recv_pe_list(liste_pe_voisins, liste_pe_voisins);
 
-  // On va avoir besoin d'un acces rapide a la liste des processeurs qui partagent un
-  // sommet et a l'indice de ce sommet sur ce processeur.
-  // Contenu de la structure:
-  //  data_sommets_communs.get_list_size(sommet) = 2*le nombre de procs qui partagent le sommet
-  //  data_sommets_communs(sommet, 2*i) = numero du pe voisin
-  //  data_sommets_communs(sommet, 2*i+1) = indice du sommet sur ce pe.
+  // We will need fast access to the list of processors that share a
+  // vertex and the index of that vertex on each processor.
+  // Structure content:
+  //  data_sommets_communs.get_list_size(sommet) = 2 * number of procs sharing the vertex
+  //  data_sommets_communs(sommet, 2*i) = neighboring PE number
+  //  data_sommets_communs(sommet, 2*i+1) = index of the vertex on that PE.
   Static_Int_Lists data_sommets_communs;
-  // Remplissage : la structure n'est utilisee que si l'epaisseur de joint est > 1
+  // Filling: the structure is only used if joint thickness is > 1
   if (epaisseur_joint > 1)
     {
       ArrOfInt count(dom.nb_som());
-      // Etape 1 : avec combien de processeurs chaque sommet est-il partage ?
+      // Step 1: with how many processors is each vertex shared?
       for (int ijoint = 0; ijoint < nbjoints; ijoint++)
         {
           const Joint& joint = dom.joint(ijoint);
@@ -2148,12 +2145,12 @@ void Scatter::calculer_espace_distant_elements(Domaine& dom)
           for (int i = 0; i < n; i++)
             {
               const int som = sommets_joint[i];
-              count[som] += 2; // On stocke 2 entiers par sommets commun
+              count[som] += 2; // 2 integers stored per common vertex
             }
         }
       data_sommets_communs.set_list_sizes(count);
       count = 0;
-      // Etape 2 : remplissage de la structure:
+      // Step 2: fill the structure:
       for (int ijoint = 0; ijoint < nbjoints; ijoint++)
         {
           const Joint& joint = dom.joint(ijoint);
@@ -2162,9 +2159,9 @@ void Scatter::calculer_espace_distant_elements(Domaine& dom)
           const int n = renum_sommets.dimension(0);
           for (int i = 0; i < n; i++)
             {
-              // Indice du sommet partage sur le pe voisin
+              // Index of the shared vertex on the neighboring PE
               const int i_sommet_distant = renum_sommets(i, 0);
-              // Indice du sommet partage sur ma domaine locale
+              // Index of the shared vertex on my local domain
               const int i_sommet_local = renum_sommets(i, 1);
               const int j = count[i_sommet_local]++;
               data_sommets_communs.set_value(i_sommet_local, j*2, pe);
@@ -2173,16 +2170,16 @@ void Scatter::calculer_espace_distant_elements(Domaine& dom)
         }
     }
 
-  // Boucle sur l'epaisseur de joint:
-  // A l'entree de la boucle, on suppose que liste_sommets contient, pour chaque processeur
-  // qui requiert des elements virtuels, la liste des sommets de me() dont il veut les voisins.
+  // Loop over joint thickness:
+  // At the start of the loop, liste_sommets is assumed to contain, for each processor
+  // requesting virtual elements, the list of vertices of me() whose neighbors it wants.
   for (int epaisseur = 1; ; epaisseur++)
     {
       if (Process::je_suis_maitre())
         Cerr << " Calculation of the thickness " << epaisseur << finl;
 
-      // Pour chaque liste de sommets, mettre dans les elements distants du meme processeur
-      // les elements voisins des sommets de la liste.
+      // For each vertex list, put in the remote elements of the same processor
+      // the elements neighboring the vertices in the list.
       int pe;
       for (pe = 0; pe < nproc; pe++)
         {
@@ -2205,12 +2202,12 @@ void Scatter::calculer_espace_distant_elements(Domaine& dom)
           array_trier_retirer_doublons(elems_dist);
         }
 
-      // La suite est la mise a jour de liste_sommets pour l'iteration suivante.
-      // Inutile de le faire si on est a la derniere iteration:
+      // The following updates liste_sommets for the next iteration.
+      // No need to do this if we are at the last iteration:
       if (epaisseur == epaisseur_joint)
         break;
 
-      // Mettre dans les listes de sommets les sommets des elements distants trouves
+      // Put in the vertex lists the vertices of the remote elements found
       for (pe = 0; pe < nproc; pe++)
         {
           ArrOfInt& sommets = liste_sommets[pe];
@@ -2228,13 +2225,13 @@ void Scatter::calculer_espace_distant_elements(Domaine& dom)
             }
           array_trier_retirer_doublons(sommets);
         }
-      // Parcourir les listes de sommets. Pour chaque sommet, s'il est de joint,
-      // envoyer aux processeurs possedant ce sommet une requete "le processeur i
-      // veut tous les voisins de ce sommet".
-      // Ne pas envoyer la requete au processeur "i" pour la liste "i": il connait
-      // deja ses propres elements !
+      // Traverse the vertex lists. For each vertex, if it is a joint vertex,
+      // send to the processors owning that vertex a request "processor i
+      // wants all neighbors of this vertex".
+      // Do not send the request to processor "i" for list "i": it already knows
+      // its own elements!
       schema_comm.begin_comm();
-      // Premiere phase de communication: empiler les donnees a envoyer dans des buffers
+      // First communication phase: stack data to send in buffers
       for (pe = 0; pe < nproc; pe++)
         {
           const ArrOfInt& sommets = liste_sommets[pe];
@@ -2248,12 +2245,12 @@ void Scatter::calculer_espace_distant_elements(Domaine& dom)
               for (int i = 0; i < nb_pe_voisins; i++)
                 {
                   const int pe_voisin = data_sommets_communs(i_sommet_local, i*2);
-                  // Indice du sommet sur le processeur voisin.
+                  // Index of the vertex on the neighboring processor.
                   const int i_sommet_distant = data_sommets_communs(i_sommet_local, i*2+1);
                   if (pe_voisin != pe)
                     {
-                      // Envoyer au processeur "pe_voisin" le message : "le processeur PE a besoin
-                      // des elements voisins du sommet i_sommet_distant"
+                      // Send to processor "pe_voisin" the message: "processor PE needs
+                      // the elements neighboring vertex i_sommet_distant"
                       schema_comm.send_buffer(pe_voisin) << pe << i_sommet_distant;
                     }
                 }
@@ -2267,7 +2264,7 @@ void Scatter::calculer_espace_distant_elements(Domaine& dom)
           for (;;)
             {
               int pe2, sommet;
-              // On recupere le message "le processeur PE a besoin des elements voisins de SOMMET".
+              // Retrieve the message "processor PE needs the elements neighboring SOMMET".
               buffer >> pe2 >> sommet;
               if (buffer.eof())
                 break;
@@ -2275,7 +2272,7 @@ void Scatter::calculer_espace_distant_elements(Domaine& dom)
             }
         }
       schema_comm.end_comm();
-      // Supprimer les doublons dans les listes de sommets
+      // Remove duplicates from the vertex lists
       for (pe = 0; pe < nproc; pe++)
         {
           ArrOfInt& sommets = liste_sommets[pe];
@@ -2283,7 +2280,7 @@ void Scatter::calculer_espace_distant_elements(Domaine& dom)
         }
     }
 
-  // Creation des nouveaux joints si besoin, et stockage des elements distants dans les joints
+  // Create new joints if needed, and store remote elements in the joints
   {
     ArrOfInt voisins;
 
@@ -2294,11 +2291,10 @@ void Scatter::calculer_espace_distant_elements(Domaine& dom)
     ajouter_joints(dom, voisins);
 
 #ifdef CHECK_ALGO_ESPACE_VIRTUEL
-    // On n'utilise pas les espaces virtuels calcules ci-dessus, on se
-    // contente de les comparer aux espaces virtuels calcules lors du decoupage
-    // par l'algorithme sequentiel.
-    // Pour l'instant, l'algorithme parallele a l'air de fonctionner sans probleme
-    // je desactive ce test. (Benoit Mathieu)
+    // We do not use the virtual spaces computed above; we only compare them
+    // to the virtual spaces computed at partition time by the sequential algorithm.
+    // For now, the parallel algorithm appears to work correctly;
+    // this test is disabled. (Benoit Mathieu)
     bool erreur = false;
     const int nbjoints = dom.nbjoints();
     for (int i = 0; i < nbjoints; i++)
@@ -2318,7 +2314,7 @@ void Scatter::calculer_espace_distant_elements(Domaine& dom)
     if (mp_or(erreur))
       Process::exit();
 #else
-    // Stockage du resultat
+    // Store the result
     const int nb_joints = dom.nb_joints();
     for (int i = 0; i < nb_joints; i++)
       {
@@ -2351,20 +2347,20 @@ static inline int fct_cmp_coordonnees(const double * s1, const double *s2, int d
     return 0;
 }
 
-/*! @brief Construit le tableau "correspondance" tel que Pour 0 <= i < sommets2.
+/*! @brief Builds the "correspondance" array such that for 0 <= i < sommets2.
  *
  * size_array(),
- *    Si sommet2(i) existe dans le tableau sommet1, alors
+ *    If sommet2(i) exists in sommets1, then
  *       sommets2(i, ...) == sommets1(correspondance[i], ...)
- *    Sinon
+ *    Otherwise
  *       correspondance[i] = -1
- *   L'egalite est verifiee a epsilon pres en absolu (soit abs(x1-x2)<epsilon)
- *   L'algorithme est generalement en n1*log(n1) + n2*log(n1)
- *   (recherche basee sur un quicksort).
- *   En cas d'echec du tri, on utilise un algorithme en n1*n2.
- *   Les tableaux sommets1 et sommets2 doivent etre de dimension 2
- *   Le tableau correspondance doit etre de taille sommets2.size_array().
- *  Valeur de retour: nombre de sommets de sommets2 non trouves dans le tableau sommets1.
+ *   Equality is checked to within epsilon in absolute value (i.e. abs(x1-x2) < epsilon)
+ *   The algorithm is generally O(n1*log(n1) + n2*log(n1))
+ *   (search based on quicksort).
+ *   If the sort fails, an O(n1*n2) algorithm is used.
+ *   Arrays sommets1 and sommets2 must be 2-dimensional.
+ *   The correspondance array must have size sommets2.size_array().
+ *  Return value: number of vertices of sommets2 not found in sommets1.
  *
  */
 int Scatter::Chercher_Correspondance(const DoubleTab& sommets1, const DoubleTab& sommets2,
@@ -2372,7 +2368,7 @@ int Scatter::Chercher_Correspondance(const DoubleTab& sommets1, const DoubleTab&
 {
   const int nb_sommets1 = sommets1.dimension(0);
   const int nb_sommets2 = sommets2.dimension(0);
-  // Precondition necessaire pour fct_cmp_index_coord
+  // Precondition required for fct_cmp_index_coord
   assert(sommets1.nb_dim() == 2);
   assert(sommets2.nb_dim() == 2);
   assert(correspondance.size_array() == nb_sommets2);
@@ -2382,8 +2378,8 @@ int Scatter::Chercher_Correspondance(const DoubleTab& sommets1, const DoubleTab&
       return nb_sommets2;
     }
 
-  // Tableau d'indirection trie, tel que les coordonnees sommets1(index[i], .) soient
-  // tiees dans l'ordre lexicographique.
+  // Sorted indirection array such that coordinates sommets1(index[i], .) are
+  // sorted in lexicographic order.
   ArrOfInt index(nb_sommets1);
   {
     int i;
@@ -2391,17 +2387,17 @@ int Scatter::Chercher_Correspondance(const DoubleTab& sommets1, const DoubleTab&
       index[i] = i;
   }
 
-  // Tri du tableau d'index
-  // On trie les sommets par ordre lexicographique des coordonnees.
-  // Comme on fait un test a epsilon pres, le tri peut echouer:
-  //  Si x=1, y=1.01, z=1.02 et epsilon=0.01, on a
-  //   x==y (a epsilon pres)
-  //   y==z (a epsilon pres)
-  //  mais x!=z
-  // Donc la recherche par dichotomie peut echouer par la suite.
+  // Sort the index array
+  // Vertices are sorted in lexicographic coordinate order.
+  // Since we test with a tolerance of epsilon, the sort may fail:
+  //  If x=1, y=1.01, z=1.02 and epsilon=0.01, we have
+  //   x==y (to within epsilon)
+  //   y==z (to within epsilon)
+  //  but x!=z
+  // So the binary search may fail subsequently.
   tri_lexicographique_tableau_indirect(sommets1, index);
 
-  // Construction du tableau de correspondance tel que
+  // Build the correspondance array such that
   //   sommet1(correspondance[i], ...) == sommet2(i, ...)
   int nb_sommets_non_trouves = 0;
   int nb_echec_dichotomie = 0;
@@ -2413,7 +2409,7 @@ int Scatter::Chercher_Correspondance(const DoubleTab& sommets1, const DoubleTab&
         const double * s2 = & sommets2(i,0);
         int num_sommet = -1;
 
-        // D'abord recherche du sommet dans le tableau sommets1 par dichotomie (bsearch)
+        // First search for the vertex in sommets1 using binary search (bsearch)
         int imin = 0;
         int imax = nb_sommets1 - 1;
         int resu_cmp = -1;
@@ -2450,8 +2446,8 @@ int Scatter::Chercher_Correspondance(const DoubleTab& sommets1, const DoubleTab&
         else
           {
             nb_echec_dichotomie++;
-            // Si echec, c'est peut-etre que le tableau n'est pas ordonne correctement
-            // => recherche du sommet en parcourant tout le tableau
+            // If failure, the array may not be correctly ordered
+            // => search for the vertex by scanning the entire array
             int j;
             for (j = 0; j < nb_sommets1; j++)
               {
@@ -2501,22 +2497,22 @@ void Scatter::construire_correspondance_items_par_coordonnees(Joints& joints, co
   const int dim = Objet_U::dimension;
   const int nb_joints = joints.size();
 
-  // Indices des items de joints dans le domaine sur mon processeur
+  // Indices of joint items in the domain on my processor
   ArrsOfInt  indices_items_locaux(nb_joints);
-  // Indices des items de joints dans le domaine sur le processeur voisin
+  // Indices of joint items in the domain on the neighboring processor
   ArrsOfInt  indices_items_distants(nb_joints);
-  // Coordonnees des items correspondants (dans le meme ordre que indices_items_xxx)
+  // Coordinates of the corresponding items (in the same order as indices_items_xxx)
   DoubleTabs coord_items_locaux(nb_joints);
   DoubleTabs coord_items_distants(nb_joints);
 
-  // Remplissage des tableaux indices_items_locaux
-  // et coord_items_locaux
+  // Fill indices_items_locaux
+  // and coord_items_locaux
   for (int i_joint = 0; i_joint < nb_joints; i_joint++)
     {
       const Joint& joint = joints[i_joint];
       ArrOfInt& items = indices_items_locaux[i_joint];
-      // Remarque: **LISTE_TRI** les indices_items_locaux sont
-      //  tries dans l'ordre croissant:
+      // Note: **SORTED_LIST** indices_items_locaux are
+      //  sorted in ascending order:
       calculer_liste_complete_items_joint(joint, type_item, items);
 
       const int n       = items.size_array();
@@ -2527,7 +2523,7 @@ void Scatter::construire_correspondance_items_par_coordonnees(Joints& joints, co
           coord(i,j) = coord_items(items[i], j);
     }
 
-  // Envoi des indices et coordonnees locaux au processeur voisin
+  // Send local indices and coordinates to the neighboring processor
   {
     Schema_Comm schema_comm;
     ArrOfInt liste_pe_voisins(nb_joints);
@@ -2554,8 +2550,8 @@ void Scatter::construire_correspondance_items_par_coordonnees(Joints& joints, co
     schema_comm.end_comm();
   }
 
-  // Boucle sur les joints
-  // Cette fois, on modifie les joints (remplissage de renum_virt_loc)
+  // Loop over joints
+  // This time, joints are modified (filling renum_virt_loc)
   const int moi = Process::me();
   for (int i_joint = 0; i_joint < nb_joints; i_joint++)
     {
@@ -2566,7 +2562,7 @@ void Scatter::construire_correspondance_items_par_coordonnees(Joints& joints, co
       const DoubleTab& coord_distants  = coord_items_distants[i_joint];
       const int n = indices_locaux.size_array();
 
-      // Recherche des correspondances entre items
+      // Search for correspondences between items
       ArrOfInt corresp(n);
       const double epsilon = Objet_U::precision_geom;
       Chercher_Correspondance(coord_distants, coord_locaux, corresp, epsilon);
@@ -2605,10 +2601,10 @@ void Scatter::construire_correspondance_items_par_coordonnees(Joints& joints, co
       for (int k = 0; k < n; k++)
         {
           const int i_local = indices_locaux[k];
-          // Le j-ieme item distant est identique au k-ieme item local
+          // The j-th remote item is identical to the k-th local item
           const int j = corresp[k];
 
-          // Pas trouve ? Erreur possible
+          // Not found? Possible error
           if (j < 0)
             {
               if (!allow_resize)
@@ -2646,16 +2642,16 @@ void Scatter::construire_correspondance_items_par_coordonnees(Joints& joints, co
             {
               if (moi < PEvoisin)
                 {
-                  // items communs dans l'ordre des items de joint locaux:
+                  // common items in the order of local joint items:
                   items_communs[i] = i_local;
-                  // On verifie que c'est bien l'ordre croissant de l'indice local
-                  // (voir **LISTE_TRI**)
+                  // Verify that it is indeed in ascending order of the local index
+                  // (see **SORTED_LIST**)
                   assert(i==0 || items_communs[i] > items_communs[i-1]);
                 }
               else
                 {
                   int j2 = j - offset[j];
-                  // items communs dans l'ordre des items sur le voisin:
+                  // common items in the order of items on the neighbor:
                   assert(items_communs[j2] < 0);
                   items_communs[j2] = i_local;
                 }
@@ -2664,35 +2660,36 @@ void Scatter::construire_correspondance_items_par_coordonnees(Joints& joints, co
         }
       assert(i==nb_items_communs_trouves);
     }
-  // Remplissage de renum_items_communs:
+  // Fill renum_items_communs:
   calculer_renum_items_communs(joints, type_item);
 }
 
-/*! @brief Construction des tableaux joint_item(JOINT_ITEM::SOMMET).items_communs de
- * tous les joints du domaine(0) du domaine dom.
+/*! @brief Builds the joint_item(JOINT_ITEM::SOMMET).items_communs arrays for all joints of the domain dom.
  *
+ * @param dom The domain to process.
  * @param allow_resize may be set to True in some rare case (see Raffiner_isotrope_parallele)
  * when we know that the current size of 'items_communs' is wrong because part of the domain
- * was reszed / changed.
+ * was resized / changed.
  */
 void Scatter::construire_correspondance_sommets_par_coordonnees(Domaine& dom, bool allow_resize)
 {
   construire_correspondance_items_par_coordonnees(dom.faces_joint(), JOINT_ITEM::SOMMET, dom.coord_sommets(), allow_resize);
 }
 
-/*! @brief Construction des tableaux joint_item(JOINT_ITEM::ARETE).items_communs de tous les joints du domaine
+/*! @brief Builds the joint_item(JOINT_ITEM::ARETE).items_communs arrays for all joints of the domain.
  *
+ * @param zvf The VF domain to process.
  */
 void Scatter::construire_correspondance_aretes_par_coordonnees(Domaine_VF& zvf)
 {
   construire_correspondance_items_par_coordonnees(zvf.domaine().faces_joint(), JOINT_ITEM::ARETE, zvf.xa());
 }
 
-/*! @brief Pour un item geometrique "type_item", remplit le champ nb_items_virtuels_ des joints en fonction
- *  du nombre d'items distants :
+/*! @brief For a geometric item "type_item", fills the nb_items_virtuels_ field of joints based on
+ *  the number of remote items:
  *
- *   Le nombre d'items virtuels sur un joint i du processeur j est le
- *   nombre d'items distants du joint j sur le processeur i.
+ *   The number of virtual items on joint i of processor j is the
+ *   number of remote items of joint j on processor i.
  *
  */
 void Scatter::calculer_nb_items_virtuels(Joints& joints,
@@ -2705,7 +2702,7 @@ void Scatter::calculer_nb_items_virtuels(Joints& joints,
   for (i_joint = 0; i_joint < nb_joints; i_joint++)
     liste_voisins[i_joint] = joints[i_joint].PEvoisin();
 
-  // On envoie le nombre d'items distants au PE voisin
+  // Send the number of remote items to the neighboring PE
   schema_comm.set_send_recv_pe_list(liste_voisins, liste_voisins);
   schema_comm.begin_comm();
   for (i_joint = 0; i_joint < nb_joints; i_joint++)
@@ -2716,9 +2713,9 @@ void Scatter::calculer_nb_items_virtuels(Joints& joints,
       const int pe = joint.PEvoisin();
       schema_comm.send_buffer(pe) << n;
     }
-  // Echange des messages
+  // Exchange messages
   schema_comm.echange_taille_et_messages();
-  // Le PE voisin recoit ce nombre d'items et le stocke.
+  // The neighboring PE receives this number of items and stores it.
   for (i_joint = 0; i_joint < nb_joints; i_joint++)
     {
       Joint&        joint = joints[i_joint];
@@ -2750,13 +2747,13 @@ void Scatter::init_sequential_domain(Domaine_32_64<_SIZE_>& dom)
   dom.les_elems().set_md_vector(md);
 }
 
-/*! @brief methode utilisee par les interpretes qui modifient le domaine (sequentiel), detruit les descripteurs
- *  des sommets et elements pour permettre la modification de ces tableaux.
+/*! @brief Method used by interpreters that modify the domain (sequential), destroys the descriptors
+ *  of vertices and elements to allow modification of these arrays.
  */
 template <typename _SIZE_>
 void Scatter::uninit_sequential_domain(Domaine_32_64<_SIZE_>& dom)
 {
-  MD_Vector md; // descripteur nul
+  MD_Vector md; // null descriptor
   dom.les_sommets().set_md_vector(md);
   dom.les_elems().set_md_vector(md);
 }

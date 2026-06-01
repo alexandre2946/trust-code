@@ -24,8 +24,8 @@
 
 #include <Domaine_forward.h>
 
-/*! @brief Classe outil permettant de generer des sous-domaines pour un calcul parallele a partir
- *  d'un domaine de depart (domaine_global) et d'un tableau de decoupage des elements de ce domaine (elem_part).
+/*! @brief Tool class to generate sub-domains for a parallel computation from
+ *  a starting domain (domaine_global) and an element partitioning array (elem_part).
  *
  *   @sa Partitionneur_base.
  */
@@ -85,25 +85,25 @@ private:
   void parcourir_epaisseurs_elements(SmallArrOfTID_t liste_sommets_depart, const int partie_a_ignorer, SmallArrOfTID_t& liste_elements_trouves) const;
 
 
-  // Ne pas utiliser ces deux methodes:
+  // Do not use these two methods:
   const DomaineCutter_32_64& operator=(const DomaineCutter_32_64& dc) = delete;
   DomaineCutter_32_64(const DomaineCutter_32_64& dc) : Objet_U() { abort(); Process::exit(-1); } // Can't use delete because of TRUST macros ...
 
-  // Reference au domaine global
+  // Reference to the global domain
   OBS_PTR(Domaine_t) ref_domaine_;
-  // Reference au tableau de decoupage
-  //  (pour chaque element du domaine global, numero de sous-domaine)
+  // Reference to the partitioning array
+  //  (for each element of the global domain, sub-domain number)
   OBS_PTR(BigIntVect_t) ref_elem_part_;
-  // Nombre total de parties (>= a max_array(elem_part) + 1)
+  // Total number of parts (>= max_array(elem_part) + 1)
   int nb_parties_ = -1;
-  // Epaisseur du joint
+  // Joint thickness
   int epaisseur_joint_ = -1;
-  // Connectivite sommets_elements du domaine global:
+  // Vertex-element connectivity of the global domain:
   Static_Int_Lists_t som_elem_;
-  // Pour chaque partie, liste des elements du domaine source de cette partie
+  // For each part, list of elements of the source domain belonging to this part
   Static_Int_Lists_t liste_elems_sous_domaines_;
-  // Pour chaque frontiere du domaine source, liste des elements adjacent a
-  // chaque face de la frontiere
+  // For each boundary of the source domain, list of elements adjacent to
+  // each face of the boundary
   Static_Int_Lists_t voisins_bords_;
   Noms bords_a_pb_;
 };

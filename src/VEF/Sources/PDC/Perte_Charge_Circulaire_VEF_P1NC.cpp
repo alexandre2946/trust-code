@@ -98,7 +98,7 @@ int Perte_Charge_Circulaire_VEF_P1NC::lire_motcle_non_standard(const Motcle& mot
 
 ////////////////////////////////////////////////////////////////
 //                                                            //
-//           Fonction principale : perte_charge               //
+//           Main function: pressure drop coefficients        //
 //                                                            //
 ////////////////////////////////////////////////////////////////
 
@@ -106,30 +106,30 @@ void  Perte_Charge_Circulaire_VEF_P1NC::coeffs_perte_charge(const DoubleVect& u,
                                                             double t, double norme_u, double dh, double nu, double reynolds,double& coeff_ortho,double& coeff_long,double& u_l,DoubleVect& av_valeur) const
 {
 
-  // calcul de dh_ortho
+  // Compute dh_ortho
   double dh_ortho=diam_hydr_ortho->valeur_a_compo(pos,0);
 
-  // calcul de u.d/||d||
-  // Calcul de v et ||v||^2
+  // Compute u.d/||d||
+  // Compute v and ||v||^2
   av_valeur.resize(dimension);
 
   v->valeur_a(pos,av_valeur);
-  // on norme v
+  // normalize v
   {
     double vcarre=0;
     for (int dim=0; dim<dimension; dim++)
       vcarre+=av_valeur[dim]*av_valeur[dim];
     av_valeur/=sqrt(vcarre);
   }
-  // Calcul de u.v/||v||
+  // Compute u.v/||v||
   u_l=0;
 
   for (int dim=0; dim<dimension; dim++)
     u_l+=u[dim]*av_valeur[dim];
 
   double u_ortho=sqrt(std::max(norme_u*norme_u-u_l*u_l,0.0));
-  // calcule de Re_l et Re_ortho
-  // Calcul du reynolds
+  // compute Re_l and Re_ortho
+  // Compute the Reynolds number
   /* PL: To avoid a possible division by zero, we replace:
      double nu=norme_u*dh/reynolds;
      double Re_l=std::fabs(u_l)*dh/nu; */
@@ -141,7 +141,7 @@ void  Perte_Charge_Circulaire_VEF_P1NC::coeffs_perte_charge(const DoubleVect& u,
   // By:
   double Re_ortho=dh_ortho*u_ortho/nu;
   if (Re_ortho<1e-10) Re_ortho=1e-10;
-  // Calcul de lambda
+  // Compute lambda
   lambda.setVar(0,reynolds);
   lambda.setVar(1,Re_l);
   lambda.setVar(3,t);
@@ -151,7 +151,7 @@ void  Perte_Charge_Circulaire_VEF_P1NC::coeffs_perte_charge(const DoubleVect& u,
   if (dimension>2)
     lambda.setVar(6,pos[2]);
 
-  // Calcul de lambda_ortho
+  // Compute lambda_ortho
   lambda_ortho.setVar(0,reynolds);
   lambda_ortho.setVar(1,Re_ortho);
   lambda_ortho.setVar(2,t);
@@ -160,7 +160,7 @@ void  Perte_Charge_Circulaire_VEF_P1NC::coeffs_perte_charge(const DoubleVect& u,
     lambda_ortho.setVar(4,pos[1]);
   if (dimension>2)
     lambda_ortho.setVar(5,pos[2]);
-  double l_ortho=lambda_ortho.eval(); // Pour ne pas evaluer 2 fois le parser
+  double l_ortho=lambda_ortho.eval(); // To avoid evaluating the parser twice
   double l_long=lambda.eval();
   coeff_ortho=l_ortho*u_ortho/2./dh_ortho;
   coeff_long=l_long *std::fabs(u_l)    /2./dh    ;
@@ -171,7 +171,7 @@ void  Perte_Charge_Circulaire_VEF_P1NC::coeffs_perte_charge(const DoubleVect& u,
   {
   double coeff_ortho,coeff_long,u_l; //DoubleVect v_valeur(dimension);
   calculer_coeffs(u,pos,t,norme_u,dh,reynolds, coeff_ortho, coeff_long,u_l,v_valeur) ;
-  // Calcul du resultat
+  // Compute the result
   for (int dim=0;dim<dimension;dim++)
   p_charge[dim] =
   -coeff_ortho * (u[dim]-u_l*v_valeur[dim])
@@ -183,7 +183,7 @@ void  Perte_Charge_Circulaire_VEF_P1NC::coeffs_perte_charge(const DoubleVect& u,
   {
   double coeff_ortho,coeff_long,u_l; //DoubleVect v_valeur(dimension);
   calculer_coeffs(u,pos,t,norme_u,dh,reynolds, coeff_ortho, coeff_long,u_l,v_valeur) ;
-  // Calcul du resultat
+  // Compute the result
 
   for (int dim=0;dim<dimension;dim++)
   {
@@ -204,17 +204,17 @@ void  Perte_Charge_Circulaire_VEF_P1NC::coeffs_perte_charge(const DoubleVect& u,
   void  Perte_Charge_Circulaire_VEF_P1NC::contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& matrice) const
   {
   if (pas_implicite_) return;
-  // A factoriser plus tard....
-  // copie de Perte_Charge_VEF::ajouter
-  // Raccourcis
-  const Champ_Don_base& nu=le_fluide->viscosite_cinematique(); // viscosite cinematique
-  const DoubleTab& xv=le_dom_VEF->xv() ;                     // centres de gravite des faces
+  // To be factorized later....
+  // copy of Perte_Charge_VEF::ajouter
+  // Shortcuts
+  const Champ_Don_base& nu=le_fluide->viscosite_cinematique(); // kinematic viscosity
+  const DoubleTab& xv=le_dom_VEF->xv() ;                     // face centers of gravity
   const DoubleTab& vit=la_vitesse->valeurs();
-  // Sinon segfault a l'initialisation de ssz quand il n'y a pas de sous-domaine !
+  // Otherwise segfault at the initialization of ssz when there is no sub-domain!
   const Sous_domaine_VF& ssz=sous_domaine?le_sous_domaine_dis.valeur():Sous_domaine_VF();
   const Domaine_VEF& zvef=le_dom_VEF.valeur();
 
-  // Parametres pour perte_charge()
+  // Parameters for perte_charge()
   static DoubleVect u(dimension);
   double norme_u;
   double dh_valeur;
@@ -222,7 +222,7 @@ void  Perte_Charge_Circulaire_VEF_P1NC::coeffs_perte_charge(const DoubleVect& u,
   static DoubleVect p_charge(dimension);
   static DoubleVect pos(dimension);
 
-  // Optimisations pour les cas ou nu ou diam_hydr sont constants
+  // Optimizations for cases where nu or diam_hydr are constant
   bool nu_constant=sub_type(Champ_Uniforme,nu)?true:false;
   double nu_valeur;
   //if (nu_constant)
@@ -232,22 +232,22 @@ void  Perte_Charge_Circulaire_VEF_P1NC::coeffs_perte_charge(const DoubleVect& u,
   //if (dh_constant)
   ////dh_valeur=diam_hydr(0,0);
 
-  // Le temps actuel
+  // Current time
   double t=equation().schema_temps().temps_courant();
 
-  // Nombre de faces a traiter.
+  // Number of faces to process.
   int max_faces=sous_domaine?
   ssz.les_faces().size() :
   zvef.nb_faces_tot();
 
   for (int face=0;face<max_faces;face++) {
 
-  // indice de la face dans le domaine_VEF
+  // index of the face in domaine_VEF
   int la_face=sous_domaine?
   ssz.les_faces()[face] :
   face;
 
-  // Recup la vitesse a la face, et en calcule le module
+  // Retrieve velocity at the face and compute its magnitude
   norme_u=0;
   for (int dim=0;dim<dimension;dim++) {
   u[dim]=vit(la_face,dim);
@@ -255,34 +255,34 @@ void  Perte_Charge_Circulaire_VEF_P1NC::coeffs_perte_charge(const DoubleVect& u,
   }
   norme_u=sqrt(norme_u) ;
 
-  // Calcul de la position
+  // Compute position
   for (int i=0;i<dimension;i++)
   pos[i]=xv(la_face,i);
 
-  // Calcul de nu
+  // Compute nu
   if (!nu_constant) {
   nu_valeur=nu.valeur_a_compo(pos,0);
   } else nu_valeur=nu(0,0);
 
-  // Calcul du diametre hydraulique
+  // Compute hydraulic diameter
   if (!dh_constant) {
   dh_valeur=diam_hydr->valeur_a_compo(pos,0);
   }
   else dh_valeur=diam_hydr(0,0);
 
-  // Calcul du reynolds
+  // Compute Reynolds number
   reynolds=norme_u*dh_valeur/nu_valeur;
-  // Lambda est souvent indetermine pour Re->0
+  // Lambda is often undefined for Re->0
   if (reynolds < 1.e-10)
   reynolds=1e-10;
 
-  // Calcul du volume d'integration
+  // Compute the integration volume
   double volume=sous_domaine?
   ssz.volumes_entrelaces(face) :
   zvef.volumes_entrelaces(la_face);
   volume*=zvef.porosite_face(la_face);
 
-  // fin de copie....
+  // end of copy....
 
 
   coef_implicite_perte_charge (u,pos,t,norme_u,dh_valeur,reynolds,p_charge);

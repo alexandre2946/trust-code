@@ -42,7 +42,7 @@ Entree& Op_Diff_VEF_Anisotrope_Face::readOn(Entree& s )
   return s ;
 }
 
-/*! @brief associe le champ de diffusivite
+/*! @brief Associate the diffusivity field.
  *
  */
 void Op_Diff_VEF_Anisotrope_Face::associer_diffusivite(const Champ_base& diffu)
@@ -66,9 +66,9 @@ void Op_Diff_VEF_Anisotrope_Face::ajouter_cas_scalaire(const DoubleTab& inconnue
                                                        const Domaine_Cl_VEF& domaine_Cl_VEF,
                                                        const Domaine_VEF& domaine_VEF ) const
 {
-  // assurer on a un tableau bidimensionnel
+  // ensure we have a two-dimensional array
   assert(nu.nb_dim()==2);
-  // assurer vrai nombre de composants pour l'anisotropie (9 pour 3d et 4 pour 2d)
+  // ensure correct number of components for anisotropy (9 for 3d and 4 for 2d)
   assert(nu.dimension(1)==dimension*dimension);
 
   const IntTab& elemfaces = domaine_VEF.elem_faces();
@@ -79,12 +79,12 @@ void Op_Diff_VEF_Anisotrope_Face::ajouter_cas_scalaire(const DoubleTab& inconnue
   double valA,flux;
   int n_bord, ind_face;
   int nb_bords=domaine_VEF.nb_front_Cl();
-  // On dimensionne et initialise le tableau des bilans de flux:
+  // Size and initialize the flux balance array:
   tab_flux_bords.resize(domaine_VEF.nb_faces_bord(),1);
   tab_flux_bords=0.;
   const int premiere_face_int=domaine_VEF.premiere_face_int();
 
-  // On traite les faces bord
+  // Process boundary faces
   for (n_bord=0; n_bord<nb_bords; n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -113,7 +113,7 @@ void Op_Diff_VEF_Anisotrope_Face::ajouter_cas_scalaire(const DoubleTab& inconnue
                           valA = viscA(num_face,j,elem,nu);
                           resu(num_face)+=valA*inconnue(j);
                           resu(num_face)-=valA*inconnue(num_face);
-                          if(j<nb_faces) // face reelle
+                          if(j<nb_faces) // real face
                             {
                               resu(j)+=0.5*valA*inconnue(num_face);
                               resu(j)-=0.5*valA*inconnue(j);
@@ -123,10 +123,8 @@ void Op_Diff_VEF_Anisotrope_Face::ajouter_cas_scalaire(const DoubleTab& inconnue
                 }
             }
         }
-      else   // Il n'y a qu'une seule composante, donc on traite
-        // une equation scalaire (pas la vitesse) on a pas a utiliser
-        // le tau tangentiel (les lois de paroi thermiques ne calculent pas
-        // d'echange turbulent a la paroi pour l'instant
+      else   // There is only one component, so this is a scalar equation (not velocity): no need to use
+        // the tangential tau (wall thermal laws do not compute turbulent wall exchange for now
         {
           for (ind_face=num1; ind_face<num2; ind_face++)
             {
@@ -142,14 +140,14 @@ void Op_Diff_VEF_Anisotrope_Face::ajouter_cas_scalaire(const DoubleTab& inconnue
                       if (ind_face<nb_faces_bord_reel)
                         {
                           flux=valA*(inconnue(j)-inconnue(num_face));
-                          // PL : c'est bien un - ici pour flux_bords. Cette valeur est ensuite
-                          // ecrasee pour les bords avec Neumann et ne sert donc que pour les bords
-                          // avec Dirichlet ou le volume de controle est nul
+                          // PL : this is indeed a minus sign here for flux_bords. This value is then
+                          // overwritten for Neumann boundaries and is therefore only used for
+                          // Dirichlet boundaries where the control volume is zero
                           tab_flux_bords(num_face,0)-=flux;
                           resu(num_face)+=flux;
                         }
 
-                      if(j<nb_faces) // face reelle
+                      if(j<nb_faces) // real face
                         {
                           flux=valA*(inconnue(num_face)-inconnue(j));
                           if (j<premiere_face_int)
@@ -176,7 +174,7 @@ void Op_Diff_VEF_Anisotrope_Face::ajouter_cas_scalaire(const DoubleTab& inconnue
                   {
                     int el1,el2;
                     int contrib=1;
-                    if(j>=nb_faces) // C'est une face virtuelle
+                    if(j>=nb_faces) // This is a virtual face
                       {
                         el1 = face_voisins(j,0);
                         el2 = face_voisins(j,1);
@@ -188,7 +186,7 @@ void Op_Diff_VEF_Anisotrope_Face::ajouter_cas_scalaire(const DoubleTab& inconnue
                         valA = viscA(num_face,j,elem,nu);
                         resu(num_face)+=valA*inconnue(j);
                         resu(num_face)-=valA*inconnue(num_face);
-                        if(j<nb_faces) // On traite les faces reelles
+                        if(j<nb_faces) // Process real faces only
                           {
                             resu(j)+=valA*inconnue(num_face);
                             resu(j)-=valA*inconnue(j);
@@ -432,7 +430,7 @@ void Op_Diff_VEF_Anisotrope_Face::ajouter_cas_multi_scalaire(const DoubleTab& in
 
 
   // Neumann
-  //On se base sur ce qui est fait pour le cas scalaire
+  //Based on what is done for the scalar case
   for (n_bord=0; n_bord<nb_bords; n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -507,9 +505,9 @@ DoubleTab& Op_Diff_VEF_Anisotrope_Face::ajouter(const DoubleTab& inconnue_org, D
   int marq=phi_psi_diffuse(equation());
   const DoubleVect& porosite_face = equation().milieu().porosite_face();
   const DoubleVect& porosite_elem = equation().milieu().porosite_elem();
-  // soit on a div(phi nu grad inco)
-  // soit on a div(nu grad phi inco)
-  // cela depend si on diffuse phi_psi ou psi
+  // either div(phi nu grad inco)
+  // or div(nu grad phi inco)
+  // depending on whether phi_psi or psi is diffused
   modif_par_porosite_si_flag(nu_,nu,!marq,porosite_elem);
   const DoubleTab& inconnue=modif_par_porosite_si_flag(inconnue_org,tab_inconnue,marq,porosite_face);
 
@@ -536,9 +534,8 @@ void Op_Diff_VEF_Anisotrope_Face::ajouter_contribution(const DoubleTab& transpor
 {
 
   modifier_matrice_pour_periodique_avant_contribuer(matrice,equation());
-  // On remplit le tableau nu car l'assemblage d'une
-  // matrice avec ajouter_contribution peut se faire
-  // avant le premier pas de temps
+  // Fill the nu array because matrix assembly with ajouter_contribution
+  // may be performed before the first time step
   remplir_nu(nu_);
   const Domaine_Cl_VEF& domaine_Cl_VEF = la_zcl_vef.valeur();
   const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
@@ -553,9 +550,9 @@ void Op_Diff_VEF_Anisotrope_Face::ajouter_contribution(const DoubleTab& transpor
   int marq=phi_psi_diffuse(equation());
   const DoubleVect& porosite_elem = equation().milieu().porosite_elem();
 
-  // soit on a div(phi nu grad inco)
-  // soit on a div(nu grad phi inco)
-  // cela depend si on diffuse phi_psi ou psi
+  // either div(phi nu grad inco)
+  // or div(nu grad phi inco)
+  // depending on whether phi_psi or psi is diffused
   modif_par_porosite_si_flag(nu_,nu,!marq,porosite_elem);
   DoubleVect porosite_eventuelle(equation().milieu().porosite_face());
   if (!marq)
@@ -582,8 +579,8 @@ void Op_Diff_VEF_Anisotrope_Face::ajouter_contribution(const DoubleTab& transpor
         {
           const Periodique& la_cl_perio = ref_cast(Periodique,la_cl.valeur());
           int fac_asso;
-          // on ne parcourt que la moitie des faces periodiques
-          // on copiera a la fin le resultat dans la face associe..
+          // only iterate over half the periodic faces
+          // the result will be copied to the associated face at the end..
           int num2b=num1+le_bord.nb_faces()/2;
           for (num_face=num1; num_face<num2b; num_face++)
             {
@@ -739,9 +736,8 @@ void Op_Diff_VEF_Anisotrope_Face::ajouter_contribution(const DoubleTab& transpor
 void Op_Diff_VEF_Anisotrope_Face::ajouter_contribution_multi_scalaire(const DoubleTab& transporte, Matrice_Morse& matrice) const
 {
   modifier_matrice_pour_periodique_avant_contribuer(matrice,equation());
-  // On remplit le tableau nu car l'assemblage d'une
-  // matrice avec ajouter_contribution peut se faire
-  // avant le premier pas de temps
+  // Fill the nu array because matrix assembly with ajouter_contribution
+  // may be performed before the first time step
   remplir_nu(nu_);
   const Domaine_Cl_VEF& domaine_Cl_VEF = la_zcl_vef.valeur();
   const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
@@ -756,9 +752,9 @@ void Op_Diff_VEF_Anisotrope_Face::ajouter_contribution_multi_scalaire(const Doub
   int marq=phi_psi_diffuse(equation());
   const DoubleVect& porosite_elem = equation().milieu().porosite_elem();
 
-  // soit on a div(phi nu grad inco)
-  // soit on a div(nu grad phi inco)
-  // cela depend si on diffuse phi_psi ou psi
+  // either div(phi nu grad inco)
+  // or div(nu grad phi inco)
+  // depending on whether phi_psi or psi is diffused
   modif_par_porosite_si_flag(nu_,nu,!marq,porosite_elem);
   DoubleVect porosite_eventuelle(equation().milieu().porosite_face());
   if (!marq)
@@ -787,8 +783,8 @@ void Op_Diff_VEF_Anisotrope_Face::ajouter_contribution_multi_scalaire(const Doub
         {
           const Periodique& la_cl_perio = ref_cast(Periodique,la_cl.valeur());
           int fac_asso;
-          // on ne parcourt que la moitie des faces periodiques
-          // on copiera a la fin le resultat dans la face associe..
+          // only iterate over half the periodic faces
+          // the result will be copied to the associated face at the end..
           int num2b=num1+le_bord.nb_faces()/2;
           for (num_face=num1; num_face<num2b; num_face++)
             {

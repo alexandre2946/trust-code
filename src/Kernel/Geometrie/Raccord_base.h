@@ -19,18 +19,18 @@
 #include <Frontiere.h>
 #include <Domaine_forward.h>
 
-/*! @brief Classe Raccord_base Cette classe est simplement une frontiere, c'est la classe de base de la
+/*! @brief Class Raccord_base This class is simply a boundary; it is the base class of the
  *
- *     hierarchie des raccords. Un raccord intervient dans Trio-U lorsque
- *     l'on resoud des problemes differents sur des domaines differents
- *     mais que l'on desire les coupler. On couple alors ces problemes avec
- *     des raccords.
+ *     connector hierarchy. A connector is used in TRUST when
+ *     different problems are solved on different domains
+ *     and one wishes to couple them. Problems are then coupled using
+ *     connectors.
  *
- *     Si les problemes sont resolus dans Trio-U les raccords sont dit
- *     locaux, si un probleme est resolu dans Trio-U et l'autre dans un
- *     autre code le raccord est dit distant.
- *     Cette distinction donne lieu a 2 classes derivees de Raccord_base:
- *            Raccord_local et Raccord_distant
+ *     If the problems are solved within TRUST the connectors are called
+ *     local; if one problem is solved in TRUST and the other in an
+ *     external code, the connector is called distant.
+ *     This distinction gives rise to 2 subclasses of Raccord_base:
+ *            Raccord_local and Raccord_distant
  *
  * @sa Frontiere Raccord Raccord_distant Raccord_local
  */
@@ -44,7 +44,7 @@ using Raccord_base = Raccord_base_32_64<int>;
 using Raccord_base_64 = Raccord_base_32_64<trustIdType>;
 
 
-/*! @brief Classe Raccord_local Cette classe represente un raccord entre 2 probleme resolus par TRUST.
+/*! @brief Class Raccord_local This class represents a connector between 2 problems solved by TRUST.
  *
  * @sa Raccord_base Raccord Raccord_distant Raccord
  */
@@ -58,8 +58,8 @@ using Raccord_local = Raccord_local_32_64<int>;
 using Raccord_local_64 = Raccord_local_32_64<trustIdType>;
 
 
-/*! @brief Classe Raccord_distant Cette classe represente un raccord entre 2 problemes
- *  dont un est resolu par TRUST et l'autre par un autre code
+/*! @brief Class Raccord_distant This class represents a connector between 2 problems
+ *  where one is solved by TRUST and the other by an external code.
  *
  * @sa Raccord_base Raccord Raccord_local
  */
@@ -72,8 +72,7 @@ class Raccord_distant_32_64 : public Raccord_base_32_64<_SIZE_>
 using Raccord_distant = Raccord_distant_32_64<int>;
 using Raccord_distant_64 = Raccord_distant_32_64<trustIdType>;
 
-/*! @brief Classe Raccord_local_homogene Cette classe represente un Raccord_local ou les maillages de part et
- *  d'autres coincident.
+/*! @brief Class Raccord_local_homogene This class represents a Raccord_local where the meshes on both sides coincide.
  *
  * @sa Raccord_base Raccord Raccord_distant Raccord_local
  */

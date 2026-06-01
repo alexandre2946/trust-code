@@ -40,17 +40,17 @@ Sortie& Extruder_en3::printOn(Sortie& os) const { return Interprete::printOn(os)
 
 Entree& Extruder_en3::readOn(Entree& is) { return Interprete::readOn(is); }
 
-/*! @brief Fonction principale de l'interprete Extruder_en3
+/*! @brief Main function of the Extruder_en3 interpreter
  *
- * Triangule 1 a 1 toutes les domaines du domaine specifie par la directive.
- *     On triangule le domaine grace a la methode:
+ * Extrudes one by one all the domains specified by the directive.
+ *     The domain is extruded through the method:
  *       void Extruder_en3::extruder(Domaine& domaine) const
- *     Extruder_en3 signifie ici transformer en triangle des
- *     elements geometrique d'un domaine.
+ *     Extruder_en3 means here to transform geometric
+ *     elements of a domain into a triangular mesh.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree
- * @throws l'objet a mailler n'est pas de type Domaine
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the input stream
+ * @throws the object to be meshed is not of Domaine type
  */
 Entree& Extruder_en3::interpreter_(Entree& is)
 {
@@ -73,15 +73,15 @@ Entree& Extruder_en3::interpreter_(Entree& is)
   param.lire_avec_accolades_depuis(is);
   nb_dom=noms_dom.size();
 
-  // creation du tableau de correspondance des indices
-  // pour assurer le decoupage conforme entre domaines
+  // Create the index correspondence table
+  // to ensure conforming splitting between domains
   //////////////////////////////////////////////////////
 
-  // PQ : 07/09/08 : le decoupage des prismes apres extrusion est base sur une numerotation
-  // globale des indices qui permet d'assurer la conformite des maillages. Ces indices references
-  // dans le tableau nums sont issus du regroupement des domaines en un seul
-  // On procede par concatenation des domaines dans "dom_tot" de maniere a ne pas interferer
-  // avec les domaines d'origines.
+  // PQ : 07/09/08 : splitting of prisms after extrusion is based on a global
+  // numbering of indices that ensures mesh conformity. These indices, referenced
+  // in the nums array, result from merging all domains into one.
+  // We concatenate the domains into "dom_tot" so as not to interfere
+  // with the original domains.
   Domaine dom_tot;   // just to get correct renumbering
   for(int i=0; i<nb_dom; i++)
     {
@@ -91,7 +91,7 @@ Entree& Extruder_en3::interpreter_(Entree& is)
       dom_tot.ajouter(domi.coord_sommets(), num);
 
       /////////////////////////
-      // extrusion des domaines
+      // domain extrusion
       /////////////////////////
       Scatter::uninit_sequential_domain(domi);
       extruder(domi,num);
@@ -101,8 +101,10 @@ Entree& Extruder_en3::interpreter_(Entree& is)
   return is;
 }
 
-/*! @brief Extrusion d'un domaine surfacique
+/*! @brief Extrudes a surface domain.
  *
+ * @param dom The domain to extrude.
+ * @param num Global vertex index correspondence array for conforming splitting.
  */
 void Extruder_en3::extruder(Domaine& dom, const IntVect& num)
 {
@@ -117,7 +119,7 @@ void Extruder_en3::extruder(Domaine& dom, const IntVect& num)
 
       Faces les_faces;
       {
-        // bloc a factoriser avec Domaine_VF.cpp :
+        // block to be factored out with Domaine_VF.cpp :
         Type_Face type_face = dom.type_elem()->type_face(0);
         les_faces.typer(type_face);
         les_faces.associer_domaine(dom);
@@ -132,7 +134,7 @@ void Extruder_en3::extruder(Domaine& dom, const IntVect& num)
                                          1 /* include virtual elements */);
 
         Faces_builder faces_builder;
-        IntTab dnu; // Tableau dont on aura pas besoin
+        IntTab dnu; // Array that will not be needed
         faces_builder.creer_faces_reeles(dom,
                                          connectivite_som_elem,
                                          les_faces,
@@ -144,7 +146,7 @@ void Extruder_en3::extruder(Domaine& dom, const IntVect& num)
       DoubleTab& coord_sommets=dom.les_sommets();
       Objet_U::dimension=3;
 
-      // les sommets du maillage 2D sont translates en premier
+      // vertices of the 2D mesh are translated first
       for (int i=0; i<oldnbsom; i++)
         {
           double x = coord_sommets(i,0);
@@ -168,7 +170,7 @@ void Extruder_en3::extruder(Domaine& dom, const IntVect& num)
       dom.ajouter(new_soms);
 
       int newnbelem = 3*NZ_*oldsz;
-      IntTab new_elems(newnbelem, 4); // les nouveaux elements
+      IntTab new_elems(newnbelem, 4); // the new elements
       for (int i=0; i<oldsz; i++)
         {
           int i1=les_elems(i,0);
@@ -290,7 +292,7 @@ void Extruder_en3::extruder(Domaine& dom, const IntVect& num)
               i6+=oldnbsom;
             }
         }
-      // Reconstruction de l'octree
+      // Rebuild the octree
       dom.invalide_octree();
       dom.typer("Tetraedre");
 
@@ -301,20 +303,25 @@ void Extruder_en3::extruder(Domaine& dom, const IntVect& num)
     Cerr << "TRUST doesn't know how to extrude " << dom.type_elem()->que_suis_je() <<"s"<<finl;
 }
 
-/*! @brief Creation des bords du domaine extrude
+/*! @brief Creates the boundaries of the extruded domain.
  *
+ * @param dom The extruded domain.
+ * @param les_faces The internal faces of the 2D domain.
+ * @param oldnbsom Number of vertices in the 2D mesh.
+ * @param oldsz Number of elements in the 2D mesh.
+ * @param num Global vertex index correspondence array.
  */
 void Extruder_en3::construire_bords(Domaine& dom, Faces& les_faces, int oldnbsom, int oldsz, const IntVect& num)
 {
   IntTab& les_elems = dom.les_elems();
-  // Les bords:
+  // Boundaries:
   for (auto &itr : dom.faces_bord())
     {
       Faces& les_faces_du_bord = itr.faces();
       construire_bord_lateral(les_faces_du_bord, les_faces, oldnbsom, num);
     }
 
-  // Les raccords:
+  // Connections (raccords):
   for (auto &itr : dom.faces_raccord())
     {
       Faces& les_faces_du_bord = itr->faces();
@@ -380,8 +387,12 @@ void Extruder_en3::construire_bords(Domaine& dom, Faces& les_faces, int oldnbsom
     }
 }
 
-/*! @brief Creation d'un bord lateral
+/*! @brief Creates a lateral boundary.
  *
+ * @param les_faces_du_bord The boundary faces to fill.
+ * @param les_faces The internal faces of the 2D domain.
+ * @param oldnbsom Number of vertices in the 2D mesh.
+ * @param num Global vertex index correspondence array.
  */
 void Extruder_en3::construire_bord_lateral(Faces& les_faces_du_bord, Faces& les_faces, int oldnbsom, const IntVect& num)
 {

@@ -23,7 +23,7 @@
 #include <Kokkos_UniqueToken.hpp>
 #include <TRUSTTrav.h>
 
-/*! Teste les methodes de l'interface Kokkos utilisees dans TRUST
+/*! @brief Tests the Kokkos interface methods used in TRUST.
  */
 void kokkos_self_test()
 {
@@ -52,7 +52,7 @@ void kokkos_self_test()
         b_v(i, j) = 2 * b_v(i, j);
     });
     Kokkos::fence();
-    assert(b(0, 0) == 4); // Retour sur le host et verification
+    assert(b(0, 0) == 4); // Return to host and verify
   }
   // Check CDoubleTabView:
   {
@@ -62,7 +62,7 @@ void kokkos_self_test()
       assert(a_v(i, 0) == 1);
     });
     Kokkos::fence();
-    assert(a(0, 0) == 1); // Verification sur le host
+    assert(a(0, 0) == 1); // Verification on the host
   }
   // Check basic loop:
   {
@@ -80,7 +80,7 @@ void kokkos_self_test()
         }
     });
     Kokkos::fence();
-    assert(est_egal(b(0, 0), 5)); // Retour sur le host et verification
+    assert(est_egal(b(0, 0), 5)); // Return to host and verify
   }
 
   // Check basic loop on vect
@@ -96,7 +96,7 @@ void kokkos_self_test()
       b_v(i) = 2 * b_v(i) + a_v(i);
     });
     Kokkos::fence();
-    assert(est_egal(v(0), 5)); // Retour sur le host et verification
+    assert(est_egal(v(0), 5)); // Return to host and verify
   }
   // Check DoubleVect built as a DoubleTab
   {
@@ -119,23 +119,23 @@ void kokkos_self_test()
       vect_v(i) = 2;
     });
   }
-  // Verification des adresses memoire:
+  // Verification of memory addresses:
   {
     DoubleTab tab(nb_elem,2);
     for (int i=0; i<nb_elem; i++)
       for (int j=0; j<2; j++)
         tab(i,j) = i + 0.1*j;
     CDoubleTabView tab_v = tab.view_ro();
-    // La creation de la vue fait une copie de u sur le device:
-    //printf("Provisoire OpenMP adresse host: [%p] device: [%p]\n",(void*)tab.data(), (void*)addrOnDevice(tab));
+    // Creating the view copies u to the device:
+    //printf("Temporary OpenMP address host: [%p] device: [%p]\n",(void*)tab.data(), (void*)addrOnDevice(tab));
     assert(a.data() != addrOnDevice(a));
-    // On verifie les adresses memoires de la vue:
-    //printf("Provisoire Kokkos adresse            device: [%p]\n",(void*)tab_v.data());
+    // Verify the memory addresses of the view:
+    //printf("Temporary Kokkos address            device: [%p]\n",(void*)tab_v.data());
     //assert(tab_v.h_view.view_host()==tab.data());
     assert(tab_v.data()==addrOnDevice(tab));
     //debug_device_view(tab_v, tab);
   }
-  // Changement de la zone memoire sur le device avec OpenMP:
+  // Change of the memory area on the device with OpenMP:
   {
     DoubleTab tab(nb_elem,2);
     for (int i=0; i<nb_elem; i++)
@@ -143,10 +143,10 @@ void kokkos_self_test()
         tab(i,j) = i + 0.1*j;
     CDoubleTabView tab_v = tab.view_ro();
     assert(tab_v.data()==addrOnDevice(tab)); // Meme adresse
-    //printf("Provisoire OpenMP device before: [%p]\n", (void*)addrOnDevice(tab));
+    //printf("Temporary OpenMP device before: [%p]\n", (void*)addrOnDevice(tab));
     deleteOnDevice(tab);
     allocateOnDevice(tab);
-    //printf("Provisoire OpenMP device after: [%p]\n", (void*)addrOnDevice(tab));
+    //printf("Temporary OpenMP device after: [%p]\n", (void*)addrOnDevice(tab));
     CDoubleTabView tab_v2 = tab.view_ro();
     assert(tab_v2.data()==addrOnDevice(tab)); // Meme adresse
   }
@@ -155,7 +155,7 @@ void kokkos_self_test()
     ArrOfDouble f(nb_elem);
     f = 0;
     std::string expr("2*x+2");
-    // Parser sur le device;
+    // Parser on the device:
     ParserView parser(expr, 1);
     parser.addVar("x");
     parser.parseString();

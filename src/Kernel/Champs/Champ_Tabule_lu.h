@@ -19,7 +19,7 @@
 #include <Champ_Tabule_Temps.h>
 #include <Champ_lu_proto.h>
 
-/*! @brief : classe Champ_Tabule_lu Classe derivee de Champ_Tabule_Temps construit un Champ_Tabule_Temps a partir d'un fichier sonde
+/*! @brief : class Champ_Tabule_lu Derived class of Champ_Tabule_Temps, builds a Champ_Tabule_Temps from a probe file
  *
  * @sa : Champ_Tabule_temps
  */

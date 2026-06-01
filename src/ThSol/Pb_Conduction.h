@@ -22,11 +22,11 @@
 
 
 
-/*! @brief Classe Pb_Conduction Cette classe represente un probleme de conduction avec rho et Cp non uniformes :
+/*! @brief Class Pb_Conduction: represents a heat conduction problem with non-uniform rho and Cp:
  *
  *       (rho.Cp) dT/dt -div (k grad T) = (rho.Cp) f
- *     Cette classe est exactement identique a Pb_Conduction si ce n'est qu'elle force l'utilisateur a l'usage d'un probleme
- *     de nature differente.
+ *     This class is functionally identical to a basic conduction problem,
+ *     except that it enforces the use of a problem of a different nature.
  *
  * @sa Probleme_base, Pb_Conduction
  */

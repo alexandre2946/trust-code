@@ -23,19 +23,18 @@ Sortie& Modele_turbulence_scal_diffturb_base::printOn(Sortie& s) const { return 
 
 Entree& Modele_turbulence_scal_diffturb_base::readOn(Entree& is) { return Modele_turbulence_scal_base::readOn(is); }
 
-/*! @brief Associe une viscosite turbulente au modele de turbulence.
+/*! @brief Associates a turbulent viscosity to the turbulence model.
  *
- * @param (Champ_Fonc_base& visc_turb) le champ fonction representant la viscosite turbulente a associer.
+ * @param visc_turb The functional field representing the turbulent viscosity to associate.
  */
 void Modele_turbulence_scal_diffturb_base::associer_viscosite_turbulente(const Champ_Fonc_base& visc_turb)
 {
   la_viscosite_turbulente_ = visc_turb;
 }
 
-/*! @brief Complete le modele de turbulence: Appelle Modele_turbulence_scal_base::completer()
+/*! @brief Completes the turbulence model: calls Modele_turbulence_scal_base::completer()
  *
- *     associe la viscosite turbulente du probleme
- *     au modele de turbulence.
+ *     and associates the problem's turbulent viscosity to the turbulence model.
  *
  */
 void Modele_turbulence_scal_diffturb_base::completer()

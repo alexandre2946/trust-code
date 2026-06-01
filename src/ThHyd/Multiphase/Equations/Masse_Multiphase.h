@@ -23,9 +23,8 @@
 
 class Fluide_base;
 
-/*! @brief classe Masse_Multiphase Cas particulier de Convection_Diffusion_std pour un fluide quasi conpressible
- *
- *      quand le scalaire subissant le transport est la fraction massique
+/*! @brief Specialisation of Convection_Diffusion_std for multiphase flows where the transported scalar
+ *      is the volume fraction.
  *
  * @sa Conv_Diffusion_std
  */
@@ -47,7 +46,7 @@ public :
   void associer_milieu_base(const Milieu_base& ) override;
   void completer() override;
 
-  int nombre_d_operateurs() const override //pas de diffusion
+  int nombre_d_operateurs() const override // no diffusion
   {
     return 1;
   }
@@ -58,13 +57,13 @@ public :
 
   /*
     interface {dimensionner,assembler}_blocs
-    specificites : prend en compte l'evanescence (en dernier)
+    specifics: evanescence is taken into account (last)
   */
   int has_interface_blocs() const override;
   void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
   void assembler_blocs_avec_inertie(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) override;
 
-  /* champ convecte : alpha * rho */
+  /* convected field: alpha * rho */
   static void calculer_alpha_rho(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv);
   std::pair<std::string, fonc_calc_t> get_fonc_champ_conserve() const override
   {
@@ -77,7 +76,7 @@ public :
     return { "alpha_rho_conv", calculer_alpha_rho_conv };
   }
 
-  Champ_Inc_base& champ_convecte() const override //par defaut le champ conserve
+  Champ_Inc_base& champ_convecte() const override // by default the conserved field
   {
     return champ_convecte_.valeur();
   }
@@ -85,7 +84,7 @@ public :
   {
     return bool(champ_convecte_);
   }
-  void init_champ_convecte() const override; //a appeller dans le completer() des operateurs/sources qui auront besoin de champ_convecte_
+  void init_champ_convecte() const override; // to be called in the completer() of operators/sources that will need champ_convecte_
 
   /////////////////////////////////////////////////////
   const Motcle& domaine_application() const override;
@@ -95,7 +94,7 @@ public :
 protected :
   OWN_PTR(Champ_Inc_base) l_inco_ch_;
   OBS_PTR(Fluide_base) le_fluide_;
-  Operateur_Grad Op_Grad_; // Pour calculer le gradient en VDF
+  Operateur_Grad Op_Grad_; // To compute the gradient in VDF
   Operateur_Evanescence evanescence_;
 
 private:
@@ -103,18 +102,18 @@ private:
 };
 
 
-/*! @brief Renvoie le champ inconnue representant l'inconnue (T ou H) (version const)
+/*! @brief Returns the unknown field representing the unknown (alpha) (const version).
  *
- * @return (Champ_Inc_base&) le champ inconnue representant la temperature (GP) ou l'enthalpie (GR)
+ * @return (Champ_Inc_base&) the unknown field representing the volume fraction
  */
 inline const Champ_Inc_base& Masse_Multiphase::inconnue() const
 {
   return l_inco_ch_;
 }
 
-/*! @brief Renvoie le champ inconnue representant l'inconnue (T ou H)
+/*! @brief Returns the unknown field representing the unknown (alpha).
  *
- * @return (Champ_Inc_base&) le champ inconnue representant la temperature (GP) ou l'enthalpie (GR)
+ * @return (Champ_Inc_base&) the unknown field representing the volume fraction
  */
 inline Champ_Inc_base& Masse_Multiphase::inconnue()
 {

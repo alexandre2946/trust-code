@@ -19,18 +19,18 @@
 #include <SFichier.h>
 #include <Process.h>
 
-/*! @brief Ecriture dans un fichier Cette classe implemente les operateurs et les methodes virtuelles de la clase SFichier de la facon suivante :
+/*! @brief Writing to a file. This class implements the operators and virtual methods of the SFichier class as follows:
  *
- *     Il y a autant de fichiers que de processus, physiquement localises sur le disque de la machine hebergeant la tache maitre de l'application Trio-U (le processus de rang 0 dans le groupe "tous")
- *     Le processus maitre recoit chaque item a ecrire de chacun des processus et dans chacun chacun des fichiers.
- *     il en est de meme pour les methodes d'inspection de l'etat d'un fichier.
+ *     There are as many files as there are processes, physically located on the disk of the machine hosting the master task of the Trio-U application (the process with rank 0 in the "all" group).
+ *     The master process receives each item to write from each of the processes and into each of the files.
+ *     The same applies to the methods inspecting the state of a file.
  *
  */
 
 class EcrFicCollecte : public SFichier
 {
   Declare_instanciable_sans_constructeur(EcrFicCollecte);
-  // le maitre collecte l'information de tous les PE et l'ecrit dans differents fichiers
+  // the master collects information from all PEs and writes it into different files
 private :
   EcrFicCollecte(int) {}
 public:

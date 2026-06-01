@@ -23,7 +23,7 @@
 
 /*! @brief class Ch_input_uniforme
  *
- *      Cette classe represente un champ uniforme accessible par setInputField
+ *      This class represents a uniform field accessible via setInputField
  *
  *
  * @sa Champ_Input_Proto

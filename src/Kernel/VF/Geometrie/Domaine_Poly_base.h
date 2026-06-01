@@ -38,34 +38,32 @@ class Geometrie;
 extern bool polymac_flica5;
 /*! @brief class Domaine_Poly_base
  *
- *  	Classe instanciable qui derive de Domaine_VF.
- *  	Cette classe contient les informations geometriques que demande
- *  	la methode des Volumes Elements Finis (element de Crouzeix-Raviart)
- *  	La classe porte un certain nombre d'informations concernant les faces
- *  	Dans cet ensemble de faces on fait figurer aussi les faces du bord et
- *       des joints. Pour manipuler les faces on distingue 2 categories:
- *            - les faces non standard qui sont sur un joint, un bord ou qui sont
- *              internes tout en appartenant a un element du bord
- *            - les faces standard qui sont les faces internes n'appartenant pas
- *              a un element du bord
- *       Cette distinction correspond au traitement des conditions aux limites:les
- *       faces standard ne "voient pas" les conditions aux limites.
- *       L'ensemble des faces est numerote comme suit:
- *            - les faces qui sont sur un Domaine_joint apparaissent en premier
- *     	       (dans l'ordre du vecteur les_joints)
- *    	     - les faces qui sont sur un Domaine_bord apparaissent ensuite
- * 	       (dans l'ordre du vecteur les_bords)
- *   	     - les faces internes non standard apparaissent ensuite
- *            - les faces internes standard en dernier
- *       Finalement on trouve regroupees en premier toutes les faces non standard
- *       qui vont necessiter un traitement particulier
- *       On distingue deux types d'elements
- *            - les elements non standard : ils ont au moins une face de bord
- *            - les elements standard : ils n'ont pas de face de bord
- *       Les elements standard (resp. les elements non standard) ne sont pas ranges
- *       de maniere consecutive dans l'objet Domaine. On utilise le tableau
- *       rang_elem_non_std pour acceder de maniere selective a l'un ou
- *       l'autre des types d'elements
+ *  	Instantiable class derived from Domaine_VF.
+ *  	This class contains the geometric information required by the
+ *  	Finite Volume Element method (Crouzeix-Raviart element).
+ *  	The class holds a number of pieces of information concerning the faces.
+ *  	In this set of faces, the boundary and joint faces are also included.
+ *       To handle the faces, two categories are distinguished:
+ *            - non-standard faces: located on a joint, a boundary, or internal
+ *              but belonging to a boundary element
+ *            - standard faces: internal faces not belonging to a boundary element
+ *       This distinction corresponds to the treatment of boundary conditions:
+ *       standard faces do not "see" boundary conditions.
+ *       The set of faces is numbered as follows:
+ *            - faces on a Domaine_joint appear first
+ *     	       (in the order of the les_joints vector)
+ *    	     - faces on a Domaine_bord appear next
+ * 	       (in the order of the les_bords vector)
+ *   	     - non-standard internal faces appear next
+ *            - standard internal faces appear last
+ *       Consequently, all non-standard faces requiring special treatment are
+ *       grouped together at the beginning.
+ *       Two types of elements are distinguished:
+ *            - non-standard elements: they have at least one boundary face
+ *            - standard elements: they have no boundary face
+ *       Standard elements (resp. non-standard elements) are not stored
+ *       consecutively in the Domaine object. The rang_elem_non_std array
+ *       is used to selectively access one or the other type of element.
  *
  */
 class Domaine_Poly_base : public Domaine_VF
@@ -96,10 +94,10 @@ public :
 
   virtual void calculer_h_carre();
 
-  inline DoubleTab& volumes_entrelaces_dir() { return volumes_entrelaces_dir_; } // renvoie le tableau des volumes entrelaces par cote.
+  inline DoubleTab& volumes_entrelaces_dir() { return volumes_entrelaces_dir_; } // returns the interlaced volumes array per side.
   inline const DoubleTab& volumes_entrelaces_dir() const { return volumes_entrelaces_dir_; }
 
-  //equivalent de dot(), mais pour le produit (a - ma).nu.(b - mb)
+  //equivalent to dot(), but for the product (a - ma).nu.(b - mb)
   inline double nu_dot(const DoubleTab* nu, int e, int n, const double *a, const double *b, const double *ma = nullptr, const double *mb = nullptr) const;
 
   inline double dist_norm(int num_face) const override;
@@ -112,26 +110,26 @@ public :
 
   void detecter_faces_non_planes() const;
 
-  //faces "equivalentes" : equiv(f, 0/1, i) = face equivalente a e_f(f_e(f, 0/1), i) de l'autre cote, -1 si il n'y en a pas
+  //equivalent faces: equiv(f, 0/1, i) = face equivalent to e_f(f_e(f, 0/1), i) on the other side, -1 if there is none
   const IntTab& equiv() const;
   virtual void init_equiv() const = 0;
 
   //connectivite sommet-elements
   const Static_Int_Lists& som_elem() const;
 
-  //indexation dans des tableaux de type (element, sommet) et (element, arete)
-  const IntTab& elem_som_d() const; //entree du sommet les_elems(e, i) de l'element e : elem_som_d()(e) + i
-  const IntTab& elem_arete_d() const; //entree de l'arete elem_arete(e, i) de l'element e : elem_arete_d()(e) + i
+  //indexing in arrays of type (element, vertex) and (element, edge)
+  const IntTab& elem_som_d() const; //entry of vertex les_elems(e, i) of element e: elem_som_d()(e) + i
+  const IntTab& elem_arete_d() const; //entry of edge elem_arete(e, i) of element e: elem_arete_d()(e) + i
 
-  //pour chaque element, repartition de son volume entre chacun de ses sommets
+  //for each element, distribution of its volume among each of its vertices
   const DoubleTab& vol_elem_som() const;
-  //pour chaque sommet, produit porosite * volume
+  //for each vertex, product porosity * volume
   const DoubleTab& pvol_som(const DoubleVect& poro) const;
 
   //som_arete[som1][som2 > som1] -> arete correspondant a (som1, som2)
   std::vector<std::map<int, int> > som_arete;
 
-  //MD_Vectors pour Champ_Elem_PolyMAC_CDO (elems + faces) et pour Champ_Face_PolyMAC_CDO (faces + aretes)
+  //MD_Vectors for Champ_Elem_PolyMAC_CDO (elems + faces) and for Champ_Face_PolyMAC_CDO (faces + edges)
   mutable MD_Vector mdv_elems_faces, mdv_faces_aretes;
 
   void calculer_infos_aretes();
@@ -142,9 +140,9 @@ protected:
   void verifier_type_elem() const;
   void corriger_face_voisins_sur_les_faces_virtuelles();
 
-  double h_carre = DMAXFLOAT;			 // carre du pas du maillage
-  DoubleVect h_carre_;			// carre du pas d'une maille
-  OWN_PTR(Elem_poly_base) type_elem_;                  // type de l'element de discretisation
+  double h_carre = DMAXFLOAT;			 // square of the mesh step size
+  DoubleVect h_carre_;			// square of the mesh cell step size
+  OWN_PTR(Elem_poly_base) type_elem_;                  // type of the discretization element
 
   Sortie& ecrit(Sortie& os) const;
 
@@ -153,11 +151,11 @@ protected:
   mutable IntTab elem_som_d_, elem_arete_d_;
   mutable DoubleTab vol_elem_som_, pvol_som_;
 
-  DoubleVect longueur_aretes_; //longueur des aretes
-  mutable DoubleTab ta_;       //vecteurs tangents aux aretes
+  DoubleVect longueur_aretes_; //edge lengths
+  mutable DoubleTab ta_;       //tangent vectors to the edges
 };
 
-/* equivalent du dist_norm_bord du VDF */
+/* equivalent of dist_norm_bord from VDF */
 inline double Domaine_Poly_base::dist_norm_bord(int f) const
 {
   assert(face_voisins(f, 1) == -1);
@@ -191,7 +189,7 @@ inline double Domaine_Poly_base::dist_face_elem1_period(int num_face,int n1,doub
   return 0;
 }
 
-//renvoie le produit scalaire a.nu.b quelle que soient le nombre de composantes et le type de tenseur de nu
+//returns the dot product a.nu.b regardless of the number of components and the type of nu tensor
 inline double Domaine_Poly_base::nu_dot(const DoubleTab* nu, int e, int n, const double *a, const double *b, const double *ma, const double *mb) const
 {
   if (!nu) return dot(a, b, ma, mb);

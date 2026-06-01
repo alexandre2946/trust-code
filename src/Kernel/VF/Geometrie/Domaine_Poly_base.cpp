@@ -224,14 +224,14 @@ void Domaine_Poly_base::verifier_type_elem() const
 
 void Domaine_Poly_base::corriger_face_voisins_sur_les_faces_virtuelles()
 {
-  // Correction du tableau facevoisins:
-  //  A l'issue de Domaine_VF::discretiser(), les elements voisins 0 et 1 d'une
-  //  face sont les memes sur tous les processeurs qui possedent la face.
-  //  Si la face est virtuelle et qu'un des deux elements voisins n'est
-  //  pas connu (il n'est pas dans l'epaisseur du joint), l'element voisin
-  //  vaut -1. Cela peut etre un voisin 0 ou un voisin 1.
-  //  On corrige les faces virtuelles pour que, si un element voisin n'est
-  //  pas connu, alors il est voisin1. Le voisin0 est donc toujours valide.
+  // Correction of the face_voisins array:
+  //  After Domaine_VF::discretiser(), the neighbour elements 0 and 1 of a face
+  //  are the same on all processors that own the face.
+  //  If the face is virtual and one of the two neighbour elements is not
+  //  known (it is not within the joint thickness), the neighbour element
+  //  equals -1. This can be either neighbour 0 or neighbour 1.
+  //  We correct virtual faces so that, if a neighbour element is not
+  //  known, it is placed as neighbour1. Neighbour0 is therefore always valid.
   IntTab& face_vois = face_voisins();
   const int debut = nb_faces();
   const int fin = nb_faces_tot();
@@ -262,7 +262,7 @@ void Domaine_Poly_base::discretiser()
   volumes_entrelaces_dir_.resize(0, 2), creer_tableau_faces(volumes_entrelaces_dir_);
   calculer_volumes_entrelaces();
 
-  /* ordre canonique dans elem_faces_ */
+  /* canonical ordering in elem_faces_ */
   std::map<std::array<double, 3>, int> xv_fsa;
   for (int e = 0, i, j, f; e < nb_elem_tot(); e++)
     {
@@ -275,12 +275,12 @@ void Domaine_Poly_base::discretiser()
 
 void Domaine_Poly_base::fill_normales()
 {
-  // On remplit le tableau face_normales_;
-  //  Attention : le tableau face_voisins n'est pas exactement un
-  //  tableau distribue. Une face n'a pas ses deux voisins dans le
-  //  meme ordre sur tous les processeurs qui possedent la face.
-  //  Donc la normale a la face peut changer de direction d'un
-  //  processeur a l'autre, y compris pour les faces de joint.
+  // Fill the face_normales_ array;
+  //  Warning: the face_voisins array is not exactly a
+  //  distributed array. A face does not have its two neighbors in the
+  //  same order on all processors that own the face.
+  //  Therefore the face normal can change direction from one
+  //  processor to another, including for joint faces.
 
   const IntTab& face_som = face_sommets();
   IntTab& face_vois = face_voisins();
@@ -306,7 +306,7 @@ void Domaine_Poly_base::fill_normales()
           }
       if (id == 0)
         {
-          // on a change le sens de la normale, on inverse elem1 elem2
+          // we changed the direction of the normal, swap elem1 and elem2
           std::swap(face_vois(f, 0), face_vois(f, 1));
         }
     }
@@ -341,11 +341,11 @@ void Domaine_Poly_base::modifier_pour_Cl(const Conds_lim& conds_lim)
           assert(nfin>=ndeb);
           int elem1,elem2,k;
           int face;
-          // Modification des tableaux face_voisins_ , face_normales_ , volumes_entrelaces_
-          // On change l'orientation de certaines normales
-          // de sorte que les normales aux faces de periodicite soient orientees
-          // de face_voisins(la_face_en_question,0) vers face_voisins(la_face_en_question,1)
-          // comme le sont les faces internes d'ailleurs
+          // Modification of arrays face_voisins_ , face_normales_ , volumes_entrelaces_
+          // Reorienting certain normals
+          // so that normals to periodic faces are oriented
+          // from face_voisins(the_face,0) towards face_voisins(the_face,1)
+          // as is the case for internal faces
 
           DoubleVect C1C2(dimension);
           double vol,psc=0;
@@ -389,9 +389,9 @@ void Domaine_Poly_base::modifier_pour_Cl(const Conds_lim& conds_lim)
         }
     }
 
-  // PQ : 10/10/05 : les faces periodiques etant a double contribution
-  //          l'appel a marquer_faces_double_contrib s'effectue dans cette methode
-  //          afin de pouvoir beneficier de conds_lim.
+  // PQ : 10/10/05 : since periodic faces have a double contribution
+  //          the call to marquer_faces_double_contrib is performed in this method
+  //          in order to benefit from conds_lim.
   Domaine_VF::marquer_faces_double_contrib(conds_lim);
 }
 
@@ -402,10 +402,10 @@ void Domaine_Poly_base::detecter_faces_non_planes() const
   const DoubleVect& fs = face_surfaces();
   int i, j, f, s, rk = Process::me(), np = Process::nproc();
   double sin2;
-  ArrOfDouble val(np); //sur chaque proc : { cos^2 max, indice de face, indices d'elements }
+  ArrOfDouble val(np); //on each proc: { max cos^2, face index, element indices }
   IntTab face(np), elem1(np), elem2(np);
 
-  //sur chaque proc : on cherche l'angle le plus grand entre un sommet et le plan de sa face
+  //on each proc: find the largest angle between a vertex and the plane of its face
   for (f = 0; f < nb_faces(); f++)
     for (i = 0; i < f_s.dimension(1) && (s = f_s(f, i)) >= 0; i++)
       if (fs(f) > 0 && (sin2 = std::pow(dot(&xs(s, 0), &nf(f, 0), &xv_(f, 0)) / fs(f), 2) / dot(&xs(s, 0), &xs(s, 0), &xv_(f, 0), &xv_(f, 0))) > val[rk])
@@ -426,24 +426,24 @@ void Domaine_Poly_base::detecter_faces_non_planes() const
 
 void Domaine_Poly_base::discretiser_aretes()
 {
-  //diverses quantites liees aux aretes
+  //various quantities related to the edges
   if (dimension > 2)
     {
       domaine().creer_aretes();
       md_vector_aretes_ = domaine().aretes_som().get_md_vector();
 
-      //remplissage de xa (CGs des aretes), de ta_ (vecteur tangent aux aretes) et de longueur_arete_ (longueurs des aretes)
+      //fill xa (edge CGs), ta_ (edge tangent vectors) and longueur_arete_ (edge lengths)
       xa_.resize(0, 3), ta_.resize(0, 3);
       creer_tableau_aretes(xa_), creer_tableau_aretes(ta_), creer_tableau_aretes(longueur_aretes_);
       calculer_infos_aretes();
     }
 
-  //MD_vector pour Champ_Elem_PolyMAC_HFV (elems + faces)
+  //MD_vector for Champ_Elem_PolyMAC_HFV (elems + faces)
   MD_Vector_composite mdc_ef;
   mdc_ef.add_part(domaine().md_vector_elements()), mdc_ef.add_part(md_vector_faces());
   mdv_elems_faces.copy(mdc_ef);
 
-  //MD_vector pour Champ_Face_PolyMAC_HFV (faces + aretes)
+  //MD_vector for Champ_Face_PolyMAC_HFV (faces + edges)
   MD_Vector_composite mdc_fa;
   mdc_fa.add_part(md_vector_faces()), mdc_fa.add_part(dimension < 3 ? domaine().md_vector_sommets() : md_vector_aretes());
   mdv_faces_aretes.copy(mdc_fa);
@@ -512,31 +512,31 @@ void Domaine_Poly_base::orthocentrer()
   const DoubleTab& xs = domaine().coord_sommets(), &nf = face_normales_;
   const DoubleVect& fs = face_surfaces();
   int i, j, e, f, s, np;
-  DoubleTab M(0, dimension + 1), X(dimension + 1, 1), S(0, 1), vp; //pour les systemes lineaires
+  DoubleTab M(0, dimension + 1), X(dimension + 1, 1), S(0, 1), vp; //for the linear systems
 
-  IntTrav b_f_ortho, b_e_ortho; // b_{f,e}_ortho(f/e) = 1 si la face / l'element est orthocentre
+  IntTrav b_f_ortho, b_e_ortho; // b_{f,e}_ortho(f/e) = 1 if the face / element is orthocentered
   creer_tableau_faces(b_f_ortho), domaine().creer_tableau_elements(b_e_ortho);
 
-  /* 1. orthocentrage des faces (en dimension 3) */
+  /* 1. orthocentering of faces (in 3D) */
   Cerr << domaine().le_nom() << " : ";
-  if (dimension < 3) b_f_ortho = 1; //les faces (segments) sont deja orthcentrees!
+  if (dimension < 3) b_f_ortho = 1; //faces (segments) are already orthocentered!
   else for (f = 0; f < nb_faces_tot(); f++)
       {
-        //la face est-elle deja orthocentree?
+        //is the face already orthocentered?
         double d2min = DBL_MAX, d2max = 0, d2;
         for (i = 0, np = 0; i < f_s.dimension(1) && (s = f_s(f, i)) >= 0; i++, np++)
           d2min = std::min(d2min, d2 = dot(&xs(s, 0), &xs(s, 0), &xv_(f, 0), &xv_(f, 0))), d2max = std::max(d2max, d2);
         if ((b_f_ortho(f) = (d2max / d2min - 1 < 1e-8))) continue;
 
-        //peut-on l'orthocentrer?
+        //can it be orthocentered?
         M.resize(np + 1, 4), S.resize(np + 1, 1);
         for (i = 0; i < np; i++)
           for (j = 0, S(i, 0) = 0, M(i, 3) = 1; j < 3; j++)
             S(i, 0) += 0.5 * std::pow(M(i, j) = xs(f_s(f, i), j) - xv_(f, j), 2);
         for (j = 0, S(np, 0) = M(np, 3) = 0; j < 3; j++) M(np, j) = nf(f, j) / fs(f);
-        if (kersol(M, S, 1e-12, nullptr, X, vp) > 1e-8) continue; //la face n'a pas d'orthocentre
+        if (kersol(M, S, 1e-12, nullptr, X, vp) > 1e-8) continue; //the face has no orthocentre
 
-        //contrainte : ne pas diminuer la distance entre xv et chaque arete de plus de 50%
+        //constraint: do not reduce the distance between xv and each edge by more than 50%
         double r2min = DBL_MAX;
         for (i = 0; i < f_s.dimension(1) && (s = f_s(f, i)) >= 0; i++)
           {
@@ -754,7 +754,7 @@ const IntTab& Domaine_Poly_base::elem_arete_d() const
 
 const DoubleTab& Domaine_Poly_base::vol_elem_som() const
 {
-  if (vol_elem_som_.size()) return vol_elem_som_; //deja fait
+  if (vol_elem_som_.size()) return vol_elem_som_; //already done
   const IntTab& es_d = elem_som_d(), &e_f = elem_faces(), &f_s = face_sommets(), &e_s = domaine().les_elems();
   const DoubleTab& xs = domaine().coord_sommets();
   DoubleTab& vol = vol_elem_som_;
@@ -764,10 +764,10 @@ const DoubleTab& Domaine_Poly_base::vol_elem_som() const
     for (i = 0; i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++)
       for (j = 0; j < f_s.dimension(1) && (s = f_s(f, j)) >= 0; j++)
         {
-          int sb = D < 3 ? -1 : f_s(f, j + 1 < f_s.dimension(1) && f_s(f, j + 1) >= 0 ? j + 1 : 0); //sommet suivant sur l'arete (3D)
+          int sb = D < 3 ? -1 : f_s(f, j + 1 < f_s.dimension(1) && f_s(f, j + 1) >= 0 ? j + 1 : 0); //next vertex on the edge (3D)
           auto vec = cross(D, D, &xv_(f, 0), &xs(s, 0), &xp_(e, 0), &xp_(e, 0));
-          double x = std::abs(D < 3 ? vec[2] : dot(&xs(sb, 0), &vec[0], &xp_(e, 0))); //volume du parallelepipede
-          for (k = 0; k < D - 1; k++) //contribution au volume de s (2D) ou a ceux de s / sb (3D)
+          double x = std::abs(D < 3 ? vec[2] : dot(&xs(sb, 0), &vec[0], &xp_(e, 0))); //volume of the parallelepiped
+          for (k = 0; k < D - 1; k++) //contribution to the volume of s (2D) or to those of s / sb (3D)
             vol(es_d(e) + (int)(std::find(&e_s(e, 0), &e_s(e, 0) + es_d(e + 1) - es_d(e), k ? sb : s) - &e_s(e, 0))) += x / (D < 3 ? 2 : 12);
         }
   return vol;
@@ -775,7 +775,7 @@ const DoubleTab& Domaine_Poly_base::vol_elem_som() const
 
 const DoubleTab& Domaine_Poly_base::pvol_som(const DoubleVect& porosite_elem) const
 {
-  if (pvol_som_.size()) return pvol_som_; //deja fait
+  if (pvol_som_.size()) return pvol_som_; //already done
   const IntTab& es_d = elem_som_d(), &e_s = domaine().les_elems();
   const DoubleTab& v_es = vol_elem_som();
   domaine().creer_tableau_sommets(pvol_som_);
@@ -789,7 +789,7 @@ const DoubleTab& Domaine_Poly_base::pvol_som(const DoubleVect& porosite_elem) co
 void Domaine_Poly_base::calculer_infos_aretes()
 {
   if (dimension < 3) return;
-  /* ordre canonique dans aretes_som */
+  /* canonical ordering in aretes_som */
   IntTab& a_s = domaine().set_aretes_som(), &e_a = domaine().set_elem_aretes();
   const DoubleTab& xs = domaine().coord_sommets();
   std::map<std::array<double, 3>, int> xv_fsa;
@@ -799,7 +799,7 @@ void Domaine_Poly_base::calculer_infos_aretes()
       for (auto &&c_s : xv_fsa) a_s(a, j) = c_s.second, j++;
     }
 
-  //remplissage de som_aretes
+  //fill som_aretes
   som_arete.resize(domaine().nb_som_tot());
   for (int i = 0; i < a_s.dimension_tot(0); i++)
     for (int j = 0; j < 2; j++) som_arete[a_s(i, j)][a_s(i, !j)] = i;
@@ -811,7 +811,7 @@ void Domaine_Poly_base::calculer_infos_aretes()
       for (k = 0; k < 3; k++) xa_(i, k) = (xs(s1, k) + xs(s2, k)) / 2, ta_(i, k) = (xs(s2, k) - xs(s1, k)) / longueur_aretes_(i);
     }
 
-  /* ordre canonique dans elem_aretes_ */
+  /* canonical ordering in elem_aretes_ */
   for (int e = 0, i, j, a; e < nb_elem_tot(); e++)
     {
       for (i = 0, j = 0, xv_fsa.clear(); i < e_a.dimension(1) && (a = e_a(e, i)) >= 0; i++) xv_fsa[ {{ xa_(a, 0), xa_(a, 1), xa_(a, 2) }}] = a;
@@ -822,7 +822,7 @@ void Domaine_Poly_base::calculer_infos_aretes()
 void Domaine_Poly_base::recalculer_xv()
 {
   if (dimension < 3) return;
-  /* recalcul de xv pour avoir les vrais CG des faces */
+  /* recompute xv to get the true face CGs */
   const DoubleTab& coords = domaine().coord_sommets();
   for (int face = 0; face < nb_faces(); face++)
     {

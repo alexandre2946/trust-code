@@ -119,7 +119,7 @@ void Domaine_EF::calculer_IPhi(const Domaine_Cl_dis_base& zcl)
   IPhi_thilde_=IPhi_;
   double rap=1./domaine().nb_som_elem();
 
-  // calcul de IPhi_ version valable poour les carres...
+  // computation of IPhi_ version valid for squares...
   for (int elem=0; elem<nbelem; elem++)
     {
       double vol=volumes(elem)*rap;
@@ -141,7 +141,7 @@ void Domaine_EF::calculer_volumes_sommets(const Domaine_Cl_dis_base& zcl)
 
   calculer_IPhi(zcl);
 
-  // calcul de volumes_sommets_thilde
+  // computation of volumes_sommets_thilde
   const IntTab& les_elems=domaine().les_elems() ;
 
   DoubleVect volumes_som_prov(volumes_sommets_thilde_);
@@ -281,14 +281,14 @@ void Domaine_EF::discretiser()
   Elem_geom_base& elem_geom = domaine_geom.type_elem().valeur();
   Domaine_VF::discretiser();
 
-  // Correction du tableau facevoisins:
-  //  A l'issue de Domaine_VF::discretiser(), les elements voisins 0 et 1 d'une
-  //  face sont les memes sur tous les processeurs qui possedent la face.
-  //  Si la face est virtuelle et qu'un des deux elements voisins n'est
-  //  pas connu (il n'est pas dans l'epaisseur du joint), l'element voisin
-  //  vaut -1. Cela peut etre un voisin 0 ou un voisin 1.
-  //  On corrige les faces virtuelles pour que, si un element voisin n'est
-  //  pas connu, alors il est voisin1. Le voisin0 est donc toujours valide.
+  // Correction of the face_voisins array:
+  //  After Domaine_VF::discretiser(), neighbor elements 0 and 1 of a
+  //  face are the same on all processors that own the face.
+  //  If the face is virtual and one of the two neighbor elements is not
+  //  known (it is not within the joint thickness), that neighbor element
+  //  is -1. It can be either neighbor 0 or neighbor 1.
+  //  Virtual faces are corrected so that, if a neighbor element is not
+  //  known, it is placed as neighbor 1. Neighbor 0 is therefore always valid.
   {
     IntTab& face_vois = face_voisins();
     const int debut = nb_faces();
@@ -362,12 +362,12 @@ void Domaine_EF::discretiser()
   int num_face;
 
 
-  // On remplit le tableau face_normales_;
-  //  Attention : le tableau face_voisins n'est pas exactement un
-  //  tableau distribue. Une face n'a pas ses deux voisins dans le
-  //  meme ordre sur tous les processeurs qui possedent la face.
-  //  Donc la normale a la face peut changer de direction d'un
-  //  processeur a l'autre, y compris pour les faces de joint.
+  // Fill the face_normales_ array.
+  //  Note: the face_voisins array is not exactly a distributed array.
+  //  A face does not have its two neighbors in the same order on all
+  //  processors that own the face.
+  //  Therefore the face normal can change direction from one processor
+  //  to another, including for joint faces.
   {
     const int n = nb_faces();
     face_normales_.resize(n, dimension);
@@ -401,7 +401,7 @@ void Domaine_EF::calculer_Bij_gen(DoubleTab& bij)
   for (int elem=0; elem<nbelem; elem++)
     for (int i=0; i<nbsom_elem; i++)
       {
-        // on cherche les faces contribuantes ,ce n'est pas optimal
+        // search for contributing faces, this is not optimal
         for (int f=0; f<nbface_elem; f++)
           {
             int face=elemfaces(elem,f);
@@ -409,7 +409,7 @@ void Domaine_EF::calculer_Bij_gen(DoubleTab& bij)
             for (int s=0; s<nbsom_face; s++)
               if (face_sommets_(face,s)==les_elems(elem,i))
 
-                // on cherche les faces contribuantes ,ce n'est pas optimal
+                // search for contributing faces, this is not optimal
                 for (int j=0; j<dimension; j++)
                   {
                     bij(elem,i,j)+=face_normales(face,j)*oriente_normale(face,elem) * ratio;
@@ -595,10 +595,10 @@ void Domaine_EF::calculer_porosites_sommets()
 }
 void Domaine_EF::calculer_h_carre()
 {
-  // Calcul de h_carre
+  // Computation of h_carre
   h_carre = 1.e30;
   h_carre_.resize(nb_faces());
-  // Calcul des surfaces
+  // Computation of face areas
   const DoubleVect& surfaces=face_surfaces();
   const int nb_faces_elem=domaine().nb_faces_elem();
   const int nbe=nb_elem();
@@ -620,7 +620,7 @@ void Domaine_EF::calculer_h_carre()
 void Domaine_EF::calculer_volumes_entrelaces()
 {
   //  Cerr << "les normales aux faces " << face_normales() << finl;
-  // On calcule les volumes entrelaces;
+  // Compute the interleaved volumes;
   //  volumes_entrelaces_.resize(nb_faces());
   creer_tableau_faces(volumes_entrelaces_);
   int elem1,elem2;
@@ -654,9 +654,9 @@ void Domaine_EF::modifier_pour_Cl(const Conds_lim& conds_lim)
       Cerr << "le Domaine_EF a ete rempli avec succes" << finl;
 
       calculer_h_carre();
-      // Calcul des porosites
+      // Compute porosities
 
-      // les porosites sommets ne servent pas
+      // vertex porosities are not used
       //calculer_porosites_sommets();
       calculer_Bij(Bij_);
 
@@ -685,11 +685,10 @@ void Domaine_EF::modifier_pour_Cl(const Conds_lim& conds_lim)
           assert(nfin>=ndeb);
           int elem1,elem2,k;
           int face;
-          // Modification des tableaux face_voisins_ , face_normales_ , volumes_entrelaces_
-          // On change l'orientation de certaines normales
-          // de sorte que les normales aux faces de periodicite soient orientees
-          // de face_voisins(la_face_en_question,0) vers face_voisins(la_face_en_question,1)
-          // comme le sont les faces internes d'ailleurs
+          // Modification of face_voisins_, face_normales_, volumes_entrelaces_ arrays.
+          // Some normals are reoriented so that normals to periodic faces point
+          // from face_voisins(face,0) toward face_voisins(face,1),
+          // as is the case for internal faces.
 
           DoubleVect C1C2(dimension);
           double vol,psc=0;
@@ -733,9 +732,9 @@ void Domaine_EF::modifier_pour_Cl(const Conds_lim& conds_lim)
         }
     }
 
-  // PQ : 10/10/05 : les faces periodiques etant a double contribution
-  //		      l'appel a marquer_faces_double_contrib s'effectue dans cette methode
-  //		      afin de pouvoir beneficier de conds_lim.
+  // PQ: 10/10/05: since periodic faces have a double contribution,
+  //		      the call to marquer_faces_double_contrib is made in this method
+  //		      in order to have access to conds_lim.
   Domaine_VF::marquer_faces_double_contrib(conds_lim);
 }
 

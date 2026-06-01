@@ -32,10 +32,10 @@ Entree& Op_Conv_kschemas_centre_VEF::readOn(Entree& s )
 
 
 //////////////////////////////////////////////////////////////
-//   Fonctions pour les kschemas_centre.
+//   Functions for kschemas_centre.
 ////////////////////////////////////////////////////////////////
 
-// convkschemas_centre : fonction utilitaire pour la convection
+// convkschemas_centre : utility function for convection
 
 void Op_Conv_kschemas_centre_VEF::convkschemas_centre(const double dK, const int ncomp, int dim, const int poly ,
                                                       const int poly1, const int poly2,const int jel0,
@@ -56,7 +56,7 @@ void Op_Conv_kschemas_centre_VEF::convkschemas_centre(const double dK, const int
 
   if ((poly1==-1) || (poly2==-1))
     {
-      //**** Cas ou on applique le schema amont
+      //**** Case where the upwind scheme is applied
       if (psc >= 0)
         {
           amont = jel0;
@@ -75,7 +75,7 @@ void Op_Conv_kschemas_centre_VEF::convkschemas_centre(const double dK, const int
         {
           flux(0) = tab1(amont);
 
-          // on centrepole le flux de la face amont sur la droite reliant les milieux des deux faces.
+          // extrapolate the upwind face flux onto the line connecting the midpoints of the two faces.
           for (j=0; j<dim; j++)
             flux(0) = flux(0)+gradient_elem(poly,0,j)*dist(j);
 
@@ -91,7 +91,7 @@ void Op_Conv_kschemas_centre_VEF::convkschemas_centre(const double dK, const int
 
   else
     {
-      // **** Cas ou on applique le schema centre
+      // **** Case where the centered scheme is applied
 
       if (psc >= 0)
         tab_fluent(jel1)  += psc;
@@ -114,13 +114,13 @@ void Op_Conv_kschemas_centre_VEF::convkschemas_centre(const double dK, const int
             flux(0) = flux(0)+0.5*gradient_elem(poly,0,j)*(dist_amont(j)+dist_aval(j));
           for (i=0; i<dim; i++)
             {
-              // Determination des deltat phi0 et phi1
+              // Determine deltat phi0 and phi1
               deltat0 += gradient_elem(poly1,0,i)*rx(i);
               deltat1 -= gradient_elem(poly2,0,i)*rx(i);
             }
 
 
-          // Calcul du flux
+          // Flux computation
           flux(0) += deltat0/16. + deltat1/16. ;
           //      if (K == 0.5)
           //        flux(0) += deltat0/16. + deltat1/16. ;
@@ -144,7 +144,7 @@ void Op_Conv_kschemas_centre_VEF::convkschemas_centre(const double dK, const int
                   deltat0 += gradient_elem(poly1,comp,i)*rx(i);
                   deltat1 += gradient_elem(poly2,comp,i)*rx(i);
                 }
-              // Calcul du flux
+              // Flux computation
               flux(comp) += deltat0/16. + deltat1/16. ;
               //        if (K == 0.5)
               //          flux(comp) += deltat0/16. + deltat1/16. ;
@@ -194,15 +194,14 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
   int nsom = domaine.nb_som_elem();
   int nb_som_facette = domaine.type_elem()->nb_som_face();
   // MODIF SB su 10/09/03
-  // Pour les 3 elements suivants, il y a autant de sommets que de face
-  // constituant l'element geometrique
-  // PB avec les hexa, 8 sommets et 6 faces, donc l'utilisation du tableau
-  // face[i] ne fonctionne plus
-  // la methode retenue pour eviter de calculer la vitesse aux sommets sans
-  // les fonctions de forme n'est donc pas utilisable,
-  // pour l'hexa on n'a pas acces a la face.
-  // il existe le tableau Face=>sommets mais pas l'inverse.
-  // trop couteux et pour le moment on n'etend pas les porosites aux hexa
+  // For the following 3 element types, the number of vertices equals the number of faces
+  // composing the geometric element.
+  // Problem with hexa: 8 vertices and 6 faces, so using the face[i] array no longer works
+  // the method retained to avoid computing the velocity at vertices without
+  // shape functions is therefore not applicable,
+  // for hexa elements the face-to-vertex mapping is not directly accessible.
+  // The Face=>vertices table exists but not the inverse.
+  // Too costly; for now porosity is not extended to hexa elements.
 
   int istetra=0;
   const Elem_VEF_base& type_elemvef= domaine_VEF.type_elem();
@@ -210,15 +209,13 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
   if ((nom_elem=="Tetra_VEF")||(nom_elem=="Tri_VEF"))
     istetra=1;
 
-  // Pour le traitement de la convection on distingue les polyedres
-  // standard qui ne "voient" pas les conditions aux limites et les
-  // polyedres non standard qui ont au moins une face sur le bord.
-  // Un polyedre standard a n facettes sur lesquelles on applique le
-  // schema de convection.
-  // Pour un polyedre non standard qui porte des conditions aux limites
-  // de Dirichlet, une partie des facettes sont portees par les faces.
-  // En bref pour un polyedre le traitement de la convection depend
-  // du type (triangle, tetraedre ...) et du nombre de faces de Dirichlet.
+  // For convection processing, standard polyhedra (those not "seeing" boundary conditions)
+  // are distinguished from non-standard polyhedra that have at least one boundary face.
+  // A standard polyhedron has n facets on which the convection scheme is applied.
+  // For a non-standard polyhedron with Dirichlet boundary conditions,
+  // some of the facets are carried by the boundary faces.
+  // In short, for a polyhedron, the convection treatment depends
+  // on the type (triangle, tetrahedron, ...) and the number of Dirichlet faces.
 
   double psc;
   int poly,poly1,poly2,face_adj,fa7,i,j,n_bord;
@@ -240,7 +237,7 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
   DoubleVect fluxg(ncomp_ch_transporte);
 
 
-  // Traitement particulier pour les faces de periodicite
+  // Special treatment for periodic faces
   int nb_faces_perio = 0;
   for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {
@@ -286,14 +283,14 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
 
   ///////////////////////////////////////////////////////////////////////////////////////////////
   //                        <
-  // calcul des gradients;  < [ Ujp*np/vol(j) ]
+  // gradient computation;  < [ Ujp*np/vol(j) ]
   //                         j
   ////////////////////////////////////////////////////////////////////////////////////////////////
-  // Creation de l'espace virtuel pour gradient_elem
+  // Create the virtual space for gradient_elem
   DoubleTab gradient_elem(0, ncomp_ch_transporte, dimension);
-  // (du/dx du/dy dv/dx dv/dy) pour un poly
+  // (du/dx du/dy dv/dx dv/dy) for a polyhedron
   domaine_VEF.domaine().creer_tableau_elements(gradient_elem);
-  // Boucle sur les faces
+  // Loop over faces
 
 
   for (fac=0; fac< premiere_face_int; fac++)
@@ -311,7 +308,7 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
             gradient_elem(elem1, comp0, i) +=
               face_normales(fac,i)*transporte(fac,comp0);
       // dUcomp/dXi
-    } // fin du for faces
+    } // end of for faces
 
   for (; fac<nb_faces_; fac++)
     {
@@ -335,7 +332,7 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
                 face_normales(fac,i)*transporte(fac,comp0);
             }
       // dUcomp/dXi
-    } // fin du for faces
+    } // end of for faces
 
   for (int elem=0; elem<nb_elem; elem++)
     for (comp0=0; comp0<ncomp_ch_transporte; comp0++)
@@ -345,7 +342,7 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
   gradient_elem.echange_espace_virtuel();
 
   ////////////////////////////////////////////////////////////////////////////////////
-  // On a les gradient_elem par elements
+  // gradient_elem is now available per element
   ////////////////////////////////////////////////////////////////////////////////////
   DoubleVect coord_som(dimension);
   DoubleVect vs(dimension);
@@ -354,18 +351,17 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
   DoubleVect cc(dimension);
   double xm;
 
-  // On remet a zero le tableau qui sert pour
-  // le calcul du pas de temps de stabilite
+  // Reset the array used for stability time step computation
   fluent_ = 0;
 
-  // Les polyedres non standard sont ranges en 2 groupes dans le Domaine_VEF:
-  //  - polyedres bords et joints
-  //  - polyedres bords et non joints
-  // On traite les polyedres en suivant l'ordre dans lequel ils figurent
-  // dans le domaine
+  // Non-standard polyhedra are grouped in 2 categories in Domaine_VEF:
+  //  - boundary and joint polyhedra
+  //  - boundary and non-joint polyhedra
+  // Process polyhedra following the order in which they appear
+  // in the domain
 
   //////////////////////////////////////////////////////////////////////////////////////
-  // boucle sur les polys
+  // loop over polyhedra
   //////////////////////////////////////////////////////////////////////////////////////
 
   const IntTab& KEL=type_elemvef.KEL();
@@ -379,7 +375,7 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
       else
         itypcl=domaine_Cl_VEF.type_elem_Cl(rang);
 
-      // calcul des numeros des faces du polyedre
+      // compute face indices of the polyhedron
 
       for (face_adj=0; face_adj<nfac; face_adj++)
         {
@@ -390,7 +386,7 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
       int scom;
       DoubleVect rx0(dimension);
 
-      // calcul de la vitesse aux sommets des polyedres
+      // compute velocity at the vertices of the polyhedra
 
       for (j=0; j<dimension; j++)
         {
@@ -410,8 +406,8 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
         }
       else
         {
-          // pour que cela soit valide avec les hexa
-          // On va utliser les fonctions de forme implementees dans la classe Champs_P1_impl ou Champs_Q1_impl
+          // to make this valid for hexahedral elements
+          // Use the shape functions implemented in the class Champs_P1_impl or Champs_Q1_impl
           int ncomp;
           for (j=0; j<nsom; j++)
             {
@@ -455,12 +451,12 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
 
           scom = les_Polys(poly,KEL(2,fa7));
 
-          // calcul des rx0, distance entre les milieux des 'num i'
+          // compute rx0, distance between centers of 'num i' faces
 
           for (i=0; i<dimension; i++)
             rx0(i) = xv(num20,i)-xv(num10,i);
 
-          // normales aux facettes
+          // facet normals
 
           if (rang==-1)
             for (i=0; i<dimension; i++)
@@ -471,7 +467,7 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
 
 
           /////////////////////////////////////////////////////////////////////////
-          // On traite le point pour lequel vitesse = 0.5(vitsommet + vitmilieu)
+          // Process the point where velocity = 0.5(vitsommet + vitmilieu)
           /////////////////////////////////////////////////////////////////////////
 
 
@@ -479,7 +475,7 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
             {
 
               //////////////////////////////////////////////////////////////////////////
-              //Determination de PhiIJ au milieu entre le sommet et le milieu de num3
+              //Determine PhiIJ at the midpoint between the vertex and the midpoint of num3
               /////////////////////////////////////////////////////////////////////////
 
               psc = 0;
@@ -494,15 +490,15 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
 
 
               ////////////////////////////////////////////////////////////////////////////////////////////////////////
-              //Limiteur pour le gradient. Calcul effectue en meme temps que le calcul du flux.
-              // gradient(K0) = teta*gradient(K0)+ (1-teta)gradient(K1ou K2)
+              //Gradient limiter. Computed simultaneously with the flux computation.
+              // gradient(K0) = teta*gradient(K0)+ (1-teta)gradient(K1 or K2)
               ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
               double teta;
               teta = 1.;
 
               /////////////////////////////////////////////////////////////////////////
-              // On traite les sommets qui sont aussi des sommets du polyedre
+              // Process vertices that are also vertices of the polyhedron
               /////////////////////////////////////////////////////////////////////////
 
               if (ncomp_ch_transporte == 1)
@@ -579,7 +575,7 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
 
 
               ////////////////////////////////////////////////////////////////////////////
-              // on traite le centre de gravite
+              // Process the center of gravity
               ////////////////////////////////////////////////////////////////////////////
 
               if (ncomp_ch_transporte == 1)
@@ -656,7 +652,7 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
                 }
 
               //////////////////////////////////////////////////////////////////////////////
-              // Integration de u.n.flux
+              // Integration of u.n.flux
               /////////////////////////////////////////////////////////////////////////////
 
               if (ncomp_ch_transporte == 1)
@@ -675,12 +671,12 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
                 }
             }
         }
-    } // fin de la boucle
+    } // end of loop
 
-  // Traitement des elements joints d'epaisseur 1
+  // Processing of joint elements of thickness 1
   for (poly=0; poly<nb_elem_tot; poly++)
     {
-      // On regarde si une face du polyedre est une face joint
+      // Check if a face of the polyhedron is a joint face
       for (face_adj=0; face_adj<nfac; face_adj++)
         if(face_adj<nb_faces) break;
       if(face_adj<nfac)
@@ -691,7 +687,7 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
           else
             itypcl=domaine_Cl_VEF.type_elem_Cl(rang);
 
-          // calcul des numeros des faces du polyedre
+          // compute face indices of the polyhedron
 
           for (face_adj=0; face_adj<nfac; face_adj++)
             {
@@ -702,7 +698,7 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
           int scom;
           DoubleVect rx0(dimension);
 
-          // calcul de la vitesse aux sommets des polyedres
+          // compute velocity at the vertices of the polyhedra
           for (j=0; j<dimension; j++)
             {
               vs(j) = la_vitesse.valeurs()(face(0),j)*porosite_face(face(0));
@@ -721,8 +717,8 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
             }
           else
             {
-              // pour que cela soit valide avec les hexa
-              // On va utliser les fonctions de forme implementees dans la classe Champs_P1_impl ou Champs_Q1_impl
+              // to be valid for hexa elements
+              // use shape functions implemented in Champs_P1_impl or Champs_Q1_impl
               int ncomp;
               for (j=0; j<nsom; j++)
                 {
@@ -766,12 +762,12 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
 
               scom = les_Polys(poly,KEL(2,fa7));
 
-              // calcul des rx0, distance entre les milieux des 'num i'
+              // compute rx0, distance between centers of 'num i' faces
 
               for (i=0; i<dimension; i++)
                 rx0(i) = xv(num20,i)-xv(num10,i);
 
-              // normales aux facettes
+              // facet normals
 
               if (rang==-1)
                 for (i=0; i<dimension; i++)
@@ -782,7 +778,7 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
 
 
               /////////////////////////////////////////////////////////////////////////
-              // On traite le point pour lequel vitesse = 0.5(vitsommet + vitmilieu)
+              // Process the point where velocity = 0.5(vitsommet + vitmilieu)
               /////////////////////////////////////////////////////////////////////////
 
 
@@ -790,7 +786,7 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
                 {
 
                   //////////////////////////////////////////////////////////////////////////
-                  //Determination de PhiIJ au milieu entre le sommet et le milieu de num3
+                  //Determine PhiIJ at the midpoint between the vertex and the midpoint of num3
                   /////////////////////////////////////////////////////////////////////////
 
                   psc = 0;
@@ -804,15 +800,15 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
 
 
                   ////////////////////////////////////////////////////////////////////////////////////////////////////////
-                  //Limiteur pour le gradient. Calcul effectue en meme temps que le calcul du flux.
-                  // gradient(K0) = teta*gradient(K0)+ (1-teta)gradient(K1ou K2)
+                  //Gradient limiter. Computed simultaneously with the flux computation.
+                  // gradient(K0) = teta*gradient(K0)+ (1-teta)gradient(K1 or K2)
                   ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                   double teta;
                   teta = 1.;
 
                   /////////////////////////////////////////////////////////////////////////
-                  // On traite les sommets qui sont aussi des sommets du polyedre
+                  // Process vertices that are also vertices of the polyhedron
                   /////////////////////////////////////////////////////////////////////////
 
                   if (ncomp_ch_transporte == 1)
@@ -889,7 +885,7 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
 
 
                   ////////////////////////////////////////////////////////////////////////////
-                  // on traite le centre de gravite
+                  // Process the center of gravity
                   ////////////////////////////////////////////////////////////////////////////
 
                   if (ncomp_ch_transporte == 1)
@@ -966,7 +962,7 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
                     }
 
                   //////////////////////////////////////////////////////////////////////////////
-                  // Integration de u.n.flux
+                  // Integration of u.n.flux
                   /////////////////////////////////////////////////////////////////////////////
 
                   if (ncomp_ch_transporte == 1)
@@ -986,20 +982,19 @@ DoubleTab& Op_Conv_kschemas_centre_VEF::ajouter(const DoubleTab& transporte,
                 }
             }
         }
-    } // fin de la boucle
+    } // end of loop
   int voisine;
   nb_faces_perio = 0;
   double diff1,diff2;
 
-  // Dimensionnement du tableau des flux convectifs au bord du domaine
-  // de calcul
+  // Size the array of convective fluxes at the domain boundary
   DoubleTab& flux_b = flux_bords_;
   flux_b.resize(domaine_VEF.nb_faces_bord(),ncomp_ch_transporte);
   flux_b = 0.;
 
-  // Boucle sur les bords pour traiter les conditions aux limites
-  // il y a prise en compte d'un terme de convection pour les
-  // conditions aux limites de Neumann_sortie_libre seulement
+  // Loop over boundary conditions
+  // a convection term is taken into account for
+  // Neumann_sortie_libre boundary conditions only
 
   for (n_bord=0; n_bord<domaine_VEF.nb_front_Cl(); n_bord++)
     {

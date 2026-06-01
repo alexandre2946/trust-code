@@ -24,9 +24,9 @@
 
 class Champ_base;
 
-/*! @brief classe Champ_Fonc_Tabule_Morceaux_Interp Cette classe represente un champ prenant par morceaux des valuers fonctions
+/*! @brief Champ_Fonc_Tabule_Morceaux_Interp This class represents a field taking piecewise values as functions
  *
- *      de l'espace et d'un autre champ scalaire passe en parametre .
+ *      of space and of another scalar field passed as a parameter.
  *
  * @sa : TRUSTChamp_Morceaux_generique
  */
@@ -39,7 +39,7 @@ public :
   int initialiser(const double temps) override;
 
 protected :
-  std::vector<Champ_Fonc_Interp> ch_param_interp; /* liste de champs parametres */
+  std::vector<Champ_Fonc_Interp> ch_param_interp; /* list of parameter fields */
 };
 
 #endif /* Champ_Fonc_Tabule_Morceaux_Interp_included */

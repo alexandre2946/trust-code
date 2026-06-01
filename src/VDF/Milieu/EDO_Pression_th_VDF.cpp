@@ -24,9 +24,9 @@ Sortie& EDO_Pression_th_VDF::printOn(Sortie& os) const { return EDO_Pression_th_
 
 Entree& EDO_Pression_th_VDF::readOn(Entree& is) { return EDO_Pression_th_base::readOn(is); }
 
-/*! @brief Renvoie la valeur de la pression calculee pour conserver la masse
+/*! @brief @brief Returns the computed pressure value that conserves mass.
  *
- * @return (Double) pression calculee
+ * @return Computed pressure value.
  */
 double EDO_Pression_th_VDF::masse_totale(double P, const DoubleTab& T)
 {
@@ -102,7 +102,7 @@ void EDO_Pression_th_VDF::calculer_grad(const DoubleTab& inco, DoubleTab& resu)
   const DoubleTab& xp = dom.xp();
   const DoubleVect& volume_entrelaces = le_dom->volumes_entrelaces();
 
-  // Boucle sur les faces internes
+  // Loop over internal faces
   ToDo_Kokkos("critical");
   for (face = dom.premiere_face_int(); face < dom.nb_faces(); face++)
     {

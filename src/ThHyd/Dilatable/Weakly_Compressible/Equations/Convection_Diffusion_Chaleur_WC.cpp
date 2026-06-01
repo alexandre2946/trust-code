@@ -44,7 +44,7 @@ int Convection_Diffusion_Chaleur_WC::lire_motcle_non_standard(const Motcle& mot,
     {
       Convection_Diffusion_Chaleur_Fluide_Dilatable_base::lire_motcle_non_standard(mot,is);
 
-      //l'equation de la chaleur en quasi compressible contient un terme source dP_tot/dt
+      //the weakly-compressible heat equation contains a source term dP_tot/dt
       Cerr << "Source term creation of the energy equation :"<< finl;
       Source t;
       Source& so=les_sources.add(t);
@@ -64,9 +64,9 @@ int Convection_Diffusion_Chaleur_WC::lire_motcle_non_standard(const Motcle& mot,
 
 void Convection_Diffusion_Chaleur_WC::completer()
 {
-  Convection_Diffusion_Chaleur_Fluide_Dilatable_base::completer(); // en fait c'est Equation_base::completer() mais on sais pas un jour ...
+  Convection_Diffusion_Chaleur_Fluide_Dilatable_base::completer(); // in practice this calls Equation_base::completer() but that might change someday ...
 
-  // initialiser l'operateur grad
+  // initialise the gradient operator
   Op_Grad_WC_.associer_eqn(*this);
   Op_Grad_WC_.typer();
   Op_Grad_WC_.l_op_base().associer_eqn(*this);

@@ -264,9 +264,9 @@ KOKKOS_INLINE_FUNCTION double formule_3D(int n)
 
 ////////////////////////////////////////////////////////////////////
 //
-//                      Implementation des fonctions
+//                      Implementation of functions
 //
-//                   de la classe Op_Conv_EF_VEF_P1NC_Stab
+//                   of class Op_Conv_EF_VEF_P1NC_Stab
 //
 ////////////////////////////////////////////////////////////////////
 
@@ -282,7 +282,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::reinit_conv_pour_Cl(const DoubleTab& transporte,c
 
   const DoubleVect& transporteV= transporte;
 
-  //Boucle pour dimensionner la liste "faces"
+  //Loop to dimension the "faces" list
   for (n_bord=0; n_bord<nb_bord; n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -308,7 +308,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::reinit_conv_pour_Cl(const DoubleTab& transporte,c
                   resu(facei,dim)+=psc*(la_sortie_libre.val_ext(facei-num1,dim)-transporteV[facei*nb_comp+dim]);
 
             }
-        }//fin du if sur "Neumann_sortie_libre"
+        }//end if on "Neumann_sortie_libre"
     }
 }
 
@@ -326,7 +326,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::calculer_coefficients_operateur_centre(DoubleTab&
   assert(tab_Kij.dimension(1)==nb_faces_elem);
 
   //
-  //Calcul des coefficients de l'operateur
+  //Compute the operator coefficients
   //
   CDoubleTabView face_normales = domaine_VEF.face_normales().view_ro();
   CIntTabView elem_faces = domaine_VEF.elem_faces().view_ro();
@@ -365,11 +365,11 @@ void Op_Conv_EF_VEF_P1NC_Stab::calculer_coefficients_operateur_centre(DoubleTab&
         Kokkos::atomic_add(&Kij(elem,face_loci,face_loci), +1./nb_faces_elem*pscj);
         Kokkos::atomic_add(&Kij(elem,face_locj,face_loci), -1./nb_faces_elem*psci);
         Kokkos::atomic_add(&Kij(elem,face_locj,face_locj), +1./nb_faces_elem*psci);
-      }//fin du for sur "face_locj"
-  });//fin du for sur "elem"
+      }//end for on "face_locj"
+  });//end for on "elem"
   end_gpu_timer(__KERNEL_NAME__);
   //
-  // Correction des Kij pour Dirichlet !
+  // Correction of Kij for Dirichlet!
   //
   {
     int nb_bord=domaine_Cl_VEF.nb_cond_lim();
@@ -381,7 +381,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::calculer_coefficients_operateur_centre(DoubleTab&
              || (sub_type(Dirichlet_homogene,la_cl.valeur()))
            )
           {
-            // GF on retire le test sur nb_comp car sinon en scalaire on fait tjs du volume etendu
+            // GF: removing the test on nb_comp because otherwise in scalar mode we always use extended volume
             if ( volumes_etendus_ )
               {
                 CIntTabView num_fac_loc = domaine_VEF.get_num_fac_loc().view_ro();
@@ -390,7 +390,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::calculer_coefficients_operateur_centre(DoubleTab&
                 CIntArrView elem_faces_frontiere_v = elem_faces_frontiere[n_bord].view_ro();
                 const int elem_faces_frontiere_size = elem_faces_frontiere[n_bord].size_array();
                 //
-                //Modification des coefficients de la matrice
+                //Modification of the matrix coefficients
                 //
                 Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__),
                                      Kokkos::RangePolicy<>(0,elem_faces_frontiere_size), KOKKOS_LAMBDA(
@@ -401,31 +401,31 @@ void Op_Conv_EF_VEF_P1NC_Stab::calculer_coefficients_operateur_centre(DoubleTab&
                   const int nb_faces_bord = elem_nb_faces_dirichlet_v(elem);
 
                   //
-                  //Calcul du coefficient ponderateur
+                  //Compute the weighting coefficient
                   //
 
                   const double coeff = (dim==2) ?
                                        nb_faces_bord/2. : nb_faces_bord*nb_faces_bord/6.-nb_faces_bord/3.+1./2;
 
                   //
-                  //Fin du calcul du coefficient ponderateur
+                  //End of weighting coefficient computation
                   //
 
                   for (int face_loc_i=0; face_loc_i<nb_faces_elem; face_loc_i++)
                     {
                       const int face_i = elem_faces(elem,face_loc_i);
 
-                      /* On determine si "face_i" est une face de Dirichlet */
+                      /* Determine whether "face_i" is a Dirichlet face */
                       bool is_not_on_boundary = true;
                       for (int f_loc=0; f_loc<nb_faces_bord; f_loc++)
                         is_not_on_boundary&=(face_i!=elem_faces_dirichlet_v(elem,f_loc));
 
-                      if (is_not_on_boundary) /* si "face_i" n'est pas de Dirichlet */
+                      if (is_not_on_boundary) /* if "face_i" is not a Dirichlet face */
                         {
                           for (int face_loc_j=0; face_loc_j<nb_faces_elem; face_loc_j++)
                             {
-                              /* Modification des coefficients de la matrice */
-                              /* selon les fonctions de formes etendues */
+                              /* Modify the matrix coefficients */
+                              /* according to the extended shape functions */
                               for (int f_loc=0; f_loc<nb_faces_bord; f_loc++)
                                 {
                                   const int face_bord = elem_faces_dirichlet_v(elem,f_loc);
@@ -435,18 +435,18 @@ void Op_Conv_EF_VEF_P1NC_Stab::calculer_coefficients_operateur_centre(DoubleTab&
 
                                   const double kkj = Kij(elem,face_loc_k,face_loc_j);
                                   Kij(elem,face_loc_i,face_loc_j) += coeff*kkj;
-                                }//fin du for sur "f_loc"
+                                }//end for on "f_loc"
 
-                            }//fin du for sur "face_loc_k"
+                            }//end of for on "face_loc_k"
 
-                        }//fin du if
+                        }//end of if
 
-                    }//fin du for sur "face_loc_i"
+                    }//end of for on "face_loc_i"
 
 
                   //
-                  //Remise a zero des coefficients associes aux noeuds
-                  //qui se situent sur la frontiere de Dirichlet
+                  //Reset to zero the coefficients associated with nodes
+                  //that lie on the Dirichlet boundary
                   //
                   {
                     for (int f_loc=0; f_loc<nb_faces_bord; f_loc++)
@@ -458,14 +458,14 @@ void Op_Conv_EF_VEF_P1NC_Stab::calculer_coefficients_operateur_centre(DoubleTab&
 
                         for (int face_loc_i=0; face_loc_i<nb_faces_elem; face_loc_i++)
                           Kij(elem,face_loc_j,face_loc_i)=0;
-                      }//fin du for sur "f_loc"
+                      }//end of for on "f_loc"
                   }
                   //
-                  //Fin de la remise a zero
+                  //End of reset to zero
                   //
 
                   //
-                  //Pour retrouver le schema LED
+                  //To recover the LED scheme
                   //
                   {
                     for (int face_loc_i=0; face_loc_i<nb_faces_elem; face_loc_i++)
@@ -480,7 +480,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::calculer_coefficients_operateur_centre(DoubleTab&
                       }
                   }
                   //
-                  //Fin du schema LED
+                  //End of LED scheme
                   //
 
                 });// for face
@@ -574,18 +574,18 @@ DoubleTab& Op_Conv_EF_VEF_P1NC_Stab::ajouter(const DoubleTab& transporte_2,
 
   DoubleTab transporte_;
   DoubleTab vitesse_face_;
-  // soit on a transporte=phi*transporte_ et vitesse=vitesse_
-  // soit transporte=transporte_ et vitesse=phi*vitesse_
-  // cela depend si on transporte avec phi u ou avec u.
+  // either transporte=phi*transporte_ and vitesse=vitesse_
+  // or transporte=transporte_ and vitesse=phi*vitesse_
+  // depending on whether transport uses phi*u or u.
   const DoubleTab& tab_vitesse=modif_par_porosite_si_flag(vitesse_2,vitesse_face_,marq,porosite_face);
 
-  // soit on a transporte=phi*transporte_ et vitesse=vitesse_
-  // soit transporte=transporte_ et vitesse=phi*vitesse_
-  // cela depend si on transporte avec phi u ou avec u.
+  // either transporte=phi*transporte_ and vitesse=vitesse_
+  // or transporte=transporte_ and vitesse=phi*vitesse_
+  // depending on whether transport uses phi*u or u.
   const DoubleTab& transporte=modif_par_porosite_si_flag(transporte_2,transporte_,!marq,porosite_face);
 
   DoubleTrav Kij(nb_elem_tot,nb_faces_elem,nb_faces_elem);
-  //Initialisation du tableau flux_bords_ pour le calcul des pertes de charge
+  //Initialize the flux_bords_ array for pressure drop computation
   flux_bords_.resize(domaine_VEF.nb_faces_bord(),nb_comp);
   calculer_flux_bords(Kij,tab_vitesse,transporte);
 
@@ -607,7 +607,7 @@ DoubleTab& Op_Conv_EF_VEF_P1NC_Stab::ajouter(const DoubleTab& transporte_2,
       ajouter_old(transporte,resu,tab_vitesse);
     }
 
-  //Pour tenir compte des conditions de Neumann sortie libre
+  //To account for Neumann outflow boundary conditions
   IntList NeumannFaces;
   DoubleTabs ValeursNeumannFaces;
   reinit_conv_pour_Cl(transporte,NeumannFaces,ValeursNeumannFaces,tab_vitesse,resu);
@@ -619,13 +619,12 @@ DoubleTab& Op_Conv_EF_VEF_P1NC_Stab::ajouter(const DoubleTab& transporte_2,
   return resu;
 }
 
-//Correction pour le poreux : on rajoute la partie en  T div(u)
-//Variable transportee : T
-//Variable transportante : u
-//REMARQUE : il ne FAUT SURTOUT PAS utiliser le tableau Kij car par
-//construction celui-ci est telle que sum_{j} Kij =0 ce qui revient a
-//imposer une vitesse a divergence nulle par element. Ce qui est
-//problematique quand on est en compressible
+//Porous correction: add the T*div(u) contribution
+//Transported variable: T
+//Transporting variable: u
+//NOTE: the Kij array MUST NOT be used because by
+//construction sum_{j} Kij = 0, which enforces a zero-divergence
+//velocity per element — problematic in compressible flows
 DoubleTab& Op_Conv_EF_VEF_P1NC_Stab::ajouter_partie_compressible(const DoubleTab& transporte,
                                                                  DoubleTab& resu, const DoubleTab& vitesse_2) const
 {
@@ -636,7 +635,7 @@ DoubleTab& Op_Conv_EF_VEF_P1NC_Stab::ajouter_partie_compressible(const DoubleTab
   const int nb_elem_tot=domaine_VEF.nb_elem_tot();
   const int nb_faces_elem=elem_faces.line_size();
 
-  //Pour tenir compte de la porosite
+  //To account for porosity
   const int marq = phi_u_transportant(equation());
   const DoubleVect& porosite_elem = equation().milieu().porosite_elem();
   const DoubleVect& porosite_face = equation().milieu().porosite_face();
@@ -672,8 +671,8 @@ DoubleTab& Op_Conv_EF_VEF_P1NC_Stab::ajouter_partie_compressible(const DoubleTab
                        Kokkos::RangePolicy<>(0, nb_elem_tot), KOKKOS_LAMBDA(
                          const int elem)
   {
-    //Type de l'element : le nombre de faces de Dirichlet
-    //qu'il contient
+    //Element type: the number of Dirichlet faces
+    //it contains
     int type_elem=elem_nb_faces_dirichlet_v(elem);
     double coeff;
     if (!vol_etendus)
@@ -683,7 +682,7 @@ DoubleTab& Op_Conv_EF_VEF_P1NC_Stab::ajouter_partie_compressible(const DoubleTab
 
     int facei, facei_loc, dim;
 
-    //Calcul de la divergence par element
+    //Compute the divergence per element
     double div=0.;
     for (facei_loc=0; facei_loc<nb_faces_elem; facei_loc++)
       {
@@ -696,7 +695,7 @@ DoubleTab& Op_Conv_EF_VEF_P1NC_Stab::ajouter_partie_compressible(const DoubleTab
     div*=coeff;
     if (!marq) div/=porosite_elem_v(elem);
 
-    //Calcul de la partie compressible
+    //Compute the compressible part
     for (facei_loc=0; facei_loc<nb_faces_elem; facei_loc++)
       {
         facei=elem_faces_v(elem,facei_loc);
@@ -725,11 +724,11 @@ void Op_Conv_EF_VEF_P1NC_Stab::calculer_flux_bords(const DoubleTab& Kij, const D
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       int num1 = 0;
-      int num2 = le_bord.nb_faces();//il ne faut boucler que sur les faces reelles ici
+      int num2 = le_bord.nb_faces();//only loop over real faces here
 
       if ( sub_type(Dirichlet_homogene,la_cl.valeur()) )
         {
-          //On ne calcule pas le flux aux bords Dirichlet_homogene
+          //Do not compute flux at Dirichlet_homogene boundaries
         }
       else if ( sub_type(Neumann,la_cl.valeur())
                 || sub_type(Neumann_val_ext,la_cl.valeur())
@@ -838,8 +837,8 @@ Op_Conv_EF_VEF_P1NC_Stab::ajouter_diffusion(const DoubleTab& tab_Kij, const Doub
             int colonne=facej*nb_comp+dim;
             double delta=transporteV[colonne]-transporteV[ligne];
 
-            //ATTENTION AU SIGNE : ici on code +div(uT)
-            //REMARQUE : on utilise la symetrie de l'operateur
+            //NOTE ON SIGN: here we code +div(uT)
+            //NOTE: exploiting the symmetry of the operator
             Kokkos::atomic_add(&resuV[ligne], coeffij*delta);
             Kokkos::atomic_sub(&resuV[colonne], coeffji*delta);
           }
@@ -858,7 +857,7 @@ Op_Conv_EF_VEF_P1NC_Stab::ajouter_antidiffusion(const DoubleTab& tab_Kij, const 
   const int nb_comp=transporte.line_size();
   if (nb_comp>3) Process::exit("EF_stab is not coded for more than 3 components for array transporte.");
 
-  //Pour le limiteur
+  //For the limiter
 
   CIntTabView elem_faces = domaine_VEF.elem_faces().view_ro();
   CIntTabView face_voisins = domaine_VEF.face_voisins().view_ro();
@@ -890,13 +889,13 @@ Op_Conv_EF_VEF_P1NC_Stab::ajouter_antidiffusion(const DoubleTab& tab_Kij, const 
           assert(lij >= 0);
           assert(lji >= 0);
 
-          if (lij <= lji) //facei est amont
+          if (lij <= lji) //facei is upstream
             {
               int face_amont = facei;
               int face_aval = facej;
 
-              //Si lij==lji, on passe deux foix dans la boucle
-              //d'ou la presence du coefficient 1/2
+              //If lij==lji, we iterate twice in the loop
+              //hence the coefficient 1/2
               double coeff = 1. * (lij < lji) + 0.5 * (lij == lji);
               assert(coeff == 1. || coeff == 0.5);
 
@@ -911,7 +910,7 @@ Op_Conv_EF_VEF_P1NC_Stab::ajouter_antidiffusion(const DoubleTab& tab_Kij, const 
 
                   double delta = transporteV[colonne] - transporteV[ligne];
 
-                  //Limiteur de pente
+                  //Slope limiter
                   double R;
                   if (delta >= 0.) R = (Kokkos::fabs(P_plus[dim]) < DMINFLOAT) ? 0. : Q_plus[dim] / P_plus[dim];
                   else R = (Kokkos::fabs(P_moins[dim]) < DMINFLOAT) ? 0. : Q_moins[dim] / P_moins[dim];
@@ -925,7 +924,7 @@ Op_Conv_EF_VEF_P1NC_Stab::ajouter_antidiffusion(const DoubleTab& tab_Kij, const 
                   double coeffij = alpha_beta_amont * daij * coeff * delta;
                   double coeffji = alpha_beta_aval  * daij * coeff * delta;
 
-                  //Calcul de resu
+                  //Compute resu
                   Kokkos::atomic_add(&resuV[colonne], + coeffij);
                   Kokkos::atomic_add(&resuV[ligne],   - coeffji);
                 }
@@ -936,7 +935,7 @@ Op_Conv_EF_VEF_P1NC_Stab::ajouter_antidiffusion(const DoubleTab& tab_Kij, const 
   return resu;
 }
 
-//ATTENTION : suppose les parametres P_plus, P_moins, Q_plus, Q_moins nuls en entree
+//WARNING: assumes that the parameters P_plus, P_moins, Q_plus, Q_moins are zero on entry
 KOKKOS_INLINE_FUNCTION void
 Op_Conv_EF_VEF_P1NC_Stab::calculer_senseur(CDoubleTabView3 Kij, CDoubleArrView transporteV,
                                            const int nb_comp, const int face_i,
@@ -956,26 +955,26 @@ Op_Conv_EF_VEF_P1NC_Stab::calculer_senseur(CDoubleTabView3 Kij, CDoubleArrView t
       if (elem!=-1)
         {
           int face_i_loc = num_fac_loc(face_i,elem_voisin);
-          //On travaille sur les faces de "elem"
+          //Work on the faces of "elem"
           for (int face_k_loc=0; face_k_loc<nb_faces_elem; face_k_loc++)
             {
               int face_k=elem_faces(elem,face_k_loc);
               double kik=Kij(elem,face_i_loc,face_k_loc);
               //
-              //Calcul des variables intermediaires
+              //Compute the intermediate variables
               //
               for (int dim=0; dim<nb_comp; dim++)
                 {
                   double deltaki = transporteV[face_k*nb_comp+dim]-transporteV[face_i*nb_comp+dim];
-                  //Calcul de P_plus et P_moins
-                  //Calcul de Q_plus et Q_moins
-                  /* Codage initial:
+                  //Compute P_plus and P_moins
+                  //Compute Q_plus and Q_moins
+                  /* Initial coding:
                      P_plus(dim)+=minimum(0.,kik)*minimum(0.,deltaki);
                      P_moins(dim)+=minimum(0.,kik)*maximum(0.,deltaki);
                      Q_plus(dim)+=maximum(0.,kik)*maximum(0.,deltaki);
                      Q_moins(dim)+=maximum(0.,kik)*minimum(0.,deltaki);
                   */
-                  // Codage optimise:
+                  // Optimized coding:
                   double tmp = kik*deltaki;
                   if (kik>0)
                     {
@@ -987,16 +986,16 @@ Op_Conv_EF_VEF_P1NC_Stab::calculer_senseur(CDoubleTabView3 Kij, CDoubleArrView t
                       if (tmp>0) P_plus[dim]+=tmp;
                       else       P_moins[dim]+=tmp;
                     }
-                }//fin du for sur "dim"
+                }//end of for loop over "dim"
               //
-              //Fin du calcul des variables intermediaires
+              //End of intermediate variable computation
               //
-            }//fin du for sur "face_k_loc"
-        }//fin du if sur "elem!=-1"
-    }//fin du for sur "elem_voisin"
+            }//end of for loop over "face_k_loc"
+        }//end of if on "elem!=-1"
+    }//end of for loop over "elem_voisin"
 }
 
-//ATTENTION : suppose les parametres P_plus, P_moins, Q_plus, Q_moins nuls en entree
+//WARNING: assumes that the parameters P_plus, P_moins, Q_plus, Q_moins are zero on entry
 inline void
 Op_Conv_EF_VEF_P1NC_Stab::calculer_senseur(const DoubleTab& Kij, const DoubleVect& transporteV,
                                            const int nb_comp, const int face_i,
@@ -1017,26 +1016,26 @@ Op_Conv_EF_VEF_P1NC_Stab::calculer_senseur(const DoubleTab& Kij, const DoubleVec
           int face_i_loc = num_fac_loc(face_i,elem_voisin);
           assert(face_i_loc>=0);
           assert(face_i_loc<nb_faces_elem);
-          //On travaille sur les faces de "elem"
+          //Work on the faces of "elem"
           for (int face_k_loc=0; face_k_loc<nb_faces_elem; face_k_loc++)
             {
               int face_k=elem_faces(elem,face_k_loc);
               double kik=Kij(elem,face_i_loc,face_k_loc);
               //
-              //Calcul des variables intermediaires
+              //Compute the intermediate variables
               //
               for (int dim=0; dim<nb_comp; dim++)
                 {
                   double deltaki = transporteV[face_k*nb_comp+dim]-transporteV[face_i*nb_comp+dim];
-                  //Calcul de P_plus et P_moins
-                  //Calcul de Q_plus et Q_moins
-                  /* Codage initial:
+                  //Compute P_plus and P_moins
+                  //Compute Q_plus and Q_moins
+                  /* Initial coding:
                      P_plus(dim)+=minimum(0.,kik)*minimum(0.,deltaki);
                      P_moins(dim)+=minimum(0.,kik)*maximum(0.,deltaki);
                      Q_plus(dim)+=maximum(0.,kik)*maximum(0.,deltaki);
                      Q_moins(dim)+=maximum(0.,kik)*minimum(0.,deltaki);
                   */
-                  // Codage optimise:
+                  // Optimized coding:
                   double tmp = kik*deltaki;
                   if (kik>0)
                     {
@@ -1052,13 +1051,13 @@ Op_Conv_EF_VEF_P1NC_Stab::calculer_senseur(const DoubleTab& Kij, const DoubleVec
                   assert(Q_plus[dim]>=0);
                   assert(P_moins[dim]<=0);
                   assert(Q_moins[dim]<=0);
-                }//fin du for sur "dim"
+                }//end of for loop over "dim"
               //
-              //Fin du calcul des variables intermediaires
+              //End of intermediate variable computation
               //
-            }//fin du for sur "face_k_loc"
-        }//fin du if sur "elem!=-1"
-    }//fin du for sur "elem_voisin"
+            }//end of for loop over "face_k_loc"
+        }//end of if on "elem!=-1"
+    }//end of for loop over "elem_voisin"
 }
 
 void Op_Conv_EF_VEF_P1NC_Stab::test(const DoubleTab& transporte, const DoubleTab& resu, const DoubleTab& tab_vitesse) const
@@ -1093,7 +1092,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::test_difference_Kij(const DoubleTab& transporte, 
   calculer_coefficients_operateur_centre(Kij,nb_comp,tab_vitesse);
 
   //
-  //   Calcul des Kij_ancien :
+  //   Compute Kij_ancien:
   //
   for(int elem0=0; elem0<nb_elem_tot; elem0++)
     {
@@ -1128,7 +1127,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::test_difference_Kij(const DoubleTab& transporte, 
             }
         }
     }
-  // Correction des Kij_ancien pour Dirichlet !
+  // Correction of Kij_ancien for Dirichlet!
   {
     int nb_bord=domaine_Cl_VEF.nb_cond_lim();
     double coeff=1./dimension;
@@ -1202,7 +1201,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::test_difference_Kij(const DoubleTab& transporte, 
                     }
                   }// for face
 
-              }//fin du if sur "volumes_etendus_"
+              }//end of if on "volumes_etendus_"
 
           }// sub_type Dirichlet
       }
@@ -1236,7 +1235,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::test_difference_resu(const DoubleTab& Kij, const 
   resu2=0;
 
   //
-  //   Calcul de resu2
+  //   Compute resu2
   //
 
   const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
@@ -1274,7 +1273,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::test_difference_resu(const DoubleTab& Kij, const 
           double dT,min_dT,max_dT, K,min_K,max_K;
 
           //
-          // dans elem1 :
+          // in elem1:
           //
           while((face_loc_i<nb_faces_elem)&&(elem_faces(elem1,face_loc_i)!=face_i0))
             face_loc_i++;
@@ -1333,7 +1332,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::test_difference_resu(const DoubleTab& Kij, const 
             }
 
           //
-          // dans elem2 :
+          // in elem2:
           //
 
           if(elem2!=-1)
@@ -1444,7 +1443,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::test_difference_resu(const DoubleTab& Kij, const 
         }
     }
 
-  // Pour periodique
+  // For periodicity
 
   int nb_bord=domaine_Cl_VEF.nb_cond_lim();
   int face;
@@ -1478,11 +1477,11 @@ void Op_Conv_EF_VEF_P1NC_Stab::test_difference_resu(const DoubleTab& Kij, const 
 
   resu1-=resu2;
 
-  //Dans le cas des faces de Dirichlet, notre algorithme ne calcule aucune
-  //valeur sur les faces de Dirichlet car de toute facon, elles sont ecrasees
-  //par la matrice de masse. Mais ce n'est pas le cas de l'ancien algorithme
-  //d'ou la modification apportee ici pour eviter de ne voir que les erreurs
-  //commises sur les bords de Dirichlet qui n'ont aucune importance
+  //For Dirichlet faces, our algorithm computes no
+  //value on those faces since they are overwritten
+  //by the mass matrix anyway. This is not the case with the old algorithm,
+  //hence the modification here to avoid seeing only the errors
+  //made on Dirichlet boundaries, which have no significance
   for (int n_bord=0; n_bord<nb_bord; n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -1496,8 +1495,8 @@ void Op_Conv_EF_VEF_P1NC_Stab::test_difference_resu(const DoubleTab& Kij, const 
           for (face=num1; face<num2; face++)
             for (int dim=0; dim<nb_comp; dim++)
               resu1(face,dim)=0;
-        }//fin du if sur Dirichlet
-    }//fin du for sur "n_bord"
+        }//end of if on Dirichlet
+    }//end of for on "n_bord"
 
   const double max_abs_resu1 = local_max_abs_vect(resu1);
   Journal() << "local_max_abs_vect(resu1) = " << max_abs_resu1
@@ -1551,7 +1550,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::test_difference_resu(const DoubleTab& Kij, const 
               if (resu1(face_i)>1.e-15)
                 Cerr << face_i << "(" << face_voisins(face_i,0) << ","
                      << face_voisins(face_i,1) << ") ; ";
-            }//fin du for sur "face_i"
+            }//end of for on "face_i"
         }
       else
         {
@@ -1594,7 +1593,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::test_difference_resu(const DoubleTab& Kij, const 
               Cerr << finl;
             }// sub_type Perio
 
-        }//fin du for sur "nbord"
+        }//end of for on "nbord"
 
       /**************************************************/
 
@@ -1614,7 +1613,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::mettre_a_jour_pour_periodicite(DoubleTab& resu) c
   const int nb_bord = domaine_Cl_VEF.nb_cond_lim();
   const int nb_comp = (resu.nb_dim()==1) ? 1 : resu.dimension(1);
 
-  //Faces de bord
+  //Boundary faces
   for (int n_bord=0; n_bord<nb_bord; n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
@@ -1644,11 +1643,11 @@ void Op_Conv_EF_VEF_P1NC_Stab::mettre_a_jour_pour_periodicite(DoubleTab& resu) c
                   Kokkos::atomic_store(&resuV[ligne],resuV[ligneAss]);
                 }
 
-          });//fin du for sur "face_i"
+          });//end of for on "face_i"
           end_gpu_timer(__KERNEL_NAME__);
-        }//fin du if sur "Periodique"
+        }//end of if on "Periodique"
 
-    }//fin du for sur "n_bord"
+    }//end of for on "n_bord"
 }
 
 void Op_Conv_EF_VEF_P1NC_Stab::ajouter_old(const DoubleTab& transporte, DoubleTab& resu, const DoubleTab& tab_vitesse ) const
@@ -1671,7 +1670,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_old(const DoubleTab& transporte, DoubleTa
   int face_i0, face_j0, elem0, comp0;
   DoubleTab Kij(nb_elem_tot,nb_faces_elem, nb_faces_elem);
   //
-  //   Calcul des Kij :
+  //   Compute Kij:
   //
   for(elem0=0; elem0<nb_elem_tot; elem0++)
     {
@@ -1708,7 +1707,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_old(const DoubleTab& transporte, DoubleTa
         }
     }
   //
-  // Correction des Kij pour Dirichlet !
+  // Correction of Kij for Dirichlet!
   //
   {
     int nb_bord=domaine_Cl_VEF.nb_cond_lim();
@@ -1784,7 +1783,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_old(const DoubleTab& transporte, DoubleTa
   }
 
   //
-  //   Calcul de resu
+  //   Compute resu
   //
 
   ArrOfDouble pplusi(nb_comp);
@@ -1814,7 +1813,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_old(const DoubleTab& transporte, DoubleTa
           double K,min_K,max_K;
 
           //
-          // dans elem1 :
+          // in elem1:
           //
           while((face_loc_i<nb_faces_elem)&&(elem_faces(elem1,face_loc_i)!=face_i0))
             face_loc_i++;
@@ -1872,7 +1871,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_old(const DoubleTab& transporte, DoubleTa
             }
 
           //
-          // dans elem2 :
+          // in elem2:
           //
 
           if(elem2!=-1)
@@ -1983,7 +1982,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_old(const DoubleTab& transporte, DoubleTa
               }
         }
     }
-  //On reprend ici le traitement qui est fait pour la CL de Neumann_sortie_libre dans Op_Conv_VEF_Face
+  //Apply here the treatment used for Neumann_sortie_libre boundary conditions in Op_Conv_VEF_Face
   int nb_bord=domaine_Cl_VEF.nb_cond_lim();
   int face;
   const int ncomp_ch_transporte = transporte.line_size();
@@ -2022,7 +2021,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_old(const DoubleTab& transporte, DoubleTa
                 }
             }
         }
-      // Pour periodique
+      // For periodicity
       else if (sub_type(Periodique,la_cl.valeur()))
         {
           const Periodique& la_cl_perio = ref_cast(Periodique,la_cl.valeur());
@@ -2075,12 +2074,12 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_old(const DoubleTab& transporte, DoubleTa
   */
 }
 
-//Fonction qui initialise les attributs "elem_nb_faces_dirichlet_"
-//et "elem_faces_dirichlet_"
-//REMARQUE : "elem_nb_faces_dirichlet_" contient le nombre de faces de Dirichlet
-//pour chaque element du maillage
-//REMARQUE : "elem_faces_dirichlet_" le numero global des faces de Dirichlet
-//contenu dans un element quelconque du maillage
+//Function that initializes the attributes "elem_nb_faces_dirichlet_"
+//and "elem_faces_dirichlet_"
+//NOTE: "elem_nb_faces_dirichlet_" contains the number of Dirichlet faces
+//for each element of the mesh
+//NOTE: "elem_faces_dirichlet_" contains the global indices of Dirichlet faces
+//belonging to any element of the mesh
 void Op_Conv_EF_VEF_P1NC_Stab::calculer_data_pour_dirichlet()
 {
   const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
@@ -2090,9 +2089,9 @@ void Op_Conv_EF_VEF_P1NC_Stab::calculer_data_pour_dirichlet()
   const int nb_elem_tot = domaine_VEF.nb_elem_tot();
   const int nb_bord=domaine_Cl_VEF.nb_cond_lim();
 
-  //Dimensionnement et initialisation des attributs
-  //REMARQUE : un element ne peut pas avoir plus de
-  //(dimension) faces de Dirichlet
+  //Sizing and initialization of attributes
+  //NOTE: an element cannot have more than
+  //(dimension) Dirichlet faces
   elem_nb_faces_dirichlet_.resize(nb_elem_tot);
   elem_faces_dirichlet_.resize(nb_elem_tot,Objet_U::dimension);
   elem_nb_faces_dirichlet_=0;
@@ -2110,7 +2109,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::calculer_data_pour_dirichlet()
          )
         {
           //
-          //Remplissage des tableaux
+          //Filling the arrays
           //
           for (int ind_face=0; ind_face<nb_faces_tot; ind_face++)
             {
@@ -2247,7 +2246,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution(const DoubleTab& transporte_
   Kij=0.;
 
   //
-  //Pour tenir compte de la porosite
+  //To account for porosity
   //
   const Champ_P1NC& la_vitesse=ref_cast( Champ_P1NC, vitesse_.valeur());
   const DoubleTab& vitesse_2=la_vitesse.valeurs();
@@ -2255,9 +2254,9 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution(const DoubleTab& transporte_
   DoubleTrav transporte_;
   DoubleTrav vitesse_face_;
 
-  // soit on a transporte=phi*transporte_ et vitesse=vitesse_
-  // soit transporte=transporte_ et vitesse=phi*vitesse_
-  // cela depend si on transporte avec phi u ou avec u.
+  // either transporte=phi*transporte_ and vitesse=vitesse_
+  // or transporte=transporte_ and vitesse=phi*vitesse_
+  // depending on whether transport uses phi*u or u.
   const int marq=phi_u_transportant(equation());
   const DoubleTab& transporte=modif_par_porosite_si_flag(transporte_2,transporte_,!marq,porosite_face);
   const DoubleTab& tab_vitesse=modif_par_porosite_si_flag(vitesse_2,vitesse_face_,marq,porosite_face);
@@ -2320,7 +2319,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_operateur_centre(const Doubl
   end_gpu_timer(__KERNEL_NAME__);
 
   //
-  //Pour la periodicite
+  //For periodicity
   //
   const IntTab& num_fac_loc = domaine_VEF.get_num_fac_loc();
   for (int n_bord=0; n_bord<nb_bord; n_bord++)
@@ -2328,7 +2327,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_operateur_centre(const Doubl
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       int num1 = 0;
-      int num2=le_bord.nb_faces_tot();//et surtout pas nb_faces sinon on oublie certains coefficients
+      int num2=le_bord.nb_faces_tot();//and not nb_faces otherwise some coefficients are missed
 
       if (sub_type(Periodique,la_cl.valeur()))
         {
@@ -2342,14 +2341,14 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_operateur_centre(const Doubl
               int facei=le_bord.num_face(ind_face);
               faceiAss=le_bord.num_face(ind_faceiAss);
 
-              //Pour ne parcourir qu'une seule fois les faces perio
+              //To iterate over periodic faces only once
               if (facei<faceiAss)
                 for (int elem_loc=0; elem_loc<2; elem_loc++)
                   {
                     int elem=face_voisins(facei,elem_loc);
                     assert(elem!=-1);
 
-                    //Calcul du numero local de la face dans "elem"
+                    //Compute the local face index within "elem"
                     int facei_loc=num_fac_loc(facei,elem_loc);
                     int faceToComplete;
                     if (facei_loc!=-1)
@@ -2361,7 +2360,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_operateur_centre(const Doubl
                         assert(facei_loc!=-1);
                       }
 
-                    //Calcul des coefficients de la matrice dus a "elem"
+                    //Compute the matrix coefficients due to "elem"
                     for (int facej_loc=0; facej_loc<nb_faces_elem; facej_loc++)
                       {
                         int facej=elem_faces(elem,facej_loc);
@@ -2423,8 +2422,8 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_diffusion(const DoubleTab& t
             int ligne = facei*nb_comp + dim;
             int colonne = facej*nb_comp + dim;
 
-            //ATTENTION AU SIGNE : ici on code +div(uT)
-            //REMARQUE : on utilise la symetrie de l'operateur
+            //NOTE ON SIGN: here we code +div(uT)
+            //NOTE: exploiting the symmetry of the operator
             matrice.atomic_add(ligne, ligne, coeffij);
             matrice.atomic_add(ligne, colonne, -coeffij);
             matrice.atomic_add(colonne, colonne, coeffji);
@@ -2435,7 +2434,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_diffusion(const DoubleTab& t
   end_gpu_timer(__KERNEL_NAME__);
 
   //
-  //Pour la periodicite
+  //For periodicity
   //
   const IntTab& num_fac_loc = domaine_VEF.get_num_fac_loc();
   for (int n_bord=0; n_bord<nb_bord; n_bord++)
@@ -2443,7 +2442,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_diffusion(const DoubleTab& t
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       int num1 = 0;
-      int num2=le_bord.nb_faces_tot();//et surtout pas nb_faces() sinon on oublie certains coefficiens
+      int num2=le_bord.nb_faces_tot();//and not nb_faces() otherwise some coefficients are missed
 
       if (sub_type(Periodique,la_cl.valeur()))
         {
@@ -2456,14 +2455,14 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_diffusion(const DoubleTab& t
               ind_faceiAss=la_cl_perio.face_associee(ind_face);
               faceiAss=le_bord.num_face(ind_faceiAss);
 
-              //Pour ne parcourir qu'une seule fois les faces perio
+              //To iterate over periodic faces only once
               if (facei<faceiAss)
                 for (int elem_loc=0; elem_loc<2; elem_loc++)
                   {
                     int elem=face_voisins(facei,elem_loc);
                     assert(elem!=-1);
 
-                    //Calcul du numero local de la face dans "elem"
+                    //Compute the local face index within "elem"
                     int facei_loc=num_fac_loc(facei,elem_loc);
                     int faceToComplete;
                     if (facei_loc!=-1)
@@ -2475,7 +2474,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_diffusion(const DoubleTab& t
                         assert(facei_loc!=-1);
                       }
 
-                    //Calcul des coefficients de la matrice dus a "elem"
+                    //Compute the matrix coefficients due to "elem"
                     for (int facej_loc=0; facej_loc<nb_faces_elem; facej_loc++)
                       {
                         int facej=elem_faces(elem,facej_loc);
@@ -2505,13 +2504,12 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_diffusion(const DoubleTab& t
     }
 }
 
-//Correction pour le poreux : on rajoute la partie en  T div(u)
-//Variable transportee : T
-//Variable transportante : u
-//REMARQUE : il ne FAUT SURTOUT PAS utiliser le tableau Kij car par
-//construction celui-ci est telle que sum_{j} Kij =0 ce qui revient a
-//imposer une vitesse a divergence nulle par element. Ce qui est
-//problematique quand on est en compressible
+//Porous correction: add the T*div(u) contribution
+//Transported variable: T
+//Transporting variable: u
+//NOTE: the Kij array MUST NOT be used because by
+//construction sum_{j} Kij = 0, which enforces a zero-divergence
+//velocity per element — problematic in compressible flows
 void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_partie_compressible(const DoubleTab& transporte, const DoubleTab& vitesse_2,
                                                                         Matrice_Morse& matrice) const
 {
@@ -2524,7 +2522,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_partie_compressible(const Do
   const int nb_faces_elem=elem_faces.line_size();
   const int nb_bord=domaine_Cl_VEF.nb_cond_lim();
 
-  //Pour tenir compte de la porosite
+  //To account for porosity
   const int marq = phi_u_transportant(equation());
   const DoubleVect& porosite_elem = equation().milieu().porosite_elem();
   const DoubleVect& porosite_face = equation().milieu().porosite_face();
@@ -2546,12 +2544,12 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_partie_compressible(const Do
   ToDo_Kokkos("critical");
   for (int elem=0; elem<nb_elem_tot; elem++)
     {
-      //Type de l'element : le nombre de faces de Dirichlet
-      //qu'il contient
+      //Element type: the number of Dirichlet faces
+      //it contains
       int type_elem=elem_nb_faces_dirichlet_(elem);
       double coeff=formule(type_elem);
 
-      //Calcul de la divergence par element
+      //Compute the divergence per element
       double div=0.;
       for (int facei_loc=0; facei_loc<nb_faces_elem; facei_loc++)
         {
@@ -2564,7 +2562,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_partie_compressible(const Do
       div*=coeff;
       if (!marq) div/=porosite_elem(elem);
 
-      //Calcul de la partie compressible
+      //Compute the compressible part
       for (int facei_loc=0; facei_loc<nb_faces_elem; facei_loc++)
         {
           int facei=elem_faces(elem,facei_loc);
@@ -2578,7 +2576,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_partie_compressible(const Do
     }
 
   //
-  //Pour la periodicite
+  //For periodicity
   //
   const IntTab& num_fac_loc = domaine_VEF.get_num_fac_loc();
   for (int n_bord=0; n_bord<nb_bord; n_bord++)
@@ -2586,7 +2584,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_partie_compressible(const Do
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       int num1 = 0;
-      int num2 = le_bord.nb_faces();//pour ne parcourir que les faces reelles
+      int num2 = le_bord.nb_faces();//only iterate over real faces
 
       if (sub_type(Periodique,la_cl.valeur()))
         {
@@ -2598,14 +2596,14 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_partie_compressible(const Do
               int ind_faceiAss = la_cl_perio.face_associee(ind_face);
               int faceiAss = le_bord.num_face(ind_faceiAss);
 
-              //Pour ne parcourir qu'une seule fois les faces perio
+              //To iterate over periodic faces only once
               if (facei<faceiAss)
                 for (int elem_loc=0; elem_loc<2; elem_loc++)
                   {
                     int elem = face_voisins(facei,elem_loc);
                     assert(elem!=-1);
 
-                    //Calcul du numero local de la face dans "elem"
+                    //Compute the local face index within "elem"
                     int facei_loc=num_fac_loc(facei,elem_loc);
                     int faceToComplete;
                     if (facei_loc!=-1)
@@ -2617,12 +2615,12 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_partie_compressible(const Do
                         assert(facei_loc!=-1);
                       }
 
-                    //Type de l'element : le nombre de faces de Dirichlet
-                    //qu'il contient
+                    //Element type: the number of Dirichlet faces
+                    //it contains
                     int type_elem=elem_nb_faces_dirichlet_(elem);
                     double coeff=formule(type_elem);
 
-                    //Calcul de la divergence par element
+                    //Compute the divergence per element
                     double div=0.;
                     for (facei_loc=0; facei_loc<nb_faces_elem; facei_loc++)
                       {
@@ -2635,7 +2633,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_partie_compressible(const Do
                     div*=coeff;
                     if (!marq) div/=porosite_elem(elem);
 
-                    //Calcul de la partie compressible
+                    //Compute the compressible part
                     for (int dim=0; dim<nb_comp; dim++)
                       {
                         int ligne=faceToComplete*nb_comp+dim;
@@ -2665,7 +2663,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_antidiffusion(const DoubleTa
   double kij=0.,kji=0.,dij=0., lij=0.,lji=0., daij=0.;
   double delta=0., coeffij=0.,coeffji=0., coeff=0., R=0.;
 
-  //Pour le limiteur
+  //For the limiter
   ArrOfDouble P_plus(nb_comp),P_moins(nb_comp);
   ArrOfDouble Q_plus(nb_comp),Q_moins(nb_comp);
   P_plus=0., P_moins=0., Q_plus=0., Q_moins=0.;
@@ -2693,13 +2691,13 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_antidiffusion(const DoubleTa
               assert(lij>=0);
               assert(lji>=0);
 
-              if (lij<=lji) //facei est amont
+              if (lij<=lji) //facei is upstream
                 {
                   face_amont = facei;
                   face_aval = facej;
 
-                  //Si lij==lji, on passe deux foix dans la boucle
-                  //d'ou la presence du coefficient 1/2
+                  //If lij==lji, we iterate twice in the loop
+                  //hence the coefficient 1/2
                   coeff = 1.*(lij<lji)+0.5*(lij==lji);
                   assert(coeff==1. || coeff==0.5);
 
@@ -2710,7 +2708,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_antidiffusion(const DoubleTa
 
                       delta=transporteV[ligne]-transporteV[colonne];
 
-                      //Limiteur de pente
+                      //Slope limiter
                       // if (delta>=0.) R=(P_plus(dim)==0.) ? 0. : Q_plus(dim)/P_plus(dim);
                       // else  R=(P_moins(dim)==0.) ? 0. : Q_moins(dim)/P_moins(dim);
 
@@ -2727,7 +2725,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_antidiffusion(const DoubleTa
                       coeffij=alpha_tab_[face_amont]*beta_[face_amont]*daij;
                       coeffji=alpha_tab_[face_aval]*beta_[face_aval]*daij;
 
-                      //Calcul de la matrice
+                      //Compute the matrix
                       matrice(ligne,ligne)-=coeffij*coeff;
                       matrice(ligne,colonne)+=coeffij*coeff;
                       matrice(colonne,colonne)-=coeffji*coeff;
@@ -2738,20 +2736,20 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_antidiffusion(const DoubleTa
       }
 
   //
-  //Pour la periodicite
+  //For periodicity
   //
   for (n_bord=0; n_bord<nb_bord; n_bord++)
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       num1 = 0;
-      num2=le_bord.nb_faces();//pour ne parcourir que les faces reelles
+      num2=le_bord.nb_faces();//only iterate over real faces
 
       if (sub_type(Periodique,la_cl.valeur()))
         {
           const Periodique& la_cl_perio = ref_cast(Periodique,la_cl.valeur());
 
-          //Pour le limiteur
+          //For the limiter
           ArrOfDouble Pj_plus(nb_comp),Pj_moins(nb_comp);
           ArrOfDouble Qj_plus(nb_comp),Qj_moins(nb_comp);
           Pj_plus=0., Pj_moins=0.;
@@ -2763,14 +2761,14 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_antidiffusion(const DoubleTa
               ind_faceiAss=la_cl_perio.face_associee(ind_face);
               faceiAss=le_bord.num_face(ind_faceiAss);
 
-              //Pour ne parcourir qu'une seule fois les faces perio
+              //To iterate over periodic faces only once
               if (facei<faceiAss)
                 for (elem_loc=0; elem_loc<2; elem_loc++)
                   {
                     elem=face_voisins(facei,elem_loc);
                     assert(elem!=-1);
 
-                    //Calcul du numero local de la face dans "elem"
+                    //Compute the local face index within "elem"
                     facei_loc=num_fac_loc(facei,elem_loc);
                     if (facei_loc!=-1)
                       faceToComplete=faceiAss;
@@ -2781,7 +2779,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_antidiffusion(const DoubleTa
                         assert(facei_loc!=-1);
                       }
 
-                    //Calcul du coefficient a rajouter dans la matrice
+                    //Compute the coefficient to add to the matrix
                     P_plus=0., P_moins=0.;
                     Q_plus=0., Q_moins=0.;
                     calculer_senseur(Kij,transporteV,nb_comp,faceToComplete,elem_faces,face_voisins,num_fac_loc,P_plus,P_moins,Q_plus,Q_moins);
@@ -2799,13 +2797,13 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_antidiffusion(const DoubleTa
                           assert(lij>=0);
                           assert(lji>=0);
 
-                          if (lij<=lji) //faceToComplete est amont
+                          if (lij<=lji) //faceToComplete is upstream
                             {
                               face_amont=faceToComplete;
                               face_aval=facej;
 
-                              //Si lij==lji, on passe deux foix dans la boucle
-                              //d'ou la presence du coefficient 1/2
+                              //If lij==lji, we iterate twice in the loop
+                              //hence the coefficient 1/2
                               coeff = 1.*(lij<lji)+0.5*(lij==lji);
                               assert(coeff==1. || coeff==0.5);
 
@@ -2815,7 +2813,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_antidiffusion(const DoubleTa
                                   colonne=face_aval*nb_comp+dim;
                                   delta=transporteV[ligne]-transporteV[colonne];
 
-                                  //Limiteur de pente
+                                  //Slope limiter
                                   // if (delta>=0.) R=(P_plus(dim)==0.) ? 0. : Q_plus(dim)/P_plus(dim);
                                   // else  R=(P_moins(dim)==0.) ? 0. : Q_moins(dim)/P_moins(dim);
 
@@ -2830,12 +2828,12 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_antidiffusion(const DoubleTa
                                   assert(daij<=lji);
                                   coeffij=alpha_tab[face_amont]*beta_[face_amont]*daij;
 
-                                  //Calcul de la matrice
+                                  //Compute the matrix
                                   matrice(ligne,ligne)-=coeffij*coeff;
                                   matrice(ligne,colonne)+=coeffij*coeff;
                                 }
                             }
-                          else  //faceToComplete est aval
+                          else  //faceToComplete is downstream
                             {
                               face_aval=faceToComplete;
                               face_amont=facej;
@@ -2850,7 +2848,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_antidiffusion(const DoubleTa
 
                                   delta=transporteV[ligne]-transporteV[colonne];
 
-                                  //Limiteur de pente
+                                  //Slope limiter
                                   // if (delta>=0.) R=(Pj_plus(dim)==0.) ? 0. : Qj_plus(dim)/Pj_plus(dim);
                                   // else  R=(Pj_moins(dim)==0.) ? 0. : Qj_moins(dim)/Pj_moins(dim);
 
@@ -2865,7 +2863,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::ajouter_contribution_antidiffusion(const DoubleTa
                                   assert(daij<=lij);
                                   coeffij=alpha_tab[face_aval]*beta_[face_aval]*daij;
 
-                                  //Calcul de la matrice
+                                  //Compute the matrix
                                   matrice(colonne,colonne)-=coeffij*coeff;
                                   matrice(colonne,ligne)+=coeffij*coeff;
                                 }
@@ -2913,7 +2911,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::test_implicite() const
   SFichier testMat("matrice.txt");
 
   //
-  //Pour la periodicite
+  //For periodicity
   //
   IntTab faces_associees(nb_faces_tot);
   for (face=0; face<nb_faces_tot; face++)
@@ -2924,7 +2922,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::test_implicite() const
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       num1 = 0;
-      num2=le_bord.nb_faces_tot();//pour ne pas en oublier
+      num2=le_bord.nb_faces_tot();//to avoid missing any
 
       if (sub_type(Periodique,la_cl.valeur()))
         {
@@ -2936,7 +2934,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::test_implicite() const
               ind_faceAss=la_cl_perio.face_associee(ind_face);
               faceAss=le_bord.num_face(ind_faceAss);
 
-              //Pour ne parcourir que la moitie des faces periodiques
+              //To iterate over only half the periodic faces
               if (face<faceAss)
                 {
                   faces_associees(face)=faceAss;
@@ -2946,13 +2944,13 @@ void Op_Conv_EF_VEF_P1NC_Stab::test_implicite() const
         }
     }
   //
-  //Fin du traitement pour la periodicite
+  //End of periodic face treatment
   //
 
   calculer_coefficients_operateur_centre(Kij,nb_comp,tab_vitesse);
 
   //
-  //Construction de la matrice
+  //Build the matrix
   //
   Matrice_Morse matrice;
   dimensionner(matrice);
@@ -2963,18 +2961,18 @@ void Op_Conv_EF_VEF_P1NC_Stab::test_implicite() const
   ajouter_contribution_antidiffusion(Kij,unknown,matrice);
   matrice.imprimer_formatte(testMat);
   //
-  //Fin de la construction de la matrice
+  //End of matrix construction
   //
 
   //
-  //Calcul de l'operateur explicite et comparaison
+  //Compute the explicit operator and comparison
   //
   for (face=0; face<size; face++)
     {
       test2[face]=1.;
       test2[faces_associees(face)]=1.;
 
-      /* Calcul de l'operateur explicite */
+      /* Compute the explicit operator */
       resuExp=0.;
       if (is_compressible_)
         ajouter_partie_compressible(tab_test,resuExp,tab_vitesse);
@@ -2983,14 +2981,14 @@ void Op_Conv_EF_VEF_P1NC_Stab::test_implicite() const
       ajouter_antidiffusion(Kij,tab_test,resuExp);
       mettre_a_jour_pour_periodicite(resuExp);
 
-      /* Calcul de l'operateur implicite */
+      /* Compute the implicit operator */
       resuImp=0.;
       matrice.ajouter_multvect_(tab_test,resuImp);
 
-      /* Calcul de la difference */
+      /* Compute the difference */
       resuExp+=resuImp;
 
-      /* Affichage de la difference */
+      /* Display of the difference */
       testResu<<"*************************"<<finl;
       testResu<<"Face test : "<<face<<finl;
       for (face2=0; face2<size; face2++)
@@ -3004,7 +3002,7 @@ void Op_Conv_EF_VEF_P1NC_Stab::test_implicite() const
       test2[faces_associees(face)]=0.;
     }
   //
-  //Fin du calcul de l'operateur explicite et comparaison
+  //End of explicit operator computation and comparison
   //
 
   Process::exit();

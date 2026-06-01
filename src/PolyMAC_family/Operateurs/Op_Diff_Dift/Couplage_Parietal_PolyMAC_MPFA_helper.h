@@ -37,18 +37,18 @@ public:
 private:
   OBS_PTR(Op_Diff_PolyMAC_MPFA_Elem) op_elem_;
 
-  /* sommets connectes a un autre probleme par un Echange_contact */
+  /* vertices connected to another problem via an Echange_contact */
   void init_s_dist() const;
   mutable std::map<int, std::map<const Operateur_Diff_base *, int>> s_dist; //s_dist[som] = { { pb1, som1 }, { pb2, som2 }, ... }
   mutable int s_dist_init_ = 0;
 
-  /* tableaux op_ext et pe_ext */
-  mutable IntTab som_mix, som_ext_d, som_ext_pe, som_ext_pf; //sommet s = som_ext(i) : melange-t-il les composantes, couple (probleme, elem) dans som_ext_e([som_ext_d(i, 0), som_ext_d(i + 1, 0)[, 0/1)
-  //faces Echange_contact (pb1, face1, pb2, face2) dans som_ext_f([som_ext_d(i, 1), som_ext_d(i + 1, 1)[, 0/1/2/3)
+  /* op_ext and pe_ext arrays */
+  mutable IntTab som_mix, som_ext_d, som_ext_pe, som_ext_pf; //vertex s = som_ext(i): does it mix components, (problem, element) pair in som_ext_e([som_ext_d(i, 0), som_ext_d(i + 1, 0)[, 0/1)
+  //Echange_contact faces (pb1, face1, pb2, face2) in som_ext_f([som_ext_d(i, 1), som_ext_d(i + 1, 1)[, 0/1/2/3)
   mutable int som_ext_init_ = 0;
 
-  /* tableau renvoye par d_nucleation(), rempli lors de ajouter_blocs() */
-  mutable int d_nuc_a_jour_ = 0; //d_nucleation() est utilisable ("a jour") entre le moment ou on a appelle ajouter_blocs() et le mettre_a_jour() suivant
+  /* array returned by d_nucleation(), filled during ajouter_blocs() */
+  mutable int d_nuc_a_jour_ = 0; //d_nucleation() is usable (up to date) between the call to ajouter_blocs() and the next mettre_a_jour()
   mutable DoubleTab d_nuc_;
 };
 

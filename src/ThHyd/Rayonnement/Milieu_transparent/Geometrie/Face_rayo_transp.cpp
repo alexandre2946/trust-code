@@ -25,7 +25,7 @@ Entree& Face_rayo_transp::readOn(Entree& is)
   is >> nom_bord_rayo_lu_;
   nom_bord_rayo_ = nom_bord_rayo_lu_;
 
-  // on recupere le nom du bord (c.a.d la partie a gauche du %)
+  // retrieve the boundary name (i.e. the part to the left of %)
   const char *marq = strchr(nom_bord_rayo_lu_, '%');
   if (marq)
     {
@@ -44,7 +44,7 @@ Sortie& Face_rayo_transp::printOn(Sortie& os) const { return os; }
 
 double Face_rayo_transp::calculer_temperature()
 {
-  // cas particulier ou Ensemble_Faces coincide avec un bord: nb_ensembles_faces() = 1
+  // special case where Ensemble_Faces coincides with a boundary: nb_ensembles_faces() = 1
   for (int j = 0; j < nb_ensembles_faces(); j++)
     {
       Ensemble_faces_rayo_transp& faces_j = ensembles_faces_bord(j);
@@ -81,7 +81,7 @@ double Face_rayo_transp::calculer_temperature()
       double sum_T_tot = sum_T;
       double sum_surf_tot = sum_surf;
       sum_surf_tot = mp_sum(sum_surf_tot);
-      // test important mais gene validation Rayo
+      // important test but interferes with Rayo validation
       //if (!est_egal(sum_surf_tot,surf_,1e-4)) { Cerr<< " Pb surface calculee "<<sum_surf_tot<<" surfaces du fichier facesrayo "<<surf_<<finl;abort();}
       //surf_=sum_surf_tot;
       sum_T_tot = mp_sum(sum_T_tot);
@@ -104,7 +104,7 @@ double Face_rayo_transp::imprimer_flux_radiatif(Sortie& os, Sortie& os1, Sortie&
 
 int Face_rayo_transp::chercher_ensemble_faces(const Nom& nom_bord) const
 {
-  // recherche si le nom_bord passe est une face rayonnante.
+  // check whether the given nom_bord is a radiating face.
   if (nom_bord == nom_bord_rayo_)
     {
       if (emissivite_ != -1)

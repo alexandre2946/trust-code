@@ -31,7 +31,7 @@ double compute_fractionnal_timestep_rk3(const double dt_tot, int step)
   return intermediate_tstep[step] * dt_tot;
 }
 
-// Imposer une condition limite de vitesse nulle aux parois (en zmin et zmax)
+// Impose a zero velocity boundary condition at walls (at zmin and zmax)
 void force_zero_on_walls(IJK_Field_double& vz)
 {
   const int nj = vz.nj();
@@ -392,7 +392,7 @@ void pressure_projection_with_rho(const IJK_Field_double& rho,
   statistics().end_count("Velocity update: projection");
 }
 
-// Methode basee sur 1/rho au lieu de rho :
+// Method based on 1/rho instead of rho:
 
 void pressure_projection_with_inv_rho(const IJK_Field_double& inv_rho,
                                       IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz,
@@ -424,7 +424,7 @@ void pressure_projection_with_inv_rho(const IJK_Field_double& inv_rho,
       poisson_solver.set_inv_rho(inv_rho);
     }
 
-  // Fait aussi : compute_faces_coefficients_from_inv_rho
+  // Also does: compute_faces_coefficients_from_inv_rho
   poisson_solver.resoudre_systeme_IJK(pressure_rhs, pressure);
   // pressure gradient requires the "left" value in all directions:
   pressure.echange_espace_virtuel(1 /*, IJK_Field_double::EXCHANGE_GET_AT_LEFT_IJK*/);
@@ -521,7 +521,7 @@ void runge_kutta3_update(const IJK_Field_double& dv, IJK_Field_double& F, IJK_Fi
     };
 }
 #if 0
-// Copie de la methode precedente mais pour les DoubleTab aux sommets :
+// Copy of the previous method but for DoubleTab at vertices:
 void runge_kutta3_update(const DoubleTab& dvi, DoubleTab& G, DoubleTab& l,
                          const int step, const double dt_tot,
                          const Maillage_FT_IJK& maillage)
@@ -535,7 +535,7 @@ void runge_kutta3_update(const DoubleTab& dvi, DoubleTab& G, DoubleTab& l,
   const double delta_t_divided_by_Gk = intermediate_dt / coeff_Gk[step];
   const int nbsom = maillage.nb_sommets();
 
-  // Resize du tableau
+  // Resize the array
 
   G.resize(nbsom, 3);
 
@@ -655,14 +655,14 @@ void runge_kutta3_update_surfacic_fluxes(IJK_Field_double& dv, IJK_Field_double&
     };
 }
 
-// Calculer rho*v sur la couche k de faces dans la direction DIR
-// a partir de rho aux elements et v aux faces
+// Compute rho*v on the layer k of faces in direction DIR
+// from rho at elements and v at faces
 static void calculer_rho_v_DIR(DIRECTION _DIR_, const IJK_Field_double& input_rho, const IJK_Field_double& input_v, IJK_Field_double& rho_v, const int k)
 {
   const int ni = rho_v.ni();
   const int nj = rho_v.nj();
   ConstIJK_double_ptr rho(input_rho, 0, 0, k);
-  ConstIJK_double_ptr v(input_v, 0, 0, k); // pointeur sur le plan k de la vitesse
+  ConstIJK_double_ptr v(input_v, 0, 0, k); // pointer to the k-th velocity plane
   IJK_double_ptr resu(rho_v, 0, 0, k);
 
   for (int j = 0; j < nj; j++)
@@ -670,7 +670,7 @@ static void calculer_rho_v_DIR(DIRECTION _DIR_, const IJK_Field_double& input_rh
       for (int i = 0; i < ni; i++)
         {
           double a, b, c;
-          rho.get_left_center(_DIR_, i, a, b); // a et b sont les masses volumiques a gauche et a droite de la face
+          rho.get_left_center(_DIR_, i, a, b); // a and b are the densities to the left and right of the face
           v.get_center(i, c);
           resu.put_val(i, (a + b) * c * 0.5);
         }
@@ -683,14 +683,14 @@ static void calculer_rho_v_DIR(DIRECTION _DIR_, const IJK_Field_double& input_rh
     }
 }
 
-// Remplace la moyenne arithmetique par une moyenne des inverses :
+// Replaces the arithmetic mean by a harmonic mean:
 // rho_face = 2 rho1 rho2 / (rho1+rho2)  => 1/rho_face = (1/rho1 + 1/rho2) /2
 static void calculer_rho_harmonic_v_DIR(DIRECTION _DIR_, const IJK_Field_double& input_rho, const IJK_Field_double& input_v, IJK_Field_double& rho_v, const int k)
 {
   const int ni = rho_v.ni();
   const int nj = rho_v.nj();
   ConstIJK_double_ptr rho(input_rho, 0, 0, k);
-  ConstIJK_double_ptr v(input_v, 0, 0, k); // pointeur sur le plan k de la vitesse
+  ConstIJK_double_ptr v(input_v, 0, 0, k); // pointer to the k-th velocity plane
   IJK_double_ptr resu(rho_v, 0, 0, k);
 
   for (int j = 0; j < nj; j++)
@@ -698,7 +698,7 @@ static void calculer_rho_harmonic_v_DIR(DIRECTION _DIR_, const IJK_Field_double&
       for (int i = 0; i < ni; i++)
         {
           double a, b, c;
-          rho.get_left_center(_DIR_, i, a, b); // a et b sont les masses volumiques a gauche et a droite de la face
+          rho.get_left_center(_DIR_, i, a, b); // a and b are the densities to the left and right of the face
           v.get_center(i, c);
           resu.put_val(i, 2. * a * b / (a + b) * c);
         }
@@ -713,13 +713,13 @@ static void calculer_rho_harmonic_v_DIR(DIRECTION _DIR_, const IJK_Field_double&
 
 void calculer_rho_v(const IJK_Field_double& rho, const IJK_Field_vector3_double& v, IJK_Field_vector3_double& rho_v)
 {
-  // Conditions aux limites plans: on suppose que v = 0 sur le plan, alors rho_v sera = 0,
-  // donc il n'y a rien a faire.
+  // Boundary conditions on planes: assume v = 0 on the plane, so rho_v will be = 0,
+  // hence nothing to do.
   const int nk = std::max(rho_v[0].nk(), std::max(rho_v[1].nk(), rho_v[2].nk()));
-  // Boucle sur les plans de maillage pour reutiliser les valeurs de rho mises en cache
+  // Loop over mesh planes to reuse rho values cached
   for (int k = 0; k < nk; k++)
     {
-      // Calcul des trois composantes de vitesse pour ce plan de maillage
+      // Compute the three velocity components for this mesh plane
       if (k < rho_v[0].nk())
         calculer_rho_v_DIR(DIRECTION::X, rho, v[0], rho_v[0], k);
       if (k < rho_v[1].nk())
@@ -729,16 +729,16 @@ void calculer_rho_v(const IJK_Field_double& rho, const IJK_Field_vector3_double&
     }
 }
 
-// On utilise la moyenne harmonique au lieu de la moyenne arithmetique.
+// Use the harmonic mean instead of the arithmetic mean.
 void calculer_rho_harmonic_v(const IJK_Field_double& rho, const IJK_Field_vector3_double& v, IJK_Field_vector3_double& rho_v)
 {
-  // Conditions aux limites plans: on suppose que v = 0 sur le plan, alors rho_v sera = 0,
-  // donc il n'y a rien a faire.
+  // Boundary conditions on planes: assume v = 0 on the plane, so rho_v will be = 0,
+  // hence nothing to do.
   const int nk = std::max(rho_v[0].nk(), std::max(rho_v[1].nk(), rho_v[2].nk()));
-  // Boucle sur les plans de maillage pour reutiliser les valeurs de rho mises en cache
+  // Loop over mesh planes to reuse rho values cached
   for (int k = 0; k < nk; k++)
     {
-      // Calcul des trois composantes de vitesse pour ce plan de maillage
+      // Compute the three velocity components for this mesh plane
       if (k < rho_v[0].nk())
         calculer_rho_harmonic_v_DIR(DIRECTION::X, rho, v[0], rho_v[0], k);
       if (k < rho_v[1].nk())
@@ -748,8 +748,8 @@ void calculer_rho_harmonic_v(const IJK_Field_double& rho, const IJK_Field_vector
     }
 }
 
-// Calculer rho*v sur la couche k de faces dans la direction DIR
-// a partir de rho aux elements et v aux faces
+// Compute rho*v on the layer k of faces in direction DIR
+// from rho at elements and v at faces
 static void mass_solver_with_rho_DIR(DIRECTION _DIR_, const IJK_Field_double& input_rho, IJK_Field_double& velocity, const double volume, const int k)
 {
   const int ni = velocity.ni();
@@ -764,9 +764,9 @@ static void mass_solver_with_rho_DIR(DIRECTION _DIR_, const IJK_Field_double& in
       for (int i = 0; i < ni; i++)
         {
           double a = 0., b = 0., c, resu;
-          rho.get_left_center(_DIR_, i, a, b); // a et b sont les masses volumiques a gauche et a droite de la face
+          rho.get_left_center(_DIR_, i, a, b); // a and b are the densities to the left and right of the face
           v.get_center(i, c); // v
-          resu = c / ((a + b) * facteur); // division par le produit (volume * rho_face)
+          resu = c / ((a + b) * facteur); // divide by the product (volume * rho_face)
           v.put_val(i, resu);
         }
       if (j < nj - 1)
@@ -776,7 +776,7 @@ static void mass_solver_with_rho_DIR(DIRECTION _DIR_, const IJK_Field_double& in
         }
     }
 }
-// Remplace la moyenne arithmetique par une moyenne des inverses :
+// Replaces the arithmetic mean by a harmonic mean:
 // rho_face = 2 rho1 rho2 / (rho1+rho2)  => 1/rho_face = (1/rho1 + 1/rho2) /2
 static void mass_solver_with_inv_rho_DIR(DIRECTION _DIR_, const IJK_Field_double& input_inv_rho, IJK_Field_double& velocity, const double volume, const int k)
 {
@@ -792,7 +792,7 @@ static void mass_solver_with_inv_rho_DIR(DIRECTION _DIR_, const IJK_Field_double
       for (int i = 0; i < ni; i++)
         {
           double a = 0., b = 0., c, resu;
-          inv_rho.get_left_center(_DIR_, i, a, b); // a et b sont les masses volumiques a gauche et a droite de la face
+          inv_rho.get_left_center(_DIR_, i, a, b); // a and b are the inverse densities to the left and right of the face
           v.get_center(i, c); // v
           resu = c * (a + b) * facteur; // v * inv_rho_face * volume
           v.put_val(i, resu);
@@ -805,10 +805,10 @@ static void mass_solver_with_inv_rho_DIR(DIRECTION _DIR_, const IJK_Field_double
     }
 }
 
-// Calcule le volume d'un volume de controle situe a l'indice local k
-// en fonction de la localisation du champ
-// (suppose que le maillage est uniforme en i et j)
-// Si maillage non periodique, renvoie le demi-volume pour les faces paroi
+// Computes the volume of a control volume located at local index k
+// depending on the field location
+// (assumes uniform mesh in i and j)
+// If the mesh is non-periodic, returns the half-volume for wall faces
 double get_channel_control_volume(IJK_Field_double& field, int local_k_layer, const ArrOfDouble_with_ghost& delta_z_local)
 {
   double delta_z;
@@ -854,9 +854,9 @@ double get_channel_control_volume(IJK_Field_double& field, int local_k_layer, co
   return delta_x * delta_y * delta_z;
 }
 
-// Division de toutes les valeurs stockees dans velocity par le volume du "volume de controle"
-//  et par la mase volumique moyenne au noeud de vitesse.
-// (meme moyenne que pour calculer_rho_v)
+// Divides all values stored in velocity by the "control volume" volume
+//  and by the mean density at the velocity node.
+// (same average as for calculer_rho_v)
 void mass_solver_with_rho(IJK_Field_double& velocity, const IJK_Field_double& rho, const ArrOfDouble_with_ghost& delta_z_local, const int k)
 {
   const double volume = get_channel_control_volume(velocity, k, delta_z_local);
@@ -876,8 +876,8 @@ void mass_solver_with_rho(IJK_Field_double& velocity, const IJK_Field_double& rh
     }
 }
 
-// Au lieu de diviser par rho, on multiplie par inv_rho
-// C'est mieux car en discret : inv_rho = 1/rho_l * chi_l + 1/rho_v * (1-chi_l)
+// Instead of dividing by rho, multiply by inv_rho
+// This is better because in discrete form: inv_rho = 1/rho_l * chi_l + 1/rho_v * (1-chi_l)
 void mass_solver_with_inv_rho(IJK_Field_double& velocity, const IJK_Field_double& inv_rho, const ArrOfDouble_with_ghost& delta_z_local, const int k)
 {
   const double volume = get_channel_control_volume(velocity, k, delta_z_local);
@@ -912,9 +912,9 @@ void mass_solver_scalar(IJK_Field_double& dv, const ArrOfDouble_with_ghost& delt
     }
 }
 
-// Division de toutes les valeurs stockees dans velocity par
-// la mase volumique moyenne au noeud de vitesse.
-// (meme moyenne que pour calculer_rho_v)
+// Divides all values stored in velocity by
+// the mean density at the velocity node.
+// (same average as for calculer_rho_v)
 void density_solver_with_rho(IJK_Field_double& velocity, const IJK_Field_double& rho, const ArrOfDouble_with_ghost& delta_z_local, const int k)
 {
   switch(velocity.get_localisation())
@@ -933,7 +933,7 @@ void density_solver_with_rho(IJK_Field_double& velocity, const IJK_Field_double&
     }
 }
 
-// fonction moyenne en temps du champs de vitesse utilise dans le cas de bulles fixes
+// time-averaged velocity field function used in the case of fixed bubbles
 void update_integral_velocity(const IJK_Field_vector3_double& v_instant, IJK_Field_vector3_double& v_tmp, const IJK_Field_double& indic, const IJK_Field_double& indic_tmp)
 {
   const int ni = indic_tmp.ni();
@@ -965,11 +965,11 @@ void update_integral_velocity(const IJK_Field_vector3_double& v_instant, IJK_Fie
 }
 
 /*
- * Calcul le gradient de U aux cellules a partir de la vitesse aux faces
+ * Computes the gradient of U at cell centres from the face velocity field,
  * all components or not.
  */
 void compute_and_store_gradU_cell(const IJK_Field_double& vitesse_i, const IJK_Field_double& vitesse_j, const IJK_Field_double& vitesse_k,
-                                  /* Et les champs en sortie */
+                                  /* And the output fields */
                                   IJK_Field_double& dudx,
                                   IJK_Field_double& dvdy, IJK_Field_double& dwdx, IJK_Field_double& dudz, IJK_Field_double& dvdz, IJK_Field_double& dwdz, const int compute_all,
                                   /* Following will be untouched if compute_all is 0 */
@@ -978,14 +978,14 @@ void compute_and_store_gradU_cell(const IJK_Field_double& vitesse_i, const IJK_F
 {
   const Domaine_IJK& geom = vitesse_i.get_domaine();
 
-  // Pour detacher de toute classe :
+  // To decouple from any class:
   const double dx = geom.get_constant_delta(0);
   const double dy = geom.get_constant_delta(1);
   const ArrOfDouble& tab_dz = geom.get_delta(2);
 
-  // Nombre total de mailles en K
+  // Total number of cells in K
   const int nktot = geom.get_nb_items_global(Domaine_IJK::ELEM, DIRECTION_K);
-  // Nombre local de mailles :
+  // Local number of cells:
   const int imax = geom.get_nb_items_local(Domaine_IJK::ELEM, 0);
   const int jmax = geom.get_nb_items_local(Domaine_IJK::ELEM, 1);
   const int kmax = geom.get_nb_items_local(Domaine_IJK::ELEM, 2);
@@ -1006,17 +1006,17 @@ void compute_and_store_gradU_cell(const IJK_Field_double& vitesse_i, const IJK_F
             {
               // ******************************** //
               // derivation direction x
-              // de Ux
+              // of Ux
               dudx(i, j, k) = (vitesse_i(i + 1, j, k) - vitesse_i(i, j, k)) / dx;
 
-              // de Uz !!!!!! ATTENTION on veux calculer la moyenne entre (i,j,k) et (i,j,k+1) aux mailles i-1 et i+1
+              // of Uz !!!!!! NOTE: we want to compute the average between (i,j,k) and (i,j,k+1) at cells i-1 and i+1
               double We_mi = (vitesse_k(i - 1, j, k) + vitesse_k(i - 1, j, k + 1)) * 0.5;
               double We_pi = (vitesse_k(i + 1, j, k) + vitesse_k(i + 1, j, k + 1)) * 0.5;
               dwdx(i, j, k) = (We_pi - We_mi) / (2 * dx);
 
               // ******************************** //
               // derivation direction y
-              // de Uy
+              // of Uy
               dvdy(i, j, k) = (vitesse_j(i, j + 1, k) - vitesse_j(i, j, k)) / dy;
 
               if (compute_all)
@@ -1034,21 +1034,21 @@ void compute_and_store_gradU_cell(const IJK_Field_double& vitesse_i, const IJK_F
 
               // ******************************** //
               // derivation direction z
-              // Si on est sur un bord, on utilise l'info que la vitesse y est nulle.
-              // Cette info est a dz/2 donc on utilise la formule centree d'ordre 2 pour pas variable :
-              // Formule centree (ordre 2) pour pas variable dans le domaine :
+              // If we are on a boundary, we use the information that the velocity is zero there.
+              // This information is at dz/2 so we use the second-order centered formula for variable step:
+              // Centered formula (order 2) for variable step in the domain:
               // grad[1:-1] = (h1/h2*u_pl - h2/h1*u_m + (h2**2-h1**2)/(h1*h2)*u_c) / (h1+h2)
               //
               if (on_the_first_cell && !(geom.get_periodic_flag(DIRECTION_K)))
                 {
-                  // de Ux
+                  // of Ux
                   double Ue_mk = 0.;
                   double Ue_ck = (vitesse_i(i, j, k) + vitesse_i(i + 1, j, k)) * 0.5;
                   double Ue_pk = (vitesse_i(i, j, k + 1) + vitesse_i(i + 1, j, k + 1)) * 0.5;
-                  // Formule decentree (ordre 2) pour pas variable sur le bord gauche :
+                  // Upwind formula (order 2) for variable step on the left boundary:
                   dudz(i, j, k) = (-4 * Ue_mk + 3 * Ue_ck + Ue_pk) / (3 * dz);
 
-                  // de Uy
+                  // of Uy
                   double Ve_mk = 0.;
                   double Ve_ck = (vitesse_j(i, j, k) + vitesse_j(i, j + 1, k)) * 0.5;
                   double Ve_pk = (vitesse_j(i, j, k + 1) + vitesse_j(i, j + 1, k + 1)) * 0.5;
@@ -1056,14 +1056,14 @@ void compute_and_store_gradU_cell(const IJK_Field_double& vitesse_i, const IJK_F
                 }
               else if (on_the_last_cell && !(geom.get_periodic_flag(DIRECTION_K)))
                 {
-                  // de Ux
+                  // of Ux
                   double Ue_mk = (vitesse_i(i, j, k - 1) + vitesse_i(i + 1, j, k - 1)) * 0.5;
                   double Ue_ck = (vitesse_i(i, j, k) + vitesse_i(i + 1, j, k)) * 0.5;
                   double Ue_pk = 0.;
-                  // Formule decentree (ordre 2) pour pas variable sur le bord droit :
+                  // Upwind formula (order 2) for variable step on the right boundary:
                   dudz(i, j, k) = (-Ue_mk - 3 * Ue_ck + 4 * Ue_pk) / (3 * dz);
 
-                  // de Uy
+                  // of Uy
                   double Ve_mk = (vitesse_j(i, j, k - 1) + vitesse_j(i, j + 1, k - 1)) * 0.5;
                   double Ve_ck = (vitesse_j(i, j, k) + vitesse_j(i, j + 1, k)) * 0.5;
                   double Ve_pk = 0.;
@@ -1071,23 +1071,23 @@ void compute_and_store_gradU_cell(const IJK_Field_double& vitesse_i, const IJK_F
                 }
               else
                 {
-                  // For any interior cell... Formule centree pour pas cste
+                  // For any interior cell... Centered formula for constant step
 
-                  // de Ux !!!!!! ATTENTION on veux calculer la moyenne entre (i,j,k) et (i+1,j,k) aux mailles k-1 et k+1
+                  // of Ux !!!!!! NOTE: we want to compute the average between (i,j,k) and (i+1,j,k) at cells k-1 and k+1
                   double Ue_mk = (vitesse_i(i, j, k - 1) + vitesse_i(i + 1, j, k - 1)) * 0.5;
                   double Ue_pk = (vitesse_i(i, j, k + 1) + vitesse_i(i + 1, j, k + 1)) * 0.5;
                   dudz(i, j, k) = (Ue_pk - Ue_mk) / (2 * dz);
 
-                  // de Uy !!!!!! ATTENTION on veux calculer la moyenne entre (i,j,k) et (i,j+1,k) aux mailles k-1 et k+1
+                  // of Uy !!!!!! NOTE: we want to compute the average between (i,j,k) and (i,j+1,k) at cells k-1 and k+1
                   double Ve_mk = (vitesse_j(i, j, k - 1) + vitesse_j(i, j + 1, k - 1)) * 0.5;
                   double Ve_pk = (vitesse_j(i, j, k + 1) + vitesse_j(i, j + 1, k + 1)) * 0.5;
                   dvdz(i, j, k) = (Ve_pk - Ve_mk) / (2 * dz);
                 }
 
-              // de Uz
+              // of Uz
               dwdz(i, j, k) = (vitesse_k(i, j, k + 1) - vitesse_k(i, j, k)) / dz;
 
-              // Calcul de lambda2 :
+              // Compute lambda2:
               if (compute_all)
                 {
                   // Sij = 1/2*(aij+aji)
@@ -1126,7 +1126,7 @@ void compute_and_store_gradU_cell(const IJK_Field_double& vitesse_i, const IJK_F
                   const double a33 = s33 + o33;
 
                   //double a11=1,a22=2,a33=3,a12=0,a21=0,a13=0,a31=0,a23=0,a32=0;
-                  // Changement de tous les signes :
+                  // Change all signs:
                   const double a = 1.;
                   const double b = -(a11 + a22 + a33);
                   const double c = -(a12 * a21 + a23 * a32 + a13 * a31 - a11 * a22 - a11 * a33 - a22 * a33);
@@ -1239,7 +1239,7 @@ void compute_and_store_gradU_cell(const IJK_Field_double& vitesse_i, const IJK_F
                        //const double delta0 = b*b-3*a*c;
                        //const double delta1 = 2*b*b*b-9*a*b*c+27*a*a*d;
                        // Cerr << delta1*delta1-4*delta0*delta0*delta0 << " " << -27.*a*a*delta << finl;
-                       // Apres le premier delta1, WIKI dit +- choix libre ?!
+                       // After the first delta1, WIKI says +- is a free choice ?!
                        // WIKI : const double C = std::cbrt((delta1+sqrt(delta1*delta1-4*delta0*delta0*delta0))/2.);
                        //                      const double C = std::cbrt((delta1+sqrt(-delta1*delta1+4*delta0*delta0*delta0))/2.);
                        //const double C = cbrt((delta1+sqrt(-delta1*delta1+4*delta0*delta0*delta0))/2.);
@@ -1259,7 +1259,7 @@ void compute_and_store_gradU_cell(const IJK_Field_double& vitesse_i, const IJK_F
                       //roots[1] = z2;
                       //roots[2] = z3;
                       //ArrOfInt cc(3);
-                      //trier(roots,cc); // du + grand au plus petit...
+                      //trier(roots,cc); // from largest to smallest...
                       //Cerr << roots;
                       //Cerr << "Sorted roots : " << roots[0] << " " << roots[1] << " " << roots[2] << finl;
                       const double x = z1 + z2 + z3 - std::min(z1, std::min(z2, z3)) - std::max(z1, std::max(z2, z3));
@@ -1282,7 +1282,7 @@ void compute_and_store_gradU_cell(const IJK_Field_double& vitesse_i, const IJK_F
     }
 
   Cerr << "Maximal residue encountered with lambda2 : " << residue << finl;
-  // Mise a jour des espaces virtuels :
+  // Update virtual spaces:
   dudx.echange_espace_virtuel(dudx.ghost());
   dvdy.echange_espace_virtuel(dvdy.ghost());
   dwdx.echange_espace_virtuel(dwdx.ghost());
@@ -1372,10 +1372,10 @@ double calculer_v_moyen(const IJK_Field_double& vx)
             }
         }
     }
-  // somme sur tous les processeurs.
+  // sum across all processors.
   v_moy = Process::mp_sum(v_moy);
-  // Maillage uniforme, il suffit donc de diviser par le nombre total de mailles:
-  // cast en double au cas ou on voudrait faire un maillage >2 milliards
+  // Uniform mesh, so it suffices to divide by the total number of cells:
+  // cast to double in case we want to use a mesh with more than 2 billion cells
   const double n_mailles_tot = ((double) geom.get_nb_elem_tot(0)) * geom.get_nb_elem_tot(1) * geom.get_nb_elem_tot(2);
   v_moy /= n_mailles_tot;
 #else
@@ -1392,10 +1392,10 @@ double calculer_v_moyen(const IJK_Field_double& vx)
             }
         }
     }
-  // somme sur tous les processeurs.
+  // sum across all processors.
   v_moy = Process::mp_sum(v_moy);
-  // Maillage uniforme, il suffit donc de diviser par le nombre total de mailles:
-  // cast en double au cas ou on voudrait faire un maillage >2 milliards
+  // Uniform mesh, so it suffices to divide by the total number of cells:
+  // cast to double in case we want to use a mesh with more than 2 billion cells
   const double n_mailles_xy = ((double) geom.get_nb_elem_tot(0)) * geom.get_nb_elem_tot(1);
   v_moy /= (n_mailles_xy * geom.get_domain_length(DIRECTION_K) );
 #endif
@@ -1421,11 +1421,11 @@ double calculer_vl_moyen(const IJK_Field_double& vx, const IJK_Field_double& ind
             }
         }
     }
-  // somme sur tous les processeurs.
+  // sum across all processors.
   v_moy = Process::mp_sum(v_moy);
   indic_moy = Process::mp_sum(indic_moy);
-  // Maillage uniforme, il suffit donc de diviser par le nombre total de mailles:
-  // cast en double au cas ou on voudrait faire un maillage >2 milliards
+  // Uniform mesh, so it suffices to divide by the total number of cells:
+  // cast to double in case we want to use a mesh with more than 2 billion cells
   const double n_mailles_tot = ((double) geom.get_nb_elem_tot(0)) * geom.get_nb_elem_tot(1) * geom.get_nb_elem_tot(2);
   v_moy /= n_mailles_tot;
   indic_moy /= n_mailles_tot;
@@ -1469,10 +1469,10 @@ double calculer_rho_cp_u_moyen(const IJK_Field_double& vx, const IJK_Field_doubl
           const double rho_cp_u = rho * cp * u;
           rho_cp_u_moy += rho_cp_u;
         }
-  // somme sur tous les processeurs.
+  // sum across all processors.
   rho_cp_u_moy = Process::mp_sum(rho_cp_u_moy);
-  // Maillage uniforme, il suffit donc de diviser par le nombre total de mailles:
-  // cast en double au cas ou on voudrait faire un maillage >2 milliards
+  // Uniform mesh, so it suffices to divide by the total number of cells:
+  // cast to double in case we want to use a mesh with more than 2 billion cells
   const Domaine_IJK& geom = vx.get_domaine();
   const double n_mailles_tot = ((double) geom.get_nb_elem_tot(0)) * geom.get_nb_elem_tot(1) * geom.get_nb_elem_tot(2);
   rho_cp_u_moy /= n_mailles_tot;
@@ -1520,14 +1520,14 @@ double calculer_temperature_adimensionnelle_theta_moy(const IJK_Field_double& vx
           rho_cp_u_moy += rho * cp * u;
           theta_adim_moy += rho * cp * u * theta_adim;
         }
-  //somme sur les proc
+  //sum across processors
   rho_cp_u_moy = Process::mp_sum(rho_cp_u_moy);
   theta_adim_moy = Process::mp_sum(theta_adim_moy);
-  //Division par le nombre de mailles
+  //Divide by the number of cells
   const double n_mailles_tot = ((double) geom.get_nb_elem_tot(0)) * geom.get_nb_elem_tot(1) * geom.get_nb_elem_tot(2);
   rho_cp_u_moy /= n_mailles_tot;
   theta_adim_moy /= n_mailles_tot;
-  //valeur adimensionnelle moyenne
+  //mean dimensionless value
   theta_adim_moy /= rho_cp_u_moy;
   return theta_adim_moy;
 }
@@ -1546,14 +1546,14 @@ double calculer_variable_wall(const IJK_Field_double& variable, const IJK_Field_
       int k = nk - 1;
       calculer_rho_cp_var(variable, cp_rhocp_rhocpinv, rho_field, rho_cp, rho_cp_moy, variable_moy, k, rho_cp_case);
     }
-  //somme sur les proc
+  //sum across processors
   rho_cp_moy = Process::mp_sum(rho_cp_moy);
   variable_moy = Process::mp_sum(variable_moy);
-  //Division par le nombre de mailles sur les 2 plans de bords
+  //Divide by the number of cells on the 2 boundary planes
   const double n_mailles_plan_xy_tot = 2. * ((double) geom.get_nb_elem_tot(0)) * geom.get_nb_elem_tot(1);
   rho_cp_moy /= n_mailles_plan_xy_tot;
   variable_moy /= n_mailles_plan_xy_tot;
-  //valeur adimensionnelle moyenne
+  //mean dimensionless value
   variable_moy /= rho_cp_moy;
   return variable_moy;
 }
@@ -1671,8 +1671,8 @@ void add_gradient_temperature(const IJK_Field_double& temperature, const double 
               if (bctype_kmin == 0)
                 {
                   f = constant * 2. / delta_z_all[k + offset];
-                  // schema decentre prenant en compte le bord et les trois centres de cellules suivants
-                  // pour calculer le gradient a la demi-longueur
+                  // upwind scheme taking into account the boundary and the three following cell centres
+                  // to compute the gradient at the half-length
                   //const double coef = 1./48.;
 
                   const double temperature_kmin = boundary.get_temperature_kmin();

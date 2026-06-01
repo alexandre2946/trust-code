@@ -19,7 +19,7 @@
 #include <Convection_Diffusion_Espece_Multi_QC.h>
 #include <Convection_Diffusion_Turbulent.h>
 
-/*! @brief classe Convection_Diffusion_Espece_Multi_Turbulent_QC
+/*! @brief Turbulent convection-diffusion of multiple species for a quasi-compressible fluid.
  *
  * @sa Convection_Diffusion_Espece_Multi_QC Convection_Diffusion_Turbulent
  */

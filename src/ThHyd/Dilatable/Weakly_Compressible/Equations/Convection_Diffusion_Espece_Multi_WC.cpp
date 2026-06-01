@@ -49,7 +49,7 @@ const Champ_base& Convection_Diffusion_Espece_Multi_WC::vitesse_pour_transport()
   return eqn_hydr.rho_la_vitesse() /* rho * u and not u */;
 }
 
-/*! @brief Associe l inconnue de l equation a la loi d etat,
+/*! @brief Associates the equation unknown with the state law.
  *
  */
 void Convection_Diffusion_Espece_Multi_WC::completer()

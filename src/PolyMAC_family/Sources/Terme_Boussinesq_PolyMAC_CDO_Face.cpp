@@ -60,11 +60,11 @@ void Terme_Boussinesq_PolyMAC_CDO_Face::ajouter_blocs(matrices_t matrices, Doubl
   DoubleVect g(dimension);
   g = grav;
 
-  // Verifie la validite de T0:
+  // Check validity of T0:
   check();
   int e, i, f, n, calc_cl = !sub_type(Domaine_PolyMAC_MPFA, domaine), nb_dim = param.line_size(), cR = (rho.dimension_tot(0) == 1), d, D = dimension, nf_tot = domaine.nb_faces_tot();
   for (f = 0; f < domaine.nb_faces(); f++)
-    for (i = 0; (calc_cl || fcl(f, 0) < 2) && i < 2 && (e = f_e(f, i)) >= 0; i++) //contributions amont/aval
+    for (i = 0; (calc_cl || fcl(f, 0) < 2) && i < 2 && (e = f_e(f, i)) >= 0; i++) //upwind/downwind contributions
       {
         double coeff = 0;
         for (n = 0; n < nb_dim; n++)

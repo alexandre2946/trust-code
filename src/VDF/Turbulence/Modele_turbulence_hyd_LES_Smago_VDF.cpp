@@ -91,7 +91,7 @@ void Modele_turbulence_hyd_LES_Smago_VDF::calculer_S_barre()
       temp = 0.;
       for (i = 0; i < dimension; i++)
         for (j = 0; j < dimension; j++)
-          //Deplacement du calcul de Sij
+          //Shifted computation of Sij
           {
             Sij = 0.5 * (duidxj(elem, i, j, 0) + duidxj(elem, j, i, 0));
             temp += Sij * Sij;

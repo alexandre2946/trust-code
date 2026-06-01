@@ -53,8 +53,8 @@ int Modele_turbulence_hyd_Longueur_Melange_VDF::preparer_calcul()
 
 Champ_Fonc_base& Modele_turbulence_hyd_Longueur_Melange_VDF::calculer_viscosite_turbulente()
 {
-  double hauteur = std::fabs(alt_max_ - alt_min_); // test alt_max>alt_min a faire, plutot que de prendre fabs ??
-  //Attention, ici "hauteur" est la hauteur reelle du canal (pas la demi-hauteur)
+  double hauteur = std::fabs(alt_max_ - alt_min_); // test alt_max>alt_min should be done instead of taking fabs
+  //Note: "hauteur" here is the actual channel height (not the half-height)
   const double Kappa = 0.415;
   double Cmu = CMU;
 
@@ -84,7 +84,7 @@ Champ_Fonc_base& Modele_turbulence_hyd_Longueur_Melange_VDF::calculer_viscosite_
       exit();
     }
 
-  //    CANAL PLAN suivant (Ox - h=2) **********************************
+  //    PLANE CHANNEL along (Ox - h=2) **********************************
 
   for (int elem = 0; elem < nb_elem; elem++)
     {
@@ -125,7 +125,7 @@ void Modele_turbulence_hyd_Longueur_Melange_VDF::calculer_Sij2()
       for (i = 0; i < dimension; i++)
         for (j = 0; j < dimension; j++)
           {
-            //Deplacement du calcul de Sij
+            //Shifted computation of Sij
             Sij = 0.5 * (duidxj(elem, i, j, 0) + duidxj(elem, j, i, 0));
             Sij2_(elem) += Sij * Sij;
           }

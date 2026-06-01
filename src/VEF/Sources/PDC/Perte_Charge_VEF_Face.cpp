@@ -49,9 +49,9 @@ void Perte_Charge_VEF_Face::mettre_a_jour(double temps)
 
 /////////////////////////////////////////////////////////////////////
 //
-//                    Implementation des fonctions
+//                    Implementation of member functions
 //
-//               de la classe Perte_Charge_VEF_Face
+//               of class Perte_Charge_VEF_Face
 //
 ////////////////////////////////////////////////////////////////////
 

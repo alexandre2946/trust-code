@@ -21,17 +21,17 @@
 #include <MorEqn.h>
 #include <Domaine_forward.h>
 
-/*! @brief classe Domaine_Cl_dis_base Les objets Domaine_Cl_dis_base representent les conditions aux limites
+/*! @brief class Domaine_Cl_dis_base Domaine_Cl_dis_base objects represent discretized boundary conditions
  *
- *      discretisees. Domaine_Cl_dis_base est un morceau d'equation donc elle
- *      herite de MorEqn, c'est grace a cet heritage que chaque objet
- *      Domaine_Cl_dis_base contient une reference vers l'equation a laquelle il
- *      se rapporte. Les conditions aux limites discretisees representent les
- *      conditions aux limites du domaine discretise associe a l'equation
- *      reference par Domaine_Cl_dis_base.
- *      Domaine_Cl_dis_base a un membre representant les conditions aux limites.
+ *      . Domaine_Cl_dis_base is a piece of equation so it
+ *      inherits from MorEqn, it is through this inheritance that each
+ *      Domaine_Cl_dis_base object contains a reference to the equation to which it
+ *      refers. The discretized boundary conditions represent the
+ *      boundary conditions of the discretized domain associated with the equation
+ *      referenced by Domaine_Cl_dis_base.
+ *      Domaine_Cl_dis_base has a member representing the boundary conditions.
  *
- * @sa MorEqn Conds_lim Cond_lim_base, Classe abstraite., Methodes abstraites:, void completer(const Domaine_dis_base& ), void imposer_cond_lim(Champ_Inc_base& )
+ * @sa MorEqn Conds_lim Cond_lim_base, Abstract class., Abstract methods:, void completer(const Domaine_dis_base& ), void imposer_cond_lim(Champ_Inc_base& )
  */
 class Domaine_Cl_dis_base : public MorEqn, public Objet_U
 {
@@ -40,7 +40,7 @@ class Domaine_Cl_dis_base : public MorEqn, public Objet_U
 
 public:
 
-  // Methode surchargee de Objet_U:
+  // Method overridden from Objet_U:
   void nommer(const Nom& nom) override;
   const Cond_lim&  les_conditions_limites(int ) const;
   Cond_lim&        les_conditions_limites(int );
@@ -60,7 +60,7 @@ public:
   virtual void associer(const Domaine_dis_base& ddb) { /* Does nothing by default */ }
 
   virtual int   calculer_coeffs_echange(double temps);
-  // !SC : passage du OWN_PTR(Champ_Inc_base) n'est plus necessaire car il y a une ref maintenant
+  // !SC: passing OWN_PTR(Champ_Inc_base) is no longer necessary since there is a ref now
   virtual void     imposer_cond_lim(Champ_Inc_base&,double ) = 0;
   int           nb_faces_Cl() const;
 

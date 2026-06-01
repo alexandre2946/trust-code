@@ -18,10 +18,9 @@
 
 #include <CoolProp_to_TRUST.h>
 
-/*! @brief classe CoolProp_to_TRUST_generique
+/*! @brief CoolProp interface for fluid properties as functions of temperature and enthalpy.
  *
- *  Interface commune pour TRUST et ses baltiks qui permet appeler les methodes de la lib CoolProp
- *  Methods disponibles pour les fluids en temperature et enthalpie
+ *  Common interface for TRUST and its baltiks to call CoolProp library fluid-property methods.
  *
  *  @sa CoolProp_to_TRUST CoolProp_Supported_Models_Fluids
  */
@@ -30,11 +29,11 @@ class CoolProp_to_TRUST_generique: public CoolProp_to_TRUST
 public:
   void set_fluide_generique(const char *const model_name, const char *const fluid_name) override;
 
-  // methodes particulieres par application pour gagner en performance : utilisees dans Pb_Multiphase (pour le moment !)
+  // application-specific methods to improve performance: used in Pb_Multiphase (for now)
   int tppi_get_CPMLB_pb_multiphase_pT(const MSpanD, MLoiSpanD, int ncomp = 1, int id = 0) const override;
   int tppi_get_all_pb_multiphase_pT(const MSpanD, MLoiSpanD, MLoiSpanD, int ncomp = 1, int id = 0) const override;
 
-  // methode particuliere par application pour gagner en performance : utilisee dans F5 (pour le moment !)
+  // application-specific method to improve performance: used in F5 (for now)
   int tppi_get_all_prop_loi_F5(const MSpanD, MLoiSpanD_h, int ncomp = 1, int id = 0, bool is_liq = true) const override;
 
 private:

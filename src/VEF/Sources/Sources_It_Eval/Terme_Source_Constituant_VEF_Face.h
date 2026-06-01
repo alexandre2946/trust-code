@@ -23,7 +23,7 @@
 
 /*! @brief class Terme_Source_Constituant_VEF_Face
  *
- *  Cette classe represente un terme source de l'equation de la concentration
+ *  This class represents a source term for the concentration equation.
  *
  * @sa Terme_Source_Constituant, Terme_Source_VEF_base
  */

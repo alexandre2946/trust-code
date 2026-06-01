@@ -21,10 +21,10 @@
 
 
 
-/*! @brief classe Champ_front_bruite Classe derivee de Champ_front_base qui represente les
+/*! @brief class Champ_front_bruite Derived class of Champ_front_base representing noisy boundary fields:
  *
- *      champs aux frontieres bruites : ch(*,i)=m(i)+alea*amplitude(i)
- *      ou alea est une variable aleatoire de loi uniforme sur [0,1]
+ *      ch(*,i)=m(i)+random*amplitude(i)
+ *      where random is a uniformly distributed random variable on [0,1]
  *
  * @sa Champ_front_base
  */

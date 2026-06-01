@@ -24,7 +24,7 @@ class Perte_Charge_PolyMAC_HFV : public Perte_Charge_PolyMAC_CDO
 public:
   int has_interface_blocs() const override { return 1; }
   void check_multiphase_compatibility() const override { }
-  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override { } //rien
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override { } //nothing
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
 };
 

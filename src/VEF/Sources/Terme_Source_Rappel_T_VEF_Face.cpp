@@ -129,7 +129,7 @@ void Terme_Source_Rappel_T_VEF_Face::completer()
       const DoubleTab& xp_autre_pb = domaine_VEF_autre_pb->xp() ;
       const DoubleVect& volumes = domaine_VEF_autre_pb->volumes();
 
-      // Dimensionnement des tabs
+      // Array dimensioning
       nb_fin.resize_array(nb_elem);
       corresp_fin_gros.resize_array(nb_elem_autre_pb);
       nb_fin=0;
@@ -137,7 +137,7 @@ void Terme_Source_Rappel_T_VEF_Face::completer()
       vol_fin_tot.resize_array(nb_elem);
       vol_fin_tot=0.;
 
-      // Calcul des connectivites entre les maillages des deux pbs
+      // Compute connectivities between the meshes of the two problems
       domaine.chercher_elements(xp_autre_pb, corresp_fin_gros);
       for (int i=0; i<nb_elem_autre_pb; i++)
         {
@@ -201,9 +201,9 @@ DoubleTab& Terme_Source_Rappel_T_VEF_Face::ajouter(DoubleTab& resu) const
       const DoubleTab& xp=domaineVEF_autre_pb.xp() ;
 
       const IntTab& face_voisins=domaine_VEF.face_voisins() ;
-      ArrOfDouble val_elem(nb_elem); // valeurs sur les elems du pb courant du champ de l'autre pb.
+      ArrOfDouble val_elem(nb_elem); // values on elements of the current pb from the field of the other pb.
 
-      DoubleTab valeurs(nb_elem_autre_pb,l_inconnue->nb_comp()); //valeurs sur l'autre pb
+      DoubleTab valeurs(nb_elem_autre_pb,l_inconnue->nb_comp()); //values on the other pb
       IntTab elems(nb_elem_autre_pb);
       for (int i=0; i<nb_elem_autre_pb; i++)
         elems(i)=i;

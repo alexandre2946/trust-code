@@ -35,7 +35,7 @@ public:
   DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const override;
   void verifier() const;
 
-  // Methodes pour l implicite.
+  // Methods for the implicit scheme.
   inline void dimensionner(Matrice_Morse& ) const override;
   inline void modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const override;
   inline void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override;
@@ -72,7 +72,7 @@ protected :
   //DoubleVect porosite_face;
 };
 
-/*! @brief on dimensionne notre matrice.
+/*! @brief Size/initialize the matrix.
  *
  */
 
@@ -87,7 +87,7 @@ inline void Op_Diff_VEF_Anisotrope_Face::modifier_pour_Cl(Matrice_Morse& matrice
 }
 
 
-/*! @brief on assemble la matrice.
+/*! @brief Assemble the matrix.
  *
  */
 
@@ -102,7 +102,7 @@ inline void Op_Diff_VEF_Anisotrope_Face::contribuer_a_avec(const DoubleTab& inco
     ajouter_contribution_multi_scalaire(inco, matrice);
 }
 
-/*! @brief on ajoute la contribution du second membre.
+/*! @brief Add the contribution to the right-hand side.
  *
  */
 

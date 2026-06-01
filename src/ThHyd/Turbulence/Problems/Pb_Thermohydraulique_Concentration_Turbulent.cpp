@@ -32,14 +32,15 @@ Sortie& Pb_Thermohydraulique_Concentration_Turbulent::printOn(Sortie& os) const 
 
 Entree& Pb_Thermohydraulique_Concentration_Turbulent::readOn(Entree& is) { return Pb_Fluide_base::readOn(is); }
 
-/*! @brief Renvoie le nombre d'equation, Renvoie 3 car il y a 2 equations a un probleme de
+/*! @brief Returns the number of equations.
  *
- *     thermo-hydraulique avec concentration:
- *         - l'equation de Navier Stokes turbulent
- *         - equation d'energie en regime turbulent
- *         - une equation de convection-diffusion turbulente
+ *     Returns 3 because there are 3 equations in a turbulent
+ *     thermohydraulic problem with concentration:
+ *         - the turbulent Navier-Stokes equation
+ *         - the turbulent energy equation
+ *         - a turbulent convection-diffusion equation
  *
- * @return (int) le nombre d'equations
+ * @return Number of equations (3).
  */
 int Pb_Thermohydraulique_Concentration_Turbulent::nombre_d_equations() const
 {
@@ -61,14 +62,10 @@ const Equation_base& Pb_Thermohydraulique_Concentration_Turbulent::equation(int 
     return eq_concentration;
 }
 
-/*! @brief Renvoie l'equation d'hydraulique de type Navier_Stokes_Turbulent si i=0 Renvoie l'equation de la thermique de type
+/*! @brief Returns the hydraulic equation of type Navier_Stokes_Turbulent if i=0, returns the thermal equation of type Convection_Diffusion_Temperature_Turbulent if i=1, returns the concentration equation of type Convection_Diffusion_Concentration_Turbulent if i=2.
  *
- *     Convection_Diffusion_Temperature_Turbulent si i=1
- *     Renvoie l'equation de la thermique de type
- *     Convection_Diffusion_Concentration_Turbulent si i=2
- *
- * @param (int i) l'index de l'equation a renvoyer
- * @return (Equation_base&) l'equation correspondante a l'index
+ * @param i Index of the equation to return.
+ * @return The equation corresponding to the given index.
  */
 Equation_base& Pb_Thermohydraulique_Concentration_Turbulent::equation(int i)
 {
@@ -85,15 +82,15 @@ Equation_base& Pb_Thermohydraulique_Concentration_Turbulent::equation(int i)
     return eq_concentration;
 }
 
-/*! @brief Associe un milieu au probleme, Si le milieu est de type
+/*! @brief Associates a medium to the problem.
  *
- *       - Fluide_Incompressible, il sera associe a l'equation de l'hydraulique
- *         et a l'equation d'energie.
- *       - Constituant, il sera associe a l'equation de convection-diffusion
- *     Un autre type de milieu provoque une erreur
+ * Depending on the medium type:
+ *       - Fluide_Incompressible: associated to the hydraulic equation and the energy equation
+ *       - Constituant: associated to the convection-diffusion equation
+ *     Any other medium type causes an error.
  *
- * @param (Milieu_base& mil) le milieu physique a associer au probleme
- * @throws mauvais type de milieu physique
+ * @param mil Physical medium to associate with the problem.
+ * @throws If the medium is not of the correct physical type.
  */
 void Pb_Thermohydraulique_Concentration_Turbulent::associer_milieu_base(const Milieu_base& mil)
 {

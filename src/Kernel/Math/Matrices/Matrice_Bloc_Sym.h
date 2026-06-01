@@ -18,7 +18,7 @@
 
 
 
-/*! @brief class Matrice_Bloc_Sym Cette classe derive de Matrice_Bloc et Matrice_Sym.
+/*! @brief Symmetric block matrix class. Derives from both Matrice_Bloc and Matrice_Sym.
  *
  *
  *
@@ -36,17 +36,17 @@
 
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
-/*     classe Matrice_Bloc_Sym : stockage des blocs d`une matrice bloc A(N,M) */
+/*     class Matrice_Bloc_Sym: storage of blocks of a block matrix A(N,M)    */
 /*                                                                            */
-/*                           le stockage est effectue ligne par ligne         */
-/*                           dans un vecteur de type VECT(Matrice).           */
-/*     On utilise:                                                            */
-/*              blocs_    = vecteur de matrices Aij                           */
-/*              N_        = 1ere dim de blocs_                                */
-/*              M_        = 2eme dim de blocs_                                */
-/*              nb_blocs_ = nb total de blocs (= N_ * M_)                     */
+/*                         storage is done row by row                        */
+/*                         in a vector of type VECT(Matrice).                */
+/*     Uses:                                                                  */
+/*              blocs_    = vector of matrices Aij                            */
+/*              N_        = 1st dim of blocs_                                 */
+/*              M_        = 2nd dim of blocs_                                 */
+/*              nb_blocs_ = total number of blocks (= N_ * M_)               */
 /*                                                                            */
-/*     Forme matricielle:                                                     */
+/*     Matrix form:                                                           */
 /*                                                                            */
 /*              [A11 A12 ... A1M]                                             */
 /*              [... A22 ... A2M]                                             */
@@ -67,7 +67,7 @@ public:
   // Constructeurs :
   Matrice_Bloc_Sym(int N=0, int M=0);
 
-  // Impression
+  // Printing
   Sortie& imprimer(Sortie& s) const override;
   Sortie& imprimer_formatte(Sortie& s) const override;
 
@@ -79,10 +79,10 @@ public:
   //Conversions:
   void BlocSymToMatMorseSym(Matrice_Morse_Sym& mat) const;
 
-  // Dimensionnement
-  void dimensionner(int N, int M) override; // dimensionnement de blocs_
+  // Sizing
+  void dimensionner(int N, int M) override; // sizing of blocs_
 
-  // Acces aux blocs: renvoie le bloc Aij avec A(N,M)
+  // Block access: returns the block Aij with A(N,M)
   const Matrice& get_bloc(int i, int j) const override; // (0<=i<N , i<=j<M)
   Matrice& get_bloc(int i, int j) override;
 

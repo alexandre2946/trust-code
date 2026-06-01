@@ -101,7 +101,7 @@ void Source_Masse_Fluide_Dilatable_VEF::ajouter_eq_espece(const Convection_Diffu
   CDoubleArrView volumes_entrelaces = zvf.volumes_entrelaces().view_ro();
   DoubleArrView view_resu = resu.view_rw();
 
-  // pour post
+  // for post-processing
   Champ_Don_base * post_src_ch = fluide.has_source_masse_espece_champ() ? &ref_cast_non_const(Fluide_Dilatable_base, fluide).source_masse_espece() : nullptr;
 
   bool ok_post_src_ch = post_src_ch ? true:false;
@@ -109,10 +109,10 @@ void Source_Masse_Fluide_Dilatable_VEF::ajouter_eq_espece(const Convection_Diffu
   if (ok_post_src_ch) valeurs = static_cast<DoubleVect&>((*post_src_ch).valeurs()).view_wo();
 
   /*
-   * XXX Elie Saikali mai 2025 : soucis avec ICoCo ...
-   * Attention : val_flux a dimension de nb_faces or val_flux0 a dimension de nb_faces du bord nom_bord_ ...
-   * faut bien remplir les bonnes faces ...
-   * On commence par remplir val_flux seulement pour les bonnes faces ...
+   * XXX Elie Saikali mai 2025 : issue with ICoCo ...
+   * Note: val_flux has dimension nb_faces whereas val_flux0 has dimension nb_faces of border nom_bord_ ...
+   * the correct faces must be filled ...
+   * Start by filling val_flux only for the relevant faces ...
    * TODO FIXME utilise Source_Masse_Fluide_Dilatable_base::fill_val_flux_tab ...
    */
 
@@ -136,7 +136,7 @@ void Source_Masse_Fluide_Dilatable_VEF::ajouter_eq_espece(const Convection_Diffu
         }
     }
 
-  // Maintennat on regarde resu ...
+  // Now look at resu ...
   for (int n_bord = 0; n_bord < domaine_cl_dis_->nb_cond_lim(); n_bord++)
     {
       const Cond_lim& la_cl = domaine_cl_dis_->les_conditions_limites(n_bord);
@@ -155,13 +155,13 @@ void Source_Masse_Fluide_Dilatable_VEF::ajouter_eq_espece(const Convection_Diffu
             int elem = elem1 == -1 ? elem2 : elem1;
             const double surface_elem = face_surfaces(num_face);
             /*
-             * NOTA BENE : on cherche un facteur de correction car Y est aux faces
-             * Terme source surfacique, on utilise Y face => volume entrelaces
-             * Or P aux elems et sommets => on a pas le meme volume
-             * On interpole Y aux elem, le facteur = Yelem / Yface
+             * NOTA BENE : a correction factor is needed because Y is on faces
+             * Surface source term, we use Y face => interlaced volume
+             * But P is on elements and nodes => not the same volume
+             * Interpolate Y to elements, the factor = Yelem / Yface
              *
-             * Conclusion : pour Y on utilise les valeurs aux elems pas faaces !
-             * Attention, on divise par rho(face) car c'est pas dans la formulation de terme source !
+             * Conclusion: for Y we use element values, not face values!
+             * Note: we divide by rho(face) because it is not included in the source term formulation!
              */
             double YY = 0.;
             for (int j = 0; j < elem_faces_line_size; j++)
@@ -170,7 +170,7 @@ void Source_Masse_Fluide_Dilatable_VEF::ajouter_eq_espece(const Convection_Diffu
             YY /= elem_faces_line_size;
             double srcmass = -(YY * view_val_flux(num_face, 0) * surface_elem) / rho(num_face);
             if (is_expl)
-              srcmass /= volumes_entrelaces(num_face); // on divise par volume (pas de solveur masse dans l'equation ...)
+              srcmass /= volumes_entrelaces(num_face); // divide by volume (no mass solver in the equation ...)
             view_resu(num_face) += srcmass;
 
             // DOUBT_HARI: Could give a different result according to order of execution
@@ -181,7 +181,7 @@ void Source_Masse_Fluide_Dilatable_VEF::ajouter_eq_espece(const Convection_Diffu
         }
     }
 
-  // pour post
+  // for post-processing
   if (post_src_ch)
     (*post_src_ch).mettre_a_jour(fluide.inco_chaleur().temps());
 }
@@ -191,7 +191,7 @@ void Source_Masse_Fluide_Dilatable_VEF::ajouter_projection(const Fluide_Dilatabl
   assert(sub_type(Fluide_Weakly_Compressible,fluide));
   const Domaine_Cl_dis_base& zclb = domaine_cl_dis_.valeur();
   const Domaine_VEF& zp1b = ref_cast(Domaine_VEF, zclb.domaine_dis());
-  // pour post
+  // for post-processing
   Champ_Don_base * post_src_ch = fluide.has_source_masse_projection_champ() ? &ref_cast_non_const(Fluide_Dilatable_base, fluide).source_masse_projection() : nullptr;
 
   const int nb_faces = zp1b.nb_faces();
@@ -202,10 +202,10 @@ void Source_Masse_Fluide_Dilatable_VEF::ajouter_projection(const Fluide_Dilatabl
   DoubleTabView val_flux = tab_val_flux.view_rw();
 
   /*
-    * XXX Elie Saikali mai 2025 : soucis avec ICoCo ...
-    * Attention : val_flux a dimension de nb_faces or val_flux0 a dimension de nb_faces du bord nom_bord_ ...
-    * faut bien remplir les bonnes faces ...
-    * On commence par remplir val_flux seulement pour les bonnes faces ...
+    * XXX Elie Saikali mai 2025 : issue with ICoCo ...
+    * Warning: val_flux has dimension nb_faces while val_flux0 has dimension nb_faces of boundary nom_bord_ ...
+    * must fill the correct faces ...
+    * Start by filling val_flux only for the correct faces ...
     * TODO FIXME utilise Source_Masse_Fluide_Dilatable_base::fill_val_flux_tab ...
     */
 
@@ -229,11 +229,11 @@ void Source_Masse_Fluide_Dilatable_VEF::ajouter_projection(const Fluide_Dilatabl
         }
     }
   /*
-   * Attention : ici resu est comme la Pression => P0 et P1 ... Pa peut etre
-   * Le flux est aux faces
-   * Donc : passage aux elems et aux sommets
+   * Note: here resu is like the Pressure => P0 and P1 ... possibly Pa
+   * The flux is on faces
+   * Therefore: interpolation to elements and nodes
    */
-  DoubleTrav tab_flux_faces = fluide.inco_chaleur().valeurs(); // pour initialiser avec la bonne taille
+  DoubleTrav tab_flux_faces = fluide.inco_chaleur().valeurs(); // to initialize with the correct size
   tab_flux_faces = 0.;
 
   const int nb_elem_tot = zp1b.nb_elem_tot(), nb_som_tot = zp1b.domaine().nb_som_tot(), nb_faces_tot = zp1b.nb_faces_tot();
@@ -243,7 +243,7 @@ void Source_Masse_Fluide_Dilatable_VEF::ajouter_projection(const Fluide_Dilatabl
   CIntTabView face_voisins = zp1b.face_voisins().view_ro();
   CIntTabView face_sommets = zp1b.face_sommets().view_ro();
   DoubleArrView flux_faces = static_cast<DoubleVect&>(tab_flux_faces).view_rw();
-  // remplir flux_faces (seulement au bord !)
+  // fill flux_faces (boundary only!)
   for (int n_bord = 0; n_bord < domaine_cl_dis_->nb_cond_lim(); n_bord++)
     {
       const Cond_lim& la_cl = domaine_cl_dis_->les_conditions_limites(n_bord);
@@ -268,7 +268,7 @@ void Source_Masse_Fluide_Dilatable_VEF::ajouter_projection(const Fluide_Dilatabl
   tab_volume_int_som = 0.;
 
   const int nfe = zp1b.domaine().nb_faces_elem(), nsf = zp1b.nb_som_face();
-  // calcul de la somme des volumes entrelacees autour d'un sommet
+  // compute the sum of interlaced volumes around a vertex
   CIntArrView renum_som_perio = zp1b.domaine().get_renum_som_perio().view_ro();
   DoubleArrView volume_int_som = static_cast<DoubleVect&>(tab_volume_int_som).view_rw();
   Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_faces_tot, KOKKOS_LAMBDA (const int face)
@@ -281,7 +281,7 @@ void Source_Masse_Fluide_Dilatable_VEF::ajouter_projection(const Fluide_Dilatabl
   });
   end_gpu_timer(__KERNEL_NAME__);
 
-  // interpolation du flux aux sommets
+  // interpolation of the flux to the vertices
   tab_flux_som = 0.;
   DoubleArrView flux_som = static_cast<DoubleVect&>(tab_flux_som).view_rw();
   Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__), nb_faces_tot, KOKKOS_LAMBDA (const int face)
@@ -294,7 +294,7 @@ void Source_Masse_Fluide_Dilatable_VEF::ajouter_projection(const Fluide_Dilatabl
       }
   });
   end_gpu_timer(__KERNEL_NAME__);
-  // on passe aux elems
+  // interpolate to elements
   bool ok_post_src_ch = post_src_ch ? true:false;
   int decal = 0;
   int p_has_elem = zp1b.get_alphaE();
@@ -307,7 +307,7 @@ void Source_Masse_Fluide_Dilatable_VEF::ajouter_projection(const Fluide_Dilatabl
   {
     double fll = 0.;
     for (int face = 0; face < nfe; face++)
-      fll += flux_faces(elem_faces(elem, face));  // divise par nfe ??? sais pas
+      fll += flux_faces(elem_faces(elem, face));  // divide by nfe ??? not sure
 
     resu(elem) -= fll; // in [kg.m-3.s-1]
 
@@ -328,7 +328,7 @@ void Source_Masse_Fluide_Dilatable_VEF::ajouter_projection(const Fluide_Dilatabl
 
   tab_resu.echange_espace_virtuel();
 
-  // pour post
+  // for post-processing
   if (post_src_ch)
     (*post_src_ch).mettre_a_jour(fluide.inco_chaleur().temps());
 }

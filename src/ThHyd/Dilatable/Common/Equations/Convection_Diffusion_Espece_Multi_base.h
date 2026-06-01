@@ -18,10 +18,7 @@
 
 #include <Convection_Diffusion_Espece_Fluide_Dilatable_base.h>
 
-/*! @brief classe Convection_Diffusion_Espece_Multi_base Cas particulier de Convection_Diffusion_Espece_Fluide_Dilatable_base
- *
- *      pour un fluide quasi conpressible quand le scalaire subissant le transport est
- *      la fraction massique
+/*! @brief @brief Particular case of Convection_Diffusion_Espece_Fluide_Dilatable_base for a quasi-compressible fluid when the transported scalar is the mass fraction.
  *
  * @sa Convection_Diffusion_Espece_Fluide_Dilatable_base
  */
@@ -37,7 +34,7 @@ public:
   void set_param(Param& titi) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
 
-  // Methodes inlines
+  // Inline methods
   inline const Motcle& get_alias() const { return alias_; }
 
 protected:

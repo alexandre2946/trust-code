@@ -22,22 +22,22 @@
 
 class Milieu_base;
 
-/*! @brief class Champ_Generique_modifier_pour_QC OWN_PTR(Champ_base) destine a post-traiter un champ d un probleme en quasi-compressible
+/*! @brief class Champ_Generique_modifier_pour_QC OWN_PTR(Champ_base) intended to post-process a field of a quasi-compressible problem
  *
- *  que l on souhaite multiplier ou diviser par la masse volumique (rho).
- *  La classe porte une REF au milieu qui doit etre de type Fluide_Quasi_Compressible.
+ *  that we want to multiply or divide by the density (rho).
+ *  The class carries a REF to the medium which must be of type Fluide_Quasi_Compressible.
  *
  */
 
-//// Syntaxe a respecter pour jdd
+//// Data file syntax to follow
 //
-// "nom_champ" modifier_pour_QC {
+// "field_name" modifier_pour_QC {
 //                 [division]
-//                source "type_champ_gen" { ... source ref_Champ { Pb_champ "nom_pb" "nom_champ_discret" } }
+//                source "generic_field_type" { ... source ref_Champ { Pb_champ "pb_name" "discrete_field_name" } }
 //               }
-// "nom_champ" fixe par utilisateur sera le nom du champ generique
-// "division" active la division du champ par rho sinon le champ est multiplie par rho
-// "type_champ_gen" type d'un champ generique
+// "field_name" set by user will be the name of the generic field
+// "division" activates the division of the field by rho otherwise the field is multiplied by rho
+// "generic_field_type" type of a generic field
 
 class Champ_Generique_modifier_pour_QC : public Champ_Gen_de_Champs_Gen
 {

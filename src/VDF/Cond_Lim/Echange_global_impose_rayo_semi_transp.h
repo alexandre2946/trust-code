@@ -19,9 +19,10 @@
 #include <Cond_lim_rayo_semi_transp.h>
 #include <Echange_global_impose.h>
 
-/*! @brief classe Echange_global_impose_rayo_semi_transp cette classe est utilisee pour imposer une temperature de paroi imposee
+/*! @brief class Echange_global_impose_rayo_semi_transp
  *
- *    uniquement pour une discretisation VDF.
+ *   This class is used to impose a wall temperature boundary condition,
+ *   exclusively for a VDF discretization.
  *
  *
  */
@@ -33,7 +34,7 @@ public :
   const Cond_lim_base& la_cl() const override;
   Champ_front_base& temperature_bord();
 
-  // La temperature de paroi etant directement donnee par le champ_front T_ext, il n'y a rien a calculer ici
+  // The wall temperature is directly given by the champ_front T_ext, so there is nothing to compute here
   void calculer_temperature_bord(double temps) {}
   int compatible_avec_eqn(const Equation_base&) const override { return 1; }
   void completer() override;

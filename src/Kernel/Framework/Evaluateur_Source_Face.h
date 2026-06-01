@@ -28,8 +28,8 @@ public:
   template <typename Type_Double>
   void calculer_terme_source_bord(const int , Type_Double& ) const { Process::exit("Evaluateur_Source_Face::calculer_terme_source_bord must be overloaded !!"); }
 protected:
-  IntVect orientation; // orientations des faces
-  DoubleVect volumes_entrelaces, porosite_surf; // porosites surfaciques
+  IntVect orientation; // face orientations
+  DoubleVect volumes_entrelaces, porosite_surf; // surface porosities
 };
 
 #endif /* Evaluateur_Source_Face_included */

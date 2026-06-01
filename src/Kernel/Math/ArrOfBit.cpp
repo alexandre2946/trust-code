@@ -19,7 +19,7 @@
 
 Implemente_instanciable_sans_constructeur_ni_destructeur_32_64(ArrOfBit_32_64,"ArrOfBit",Objet_U);
 
-/*! @brief Constructeur d'un tableau de taille n, non initialise
+/*! @brief Constructor for an array of size n, uninitialized.
  */
 template <typename _SIZE_>
 ArrOfBit_32_64<_SIZE_>::ArrOfBit_32_64(int_t n)
@@ -29,7 +29,7 @@ ArrOfBit_32_64<_SIZE_>::ArrOfBit_32_64(int_t n)
   resize_array(n);
 }
 
-/*! @brief Destructeur.
+/*! @brief Destructor.
  */
 template <typename _SIZE_>
 ArrOfBit_32_64<_SIZE_>::~ArrOfBit_32_64()
@@ -39,7 +39,7 @@ ArrOfBit_32_64<_SIZE_>::~ArrOfBit_32_64()
   data = 0;
 }
 
-/*! @brief Constructeur par copie (deep copy)
+/*! @brief Copy constructor (deep copy).
  */
 template <typename _SIZE_>
 ArrOfBit_32_64<_SIZE_>::ArrOfBit_32_64(const ArrOfBit_32_64& array):Objet_U(array)
@@ -49,7 +49,7 @@ ArrOfBit_32_64<_SIZE_>::ArrOfBit_32_64(const ArrOfBit_32_64& array):Objet_U(arra
   operator=(array);
 }
 
-/*! @brief Taille en "int" du tableau requis pour stocker un tableau de bits de taille donnees.
+/*! @brief Size in "int" units of the array required to store a bit array of the given size.
  */
 template <typename _SIZE_>
 typename ArrOfBit_32_64<_SIZE_>::int_t ArrOfBit_32_64<_SIZE_>::calculer_int_size(int_t la_taille) const
@@ -61,11 +61,10 @@ typename ArrOfBit_32_64<_SIZE_>::int_t ArrOfBit_32_64<_SIZE_>::calculer_int_size
   return siz;
 }
 
-/*! @brief Change la taille du tableau et copie les donnees existantes.
+/*! @brief Changes the size of the array and copies existing data.
  *
- * Si la taille est plus petite, les donnees sont
- *  tronquees, et si la taille est plus grande, les nouveaux elements
- *  ne sont pas initialises.
+ * If the new size is smaller, the data is truncated; if larger, the new
+ *  elements are not initialized.
  */
 template <typename _SIZE_>
 ArrOfBit_32_64<_SIZE_>& ArrOfBit_32_64<_SIZE_>::resize_array(int_t n)
@@ -89,14 +88,14 @@ ArrOfBit_32_64<_SIZE_>& ArrOfBit_32_64<_SIZE_>::resize_array(int_t n)
     }
   else
     {
-      delete[] data; // data!=0 sinon taille==n et on ne serait pas ici
+      delete[] data; // data!=0 otherwise taille==n and we would not be here
       data = 0;
       taille = 0;
     }
   return *this;
 }
 
-/*! @brief Operateur copie (deep copy).
+/*! @brief Copy operator (deep copy).
  */
 template <typename _SIZE_>
 ArrOfBit_32_64<_SIZE_>& ArrOfBit_32_64<_SIZE_>::operator=(const ArrOfBit_32_64& array)
@@ -118,7 +117,7 @@ ArrOfBit_32_64<_SIZE_>& ArrOfBit_32_64<_SIZE_>::operator=(const ArrOfBit_32_64& 
   return *this;
 }
 
-/*! @brief Si la valeur est non nulle, met la valeur 1 dans tous les elements du tableau, sinon met la valeur 0.
+/*! @brief If the value is non-zero, sets all elements of the array to 1; otherwise sets them to 0.
  */
 template <typename _SIZE_>
 ArrOfBit_32_64<_SIZE_>& ArrOfBit_32_64<_SIZE_>::operator=(int_t val)
@@ -130,10 +129,10 @@ ArrOfBit_32_64<_SIZE_>& ArrOfBit_32_64<_SIZE_>::operator=(int_t val)
   return *this;
 }
 
-/*! @brief Ecriture du tableau.
+/*! @brief Writes the array.
  *
  * Format: n
- *  0 1 0 0 1 0 ... (n valeurs)
+ *  0 1 0 0 1 0 ... (n values)
  *
  */
 template <typename _SIZE_>
@@ -141,8 +140,8 @@ Sortie& ArrOfBit_32_64<_SIZE_>::printOn(Sortie& os) const
 {
 #ifndef LATATOOLS
   os << taille << finl;
-  // Un retour a la ligne tous les 32 bits,
-  // Une espace tous les 8 bits
+  // A newline every 32 bits,
+  // A space every 8 bits
   int_t i = 0;
   for (; i < taille; i++)
     {
@@ -152,17 +151,17 @@ Sortie& ArrOfBit_32_64<_SIZE_>::printOn(Sortie& os) const
       if ((i & 31) == 31)
         os << finl;
     }
-  // Un retour a la ligne si la derniere ligne n'etait pas terminee
+  // A newline if the last line was not terminated
   if (i & 31)
     os << finl;
 #endif
   return os;
 }
 
-/*! @brief Lecture du tableau.
+/*! @brief Reads the array.
  *
  * Format: n
- *  0 1 0 0 1 0 ... (n valeurs)
+ *  0 1 0 0 1 0 ... (n values)
  *
  */
 template <typename _SIZE_>

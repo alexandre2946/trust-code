@@ -24,7 +24,7 @@
 class Domaine_Cl_VDF;
 class Champ_Face_VDF;
 
-/*! @brief classe Y_plus_Champ_Face
+/*! @brief class Y_plus_Champ_Face
  *
  * @sa Champ_y_plus Champ_Fonc_P0_VDF
  */

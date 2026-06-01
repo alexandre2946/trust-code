@@ -22,7 +22,7 @@
 #include <Probleme_base.h>
 #include <Champs_Fonc.h>
 
-/*! @brief Classe Pb_MED Classe pour postraiter relire des fichiers med et les postraiter
+/*! @brief class Pb_MED Class for re-reading MED files and post-processing them.
  */
 class Pb_MED : public Probleme_base
 {
@@ -39,7 +39,7 @@ public:
   inline Champs_Fonc& get_champs_fonc_post()     { return champs_fonc_post;  }
 
   /////////////////////////////////////////////////////
-  //Methodes de l interface des champs postraitables
+  // Methods of the post-processable fields interface
   /////////////////////////////////////////////////////
   void creer_champ(const Motcle& motlu) override;
   const Champ_base& get_champ(const Motcle& nom) const override;
@@ -58,13 +58,13 @@ private:
   Discretisation dis_bidon;
   ArrOfDouble temps_sauv_;
 
-  //Une classe portant des champs postraitables possede normalement un
-  //attribut champs_compris_ qui contient une reference a ces champs.
-  //Dans le cas particulier des Pb_MED on ne declare pas cet attribut
-  //afin de pouvoir coder une methhode get_champ() tres specifique a ce
-  //type de probleme et qui n utilisera pas les methodes de Champs_compris.
-  //La methode get_noms_champs_postraitables() et creer_champ() ne manipuleront
-  //pas non plus de champs_compris_.
+  // A class carrying post-processable fields normally has an attribute
+  // champs_compris_ containing a reference to those fields.
+  // In the specific case of Pb_MED, this attribute is not declared,
+  // so that a very specific get_champ() method can be implemented for this
+  // problem type, which will not use the Champs_compris methods.
+  // The methods get_noms_champs_postraitables() and creer_champ() will also
+  // not manipulate champs_compris_.
 
   //Champs_compris champs_compris_;
 };

@@ -37,44 +37,58 @@ public:
   inline const IntTab& get_tab_nb_pts_integ() const { return tab_nb_pts_integ_; }
   inline const IntTab& get_ind_pts_integ() const { return ind_pts_integ_; }
 
-  /*! Compute for the whole domain the exact location of integration points per element
+  /*! @brief Compute for the whole domain the exact location of integration points per element
    */
   virtual void compute_integ_points() = 0;
 
-  /*! Compute for the whole domain the exact location of integration points per facet
+  /*! @brief Compute for the whole domain the exact location of integration points per facet
    */
   virtual void compute_integ_points_on_facet() = 0;
 
 
-  inline int nb_pts_integ_max() const { return nb_pts_integ_max_; } // TODO: max du nombre de pts de la quadrature
+  inline int nb_pts_integ_max() const { return nb_pts_integ_max_; } // TODO: maximum number of quadrature points
   inline int nb_pts_integ(int e ) const { return tab_nb_pts_integ_(e); }
   inline int nb_pts_integ_facets() const { return nb_pts_integ_facets_; }
   inline int ind_pts_integ(int e ) const { return ind_pts_integ_(e); }
 
-  /*! Compute the integral of a function on the whole domain
+  /*! @brief Compute the integral of a function on the whole domain
    */
   double compute_integral(Parser_U& parser) const;
-  /*! Compute the integral of a function on the whole domain with its values on integration points
+  /*! @brief Compute the integral of a function on the whole domain with its values on integration points
    */
   double compute_integral(DoubleTab& vals_pts_integ) const;
-  /*! Compute the integral of a function on one triangle
+  /*! @brief Compute the integral of a function on one triangle
+   * @param num_elem index of the element
+   * @param parser parser providing the function values
+   * @return the integral value on the element
    */
   double compute_integral_on_elem(int num_elem, Parser_U& parser) const ;
-  /*! Compute the integral of a function on each triangle
+  /*! @brief Compute the integral of a function on each triangle
+   * @param parser parser providing the function values
+   * @return the total integral value over all elements
    */
   double compute_integral_on_elem(Parser_U& parser) const ;
 
-  /*! Compute the integral of a function on one triangle with its value on integration points
+  /*! @brief Compute the integral of a function on one triangle with its value on integration points
+   * @param num_elem index of the element
+   * @param val_pts_integ values of the function at integration points
+   * @return the integral value on the element
    */
   double compute_integral_on_elem(int num_elem, DoubleTab& val_pts_integ) const ;
-  /*! Compute the integral of a function on each triangle with its value on integration points
+  /*! @brief Compute the integral of a function on each triangle with its value on integration points
    */
-  // DoubleTab compute_integral_on_elem(DoubleTab& val_pts_integ) const ; // pas sur que cela serve : je commente jusqu'a destruction
+  // DoubleTab compute_integral_on_elem(DoubleTab& val_pts_integ) const ; // unsure this is used: commented out until removed
 
-  /*! Compute the integral of a function on one facet
+  /*! @brief Compute the integral of a function on one facet
+   * @param num_facet index of the facet
+   * @param parser parser providing the function values
+   * @return the integral value on the facet
    */
   double compute_integral_on_facet(int num_facet, Parser_U& parser) const ;
-  /*! Compute the integral of a function on one facet with its value on integration points
+  /*! @brief Compute the integral of a function on one facet with its value on integration points
+   * @param num_facet index of the facet
+   * @param val_pts_integ values of the function at integration points
+   * @return the integral value on the facet
    */
   double compute_integral_on_facet(int num_facet, DoubleTab& val_pts_integ) const ;
 
@@ -89,7 +103,7 @@ protected:
 
   IntTab tab_nb_pts_integ_; // numbers of integ points cumulated
 
-  IntTab ind_pts_integ_; // numero of the first integ points
+  IntTab ind_pts_integ_; // index of the first integration point for each element
 
   DoubleTab integ_points_; // Integ points for quadrature formula
   DoubleTab integ_points_facets_; // Integ points for quadrature formula for facets

@@ -38,9 +38,9 @@ Entree& Terme_Source_Acceleration_VDF_Face::readOn(Entree& s )
   return s;
 }
 
-/*! @brief Methode appelee par Source_base::completer() apres associer_domaines Remplit les ref.
+/*! @brief Method called by Source_base::completer() after associer_domaines. Fills the refs.
  *
- * aux domaines et domaine_cl
+ * to domaines and domaine_cl.
  *
  */
 void Terme_Source_Acceleration_VDF_Face::associer_domaines(const Domaine_dis_base& domaine_dis,
@@ -52,15 +52,15 @@ void Terme_Source_Acceleration_VDF_Face::associer_domaines(const Domaine_dis_bas
   le_dom_Cl_VDF_ = ref_cast(Domaine_Cl_VDF, domaine_Cl_dis);
 }
 
-/*! @brief Fonction outil pour Terme_Source_Acceleration_VDF_Face::ajouter Ajout des contributions d'une liste contigue de faces du terme source de translation:
+/*! @brief Utility function for Terme_Source_Acceleration_VDF_Face::ajouter. Adds contributions of a contiguous list of faces of the translation source term:
  *
  *    s_face = terme_source * rho
- *    resu  += integrale (s_face) sur le volume de controle de la vitesse.
- *   On traite les cas suivants:
- *     rho = reference nulle (=> rho = 1.)  sinon rho != nul
- *     faces de bord => sortie libre
- *     periodicite
- *     faces_internes
+ *    resu  += integral (s_face) over the velocity control volume.
+ *   Handles the following cases:
+ *     rho = null reference (=> rho = 1.)  otherwise rho != null
+ *     boundary faces => free outlet
+ *     periodicity
+ *     internal_faces
  *
  */
 static void TSAVDF_ajouter_liste_faces(const int premiere_face, const int derniere_face,
@@ -75,8 +75,8 @@ static void TSAVDF_ajouter_liste_faces(const int premiere_face, const int dernie
                                        DoubleTab& resu)
 {
   int num_face;
-  // Pointeur constant sur tableau constant.
-  // Pointeur nul si ref_rho_ est une reference nulle.
+  // Constant pointer to constant array.
+  // Null pointer if ref_rho_ is a null reference.
   const DoubleTab * const rho_elem =
     (bool(ref_rho)) ? &(ref_rho->valeurs()) : 0;
 
@@ -88,7 +88,7 @@ static void TSAVDF_ajouter_liste_faces(const int premiere_face, const int dernie
 
       double rho = 1.;
 
-      // Calcul d'un rho moyen sur le volume de controle de la vitesse
+      // Compute an average rho over the velocity control volume
       if (rho_elem)
         {
           const int elem0 = face_voisins(num_face,0);
@@ -109,16 +109,16 @@ static void TSAVDF_ajouter_liste_faces(const int premiere_face, const int dernie
 
       double a = src * rho;
       s_face(num_face) = a;
-      // Integrale sur le volume de controle :
+      // Integral over the control volume:
       resu(num_face) += a * vol;
     }
 }
 
-/*! @brief Ajoute le terme (la_source_ * rho * volume_entrelace) au champ resu.
+/*! @brief Adds the term (la_source_ * rho * volume_entrelace) to the field resu.
  *
- * On suppose que resu est discretise comme la vitesse en VDF.
- *  Effet de bord:
- *   On met (la_source_ * rho) dans terme_source_post_
+ * Assumes that resu is discretized like the velocity in VDF.
+ *  Side effect:
+ *   Sets (la_source_ * rho) in terme_source_post_
  *
  */
 void Terme_Source_Acceleration_VDF_Face::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
@@ -133,20 +133,20 @@ void Terme_Source_Acceleration_VDF_Face::ajouter_blocs(matrices_t matrices, Doub
   DoubleTab& s_face = get_set_terme_source_post().valeurs();
   s_face = 0.;
 
-  // Calcul de la_source_ en fonction des champs d'acceleration et de la
-  // vitesse du fluide.
+  // Compute la_source_ from the acceleration fields and the
+  // fluid velocity.
   const int dim     = Objet_U::dimension;
   const int nb_faces = secmem.dimension(0);
   DoubleTab acceleration_aux_faces(nb_faces, dim);
   calculer_la_source(acceleration_aux_faces);
 
-  // Boucle sur les conditions limites pour traiter les faces de bord
+  // Loop over boundary conditions to process boundary faces
 
   for (int n_bord=0; n_bord<domaine_VDF.nb_front_Cl(); n_bord++)
     {
-      // pour chaque Condition Limite on regarde son type
-      // Si face de Dirichlet ou de Symetrie on ne fait rien
-      // Si face de Neumann on calcule la contribution au terme source
+      // for each boundary condition, check its type
+      // If Dirichlet or Symmetry face, do nothing
+      // If Neumann face, compute the contribution to the source term
       const Cond_lim& la_cl = domaine_Cl_VDF.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
       const int ndeb = le_bord.num_premiere_face();
@@ -164,7 +164,7 @@ void Terme_Source_Acceleration_VDF_Face::ajouter_blocs(matrices_t matrices, Doub
     }
 
 
-  // Boucle sur les faces internes
+  // Loop over internal faces
   {
     const int ndeb = domaine_VDF.premiere_face_int();
     const int nfin = domaine_VDF.nb_faces();
@@ -209,17 +209,17 @@ void Terme_Source_Acceleration_VDF_Face::ajouter_blocs(matrices_t matrices, Doub
   }
 }
 
-/*! @brief Calcul des trois composantes du champ de vitesse fluide au centre de chaque face.
+/*! @brief Computes the three components of the fluid velocity field at the center of each face.
  *
- * Le resultat est stocke dans v_faces_stockage et on renvoie
- *   une reference au tableau. Pas d'espace virtuel dans le tableau.
- *   La composante normale a la face est deja connue: c'est la valeur discrete.
- *   Les autres composantes sont calculees en faisant la moyenne des vitesse
- *   des faces des elements voisins qui ont la bonne orientation, ponderee
- *   par le volume de l'element.
- *   Traitement des bords : on prend la vitesse de l'element voisin (a priori
- *    pas bon pour les conditions aux limites de vitesse imposee au bord,
- *    mais le vpoint est corrige ensuite pour imposer la vitesse).
+ * The result is stored in v_faces_stockage and a reference to
+ *   the array is returned. No virtual space in the array.
+ *   The normal component to the face is already known: it is the discrete value.
+ *   The other components are computed by averaging the velocities
+ *   of the neighbouring element faces with the correct orientation, weighted
+ *   by the element volume.
+ *   Boundary treatment: take the velocity of the neighbouring element (a priori
+ *    not correct for velocity-imposed boundary conditions at the boundary,
+ *    but vpoint is corrected afterward to impose the velocity).
  *
  */
 const DoubleTab& Terme_Source_Acceleration_VDF_Face::calculer_vitesse_faces(
@@ -228,7 +228,7 @@ const DoubleTab& Terme_Source_Acceleration_VDF_Face::calculer_vitesse_faces(
   const Domaine_VDF&    domaine_VDF      = le_dom_VDF_.valeur();
   const IntVect&     orientation   = domaine_VDF.orientation();
   const IntTab&      faces_voisins = domaine_VDF.face_voisins();
-  const DoubleVect& volumes       = domaine_VDF.volumes();  // volumes des elements
+  const DoubleVect& volumes       = domaine_VDF.volumes();  // element volumes
   const IntTab&      elem_faces    = domaine_VDF.elem_faces();
   const DoubleTab&   v_faces  = get_eq_hydraulique().inconnue().valeurs();
   const int       dim      = Objet_U::dimension;
@@ -242,12 +242,12 @@ const DoubleTab& Terme_Source_Acceleration_VDF_Face::calculer_vitesse_faces(
       composante_vitesse=0;
       int composante;
 
-      // Numeros des deux elements voisins de la face (-1 si face de bord)
+      // Indices of the two neighbouring elements of the face (-1 if boundary face)
       int elem[2];
       elem[0] = faces_voisins(i_face, 0);
       elem[1] = faces_voisins(i_face, 1);
 
-      // Volumes de ces deux elements (0. si pas de voisin)
+      // Volumes of these two elements (0. if no neighbour)
       double volume_elem[2] = {0., 0.};
       if (elem[0] >= 0)
         volume_elem[0] = volumes(elem[0]);
@@ -264,8 +264,8 @@ const DoubleTab& Terme_Source_Acceleration_VDF_Face::calculer_vitesse_faces(
             }
           else
             {
-              // Calcul de la moyenne des vitesses sur les faces voisines
-              // qui ont la bonne orientation:
+              // Compute the average of velocities on the neighbouring faces
+              // that have the correct orientation:
               composante_vitesse[composante] = 0.;
               int i_elem;
               for (i_elem = 0; i_elem < 2; i_elem++)

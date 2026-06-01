@@ -30,7 +30,7 @@
 class StringTokenizer;
 // FUNCTION start at 1, cause 0 is needed
 enum class FUNCTION { SIN=1, ASIN, COS, ACOS, TAN, ATAN, LN, EXP, SQRT, ENT, ERF, RND, COSH,  SINH, TANH, ATANH, NOT, ABS, SGN };
-/*! @brief Representation des donnees de la classe Parser
+/*! @brief Representation of data for the Parser class.
  *
  * @sa =
  */
@@ -40,7 +40,7 @@ class Parser
 public :
 
   /**
-   * Initialise le parser avec une chaine "0" : ne sert a rien !!
+   * Initialises the parser with the string "0": serves no purpose!!
    */
   Parser();
   Parser(const Parser&);
@@ -48,7 +48,7 @@ public :
   void set(const Parser&);
 
   /**
-   * Construit un objet Parser avec une chaine specifiee et un nb max de variables a indiquer avec la methode addVar.
+   * Constructs a Parser object with a specified string and a maximum number of variables to be indicated with the addVar method.
    */
   Parser(std::string&,int n =1);
 
@@ -58,27 +58,27 @@ public :
   void init_parser();
 
   /**
-   * Construit l'arbre correspondant a la chaine de caracteres. Cet arbre doit etre construit une seule fois et la chaine de caractere est evaluee en parcourant cet arbre par la methode eval() autant de fois qu'on le souhaite.
+   * Builds the tree corresponding to the character string. This tree must be built once and the string is evaluated by traversing this tree via the eval() method as many times as desired.
    */
   virtual void parseString();
 
   /**
-   * Sert a evaluer l'expression mathematique correspondante a la chaine de caracteres. Poru cela il faut avant toute chose construire l'arbre par la methode parseString().
+   * Used to evaluate the mathematical expression corresponding to the character string. To do so, the tree must first be built using the parseString() method.
    */
   inline double eval() { return eval(PNodes[0]); }
 
   /**
-   * Fixe la valeur de la variable representee par une chaine sv.
+   * Sets the value of the variable represented by the string sv.
    */
   inline void setVar(const char* sv, double val) { setVar(searchVar(sv),val); }
 
   /**
-  * Fixe la valeur de la variable representee par v.
+  * Sets the value of the variable represented by v.
   */
   inline void setVar(const std::string& v, double val) { setVar(searchVar(v),val); }
 
   /**
-  * Fixe la valeur de la variable de numero specifie. Ce numero correspondt a l'ordre de l'ajout des variables par la methode addVar().
+  * Sets the value of the variable with the specified number. This number corresponds to the order in which variables were added via the addVar() method.
   */
   inline void setVar(int i, double val)
   {
@@ -87,12 +87,12 @@ public :
   }
 
   /**
-   * Fixe le nombre max de variables a indiquer avec la methode addVar.
+   * Sets the maximum number of variables to be specified with the addVar method.
    */
   virtual void setNbVar(int nvar);
 
   /**
-   * permet d'ajouter une variable en specifiant sa chaine representative (par ex. : x, y1 etc...)
+   * Allows adding a variable by specifying its representative string (e.g.: x, y1, etc.)
    */
   void addVar(const char *);
 
@@ -106,7 +106,7 @@ public :
   void addCst(const Constante& cst);
 
   /**
-   * Fixe le temps initial et la periode de la fonction impulsion
+   * Sets the initial time and period of the impulse function.
    */
   inline void setImpulsion(double tinit, double periode)
   {
@@ -157,8 +157,8 @@ protected:
   double impuls_tn;
   double impuls_tempo;
 
-  PNode* root;                      // Liste chainee de PNode
-  std::vector<PNodePod> PNodes;     // Vecteur de PNodePod
+  PNode* root;                      // Linked list of PNode
+  std::vector<PNodePod> PNodes;     // Vector of PNodePod
   std::string str;
   ArrOfDouble les_var;
   Noms les_var_names;
@@ -176,13 +176,13 @@ inline int Parser::searchVar(const char * sv)
 
 KOKKOS_INLINE_FUNCTION double Parser::evalFunc(const PNodePod& node, double x)
 {
-  /* OC : Nouvelle version : */
+  /* OC: New version: */
   if (node.value<=0)
     {
-      int unary_function = -node.value-1; // OC attention, dans node->value c est l'oppose de l'indice de la func dans la liste
-      // afin de distinguer operateur binaire (>0) et fonctions unaires (<0>
-      // Il est donc necessaire de prendre -node->value ici pour referencer un element de la liste
-      // De plus, on rajoute +1 car le zero ne doit pas etre utiliser pour les fonctions
+      int unary_function = -node.value-1;  // OC note: in node->value the stored value is the opposite of the function index in the list
+      // in order to distinguish binary operators (>0) from unary functions (<0)
+      // It is therefore necessary to take -node->value here to reference an element of the list
+      // Furthermore, +1 is added because zero must not be used for functions
       switch (unary_function)
         {
         case static_cast<int>(FUNCTION::SIN):
@@ -251,8 +251,8 @@ KOKKOS_INLINE_FUNCTION double Parser::evalFunc(const PNodePod& node, double x)
     }
 }
 
-// Ne pas inliner car sinon Parser::eval(PNode* node) plus souvent appelee encore
-// ne sera peut etre pas inlinee...
+// Do not inline, otherwise Parser::eval(PNode* node), which is called even more frequently,
+// might not be inlined either...
 KOKKOS_INLINE_FUNCTION
 double Parser::evalOp(const PNodePod& node, double x, double y)
 {

@@ -22,11 +22,11 @@
 
 class Domaine_dis_base;
 
-/*! @brief Classe Champ_Fonc_Tabule Classe derivee de Champ_Fonc_base qui represente les
+/*! @brief Class Champ_Fonc_Tabule Derived class of Champ_Fonc_base representing
  *
- *      champs fonctions d'un autre champ par tabulation
- *      L'objet porte un membre de type OWN_PTR(Champ_Fonc_base)  qui stocke
- *      les valeurs du champ tabule.
+ *      fields that are functions of another field by tabulation.
+ *      The object carries a member of type OWN_PTR(Champ_Fonc_base) that stores
+ *      the values of the tabulated field.
  *
  * @sa Champ_Fonc_base
  */
@@ -94,7 +94,7 @@ public:
     return le_champ_tabule_discretise().valeur_a_elem_compo(position, le_poly, ncomp);
   }
 
-  // Methodes utiles pour notifier l'utilisateur suite au changement du syntaxe
+  // Utility methods to notify the user following a syntax change
   static void Warn_old_chp_fonc_syntax_V_184(const char * nom_class, const Nom& val1, const Nom& val2);
   static bool Check_if_int(const Nom& val);
 
@@ -105,11 +105,11 @@ protected:
   OWN_PTR(Champ_Fonc_base)  le_champ_tabule_dis;
 };
 
-/*! @brief Renvoie le champ tabule calcule.
+/*! @brief Returns the computed tabulated field.
  *
- * (version const)
+ * (const version)
  *
- * @return (Champ_Fonc_base&) le champ tabule calcule
+ * @return (Champ_Fonc_base&) the computed tabulated field
  */
 inline const Champ_Fonc_base& Champ_Fonc_Tabule::le_champ_tabule_discretise() const
 {

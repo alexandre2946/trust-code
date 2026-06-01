@@ -19,9 +19,8 @@
 #include <Correlation_base.h>
 #include <TRUSTTab.h>
 
-/*! @brief classe Vitesse_relative_base
+/*! @brief Relative velocity correlations of the form ur = (v_k - v_l).
  *
- *  correlations de vitesse relative de la forme ur = (v_k - v_l)
  *
  */
 
@@ -32,25 +31,25 @@ class Vitesse_relative_base : public Correlation_base
 public:
   struct input_t
   {
-    double dh = 0.0;       // diametre hydraulique
-    DoubleTab sigma; // tension superficielle sigma(ind_trav), ind_trav = (n*(N-1)-(n-1)*(n)/2) + (m-n-1)
-    DoubleTab alpha; // taux de vide
-    DoubleTab rho;   // masse volumique
-    DoubleTab mu;    // viscosite
-    DoubleTab d_bulles;   // diametre bulles
-    DoubleTab k;     // energie cinetique turbulente
-    DoubleTab nut;   // energie cinetique turbulente
-    DoubleTab v;     // v(n, d) : vitesse de la phase n dans la direction d
-    DoubleTab gradAlpha;// gradAlpha(n,d) : gradient du taux de vide ; calcule que si requis par la correlation
-    DoubleTab vort;  // vort(n,d) : gradient du taux de vide ; calcule que si requis par la correlation
-    DoubleVect g;    // vecteur gravite
+    double dh = 0.0;       // hydraulic diameter
+    DoubleTab sigma; // surface tension sigma(ind_trav), ind_trav = (n*(N-1)-(n-1)*(n)/2) + (m-n-1)
+    DoubleTab alpha; // void fraction
+    DoubleTab rho;   // density
+    DoubleTab mu;    // viscosity
+    DoubleTab d_bulles;   // bubble diameter
+    DoubleTab k;     // turbulent kinetic energy
+    DoubleTab nut;   // turbulent viscosity
+    DoubleTab v;     // v(n, d) : velocity of phase n in direction d
+    DoubleTab gradAlpha;// gradAlpha(n,d) : gradient of void fraction; computed only if required by the correlation
+    DoubleTab vort;  // vort(n,d) : vorticity; computed only if required by the correlation
+    DoubleVect g;    // gravity vector
   };
-  /* valeurs de sortie */
+  /* output values */
   struct output_t
   {
-    DoubleTab vr; // vr(n, m, d) : vitesse relative des phases n et m dans la direction d (v(n, d) - v(m, d))
-    DoubleTab dvr;//dvr(n, m, d, D*l+d2) : derivee de la vitesse relative des phases n et m dans la direction d (v(n, d) - v(m, d))
-    // par rapport a la vitesse de la phase l selon la direction d2
+    DoubleTab vr; // vr(n, m, d) : relative velocity of phases n and m in direction d (v(n, d) - v(m, d))
+    DoubleTab dvr;//dvr(n, m, d, D*l+d2) : derivative of the relative velocity of phases n and m in direction d (v(n, d) - v(m, d))
+    // with respect to the velocity of phase l in direction d2
   };
   virtual void vitesse_relative(const input_t& input, output_t& output) const = 0;
   virtual bool needs_grad_alpha() const {return 0;};
@@ -58,7 +57,7 @@ public:
   virtual void set_param(Param& param) const override { /* do nothing */ }
 
 protected:
-  int n_l = -1, n_g = -1; // phases traitees : liquide / gaz continu
+  int n_l = -1, n_g = -1; // treated phases: liquid / continuous gas
 };
 
 #endif /* Vitesse_relative_base_included */

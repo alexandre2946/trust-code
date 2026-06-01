@@ -21,12 +21,12 @@
 #include <Matrice.h>
 
 
-/*! @brief Classe Matrice_Morse_Sym Represente une matrice M (creuse) symetrique stockee au format Morse
+/*! @brief Matrice_Morse_Sym class - Represents a sparse symmetric matrix M stored in Morse format.
  *
- *     Symetrique: on ne stocke que la partie triangulaire superieure de la
- *     matrice. Important: Tous les coefficients diagonaux doivent etre stockes
- *     meme s'ils sont nuls (hypothese TRUST pour plusieurs methodes dont multvect).
- *     Cette classe derive de Matrice_Morse et Matrice_Sym.
+ *     Symmetric: only the upper triangular part of the matrix is stored.
+ *     Important: All diagonal coefficients must be stored even if they are zero
+ *     (TRUST assumption for several methods including multvect).
+ *     This class derives from Matrice_Morse and Matrice_Sym.
  *
  * @sa Matrice_Morse Matrice_Sym
  */
@@ -77,9 +77,9 @@ public :
 
   Sortie& imprimer_formatte(Sortie& s) const override;
   void compacte(int elim_coeff_nul=0);
-  void renumerote() const;                       // Creation d'une matrice renumerotee pour reduire la largeur de bande
-  Matrice& matrice_renumerotee() { return matrice_renumerotee_; }// Renvoie la matrice renumerotee
-  Matrice& matrice_renumerotee() const { return matrice_renumerotee_; }// Renvoie la matrice renumerotee
+  void renumerote() const;                       // Create a renumbered matrix to reduce the bandwidth
+  Matrice& matrice_renumerotee() { return matrice_renumerotee_; }// Returns the renumbered matrix
+  Matrice& matrice_renumerotee() const { return matrice_renumerotee_; }// Returns the renumbered matrix
   inline ArrOfInt& permutation() { return permutation_; }
   inline ArrOfInt& permutation_inverse() { return permutation_inverse_; }
   inline ArrOfInt& permutation() const { return permutation_; }

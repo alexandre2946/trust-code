@@ -34,7 +34,7 @@ public:
   DoubleVect& equivalent_distance_name(DoubleVect& d_equiv, const Nom& nom_bord) const override;
 
 protected:
-  mutable int nb_impr_ = -123;        // Compteur d'impression
+  mutable int nb_impr_ = -123;        // Print counter
 };
 
 #endif /* Paroi_scal_hyd_base_VDF_included */

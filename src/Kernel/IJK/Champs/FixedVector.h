@@ -107,10 +107,10 @@ inline const FixedVector<T,N>& operator*=(FixedVector<T,N>& v1, const T& x)
   return v1;
 }
 
-//GAB 02 dec 2020 : on definit le produit_scalaire
-// /!\ ATTENTION les deux fixed vectors doivent etre du meme type T !!
-// /!\ On a fait la surcharge pour un IJK_FT_double : on peut faire le
-//     le prod scal pour un IJK_FT_double du coup
+//GAB 02 dec 2020: defining produit_scalaire
+// /!\ WARNING: both fixed vectors must be of the same type T !!
+// /!\ The overload was made for IJK_FT_double: the dot product can
+//     therefore be computed for an IJK_FT_double
 template<class T, int N>
 inline const T& produit_scalaire(FixedVector<T,N>& v1, const FixedVector<T,N>& v2)
 {

@@ -22,10 +22,10 @@
 #include <FichierHDFPar.h>
 #include <TRUST_Deriv.h>
 
-/*! @brief classe Champ_Fonc_reprise Cette classe permet de relire un champ sauvegarde dans un fichier xyz
+/*! @brief Champ_Fonc_reprise This class allows reading back a field saved in an xyz file.
  *
- *  elle porte un champ de type OWN_PTR(Champ_Inc_base) qui est du meme type que le
- *  champ passe en argument
+ *  It holds a field of type OWN_PTR(Champ_Inc_base) which is of the same type as
+ *  the field passed as argument.
  *
  */
 class Champ_Fonc_reprise: public Champ_Fonc_base

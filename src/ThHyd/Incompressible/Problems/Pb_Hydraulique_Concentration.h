@@ -23,18 +23,17 @@
 
 
 
-/*! @brief Classe Pb_Hydraulique_Concentration Cette classe represente un probleme d'hydraulique avec transport
+/*! @brief Classe Pb_Hydraulique_Concentration This class represents a hydraulic problem with transport
  *
- *     d'un ou plusieurs constituants:
- *        - Equations de Navier_Stokes en regime laminaire
- *          pour un fluide incompressible
- *        - Equations de convection-diffusion en regime laminaire
- *          En fait si on transporte plusieurs constituants on utilisera une
- *          seule equation de convection-diffusion avec une inconnue vectorielle.
- *          En general, on couple les 2 equations par l'intermediaire du terme
- *          source des forces de volume de Navier_Stokes dans lequel on prend
- *          en compte de petites variations de la masse volumique en fonction
- *          du ou des constituants
+ *     of one or more constituents:
+ *        - Navier-Stokes equations in laminar regime
+ *          for an incompressible fluid
+ *        - Convection-diffusion equations in laminar regime
+ *          In practice, if several constituents are transported, a single
+ *          convection-diffusion equation with a vector unknown will be used.
+ *          In general, the two equations are coupled through the body force
+ *          source term of Navier-Stokes in which small variations of density
+ *          as a function of the constituent(s) are taken into account.
  *
  * @sa Pb_Fluide_base
  */

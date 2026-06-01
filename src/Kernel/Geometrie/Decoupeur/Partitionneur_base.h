@@ -23,28 +23,28 @@
 class Param;
 #include <Domaine_forward.h>
 
-/*! @brief Classe de base des partitionneurs de domaine (pour decouper un maillage avant un calcul parallele).
+/*! @brief Base class for domain partitioners (for splitting a mesh before a parallel computation).
  *
- *   Cette classe decrit l'interface commune a tous les partitionneurs:
- *   Exemple :
+ *   This class describes the interface common to all partitioners.
+ *   Example:
  *
- *    // Creation d'un instance de la classe:
+ *    // Create an instance of the class:
  *    Partitionneur_xxx part;
- *    // Association du domaine de calcul a decouper
+ *    // Associate the computational domain to be split
  *    part.associer_domaine(domaine);
- *    // Initialisation des parametres specifiques a la classe derivee!
- *        fichier_data >> part;       // Lecture des parametres dans le jdd
- *    ou
- *        part.initialiser(nb_parties); // Initialisation directe (depend de la classe)
- *    // Si besoin :
+ *    // Initialise the parameters specific to the derived class!
+ *        fichier_data >> part;       // Read parameters from the data file
+ *    or
+ *        part.initialiser(nb_parties); // Direct initialisation (depends on the class)
+ *    // If needed:
  *    part.declarer_bords_periodiques(liste_noms_bords_perio);
- *    // Construction du tableau de decoupage:
+ *    // Build the partition array:
  *    ArrOfInt elem_part;
  *    part.construire_partition(elem_part);
  *
- *   ATTENTION: en principe, l'implementation de la methode construire_partition()
- *    doit assurer que le decoupage est valide (application des corrections pour les bords
- *    periodiques et autres...)
+ *   WARNING: in principle, the implementation of construire_partition()
+ *    must ensure that the partition is valid (applying corrections for periodic
+ *    boundaries and others...)
  *
  */
 template <typename _SIZE_>

@@ -66,7 +66,7 @@ Entree& Multigrille_Adrien::readOn(Entree& is)
 
 int Multigrille_Adrien::completer(const Equation_base& eq)
 {
-  // fait dans readOn si on a lu ijkdis_name
+  // done in readOn if ijkdis_name was read
   // fetch the vdf_to_ijk translator (assume there is one unique object, with conventional name)
   const Nom& ijkdis_name = IJK_VDF_converter::get_conventional_name();
   const IJK_VDF_converter& ijkdis = ref_cast(IJK_VDF_converter, Interprete_bloc::objet_global(ijkdis_name));

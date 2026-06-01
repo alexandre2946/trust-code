@@ -17,16 +17,16 @@
 #define Loi_Etat_rhoT_GR_QC_included
 
 #ifndef RU_
-//constante des gaz
+// universal gas constant
 #define RU_ 8.3143*4.18448
 #endif
 
 #include <Loi_Etat_GR_base.h>
 
-/*! @brief classe Loi_Etat_rhoT_GR_QC Cette classe represente la loi d'etat pour les gaz reels.
+/*! @brief @brief State law class for real gases in the quasi-compressible (QC) framework.
  *
- *      Associe a un fluide incompressible, elle definit un fluide quasi compressible
- *      dont la loi d'etat est :
+ *      Associated with a dilatable fluid, it defines a quasi-compressible fluid
+ *      whose equation of state is:
  *          rho=rho(Pth,H)
  *          T  =  T(Pth,H)
  *

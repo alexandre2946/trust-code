@@ -16,10 +16,10 @@
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Constante,"Constante",Objet_U);
 
-/*! @brief Ecriture sur un flot de sortie Ecrit la valeur de la constante
+/*! @brief Write to an output stream. Writes the value of the constant.
  *
- * @param (Sortie& os) le flot de sortie a utiliser
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) the output stream to use
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Constante::printOn(Sortie& os) const
 {
@@ -28,10 +28,10 @@ Sortie& Constante::printOn(Sortie& os) const
 }
 
 
-/*! @brief Lit la valeur de la constante
+/*! @brief Reads the value of the constant.
  *
- * @param (Entree& is) le flot d'entree a utiliser
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) the input stream to use
+ * @return (Entree&) the modified input stream
  */
 Entree& Constante::readOn(Entree& is)
 {

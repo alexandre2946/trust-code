@@ -31,9 +31,9 @@ Entree& Rectangle_axi_32_64<_SIZE_>::readOn(Entree& s )
 }
 
 
-/*! @brief Calcule les centres de gravites de tous les elements du domaine associe a l'element goemetrique.
+/*! @brief Computes the centers of gravity of all elements of the domain associated with the geometric element.
  *
- * @param (DoubleTab& xp) le tableau contenant les coordonnees des centres de gravite
+ * @param xp the array containing the coordinates of the centers of gravity
  */
 template <typename _SIZE_>
 void Rectangle_axi_32_64<_SIZE_>::calculer_centres_gravite(DoubleTab_t& xp) const
@@ -76,9 +76,9 @@ void Rectangle_axi_32_64<_SIZE_>::calculer_centres_gravite(DoubleTab_t& xp) cons
   xp*=x;
 }
 
-/*! @brief Renvoie le nom LML d'un rectangle_axi = "VOXEL8".
+/*! @brief Returns the LML name of a rectangle_axi = "VOXEL8".
  *
- * @return (Nom&) toujours egal a "VOXEL8"
+ * @return always equal to "VOXEL8"
  */
 template <typename _SIZE_>
 const Nom& Rectangle_axi_32_64<_SIZE_>::nom_lml() const
@@ -87,9 +87,9 @@ const Nom& Rectangle_axi_32_64<_SIZE_>::nom_lml() const
   return nom;
 }
 
-/*! @brief Calcule les volumes des elements du domaine associe.
+/*! @brief Computes the volumes of the elements of the associated domain.
  *
- * @param (DoubleVect& volumes) le vecteur contenant les valeurs  des des volumes des elements du domaine
+ * @param volumes the vector containing the volume values of the domain elements
  */
 template <typename _SIZE_>
 void Rectangle_axi_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const
@@ -112,13 +112,13 @@ void Rectangle_axi_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const
     }
 }
 
-/*! @brief Renvoie 1 si l'element ielem du domaine associe a l'element geometrique contient le point
+/*! @brief Returns 1 if element ielem of the domain associated with the geometric element contains the point
  *
- * de coordonnees specifiees par le parametre "pos".
+ * with coordinates specified by parameter "pos".
  *
- * @param DoubleVect& pos coordonnees du point que l'on cherche a localiser
- * @param int ielem le numero de l'element du domaine dans lequel on cherche le point.
- * @return 1 si le point de coordonnees specifiees appartient a l'element ielem 0 sinon
+ * @param pos coordinates of the point to locate
+ * @param element the index of the element in the domain in which the point is searched.
+ * @return 1 if the point belongs to element ielem, 0 otherwise
  *
  */
 template <typename _SIZE_>

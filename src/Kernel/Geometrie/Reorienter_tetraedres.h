@@ -20,7 +20,7 @@
 #include <Domaine.h>
 #include <Domaine_forward.h>
 
-/*! @brief class Reorienter_tetra Balaye les tetraedres du maillage pour qu'ils soient directs.
+/*! @brief class Reorienter_tetra Sweeps through the mesh tetrahedra to ensure they are positively oriented.
  *
  * @sa Interprete
  */

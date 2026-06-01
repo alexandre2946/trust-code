@@ -50,16 +50,16 @@ public:
 
   int remplir_coord_noeuds_et_polys(DoubleTab& positions, IntVect& polys) const override;
   int imprime_P1B(Sortie&, int) const;
-  DoubleTab& filtrage(const Domaine_VEF&, const Champ_base&, bool implicitCoupling=false) const;        // Methode pour filtrer le champ
+  DoubleTab& filtrage(const Domaine_VEF&, const Champ_base&, bool implicitCoupling=false) const;        // Method to filter the field
   const DoubleTab& champ_filtre() const { return champ_filtre_; }
 
-  int Condition_Neumann_imposee_;        // Drapeau pour savoir s'il y'a des CL de Neumann (influe sur le filtrage)
+  int Condition_Neumann_imposee_;        // Flag indicating whether Neumann BCs are present (affects filtering)
 
 protected:
-  mutable DoubleTab champ_filtre_;                // Contient les valeurs du champ filtre
-  mutable Matrice matrice_filtrage_;                // Contient la matrice necessaire au filtrage (evite d'avoir a la recalculer)
-  mutable double temps_filtrage_;                // Temps du dernier filtrage         (va servir a ne pas refiltrer inutilement)
-  mutable const double *adresse_champ_filtre_;        // Adresse du champ filtre        (va servir a ne pas refiltrer inutilement)
+  mutable DoubleTab champ_filtre_;                // Contains the filtered field values
+  mutable Matrice matrice_filtrage_;                // Contains the filtering matrix (avoids recomputing it)
+  mutable double temps_filtrage_;                // Time of the last filtering (used to avoid unnecessary re-filtering)
+  mutable const double *adresse_champ_filtre_;        // Address of the filtered field (used to avoid unnecessary re-filtering)
 
   void completer(const Domaine_Cl_dis_base& zcl);
 

@@ -20,7 +20,7 @@
 
 #include <Domaine_forward.h>
 
-/*! @brief Partitionneur de domaine a partir de sous-domaines du domaine Voir construire_partition()
+/*! @brief Domain partitioner based on sub-domains of the domain. See construire_partition().
  *
  */
 class Partitionneur_Sous_Domaines : public Partitionneur_base
@@ -33,11 +33,11 @@ public:
   void construire_partition(IntVect& elem_part, int& nb_parts_tot) const override;
 
 private:
-  // Parametres du partitionneur
+  // Partitioner parameters
   OBS_PTR(Domaine) ref_domaine_;
-  // Noms des sous-domaines a utiliser
+  // Names of sub-domains to use
   Noms noms_sous_domaines_;
-  // Noms de domaine a utiliser
+  // Names of domains to use
   Noms noms_domaines_;
 };
 #endif

@@ -16,7 +16,7 @@
 #ifndef TVAlloc_included
 #define TVAlloc_included
 
-/*! Allocator adaptor that intercepts the 'construct' calls to convert value initialization into default initialization
+/*! @brief Allocator adaptor that intercepts the 'construct' calls to convert value initialization into default initialization.
  * Written by Casey Carter (@codercasey)
  * Taken from https://hackingcpp.com/cpp/recipe/uninitialized_numeric_array.html
  *

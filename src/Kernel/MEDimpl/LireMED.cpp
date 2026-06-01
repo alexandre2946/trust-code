@@ -110,10 +110,10 @@ void verifier_modifier_type_elem(Nom& type_elem,const IntTab_T<_SIZE_>& les_elem
       ArrOfDouble pos(2);
       for (int_t elem=0; elem<les_elems.dimension(0) && ok; elem++)
         {
-          // pour chaque elt on verifie si il est bien a angle droit
+          // for each element, check that it has right angles
           for (int dir=0; dir<dimension && ok; dir++)
             {
-              // on compte le nombre de pos de sommmets dans chaque direction
+              // count the number of vertex positions in each direction
               int n=0;
               for (int s=0; s<nb_som_elem && ok; s++)
                 {
@@ -140,7 +140,7 @@ void verifier_modifier_type_elem(Nom& type_elem,const IntTab_T<_SIZE_>& les_elem
         }
       if (!ok)
         {
-          // on change type_elem
+          // change type_elem
           if (typ_elem_no64=="Rectangle")
             typ_elem_no64="Quadrangle";
           else if  (typ_elem_no64=="Hexaedre")
@@ -216,10 +216,10 @@ LireMED_32_64<_SIZE_>::LireMED_32_64(const Nom& file_name, const Nom& mesh_name)
   nom_mesh_(mesh_name)
 { }
 
-/*! @brief Simple appel a: Interprete::printOn(Sortie&)
+/*! @brief Simple call to: Interprete::printOn(Sortie&)
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 template <typename _SIZE_>
 Sortie& LireMED_32_64<_SIZE_>::printOn(Sortie& os) const
@@ -227,10 +227,10 @@ Sortie& LireMED_32_64<_SIZE_>::printOn(Sortie& os) const
   return Interprete::printOn(os);
 }
 
-/*! @brief Simple appel a: Interprete::readOn(Entree&)
+/*! @brief Simple call to: Interprete::readOn(Entree&)
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
  */
 template <typename _SIZE_>
 Entree& LireMED_32_64<_SIZE_>::readOn(Entree& is)
@@ -312,7 +312,8 @@ Entree& LireMED_32_64<_SIZE_>::interpreter_(Entree& is)
 }
 
 
-/*! @brief renvoie le type trio a partir du type medocoupling : http://docs.salome-platform.org/6/gui/MED/MEDLoader_8cxx.html
+/*! @brief Returns the TRUST element type corresponding to the given MEDCoupling type:
+ *  http://docs.salome-platform.org/6/gui/MED/MEDLoader_8cxx.html
  */
 #ifdef MEDCOUPLING_
 template <typename _SIZE_>
@@ -450,13 +451,13 @@ void LireMED_32_64<_SIZE_>::retrieve_MC_objects()
       //assert(dim == dimension);
     }
 
-  // Desormais l'option permet de convertir tout type de maillage vers des polyedres:
+  // This option now allows converting any mesh type to polyhedra:
   if (convertAllToPoly_)
     {
       Cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << finl;
       Cerr << "Conversion to polyedrons and polygons..." << finl;
       Cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << finl;
-      mcumesh_->convertAllToPoly(); // Conversion maillage volumique
+      mcumesh_->convertAllToPoly(); // Convert volume mesh
     }
 }
 
@@ -527,16 +528,16 @@ void LireMED_32_64<_SIZE_>::prepare_som_and_elem(DoubleTab_t& sommets2, IntTab_t
       int_t face=0, node = 0;
       for (int_t i = 0; i < ncells; i++)
         {
-          polyhedronIndex[i] = face; // Index des polyedres
+          polyhedronIndex[i] = face; // Polyhedron index
 
           int_t index = connIndex[i] + 1;
           int nb_som = static_cast<int>(connIndex[i + 1] - index);
           for (int j = 0; j < nb_som; j++)
             {
               if (j==0 || conn[index + j]<0)
-                facesIndex[face++] = node; // Index des faces:
+                facesIndex[face++] = node; // Face index
               if (conn[index + j]>=0)
-                nodes[node++] = conn[index + j]; // Index local des sommets de la face
+                nodes[node++] = conn[index + j]; // Local index of face vertices
             }
         }
       facesIndex[nfaces] = node;
@@ -551,7 +552,7 @@ void LireMED_32_64<_SIZE_>::prepare_som_and_elem(DoubleTab_t& sommets2, IntTab_t
       int_t face=0;
       for (int_t i = 0; i < ncells; i++)
         {
-          polygonIndex[i] = face;   // Index des polygones
+          polygonIndex[i] = face;   // Polygon index
 
           int_t index = connIndex[i] + 1;
           int nb_som = static_cast<int>(connIndex[i + 1] - index);
@@ -561,7 +562,7 @@ void LireMED_32_64<_SIZE_>::prepare_som_and_elem(DoubleTab_t& sommets2, IntTab_t
       polygonIndex[ncells] = face;
       ref_cast(Polygone_t,type_elem_.valeur()).affecte_connectivite_numero_global(facesIndex, polygonIndex, les_elems2);
     }
-  else // Tous les autres types
+  else // All other types
     {
       for (int_t i = 0; i < ncells; i++)
         {
@@ -582,11 +583,11 @@ void LireMED_32_64<_SIZE_>::prepare_som_and_elem(DoubleTab_t& sommets2, IntTab_t
 template <typename _SIZE_>
 void LireMED_32_64<_SIZE_>::finalize_sommets(const DoubleTab_t& sommets2, DoubleTab_t& sommets) const
 {
-  // affectation des sommets
+  // assign the vertices
   if (space_dim_ != Objet_U::dimension)
     {
       Cerr << "One tries to read a meshing written in " << space_dim_ << "D in " << Objet_U::dimension << "D " << finl;
-      // determination de la direction inutile
+      // determine the useless direction
       int_t nbsom=sommets2.dimension(0);
       int dirinut=-1;
       const double epsilon = Objet_U::precision_geom;
@@ -712,7 +713,7 @@ void LireMED_32_64<_SIZE_>::read_boundaries(BigArrOfInt_& fac_grp_id, IntTab_t& 
   // Get boundary mesh:
   MCAuto<MEDCouplingUMesh> face_mesh(mfumesh_->getMeshAtLevel(-1)); // ToDo can not make it const because of ArrayOfInt
   if (Objet_U::dimension==3 && convertAllToPoly_) // In 2D this will be segments anyway
-    face_mesh->convertAllToPoly(); // Conversion maillage frontiere
+    face_mesh->convertAllToPoly(); // Convert boundary mesh
   int_t nfaces = static_cast<int_t>(face_mesh->getNumberOfCells());  // overflow check done in prepare_som_and_elem()
 
   // Retrieve connectivity - Use ArrOfInt to benefit from assert:
@@ -850,7 +851,7 @@ void LireMED_32_64<_SIZE_>::fill_frontieres(const BigArrOfInt_& fac_grp_id, cons
           Cerr<<noms_bords_[ib]<<" is considered as a joint "<<finl;
           isjoint=true;
         }
-      // on recupere la frontiere  .... que ce soit un Bord,Raccord,ou Joint
+      // retrieve the boundary, whether it is a Bord, Raccord, or Joint
       Frontiere_t& bordprov = (isjoint?jointprov:(israccord?ref_cast(Frontiere_t,raccprov.valeur()):(isfacesint?ref_cast(Frontiere_t,facesgrpprov):ref_cast(Frontiere_t,bordprov_))));
 
       bordprov.nommer(noms_bords_[ib]);
@@ -884,7 +885,7 @@ void LireMED_32_64<_SIZE_>::fill_frontieres(const BigArrOfInt_& fac_grp_id, cons
           vide_0D_a_ecrire = true;
         }
       nb_face_per_bord[ib] = nb_face_this_bord;
-      // ne marche pas ajoute la famille elem
+      // does not work when adding the elem family
       if (indice_bord != 0
           && (nb_face_this_bord>0 || vide_0D_a_ecrire))
         {
@@ -932,7 +933,7 @@ void LireMED_32_64<_SIZE_>::lire_geom(bool subDom)
   const Nom& nom_dom_trio = dom.le_nom();
 
   axi1d_ = dom.axi1d();
-  // pour verif
+  // sanity check
   if (Objet_U::dimension==0)
     {
       Cerr << "Dimension is not defined. Check your data file." << finl;
@@ -972,13 +973,13 @@ void LireMED_32_64<_SIZE_>::lire_geom(bool subDom)
   DoubleTab_t& sommets=dom.les_sommets();
   finalize_sommets(sommets2, sommets);
 
-  // Typage des elts du domaine et remplissage des elts
-  // Avant de typer on regarde si il ne faut pas transormer les hexa en Hexa_vef
+  // Type and fill domain elements
+  // Before typing, check whether hexahedra need to be converted to Hexa_vef
   Nom type_elem_orig = type_elem_n;
   verifier_modifier_type_elem(type_elem_n,les_elems2,sommets);
 
   dom.type_elem() = type_elem_;
-  // si on a modifie type_elem
+  // if type_elem was modified
   if (type_elem_orig != type_elem_n)
     dom.typer(type_elem_n);
   dom.type_elem()->associer_domaine(dom);

@@ -44,32 +44,31 @@ Sortie& DG_discretisation::printOn(Sortie& s) const { return s; }
  *
  * TODO, refactor this after stokes. And decide if we want to put this on Option_DG or not
  *
- * La directive est un Motcle comme "vitesse", "pression",
- *  "temperature", "champ_elem" (cree un champ de type P0), ...
- *  Cette methode determine le type du champ a creer en fonction du type d'element
- *  et de la directive de discretisation. Elle determine ensuite le nombre de ddl
- *  et fixe l'ensemble des parametres du champ (type, nb_compo, nb_ddl, nb_pas_dt,
- *  nom(s), unite(s) et nature du champ) et associe la Domaine_dis au champ.
- *  Voir le code pour avoir la correspondance entre les directives et
- *  le type de champ cree.
+ * The directive is a Motcle such as "vitesse", "pression",
+ *  "temperature", "champ_elem" (creates a field of type P0), ...
+ *  This method determines the type of field to create based on the element type
+ *  and the discretisation directive. It then determines the number of DOFs
+ *  and sets all the field parameters (type, nb_compo, nb_ddl, nb_pas_dt,
+ *  name(s), unit(s) and field nature) and associates the Domaine_dis to the field.
+ *  See the code for the mapping between directives and the created field type.
  *
  */
 void DG_discretisation::discretiser_champ(const Motcle& directive, const Domaine_dis_base& dom_dis, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, int nb_pas_dt,
                                           double temps, OWN_PTR(Champ_Inc_base)& champ, const Nom& sous_type) const
 {
   Motcles motcles(7);
-  motcles[0] = "vitesse";     // Choix standard pour la vitesse
-  motcles[1] = "pression";    // Choix standard pour la pression
-  motcles[2] = "temperature"; // Choix standard pour la temperature
-  motcles[3] = "divergence_vitesse"; // Le type de champ obtenu en calculant div v
-  motcles[4] = "gradient_pression";  // Le type de champ obtenu en calculant grad P
-  motcles[5] = "champ_elem";    // Creer un champ aux elements (de type P0)
-  motcles[6] = "champ_sommets"; // Creer un champ aux sommets (type P1)
-  // Le type de champ de vitesse depend du type d'element :
+  motcles[0] = "vitesse";     // Standard choice for velocity
+  motcles[1] = "pression";    // Standard choice for pressure
+  motcles[2] = "temperature"; // Standard choice for temperature
+  motcles[3] = "divergence_vitesse"; // Field type obtained by computing div v
+  motcles[4] = "gradient_pression";  // Field type obtained by computing grad P
+  motcles[5] = "champ_elem";    // Create a field at elements (type P0)
+  motcles[6] = "champ_sommets"; // Create a field at vertices (type P1)
+  // The velocity field type depends on the element type:
 //  Nom type_champ_vitesse("Champ_Face_DG");
   Nom type_elem("Champ_Elem_DG");
   Nom type;
-  int nb_basis_func = 0; // Valeur par defaut du nombre de composantes
+  int nb_basis_func = 0; // Default value for the number of components
   int rang = motcles.search(directive);
   const int order_DG = Option_DG::Get_order_for(noms[0]);
   switch(rang)
@@ -94,15 +93,15 @@ void DG_discretisation::discretiser_champ(const Motcle& directive, const Domaine
   if (sous_type != NOM_VIDE)
     rang = verifie_sous_type(type, sous_type, directive);
 
-  // Si on n'a pas compris la directive (ou si c'est une demande_description)
-  // alors on appelle l'ancetre :
+  // If the directive was not understood (or if it is a description request),
+  // call the parent class:
   if (rang < 0)
     {
       Discret_Thyd::discretiser_champ(directive, dom_dis, nature, noms, unites, nb_comp, nb_pas_dt, temps, champ);
       return;
     }
 
-  // Calcul du nombre de ddl
+  // Compute the number of degrees of freedom
   int nb_ddl = 0;
   if (type.debute_par(type_elem))
     nb_ddl = dom_dis.nb_elem();
@@ -150,7 +149,7 @@ void DG_discretisation::discretiser_champ(const Motcle& directive, const Domaine
 
 }
 
-/*! @brief Idem que DG_discretisation::discretiser_champ(.
+/*! @brief Same as DG_discretisation::discretiser_champ(.
  *
  * .. , Champ_Inc)
  *
@@ -161,7 +160,7 @@ void DG_discretisation::discretiser_champ(const Motcle& directive, const Domaine
   discretiser_champ_fonc_don(directive, z, nature, noms, unites, nb_comp, temps, champ);
 }
 
-/*! @brief Idem que DG_discretisation::discretiser_champ(.
+/*! @brief Same as DG_discretisation::discretiser_champ(.
  *
  * .. , Champ_Inc)
  *
@@ -172,17 +171,16 @@ void DG_discretisation::discretiser_champ(const Motcle& directive, const Domaine
   discretiser_champ_fonc_don(directive, z, nature, noms, unites, nb_comp, temps, champ);
 }
 
-/*! @brief Idem que DG_discretisation::discretiser_champ(.
+/*! @brief Same as DG_discretisation::discretiser_champ(.
  *
- * .. , Champ_Inc) Traitement commun aux champ_fonc et champ_don.
- *  Cette methode est privee (passage d'un Objet_U pas propre vu
- *  de l'exterieur ...)
+ * .. , Champ_Inc) Common processing for champ_fonc and champ_don.
+ *  This method is private (passing an Objet_U is not clean from the outside).
  *
  */
 void DG_discretisation::discretiser_champ_fonc_don(const Motcle& directive, const Domaine_dis_base& z, Nature_du_champ nature, const Noms& noms, const Noms& unites, int nb_comp, double temps,
                                                    Objet_U& champ) const
 {
-  // Deux pointeurs pour acceder facilement au champ_don ou au champ_fonc, suivant le type de l'objet champ.
+  // Two pointers for easy access to champ_don or champ_fonc, depending on the type of the champ object.
   OWN_PTR(Champ_Fonc_base) * champ_fonc = dynamic_cast<OWN_PTR(Champ_Fonc_base)*>(&champ);
   OWN_PTR(Champ_Don_base) * champ_don = dynamic_cast<OWN_PTR(Champ_Don_base)*>(&champ);
 
@@ -190,17 +188,17 @@ void DG_discretisation::discretiser_champ_fonc_don(const Motcle& directive, cons
 
 
   Motcles motcles(8);
-  motcles[0] = "pression";    // Choix standard pour la pression
-  motcles[1] = "temperature"; // Choix standard pour la temperature
+  motcles[0] = "pression";    // Standard choice for pressure
+  motcles[1] = "temperature"; // Standard choice for temperature
   motcles[2] = "champ_fonc_quad_dg"; // With value on quadrature points
   motcles[5] = "champ_elem_dg"; // With value on quadrature points
-  motcles[3] = "champ_elem";  // Creer un champ aux elements (de type P0)
-  motcles[6] = "champ_sommets";  // Creer un champ aux elements (de type P1)
-  motcles[4] = "vitesse";     // Choix standard pour la vitesse
-  motcles[7] = "champ_face";     // Choix standard pour la vitesse
+  motcles[3] = "champ_elem";  // Create a field at elements (type P0)
+  motcles[6] = "champ_sommets";  // Create a field at vertices (type P1)
+  motcles[4] = "vitesse";     // Standard choice for velocity
+  motcles[7] = "champ_face";     // Standard choice for velocity
 
   Nom type;
-  int nb_points = 0; // Valeur par defaut du nombre de composantes
+  int nb_points = 0; // Default value for the number of components
   int rang = motcles.search(directive);
   const Quadrature_base& quad = domaine_DG.get_quadrature(5); // TODO: Make this depend from the order of discretization ...
   int nb_pts_integ_max = quad.nb_pts_integ_max();
@@ -233,8 +231,8 @@ void DG_discretisation::discretiser_champ_fonc_don(const Motcle& directive, cons
   if (directive == DEMANDE_DESCRIPTION)
     Cerr << "DG discretisation : " << motcles;
 
-  // Si on n'a pas compris la directive (ou si c'est une demande_description)
-  // alors on appelle l'ancetre :
+  // If the directive was not understood (or if it is a description request),
+  // call the parent class:
   if (rang < 0)
     {
       if (champ_fonc)
@@ -244,7 +242,7 @@ void DG_discretisation::discretiser_champ_fonc_don(const Motcle& directive, cons
       return;
     }
 
-  // Calcul du nombre de ddl
+  // Compute the number of degrees of freedom
   int nb_ddl = 0;
   if (type == "Champ_Fonc_Elem_DG" || type == "Champ_Fonc_Quad_DG")
     nb_ddl = z.nb_elem();

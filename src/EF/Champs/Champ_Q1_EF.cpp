@@ -68,8 +68,8 @@ int Champ_Q1_EF::imprime(Sortie& os, int ncomp) const
 
 void Champ_Q1_EF::gradient(DoubleTab& gradient_elem)
 {
-  // Calcul du gradient de la vitesse pour le calcul de la vorticite
-  // Gradient ordre 1 (valeur moyenne dans un element)
+  // Compute the velocity gradient for the vorticity computation
+  // Order-1 gradient (mean value within an element)
   // Order 1 gradient (mean value within an element)
   const Domaine_EF& domaine_EF_ = domaine_EF();
   const DoubleTab& vitesse = equation().inconnue().valeurs();
@@ -83,13 +83,13 @@ void Champ_Q1_EF::gradient(DoubleTab& gradient_elem)
   assert(gradient_elem.dimension(1) == dimension); // line
   assert(gradient_elem.dimension(2) == dimension); // column
 
-  operator_egal(gradient_elem, 0.); // Espace reel uniquement
+  operator_egal(gradient_elem, 0.); // Real space only
 
   for (int num_elem = 0; num_elem < nb_elems; num_elem++)
     {
-      for (int a = 0; a < dimension; a++) // composante numero 1, component number 1
+      for (int a = 0; a < dimension; a++) // component number 1
         {
-          for (int b = 0; b < dimension; b++) // composante numero 2, component number 2
+          for (int b = 0; b < dimension; b++) // component number 2
             {
               for (int j = 0; j < nb_som_elem; j++)
                 {
@@ -108,7 +108,7 @@ void Champ_Q1_EF::cal_rot_ordre1(DoubleTab& vorticite)
   int nb_elems = domaine_EF_.domaine().nb_elem_tot();
 
   DoubleTab gradient_elem(0, dimension, dimension);
-  // le tableau est initialise dans la methode gradient():
+  // the array is initialized in the gradient() method:
   domaine_EF_.domaine().creer_tableau_elements(gradient_elem, RESIZE_OPTIONS::NOCOPY_NOINIT);
   gradient(gradient_elem);
   Debog::verifier("apres calcul gradient", gradient_elem);
@@ -139,10 +139,10 @@ void Champ_Q1_EF::cal_rot_ordre1(DoubleTab& vorticite)
 
 void Champ_Q1_EF::calcul_y_plus(const Domaine_Cl_EF& domaine_Cl_EF, DoubleTab& y_plus)
 {
-  // On initialise le champ y_plus avec une valeur negative,
-  // comme ca lorsqu'on veut visualiser le champ pres de la paroi,
-  // on n'a qu'a supprimer les valeurs negatives et n'apparaissent
-  // que les valeurs aux parois.
+  // Initialize the y_plus field with a negative value,
+  // so that when visualizing the field near the wall,
+  // one only needs to remove the negative values and only
+  // the wall values remain.
 
   int ndeb, nfin, elem, l_unif;
   double norm_tau, u_etoile, norm_v = 0, dist, d_visco = 0, visco = 1.;
@@ -225,7 +225,7 @@ void Champ_Q1_EF::calcul_y_plus(const Domaine_Cl_EF& domaine_Cl_EF, DoubleTab& y
                       for(int comp=0; comp<dimension; comp++) vit_face[comp]+=vitesse(num_som,comp)/nsom;
                     }
                   vit=0.;
-                  // Loop on nodes : vitesse moyenne des noeuds n'appartenant pas a la face CL
+                  // Loop on nodes: average velocity of nodes not belonging to the BC face
                   for (int i=0; i<nsom_elem; i++)
                     {
                       int node=elems(elem,i);
@@ -235,7 +235,7 @@ void Champ_Q1_EF::calcul_y_plus(const Domaine_Cl_EF& domaine_Cl_EF, DoubleTab& y
                       // Le noeud contribue
                       if (IOK)
                         for (int j=0; j<dimension; j++)
-                          vit[j]+=(vitesse(node,j)-vit_face[j])/nb_nodes_free; // permet de soustraire la vitesse de glissement eventuelle
+                          vit[j]+=(vitesse(node,j)-vit_face[j])/nb_nodes_free; // subtracts any possible sliding velocity
                     }
                   norm_v = norm_vit_lp(vit,num_face,domaine_EF,val);
                   dist = distance_face_elem(num_face,elem,domaine_EF);
@@ -245,7 +245,7 @@ void Champ_Q1_EF::calcul_y_plus(const Domaine_Cl_EF& domaine_Cl_EF, DoubleTab& y
                   else
                     d_visco = tab_visco[elem];
 
-                  // PQ : 01/10/03 : corrections par rapport a la version premiere
+                  // PQ : 01/10/03 : corrections with respect to the initial version
                   norm_tau = d_visco * norm_v / dist;
 
                   u_etoile = sqrt(norm_tau);
@@ -253,6 +253,6 @@ void Champ_Q1_EF::calcul_y_plus(const Domaine_Cl_EF& domaine_Cl_EF, DoubleTab& y
 
                 } // else yplus already computed
             } // loop on faces
-        } // Fin paroi fixe
-    } // Fin boucle sur les bords
+        } // End fixed wall
+    } // End loop over boundaries
 }

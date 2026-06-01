@@ -16,18 +16,16 @@
 #ifndef DG_discretisation_included
 #define DG_discretisation_included
 
-/*! @brief class DG_discretisation (schema de base) Classe qui gere la dicretisation DG du probleme
+/*! @brief class DG_discretisation (base scheme) Class managing the DG discretisation of the problem.
  *
- *     c'est ici que :
- *     * l'on discretise les proprietes physiques du fluide et notamment celui du fluide
- *        d'Ostwald( K, N, Mu, ...)
- *     * l'on associe le champ d'Ostwald et l'equation hydraulique, le fluide et la
- *     domaine_dis_base
- *     ** ( nouvelles procedures :
+ *     This is where:
+ *     * the physical properties of the fluid are discretized, in particular those of the Ostwald fluid (K, N, Mu, ...)
+ *     * the Ostwald field and the hydraulic equation, the fluid and the domaine_dis_base are associated.
+ *     ** (new procedures:
  *   void proprietes_physiques_fluide_Ostwald(Domaine_dis& ,Fluide_Ostwald& ,
  *            const Navier_Stokes_std& , const Champ_Inc& ) const;
- *    a besoin de la classe Fluide_Ostwald pour avoir acces au fluide etudie
- *                          Navier_Stokes_Std pour avoir acces a l'equation hydraulique
+ *    requires the Fluide_Ostwald class to access the studied fluid
+ *                          and Navier_Stokes_Std to access the hydraulic equation.
  *
  * @sa Discret_Thyd_Turb
  */

@@ -18,9 +18,9 @@
 
 #include <Convection_Diffusion_Temperature_base.h>
 
-/*! @brief classe Convection_Diffusion_Temperature Cas particulier de Convection_Diffusion_std
+/*! @brief Convection_Diffusion_Temperature Special case of Convection_Diffusion_std
  *
- *      quand le scalaire subissant le transport est la temperature.
+ *      when the transported scalar is the temperature.
  *
  * @sa Conv_Diffusion_std
  */
@@ -36,7 +36,7 @@ public:
   void discretiser() override;
   int preparer_calcul() override;
   void associer_milieu_base(const Milieu_base& ) override;
-  //Methodes de l interface des champs postraitables
+  // Methods of the post-processable fields interface
   /////////////////////////////////////////////////////
   void creer_champ(const Motcle& motlu) override;
   const Champ_base& get_champ(const Motcle& nom) const override;
@@ -58,7 +58,7 @@ protected :
   OWN_PTR(Champ_Inc_base) la_temperature;
   OWN_PTR(Champ_Fonc_base) gradient_temperature, h_echange;
 
-  // Parametres penalisation IBC
+  // IBC penalization parameters
   int is_penalized = 0;
   double eta = 1.0;
   int choix_pena = 0, tag_indic_pena_global = -1;

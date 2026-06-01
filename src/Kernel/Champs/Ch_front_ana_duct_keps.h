@@ -12,12 +12,12 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//   fichier a inclure dans Ch_front_ana.cpp
-//   il contient pour chaque region $$$ de {in1,up1,ou1,in2,ou2}:
-//      - les tableaux des points de la grille d'entree Y$$$, Z$$$
-//      - les tableaux des profils de k et epsilon K$$$, EPS$$$
-//   pour le cas test du conduit coude a section recatangulaire.
-//   La face d'entree est divisee en 5 regions, comme montre dans le schema :
+//   file to include in Ch_front_ana.cpp
+//   it contains for each region $$$ of {in1,up1,ou1,in2,ou2}:
+//      - the arrays of input grid points Y$$$, Z$$$
+//      - the k and epsilon profile arrays K$$$, EPS$$$
+//   for the test case of the curved duct with rectangular cross-section.
+//   The inlet face is divided into 5 regions, as shown in the diagram:
 //
 //              ^z
 //              |                |
@@ -57,12 +57,12 @@
 //region in1
 //Reynolds-stress components in the domain IN1 of Station U1
 //file name : tu1in1.dat
-//coordonnees des points a k-eps connue
+//coordinates of points with known k-eps
 static int NzKEPSin1 = 8;
 static float ZKEPSin1[] = {        0.62500E-01,        0.12500E+00,        0.18750E+00,        0.25000E+00,        0.37500E+00,        0.50000E+00,        0.75000E+00,        0.10000E+01};
 static int NyKEPSin1 = 11;
 static float YKEPSin1[] = {        0.25000E-01,        0.31250E-01,        0.37500E-01,        0.43750E-01,        0.50000E-01,        0.56250E-01,        0.62500E-01,        0.75000E-01,        0.87500E-01,        0.10000E+00,        0.12500E+00};
-//k-epsilon aux points donnes
+//k-epsilon at the given points
 static float Ubar2in1[] =
 {
   0.5632E-02,        0.5387E-02,        0.5051E-02,        0.4325E-02,        0.3862E-02,        0.3834E-02,        0.3427E-02,        0.3004E-02,        0.3204E-02,        0.2756E-02,        0.2352E-02,        /*Z=0.62500E-01*/
@@ -100,12 +100,12 @@ static float Wbar2in1[] =
 //region up1
 //Reynolds-stress components in the domain UP1 of Station U1
 //file name : tu1up1.dat
-//coordonnees des points a k-eps connue
+//coordinates of points with known k-eps
 static int NzKEPSup1 = 27;
 static float ZKEPSup1[] = {        0.15625E-01,        0.20000E-01,        0.24375E-01,        0.28750E-01,        0.33125E-01,        0.37500E-01,        0.43750E-01,        0.50000E-01,        0.56250E-01,        0.62500E-01,        0.75000E-01,        0.87500E-01,        0.10625E+00,        0.12500E+00,        0.14375E+00,        0.16250E+00,        0.18750E+00,        0.21250E+00,        0.25000E+00,        0.28750E+00,        0.32500E+00,        0.37500E+00,        0.43750E+00,        0.50000E+00,        0.62500E+00,        0.75000E+00,        0.10000E+01};
 static int NyKEPSup1 = 33;
 static float YKEPSup1[] = {        0.12500E+00,        0.15625E+00,        0.18750E+00,        0.21875E+00,        0.25000E+00,        0.28125E+00,        0.31250E+00,        0.34375E+00,        0.37500E+00,        0.39063E+00,        0.40625E+00,        0.42188E+00,        0.43750E+00,        0.45313E+00,        0.46875E+00,        0.48438E+00,        0.50000E+00,        0.51563E+00,        0.53125E+00,        0.54688E+00,        0.56250E+00,        0.57813E+00,        0.59375E+00,        0.60938E+00,        0.62500E+00,        0.65625E+00,        0.68750E+00,        0.71875E+00,        0.75000E+00,        0.78125E+00,        0.81250E+00,        0.84375E+00,        0.87500E+00};
-//k-epsilon aux points donnes
+//k-epsilon at the given points
 static float Ubar2up1[] =
 {
   0.7795E-02,        0.7410E-02,        0.7090E-02,        0.6770E-02,        0.6540E-02,        0.6408E-02,        0.6531E-02,        0.6524E-02,        0.6327E-02,        0.6576E-02,        0.5735E-02,        0.6064E-02,        0.7824E-02,        0.7413E-02,        0.6376E-02,        0.5196E-02,        0.5060E-02,        0.5489E-02,        0.6085E-02,        0.7120E-02,        0.7044E-02,        0.5679E-02,        0.6193E-02,        0.6830E-02,        0.7253E-02,        0.6469E-02,        0.5997E-02,        0.5995E-02,        0.5697E-02,        0.5774E-02,        0.6210E-02,        0.6534E-02,        0.6570E-02,        /*Z=0.15625E-01*/
@@ -200,12 +200,12 @@ static float Wbar2up1[] =
 //region ou1
 //Reynolds-stress components in the domain OU1 of Station U1
 //file name : tu1ou1.dat
-//coordonnees des points a k-eps connue
+//coordinates of points with known k-eps
 static int NzKEPSou1 = 8;
 static float ZKEPSou1[] = {        0.62500E-01,        0.12500E+00,        0.18750E+00,        0.25000E+00,        0.37500E+00,        0.50000E+00,        0.75000E+00,        0.10000E+01};
 static int NyKEPSou1 = 11;
 static float YKEPSou1[] = {        0.87500E+00,        0.90000E+00,        0.91250E+00,        0.92500E+00,        0.93750E+00,        0.94375E+00,        0.95000E+00,        0.95625E+00,        0.96250E+00,        0.96875E+00,        0.97500E+00};
-//k-epsilon aux points donnes
+//k-epsilon at the given points
 static float Ubar2ou1[] =
 {
   0.3715E-03,        0.8431E-03,        0.1066E-02,        0.1675E-02,        0.2642E-02,        0.3036E-02,        0.3503E-02,        0.4552E-02,        0.5067E-02,        0.5218E-02,        0.6101E-02,        /*Z=0.62500E-01*/
@@ -243,12 +243,12 @@ static float Wbar2ou1[] =
 //region in2
 //Reynolds-stress components in the domain IN2 of Station U1
 //file name : tu1in2.dat
-//coordonnees des points a k-eps connue
+//coordinates of points with known k-eps
 static int NzKEPSin2 = 5;
 static float ZKEPSin2[] = {        0.10000E+01,        0.15000E+01,        0.20000E+01,        0.25000E+01,        0.30000E+01};
 static int NyKEPSin2 = 15;
 static float YKEPSin2[] = {        0.25000E-01,        0.31250E-01,        0.37500E-01,        0.43750E-01,        0.50000E-01,        0.56250E-01,        0.62500E-01,        0.75000E-01,        0.87500E-01,        0.10000E+00,        0.12500E+00,        0.18750E+00,        0.25000E+00,        0.37500E+00,        0.50000E+00};
-//k-epsilon aux points donnes
+//k-epsilon at the given points
 static float Ubar2in2[] =
 {
   0.4854E-02,        0.3956E-02,        0.3524E-02,        0.2912E-02,        0.2177E-02,        0.1462E-02,        0.8047E-03,        0.1457E-03,        0.3911E-04,        0.5374E-04,        0.4145E-04,        0.6526E-04,        0.3444E-04,        0.4379E-04,        0.4046E-04,        /*Z=0.10000E+01*/
@@ -277,12 +277,12 @@ static float Wbar2in2[] =
 //region ou2
 //Reynolds-stress components in the domain OU2 of Station U1
 //file name : tu1ou2.dat
-//coordonnees des points a k-eps connue
+//coordinates of points with known k-eps
 static int NzKEPSou2 = 5;
 static float ZKEPSou2[] = {        0.10000E+01,        0.15000E+01,        0.20000E+01,        0.25000E+01,        0.30000E+01};
 static int NyKEPSou2 = 15;
 static float YKEPSou2[] = {        0.50000E+00,        0.62500E+00,        0.75000E+00,        0.81250E+00,        0.87500E+00,        0.90000E+00,        0.91250E+00,        0.92500E+00,        0.93750E+00,        0.94375E+00,        0.95000E+00,        0.95625E+00,        0.96250E+00,        0.96875E+00,        0.97500E+00};
-//k-epsilon aux points donnes
+//k-epsilon at the given points
 static float Ubar2ou2[] =
 {
   0.1997E-04,        0.2301E-04,        0.1208E-04,        0.3265E-04,        0.2467E-04,        0.7411E-04,        0.1647E-03,        0.5628E-03,        0.1365E-02,        0.1866E-02,        0.2346E-02,        0.2937E-02,        0.3286E-02,        0.4042E-02,        0.4599E-02,        /*Z=0.10000E+01*/

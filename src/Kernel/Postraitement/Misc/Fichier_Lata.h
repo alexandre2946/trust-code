@@ -18,10 +18,10 @@
 
 #include <Format_Post_Lata.h>
 
-/*! @brief : Cette classe contient un fichier de type EcrFicPartage ou EcrFicPrive,
+/*! @brief : This class holds a file of type EcrFicPartage or EcrFicPrive,
  *
- *   en ASCII ou en BINAIRE selon le format specifie dans le constructeur.
- *   Voir la doc du constructeur.
+ *   in ASCII or BINARY format as specified in the constructor.
+ *   See the constructor documentation.
  *
  */
 class SFichier;
@@ -45,9 +45,9 @@ protected:
   int     is_parallel_;
 };
 
-/*! @brief : Specialisation du Fichier_Lata pour le fichier maitre: toujours en ASCII.
+/*! @brief : Specialization of Fichier_Lata for the master file: always in ASCII.
  *
- *   On peut utiliser une precision differente si on veut
+ *   A different precision can be used if desired.
  *
  */
 class Fichier_Lata_maitre : public Fichier_Lata

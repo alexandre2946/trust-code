@@ -18,9 +18,9 @@
 
 #include <Modele_turbulence_hyd_LES_VEF_base.h>
 
-/*! @brief classe Modele_turbulence_hyd_LES_Smago_VEF Cette classe correspond a la mise en oeuvre du modele sous
+/*! @brief Class Modele_turbulence_hyd_LES_Smago_VEF
  *
- *  maille smagorinsky en VEF
+ * @brief This class implements the Smagorinsky subgrid model in VEF.
  *
  *
  */

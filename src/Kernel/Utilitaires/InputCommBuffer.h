@@ -18,24 +18,24 @@
 #include <sstream>
 class OutputCommBuffer;
 using std::istringstream;
-/*! @brief : Classe outil utilisee exclusivement par Schema_Comm.
+/*! @brief : Helper class used exclusively by Schema_Comm.
  *
- * C'est une classe
- *   derivee de Entree dont le stream est de type istringstream (les donnees
- *   lues par operator>> sont prises dans un buffer).
- *   On utilise la classe comme suit:
- *   (1) on reserve un buffer d'une certaine taille avec
- *     char * buf = input_comm_buffer.reserve_buffer(taille);
- *   (2) on remplit le buffer avec des donnees:
- *     for (i=0; i<taille; i++)
+ * This is a class
+ *   derived from Entree whose stream is of type istringstream (data
+ *   read by operator>> are taken from a buffer).
+ *   The class is used as follows:
+ *   (1) reserve a buffer of a given size with
+ *     char * buf = input_comm_buffer.reserve_buffer(size);
+ *   (2) fill the buffer with data:
+ *     for (i=0; i<size; i++)
  *        buf[i] = .....;
- *   (3) on cree un stream a partir du buffer:
+ *   (3) create a stream from the buffer:
  *     input_comm_buffer.create_stream();
- *   (4) on peut ensuite lire les donnees a travers l'operateur>>:
- *     input_comm_buffer >> x >> y >> chaine >> ... ;
- *   (5) quand on a fini de lire avec operateur>> on fait
+ *   (4) data can then be read through operator>>:
+ *     input_comm_buffer >> x >> y >> string >> ... ;
+ *   (5) when done reading with operator>>, call
  *     input_comm_buffer.clear();
- *   et on peut refaire (1)
+ *   and step (1) can be repeated.
  *
  */
 
@@ -44,18 +44,18 @@ class InputCommBuffer : public Entree
 public:
   InputCommBuffer();
   ~InputCommBuffer() override;
-  // Specifie la taille du buffer et renvoie son adresse.
-  // L'utilisateur doit ensuite y mettre les donnees (tout le buffer
-  // doit etre rempli).
+  // Specifies the buffer size and returns its address.
+  // The user must then fill it with data (the entire buffer
+  // must be filled).
   char * reserve_buffer(int bufsize);
   void   create_stream_from_output_stream(OutputCommBuffer&);
-  // On cree le stream de lecture a partir du buffer.
+  // Create the read stream from the buffer.
   void create_stream();
   void clear();
 private:
   istringstream * stream_;
   char * buffer_;
   int size_;
-  int memorysize_; // memorysize_ >= size_
+  int memorysize_; // memorysize_ >= size_ (allocated capacity)
 };
 #endif

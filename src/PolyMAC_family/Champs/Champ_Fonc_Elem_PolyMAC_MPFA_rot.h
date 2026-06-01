@@ -20,12 +20,12 @@
 #include <Champ_Face_PolyMAC_MPFA.h>
 #include <TRUST_Ref.h>
 
-/*! @brief class Champ_Fonc_Elem_PolyMAC_MPFA_rot for the calculation of the vorticity
- *       This field is a Champ_Fonc_Elem_PolyMAC_MPFA with 1 value per element and per phase in 2D and 3 in 3D
+/*! @brief class Champ_Fonc_Elem_PolyMAC_MPFA_rot for the calculation of the vorticity.
  *
- *       It isn't a Champ_Fonc_Face_PolyMAC_MPFA as there is no physical justification to project the vorticity on a face
- *       In 3D, Champ_Fonc_Elem_PolyMAC_MPFA_TC::valeurs()(e, n*D + d) returns the value of phase n in element e along the d component
- *       The vorticity is calculated by hand in 2D and 3D using the values of the gradient
+ *  @brief This field is a Champ_Fonc_Elem_PolyMAC_MPFA with 1 value per element and per phase in 2D and 3 in 3D.
+ *         It is not a Champ_Fonc_Face_PolyMAC_MPFA as there is no physical justification to project the vorticity on a face.
+ *         In 3D, Champ_Fonc_Elem_PolyMAC_MPFA_TC::valeurs()(e, n*D + d) returns the value of phase n in element e along the d component.
+ *         The vorticity is calculated by hand in 2D and 3D using the values of the gradient.
  *
  */
 

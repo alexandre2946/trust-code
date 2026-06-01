@@ -30,12 +30,12 @@ Implemente_instanciable(Champ_front_bruite,"Champ_front_bruite",Ch_front_var_ins
 // XD_CONT bruit_blanc (white_noise) is the formula given in the mettre_a_jour (update) method of the Champ_front_bruite
 // XD_CONT (noise_boundary_field) (Refer to the Champ_front_bruite.cpp file).
 
-/*! @brief Impression sur un flot de sortie au format: taille
+/*! @brief Print to an output stream in the format: size
  *
- *     valeur(0) ... valeur(i)  ... valeur(taille-1)
+ *     value(0) ... value(i)  ... value(size-1)
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Champ_front_bruite::printOn(Sortie& os) const
 {
@@ -46,16 +46,16 @@ Sortie& Champ_front_bruite::printOn(Sortie& os) const
   return os;
 }
 
-/*! @brief Lecture a partir d'un flot d'entree au format: nombre_de_composantes
+/*! @brief Read from an input stream in the format: number_of_components
  *
- *     moyenne moyenne(0) ... moyenne(nombre_de_composantes-1)
- *     moyenne amplitude(0) ... amplitude(nombre_de_composantes-1)
+ *     average average(0) ... average(number_of_components-1)
+ *     average amplitude(0) ... amplitude(number_of_components-1)
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws accolade ouvrante attendue
- * @throws mot clef inconnu a cet endroit
- * @throws accolade fermante attendue
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
+ * @throws opening brace expected
+ * @throws unknown keyword at this location
+ * @throws closing brace expected
  */
 Entree& Champ_front_bruite::readOn(Entree& is)
 {
@@ -119,7 +119,7 @@ Entree& Champ_front_bruite::readOn(Entree& is)
 }
 
 
-/*! @brief Pas code !!
+/*! @brief Not implemented !!
  *
  * @param (Champ_front_base& ch)
  * @return (Champ_front_base&)
@@ -129,9 +129,9 @@ Champ_front_base& Champ_front_bruite::affecter_(const Champ_front_base& ch)
   return *this;
 }
 
-/*! @brief Mise a jour du temps et retirage aleatoire des valeurs du bruit.
+/*! @brief Update time and randomly redraw the noise values.
  *
- * @param (double temps) le temps de mise a jour
+ * @param (double temps) the update time
  */
 void Champ_front_bruite::mettre_a_jour(double temps)
 {
@@ -142,7 +142,7 @@ void Champ_front_bruite::mettre_a_jour(double temps)
   if (nx!=0)
     {
       //
-      // N!=0 modelisation du bruit blanc (R. Howard)
+      // N!=0 white noise modelling (R. Howard)
       //
       double onde, bruit_blanc, pi, invx, d_x, tot_vel;
       pi=2.*acos(0.);
@@ -162,7 +162,7 @@ void Champ_front_bruite::mettre_a_jour(double temps)
     }
   else
     //
-    // N=0 donc modelisation bruit aleatoire
+    // N=0 so random noise modelling
     //
     for(int i=0; i<nb_faces; i++)
       for(int j=0; j<nb_comp(); j++)

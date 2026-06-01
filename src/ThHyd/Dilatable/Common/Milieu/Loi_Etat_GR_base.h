@@ -17,17 +17,15 @@
 #define Loi_Etat_GR_base_included
 
 #ifndef RU_
-//constante des gaz
+//universal gas constant
 #define RU_ 8.3143*4.18448
 #endif
 
 #include <Loi_Etat_base.h>
 
-/*! @brief classe Loi_Etat_GR_base Cette classe represente la loi d'etat base pour les gaz reels.
- *
- *      Elle definit un fluide dilatable dont la loi d'etat est :
- *          rho=rho(Pth,H)
- *          T  =  T(Pth,H)
+/*! @brief Base state law class for real gases, defining a dilatable fluid with the equations of state:
+ *           rho = rho(Pth, H)
+ *           T   = T(Pth, H)
  *
  * @sa Fluide_Dilatable_base Loi_Etat_base
  */
@@ -50,7 +48,7 @@ public :
   double inverser_Pth(double,double) override;
   void calculer_masse_volumique() override;
 
-  // Methodes virtuelles pures
+  // Pure virtual methods
   virtual double calculer_temperature(double,double) = 0;
   double calculer_H(double,double) const override = 0;
   double Drho_DP(double,double) const override = 0;
@@ -58,7 +56,7 @@ public :
   virtual double DT_DH(double,double) const = 0;
   double calculer_masse_volumique(double,double) const override = 0;
 
-  // Methodes inlines
+  // Inline methods
   inline double masse_molaire() const { return MMole_; }
 
 protected :

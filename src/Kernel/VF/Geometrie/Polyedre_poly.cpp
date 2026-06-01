@@ -69,7 +69,7 @@ void Polyedre_poly::normale(int num_Face,DoubleTab& Face_normales,
   ref_cast(Poly_geom_base,domaine_geom.type_elem().valeur()).calculer_un_centre_gravite(elem1,xp);
   Vecteur3 M(xp(0),xp(1),xp(2));
   */
-  // on prend un point a l'interieur (pas le cg trop long)
+  // take a point inside (not the cg, which is too expensive)
 
   int num_poly=Face_voisins(num_Face,0);
 

@@ -16,12 +16,12 @@
 #include <Support_Champ_Masse_Volumique.h>
 #include <Nom.h>
 
-/*! @brief Constructeur de la classe.
+/*! @brief Constructor of the class.
  *
- * Par defaut, une classe derivee deja codee appelle le constructeur sans argument. support_ok est mis a zero
- *   et on produit une erreur si Associer_champ_masse_volumique est appele.
- *   Pour signifier que le champ de masse volumique est supporte par
- *   la classe derivee, il faut appeler Declare_support_masse_volumique
+ * By default, an already coded derived class calls the constructor without argument. support_ok is set to zero
+ *   and an error is produced if Associer_champ_masse_volumique is called.
+ *   To indicate that the density field is supported by
+ *   the derived class, call Declare_support_masse_volumique
  *
  */
 Support_Champ_Masse_Volumique::Support_Champ_Masse_Volumique() :
@@ -29,18 +29,18 @@ Support_Champ_Masse_Volumique::Support_Champ_Masse_Volumique() :
 {
 }
 
-/*! @brief Destructeur virtuel (pour eviter les warnings)
+/*! @brief Virtual destructor (to avoid warnings)
  *
  */
 Support_Champ_Masse_Volumique::~Support_Champ_Masse_Volumique()
 {
 }
 
-/*! @brief Le constructeur d'une classe derivee qui se sert de la masse volumique doit appeler cette fonction avec la valeur 1.
+/*! @brief The constructor of a derived class that uses the density field must call this function with the value 1.
  *
- * Si une classe cliente
- *   (Navier Stokes par ex.) essaie d'associer la masse volumique a une
- *   classe qui n'a pas fait ok=1, on s'arrete : fonction non implementee.
+ * If a client class
+ *   (Navier Stokes for example) tries to associate the density field to a
+ *   class that has not set ok=1, it stops: function not implemented.
  *
  */
 void Support_Champ_Masse_Volumique::declare_support_masse_volumique(int ok)
@@ -48,7 +48,7 @@ void Support_Champ_Masse_Volumique::declare_support_masse_volumique(int ok)
   support_ok_ = ok;
 }
 
-/*! @brief Methode a appeler dans la preparation du probleme pour demander a l'objet de tenir compte du champ de masse volumique en parametre.
+/*! @brief Method to be called during problem preparation to ask the object to take into account the density field passed as parameter.
  *
  */
 void Support_Champ_Masse_Volumique::associer_champ_masse_volumique(const Champ_base& ch)
@@ -63,7 +63,7 @@ void Support_Champ_Masse_Volumique::associer_champ_masse_volumique(const Champ_b
   ref_champ_rho_ = ch;
 }
 
-/*! @brief Annule la reference a la masse volumique.
+/*! @brief Cancels the reference to the density field.
  *
  */
 void Support_Champ_Masse_Volumique::dissocier_champ_masse_volumique()
@@ -72,7 +72,7 @@ void Support_Champ_Masse_Volumique::dissocier_champ_masse_volumique()
   ref_champ_rho_ = ref_nulle;
 }
 
-/*! @brief Renvoie 1 si la masse volumique a ete associee, 0 sinon.
+/*! @brief Returns 1 if the density field has been associated, 0 otherwise.
  *
  */
 int Support_Champ_Masse_Volumique::has_champ_masse_volumique() const
@@ -81,7 +81,7 @@ int Support_Champ_Masse_Volumique::has_champ_masse_volumique() const
   return ref_non_nulle;
 }
 
-/*! @brief Renvoie le champ de masse volumique
+/*! @brief Returns the density field
  *
  */
 const Champ_base& Support_Champ_Masse_Volumique::get_champ_masse_volumique() const

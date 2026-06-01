@@ -155,7 +155,7 @@ int EOS_to_TRUST_Sat_generique::tppi_get_all_flux_interfacial_pb_multiphase(cons
   SpanD dPTs__ = sats.at(SAT::T_SAT_DP), Hvs__ = sats.at(SAT::HV_SAT), Hls__ = sats.at(SAT::HL_SAT),
         dPHvs__ = sats.at(SAT::HV_SAT_DP), dPHls__ = sats.at(SAT::HL_SAT_DP), Lvap__ = sats.at(SAT::LV_SAT), dPLvap__ = sats.at(SAT::LV_SAT_DP);
 
-  const int sz = (int) P.size(), nb_out = 5; /* NOTA BENE : 5 car LV_SAT et LV_SAT_DP on recalcule apres  */
+  const int sz = (int) P.size(), nb_out = 5; /* NOTA BENE : 5 because LV_SAT and LV_SAT_DP are recomputed afterwards  */
   int i_out = 0, err_;
   NEPTUNE::ArrOfInt tmp(sz);
   NEPTUNE::EOS_Error_Field ferr(tmp);
@@ -174,7 +174,7 @@ int EOS_to_TRUST_Sat_generique::tppi_get_all_flux_interfacial_pb_multiphase(cons
         }
       err_ = (int)fluide->compute(P_fld, flds_out, ferr);
 
-      // on rempli LV_SAT et LV_SAT_DP
+      // fill LV_SAT and LV_SAT_DP
       for (int i = 0; i < sz; i++)
         {
           Lvap__[i] = Hvs__[i] - Hls__[i];

@@ -75,13 +75,13 @@ const Champ_base& Paroi_hyd_base_EF::get_champ(const Motcle& nom) const
   const IntTab& face_voisins = domaine_EF.face_voisins();
   if (champ_u_star_ && (nom == champ_u_star_->le_nom()))
     {
-      // Initialisation a 0 du champ volumique u_star
+      // Initialize the volumetric u_star field to 0
       DoubleTab& valeurs = champ_u_star_->valeurs();
       valeurs = 0;
       const Equation_base& my_eqn = mon_modele_turb_hyd->equation();
       if (tab_u_star_.size_array() > 0)
         {
-          // Boucle sur les frontieres pour recuperer u_star si tab_u_star dimensionne
+          // Loop over boundaries to retrieve u_star if tab_u_star is sized
           int nb_front = my_eqn.domaine_dis().nb_front_Cl();
           for (int n_bord = 0; n_bord < nb_front; n_bord++)
             {
@@ -100,7 +100,7 @@ const Champ_base& Paroi_hyd_base_EF::get_champ(const Motcle& nom) const
             }
         }
       valeurs.echange_espace_virtuel();
-      // Met a jour le temps du champ:
+      // Update the field time:
       champ_u_star_->mettre_a_jour(my_eqn.schema_temps().temps_courant());
       return champs_compris_.get_champ(nom);
     }

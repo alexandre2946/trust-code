@@ -20,7 +20,7 @@
 #include <Lire_Fichier.h>
 
 
-/*! @brief Lecture d'un fichier au format binaire
+/*! @brief Reads a file in binary format.
  *
  */
 class Lire_Fichier_Bin : public Lire_Fichier

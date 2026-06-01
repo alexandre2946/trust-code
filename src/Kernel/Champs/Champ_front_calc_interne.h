@@ -20,9 +20,9 @@
 #include <Champ_front_calc.h>
 #include <TRUSTTrav.h>
 
-/*! @brief classe Champ_front_calc_interne Classe derivee de Champ_front_calc qui represente
+/*! @brief class Champ_front_calc_interne Derived class of Champ_front_calc representing
  *
- *      le transfert d'un champ_inc d'un cote a l'autre d'une paroi interne.
+ *      the transfer of a champ_inc from one side to the other of an internal wall.
  *
  * @sa Champ_front_calc Echange_interne_impose
  */

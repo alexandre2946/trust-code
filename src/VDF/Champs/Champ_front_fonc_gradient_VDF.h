@@ -22,7 +22,7 @@
 
 /*! @brief class Champ_front_fonc_gradient_VDF
  *
- *  Classe derivee de Champ_front_base
+ * @brief Derived from Champ_front_base.
  *
  * @sa Champ_front_base
  */

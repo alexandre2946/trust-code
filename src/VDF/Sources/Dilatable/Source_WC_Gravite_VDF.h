@@ -22,9 +22,9 @@
 
 /*! @brief class  Source_WC_Gravite_VDF
  *
- *  Cette classe represente un terme source supplementaire a prendre en compte
- *  dans les equations de quantite de mouvement dans le cas ou le fluide est
- *  weakly compressible, en cas de gravite, et pour une discretisation VDF.
+ *  This class represents a supplementary source term to be taken into account
+ *  in the momentum equations when the fluid is
+ *  weakly compressible, in the presence of gravity, and for a VDF discretization.
  *
  *
  * @sa Source_base Fluide_Weakly_Compressible Source_Gravite_Fluide_Dilatable_base

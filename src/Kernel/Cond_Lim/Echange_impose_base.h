@@ -19,21 +19,21 @@
 #include <Cond_lim_base.h>
 #include <TRUSTTab.h>
 
-/*! @brief classe Echange_impose_base: Cette condition limite sert uniquement pour l'equation d'energie.
+/*! @brief Echange_impose_base: This boundary condition is used only for the energy equation.
  *
- *     Elle correspond a imposer un echange de chaleur avec l'exterieur
- *     du domaine en imposant une temperature exterieure T_ext et un
- *     coefficient d'echange h_imp.
- *     Le terme de flux calcule a partir du couple(h_imp,T_ext) s'ecrit :
- *                            h_t(T_ext - T_entier)*Surf
- *                           avec h_t : coefficient d'echange global.
- *     Il figure au second membre de l'equation d'energie.
- *     Soit l'utilisateur donne un coefficient d'echange qui correspond
- *     uniquement a la paroi, auquel cas le programme calculera la diffusion
- *     sur la demi-maille pres de la paroi, soit il donne un coefficient
- *     d'echange global qui tient compte directement des deux precedents.
- *     Les deux classes derivees Echange_externe_impose et Echange_global_impose
- *     representent ces deux possibilites.
+ *     It corresponds to imposing a heat exchange with the exterior
+ *     of the domain by imposing an external temperature T_ext and an
+ *     exchange coefficient h_imp.
+ *     The flux term computed from the pair (h_imp, T_ext) is written:
+ *                            h_t(T_ext - T_interior)*Surf
+ *                           where h_t : global exchange coefficient.
+ *     It appears on the right-hand side of the energy equation.
+ *     Either the user provides an exchange coefficient corresponding
+ *     only to the wall, in which case the program will compute the diffusion
+ *     over the half-cell near the wall, or the user provides a global exchange
+ *     coefficient that directly accounts for both the above.
+ *     The two derived classes Echange_externe_impose and Echange_global_impose
+ *     represent these two possibilities.
  *
  * @sa Cond_lim_base Echange_externe_impose Echange_global_impose
  */
@@ -55,9 +55,9 @@ public:
   double emissivite(int num) const;
   double emissivite(int num,int k) const;
 
-  /*! @brief Renvoie le champ T_ext de temperature imposee a la frontiere.
+  /*! @brief Returns the T_ext field of temperature imposed at the boundary.
    *
-   * @return (Champ_front_base&) le champ T_ext de temperature imposee a la frontiere
+   * @return (Champ_front_base&) the T_ext field of temperature imposed at the boundary
    */
   inline virtual Champ_front_base& T_ext() { return le_champ_front.valeur(); }
   inline virtual const Champ_front_base& T_ext() const { return le_champ_front.valeur(); }
@@ -68,14 +68,14 @@ public:
   inline Champ_front_base& emissivite() {  assert (has_emissivite()); return emissivite_.valeur(); }
   inline const Champ_front_base& emissivite() const  {  assert (has_emissivite()); return emissivite_.valeur(); }
 
-  // Utilise dans les CAL de calcul des flux pour les lois de paroi
+  // Used in the CAL of flux computation for wall laws
   virtual void liste_faces_loi_paroi(IntTab&) { }
 
   void mettre_a_jour(double ) override;
   int initialiser(double temps) override;
   int a_mettre_a_jour_ss_pas_dt() override { return 1; }
 
-  // ajout de methode pour ne pas operer directement sur champ_front
+  // added method to avoid operating directly on champ_front
   void set_temps_defaut(double temps) override;
   void fixer_nb_valeurs_temporelles(int nb_cases) override;
   //
@@ -91,7 +91,7 @@ public:
 protected :
   OWN_PTR(Champ_front_base) h_imp_, emissivite_ /* si Echange_externe_radiatif */;
 private:
-  // Stocke toutes les valeurs sur les faces (utile pour GPU):
+  // Stores all values on the faces (useful for GPU):
   mutable DoubleTab text_;
   mutable DoubleTab himp_;
   mutable DoubleTab eps_;

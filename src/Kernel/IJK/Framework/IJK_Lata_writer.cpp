@@ -50,8 +50,10 @@ void dumplata_header(const char *filename)
     }
 }
 
-/*! When dumping the IJK coordinates, we do not need 64b, since only the x, y and z steps will be written.
+/*! @brief When dumping the IJK coordinates, we do not need 64b, since only the x, y and z steps will be written.
  *  This never exceeds 32b.
+ * @param filename path to the LATA master file
+ * @param splitting the IJK domain splitting containing the geometry information
  */
 void dumplata_add_geometry(const char *filename, const Domaine_IJK& splitting)
 {
@@ -114,7 +116,7 @@ void dumplata_ft_field(const char *filename, const char *meshname,
     {
       SFichier master_file;
       master_file.ouvrir(filename, ios::app);
-      // NO_INDEXING car ce n'est pas un indice de sommet ou de facette
+      // NO_INDEXING because this is not a vertex or facet index
       // In a IJK Lata file, the int written are typically PE numbers or connex components number, never need 64b.
       Nom format = "INT32";
       master_file << "Champ " << field_name << " " << basename(fdfield) << " geometrie=" << meshname ;

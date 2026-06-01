@@ -22,7 +22,7 @@
 #include <cstring>
 #include <string>
 
-/*! @brief class Nom Une chaine de caractere pour nommer les objets de TRUST
+/*! @brief class Nom: a character string for naming TRUST objects.
  *
  * @sa Motcle
  */
@@ -31,7 +31,7 @@ class Nom : public Objet_U
 {
   Declare_instanciable_sans_constructeur_ni_destructeur(Nom);
 public:
-  Nom();                                         // construit "??"
+  Nom();                                         // constructs "??"
   Nom(int i);                                // Nom(485)="485"
   Nom(long i);                                    // Nom(485)="485"
   Nom(long long i);                                    // Nom(485)="485"

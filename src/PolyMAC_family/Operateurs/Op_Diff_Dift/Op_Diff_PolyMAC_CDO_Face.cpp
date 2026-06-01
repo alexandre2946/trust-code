@@ -46,7 +46,7 @@ void Op_Diff_PolyMAC_CDO_Face::completer()
   if (polymac_flica5)
     {
       bool flag = Process::nproc() == 1 && le_dom_poly_->nb_faces() < 10000;
-      // Pour des petites matrices, LU PETSc plus rapide que GMRES/ILU(0) ou MUMPS
+      // For small matrices, LU PETSc is faster than GMRES/ILU(0) or MUMPS
       EChaine chl(flag ? "Petsc Cholesky_lapack { quiet }" : "Petsc gmres { precond block_jacobi_ilu { level 0 } quiet rtol 1.e-14 }");
       lire_solveur(chl);
       solveur.nommer("Op_Diff_PolyMAC_CDO_Face solver");
@@ -90,7 +90,7 @@ void Op_Diff_PolyMAC_CDO_Face::dimensionner(Matrice_Morse& mat) const
 
   Stencil stencil(0, 2);
 
-  //partie vitesses : m2 Rf
+  //velocity part: m2 Rf
   for (int e = 0; e < domaine.nb_elem_tot(); e++)
     {
       int idx = 0;
@@ -106,7 +106,7 @@ void Op_Diff_PolyMAC_CDO_Face::dimensionner(Matrice_Morse& mat) const
         }
     }
 
-  //partie vorticites : Ra m2 - m1 / nu
+  //vorticity part: Ra m2 - m1 / nu
   for (int a = 0; a < (dimension < 3 ? domaine.nb_som() : domaine.domaine().nb_aretes()); a++)
     {
       for (int i = ch.radeb(a, 0); i < ch.radeb(a + 1, 0); i++)
@@ -145,7 +145,7 @@ void Op_Diff_PolyMAC_CDO_Face::dimensionner_bloc(Matrice_Morse& mat, const int p
       sp[q].resize(0, 2);
     }
 
-  //partie vitesses : m2 Rf
+  //velocity part: m2 Rf
   for (e = 0; e < domaine.nb_elem_tot(); e++)
     for (i = domaine.m2d(e), idx = 0; i < domaine.m2d(e + 1); i++, idx++)
       for (f = e_f(e, idx), j = domaine.m2i(i); f < domaine.nb_faces() && ch.fcl()(f, 0) < 2 && j < domaine.m2i(i + 1); j++)
@@ -155,7 +155,7 @@ void Op_Diff_PolyMAC_CDO_Face::dimensionner_bloc(Matrice_Morse& mat, const int p
             sp[1].append_line(f, nf_tot + domaine.rfji(k));
           }
 
-  //partie vorticites : Ra m2 - m1 / nu
+  //vorticity part: Ra m2 - m1 / nu
   for (a = 0; a < (dimension < 3 ? domaine.nb_som() : domaine.domaine().nb_aretes()); a++)
     {
       for (i = ch.radeb(a, 0); i < ch.radeb(a + 1, 0); i++)
@@ -243,22 +243,22 @@ inline DoubleTab& Op_Diff_PolyMAC_CDO_Face::ajouter(const DoubleTab& inco, Doubl
       int i, j, k, e, f, fb, a, nf_tot = domaine.nb_faces_tot(), idx;
 
       update_nu();
-      //partie vitesses : m2 Rf
+      //velocity part: m2 Rf
       for (e = 0; e < domaine.nb_elem_tot(); e++)
         for (i = domaine.m2d(e), idx = 0; i < domaine.m2d(e + 1); i++, idx++)
           for (f = e_f(e, idx), j = domaine.m2i(i); f < domaine.nb_faces() && j < domaine.m2i(i + 1); j++)
             for (fb = e_f(e, domaine.m2j(j)), k = domaine.rfdeb(fb); k < domaine.rfdeb(fb + 1); k++)
               resu(f) -= domaine.m2c(j) * ve(e) * (e == f_e(f, 0) ? 1 : -1) * (e == f_e(fb, 0) ? 1 : -1) * pe(e) * domaine.rfci(k) * inco(nf_tot + domaine.rfji(k));
 
-      //partie vorticites : Ra m2 - m1 / nu
+      //vorticity part: Ra m2 - m1 / nu
       if (resu.dimension_tot(0) == nf_tot)
-        return resu; //resu ne contient que la partie "faces"
+        return resu; //resu contains only the "faces" part
       for (a = 0; a < (dimension < 3 ? domaine.nb_som() : domaine.domaine().nb_aretes()); a++)
         {
-          //rotationnel : vitesses internes
+          //curl: internal velocities
           for (i = ch.radeb(a, 0); i < ch.radeb(a + 1, 0); i++)
             resu(nf_tot + a) -= ch.raci(i) * inco(ch.raji(i));
-          //rotationnel : vitesses aux bords
+          //curl: boundary velocities
           for (i = ch.radeb(a, 1); i < ch.radeb(a + 1, 1); i++)
             for (k = 0; k < dimension; k++)
               resu(nf_tot + a) -= ch.racf(i, k) * ref_cast(Dirichlet, cls[ch.fcl()(ch.rajf(i), 1)].valeur()).val_imp(ch.fcl()(ch.rajf(i), 2), k);
@@ -278,7 +278,7 @@ inline DoubleTab& Op_Diff_PolyMAC_CDO_Face::ajouter(const DoubleTab& inco, Doubl
 
   update_nu();
 
-  //partie vitesses : m2 Rf
+  //velocity part: m2 Rf
   for (int e = 0; e < domaine.nb_elem_tot(); e++)
     {
       int idx = 0;
@@ -297,18 +297,18 @@ inline DoubleTab& Op_Diff_PolyMAC_CDO_Face::ajouter(const DoubleTab& inco, Doubl
         }
     }
 
-  //partie vorticites : Ra m2 - m1 / nu
+  //vorticity part: Ra m2 - m1 / nu
   if (resu.dimension_tot(0) == nf_tot)
-    return resu; //resu ne contient que la partie "faces"
+    return resu; //resu contains only the faces part
 
-  /* boucle aretes*/
+  /* loop over edges */
   for (int a = 0; a < (dimension < 3 ? domaine.nb_som() : domaine.domaine().nb_aretes()); a++)
     {
-      //rotationnel : vitesses internes
+      //curl: internal velocities
       for (int i = ch.radeb(a, 0); i < ch.radeb(a + 1, 0); i++)
         resu(nf_tot + a) -= ch.raci(i) * inco(ch.raji(i));
 
-      //rotationnel : vitesses aux bords
+      //curl: boundary velocities
       for (int i = ch.radeb(a, 1); i < ch.radeb(a + 1, 1); i++)
         for (int k = 0; k < dimension; k++)
           resu(nf_tot + a) -= ch.racf(i, k) * ref_cast(Dirichlet, cls[ch.fcl()(ch.rajf(i), 1)].valeur()).val_imp(ch.fcl()(ch.rajf(i), 2), k);
@@ -348,7 +348,7 @@ void Op_Diff_PolyMAC_CDO_Face::contribuer_a_avec(const DoubleTab& inco, Matrice_
 
   update_nu();
 
-  //partie vitesses : m2 Rf
+  //velocity part: m2 Rf
   for (int e = 0; e < domaine.nb_elem_tot(); e++)
     {
       int idx = 0;
@@ -368,10 +368,10 @@ void Op_Diff_PolyMAC_CDO_Face::contribuer_a_avec(const DoubleTab& inco, Matrice_
         }
     }
 
-  //partie vorticites : Ra m2 - m1 / nu
+  //vorticity part: Ra m2 - m1 / nu
   for (int a = 0; a < (dimension < 3 ? domaine.nb_som() : domaine.domaine().nb_aretes()); a++)
     {
-      //rotationnel : vitesses internes
+      //curl: internal velocities
       for (int i = ch.radeb(a, 0); i < ch.radeb(a + 1, 0); i++)
         {
           const int f = ch.raji(i);
@@ -398,7 +398,7 @@ void Op_Diff_PolyMAC_CDO_Face::contribuer_bloc(const DoubleTab& inco, Matrice_Mo
   int i, j, k, e, f, fb, a, nf_tot = domaine.nb_faces_tot(), idx;
 
   update_nu();
-  //partie vitesses : m2 Rf
+  //velocity part: m2 Rf
   for (e = 0; e < domaine.nb_elem_tot(); e++)
     for (i = domaine.m2d(e), idx = 0; i < domaine.m2d(e + 1); i++, idx++)
       for (f = e_f(e, idx), j = domaine.m2i(i); f < domaine.nb_faces() && ch.fcl()(f, 0) < 2 && j < domaine.m2i(i + 1); j++)
@@ -410,10 +410,10 @@ void Op_Diff_PolyMAC_CDO_Face::contribuer_bloc(const DoubleTab& inco, Matrice_Mo
               matrice(f, domaine.rfji(k)) += domaine.m2c(j) * ve(e) * (e == f_e(f, 0) ? 1 : -1) * (e == f_e(fb, 0) ? 1 : -1) * pe(e) * domaine.rfci(k);
           }
 
-  //partie vorticites : Ra m2 - m1 / nu
+  //vorticity part: Ra m2 - m1 / nu
   for (a = 0; a < (dimension < 3 ? domaine.nb_som() : domaine.domaine().nb_aretes()); a++)
     {
-      //rotationnel : vitesses internes
+      //curl: internal velocities
       for (i = ch.radeb(a, 0); i < ch.radeb(a + 1, 0); i++)
         if ((ch.fcl()(f = ch.raji(i), 0) < 2) || ip > -1)
           {

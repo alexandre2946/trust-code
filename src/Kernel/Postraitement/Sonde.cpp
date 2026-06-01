@@ -125,31 +125,31 @@ Implemente_instanciable_sans_constructeur_ni_destructeur(Sonde,"Sonde",Objet_U);
 static int fichier_sondes_cree=0;
 static SFichier fichier_sondes;
 
-/*! @brief Constructeur d'une sonde a partir de son nom.
+/*! @brief Constructor for a probe, given its name.
  *
- * @param (Nom& nom) le nom de la sonde a construire
+ * @param nom the name of the probe to construct
  */
 Sonde::Sonde(const Nom& nom)  :
   nom_(nom),
   dim(-1),
   ncomp(-1),
   numero_elem_(-1),
-  periode(1.e10),   // initialisation de periode par defaut
+  periode(1.e10),   // default period initialization
   nb_bip(0.),
   orientation_faces_(-1)
 {}
 
-/*! @brief Constructeur d'une sonde sans parametre.
+/*! @brief Default constructor for a probe.
  *
  */
 Sonde::Sonde() :
   Sonde(Nom())    // thank you C++11
 {}
 
-/*! @brief Imprime le type de l'objet sur un flot de sortie.
+/*! @brief Prints the type of the object to an output stream.
  *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& s) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Sonde::printOn(Sortie& s ) const
 {
@@ -161,8 +161,8 @@ void Sonde::completer()
   // Recherche du champ sonde
   // Remplissage de la reference au champ
   Cerr << "Reading of the probe: " << nom_ << " on the field: " << nom_champ_lu_ << finl;
-  //On devrait acceder au domaine par le champ generique
-  //Mais reference pas encore faite
+  //We should access the domain through the generic field
+  //But the reference has not been made yet
   Probleme_base& Pb = mon_post->probleme();
   const Motcle nom_domaine = mon_post->domaine()->le_nom();
   Motcle nom_champ_ref;
@@ -214,20 +214,20 @@ void Sonde::completer()
     }
   else
     {
-      //Cas des correlations
+      //Case of correlations
       if ((noms_champs_postraitables.contient_(nom1)) && (noms_champs_postraitables.contient_(nom2)))
         {
           nom_champ_ref = "Correlation_";
           nom_champ_ref += nom1+"_natif_"+nom_domaine+"_"+nom2+"_natif_"+nom_domaine;
         }
       else
-        //Cas d un champ generique general
+        //Case of a general generic field
         nom_champ_ref = nom_champ_lu_;
     }
 
   mon_champ = mon_post->get_champ_post(nom_champ_ref);
 
-  // Remplissage de l'attribut ncomp (il vaut -1 par defaut)
+  // Filling the ncomp attribute (its default value is -1)
 
   const Noms nom_champ = mon_champ->get_property("nom");
   const Noms noms_comp = mon_champ->get_property("composantes");
@@ -235,7 +235,7 @@ void Sonde::completer()
 
   initialiser();
 }
-/*! @brief Lit les specifications d'une sonde a partir d'un flot d'entree.
+/*! @brief Reads the specifications of a probe from an input stream.
  *
  * Format:
  *     Sondes
@@ -245,11 +245,11 @@ void Sonde::completer()
  *        ...
  *      }
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws donnees de la sonde non definies
- * @throws erreur de format, mot clef inconnus
- * @throws donnees de la sonde pas definies correctement
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
+ * @throws probe data not defined
+ * @throws format error, unknown keyword
+ * @throws probe data not correctly defined
  */
 Entree& Sonde::readOn(Entree& is)
 {
@@ -260,7 +260,7 @@ Entree& Sonde::readOn(Entree& is)
   int nbre_points;
 
   is >> motlu;
-  // Lecture d'un mot cle qui n'est pas le champ
+  // Reading a keyword that is not the field
   if (motlu=="nodes")
     {
       nodes = true;
@@ -286,13 +286,13 @@ Entree& Sonde::readOn(Entree& is)
       som = true;
       is >> motlu;
     }
-  // Affectation du nom du champ
+  // Assign the field name
   nom_champ_lu_ = motlu;
 
   validate_position();
   create_champ_generique(is, motlu);
 
-  // Lecture des caracteristiques de la sonde
+  // Reading the probe characteristics
   IntVect fait(2);
 
   Motcles les_motcles(16);
@@ -524,7 +524,7 @@ Entree& Sonde::readOn(Entree& is)
               is >> origine(i);
             if (dimension==3) is >> dir;
             is >> radius >> teta1 >> teta2;
-            // Ajout des informations
+            // Adding information
             for (int i=0; i<dimension; i++)
               {
                 type_+=" ";
@@ -585,7 +585,7 @@ Entree& Sonde::readOn(Entree& is)
             for (int i=0; i<dimension; i++)
               is >> origine(i);
             is >> theta >> radius1 >> radius2;
-            // Ajout des informations
+            // Adding information
             for (int i=0; i<dimension; i++)
               {
                 type_+=" ";
@@ -650,7 +650,7 @@ Entree& Sonde::readOn(Entree& is)
       exit();
     }
 
-  // Construction du fichier associe a la sonde
+  // Build the file name associated with the probe
   nom_fichier_=nom_du_cas();
   nom_fichier_+= "_";
   nom_fichier_+= nom_;
@@ -661,8 +661,8 @@ Entree& Sonde::readOn(Entree& is)
 
   if (Process::je_suis_maitre())
     {
-      // Ajout du nom du fichier sonde dans le fichier listant les sondes
-      // Ce fichier sera utilise par Run_sonde
+      // Adding the probe file name to the file listing probes
+      // This file will be used by Run_sonde
       // SFichier fichier_sondes;
       Nom nom_fich = nom_du_cas();
       nom_fich += ".sons";
@@ -679,8 +679,8 @@ Entree& Sonde::readOn(Entree& is)
   return is;
 }
 
-/** Creation des Champ_Generique_refChamp necessaire pour l initialisation de la REF a Champ_Generique_base
- * Si le champ demande est un Champ_base connu du probleme on cree le Champ_Generique_refChamp correspondant
+/** Creation of Champ_Generique_refChamp objects needed for initializing the REF to Champ_Generique_base.
+ * If the requested field is a Champ_base known to the problem, the corresponding Champ_Generique_refChamp is created.
  */
 void Sonde::create_champ_generique(Entree& is, const Motcle& motlu)
 {
@@ -689,8 +689,8 @@ void Sonde::create_champ_generique(Entree& is, const Motcle& motlu)
   if (noms_champs_postraitables.contient_(nom_champ_lu_))
     {
       Pb.creer_champ(nom_champ_lu_);
-      //On va creer un Champ_Generique_refChamp dont le nom a pour base
-      //le nom du champ auquel on fait reference et non pas une composante de ce champ
+      //We will create a Champ_Generique_refChamp whose name is based on
+      //the name of the field it references, not a component of that field
       OBS_PTR(Champ_base) champ_ref = Pb.get_champ(nom_champ_lu_);
       const Nom& le_nom_champ = champ_ref->le_nom();
       const Motcle nom_domaine = mon_post->domaine()->le_nom();
@@ -716,9 +716,9 @@ void Sonde::create_champ_generique(Entree& is, const Motcle& motlu)
     }
 }
 
-/*! @brief Associer le postraitement a la sonde.
+/*! @brief Associates the post-processing object with the probe.
  *
- * @param (Postraitement& le_post) le postraitement a associer
+ * @param (Postraitement& le_post) the post-processing object to associate
  */
 void Sonde::associer_post(const Postraitement& le_post)
 {
@@ -787,17 +787,16 @@ void Sonde::fix_probe_position_grav()
     ajouter_bords(coords_bords);
 }
 
-/*! @brief Initialise la sonde.
+/*! @brief Initialises the probe.
  *
- * Dimensionne les tableaux, de valeurs, verifie si les points specifies sont
- *     bien dans le domaine de calcul.
+ * Sizes the value arrays, and checks that the specified points lie within the computation domain.
  *
- * @param (Domaine& domaine_geom) le domaine de calcul qui sera sondee
- * @throws point de sondage en dehors du domaine de calcul
+ * @param domaine_geom the computation domain to be probed
+ * @throws probe point outside the computation domain
  */
 void Sonde::initialiser()
 {
-  // Calcul des positions exactes a partir des positions initiales des sondes:
+  // Compute exact positions from the initial probe positions:
   les_positions_sondes_ = les_positions_sondes_initiales_;
   // Dimension the elem_ array:
   int nbre_points_tot = les_positions_sondes_.dimension(0);
@@ -894,7 +893,7 @@ void Sonde::initialiser()
               for(int fac=0; fac<nfaces_par_element; fac++)
                 {
                   int face=elem_faces(elem_[i],fac);
-                  // Sonde de type segmentfaces : on recherche seulement parmi les faces orientees selon
+                  // segmentfaces probe type: search only among faces oriented along
                   // orientation_faces_
                   if (face >= 0 &&
                       (orientation_faces_ == -1 || domaineVF.orientation_si_definie(face)==orientation_faces_))
@@ -970,8 +969,8 @@ void Sonde::initialiser()
   // Should be done before supprime_doublons, because it may create duplicated values.
   fix_probe_position();
 
-  bool supprime_doublons = true; // Nouveaute 1.8.4 (unicite des points de sondes)
-  if (mon_post->DeprecatedKeepDuplicatedProbes) supprime_doublons = false; // option a garder car besoin pour P-E de garder les sondes dupliquees en 1.9.3
+  bool supprime_doublons = true; // New in 1.8.4 (uniqueness of probe points)
+  if (mon_post->DeprecatedKeepDuplicatedProbes) supprime_doublons = false; // option to keep as P-E needs to preserve duplicated probes in 1.9.3
   ArrOfInt doublon(elem_.size_array());
   if (supprime_doublons)
     {
@@ -1003,15 +1002,15 @@ void Sonde::initialiser()
         Cerr << "We remove " << doublons << " duplicated points from the probe " << nom_ << finl;
     }
 
-  // chaque processeur a regarde s'il avait le point
-  // le maitre construit un tableau (prop) determinant qui va donner la valeur au maitre
-  // Le maitre construit aussi le ArrsOfInt participant
-  // lui donnant pour un proc les differents elements de celui-ci
+  // each processor has checked if it holds the point
+  // the master builds a table (prop) that determines which processor will provide the value to the master
+  // the master also builds the ArrsOfInt participant
+  // giving for a proc the various elements it owns
   IntVect prop(elem_);
   if (je_suis_maitre())
     {
       ArrOfInt elems2(elem_);
-      prop=0; // Par defaut c'est le maitre le proprio (en particulier pour les sondes en dehors)
+      prop=0; // By default the master is the owner (especially for probes outside the domain)
       ArrOfInt elem_recu, doublon_recu;
       DoubleTab positions_recu;
       int nbproc=Process::nproc();
@@ -1030,8 +1029,8 @@ void Sonde::initialiser()
                   les_positions_sondes_(el,j)=positions_recu(el,j);
               }
         }
-      // OK On a rempli le tableau prop;
-      // le maitre dimensionne participant;
+      // OK the prop table has been filled;
+      // the master sizes participant;
       participant.dimensionner(nbproc);
       for(int p=0; p<nbproc; p++)
         {
@@ -1063,7 +1062,7 @@ void Sonde::initialiser()
     }
   envoyer_broadcast(prop, 0);
   //
-  // on redimensionne les tableaux a la taille locale a partir de prop et en supprimant les doublons
+  // resize arrays to local size from prop, removing duplicates
   int nbre_points=0;
   nbre_points_tot=0;
   les_positions_=les_positions_sondes_;
@@ -1090,11 +1089,11 @@ void Sonde::initialiser()
 #endif
   elem_.resize(nbre_points);
   les_positions_.resize(nbre_points, dimension);
-  if (je_suis_maitre()) // Tableau uniquement sur le maitre:
+  if (je_suis_maitre()) // Array only on the master:
     les_positions_sondes_.resize(nbre_points_tot, dimension);
   else
     les_positions_sondes_.resize(0,0);
-  // Dimensionnement de valeurs_sur_maitre
+  // Sizing valeurs_sur_maitre
   if (je_suis_maitre()&&(nproc()>1))
     {
       if (ncomp == -1)
@@ -1105,7 +1104,7 @@ void Sonde::initialiser()
       else
         valeurs_sur_maitre.resize(nbre_points_tot, 1);
     }
-  // Dimensionnement de valeurs_locales
+  // Sizing valeurs_locales
   if (ncomp == -1)
     {
       int nb_comp = get_nb_compo_champ();
@@ -1116,7 +1115,7 @@ void Sonde::initialiser()
 }
 
 
-/*! @brief Ouvre le fichier associe a la sonde.
+/*! @brief Opens the file associated with the probe.
  *
  * (*.son)
  *
@@ -1129,20 +1128,20 @@ void Sonde::ouvrir_fichier()
       int reprise = !stat(nom_fichier_, &f) && mon_post->probleme().reprise_effectuee();
       if (reprise)
         {
-          // Reprise d'un calcul, on ecrit a la suite:
+          // Restarting a computation, appending to file:
           le_fichier_.ouvrir(nom_fichier_, ios::app);
           le_fichier_.setf(ios::scientific);
           le_fichier_.precision(8);
         }
       else
         {
-          // Demarrage calcul ou fichier inexistant:
+          // Starting computation or file does not exist:
           le_fichier_.ouvrir(nom_fichier_);
           le_fichier_.setf(ios::scientific);
           le_fichier_.precision(8);
-          // Ecriture en tete:
+          // Write header:
           SFichier& s = le_fichier_;
-          // Ecriture de l'en tete des fichiers sondes :
+          // Write the header of the probe files:
           if (dim == 0 || dim == 1)
             {
               const DoubleTab& p = les_positions_sondes();
@@ -1164,7 +1163,7 @@ void Sonde::ouvrir_fichier()
                 s << "# Champ " << nom_champ_lu_ << " [??]" << finl;
               s << "# Type " << get_type() << finl;
             }
-          // Ecriture de l'en tete des fichiers plan :
+          // Write the header of the plan files:
           else
             {
               s << "TRUST   Version1  01/09/96" << finl;
@@ -1292,16 +1291,16 @@ void Sonde::ouvrir_fichier()
 
 void Sonde::update_source(double un_temps)
 {
-  // Mecanisme de cache du champ Source derriere le champ postraite (mon_champ)
-  // Implemente au niveau de Sondes
+  // Cache mechanism for the source field behind the post-processed field (mon_champ)
+  // Implemented at the Sondes level
   OBS_PTR(Champ_base) ma_source = mon_post->les_sondes().get_from_cache(mon_champ, nom_champ_lu_);
   ma_source->mettre_a_jour(un_temps);
 }
 
-/*! @brief Effectue une mise a jour en temps de la sonde effectue le postraitement.
+/*! @brief Updates the probe in time and performs the post-processing.
  *
- * @param (double un_temps) le temps de mise a jour
- * @param (double tinit) le temps initial de la sonde
+ * @param un_temps the update time
+ * @param tinit the initial time of the probe
  */
 void Sonde::mettre_a_jour(double un_temps, double tinit)
 {
@@ -1309,15 +1308,15 @@ void Sonde::mettre_a_jour(double un_temps, double tinit)
   double dt=mon_post->probleme().schema_temps().pas_de_temps();
   double nb;
 
-  // Le *(1+Objet_U::precision_geom) est pour eviter des erreurs d'arrondi selon les machines
-  // 21/01/25 : remplacement de Objet_U::precision_geom par 1e-15 (issue des patch M3D) suite bttrust #242895
-  // car precision_geom est un parametre que l'utilisateur peut changer via jdd
+  // The *(1+Objet_U::precision_geom) factor avoids rounding errors depending on the machine
+  // 21/01/25: replaced Objet_U::precision_geom with 1e-15 (from M3D patch, bttrust #242895)
+  // because precision_geom is a user-settable parameter via the data file
   if (periode<=dt)
     nb=nb_bip+1.;
   else
     modf(temps_courant*(1+1e-15)/periode, &nb);
 
-  // On doit ecrire les sondes
+  // Time to write the probes
   if (nb>nb_bip)
     {
       update_source(un_temps);
@@ -1336,8 +1335,8 @@ void Sonde::mettre_a_jour(double un_temps, double tinit)
 
 void Sonde::fill_local_values()
 {
-  // Mecanisme de cache du champ Source derriere le champ postraite (mon_champ)
-  // Implemente au niveau de Sondes
+  // Cache mechanism for the source field behind the post-processed field (mon_champ)
+  // Implemented at the Sondes level
   OBS_PTR(Champ_base) ma_source = mon_post->les_sondes().get_from_cache(mon_champ, nom_champ_lu_);
   if (chsom)
     {
@@ -1356,10 +1355,9 @@ void Sonde::fill_local_values()
     }
 }
 
-/*! @brief Effectue un postraitement.
+/*! @brief Performs post-processing.
  *
- * Calcul les valeurs du champ aux position demandees
- *     et les imprime sur le fichier associe.
+ * Computes field values at the requested positions and writes them to the associated file.
  *
  */
 void Sonde::postraiter()
@@ -1370,7 +1368,7 @@ void Sonde::postraiter()
     mettre_a_jour_bords();
   const int N = valeurs_locales.line_size();
 
-  // le maitre reconstruit le tableau valeurs a partir des differents contributeurs
+  // the master reconstructs the values array from the various contributors
   if(je_suis_maitre())
     {
       ouvrir_fichier();
@@ -1414,9 +1412,9 @@ void Sonde::postraiter()
               fichier() << " " << valeurs(i,k);
           fichier() << finl;
         }
-      // Pour les sondes type plan, impression au format lml :
+      // For plan-type probes, output in lml format:
       // num_sommet comp1 [comp2] [comp3]
-      // et dans la troisieme direction :
+      // and in the third direction:
       else if (dim==2 || dim==3)
         {
           Nom nom_post;
@@ -1455,7 +1453,7 @@ void Sonde::postraiter()
               // Pour ne pas flusher :
               fichier() << "\n";
             }
-          // Pour le 2D, on rajoute une direction
+          // For 2D, add an extra direction
           if (dim==2)
             {
               for(i=0; i<nbre_points; i++)
@@ -1472,7 +1470,7 @@ void Sonde::postraiter()
     }
   else
     {
-      // le processeur envoye un message que si il participe
+      // the processor sends a message only if it contributes
       if (valeurs_locales.dimension(0)!=0)
         envoyer(valeurs_locales,Process::me(),0,2002+Process::me());
     }

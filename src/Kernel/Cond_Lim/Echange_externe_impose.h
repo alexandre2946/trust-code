@@ -18,27 +18,27 @@
 
 #include <Echange_impose_base.h>
 
-/*! @brief Classe Echange_externe_impose: Cette classe represente le cas particulier de la classe
+/*! @brief Classe Echange_externe_impose: This class represents the special case of the class
  *
- *     Echange_impose_base ou l'echange de chaleur total est calcule grace
- *     au coefficient d'echange de chaleur a la paroi fourni par l'utilisateur.
+ *     Echange_impose_base where the total heat exchange coefficient is computed using
+ *     the wall heat exchange coefficient provided by the user.
  *
- *      h_total  : coefficient d'echange total
- *      h_imp    : coefficient d'echange a la paroi (donnee utilisateur)
- *      e/lambda : coefficient d'echange interne
- *                 avec : lambda, conductivite dans le fluide
- *                        e = d,  en laminaire
- *                        e = d',  en turbulent
- *      (ou d' est la distance equivalente calculee lors de l'application
- *        des lois de paroi)
+ *      h_total  : total exchange coefficient
+ *      h_imp    : wall exchange coefficient (user input)
+ *      e/lambda : internal exchange coefficient
+ *                 where: lambda, conductivity in the fluid
+ *                        e = d,  in laminar regime
+ *                        e = d',  in turbulent regime
+ *      (where d' is the equivalent distance computed during application
+ *        of the wall laws)
  *           1/h_total = (1/h_imp) + (e/lambda)
- *     Ce n'est pas la classe Echange_externe_impose qui gere le calcul
- *     de h_total. La classe fournit seulement h_imp et c'est l'evaluateur
- *     de flux diffusif qui calcule les termes e/lambda et h_total.
- *     Les classes Echange_global_impose et Echange_externe_impose ont
- *     exactement la meme interface; la classe Echange_externe_impose
- *     sert donc seulement a signaler a l'evaluateur de flux diffusif
- *     qu'il doit calculer un coefficient d'echange total.
+ *     It is not the Echange_externe_impose class that manages the computation
+ *     of h_total. The class only provides h_imp and it is the diffusive
+ *     flux evaluator that computes the e/lambda and h_total terms.
+ *     The classes Echange_global_impose and Echange_externe_impose have
+ *     exactly the same interface; the Echange_externe_impose class
+ *     therefore only serves to signal to the diffusive flux evaluator
+ *     that it must compute a total exchange coefficient.
  *
  * @sa Echange_impose_base Echange_global_impose
  */

@@ -41,7 +41,7 @@ Sous_Domaine& Sous_domaine_dis_base::sous_domaine()
   return le_sous_domaine.valeur();
 }
 
-/*! @brief Associe un Sous_Domaine a l'objet.
+/*! @brief Associates a Sub_Domain with the object.
  *
  */
 void Sous_domaine_dis_base::associer_sous_domaine(const Sous_Domaine& un_sous_domaine)
@@ -49,7 +49,7 @@ void Sous_domaine_dis_base::associer_sous_domaine(const Sous_Domaine& un_sous_do
   le_sous_domaine=un_sous_domaine;
 }
 
-/*! @brief Associe un Domaine_dis a l'objet.
+/*! @brief Associates a Domaine_dis with the object.
  *
  */
 void Sous_domaine_dis_base::associer_domaine_dis(const Domaine_dis_base& un_domaine_dis)

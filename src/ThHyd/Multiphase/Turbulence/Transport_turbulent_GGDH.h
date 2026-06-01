@@ -18,10 +18,9 @@
 #include <TRUSTTab.h>
 #include <Transport_turbulent_base.h>
 
-/*! @brief classe Transport_turbulent_GGDH Transport turbulent de type GGDH:
+/*! @brief Generalized Gradient Diffusion Hypothesis (GGDH) turbulent transport model:
  *
  *     < u'_i theta'> = - C_s * k / epsilon * <u'_i u'_j> * d_j theta
- *
  *
  */
 class Transport_turbulent_GGDH : public Transport_turbulent_base
@@ -34,7 +33,7 @@ public:
   }
   virtual int gradu_required() const override
   {
-    return 1; /* on a besoin de grad u */
+    return 1; /* grad u is required */
   };
   virtual void modifier_mu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const override;
 private:

@@ -18,7 +18,7 @@
 #include <Sous_Domaine.h>
 #include <Domaine_VF.h>
 
-/*! @brief renvoit le tableau res, res=org si flag=0, res= porosite*org sinon attention ne pas modifier res car sinon on ne sait pas ce que l'on fait sur org (d'ou le renvoi const)
+/*! @brief Returns the array res, res=org if flag=0, res= porosity*org otherwise. Warning: do not modify res because otherwise we don't know what we're doing to org (hence the const return)
  *
  */
 const DoubleTab& modif_par_porosite_si_flag(const DoubleTab& org, DoubleTab& res, int flag, const DoubleVect& porosite)
@@ -86,9 +86,9 @@ Entree& Porosites::readOn(Entree& is)
     }
   for (is >> mot; mot != "}"; is >> mot)
     {
-      // 1er truc a lire : nom sous-domaine
+      // 1st thing to read: sub-domain name
       les_sous_domaines.push_back(mot);
-      // 2eme truc a lire : accolade
+      // 2nd thing to read: opening brace
       is >> mot;
       if (mot != "{")
         {
@@ -116,7 +116,7 @@ Entree& Porosites::readOn(Entree& is)
     }
   assert(les_sous_domaines.size() == porosites_volu.size() && les_sous_domaines.size() == porosites_surf.size());
 
-  // quelques tests !
+  // some tests!
   for (const auto &sz : les_sous_domaines)
     if (!sub_type(Sous_Domaine, Interprete::objet(sz)))
       {

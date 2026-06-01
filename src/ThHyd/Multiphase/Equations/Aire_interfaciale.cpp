@@ -68,7 +68,7 @@ Entree& Aire_interfaciale::readOn(Entree& is)
 
   if (!pbm || pbm->nb_phases() == 1) Process::exit(que_suis_je() + " : not needed for single-phase flow!");
 
-  for (int n = 0; n < pbm->nb_phases(); n++)  //recherche de n_l, n_g : phase {liquide,gaz}_continu en priorite
+  for (int n = 0; n < pbm->nb_phases(); n++)  // search for n_l, n_g: {liquid,gas}_continuous phase in priority
     {
       if (pbm->nom_phase(n).debute_par("liquide") && (n_l < 0 || pbm->nom_phase(n).finit_par("continu")))  n_l = n;
       if (( pbm->nom_phase(n).finit_par("group1")))  n_g1 = n;
@@ -126,14 +126,14 @@ void Aire_interfaciale::discretiser()
   int N = ref_cast(Pb_Multiphase, probleme()).nb_phases();
 
   Cerr << "Interfacial area discretization" << finl;
-  //On utilise temperature pour la directive car discretisation identique
-  dis.discretiser_champ("temperature",domaine_dis(),"interfacial_area","m-1", N,nb_valeurs_temp,temps,l_inco_ch_);//une aire interfaciale par phase
+  // Use "temperature" directive as the discretization is identical
+  dis.discretiser_champ("temperature",domaine_dis(),"interfacial_area","m-1", N,nb_valeurs_temp,temps,l_inco_ch_);//one interfacial area per phase
   l_inco_ch_->fixer_nature_du_champ(multi_scalaire);
   l_inco_ch_->fixer_nom_compo(0, Nom("tau"));
   champs_compris_.ajoute_champ(l_inco_ch_);
 
   Cerr << "Bubble diameter discretization" << finl;
-  //On utilise temperature pour la directive car discretisation identique
+  // Use "temperature" directive as the discretization is identical
   Noms noms(N), unites(N);
   noms[0] = "diametre_bulles";
   unites[0] = "m";
@@ -200,7 +200,7 @@ const Operateur& Aire_interfaciale::operateur(int i) const
       Cerr << "and you are trying to access the " << i <<" th one."<< finl;
       exit();
     }
-  // Pour les compilos!!
+  // For the compilers!!
   return terme_diffusif;
 }
 
@@ -231,7 +231,7 @@ Operateur& Aire_interfaciale::operateur(int i)
       Cerr << "and you are trying to access the " << i <<" th one."<< finl;
       exit();
     }
-  // Pour les compilos!!
+  // For the compilers!!
   return terme_diffusif;
 }
 

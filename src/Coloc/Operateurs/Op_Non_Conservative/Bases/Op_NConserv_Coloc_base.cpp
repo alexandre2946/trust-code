@@ -37,7 +37,7 @@ void Op_NConserv_Coloc_base::completer()
       Process::exit();
     }
 
-  // Seulement operateur negligeable si mono-phasique
+  // Only negligible operator if single-phase
   if (!sub_type(Op_NConserv_negligeable, *this))
     {
       const Milieu_composite_Euler& mil = ref_cast(Milieu_composite_Euler, equation().probleme().milieu());

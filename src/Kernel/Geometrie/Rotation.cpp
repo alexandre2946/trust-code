@@ -26,20 +26,20 @@ Implemente_instanciable(Rotation,"Rotation",Transformer);
 // XD attr angle floattant angle REQ angle of rotation (in degrees)
 
 
-/*! @brief Simple appel a: Transformer::printOn(Sortie&)
+/*! @brief Simple call to: Transformer::printOn(Sortie&)
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Rotation::printOn(Sortie& os) const
 {
   return Transformer::printOn(os);
 }
 
-/*! @brief Simple appel a: Transformer::ReadOn(Sortie&)
+/*! @brief Simple call to: Transformer::ReadOn(Sortie&)
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
  */
 Entree& Rotation::readOn(Entree& is)
 {

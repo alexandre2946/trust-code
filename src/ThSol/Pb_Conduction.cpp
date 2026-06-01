@@ -20,10 +20,10 @@ Implemente_instanciable(Pb_Conduction,"Pb_Conduction",Probleme_base);
 // XD attr solide solide solide OPT The medium associated with the problem.
 // XD attr Conduction Conduction Conduction OPT Heat equation.
 
-/*! @brief NE FAIT RIEN
+/*! @brief Does nothing.
  *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie
+ * @param s An output stream.
+ * @return The output stream.
  */
 Sortie& Pb_Conduction::printOn(Sortie& s ) const
 {
@@ -31,10 +31,10 @@ Sortie& Pb_Conduction::printOn(Sortie& s ) const
 }
 
 
-/*! @brief Simple appel a: Probleme_base::readOn(Entree&)
+/*! @brief Simple call to Probleme_base::readOn(Entree&).
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param is An input stream.
+ * @return The modified input stream.
  */
 Entree& Pb_Conduction::readOn(Entree& is )
 {
@@ -42,25 +42,23 @@ Entree& Pb_Conduction::readOn(Entree& is )
 }
 
 
-/*! @brief Renvoie le nombre d'equations du probleme.
+/*! @brief Returns the number of equations in the problem.
  *
- * Toujours egal a 1 pour un probleme de conduction standart.
+ * Always equal to 1 for a standard conduction problem.
  *
- * @return (int) le nombre d'equations du probleme
+ * @return Number of equations in the problem.
  */
 int Pb_Conduction::nombre_d_equations() const
 {
   return 1;
 }
 
-/*! @brief Renvoie l'equation de type Conduction si i = 0,
+/*! @brief Returns the Conduction equation when i = 0 (const version).
  *
- *     Provoque une erreur sinon car le probleme
- *     n'a qu'une seule equation.
- *     (version const)
+ * Triggers an error otherwise because the problem has only one equation.
  *
- * @param (int i) l'index de l'equation a renvoyer
- * @return (Equation_base&) l'equation de type Conduction
+ * @param i Index of the equation to return.
+ * @return The Conduction equation.
  */
 const Equation_base& Pb_Conduction::equation(int i) const
 {
@@ -68,13 +66,12 @@ const Equation_base& Pb_Conduction::equation(int i) const
   return eq_conduction;
 }
 
-/*! @brief Renvoie l'equation de type Conduction si i = 0,
+/*! @brief Returns the Conduction equation when i = 0.
  *
- *     Provoque une erreur sinon car le probleme
- *     n'a qu'une seule equation.
+ * Triggers an error otherwise because the problem has only one equation.
  *
- * @param (int i) l'index de l'equation a renvoyer
- * @return (Equation_base&) l'equation de type Conduction
+ * @param i Index of the equation to return.
+ * @return The Conduction equation.
  */
 Equation_base& Pb_Conduction::equation(int i)
 {

@@ -103,15 +103,15 @@ void Op_Conv_Coloc_Elem_base::Riemann_solver(DoubleTab& num_flux) const
         assert (f_e(f, 1) < 0 && f_e(f, 0) >= 0 && vit_n(f, 0) != -123.123);
         const int e = f_e(f, 0);
 
-        //tableaux utilitaires sur les CLs : fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
-        //types de CL : 0 -> pas de CL
-        //              1 -> Echange_externe_impose
-        //              2 -> Echange_global_impose
-        //              3 -> Echange_contact_Coloc
-        //              4 -> Neumann_paroi
-        //              5 -> Neumann_val_ext ou Neumann_homogene ou Symetrie
-        //              6 -> Dirichlet
-        //              7 -> Dirichlet_homogene
+        //utility arrays for boundary conditions: fcl(f, .) = (BC type, BC index, index within BC)
+        //BC types: 0 -> no BC
+        //          1 -> Echange_externe_impose
+        //          2 -> Echange_global_impose
+        //          3 -> Echange_contact_Coloc
+        //          4 -> Neumann_paroi
+        //          5 -> Neumann_val_ext or Neumann_homogene or Symetrie
+        //          6 -> Dirichlet
+        //          7 -> Dirichlet_homogene
 
         std::array<double, 3> normal { 0., 0., 0. };
         for (int d = 0; d < Objet_U::dimension; d++)

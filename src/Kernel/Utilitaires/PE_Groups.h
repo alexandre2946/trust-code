@@ -21,14 +21,12 @@
 #include <TRUST_Deriv.h>
 #include <Comm_Group.h>
 
-/*! @brief : Cette classe regroupe des fonctions permettant la creation, la
+/*! @brief This class groups functions for creating, destroying and changing the active processor group.
  *
- *   destruction et le changement du groupe de processeurs actif.
- *   La creation du groupe principal doit etre dans le MAIN.cpp
- *   et il faut initialiser PE_Groups en lui donnant le groupe principal.
- *   Les autres groupes crees seront du meme type.
+ *   The creation of the main group must be done in MAIN.cpp and PE_Groups must be initialized by providing
+ *   it with the main group. Other groups created will be of the same type.
  *
- *   @sa la class Comm_Group
+ *   @sa Comm_Group
  *
  */
 class PE_Groups
@@ -59,8 +57,9 @@ private:
   static const Comm_Group *current_group_;
 };
 
-/*! @brief renvoie une reference au groupe de processeurs actif courant
+/*! @brief Returns a reference to the current active processor group.
  *
+ * @return Reference to the current Comm_Group.
  */
 inline const Comm_Group& PE_Groups::current_group()
 {

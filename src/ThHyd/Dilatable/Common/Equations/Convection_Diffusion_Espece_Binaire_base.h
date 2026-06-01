@@ -18,9 +18,7 @@
 
 #include <Convection_Diffusion_Espece_Fluide_Dilatable_base.h>
 
-/*! @brief classe Convection_Diffusion_Espece_Binaire_base Cas particulier de Convection_Diffusion_Espece_Fluide_Dilatable_base
- *
- *      pour un fluide dilatable iso-therme et iso-bar
+/*! @brief @brief Particular case of Convection_Diffusion_Espece_Fluide_Dilatable_base for an isothermal and isobaric dilatable fluid.
  *
  * @sa Convection_Diffusion_Espece_Fluide_Dilatable_base
  */

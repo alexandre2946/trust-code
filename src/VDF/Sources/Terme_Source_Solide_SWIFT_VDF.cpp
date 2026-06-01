@@ -84,7 +84,7 @@ Entree& Terme_Source_Solide_SWIFT_VDF::readOn(Entree& is )
     }
 
 
-  // On recupere les equations de conduction des deux domaines (SWIFT et grossier)
+  // Retrieve the conduction equations from both domains (SWIFT and coarse)
   int flag=0;
   for(i=0; i<pb_swift->nombre_d_equations(); i++)
     {
@@ -120,8 +120,8 @@ Entree& Terme_Source_Solide_SWIFT_VDF::readOn(Entree& is )
   init_calcul_moyenne(eq_swift.valeur(),Y_swift,corresp_swift,compt_swift);
   init_calcul_moyenne(eq_corse.valeur(),Y_corse,corresp_corse,compt_corse);
 
-  // Calcul du tableau de correspondance entre un element de Tmoy_swift et l'element de Tmoy_corse correspondant
-  // pour calculer le terme de forcage.
+  // Compute the correspondence table between an element of Tmoy_swift and the corresponding element of Tmoy_corse
+  // to compute the forcing term.
   correspondance_SWIFT_coarse();
 
   return is;
@@ -248,7 +248,7 @@ void Terme_Source_Solide_SWIFT_VDF::ajouter_blocs(matrices_t matrices, DoubleTab
   DoubleVect Tmoy_swift;        // Profils de temperature moyenne.
   DoubleVect Tmoy_corse;
 
-  // On calcule les profils de temperature moyenne dans les deux solides.
+  // Compute the mean temperature profiles in both solids.
   calcul_moyenne(eq_swift.valeur(), Tmoy_swift, corresp_swift, compt_swift);
   calcul_moyenne(eq_corse.valeur(), Tmoy_corse, corresp_corse, compt_corse);
 

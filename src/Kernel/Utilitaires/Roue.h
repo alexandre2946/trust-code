@@ -19,12 +19,12 @@
 #include <TRUSTTabs_forward.h>
 class Roue;
 
-/*! @brief Pointeur sur une roue.
+/*! @brief Pointer to a wheel.
  *
- * La roue est creee dans le constructeur, detruite dans le destructeur.
- *      Elle est recopiee dans le constructeur par recopie
- *      et dans l'operateur d'affectation d'un Roue_ptr a un autre.
- *      Dans tous les autres cas seuls les pointeurs sont manipules.
+ * The wheel is created in the constructor, destroyed in the destructor.
+ *      It is copied in the copy constructor
+ *      and in the assignment operator from one Roue_ptr to another.
+ *      In all other cases only the pointers are manipulated.
  *
  * @sa Champ_Inc
  */
@@ -73,10 +73,10 @@ struct Roue_ptr
 };
 
 
-/*! @brief Classe Roue utilisee dans Champ_Inc_Base.
+/*! @brief Roue class used in Champ_Inc_Base.
  *
- * Permet de gerer le nombre de valeurs du temps pour lesquels le champ
- *      doit rester en memoire.
+ * Manages the number of time values for which the field
+ *      must remain in memory.
  *
  * @sa Champ_Inc
  */
@@ -142,9 +142,9 @@ inline Roue* Roue_ptr::operator ->()
   return ptr;
 }
 
-/*! @brief Retourne le tableau des valeurs de la Roue
+/*! @brief Returns the value array of the Roue.
  *
- * @return (const DoubleTab&) reference constante sur le tableau des valeurs
+ * @return (const DoubleTab&) const reference to the value array
  */
 inline const DoubleTab& Roue::valeurs() const
 {
@@ -152,9 +152,9 @@ inline const DoubleTab& Roue::valeurs() const
 }
 
 
-/*! @brief Retourne le tableau des valeurs de la Roue
+/*! @brief Returns the value array of the Roue.
  *
- * @return (const DoubleTab&) reference sur le tableau des valeurs
+ * @return (const DoubleTab&) reference to the value array
  */
 inline DoubleTab& Roue::valeurs()
 {
@@ -162,9 +162,9 @@ inline DoubleTab& Roue::valeurs()
 }
 
 
-/*! @brief Retoune la valeur du temps de la Roue
+/*! @brief Returns the time value of the Roue.
  *
- * @return (double) le temps
+ * @return (double) the time
  */
 inline double Roue::temps() const
 {
@@ -172,18 +172,18 @@ inline double Roue::temps() const
 }
 
 
-/*! @brief Change le temps de la Roue
+/*! @brief Changes the time of the Roue.
  *
- * @param (const double& t) le nouveau temps
- * @return (double) le nouveau temps
+ * @param t the new time value
+ * @return (double) the new time value
  */
 inline double Roue::changer_temps(const double t)
 {
   return temps_=t;
 }
-/*! @brief Retourne le nombre de cases de la Roue
+/*! @brief Returns the number of slots in the Roue.
  *
- * @return (int) le nombre de cases de la Roue
+ * @return (int) the number of slots in the Roue
  */
 inline int Roue::nb_cases() const
 {

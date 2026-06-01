@@ -13,14 +13,14 @@
 *
 *****************************************************************************/
 
-// fichier genere en cas d'atelier par cree_info_atelier.sh
+// file generated for an atelier case by cree_info_atelier.sh
 #include <info_atelier.h>
 int info_atelier(Sortie& s)
 {
 
   return 0;
 }
-/*! @brief permet de stocker l'atelier et de le reecrire
+/*! @brief Stores the atelier state and rewrites it.
  *
  */
 void restore_atelier(Sortie& s)

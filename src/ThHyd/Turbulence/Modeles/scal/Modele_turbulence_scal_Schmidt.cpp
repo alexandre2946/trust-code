@@ -40,10 +40,10 @@ void Modele_turbulence_scal_Schmidt::set_param(Param& param) const
   Modele_turbulence_scal_base::set_param(param);
 }
 
-/*! @brief Renvoie 1 si le mot cle passe en parametre est un nom de champ de l'objet
+/*! @brief Returns 1 if the keyword passed as parameter is a field name of the object.
  *
- * @param (Motcle& mot) le mot cle a comparer aux noms de champs connus
- * @return (int) 0 si le mot n'est pas un nom de champ 1 sinon
+ * @param mot The keyword to compare against known field names.
+ * @return 0 if the keyword is not a field name, 1 otherwise.
  */
 int Modele_turbulence_scal_Schmidt::comprend_champ(const Motcle& mot) const
 {
@@ -53,13 +53,11 @@ int Modele_turbulence_scal_Schmidt::comprend_champ(const Motcle& mot) const
     return 0;
 }
 
-/*! @brief Renvoie 1 si un champ fonction (Champ_Fonc) du nom specifie est porte par le modele de turbulence.
+/*! @brief Returns 1 if a functional field (Champ_Fonc) with the specified name is owned by the turbulence model, 0 otherwise.
  *
- *     Renvoie 0 sinon.
- *
- * @param (Motcle& mot) le nom d'un champ fonction du modele de turbulence
- * @param (OBS_PTR(Champ_base)& ch_ref) la reference sur le champ recherche (si il a ete trouve)
- * @return (int) 1 si un champ fonction du nom specifie a ete trouve 0 sinon
+ * @param mot Name of a functional field of the turbulence model.
+ * @param ch_ref Reference to the found field (if found).
+ * @return 1 if a functional field with the given name was found, 0 otherwise.
  */
 int Modele_turbulence_scal_Schmidt::a_pour_Champ_Fonc(const Motcle& mot,
                                                       OBS_PTR(Champ_base) &ch_ref) const
@@ -72,9 +70,9 @@ int Modele_turbulence_scal_Schmidt::a_pour_Champ_Fonc(const Motcle& mot,
   return 0;
 }
 
-/*! @brief Calcule le coefficient turbulent utilise dans l equation et la loi de paroi.
+/*! @brief Computes the turbulent coefficient used in the equation and the wall law.
  *
- * @param (double)
+ * @param Unused time parameter.
  */
 void Modele_turbulence_scal_Schmidt::mettre_a_jour(double)
 {
@@ -91,13 +89,12 @@ void Modele_turbulence_scal_Schmidt::mettre_a_jour(double)
   diffusivite_turbulente_->valeurs().echange_espace_virtuel();
 }
 
-/*! @brief Calcule la diffusion turbulente.
+/*! @brief Computes the turbulent diffusion.
  *
- * diffusion_turbulente = viscosite_turbulente / Sc_turbulent
+ * turbulent_diffusion = turbulent_viscosity / turbulent_Schmidt_number
  *
- * @return (Champ_Fonc_base&) la diffusion turbulente nouvellement calculee
- * @throws les champs diffusivite_turbulente et viscosite_turbulente
- * doivent avoir le meme nombre de valeurs nodales
+ * @return The newly computed turbulent diffusion field.
+ * @throws If diffusivite_turbulente and viscosite_turbulente fields do not have the same number of nodal values.
  */
 Champ_Fonc_base& Modele_turbulence_scal_Schmidt::calculer_diffusion_turbulente()
 {

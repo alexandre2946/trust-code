@@ -21,7 +21,7 @@
 
 class Fluide_Dilatable_base;
 
-/*! @brief classe Temperature_imposee_paroi_H Impose la temperature de la paroi dans une equation de type Convection_Diffusion_Enthalpie
+/*! @brief @brief Imposes the wall temperature in a Convection_Diffusion_Enthalpie-type equation.
  *
  * @sa Dirichlet Convection_Diffusion_Enthalpie_QC
  */

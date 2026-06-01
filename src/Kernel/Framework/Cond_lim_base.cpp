@@ -25,7 +25,7 @@ Sortie& Cond_lim_base::printOn(Sortie& s) const { return s << le_champ_front; }
 
 Entree& Cond_lim_base::readOn(Entree& s) { return s >> le_champ_front; }
 
-/*! @brief NE FAIT RIEN A surcharger dans les classes derivees
+/*! @brief DOES NOTHING must be overridden in derived classes
  *
  */
 void Cond_lim_base::completer()
@@ -49,7 +49,7 @@ int Cond_lim_base::compatible_avec_eqn(const Equation_base& eqn) const
   return 0;
 }
 
-/*! @brief Change le i-eme temps futur de la CL.
+/*! @brief Changes the i-th future time of the BC.
  *
  */
 void Cond_lim_base::changer_temps_futur(double temps, int i)
@@ -57,7 +57,7 @@ void Cond_lim_base::changer_temps_futur(double temps, int i)
   champ_front().changer_temps_futur(temps, i);
 }
 
-/*! @brief Tourne la roue de la CL
+/*! @brief Rotates the wheel of the BC
  *
  */
 int Cond_lim_base::avancer(double temps)
@@ -65,7 +65,7 @@ int Cond_lim_base::avancer(double temps)
   return champ_front().avancer(temps);
 }
 
-/*! @brief Tourne la roue de la CL
+/*! @brief Rotates the wheel of the BC
  *
  */
 int Cond_lim_base::reculer(double temps)
@@ -73,23 +73,23 @@ int Cond_lim_base::reculer(double temps)
   return champ_front().reculer(temps);
 }
 
-/*! @brief Initialisation en debut de calcul.
+/*! @brief Initialization at the beginning of the calculation.
  *
- * A appeler avant tout calculer_coeffs_echange ou mettre_a_jour
- *     Contrairementaux methodes mettre_a_jour, les methodes
- *     initialiser des CLs ne peuvent pas dependre de l'exterieur
- *     (lui-meme peut ne pas etre initialise)
+ * Must be called before any calculate_exchange_coefficients or update
+ *     Unlike the update methods, the
+ *     initialize methods of BCs cannot depend on the outside
+ *     (it may not be initialized itself)
  *
- * @return (0 en cas d'erreur, 1 sinon.)
+ * @return (0 in case of error, 1 otherwise.)
  */
 int Cond_lim_base::initialiser(double temps)
 {
   return le_champ_front->initialiser(temps, domaine_Cl_dis().inconnue());
 }
 
-/*! @brief Effectue une mise a jour en temps de la condition aux limites.
+/*! @brief Performs a time update of the boundary condition.
  *
- * @param (double temps) le pas de temps de mise a jour
+ * @param (double temps) the time step for update
  */
 void Cond_lim_base::mettre_a_jour(double temps)
 {
@@ -105,39 +105,39 @@ void Cond_lim_base::resetTime(double time)
   mettre_a_jour(time);
 }
 
-/*! @brief Cette methode indique si cette condition aux limites doit etre mise a jour dans des sous pas de temps d'un schema en temps tel que RK
+/*! @brief Indicates whether this boundary condition must be updated during sub-time steps of a time scheme such as RK.
  *
- *   Par defaut elle renvoie 0 pour indiquer qu'aucune mise a jour
- *   n'est necessaire ; il faut la surcharger pour renvoyer 1 au besoin
- *   (exemple Echange_impose_base)
+ *   By default it returns 0 to indicate that no update
+ *   is necessary; it must be overloaded to return 1 if needed
+ *   (example: Echange_impose_base)
  *
- * @param (double temps) le pas de temps de mise a jour
+ * @param (double temps) the time step for update
  */
 int Cond_lim_base::a_mettre_a_jour_ss_pas_dt()
 {
   return 0;
 }
 
-/*! @brief Calcul des coefficient d'echange pour un couplage par Champ_front_contact_VEF.
+/*! @brief Computation of exchange coefficients for coupling via Champ_front_contact_VEF.
  *
- *     Ces calculs sont locaux au probleme et dependant uniquement de
- *     l'inconnue. Ils doivent donc etre faits chaque fois que
- *     l'inconnue est modifiee. Ils sont disponibles pour l'exterieur et
- *     stockes dans les CLs.
- *     WEC : Les Champ_front_contact_VEF devraient disparaitre et cette
- *     methode avec !!!
+ *     These computations are local to the problem and depend only on
+ *     the unknown. They must therefore be done every time the
+ *     unknown is modified. They are available externally and
+ *     stored in the BCs.
+ *     WEC: Champ_front_contact_VEF should disappear and this
+ *     method with it!!!
  *
- * @param (double temps) le pas de temps de mise a jour
+ * @param (double temps) the time step for update
  */
 void Cond_lim_base::calculer_coeffs_echange(double temps)
 {
   le_champ_front->calculer_coeffs_echange(temps);
 }
 
-/*! @brief Appel la verification du champ lu par l intermediaire de l equation pour laquelle on considere la condition limite
+/*! @brief Calls the verification of the field read through the equation for which the boundary condition is considered.
  *
- *  La methode est surchargee dans les cas ou l utilisateur doit
- *  specifier le champ frontiere
+ *  The method is overloaded in cases where the user must
+ *  specify the boundary field.
  *
  */
 void Cond_lim_base::verifie_ch_init_nb_comp() const
@@ -145,13 +145,13 @@ void Cond_lim_base::verifie_ch_init_nb_comp() const
 
 }
 
-/*! @brief Associe la frontiere a l'objet.
+/*! @brief Associates the boundary with the object.
  *
- * L'objet Frontiere_dis_base est en fait associe au membre
- *     OWN_PTR(Champ_front_base) de l'objet Cond_lim_base qui represente le champ des conditions
- *     aux limites imposees a la frontiere.
+ * The Frontiere_dis_base object is in fact associated with the member
+ *     OWN_PTR(Champ_front_base) of the Cond_lim_base object that represents the field of boundary
+ *     conditions imposed on the boundary.
  *
- * @param (Frontiere_dis_base& fr) la frontiere sur laquelle on impose les conditions aux limites
+ * @param (Frontiere_dis_base& fr) the boundary on which the boundary conditions are imposed
  */
 void Cond_lim_base::associer_fr_dis_base(const Frontiere_dis_base& fr)
 {
@@ -160,12 +160,12 @@ void Cond_lim_base::associer_fr_dis_base(const Frontiere_dis_base& fr)
   modifier_val_imp = 0;
 }
 
-/*! @brief Associe le Domaine_Cl_dis_base (Domaine des conditions aux limites discretisees) a l'objet.
+/*! @brief Associates the Domaine_Cl_dis_base (domain of discretized boundary conditions) with the object.
  *
- * Ce Domaine_Cl_dis_base stocke (reference) toutes les conditions
- *     aux limites relative a un Domaine geometrique.
+ * This Domaine_Cl_dis_base stores (references) all the boundary
+ *     conditions relative to a geometric domain.
  *
- * @param (Domaine_Cl_dis_base& zcl) un Domaine des conditions aux limites discretisees a laquelle l'objet Cond_lim_base se rapporte
+ * @param (Domaine_Cl_dis_base& zcl) a domain of discretized boundary conditions to which the Cond_lim_base object refers
  */
 void Cond_lim_base::associer_domaine_cl_dis_base(const Domaine_Cl_dis_base& zcl)
 {
@@ -173,9 +173,9 @@ void Cond_lim_base::associer_domaine_cl_dis_base(const Domaine_Cl_dis_base& zcl)
   le_champ_front->verifier(*this);
 }
 
-/*! @brief Renvoie 1 si la condition aux limites est compatible avec la discretisation passee en parametre.
+/*! @brief Returns 1 if the boundary condition is compatible with the discretization passed as parameter.
  *
- * @param (Discretisation_base&) la discretisation avec laquelle on veut verifier la compatibilite
+ * @param (Discretisation_base&) the discretization with which we want to verify compatibility
  */
 int Cond_lim_base::compatible_avec_discr(const Discretisation_base& discr) const
 {
@@ -191,11 +191,11 @@ int Cond_lim_base::compatible_avec_discr(const Discretisation_base& discr) const
     }
 }
 
-/*! @brief Cette methode est appelee quand la condition aux limites n'est pas compatible avec l'equation sur laquelle on essaye
+/*! @brief This method is called when the boundary condition is not compatible with the equation on which we try
  *
- *     de l'appliquer.
+ *     to apply it.
  *
- * @param (Equation_base& eqn) l'equation avec laquelle la condition aux limites est incompatible
+ * @param (Equation_base& eqn) the equation with which the boundary condition is incompatible
  */
 void Cond_lim_base::err_pas_compatible(const Equation_base& eqn) const
 {
@@ -203,11 +203,11 @@ void Cond_lim_base::err_pas_compatible(const Equation_base& eqn) const
   exit();
 }
 
-/*! @brief Cette methode est appelee quand la condition aux limites n'est pas compatible avec la discretisation sur laquelle on essaye
+/*! @brief This method is called when the boundary condition is not compatible with the discretization on which we try
  *
- *     de l'appliquer.
+ *     to apply it.
  *
- * @param (Discretisation_base& discr) la discretisation avec laquelle la condition aux limites est incompatible
+ * @param (Discretisation_base& discr) the discretization with which the boundary condition is incompatible
  */
 void Cond_lim_base::err_pas_compatible(const Discretisation_base& discr) const
 {
@@ -227,14 +227,14 @@ void Cond_lim_base::injecter_dans_champ_inc(const Champ_Inc_base&) const
   Cerr << "Contact TRUST support." << finl;
   exit();
 }
-/*! @brief Change le i-eme temps futur de la cl.
+/*! @brief Changes the i-th future time of the BC.
  *
  */
 void Cond_lim_base::set_temps_defaut(double temps)
 {
   champ_front().set_temps_defaut(temps);
 }
-/*! @brief Appele par Conds_lim::completer Appel cha_front_base::fixer_nb_valeurs_temporelles
+/*! @brief Called by Conds_lim::completer. Calls cha_front_base::fixer_nb_valeurs_temporelles.
  *
  */
 void Cond_lim_base::fixer_nb_valeurs_temporelles(int nb_cases)

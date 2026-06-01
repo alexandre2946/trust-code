@@ -27,9 +27,7 @@
 
 class Probleme_base;
 
-/*! @brief classe Fluide_Dilatable_base Cette classe represente un d'un fluide dilatable,
- *
- *     heritant de fluide base
+/*! @brief Base class for a dilatable fluid, inheriting from Fluide_base.
  *
  * @sa Milieu_base Fluide_base
  */
@@ -65,18 +63,18 @@ public :
   virtual void write_mean_edo(double);
   virtual void write_header_edo();
 
-  // Virtuelles pure
+  // Pure virtual methods
   virtual void secmembre_divU_Z(DoubleTab& ) const=0;
   virtual void Resoudre_EDO_PT()=0;
 
-  // Methodes de l interface des champs postraitables
+  // Post-processing field interface methods
   const Champ_base& get_champ(const Motcle& nom) const override;
   void creer_champ(const Motcle& motlu) override;
   bool has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const override;
   bool has_champ(const Motcle& nom) const override;
   void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
 
-  // Methodes inlines
+  // Inline methods
   inline const Nom type_fluide() const { return loi_etat_->type_fluide(); }
   inline const OWN_PTR(Loi_Etat_base)& loi_etat() const { return loi_etat_; }
   inline OWN_PTR(Loi_Etat_base)&  loi_etat() { return loi_etat_; }
@@ -111,13 +109,13 @@ public :
   inline void calculer_masse_volumique() { loi_etat_->calculer_masse_volumique(); }
   inline void set_pression_th(double Pth) { Pth_n_ = Pth_ = Pth; }
   inline int getTraitementPth() const { return traitement_PTh_; }
-  inline double pression_th() const { return Pth_; } // Pression thermodynamique
-  inline const double& get_pression_th() const { return Pth_; } // Reference to pression thermodynamique (for PDI, can't share a copy...)
-  inline double pression_thn() const { return Pth_n_; } // Pression thermodynamique a l'etape precedente
-  inline double pression_th1() const { return Pth1_; } // Pression thermodynamique calculee pour conserver la masse
+  inline double pression_th() const { return Pth_; } // Thermodynamic pressure
+  inline const double& get_pression_th() const { return Pth_; } // Reference to thermodynamic pressure (for PDI, can't share a copy...)
+  inline double pression_thn() const { return Pth_n_; } // Thermodynamic pressure at the previous time step
+  inline double pression_th1() const { return Pth1_; } // Thermodynamic pressure computed to conserve mass
   inline double calculer_H(double hh) const { return loi_etat_->calculer_H(Pth_,hh); }
 
-  // Methodes inlines from EOS_Tools
+  // Inline methods from EOS_Tools
   inline Probleme_base& get_problem() { return le_probleme_.valeur(); }
   inline const DoubleTab& rho_discvit() const { return eos_tools_->rho_discvit(); }
   inline const DoubleTab& rho_face_n() const { return eos_tools_->rho_face_n(); }
@@ -132,7 +130,7 @@ protected :
   virtual void remplir_champ_pression_tot(int n, const DoubleTab& PHydro, DoubleTab& PTot) = 0;
   void completer_edo(const Probleme_base& );
 
-  int traitement_PTh_ = 0; // flag pour le traitement de la pression thermo
+  int traitement_PTh_ = 0; // flag for the treatment of thermodynamic pressure
   double Pth_ = -1., Pth_n_ = -1., Pth1_ = -1.;
   OBS_PTR(Champ_Inc_base) ch_inco_chaleur_, ch_vitesse_, ch_pression_;
   OBS_PTR(Probleme_base) le_probleme_;

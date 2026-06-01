@@ -29,7 +29,7 @@ Sortie& Tetraedriser_homogene::printOn(Sortie& os) const { return Interprete::pr
 
 Entree& Tetraedriser_homogene::readOn(Entree& is) { return Interprete::readOn(is); }
 
-// Traitement des faces
+// Processing faces
 //
 static void decoupe(Domaine& dom, Faces& faces, IntTab& new_soms_old_elems)
 {
@@ -71,7 +71,7 @@ static void decoupe(Domaine& dom, Faces& faces, IntTab& new_soms_old_elems)
       int i8 = dom.chercher_sommets(x, y, z);
       assert(i8 >= 0);
 
-      //Nouveau : on prend le barycentre de la face
+      //New: we take the barycenter of the face
       //x=0.5*(coord(i3,0)+coord(i7,0));
       //y=0.5*(coord(i3,1)+coord(i7,1));
       //z=0.5*(coord(i3,2)+coord(i7,2));
@@ -122,10 +122,10 @@ static void decoupe(Domaine& dom, Faces& faces, IntTab& new_soms_old_elems)
 }
 
 //
-// Pour definir un nouveau sommet, il faut regarder si il n'existe pas deja
-// On renvoie le numero "global" du sommet considere
+// To define a new vertex, check if it does not already exist.
+// Returns the "global" index of the vertex.
 //
-// ATTENTION: ne considere qu'une seule domaine pour l'instant...
+// WARNING: currently only considers a single domain.
 //
 int creer_sommet(Domaine& domaine, DoubleTab& new_soms, IntTab& elem_traite, IntTab& new_soms_old_elems,
 //                int i1, int i2,
@@ -221,20 +221,20 @@ void Tetraedriser_homogene::trianguler(Domaine& domaine) const
       IntTab elem_traite(oldsz);
       int oldnbsom = domaine.nb_som();
       IntTab new_elems(40 * oldsz, 4);
-      // pour chaque cube, liste des nouveaux sommets qu'il contient :
+      // for each cube, list of new vertices it contains:
       IntTab new_soms_old_elems(oldsz, 19);
       IntTab sommets(8);
       int compteur = 0;
       int nbnewsoms = 0;
       int i;
-      // Construction de l'Octree sur la grille "VDF" de base
+      // Build the Octree on the base "VDF" grid
       domaine.construit_octree();
 
-      //On dimensionne une premiere fois le tableau des sommets avec la dimension maximum
-      //puis on redimensionnera seulement a la fin par la dimension exacte
+      //First dimension the array of vertices with the maximum size
+      //then resize only at the end to the exact dimension
 
       DoubleTab& sommets_dom = domaine.les_sommets();
-      //19 pour les nouveaux sommets et 8 pour les anciens sommets=27
+      //19 for the new vertices and 8 for the old vertices=27
       int dim_som_max = 27 * oldsz;
       int dim_som_old = sommets_dom.dimension(0);
       sommets_dom.resize(dim_som_max, 3);
@@ -255,8 +255,8 @@ void Tetraedriser_homogene::trianguler(Domaine& domaine) const
 
           compteur = 0;
 
-          // Definition des nouveaux sommets : creation des barycentres
-          //centre de l'hexaedre
+          // Definition of new vertices: creation of barycenters
+          //center of the hexahedron
           //Cerr<<" --creer_sommet "<<i0<<" "<<i7<<finl;
           sommets(0) = i0;
           sommets(1) = i1;
@@ -269,7 +269,7 @@ void Tetraedriser_homogene::trianguler(Domaine& domaine) const
           indice(0) = creer_sommet(domaine, new_soms, elem_traite, new_soms_old_elems, 8, sommets, compteur, oldnbsom, nbnewsoms);
           //creer_sommet(dom, domaine, new_soms, elem_traite, new_soms_old_elems, i0, i7, compteur, oldnbsom, nbnewsoms);
 
-          //centres des faces
+          //centers of faces
           //Cerr<<" --creer_sommet "<<i0<<" "<<i3<<finl;
           indice(1) = creer_sommet(domaine, new_soms, elem_traite, new_soms_old_elems, 4, sommets, compteur, oldnbsom, nbnewsoms);
           //creer_sommet(dom, domaine, new_soms, elem_traite, new_soms_old_elems, i0, i3, compteur, oldnbsom, nbnewsoms);
@@ -309,7 +309,7 @@ void Tetraedriser_homogene::trianguler(Domaine& domaine) const
           indice(6) = creer_sommet(domaine, new_soms, elem_traite, new_soms_old_elems, 4, sommets, compteur, oldnbsom, nbnewsoms);
           //creer_sommet(dom, domaine, new_soms, elem_traite, new_soms_old_elems, i2, i7, compteur, oldnbsom, nbnewsoms);
 
-          //centres des aretes
+          //centers of edges
           //Cerr<<" --creer_sommet "<<i0<<" "<<i1<<finl;
           sommets(0) = i0;
           sommets(1) = i1;
@@ -371,7 +371,7 @@ void Tetraedriser_homogene::trianguler(Domaine& domaine) const
           indice(18) = creer_sommet(domaine, new_soms, elem_traite, new_soms_old_elems, 2, sommets, compteur, oldnbsom, nbnewsoms);
           //creer_sommet(dom, domaine, new_soms, elem_traite, new_soms_old_elems, i6, i7, compteur, oldnbsom, nbnewsoms);
 
-          // Liste des nouveaux sommets pour cet ancien cube
+          // List of new vertices for this old cube
           for (int t = 0; t < 19; t++)
             {
               new_soms_old_elems(i, t) = indice(t);
@@ -394,7 +394,7 @@ void Tetraedriser_homogene::trianguler(Domaine& domaine) const
               sommets_dom(dim_som_old + j, k) = new_soms(j, k);
           dim_som_old += compteur;
 
-          // L'element en cours a ete "traite" en entier
+          // The current element has been fully "processed"
           elem_traite(i) = 1;
 
           //0 0-1 0-2 Bas 0-4 Arr Gauche Milieu ** 1
@@ -648,7 +648,7 @@ void Tetraedriser_homogene::trianguler(Domaine& domaine) const
       sommets_dom.resize(dim_som_old, 3);
       les_elems.ref(new_elems);
 
-      // Reconstruction de l'octree
+      // Rebuild the octree
       Cerr << "We have split the cubes..." << finl;
 
       domaine.invalide_octree();

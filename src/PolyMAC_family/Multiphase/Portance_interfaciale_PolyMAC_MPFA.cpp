@@ -47,7 +47,7 @@ void Portance_interfaciale_PolyMAC_MPFA::ajouter_blocs(matrices_t matrices, Doub
 
   int e, f, c, d, d2, i, k, l, n, N = ch.valeurs().line_size(), Np = press.line_size(), D = dimension, Nk = (k_turb) ? (*k_turb).dimension(1) : 1 ,
                                   cR = (rho.dimension_tot(0) == 1), cM = (mu.dimension_tot(0) == 1), nf_tot = domaine.nb_faces_tot();
-  DoubleTrav vr_l(N,D), scal_ur(N), scal_u(N), pvit_l(N, D), vort_l( D==2 ? 1 :D), grad_l(D,D), scal_grad(D); // Requis pour corrections vort et u_l-u-g
+  DoubleTrav vr_l(N,D), scal_ur(N), scal_u(N), pvit_l(N, D), vort_l( D==2 ? 1 :D), grad_l(D,D), scal_grad(D); // Required for vort and u_l-u-g corrections
   double fac_e, fac_f, vl_norm;
   const Portance_interfaciale_base& correlation_pi = ref_cast(Portance_interfaciale_base, correlation_.valeur());
 
@@ -56,19 +56,19 @@ void Portance_interfaciale_PolyMAC_MPFA::ajouter_blocs(matrices_t matrices, Doub
   in.alpha.resize(N), in.T.resize(N), in.p.resize(N), in.rho.resize(N), in.mu.resize(N), in.sigma.resize(N*(N-1)/2), in.k_turb.resize(N), in.d_bulles.resize(N), in.nv.resize(N, N);
   out.Cl.resize(N, N);
 
-  // Et pour les methodes span de la classe Interface pour choper la tension de surface
-  const int ne_tot = domaine.nb_elem_tot(), nb_max_sat =  N * (N-1) /2; // oui !! suite arithmetique !!
+  // And for the span methods of the Interface class to retrieve the surface tension
+  const int ne_tot = domaine.nb_elem_tot(), nb_max_sat =  N * (N-1) /2; // yes !! arithmetic series !!
   DoubleTrav Sigma_tab(ne_tot,nb_max_sat);
 
-  // remplir les tabs ...
+  // fill the arrays ...
   for (k = 0; k < N; k++)
     for (l = k + 1; l < N; l++)
       {
         if (milc.has_saturation(k, l))
           {
             Saturation_base& z_sat = milc.get_saturation(k, l);
-            const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Et oui ! matrice triang sup !
-            // recuperer sigma ...
+            const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // yes !! upper triangular matrix !
+            // retrieve sigma ...
             const DoubleTab& sig = z_sat.get_sigma_tab();
             // fill in the good case
             for (int ii = 0; ii < ne_tot; ii++) Sigma_tab(ii, ind_trav) = sig(ii);
@@ -76,7 +76,7 @@ void Portance_interfaciale_PolyMAC_MPFA::ajouter_blocs(matrices_t matrices, Doub
         else if (milc.has_interface(k, l))
           {
             Interface_base& sat = milc.get_interface(k,l);
-            const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Et oui ! matrice triang sup !
+            const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // yes !! upper triangular matrix !
             for (i = 0 ; i<ne_tot ; i++) Sigma_tab(i,ind_trav) = sat.sigma(temp(i,k),press(i,k * (Np > 1))) ;
           }
       }
@@ -85,7 +85,7 @@ void Portance_interfaciale_PolyMAC_MPFA::ajouter_blocs(matrices_t matrices, Doub
   /* elements */
   for (e = 0; e < ne_tot; e++)
     {
-      /* arguments de coeff */
+      /* coefficient arguments */
       for (n=0; n<N; n++)
         {
           in.alpha[n] = alpha(e, n);
@@ -110,7 +110,7 @@ void Portance_interfaciale_PolyMAC_MPFA::ajouter_blocs(matrices_t matrices, Doub
       fac_e = beta_*pe(e) * ve(e);
       i = nf_tot + D * e;
 
-      // Experimentation sur la portance : on enleve la partie parallele a la vitesse du liquide
+      // Lift force experimentation: we remove the component parallel to the liquid velocity
       vl_norm = 0;
       scal_ur = 0;
       for (d = 0 ; d < D ; d++) vl_norm += pvit(i+d, n_l)*pvit(i+d, n_l);
@@ -154,7 +154,7 @@ void Portance_interfaciale_PolyMAC_MPFA::ajouter_blocs(matrices_t matrices, Doub
 
     }
 
-  // Faces en dimension 2 et 3
+  // Faces in dimensions 2 and 3
   for (f = 0 ; f<domaine.nb_faces() ; f++)
     if (fcl(f, 0) < 2)
       {
@@ -265,7 +265,7 @@ void Portance_interfaciale_PolyMAC_MPFA::ajouter_blocs(matrices_t matrices, Doub
 void Portance_interfaciale_PolyMAC_MPFA::mettre_a_jour(double temps)
 {
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, equation().probleme());
-  /* Wobble si besoin */
+  /* Wobble if needed */
   if ((bool(wobble)) || (bool(C_lift)))
     {
       const Champ_Face_PolyMAC_MPFA& ch = ref_cast(Champ_Face_PolyMAC_MPFA, equation().inconnue());
@@ -292,8 +292,8 @@ void Portance_interfaciale_PolyMAC_MPFA::mettre_a_jour(double temps)
             if (milc.has_saturation(k, l))
               {
                 Saturation_base& z_sat = milc.get_saturation(k, l);
-                const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Et oui ! matrice triang sup !
-                // recuperer sigma ...
+                const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // yes !! upper triangular matrix !
+                // retrieve sigma ...
                 const DoubleTab& sig = z_sat.get_sigma_tab();
                 // fill in the good case
                 for (int ii = 0; ii < ne_tot; ii++) Sigma_tab(ii, ind_trav) = sig(ii);
@@ -301,7 +301,7 @@ void Portance_interfaciale_PolyMAC_MPFA::mettre_a_jour(double temps)
             else if (milc.has_interface(k, l))
               {
                 Interface_base& sat = milc.get_interface(k,l);
-                const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Et oui ! matrice triang sup !
+                const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // yes !! upper triangular matrix !
                 for (i = 0 ; i<ne_tot ; i++) Sigma_tab(i,ind_trav) = sat.sigma(temp(i,k),press(i,k * (Np > 1))) ;
               }
           }
@@ -332,7 +332,7 @@ void Portance_interfaciale_PolyMAC_MPFA::mettre_a_jour(double temps)
           out.Cl.resize(N, N);
           for (e = 0; e < ne_tot; e++)
             {
-              /* arguments de coeff */
+              /* arguments for coeff */
               for (n=0; n<N; n++)
                 {
                   in.alpha[n] = alpha(e, n);

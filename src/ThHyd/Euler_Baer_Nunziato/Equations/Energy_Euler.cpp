@@ -71,7 +71,7 @@ void Energy_Euler::discretiser()
   Cerr << "Energy_Euler discretization ==> ok" << finl;
 }
 
-// on surcharge pour pas effecter energie_tot et pour lire mais rien faire !!
+// overridden to avoid affecting energie_tot and to read but do nothing !!
 Entree& Energy_Euler::lire_cond_init(Entree& is)
 {
   Cerr << "Reading of initial conditions\n";
@@ -121,7 +121,7 @@ const Operateur& Energy_Euler::operateur(int i) const
       Cerr << que_suis_je() << " : wrong operator number " << i << finl;
       Process::exit();
     }
-  // Pour les compilos!!
+  // For the compilers!!
   return terme_convectif;
 }
 
@@ -137,6 +137,6 @@ Operateur& Energy_Euler::operateur(int i)
       Cerr << que_suis_je() << " : wrong operator number " << i << finl;
       Process::exit();
     }
-  // Pour les compilos!!
+  // For the compilers!!
   return terme_convectif;
 }

@@ -23,11 +23,7 @@
 
 class Fluide_Dilatable_base;
 
-/*! @brief class Source_Chaleur_Fluide_Dilatable_base
- *
- *  Cette classe represente un terme source supplementaire a prendre en compte dans
- *  les equations de la chaleur dans le cas ou le fluide est quasi compressible
- *
+/*! @brief Additional source term for the heat equation when the fluid is quasi-compressible.
  *
  * @sa Source_base Fluide_Dilatable_base
  */
@@ -41,7 +37,7 @@ public:
   DoubleTab& calculer(DoubleTab& ) const override;
   DoubleTab& ajouter(DoubleTab& ) const override = 0;
 
-  // Methodes inlines
+  // Inline methods
   inline void mettre_a_jour(double) override { }
   inline void associer_pb(const Probleme_base& ) override { }
 

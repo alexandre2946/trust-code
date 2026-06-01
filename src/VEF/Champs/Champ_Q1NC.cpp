@@ -29,8 +29,8 @@ Entree& Champ_Q1NC::readOn(Entree& s)
   return s ;
 }
 
-//-Cas CL periodique : assure que les valeurs sur des faces periodiques
-// en vis a vis sont identiques. Pour cela on prend la demi somme des deux valeurs.
+// Periodic BC case: ensures that values on facing periodic boundary faces are identical.
+// To do so, the half-sum of the two values is used.
 void Champ_Q1NC::verifie_valeurs_cl()
 {
   const Domaine_Cl_dis_base& zcl = equation().domaine_Cl_dis();
@@ -87,7 +87,7 @@ void Champ_Q1NC::cal_rot_ordre1(DoubleTab& vorticite)
   const int nb_elem = domaine_vef().nb_elem();
 
   DoubleTab gradient_elem(0, dimension, dimension);
-  // le tableau est initialise dans la methode gradient():
+  // the array is initialized in the gradient() method:
   domaine_vef().domaine().creer_tableau_elements(gradient_elem, RESIZE_OPTIONS::NOCOPY_NOINIT);
 
   gradient(gradient_elem);
@@ -121,7 +121,7 @@ void Champ_Q1NC::cal_rot_ordre1(DoubleTab& vorticite)
 
 void Champ_Q1NC::gradient(DoubleTab& gradient_elem)
 {
-  // Calcul du gradient de la vitesse pour le calcul de la vorticite
+  // Compute the velocity gradient for vorticity computation
   const Domaine_VEF& domaine_VEF = domaine_vef();
   const DoubleTab& vitesse = equation().inconnue().valeurs();
 
@@ -138,7 +138,7 @@ void Champ_Q1NC::gradient(DoubleTab& gradient_elem)
   operator_egal(gradient_elem, 0.); // Espace reel uniquement
   int icomp, fac, i, elem1, elem2;
 
-  // Boucle sur les faces
+  // Loop over faces
 
   for (fac = 0; fac < premiere_face_int; fac++)
     {

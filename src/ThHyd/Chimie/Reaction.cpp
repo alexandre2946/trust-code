@@ -70,8 +70,8 @@ void extract_coef_local(ArrOfDouble& coeff_reactifs,const Nom& reactifs_,const M
   Cerr<<finl;
 }
 
-// Descrition:
-// prend une liste de nom de variables et extrait les coefficients de la reaction, et verifie que les masses molaires sont coherentes
+// Description:
+// Takes a list of variable names, extracts the reaction coefficients, and checks that the molar masses are consistent.
 void Reaction::extract_coef(ArrOfDouble& coeff_reactifs,ArrOfDouble& coeff_produits,const Motcles& list_var,const ArrOfDouble& masse_molaire) const
 {
   assert(masse_molaire.size_array()==list_var.size());
@@ -181,7 +181,7 @@ void Reaction::discretiser_omega(const Probleme_base& pb,const Nom& nom)
 }
 void Reaction::reagir(VECT(OBS_PTR(Champ_Inc_base))& liste_C,double deltat) const
 {
-  // il faut savoir e que l'on veut faire ....
+  // we need to know what we want to do...
 
   //  Cerr<<__FILE__<<" "<<(int)__LINE__<<" non  code "<<finl;  exit();
   int size=liste_C.size();
@@ -200,10 +200,10 @@ void Reaction::reagir(VECT(OBS_PTR(Champ_Inc_base))& liste_C,double deltat) cons
     {
 
 
-      // initialisation et rabotage des C
+      // initialisation and clipping of C
       for (int i=0; i<size; i++)
         {
-          if (coeff_Y_[i]!=0.) // c'est un reactif ou un produit
+          if (coeff_Y_[i]!=0.) // it is a reactant or a product
             {
               C[i]=liste_C[i]->valeurs()(elem);
               if (C[i]<0)
@@ -222,12 +222,12 @@ void Reaction::reagir(VECT(OBS_PTR(Champ_Inc_base))& liste_C,double deltat) cons
             C[i]=0;
         }
 
-      // calcul du taux de reaction implicite
+      // compute implicit reaction rate
       C0=C;
       double proportion_directe;
       double proportion=calcul_proportion_implicite(C,C0,deltat,1e-7,proportion_directe);
       for (int i=0; i<size; i++)
-        if (coeff_Y_[i]!=0.) // c'est un reactif ou un produit
+        if (coeff_Y_[i]!=0.) // it is a reactant or a product
           {
             DoubleTab& C_i = liste_C[i]->valeurs(); // kg/kg
             //    C_i(elem)-=proportion*coeff_stoechio_[i];
@@ -246,10 +246,10 @@ double Reaction::calcul_proportion_implicite(ArrOfDouble& C_temp,const ArrOfDoub
 
   double rho_mel=1 ; //tab_rho(elem);                // kg/m3
   double T_elem=1 ; //temperature(elem);             // K
-  omegapoint=constante_taux_reaction_;  // 1/s     // prefacteur du taux de reaction volumique local
-  //omegapoint*=pow(T_elem,beta_)*exp(-Ea_/(R_gaz_parfait*T_elem)); // Arrhenius et facteur temperature
-  dy_omega=omegapoint/rho_mel;          // m3/kg/s // prefacteur du taux de reaction volumique local
-  //proportion=dy_omega*deltat;           // m3/kg a ce stade si une seule activite exposant 1
+  omegapoint=constante_taux_reaction_;  // 1/s     // prefactor of the local volumetric reaction rate
+  //omegapoint*=pow(T_elem,beta_)*exp(-Ea_/(R_gaz_parfait*T_elem)); // Arrhenius and temperature factor
+  dy_omega=omegapoint/rho_mel;          // m3/kg/s // prefactor of the local volumetric reaction rate
+  //proportion=dy_omega*deltat;           // m3/kg at this stage if a single activity with exponent 1
   double produit_activite=1;
   double produit_contre=1;
   double R_gaz_parfait=8.3143;
@@ -272,10 +272,10 @@ double Reaction::calcul_proportion_implicite(ArrOfDouble& C_temp,const ArrOfDoub
       produit_activite=1;
       produit_contre=1;
       proportion=dy_omega*deltat;
-      // calcul du taux de reaction brut
+      // compute the gross reaction rate
       for (int i=0; i<nbc; i++)
         {
-          if (coeff_Y_[i]>0.) // c'est un reactif gazeux => produit par son activite
+          if (coeff_Y_[i]>0.) // it is a gaseous reactant => multiplied by its activity
             {
               produit_activite*=pow(C[i],coeff_activite_[i]);
             }
@@ -284,7 +284,7 @@ double Reaction::calcul_proportion_implicite(ArrOfDouble& C_temp,const ArrOfDoub
               {
                 produit_contre*=pow(C[i],coeff_activite_[i]);
               }
-        } // mol/kg a ce stade
+        } // mol/kg at this stage
 
       assert(produit_contre>=0);
       proportion_directe=produit_activite*proportion;
@@ -326,7 +326,7 @@ double Reaction::calcul_proportion_implicite(ArrOfDouble& C_temp,const ArrOfDoub
 
         if (1)
           {
-            if (coeff_Y_[i]!=0.) // c'est un reactif car on est dans le cas contre treaction
+            if (coeff_Y_[i]!=0.) // it is a reactant or product in the reverse reaction case
               {
                 double pond=-1;
                 if (coeff_Y_[i]>0)

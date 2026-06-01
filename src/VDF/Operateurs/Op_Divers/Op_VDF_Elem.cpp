@@ -33,9 +33,9 @@ void Op_VDF_Elem::dimensionner(const Domaine_VDF& le_dom, const Domaine_Cl_VDF& 
 
 void Op_VDF_Elem::dimensionner_old(const Domaine_VDF& le_dom, const Domaine_Cl_VDF& le_dom_cl, Matrice_Morse& la_matrice) const
 {
-  // Dimensionnement de la matrice qui devra recevoir les coefficients provenant de la convection, de la diffusion pour le cas des elements.
-  // Cette matrice a une structure de matrice morse.
-  // Nous commencons par calculer les tailles des tableaux tab1 et tab2.
+  // Sizing of the matrix that will receive the coefficients from convection and diffusion for element unknowns.
+  // This matrix has a Morse matrix structure.
+  // We start by computing the sizes of arrays tab1 and tab2.
 
   const IntTab& face_voisins = le_dom.face_voisins();
   const Conds_lim& les_cl = le_dom_cl.les_conditions_limites();
@@ -61,7 +61,7 @@ void Op_VDF_Elem::dimensionner_old(const Domaine_VDF& le_dom, const Domaine_Cl_V
       (rang_voisin(elem1))++;
     }
 
-  // Prise en compte des conditions de type periodicite
+  // Taking into account periodic boundary conditions
   for (const auto& itr : les_cl)
     {
       const Cond_lim& la_cl = itr;
@@ -90,7 +90,7 @@ void Op_VDF_Elem::dimensionner_old(const Domaine_VDF& le_dom, const Domaine_Cl_V
         }
     }
 
-  // on balaye les elements pour dimensionner tab1 et tab2
+  // iterate over elements to size tab1 and tab2
   tab1(0) = 1;
   for(int i = 0; i < n1; i++)
     for (int k = 0; k < nb_comp; k++) tab1(i*nb_comp+1+k) = rang_voisin(i) +  tab1(i*nb_comp+k);
@@ -103,7 +103,7 @@ void Op_VDF_Elem::dimensionner_old(const Domaine_VDF& le_dom, const Domaine_Cl_V
       rang_voisin[i] = (int)tab1[i];
     }
 
-  // on traite les faces internes pour les voisins
+  // process internal faces for neighbors
   for (int num_face = ndeb; num_face < nfin; num_face++)
     {
       const int elem1 = face_voisins(num_face,0), elem2 = face_voisins(num_face,1);
@@ -117,7 +117,7 @@ void Op_VDF_Elem::dimensionner_old(const Domaine_VDF& le_dom, const Domaine_Cl_V
         }
     }
 
-  // on traite la condition de periodicite
+  // handle the periodicity condition
   for (int i=0; i<les_cl.size(); i++)
     {
       const Cond_lim& la_cl = les_cl[i];
@@ -160,13 +160,13 @@ void Op_VDF_Elem::dimensionner_multiscalar(const Domaine_VDF& le_dom, const Doma
 
   Stencil sten(0, 2);
 
-  for (int e = 0; e < ne; e++) // Boucle sur les elements
-    for (int i = 0, f, n; i < e_f.dimension(1); i++) // Boucle sur les faces de chaque element
+  for (int e = 0; e < ne; e++) // Loop over elements
+    for (int i = 0, f, n; i < e_f.dimension(1); i++) // Loop over faces of each element
       if ((f = e_f(e, i)) >= 0)
-        for (int j = 0; j < 2; j++) // Chaque cote de l'element hexaedrique ?
+        for (int j = 0; j < 2; j++) // Each side of the hexahedral element?
           if ((n = f_e(f, j)) >= 0)
             for (int k = 0; k < M; k++)
-              for (int m = (multi_scalar_diff ? 0 : k); m < (multi_scalar_diff ? M : k + 1); m++) // Chaque composante
+              for (int m = (multi_scalar_diff ? 0 : k); m < (multi_scalar_diff ? M : k + 1); m++) // Each component
                 sten.append_line(M * e + k, M * n + m);
 
   tableau_trier_retirer_doublons(sten);

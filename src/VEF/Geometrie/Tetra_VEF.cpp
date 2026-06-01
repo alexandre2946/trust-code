@@ -20,7 +20,7 @@
 
 Implemente_instanciable_sans_constructeur(Tetra_VEF,"Tetra_VEF",Elem_VEF_base);
 
-// printOn et readOn
+// printOn and readOn
 
 
 Sortie& Tetra_VEF::printOn(Sortie& s ) const
@@ -32,10 +32,9 @@ Entree& Tetra_VEF::readOn(Entree& s )
 {
   return s ;
 }
-/*! @brief renvoie pour la facette fa7 : pour j=0,j=1 : les numeros locaux des 2 faces qui entourent fa7
+/*! @brief Returns for sub-facet fa7: for j=0,j=1: the local indices of the 2 faces surrounding fa7.
  *
- *  pour j=2,j=3 : les numeros locaux des sommets du tetraedre qui
- *                 appartiennent a fa7
+ *  For j=2,j=3: the local indices of the tetrahedron vertices belonging to fa7.
  *
  */
 Tetra_VEF::Tetra_VEF()
@@ -83,8 +82,8 @@ void Tetra_VEF::creer_face_normales(DoubleTab& tab_Face_normales,
     double ny = (-x1 * z2 + x2 * z1) / 2;
     double nz = (x1 * y2 - x2 * y1) / 2;
 
-    // Orientation de la normale de elem1 vers elem2
-    // pour cela recherche du sommet de elem1 qui n'est pas sur la Face
+    // Orientation of the normal from elem1 to elem2:
+    // find the vertex of elem1 that does not lie on the face
     int elem1 = Face_voisins(num_Face, 0);
     int f0 = elem_faces(elem1, 0);
     if (f0 == num_Face)
@@ -110,7 +109,7 @@ void Tetra_VEF::creer_face_normales(DoubleTab& tab_Face_normales,
   end_gpu_timer(__KERNEL_NAME__);
 }
 
-/*! @brief remplit le tableau face_normales dans le Domaine_VEF
+/*! @brief Fills the face_normales array in the Domaine_VEF.
  *
  */
 void Tetra_VEF::creer_facette_normales(const Domaine_VEF& dom_VEF,
@@ -147,7 +146,7 @@ void Tetra_VEF::creer_facette_normales(const Domaine_VEF& dom_VEF,
         xg[2] = 0.25*(x[0][2]+x[1][2]+x[2][2]+x[3][2]);
         for (int fa7 = 0; fa7 < 6; fa7++)
           {
-            // la fa7 a pour sommets kel(2,fa7), kel(3,fa7), "G"
+            // fa7 has vertices kel(2,fa7), kel(3,fa7), "G"
             double u[3], v[3], pv[3], xj0[3];
             u[0] = x[KEL(2,fa7)][0]-xg[0];
             u[1] = x[KEL(2,fa7)][1]-xg[1];
@@ -159,7 +158,7 @@ void Tetra_VEF::creer_facette_normales(const Domaine_VEF& dom_VEF,
             pv[0] = u[1]*v[2]-u[2]*v[1];
             pv[1] = u[2]*v[0]-u[0]*v[2];
             pv[2] = u[0]*v[1]-u[1]*v[0];
-            // Orientation des normales :
+            // Normal orientation:
             xj0[0] = x[KEL(0,fa7)][0]-x[KEL(1,fa7)][0];
             xj0[1] = x[KEL(0,fa7)][1]-x[KEL(1,fa7)][1];
             xj0[2] = x[KEL(0,fa7)][2]-x[KEL(1,fa7)][2];
@@ -175,7 +174,7 @@ void Tetra_VEF::creer_facette_normales(const Domaine_VEF& dom_VEF,
 }
 
 
-/*! @brief remplit le tableau normales_facettes_Cl dans le Domaine_Cl_VEF pour la facette fa7 de l'element num_elem
+/*! @brief Fills the normales_facettes_Cl array in the Domaine_Cl_VEF for sub-facet fa7 of element num_elem.
  *
  */
 void Tetra_VEF::creer_normales_facettes_Cl(DoubleTab& normales_facettes_Cl,
@@ -183,8 +182,8 @@ void Tetra_VEF::creer_normales_facettes_Cl(DoubleTab& normales_facettes_Cl,
                                            int num_elem,const DoubleTab& x,
                                            const DoubleVect& xg, const Domaine& domaine_geom) const
 {
-  // x contient les coord des sommets du tetraedre
-  // xg contient les coord du "centre" du tetraedre
+  // x contains the coordinates of the tetrahedron vertices
+  // xg contains the coordinates of the tetrahedron "center"
   double u[3];
   double v[3];
   double xj0[3];
@@ -204,7 +203,7 @@ void Tetra_VEF::creer_normales_facettes_Cl(DoubleTab& normales_facettes_Cl,
   double pv[3];
   prodvect(u,v,pv);
 
-  // Orientation des normales :
+  // Normal orientation:
   xj0[0]= x(i0,0)-x(i1,0);
   xj0[1]= x(i0,1)-x(i1,1);
   xj0[2]= x(i0,2)-x(i1,2);
@@ -254,7 +253,7 @@ void Tetra_VEF::modif_volumes_entrelaces(int j,int elem,
         break;
       }
 
-    case 2: // une Face de Dirichlet : Face 2
+    case 2: // one Dirichlet face: Face 2
       {
         vol_mod = volumes_entrelaces[j]/3 ;
         volumes_entrelaces_Cl[elem_faces(elem,0)]  += vol_mod;
@@ -263,7 +262,7 @@ void Tetra_VEF::modif_volumes_entrelaces(int j,int elem,
         break;
       }
 
-    case 4: // une Face de Dirichlet : Face 1
+    case 4: // one Dirichlet face: Face 1
       {
         vol_mod = volumes_entrelaces[j]/3 ;
         volumes_entrelaces_Cl[elem_faces(elem,0)]  += vol_mod;
@@ -272,7 +271,7 @@ void Tetra_VEF::modif_volumes_entrelaces(int j,int elem,
         break;
       }
 
-    case 8: // une Face de Dirichlet : Face 0
+    case 8: // one Dirichlet face: Face 0
       {
         vol_mod = volumes_entrelaces[j]/3 ;
         volumes_entrelaces_Cl[elem_faces(elem,1)] += vol_mod;
@@ -281,7 +280,7 @@ void Tetra_VEF::modif_volumes_entrelaces(int j,int elem,
         break;
       }
 
-    case 3: // deux faces de Dirichlet : faces 2,3
+    case 3: // two Dirichlet faces: faces 2,3
       {
         vol_mod = (volumes_entrelaces[elem_faces(elem,2)]
                    + volumes_entrelaces[elem_faces(elem,3)])/2;
@@ -290,7 +289,7 @@ void Tetra_VEF::modif_volumes_entrelaces(int j,int elem,
         break;
       }
 
-    case 5: // deux faces de Dirichlet : faces 1,3
+    case 5: // two Dirichlet faces: faces 1,3
       {
         vol_mod = (volumes_entrelaces[elem_faces(elem,1)]
                    + volumes_entrelaces[elem_faces(elem,3)])/2;
@@ -299,7 +298,7 @@ void Tetra_VEF::modif_volumes_entrelaces(int j,int elem,
         break;
       }
 
-    case 6: // le tetraedre a deux faces de Dirichlet : faces 1,2
+    case 6: // the tetrahedron has two Dirichlet faces: faces 1,2
       {
         vol_mod = (volumes_entrelaces[elem_faces(elem,1)]
                    + volumes_entrelaces[elem_faces(elem,2)])/2;
@@ -308,7 +307,7 @@ void Tetra_VEF::modif_volumes_entrelaces(int j,int elem,
         break;
       }
 
-    case 9: // deux faces de Dirichlet :faces 0,3
+    case 9: // two Dirichlet faces: faces 0,3
       {
         vol_mod = (volumes_entrelaces[elem_faces(elem,0)]
                    + volumes_entrelaces[elem_faces(elem,3)])/2;
@@ -317,7 +316,7 @@ void Tetra_VEF::modif_volumes_entrelaces(int j,int elem,
         break;
       }
 
-    case 10: // deux faces de Dirichlet :faces 0,2
+    case 10: // two Dirichlet faces: faces 0,2
       {
         vol_mod = (volumes_entrelaces[elem_faces(elem,0)]
                    + volumes_entrelaces[elem_faces(elem,2)])/2;
@@ -326,7 +325,7 @@ void Tetra_VEF::modif_volumes_entrelaces(int j,int elem,
         break;
       }
 
-    case 12: // deux faces de Dirichlet :faces 0,1
+    case 12: // two Dirichlet faces: faces 0,1
       {
         vol_mod = (volumes_entrelaces[elem_faces(elem,0)]
                    + volumes_entrelaces[elem_faces(elem,1)])/2;
@@ -337,7 +336,7 @@ void Tetra_VEF::modif_volumes_entrelaces(int j,int elem,
 
 
 
-    case 7:  // trois faces de Dirichlet : faces 1,2,3
+    case 7:  // three Dirichlet faces: faces 1,2,3
       {
         vol_mod =  volumes_entrelaces[elem_faces(elem,1)]
                    + volumes_entrelaces[elem_faces(elem,2)]
@@ -346,7 +345,7 @@ void Tetra_VEF::modif_volumes_entrelaces(int j,int elem,
         break;
       }
 
-    case 11: // trois faces de Dirichlet : faces 0,2,3
+    case 11: // three Dirichlet faces: faces 0,2,3
       {
         vol_mod =  volumes_entrelaces[elem_faces(elem,0)]
                    + volumes_entrelaces[elem_faces(elem,2)]
@@ -355,7 +354,7 @@ void Tetra_VEF::modif_volumes_entrelaces(int j,int elem,
         break;
       }
 
-    case 13: // trois faces de Dirichlet : faces 0,1,3
+    case 13: // three Dirichlet faces: faces 0,1,3
       {
 
         vol_mod =  volumes_entrelaces[elem_faces(elem,0)]
@@ -365,7 +364,7 @@ void Tetra_VEF::modif_volumes_entrelaces(int j,int elem,
         break;
       }
 
-    case 14: // trois faces de Dirichlet : faces 0,1,2
+    case 14: // three Dirichlet faces: faces 0,1,2
       {
         vol_mod =  volumes_entrelaces[elem_faces(elem,0)]
                    + volumes_entrelaces[elem_faces(elem,1)]
@@ -418,7 +417,7 @@ void Tetra_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
         break;
       }
 
-    case 2: // une Face de Dirichlet : Face 2
+    case 2: // one Dirichlet face: Face 2
       {
         vol_mod = volumes_entrelaces[j]/3 ;
         face=elem_faces(elem,0);
@@ -433,7 +432,7 @@ void Tetra_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
         break;
       }
 
-    case 4: // une Face de Dirichlet : Face 1
+    case 4: // one Dirichlet face: Face 1
       {
         vol_mod = volumes_entrelaces[j]/3 ;
         face=elem_faces(elem,0);
@@ -448,7 +447,7 @@ void Tetra_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
         break;
       }
 
-    case 8: // une Face de Dirichlet : Face 0
+    case 8: // one Dirichlet face: Face 0
       {
         vol_mod = volumes_entrelaces[j]/3 ;
         face=elem_faces(elem,1);
@@ -463,7 +462,7 @@ void Tetra_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
         break;
       }
 
-    case 3: // deux faces de Dirichlet : faces 2,3
+    case 3: // two Dirichlet faces: faces 2,3
       {
         vol_mod = (volumes_entrelaces[elem_faces(elem,2)]
                    + volumes_entrelaces[elem_faces(elem,3)])/2;
@@ -476,7 +475,7 @@ void Tetra_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
         break;
       }
 
-    case 5: // deux faces de Dirichlet : faces 1,3
+    case 5: // two Dirichlet faces: faces 1,3
       {
         vol_mod = (volumes_entrelaces[elem_faces(elem,1)]
                    + volumes_entrelaces[elem_faces(elem,3)])/2;
@@ -489,7 +488,7 @@ void Tetra_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
         break;
       }
 
-    case 6: // le tetraedre a deux faces de Dirichlet : faces 1,2
+    case 6: // the tetrahedron has two Dirichlet faces: faces 1,2
       {
         vol_mod = (volumes_entrelaces[elem_faces(elem,1)]
                    + volumes_entrelaces[elem_faces(elem,2)])/2;
@@ -502,7 +501,7 @@ void Tetra_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
         break;
       }
 
-    case 9: // deux faces de Dirichlet :faces 0,3
+    case 9: // two Dirichlet faces: faces 0,3
       {
         vol_mod = (volumes_entrelaces[elem_faces(elem,0)]
                    + volumes_entrelaces[elem_faces(elem,3)])/2;
@@ -515,7 +514,7 @@ void Tetra_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
         break;
       }
 
-    case 10: // deux faces de Dirichlet :faces 0,2
+    case 10: // two Dirichlet faces: faces 0,2
       {
         vol_mod = (volumes_entrelaces[elem_faces(elem,0)]
                    + volumes_entrelaces[elem_faces(elem,2)])/2;
@@ -528,7 +527,7 @@ void Tetra_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
         break;
       }
 
-    case 12: // deux faces de Dirichlet :faces 0,1
+    case 12: // two Dirichlet faces: faces 0,1
       {
         vol_mod = (volumes_entrelaces[elem_faces(elem,0)]
                    + volumes_entrelaces[elem_faces(elem,1)])/2;
@@ -543,7 +542,7 @@ void Tetra_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
 
 
 
-    case 7:  // trois faces de Dirichlet : faces 1,2,3
+    case 7:  // three Dirichlet faces: faces 1,2,3
       {
         vol_mod =  volumes_entrelaces[elem_faces(elem,1)]
                    + volumes_entrelaces[elem_faces(elem,2)]
@@ -554,7 +553,7 @@ void Tetra_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
         break;
       }
 
-    case 11: // trois faces de Dirichlet : faces 0,2,3
+    case 11: // three Dirichlet faces: faces 0,2,3
       {
         vol_mod =  volumes_entrelaces[elem_faces(elem,0)]
                    + volumes_entrelaces[elem_faces(elem,2)]
@@ -565,7 +564,7 @@ void Tetra_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
         break;
       }
 
-    case 13: // trois faces de Dirichlet : faces 0,1,3
+    case 13: // three Dirichlet faces: faces 0,1,3
       {
 
         vol_mod =  volumes_entrelaces[elem_faces(elem,0)]
@@ -577,7 +576,7 @@ void Tetra_VEF::modif_volumes_entrelaces_faces_joints(int j,int elem,
         break;
       }
 
-    case 14: // trois faces de Dirichlet : faces 0,1,2
+    case 14: // three Dirichlet faces: faces 0,1,2
       {
         vol_mod =  volumes_entrelaces[elem_faces(elem,0)]
                    + volumes_entrelaces[elem_faces(elem,1)]
@@ -616,7 +615,9 @@ void Tetra_VEF::calcul_vc(const ArrOfInt& Face,ArrOfDouble& vc,
   calcul_vc_tetra(Face.addr(), vc.addr(), vs.addr(), vsom.addr(), vfa.addr(), (int)type_cl, poro.addr());
 }
 
-/*! @brief calcule les coord xg du centre d'un element non standard calcule aussi idirichlet=nb de faces de Dirichlet de l'element
+/*! @brief Computes the coordinates xg of the center of a non-standard element.
+ *
+ *  Also computes idirichlet = number of Dirichlet faces of the element.
  *
  */
 void Tetra_VEF::calcul_xg(DoubleVect& xg,const DoubleTab& x, const int type_elem_Cl,
@@ -638,7 +639,7 @@ void Tetra_VEF::modif_normales_facettes_Cl(DoubleTab& normales_facettes_Cl,
     case 1:
       break;
 
-    case 2:  // une facette nulle n1
+    case 2:  // one null sub-facet n1
       {
         fa7=n1;
         normales_facettes_Cl(num_elem,fa7,0) = 0;
@@ -664,7 +665,7 @@ void Tetra_VEF::modif_normales_facettes_Cl(DoubleTab& normales_facettes_Cl,
         break;
       }
 
-    }  //fin du switch
+    }  // end of switch
 }
 
 

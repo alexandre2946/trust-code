@@ -65,7 +65,7 @@ public:
 
   void associer_loipar(const Turbulence_paroi_scal_base& loi_paroi) override { throw; }
 
-  // pour CRTP : TODO : appel depuis eval mere
+  // for CRTP: TODO: call from parent evaluator
   inline const Correlation_base& get_corr() const { return corr_; }
 
 protected:

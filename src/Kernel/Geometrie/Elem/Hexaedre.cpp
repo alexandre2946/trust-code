@@ -16,7 +16,7 @@
 #include <Hexaedre.h>
 #include <Domaine.h>
 
-// Convention de numerotation
+// Vertex and face numbering convention
 //    sommets         faces         5(face z=1)
 //      6------7            *------*
 //     /|     /|           /| 4   /|
@@ -39,10 +39,10 @@ static int faces_sommets_hexa[6][4] =
 Implemente_instanciable_32_64(Hexaedre_32_64,"Hexaedre",Elem_geom_base_32_64<_T_>);
 
 
-/*! @brief NE FAIT RIEN
+/*! @brief Does nothing.
  *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie
+ * @param s An output stream.
+ * @return The output stream.
  */
 template <typename _SIZE_>
 Sortie& Hexaedre_32_64<_SIZE_>::printOn(Sortie& s ) const
@@ -51,10 +51,10 @@ Sortie& Hexaedre_32_64<_SIZE_>::printOn(Sortie& s ) const
 }
 
 
-/*! @brief NE FAIT RIEN
+/*! @brief Does nothing.
  *
- * @param (Entree& s) un flot d'entree
- * @return (Entree&) le flot d'entree
+ * @param s An input stream.
+ * @return The input stream.
  */
 template <typename _SIZE_>
 Entree& Hexaedre_32_64<_SIZE_>::readOn(Entree& s )
@@ -62,7 +62,7 @@ Entree& Hexaedre_32_64<_SIZE_>::readOn(Entree& s )
   return s;
 }
 
-/*! @brief Reordonne les sommets de l'hexaedre
+/*! @brief Reorders the vertices of the hexahedron.
  */
 template <typename _SIZE_>
 void Hexaedre_32_64<_SIZE_>::reordonner()
@@ -76,8 +76,9 @@ void Hexaedre_32_64<_SIZE_>::reordonner()
     }
 }
 
-/*! @brief Reordonne les sommets de l'hexaedre
+/*! @brief Reorders the vertices of the hexahedron element.
  *
+ * @return 0 on success, -1 if the mesh is not composed of regular hexahedra.
  */
 template <typename _SIZE_>
 int Hexaedre_32_64<_SIZE_>::reordonner_elem()
@@ -110,8 +111,8 @@ int Hexaedre_32_64<_SIZE_>::reordonner_elem()
             }
         }
 
-      // Pour chaque sommet, chercher rang dans l'element
-      // en fonction de ses coordonnees
+      // For each vertex, find its rank within the element
+      // based on its coordinates
       for (int i=0; i<8; i++)
         {
           int num_sommet = 0;
@@ -126,10 +127,10 @@ int Hexaedre_32_64<_SIZE_>::reordonner_elem()
           else
             return -1;
         }
-      // Est ce bien un hexaedre regulier ?
+      // Is this a regular hexahedron?
       if (min_array(NS)==-1)
         return -1;
-      // Tous les sommets ont-ils ete trouves ?
+      // Have all vertices been found?
       int updated = 0;
       for(int i=0; i<8; i++)
         {
@@ -146,9 +147,9 @@ int Hexaedre_32_64<_SIZE_>::reordonner_elem()
   return 0;
 }
 
-/*! @brief Renvoie le nom LML d'un triangle = "VOXEL8".
+/*! @brief Returns the LML name of a hexahedron = "VOXEL8".
  *
- * @return (Nom&) toujours egal a "VOXEL8"
+ * @return Always equal to "VOXEL8".
  */
 template <typename _SIZE_>
 const Nom& Hexaedre_32_64<_SIZE_>::nom_lml() const
@@ -158,14 +159,13 @@ const Nom& Hexaedre_32_64<_SIZE_>::nom_lml() const
 }
 
 
-/*! @brief Renvoie 1 si l'element "elemen" du domaine associe a l'element geometrique contient le point
+/*! @brief Returns 1 if element "element" of the domain associated with this geometric element contains the point
  *
- *               de coordonnees specifiees par le parametre "pos".
- *     Renvoie 0 sinon.
+ * with coordinates specified by the parameter "pos". Returns 0 otherwise.
  *
- * @param (DoubleVect& pos) coordonnees du point que l'on cherche a localiser
- * @param (int element) le numero de l'element du domaine dans lequel on cherche le point.
- * @return (int) 1 si le point de coordonnees specifiees appartient a l'element "element" 0 sinon
+ * @param pos Coordinates of the point to locate.
+ * @param element Index of the domain element in which to search for the point.
+ * @return 1 if the specified point belongs to element "element", 0 otherwise.
  */
 template <typename _SIZE_>
 int Hexaedre_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t element ) const
@@ -183,13 +183,13 @@ int Hexaedre_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t element ) con
 }
 
 
-/*! @brief Renvoie 1 si les sommets specifies par le parametre "pos" sont les sommets de l'element "element" du domaine associe a
+/*! @brief Returns 1 if the vertices specified by parameter "som" are the vertices of element "element"
  *
- *     l'element geometrique.
+ * in the domain associated with this geometric element. Returns 0 otherwise.
  *
- * @param (IntVect& pos) les numeros des sommets a comparer avec ceux de l'elements "element"
- * @param (int element) le numero de l'element du domaine dont on veut comparer les sommets
- * @return (int) 1 si les sommets passes en parametre sont ceux de l'element specifie, 0 sinon
+ * @param som Vertex indices to compare with those of element "element".
+ * @param element Index of the domain element whose vertices are to be compared.
+ * @return 1 if the specified vertices are those of the given element, 0 otherwise.
  */
 template <typename _SIZE_>
 int Hexaedre_32_64<_SIZE_>::contient(const SmallArrOfTID_t& som, int_t element ) const
@@ -208,9 +208,9 @@ int Hexaedre_32_64<_SIZE_>::contient(const SmallArrOfTID_t& som, int_t element )
     return 0;
 }
 
-/*! @brief Calcule les volumes des elements du domaine associe.
+/*! @brief Computes the volumes of the elements of the associated domain.
  *
- * @param (DoubleVect& volumes) le vecteur contenant les valeurs  des des volumes des elements du domaine
+ * @param volumes Vector to fill with the volumes of domain elements.
  */
 template <typename _SIZE_>
 void Hexaedre_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const
@@ -234,10 +234,10 @@ void Hexaedre_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const
     }
 }
 
-/*! @brief Calcule les normales aux faces des elements du domaine associe.
+/*! @brief Computes the face normals of the elements of the associated domain.
  *
- * @param (IntTab& face_sommets) les numeros des sommets des faces dans la liste des sommets du domaine associe
- * @param (DoubleTab& face_normales)
+ * @param Face_sommets Vertex indices of the faces in the domain vertex list.
+ * @param face_normales Output array to fill with face normals.
  */
 template <typename _SIZE_>
 void Hexaedre_32_64<_SIZE_>::calculer_normales(const IntTab_t& Face_sommets, DoubleTab_t& face_normales) const
@@ -269,7 +269,7 @@ void Hexaedre_32_64<_SIZE_>::calculer_normales(const IntTab_t& Face_sommets, Dou
 }
 
 
-/*! @brief voir ElemGeomBase::get_tab_faces_sommets_locaux
+/*! @brief See ElemGeomBase::get_tab_faces_sommets_locaux.
  *
  */
 template <typename _SIZE_>
@@ -282,11 +282,11 @@ int Hexaedre_32_64<_SIZE_>::get_tab_faces_sommets_locaux(IntTab& faces_som_local
   return 1;
 }
 
-/*! @brief Renvoie le numero du j-ieme sommet de la i-ieme face de l'element.
+/*! @brief Returns the index of the j-th vertex of the i-th face of the element.
  *
- * @param (int i) un numero de face
- * @param (int j) un numero de sommet
- * @return (int) le numero du j-ieme sommet de la i-ieme face
+ * @param (int i) a face index
+ * @param (int j) a vertex index
+ * @return (int) the index of the j-th vertex of the i-th face
  */
 template <typename _SIZE_>
 int Hexaedre_32_64<_SIZE_>::face_sommet(int i, int j) const

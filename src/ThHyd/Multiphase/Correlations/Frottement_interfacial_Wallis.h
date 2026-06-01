@@ -17,10 +17,8 @@
 #define Frottement_interfacial_Wallis_included
 #include <Frottement_interfacial_base.h>
 
-/*! @brief classe Frottement_interfacial_Wallis coefficients de frottement interfacial d'un ecoulement annulaire
- *
- *       -> correlation de Wallis
- *       parametres : non!
+/*! @brief Interfacial friction coefficients for annular flow using the Wallis correlation.
+ *         Parameters: none.
  *
  *
  */
@@ -33,7 +31,7 @@ public:
                    const DoubleTab& rho, const DoubleTab& mu, const DoubleTab& sigma, double Dh,
                    const DoubleTab& ndv, const DoubleTab& d_bulles, DoubleTab& coeff) const override;
 protected:
-  int n_l = -1, n_g = -1; //phases traitees : liquide / gaz continu
+  int n_l = -1, n_g = -1; // treated phases: liquid / continuous gas
 };
 
 #endif

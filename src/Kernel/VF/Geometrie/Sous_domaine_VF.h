@@ -20,31 +20,31 @@
 #include <Domaine_VF.h>
 #include <TRUST_Ref.h>
 
-//! Cette classe abstraite contient les informations geometrique de sous-domaine communes aux methodes de volumes finis (VDF et VEF par exemple)
+//! This abstract class contains the geometrical subdomain information common to finite-volume methods (VDF and VEF for example)
 /**
-   On suppose que chaque face a au plus deux elements voisins dans la
-   domaine, ce qui est toujours le cas en maillage conforme.
+   We assume that each face has at most two neighbouring elements in the
+   domain, which is always the case in a conforming mesh.
 
-   Le tableau les_faces contient l'ensemble des faces du Domaine_dis qui
-   appartiennent a ce sous-domaine, classees de la facon suivante :
-   * Les faces internes au sous-domaine
-   * Les faces internes au domaine, mais dont seul le premier element voisin
-   appartient au sous-domaine
-   * Les faces internes au domaine, mais dont seul le deuxieme element voisin
-   appartient au sous-domaine
-   * Les faces qui ne presentent qu'un element dans le domaine.
-   Les separations sont indiquees respectivement par les variables
-   premiere_face_bord_0, premiere_face_bord_1, et premiere_face_bord.
+   The array les_faces contains all the faces of the Domaine_dis that
+   belong to this subdomain, sorted as follows:
+   * Faces internal to the subdomain
+   * Faces internal to the domain, but whose only first neighbouring element
+   belongs to the subdomain
+   * Faces internal to the domain, but whose only second neighbouring element
+   belongs to the subdomain
+   * Faces that have only one element in the domain.
+   The separations are indicated respectively by the variables
+   premiere_face_bord_0, premiere_face_bord_1, and premiere_face_bord.
 
    les_faces : nb_dim=1
-   dimension(0) = le nombre de faces du sous_domaine
-   valeur de l'entier = indice dans les tableaux le_dom_VF->face_voisins_,
+   dimension(0) = number of faces of the subdomain
+   integer value = index in the arrays le_dom_VF->face_voisins_,
    le_dom_VF->face_sommets_,...
 
-   volumes_entrelaces(int face) renvoie le volume entrelace restreint
-   au sous-domaine. Le numero de la face fait reference au tableau
-   les_faces. Seuls sont stockes localement les volumes entrelaces
-   differents de ceux du domaine.
+   volumes_entrelaces(int face) returns the interlaced volume restricted
+   to the subdomain. The face number refers to the array
+   les_faces. Only the interlaced volumes that differ from those of the domain
+   are stored locally.
 */
 
 class Sous_domaine_VF : public Sous_domaine_dis_base
@@ -54,7 +54,7 @@ class Sous_domaine_VF : public Sous_domaine_dis_base
 
 public:
 
-  // Methodes d'acces
+  // Accessor methods
   inline const IntTab& les_faces() const
   {
     return les_faces_;
@@ -75,12 +75,12 @@ public:
   {
     return premiere_face_bord_;
   }
-  //! Renvoie le volume entrelace restreint au sous-domaine. face est l'indice dans le tableau les_faces_.
+  //! Returns the interlaced volume restricted to the sub-domain. face is the index in the les_faces_ array.
   inline double volumes_entrelaces(int) const;
 
-  // Methodes propres
+  // Specific methods
 
-  //! Genere les_faces en parcourant les faces du domaine_dis et en cherchant quels voisins appartiennent a le_sous_domaine.
+  //! Generates les_faces by iterating over the faces of domaine_dis and identifying which neighbours belong to le_sous_domaine.
   void discretiser() override;
 
 protected:

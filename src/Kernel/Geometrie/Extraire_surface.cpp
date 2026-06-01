@@ -76,7 +76,7 @@ Entree& Extraire_surface::interpreter_(Entree& is)
       exit();
     }
 
-  // on recupere le pb
+  // retrieve the problem
   if(! sub_type(Probleme_base, objet(nom_pb)))
     {
       Cerr << nom_pb << " is of type " << objet(nom_pb).que_suis_je() << finl;
@@ -92,7 +92,7 @@ Entree& Extraire_surface::interpreter_(Entree& is)
   return is;
 }
 
-// Extraction d'une ou plusieurs frontieres du domaine volumique selon certaines conditions
+// Extraction of one or several boundaries of the volumetric domain according to certain conditions
 
 void Extraire_surface::extraire_surface(Domaine& domaine_surfacique,const Domaine& domaine_volumique, const Nom& nom_domaine_surfacique, const Domaine_VF& domaine_vf, const Nom& expr_elements,const Nom& expr_faces, bool avec_les_bords, const Noms& noms_des_bords)
 {
@@ -119,7 +119,7 @@ void Extraire_surface::extraire_surface_without_cleaning(Domaine& domaine_surfac
   condition_elements.setString(expr_elements);
   condition_elements.parseString();
 
-  // Copie des sommets
+  // Copy of vertices
   domaine_surfacique.les_sommets()=domaine_volumique.les_sommets();
   const Nom& type_elem=domaine_vf.domaine().type_elem()->que_suis_je();
 
@@ -169,7 +169,7 @@ void Extraire_surface::extraire_surface_without_cleaning(Domaine& domaine_surfac
   int nb_faces=domaine_vf.nb_faces();
 
   ArrOfInt tab_marq(nb_faces);
-  // on marque les joints
+  // mark the joints
   int nbjoints=domaine_vf.nb_joints();
   for(int njoint=0; njoint<nbjoints; njoint++)
     {
@@ -191,7 +191,7 @@ void Extraire_surface::extraire_surface_without_cleaning(Domaine& domaine_surfac
     }
   int nb_t=0;
 
-  // on flage les face sde bords qui nous interesse
+  // flag the boundary faces of interest
   ArrOfInt tab_face_bord_int(nb_faces);
   if (avec_les_bords)
     tab_face_bord_int=1;
@@ -216,7 +216,7 @@ void Extraire_surface::extraire_surface_without_cleaning(Domaine& domaine_surfac
         }
     }
 
-  // on marque toutes les faces que l'on veut mettre dans le domaine
+  // mark all the faces to be added to the domain
   ParserView parser_condition_faces(condition_faces);
   parser_condition_faces.parseString();
   CDoubleTabView xv = domaine_vf.xv().view_ro();
@@ -245,7 +245,7 @@ void Extraire_surface::extraire_surface_without_cleaning(Domaine& domaine_surfac
             double res=parser_condition_faces.eval(threadId);
             parser_condition_faces.release(threadId);
             if (std::fabs(res)>1e-5)
-              if (marq[fac]!=-1)  // pas un joint, ou on est le proprietaire
+              if (marq[fac]!=-1)  // not a joint, or we are the owner
                 {
                   marq[fac]=1;
                   local_nb_t++;
@@ -289,7 +289,7 @@ void Extraire_surface::extraire_surface_without_cleaning(Domaine& domaine_surfac
           normal[i] = xv(fac, i) - xp(el1, i);
         for (int s = 0; s < nb_sommet_face; s++)
           les_elems(nb, s) = face_sommets(fac, s);
-        // on calcule la normale
+        // compute the normal
         if (nb_sommet_face > 1)
           {
             if (dim == 3)
@@ -306,7 +306,7 @@ void Extraire_surface::extraire_surface_without_cleaning(Domaine& domaine_surfac
                   dot_product+=normal[i]*normal_b[i];
                 if (dot_product < 0)
                   {
-                    // si normal a l'envers on inverse les deux sommets
+                    // if normal is reversed, swap the two vertices
                     les_elems(nb, 1) = face_sommets(fac, 2);
                     les_elems(nb, 2) = face_sommets(fac, 1);
                   }
@@ -318,7 +318,7 @@ void Extraire_surface::extraire_surface_without_cleaning(Domaine& domaine_surfac
                 double produit = normal[0] * point0b[1] - normal[1] * point0b[0];
                 if (produit < 0)
                   {
-                    // si normal a l'envers on inverse les deux sommets
+                    // if normal is reversed, swap the two vertices
                     les_elems(nb, 0) = face_sommets(fac, 1);
                     les_elems(nb, 1) = face_sommets(fac, 0);
                   }

@@ -21,10 +21,10 @@ Implemente_base(Vitesse_relative_base, "Vitesse_relative_base", Correlation_base
 Sortie& Vitesse_relative_base::printOn(Sortie& os) const { return os; }
 Entree& Vitesse_relative_base::readOn(Entree& is)
 {
-  //identification des phases
+  //phase identification
   const Pb_Multiphase *pbm = sub_type(Pb_Multiphase, pb_.valeur()) ? &ref_cast(Pb_Multiphase, pb_.valeur()) : nullptr;
   if (!pbm || pbm->nb_phases() == 1) Process::exit(que_suis_je() + " : not needed for single-phase flow!");
-  for (int n = 0; n < pbm->nb_phases(); n++) //recherche des id_composite des phases liquide et gaz
+  for (int n = 0; n < pbm->nb_phases(); n++) //search for id_composite of liquid and gas phases
     if (pbm->nom_phase(n).debute_par("liquide") && (n_l < 0 || pbm->nom_phase(n).finit_par("continu")))  n_l = n;
     else if (pbm->nom_phase(n).debute_par("gaz") && (n_g < 0 || pbm->nom_phase(n).finit_par("continu"))) n_g = n;
 

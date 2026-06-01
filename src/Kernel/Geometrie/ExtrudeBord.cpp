@@ -139,7 +139,7 @@ void ExtrudeBord::extruder_bord(Nom& nom_front, Nom& nom_dom_surfacique, DoubleV
 
     }
 
-  if (Trois_Tetra)  // Evolution de la methode Extrude bord pour l'adapter a 3tetra
+  if (Trois_Tetra)  // Evolution of the ExtrudeBord method adapted for 3tetra
     {
       Extruder_en3 extr3;
       extr3.setNbTranches(nbpas);
@@ -177,10 +177,10 @@ void ExtrudeBord::extruder_bord(Nom& nom_front, Nom& nom_dom_surfacique, DoubleV
     }
   if (en3D_)
     {
-      // en 3D on ne tourne pas le bord
+      // in 3D we do not rotate the boundary
       return;
     }
-  // on remet le nouveau domaine 3D dans le repere du domaine 3D initial
+  // put the new 3D domain back into the coordinate system of the initial 3D domain
   dimension = 3;
 
   Noms les_fcts(3);
@@ -190,10 +190,10 @@ void ExtrudeBord::extruder_bord(Nom& nom_front, Nom& nom_dom_surfacique, DoubleV
 
   Transformer transf;
   transf.transformer(dom_surfacique,les_fcts);
-  // Pour que l'on ait plus de problemes de precision ensuite quand on manipule
-  // le domaine extrude, on impose les coordonnes de la frontiere nom_front du domaine
-  // initial sur les coordonnees de la frontiere devant du domaine extrude
-  // Il faut egalement recalculer proprement pour la frontiere derriere
+  // To avoid precision problems later when manipulating
+  // the extruded domain, we impose the coordinates of the nom_front boundary of the
+  // initial domain onto the coordinates of the "front" boundary of the extruded domain.
+  // We also need to properly recompute the "back" boundary.
   const Faces& faces=dom.frontiere(dom.rang_frontiere(nom_front)).faces();
   int nb_faces=faces.nb_faces();
   int nb_som_faces=faces.nb_som_faces();
@@ -248,7 +248,7 @@ void ExtrudeBord::extruder_hexa_old(Nom& nom_front, Nom& nom_dom_surfacique, Dou
           int nbsombord,trouve;
           nbsombord = 0;
 
-          // ******** Table de correspondance des sommets de bords : dom_volumique - dom_surfacique
+          // ******** Correspondence table of boundary vertices: dom_volumique - dom_surfacique
 
           for (i=0; i<nbfaces; i++)
             for (int j=0; j<4; j++)
@@ -277,7 +277,7 @@ void ExtrudeBord::extruder_hexa_old(Nom& nom_front, Nom& nom_dom_surfacique, Dou
           compt.resize(nbsombord);
           sommets2.resize((nbpas+1)*nbsombord,3);
 
-          // ******** Creation des sommets deduits par translation
+          // ******** Creation of vertices derived by translation
 
           for (int j=0; j<nbpas+1; j++)
             for (i=0; i<nbsombord; i++)
@@ -288,7 +288,7 @@ void ExtrudeBord::extruder_hexa_old(Nom& nom_front, Nom& nom_dom_surfacique, Dou
               }
 
 
-          // ******** Definition des tableaux de correspondance ELEM<->SOMMETS
+          // ******** Definition of element-to-vertex correspondence arrays
 
           les_elems2.resize(nbpas*nbfaces,8);
 
@@ -326,7 +326,7 @@ void ExtrudeBord::extruder_hexa_old(Nom& nom_front, Nom& nom_dom_surfacique, Dou
 
 
 
-          // ******** Definition des frontieres periodiques
+          // ******** Definition of periodic boundaries
 
 
           Bord& bordperio=dom_surfacique.faces_bord().add(Bord());
@@ -368,7 +368,7 @@ void ExtrudeBord::extruder_hexa_old(Nom& nom_front, Nom& nom_dom_surfacique, Dou
 
 
 
-          // ******** Definition des frontieres parois
+          // ******** Definition of wall boundaries
 
 
           Bord& bordparoi=dom_surfacique.faces_bord().add(Bord());
@@ -379,23 +379,23 @@ void ExtrudeBord::extruder_hexa_old(Nom& nom_front, Nom& nom_dom_surfacique, Dou
 
           int nbsombordparoi=0;
 
-          // ***** recherche des sommets appartenant au contour de la face de bord *****
+          // ***** search for vertices belonging to the contour of the boundary face *****
 
           for (i=0; i<nbfaces; i++)
             for (int j=0; j<4; j++)
               for (int k=0; k<nbsombord; k++)
-                if(som(i,j)==newsom(k))  compt(k)++; // nb de faces se rapportant a chacun des sommets
+                if(som(i,j)==newsom(k))  compt(k)++; // number of faces referencing each vertex
 
           for (int k=0; k<nbsombord; k++)
-            if(compt(k)<3) nbsombordparoi++; // nb de sommets a extruder pour constituer les faces de parois
+            if(compt(k)<3) nbsombordparoi++; // number of vertices to extrude to form the wall faces
 
-          // PQ : 05/05/04 : ATTENTION : des sommets internes peuvant etre connectes qu'a
-          //                        3 faces (cf. maillage en "O" d'un cylindre)
-          //                        -> on se place donc dans le cas ou les sommets de bords ne sont connectes qu'a
-          //                        2 elements (excluant de fait les bords types VDF en marche d'escalier).
+          // PQ : 05/05/04 : WARNING: internal vertices can be connected to only
+          //                        3 faces (e.g. "O"-type mesh of a cylinder)
+          //                        -> we therefore consider only the case where boundary vertices are connected to
+          //                        2 elements (excluding VDF-type stair-step boundaries).
 
 
-          // **** Extension des aretes pour former les faces de la frontiere paroi
+          // **** Extension of edges to form the faces of the wall boundary
 
           IntTab faces_paroi(nbsombordparoi*nbpas,4);
           int ip=0;
@@ -434,7 +434,7 @@ void ExtrudeBord::extruder_hexa_old(Nom& nom_front, Nom& nom_dom_surfacique, Dou
                 }
 
 
-              if( (compt0<3) && (compt1<3) ) // arete[0-1]
+              if( (compt0<3) && (compt1<3) ) // edge[0-1]
                 {
                   for(int k=0; k<nbpas; k++)
                     {
@@ -447,7 +447,7 @@ void ExtrudeBord::extruder_hexa_old(Nom& nom_front, Nom& nom_dom_surfacique, Dou
                 }
 
 
-              if( (compt1<3) && (compt3<3) ) // arete[1-3]
+              if( (compt1<3) && (compt3<3) ) // edge[1-3]
                 {
                   for(int k=0; k<nbpas; k++)
                     {
@@ -460,7 +460,7 @@ void ExtrudeBord::extruder_hexa_old(Nom& nom_front, Nom& nom_dom_surfacique, Dou
                 }
 
 
-              if( (compt3<3) && (compt2<3) ) // arete[3-2]
+              if( (compt3<3) && (compt2<3) ) // edge[3-2]
                 {
                   for(int k=0; k<nbpas; k++)
                     {
@@ -473,7 +473,7 @@ void ExtrudeBord::extruder_hexa_old(Nom& nom_front, Nom& nom_dom_surfacique, Dou
                 }
 
 
-              if( (compt2<3) && (compt0<3) ) // arete[2-0]
+              if( (compt2<3) && (compt0<3) ) // edge[2-0]
                 {
                   for(int k=0; k<nbpas; k++)
                     {
@@ -488,8 +488,8 @@ void ExtrudeBord::extruder_hexa_old(Nom& nom_front, Nom& nom_dom_surfacique, Dou
 
           bordparoi.ajouter_faces(faces_paroi);
 
-        }//fin de la condition sur la frontiere a extruder
-    }//fin de parcours de toutes les frontieres
+        }//end of condition on the boundary to extrude
+    }//end of loop over all boundaries
   Nom mfile=nom_dom_surfacique;
   mfile+=".geom";
 

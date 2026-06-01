@@ -25,20 +25,14 @@
 
 class Matrice_Morse;
 
-/*! @brief classe Navier_Stokes_Fluide_Dilatable_base Cette classe basse porte les termes de l'equation de la dynamique
+/*! @brief @brief Base class carrying the terms of the momentum equation for a fluid without turbulence modelling under the dilatable fluid assumption.
  *
- *     pour un fluide sans modelisation de la turbulence.
- *     On suppose l'hypothese de fluide dilatable.
- *     Sous ces hypotheses, on utilise la forme suivante des equations de
- *     Navier_Stokes:
- *        DU/dt = div(terme visqueux) - gradP/rho + sources/rho
- *        div U = W
- *     avec DU/dt : derivee particulaire de la vitesse
- *          rho   : masse volumique
- *     Rq : l'implementation de la classe permet bien sur de negliger
- *          certains termes de l'equation (le terme visqueux, le terme
- *          convectif, tel ou tel terme source).
- *     L'inconnue est le champ de vitesse.
+ * The following form of the Navier-Stokes equations is used:
+ *   DU/dt = div(viscous term) - gradP/rho + sources/rho
+ *   div U = W
+ * where DU/dt is the material derivative of velocity and rho is the density.
+ * The implementation allows individual terms (viscous, convective, source) to be neglected.
+ * The unknown is the velocity field.
  *
  * @sa Navier_Stokes_std
  */
@@ -56,7 +50,7 @@ public :
   const Champ_base& diffusivite_pour_pas_de_temps() const override;
   const Champ_base& vitesse_pour_transport() const override;
 
-  // Methodes virtuelles
+  // Virtual methods
   DoubleTab& derivee_en_temps_inco(DoubleTab& ) override;
   const Champ_base& get_champ(const Motcle& nom) const override;
   bool has_champ(const Motcle& nom, OBS_PTR(Champ_base) &ref_champ) const override;
@@ -68,7 +62,7 @@ public :
   int impr(Sortie& os) const override;
   bool initTimeStep(double dt) override;
 
-  // Methodes inlines
+  // Inline methods
   inline void mettre_a_jour(double temps) override
   {
     Navier_Stokes_std::mettre_a_jour(temps);

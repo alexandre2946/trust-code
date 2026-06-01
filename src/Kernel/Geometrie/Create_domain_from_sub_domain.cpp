@@ -79,15 +79,15 @@ Entree& Create_domain_from_sub_domain::interpreter_(Entree& is)
 
   DomaineCutter cutter;
 
-  IntTab index(domaine_org.nb_elem()); //0 -> 1er domaine, ..., n_dom + 1 -> le reste
+  IntTab index(domaine_org.nb_elem()); //0 -> first domain, ..., n_dom + 1 -> the rest
   int nb_dom = noms_doms.size();
-  index = 0; //par defaut, on ne prend rien
+  index = 0; //by default, nothing is selected
   for (int i = 0; i < nb_dom; i++)
     {
       const Sous_Domaine& ssz=ref_cast(Sous_Domaine,objet(noms_sous_domaines[i]));
       for (int j = 0; j < ssz.nb_elem_tot(); j++)
         {
-          if (index(ssz(j))) /* element deja pris -> erreur */
+          if (index(ssz(j))) /* element already taken -> error */
             Process::exit(Nom("Create_domain_from_sub_domain : collision detected between ") + noms_sous_domaines[i] + " and " + noms_sous_domaines[index(ssz(j)) - 1] + " !");
           index(ssz(j)) = i + 1;
         }
@@ -104,7 +104,7 @@ Entree& Create_domain_from_sub_domain::interpreter_(Entree& is)
         dom.faces_joint().vide();
       else
         {
-          // on transforme les joints en bord
+          // convert joints to boundaries
           Joints& joints= dom.faces_joint();
           for (int j=joints.size()-1; j>=0; j--)
             {
@@ -134,7 +134,7 @@ Entree& Create_domain_from_sub_domain::interpreter_(Entree& is)
               Raccord racc_base;
               racc_base.typer("Raccord_local_homogene");
               Raccord_base& racc=racc_base.valeur();
-              // on caste en Frontiere pour pouvoir faire la copie ...
+              // cast to Frontiere to allow copying ...
               ref_cast(Frontiere,racc)=ref_cast(Frontiere,bords(b));
               listrac.add(racc_base);
 
@@ -142,7 +142,7 @@ Entree& Create_domain_from_sub_domain::interpreter_(Entree& is)
             }
         }
 
-      //et les sous-domaines?
+      //and the sub-domains?
       const LIST(OBS_PTR(Sous_Domaine)) & liste_sous_domaines = domaine_org.ss_domaines();
       int nb_sous_domaines = liste_sous_domaines.size();
       const Sous_Domaine& ssz=ref_cast(Sous_Domaine,objet(noms_sous_domaines[i]));
@@ -156,7 +156,7 @@ Entree& Create_domain_from_sub_domain::interpreter_(Entree& is)
       for (int j = 0; j < nb_sous_domaines; j++)
         if (liste_sous_domaines[j]->le_nom() != noms_sous_domaines[i])
           {
-            //liste des elements de la sous-sous-domaine
+            //list of elements of the sub-sub-domain
             ArrOfInt polys;
 
             for (int k = 0, l; k < liste_sous_domaines[j]->nb_elem_tot(); k++)
@@ -164,11 +164,11 @@ Entree& Create_domain_from_sub_domain::interpreter_(Entree& is)
                 polys.append_array(l);
 
             if (!polys.size_array())
-              continue; //sous-sous-domaine vide!
+              continue; //empty sub-sub-domain!
 
             Nom nom_ssz(noms_doms[i] + "_" + liste_sous_domaines[j]->le_nom()), file_ssz(nom_ssz + ".file");
 
-            //contribution aux JDDs des sous-sous-domaines
+            //contribution to the input data files of the sub-sub-domains
             jdd += Nom("export Sous_Domaine ") + nom_ssz + "\n";
             jdd += Nom("Associer ") + nom_ssz + " " + noms_doms[i] + "\n";
             jdd += Nom("Lire ") + nom_ssz + " { fichier " + file_ssz + " }" + "\n";
@@ -177,7 +177,7 @@ Entree& Create_domain_from_sub_domain::interpreter_(Entree& is)
             jdd_par += Nom("Lire ") + nom_ssz + " { fichier " + nom_ssz + ".ssz }" + "\n";
             ecr_jdd = 1;
 
-            //fichier de la sous-sous-domaine
+            //file of the sub-sub-domain
             SFichier f_ssz(file_ssz);
             f_ssz << polys;
           }

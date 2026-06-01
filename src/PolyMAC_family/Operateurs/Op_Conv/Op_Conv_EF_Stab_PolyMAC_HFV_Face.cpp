@@ -62,29 +62,29 @@ double Op_Conv_EF_Stab_PolyMAC_HFV_Face::calculer_dt_stab() const
                    *alp = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()).equation_masse().inconnue().passe() : nullptr;
   const IntTab& e_f = domaine.elem_faces(), &f_e = domaine.face_voisins();
   const int N = vit.line_size();
-  DoubleTrav flux(N); //somme des flux pf * |f| * vf, volume minimal des mailles d'elements/faces affectes par ce flux
+  DoubleTrav flux(N); //sum of fluxes pf * |f| * vf, minimum volume of elements/faces affected by this flux
 
   for (int e = 0; e < domaine.nb_elem(); e++)
     {
-      // Calcul du volume effectif de l'element
+      // Compute the effective volume of the element
       const double vol = pe(e) * ve(e);
       flux = 0.;
 
-      // Parcourt des faces associees a l'element
+      // Loop over faces associated with the element
       for (int i = 0; i < e_f.dimension(1); i++)
         {
           int f = e_f(e, i);
-          if (f < 0) continue; // face in-existante
+          if (f < 0) continue; // non-existent face
 
           for (int n = 0; n < N; n++)
             {
-              // Ajout du flux entrant pour la composante n : Seuls les flux entrants comptent
+              // Add incoming flux for component n: only incoming fluxes count
               double flux_f = pf(f) * fs(f) * std::max((e == f_e(f, 1) ? 1 : -1) * vit(f, n), 0.);
               flux(n) += flux_f;
             }
         }
 
-      // Calcul du pas de temps pour chaque composante n
+      // Compute the time step for each component n
       for (int n = 0; n < N; n++)
         if ((!alp || (*alp)(e, n) > 1e-3) && std::abs(flux(n)) > 1e-12)
           dt = std::min(dt, vol / flux(n));
@@ -104,7 +104,7 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Face::dimensionner_blocs(matrices_t matrices, c
   const std::string& nom_inco = ch.le_nom().getString();
 
   if (!matrices.count(nom_inco) || semi_impl.count(nom_inco))
-    return; //pas de bloc diagonal ou semi-implicite -> rien a faire
+    return; //no diagonal block or semi-implicit -> nothing to do
 
   const Pb_Multiphase *pbm = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()) : nullptr;
   const Masse_ajoutee_base *corr = pbm && pbm->has_correlation("masse_ajoutee") ? &ref_cast(Masse_ajoutee_base, pbm->get_correlation("masse_ajoutee")) : nullptr;
@@ -114,22 +114,22 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Face::dimensionner_blocs(matrices_t matrices, c
 
   Stencil stencil(0, 2);
 
-  /* Ce bloc agit uniquement aux elements; la diagonale de la matrice est omise. */
+  /* This block acts on elements only; the diagonal of the matrix is omitted. */
   for (int f = 0; f < domaine.nb_faces_tot(); f++)
     {
-      // Verifie si la face est interne ou satisfait les conditions aux limites
+      // Check if the face is internal or satisfies boundary conditions
       if (f_e(f, 0) >= 0 && (f_e(f, 1) >= 0 || fcl(f, 0) == 3))
         {
-          // Parcourt les elements associes a cette face
+          // Loop over elements associated with this face
           for (int i = 0; i < 2 ; i++)
             {
               const int e = f_e(f, i);
-              if (e < 0) continue; // elem virt
+              if (e < 0) continue; // virtual elem
 
               for (int j = 0; j < 2 ; j++)
                 {
                   const int eb = f_e(f, j);
-                  // Parcourt les faces connectees a l'element courant
+                  // Loop over faces connected to the current element
                   if (eb < 0) continue;
 
                   for (int k = 0; k < e_f.dimension(1); k++)
@@ -140,14 +140,14 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Face::dimensionner_blocs(matrices_t matrices, c
                       if (fb < domaine.nb_faces())
                         {
                           int fc = equiv(f, i, k);
-                          // Cas ou une equivalence entre faces existe
+                          // Case where a face equivalence exists
                           if (fc >= 0)
                             {
                               for (int n = 0; n < N; n++)
                                 for (int m = (corr ? 0 : n); m < (corr ? N : n + 1); m++)
                                   stencil.append_line(N * fb + n, N * fc + m);
                             }
-                          // Cas sans equivalence : contributions entre faces de l'element
+                          // Case without equivalence: contributions between element faces
                           else if (f_e(f, 1) >= 0)
                             {
                               for (int l = 0; l < e_f.dimension(1); l++)
@@ -169,21 +169,21 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Face::dimensionner_blocs(matrices_t matrices, c
         }
     }
 
-  // Trie et retire les doublons dans le stencil
+  // Sort and remove duplicates from the stencil
   tableau_trier_retirer_doublons(stencil);
 
-  // Alloue une matrice clairsemee basee sur le stencil
+  // Allocate a sparse matrix based on the stencil
   Matrix_tools::allocate_morse_matrix(inco.size_totale(), inco.size_totale(), stencil, mat2);
 
-  // Ajoute mat2 a la matrice existante ou initialise 'mat'
+  // Add mat2 to the existing matrix or initialize 'mat'
   if (mat.nb_colonnes())
     mat += mat2;
   else
     mat = mat2;
 }
 
-// ajoute la contribution de la convection au second membre resu
-// renvoie resu
+// adds the convection contribution to the right-hand side resu
+// returns resu
 void Op_Conv_EF_Stab_PolyMAC_HFV_Face::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const Domaine_Poly_base& domaine = le_dom_poly_.valeur();
@@ -193,7 +193,7 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Face::ajouter_blocs(matrices_t matrices, Double
   const DoubleTab& vit = ch.passe(), &nf = domaine.face_normales(), &vfd = domaine.volumes_entrelaces_dir(), &xp = domaine.xp(), &xv = domaine.xv();
   const DoubleVect& fs = domaine.face_surfaces(), &pe = porosite_e, &pf = porosite_f, &ve = domaine.volumes();
 
-  /* a_r : produit alpha_rho si Pb_Multiphase -> par semi_implicite, ou en recuperant le champ_conserve de l'equation de masse */
+  /* a_r : alpha_rho product if Pb_Multiphase -> via semi-implicit, or by retrieving the conserved field from the mass equation */
   const std::string& nom_inco = ch.le_nom().getString();
   const Pb_Multiphase *pbm = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()) : nullptr;
   const Masse_ajoutee_base *corr = pbm && pbm->has_correlation("masse_ajoutee") ? &ref_cast(Masse_ajoutee_base, pbm->get_correlation("masse_ajoutee")) : nullptr;
@@ -208,16 +208,16 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Face::ajouter_blocs(matrices_t matrices, Double
 
   DoubleTrav dfac(2, N, N), masse(N, N);
 
-  // Parcourt toutes les faces du domaine
+  // Loop over all faces of the domain
   for (int f = 0; f < domaine.nb_faces_tot(); f++)
     {
       if (f_e(f, 0) >= 0 && (f_e(f, 1) >= 0 || fcl(f, 0) == 1 || fcl(f, 0) == 3))
         {
-          // Calcul des contributions des faces
+          // Compute face contributions
           dfac = 0.;
           for (int i = 0; i < 2; i++)
             {
-              // Masse diagonale avec correction si necessaire
+              // Diagonal mass with correction if needed
               masse = 0.;
               int e = f_e(f, (f_e(f, i) >= 0) ? i : 0);
               for (int n = 0; n < N; n++)
@@ -237,7 +237,7 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Face::ajouter_blocs(matrices_t matrices, Double
                   }
             }
 
-          // Contributions aux matrices et au second membre
+          // Contributions to matrices and right-hand side
           for (int i = 0; i < 2 ; i++)
             {
               const int e = f_e(f, i);
@@ -251,15 +251,15 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Face::ajouter_blocs(matrices_t matrices, Double
                   if (fb < domaine.nb_faces())
                     {
                       int fc = equiv(f, i, k);
-                      // Cas d'equivalence : face source -> face cible
+                      // Equivalence case: source face -> target face
                       if (fc >= 0 || f_e(f, 1) < 0)
                         {
                           for (int j = 0; j < 2; j++)
                             {
                               int eb = f_e(f, j);
-                              int fd = (j == i) ? fb : fc; // Face ou element source
+                              int fd = (j == i) ? fb : fc; // source face or element
 
-                              //multiplicateur pour passer de vf a ve
+                              //multiplier to convert from vf to ve
                               double mult = (fd < 0 || domaine.dot(&nf(fb, 0), &nf(fd, 0)) > 0) ? 1 : -1;
                               mult *= (fd >= 0) ? pf(fd) / pe(eb) : 1;
 
@@ -270,19 +270,19 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Face::ajouter_blocs(matrices_t matrices, Double
                                       {
                                         double fac = (i ? -1 : 1) * vfd(fb, e != f_e(fb, 0)) * dfac(j, n, m) / ve(e);
 
-                                        // Mise a jour du second membre
+                                        // Update the right-hand side
                                         if (fd >= 0)
                                           secmem(fb, n) -= fac * mult * inco(fd, m);
                                         else
                                           {
-                                            // CL de Dirichlet
+                                            // Dirichlet boundary condition
                                             for (int d = 0; d < D; d++)
                                               secmem(fb, n) -= fac * nf(fb, d) / fs(fb) * ref_cast(Dirichlet, cls[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), N * d + m);
                                           }
                                         if (!incompressible_)
                                           secmem(fb, n) += fac * inco(fb, m);
 
-                                        // Mise a jour de la matrice
+                                        // Update the matrix
                                         if (mat)
                                           {
                                             if (fd >= 0)
@@ -295,7 +295,7 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Face::ajouter_blocs(matrices_t matrices, Double
                                   }
                             }
                         }
-                      // Cas sans equivalence : n_f * operateur elementaire
+                      // No equivalence: n_f * element operator
                       else
                         {
                           for (int j = 0; j < 2; j++)
@@ -320,7 +320,7 @@ void Op_Conv_EF_Stab_PolyMAC_HFV_Face::ajouter_blocs(matrices_t matrices, Double
                                             }
                                     }
                                 }
-                              // Partie correction si 'comp'
+                              // Correction part if 'comp'
                               if (!incompressible_)
                                 {
                                   for (int l = 0; l < e_f.dimension(1) ; l++)

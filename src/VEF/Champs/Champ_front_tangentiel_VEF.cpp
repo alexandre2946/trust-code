@@ -35,11 +35,10 @@ Entree& Champ_front_tangentiel_VEF::readOn(Entree& is)
 }
 
 
-// WEC : manifestement suppose qu'on est en dimension 3, que les
-// surfaces sont verticales (vecteur normal orthogonal a z) et que le
-// vecteur rotation est selon z.
+// WEC : apparently assumes dimension 3, that the surfaces are vertical
+// (normal vector orthogonal to z) and that the rotation vector is along z.
 
-// Ce champ est en fait stationnaire => tout dans initialiser.
+// This field is in fact stationary => everything is done in initialiser.
 
 int Champ_front_tangentiel_VEF::initialiser(double temps, const Champ_Inc_base& inco)
 {
@@ -55,7 +54,7 @@ int Champ_front_tangentiel_VEF::initialiser(double temps, const Champ_Inc_base& 
 
   int nb_cases=les_valeurs->nb_cases();
 
-  // on traite les faces sur la frontiere
+  // process the faces on the boundary
 
   DoubleTab vecteur_tang(le_bord.nb_faces(),3);
 
@@ -79,16 +78,16 @@ int Champ_front_tangentiel_VEF::initialiser(double temps, const Champ_Inc_base& 
 
       norme = sqrt(norme);
 
-      // Remplissage de tous les instants
+      // Fill all time steps
       for (int t=0; t<nb_cases; t++)
         {
           DoubleTab& tab=les_valeurs[t].valeurs();
 
           tab(i,2)=0.0;
 
-          // WEC : Les indices etaient i+premiere.
-          // Supprime car manifestement un bug !!
-          // Change aussi dans le domaine_Cl_VEF
+          // WEC : Indices were i+premiere.
+          // Removed as it was clearly a bug!
+          // Also changed in domaine_Cl_VEF
           for(int j=0; j<2; j++)
             {
               tab(i,j)=vecteur_tang(i,j);

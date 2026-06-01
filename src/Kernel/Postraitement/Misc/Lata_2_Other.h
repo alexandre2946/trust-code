@@ -22,7 +22,8 @@ class Format_Post_base;
 class LataFilter;
 class LataDB;
 
-/*! @brief Classe Lata_2_Other  Converts lata file to med or lml
+/*! @brief class Lata_2_Other
+ * @brief Converts lata file to med or lml
  * Can only be used with small lata files (fitting in 32b).
  */
 class Lata_2_Other: public Interprete

@@ -56,7 +56,7 @@ protected:
   OBS_PTR(Domaine_Cl_VDF) le_dom_Cl_VDF;
   ArrOfDouble les_coeff_pression;
 
-  // Drapeau, indique si la pression est imposee quelque part sur une C.L.
+  // Flag: indicates whether the pressure is imposed somewhere on a boundary condition.
   int has_P_ref;
 };
 

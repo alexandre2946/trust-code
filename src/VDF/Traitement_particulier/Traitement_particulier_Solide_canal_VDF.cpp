@@ -71,7 +71,7 @@ void Traitement_particulier_Solide_canal_VDF::post_traitement_particulier()
     }
 
 
-  // Moyennes temporelles :
+  // Temporal averages:
   if ((tps>=temps_deb)&&(tps<=temps_fin))
     {
       static int init_stat_temps = 0;
@@ -99,7 +99,7 @@ void Traitement_particulier_Solide_canal_VDF::post_traitement_particulier()
 
 
 
-// #################### Calcul Moyennes Spatiales #################################
+// #################### Compute Spatial Averages #################################
 
 void Traitement_particulier_Solide_canal_VDF::calculer_moyennes_spatiales_thermo(DoubleVect& tmoy, DoubleVect& trms,const DoubleVect& tabY, IntVect& tab_corresp, IntVect& tab_compt)
 {
@@ -107,35 +107,35 @@ void Traitement_particulier_Solide_canal_VDF::calculer_moyennes_spatiales_thermo
   const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
   const Domaine_VDF& domaine_VDF=ref_cast(Domaine_VDF, zdisbase);
 
-  // Le nombre d'elements du domaine VDF.
+  // The number of elements in the VDF domain.
   int nb_elems = domaine_VDF.domaine().nb_elem();
 
-  // On veut acceder aux valeurs de la temperature a partir de mon_equation_NRJ.
+  // Access the temperature values from mon_equation_NRJ.
   const DoubleTab& Temp = mon_equation->inconnue().valeurs();
 
-  // t2moy correspond
+  // t2moy corresponds to
   DoubleTrav t2moy(N);
   t2moy = 0.;
 
 
   int num_elem,j;
 
-  // tmoy est la moyenne de T : <T>(y,t)
+  // tmoy is the mean of T : <T>(y,t)
   tmoy = 0.;
-  // trms est l'ecart-type de la temperature : sqrt(<Tp*Tp>)(y,t)=<T*T>-<T*T>
+  // trms is the standard deviation of temperature : sqrt(<Tp*Tp>)(y,t)=<T*T>-<T*T>
   trms = 0.;
 
-  // On parcourt tous les elements pour faire toutes les moyennes au centre des elements.
+  // We iterate over all elements to compute all averages at element centers.
   for (num_elem=0; num_elem<nb_elems; num_elem++)
     {
       // <T>
       tmoy[tab_corresp[num_elem]] += Temp[num_elem];
-      // Trms : en fait ici on calcule <T*T> mais ensuite on va soustraire la partie <T*T>
+      // Trms : here we actually compute <T*T> but then we will subtract the <T*T> part
       trms[tab_corresp[num_elem]] += Temp[num_elem]*Temp[num_elem];
     }
 
 
-  // POUR LE PARALLELE !!
+  // FOR PARALLEL !!
   IntVect compt_p(tab_compt);
   envoyer(compt_p,Process::me(),0,Process::me());
 
@@ -167,8 +167,8 @@ void Traitement_particulier_Solide_canal_VDF::calculer_moyennes_spatiales_thermo
           trms_tot+=trms_p;
         }
 
-      // compt[j] correspond au nombre d'elements qui ont ete utilises pour calculer une meme valeur de temperature moyenne,
-      // ie le nombre d'elements ayant la meme coordonnee Y.
+      // compt[j] is the number of elements used to compute a given mean temperature value,
+      // i.e. the number of elements sharing the same Y coordinate.
       for (j=0; j<N; j++)
         {
           tmoy[j] = tmoy_tot[j] / compt_tot[j];
@@ -182,7 +182,7 @@ void Traitement_particulier_Solide_canal_VDF::calculer_moyennes_spatiales_thermo
 
 
 
-// #################### Calcul Integrale Temporelle ###############################
+// #################### Compute Temporal Integral ###############################
 
 void Traitement_particulier_Solide_canal_VDF::calculer_integrales_temporelles(DoubleVect& moy_temp, const DoubleVect& moy_spat)
 {
@@ -196,7 +196,7 @@ void Traitement_particulier_Solide_canal_VDF::calculer_integrales_temporelles(Do
 
 
 
-// #################### Ecriture Moyennes Spatiales dans Fichier ##################
+// #################### Writing Spatial Averages to File ##################
 
 void Traitement_particulier_Solide_canal_VDF::ecriture_fichier_moy_spat_thermo(const DoubleVect& Tmoy, const DoubleVect& Trms,const DoubleVect& tabY)
 {
@@ -219,14 +219,14 @@ void Traitement_particulier_Solide_canal_VDF::ecriture_fichier_moy_spat_thermo(c
 
       fic.flush();
       fic.close();
-    } // FIN du maitre
+    } // END of master
 }
 
 
 
 
 
-// #################### Ecriture Moyennes temporelles dans Fichier ################
+// #################### Writing Temporal Averages to File ################
 
 void Traitement_particulier_Solide_canal_VDF::ecriture_fichier_moy_temp_thermo(const DoubleVect& Tmoy, const DoubleVect& Trms, const DoubleVect& tabY, const double dt)
 {
@@ -249,7 +249,7 @@ void Traitement_particulier_Solide_canal_VDF::ecriture_fichier_moy_temp_thermo(c
       fic.flush();
       fic.close();
 
-    } // FIN du maitre
+    } // END of master
 }
 
 
@@ -278,7 +278,7 @@ void Traitement_particulier_Solide_canal_VDF::init_calcul_moyenne()
   j=0;
   indic = 0;
 
-  // dimensionnement aux valeurs rentrees dans le jeu de donnees
+  // sizing according to the values provided in the data set
   Y.resize(N);
   compt.resize(N);
   corresp.resize(nb_elems);
@@ -311,7 +311,7 @@ void Traitement_particulier_Solide_canal_VDF::init_calcul_moyenne()
           indic++;
         }
     }
-  N = indic;  // nombre de y pour Temperature
+  N = indic;  // number of y values for Temperature
 
   Y.resize(N);
 

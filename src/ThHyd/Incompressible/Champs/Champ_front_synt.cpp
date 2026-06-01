@@ -26,12 +26,12 @@
 
 Implemente_instanciable(Champ_front_synt,"Champ_front_synt",Ch_front_var_instationnaire_dep);
 
-/*! @brief Impression sur un flot de sortie au format: taille
+/*! @brief Prints to an output stream in the format: size
  *
  *     valeur(0) ... valeur(i)  ... valeur(taille-1)
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param os an output stream
+ * @return the modified output stream
  */
 Sortie& Champ_front_synt::printOn(Sortie& os) const
 {
@@ -42,7 +42,7 @@ Sortie& Champ_front_synt::printOn(Sortie& os) const
   return os;
 }
 
-/*! @brief Mise a jour du temps
+/*! @brief Updates the time.
  *
  */
 
@@ -58,16 +58,16 @@ int Champ_front_synt::initialiser(double tps, const Champ_Inc_base& inco)
 }
 
 
-/*! @brief Lecture a partir d'un flot d'entree au format: nombre_de_composantes
+/*! @brief Reads from an input stream in the format: nombre_de_composantes
  *
  *     moyenne moyenne(0) ... moyenne(nombre_de_composantes-1)
  *     moyenne amplitude(0) ... amplitude(nombre_de_composantes-1)
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws accolade ouvrante attendue
- * @throws mot clef inconnu a cet endroit
- * @throws accolade fermante attendue
+ * @param is an input stream
+ * @return the modified input stream
+ * @throws opening brace expected
+ * @throws unknown keyword at this location
+ * @throws closing brace expected
  */
 Entree& Champ_front_synt::readOn(Entree& is)
 {
@@ -210,10 +210,10 @@ Entree& Champ_front_synt::readOn(Entree& is)
 }
 
 
-/*! @brief Pas code !!
+/*! @brief Not implemented!!
  *
- * @param (Champ_front_base& ch)
- * @return (Champ_front_base&)
+ * @param ch the source boundary field
+ * @return reference to this boundary field
  */
 Champ_front_base& Champ_front_synt::affecter_(const Champ_front_base& ch)
 {
@@ -223,7 +223,7 @@ Champ_front_base& Champ_front_synt::affecter_(const Champ_front_base& ch)
 void Champ_front_synt::mettre_a_jour(double temps)
 {
 
-  // Acceder a l'equation depuis l'inconnue, ensuite acceder au milieu
+  // Access the equation from the unknown, then access the medium
   const Equation_base& equ = ref_inco_->equation();
   const Milieu_base& mil = equ.milieu();
 
@@ -247,13 +247,13 @@ void Champ_front_synt::mettre_a_jour(double temps)
   */
 
   ////////////////////////////////////////////
-  /// 	   donnees d'initialisation        ///
+  /// 	   initialisation data             ///
   ////////////////////////////////////////////
 
   double visc = ref_cast(Fluide_base,mil).viscosite_cinematique().valeurs()(0,0);
   const Front_VF& front = ref_cast(Front_VF,la_frontiere_dis.valeur());
   int nb_face = front.nb_faces(); // real only
-  const Faces& tabFaces = front.frontiere().faces(); // recuperation des faces
+  const Faces& tabFaces = front.frontiere().faces(); // retrieve the faces
 
   //Cerr << "We store : temps_d_avant_ = "<<temps_d_avant_<<finl;
   DoubleTab& tab_avant=valeurs_au_temps(temps_d_avant_);
@@ -267,24 +267,24 @@ void Champ_front_synt::mettre_a_jour(double temps)
     sum_aire += aireFaces[i];
 
   sum_aire = mp_sum(sum_aire);
-  double dmin = sqrt( sum_aire / mp_sum_as_double(nb_face) ) ; // on prend la racine de l'aire moyenne des faces d'entree pour avoir une taille de maille caracteristique
+  double dmin = sqrt( sum_aire / mp_sum_as_double(nb_face) ) ; // square root of the average inlet face area, used as a characteristic mesh size
 
   //double Uref = 0.; // vitesse de reference = norme du vecteur moyenne
   //for (int i=0; i<moyenne.size_reelle(); i++) Uref += moyenne(i)*moyenne(i);
   //Uref = sqrt(Uref);
 
   //double turbScale = turbIntensity * Uref; //urms=I*Uref
-  //double turbKinEn = 3./2. * (turbIntensity * Uref) * (turbIntensity * Uref); // evaluation de l'energie cinetique turbulente = 3/2*(I*Uref)^2
-  //double turbDissRate = pow(Cmu,0.75)*pow(turbKinEn,1.5)/lenghtScale; // calcul de epsilon pour un ecoulement etabli en conduite. A faire pour un ecoulement de grille ? (decroissance energetique)
+  //double turbKinEn = 3./2. * (turbIntensity * Uref) * (turbIntensity * Uref); // estimate of turbulent kinetic energy = 3/2*(I*Uref)^2
+  //double turbDissRate = pow(Cmu,0.75)*pow(turbKinEn,1.5)/lenghtScale; // compute epsilon for a fully developed pipe flow. TODO: adapt for grid turbulence? (energy decay)
 
   /////////////////////////////////////////////
-  /// valeurs remarquables du nombre d'onde ///
+  /// remarkable wavenumber values          ///
   /////////////////////////////////////////////
 
-  double kappa_max = (pi/dmin)*ratioCutoffWavenumber; // plus grand nombre d'onde (depend du maillage)
-  double kappa_e = 9*pi*amp/(55*lenghtScale); // pic d'energie
-  double kappa_eta = pow((turbDissRate/(visc*visc*visc)),0.25); // nombre d'onde de Kolmogorov
-  double kappa_min = kappa_e / KeOverKmin; // plus petit nombre d'onde
+  double kappa_max = (pi/dmin)*ratioCutoffWavenumber; // largest wavenumber (depends on the mesh)
+  double kappa_e = 9*pi*amp/(55*lenghtScale); // energy peak wavenumber
+  double kappa_eta = pow((turbDissRate/(visc*visc*visc)),0.25); // Kolmogorov wavenumber
+  double kappa_min = kappa_e / KeOverKmin; // smallest wavenumber
   //double delta_kappa = (min(kappa_eta,kappa_max) - kappa_min) / nbModes; // repartition lineaire des modes => pas bon
   double delta_kappa = pow( (std::min(kappa_eta,kappa_max) / kappa_min ), 1./(nbModes-1.)); // repartition logarithmique des modes => OK
   if (kappa_max <= kappa_min)
@@ -318,7 +318,7 @@ void Champ_front_synt::mettre_a_jour(double temps)
   DoubleVect tetha(nbModes);
 
   ////////////////////////////////////////////
-  /// generation aleatoire des angles      ///
+  /// random generation of angles         ///
   ////////////////////////////////////////////
 
   for(int i = 0; i<nbModes; i++)
@@ -329,12 +329,12 @@ void Champ_front_synt::mettre_a_jour(double temps)
       //tetha(i) = drand48()* pi ; // pour une densite de probabilite de 1/pi => pas bon
       tetha(i) = acos(1-2*drand48()) ; // pour une densite de probabilite de 0.5*sin(theta) => OK
 
-      /// creation vecteur onde en coordonnee cartesienne ///
+      /// wave vector in Cartesian coordinates ///
       kappa_x(i) = sin(tetha(i))*cos(phi(i));
       kappa_y(i) = sin(tetha(i))*sin(phi(i));
       kappa_z(i) = cos(tetha(i));
 
-      /// creation de la direction orthogonal au vecteur onde ///
+      /// direction orthogonal to the wave vector ///
       sigma_x(i) = cos(phi(i))*cos(tetha(i))*cos(alpha(i)) - sin(phi(i))*sin(alpha(i));
       sigma_y(i) = sin(phi(i))*cos(tetha(i))*cos(alpha(i)) + cos(phi(i))*sin(alpha(i));
       sigma_z(i) = -sin(tetha(i))*cos(alpha(i));
@@ -353,7 +353,7 @@ void Champ_front_synt::mettre_a_jour(double temps)
       dkn(i) = kappa_face(i+1)- kappa_face(i);
     }
 
-  /// recuperation des centres de gravite ///
+  /// retrieval of the face barycenters ///
   DoubleTab centreGrav(nb_face);
   tabFaces.calculer_centres_gravite(centreGrav);
 
@@ -389,7 +389,7 @@ void Champ_front_synt::mettre_a_jour(double temps)
         }
 
       //////////////////////////////////////
-      /// MISE EN PLACE AUTOCORRELATION  ///
+      /// AUTOCORRELATION SETUP         ///
       //////////////////////////////////////
 
       double dt = equ.schema_temps().pas_de_temps();

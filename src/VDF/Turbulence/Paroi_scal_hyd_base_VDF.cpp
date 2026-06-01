@@ -40,7 +40,7 @@ void Paroi_scal_hyd_base_VDF::associer(const Domaine_dis_base& domaine_dis, cons
 {
   le_dom_dis_ = ref_cast(Domaine_VF, domaine_dis);
   le_dom_Cl_dis_ = domaine_Cl_dis;
-  // On initialise tout de suite la loi de paroi
+  // Initialize the wall law immediately
   Paroi_scal_hyd_base_VDF::init_lois_paroi();
 }
 

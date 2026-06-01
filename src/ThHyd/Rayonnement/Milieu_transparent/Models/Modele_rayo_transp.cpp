@@ -225,7 +225,7 @@ void Modele_rayo_transp::calculer_flux_radiatifs()
       assert(me() == 0);
       ArrOfDouble secmem(nb_faces_rayonnantes());
 
-      // Remplissage du second membre.
+      // Fill the right-hand side.
       int irayo = 0;
 
       for (int i = 0; i < nb_faces_totales(); i++)
@@ -239,8 +239,8 @@ void Modele_rayo_transp::calculer_flux_radiatifs()
             }
         }
 
-      // La matrice_rayo a ete inversee au debut du calcule dans Modele_rayo_transp::preparer_calcul.
-      // Il ne reste ici qu'a calculer le produit du second membre avec la matrice inverse.
+      // matrice_rayo was inverted at the start of the computation in Modele_rayo_transp::preparer_calcul.
+      // Only the product of the right-hand side with the inverse matrix needs to be computed here.
       for (int ii = 0; ii < nb_faces_rayonnantes(); ii++)
         {
           les_flux_radiatifs_(ii) = 0.;
@@ -277,7 +277,7 @@ int Modele_rayo_transp::postraiter()
 
 void Modele_rayo_transp::imprimer_flux_radiatifs(Sortie& os) const
 {
-  if (Process::me()) return; /* seulement maitre qui imprime ! */
+  if (Process::me()) return; /* only the master process prints! */
 
   Nom fichier1(nom_du_cas());
   fichier1 += "_";
@@ -334,7 +334,7 @@ double Modele_rayo_transp::flux_radiatif(int num_face) const
 {
   if (corres_.size() == 0)
     {
-      // on recupere le domaine et on cherche la premiere cond_lim rayo
+      // retrieve the domain and find the first radiation boundary condition
       int i0 = 0;
       while (((les_faces_rayonnantes_[i0].ensembles_faces_bord(0).nb_faces_bord() == 0) || (les_faces_rayonnantes_[i0].emissivite() == -1)) && (i0 < nb_faces_totales()))
         i0++;
@@ -386,7 +386,7 @@ double Modele_rayo_transp::flux_radiatif(int num_face) const
 
 void Modele_rayo_transp::completer()
 {
-  // Lire Ensemble_faces_rayo_transp
+  // Read Ensemble_faces_rayo_transp
   for (int i = 0; i < nb_faces_totales(); i++)
     {
       Face_rayo_transp& face_rayo = face_rayonnante(i);
@@ -411,7 +411,7 @@ void Modele_rayo_transp::completer()
           if (la_cl.is_bc_rayo_milieu_transp(la_cl_rayo))
             {
 
-              // on associe la cl liee au pb fluide
+              // associate the boundary condition linked to the fluid problem
               int ok = 0;
               for (int i = 0; i < nb_faces_totales(); i++)
                 {
@@ -490,7 +490,7 @@ void Modele_rayo_transp::init_matrice_rayo()
 {
   if (je_suis_maitre())
     {
-      // dimensionnement de la matrice de rayonnement.
+      // size the radiation matrix.
       int irayo = 0, jrayo = 0;
 
       matrice_rayo_.resize(nb_faces_rayonnantes(), nb_faces_rayonnantes());
@@ -540,7 +540,7 @@ void Modele_rayo_transp::init_matrice_rayo()
 
             int cvg = matrice_rayo_.decomp_LU(nb_faces_rayonnantes(), index, lu_dec);
 
-            // Puis on inverse la matrice_rayo
+            // Then invert the matrice_rayo
             if (cvg == 1)
               {
                 for (jrayo = 0; jrayo < nb_faces_rayonnantes(); jrayo++)
@@ -550,26 +550,26 @@ void Modele_rayo_transp::init_matrice_rayo()
                     secmem_tmp(jrayo) = 1.;
 
                     lu_dec.resoud_LU(nb_faces_rayonnantes(), index, secmem_tmp, sol_tmp);
-                    // On recopie le resultat de la resolution ci-dessus dans la colonne jrayo de matrice_rayo
+                    // Copy the result of the above solve into column jrayo of matrice_rayo
                     for (irayo = 0; irayo < nb_faces_rayonnantes(); irayo++)
                       matrice_rayo_(irayo, jrayo) = sol_tmp(irayo);
                   }
-                // matrice_rayo contient maintenant l'inverse de la matrice_rayo initiale
+                // matrice_rayo now contains the inverse of the initial matrice_rayo
               }
           }
 
           {
-            // on change la matrice;
+            // modify the matrix;
             les_facteurs_de_forme_ *= -1;
             for (jrayo = 0; jrayo < nb_faces_rayonnantes(); jrayo++)
               les_facteurs_de_forme_(jrayo, jrayo) += 1;
 
             for (jrayo = 0; jrayo < nb_faces_rayonnantes(); jrayo++)
               {
-                // on sauve la colonne
+                // save the column
                 for (irayo = 0; irayo < nb_faces_rayonnantes(); irayo++)
                   sol_tmp(irayo) = matrice_rayo_(irayo, jrayo);
-                //calcul de (I-Fij)*M-1
+                //compute (I-Fij)*M-1
                 for (irayo = 0; irayo < nb_faces_rayonnantes(); irayo++)
                   {
                     double res = 0.;
@@ -579,7 +579,7 @@ void Modele_rayo_transp::init_matrice_rayo()
                   }
               }
 
-            // on continue en multipliant par sigma delta_i_j emissivite(j)
+            // continue by multiplying by sigma delta_i_j emissivity(j)
             jrayo = 0;
             for (int j = 0; j < nb_faces_totales(); j++)
               {
@@ -593,10 +593,10 @@ void Modele_rayo_transp::init_matrice_rayo()
               }
           }
 
-          // On a fini on peut vider Fij
+          // Done, Fij can be cleared
           les_facteurs_de_forme_.resize(0, 0);
 
-          // Impression "jolie" de la matrice dans un fichier nom_fic_mat_ray_inv_
+          // Pretty-print the matrix to the file nom_fic_mat_ray_inv_
           if (nom_fic_mat_ray_inv_ != "??")
             {
               if (!fic_mat_ray_inv_bin_)
@@ -613,7 +613,7 @@ void Modele_rayo_transp::init_matrice_rayo()
                     }
                 }
               else
-                // Ecriture le la matrice inverse en format binaire
+                // Write the inverse matrix in binary format
                 {
                   SFichierBin fic_bin(nom_fic_mat_ray_inv_);
                   fic_bin << version << finl << matrice_rayo_;

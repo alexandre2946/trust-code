@@ -45,8 +45,9 @@ const Champ_Don_base& Navier_Stokes_Turbulent_QC::diffusivite_pour_transport() c
   return fluide().viscosite_dynamique();
 }
 
-/*! @brief appel Navier_Stokes_Turbulent::mettre_a_jour et Convection_Diffusion_Chaleur_Turbulent_QC::mettre_a_jour_modele
+/*! @brief Calls Navier_Stokes_Turbulent::mettre_a_jour and Convection_Diffusion_Chaleur_Turbulent_QC::mettre_a_jour_modele.
  *
+ * @param temps Current time.
  */
 void Navier_Stokes_Turbulent_QC::mettre_a_jour(double temps)
 {
@@ -77,9 +78,9 @@ void Navier_Stokes_Turbulent_QC::discretiser()
   rho_la_vitesse_->nommer("rho_u");
 }
 
-/*! @brief Appels successifs a: Navier_Stokes_std::completer()
+/*! @brief Successive calls to: Navier_Stokes_std::completer()
  *
- *       Mod_Turb_Hyd::completer() [sur le membre concerne]
+ *       Mod_Turb_Hyd::completer() [on the turbulence member]
  *
  */
 void Navier_Stokes_Turbulent_QC::completer()
@@ -87,8 +88,8 @@ void Navier_Stokes_Turbulent_QC::completer()
   if (le_fluide->a_gravite())
     {
       Cerr << "Gravity=" << le_fluide->gravite() << finl;
-      //l'equation de NS en quasi compressible peut contenir un terme source de gravite
-      if (le_fluide->has_beta_t())    //pour debogage    A ENLEVER APRES
+      //the quasi-compressible NS equation may contain a gravity source term
+      if (le_fluide->has_beta_t())    // for debugging - TO BE REMOVED LATER
         {
           Cerr << "Beta_t !=0  -> Boussinesq is currently used :" << finl;
         }
@@ -111,11 +112,9 @@ void Navier_Stokes_Turbulent_QC::completer()
   Navier_Stokes_Turbulent::completer();
 }
 
-/*! @brief cf Equation_base::preparer_calcul() Assemblage du solveur pression et
+/*! @brief See Equation_base::preparer_calcul(). Assembles the pressure solver and initializes the pressure.
  *
- *      initialisation de la pression.
- *
- * @return (int) renvoie toujours 1
+ * @return Always returns 1.
  */
 int Navier_Stokes_Turbulent_QC::preparer_calcul()
 {
@@ -136,7 +135,7 @@ bool Navier_Stokes_Turbulent_QC::has_champ(const Motcle& nom, OBS_PTR(Champ_base
   if (milieu().has_champ(nom, ref_champ))
     return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 bool Navier_Stokes_Turbulent_QC::has_champ(const Motcle& nom) const
@@ -150,7 +149,7 @@ bool Navier_Stokes_Turbulent_QC::has_champ(const Motcle& nom) const
   if (milieu().has_champ(nom))
     return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 const Champ_base& Navier_Stokes_Turbulent_QC::get_champ(const Motcle& nom) const
@@ -169,14 +168,13 @@ const Champ_base& Navier_Stokes_Turbulent_QC::get_champ(const Motcle& nom) const
   throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !"));
 }
 
-/*! @brief Calcule la derivee en temps de l'inconnue vitesse, i.
+/*! @brief Computes the time derivative of the velocity unknown, i.e. the acceleration dU/dt, and returns it.
  *
- * e. l'acceleration dU/dt et la renvoie.
- *     Appelle Equation_base::derivee_en_temps_inco(DoubleTab& )
- *     Calcule egalement la pression.
+ * Calls Equation_base::derivee_en_temps_inco(DoubleTab&).
+ * Also computes the pressure.
  *
- * @param (DoubleTab& vpoint) le tableau des valeurs de l'acceleration dU/dt
- * @return (DoubleTab&) le tableau des valeurs de l'acceleration (derivee de la vitesse)
+ * @param vpoint Array of acceleration values dU/dt.
+ * @return Array of acceleration values (velocity derivative).
  */
 DoubleTab& Navier_Stokes_Turbulent_QC::derivee_en_temps_inco(DoubleTab& vpoint)
 {

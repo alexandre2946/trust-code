@@ -19,7 +19,7 @@
 #include <Comm_Group.h>
 #include <TRUSTVect.h>
 
-// Renvoie 1 si l'espace virtuel de v est a jour, 0 sinon
+// Returns 1 if the virtual space of v is up to date, 0 otherwise
 int check_espace_virtuel_vect(const DoubleVect& v);
 int check_espace_virtuel_vect(const IntVect& v);
 void assert_invalide_items_non_calcules(DoubleVect& v, double valeur = 0.);
@@ -27,11 +27,11 @@ void assert_invalide_items_non_calcules(DoubleVect& v, double valeur = 0.);
 template <typename _TYPE_>
 extern void remplir_items_non_calcules_(TRUSTVect<_TYPE_>& v, _TYPE_ valeur);
 
-/*! @brief Remplit les "items non calcules" du tableau avec une valeur invalide.
+/*! @brief Fills the "non-computed items" of the array with an invalid value.
  *
- * Ce sont tous les items qui ne sont pas repertories dans v.get_md_vector().valeurs().get_blocs_items_to_compute(). (items non calcules par les operations par defaut sur les vecteurs, en general ce sont les items virtuels)
- *   Il est conseille d'appliquer cette methode a la fin des fonctions qui ne renvoient pas un espace virtuel a jour avec declare_espace_virtuel_invalide(...))
- *   de sorte a provoquer une erreur si l'espace virtuel est utilise.
+ * These are all items not listed in v.get_md_vector().valeurs().get_blocs_items_to_compute(). (items not computed by default vector operations, generally the virtual items)
+ *   It is recommended to apply this method at the end of functions that do not return an up-to-date virtual space (using declare_espace_virtuel_invalide(...))
+ *   so as to trigger an error if the virtual space is used.
  *
  */
 template<typename _TYPE_>
@@ -40,9 +40,9 @@ inline void remplir_items_non_calcules(TRUSTVect<_TYPE_>& v, _TYPE_ valeur = 0)
   remplir_items_non_calcules_(v, valeur);
 }
 
-/*! @brief en mode comm_check_enabled(), verifie si l'espace virtuel du vecteur est a jour, si ce n'est pas le cas, exit().
+/*! @brief In comm_check_enabled() mode, checks if the virtual space of the vector is up to date; if not, calls exit().
  *
- * Ce test n'est fait qu'en mode comm_check_enabled() car il necessite des communications.
+ * This test is only performed in comm_check_enabled() mode because it requires communications.
  *
  */
 template<typename _TYPE_>

@@ -34,7 +34,7 @@ Entree& Op_Diff_PolyMAC_MPFA_base::readOn(Entree& s) { return s; }
 void Op_Diff_PolyMAC_MPFA_base::mettre_a_jour(double t)
 {
   Operateur_base::mettre_a_jour(t);
-  //si le champ est constant en temps, alors pas besoin de recalculer nu_ et les interpolations
+  //if the field is constant in time, no need to recompute nu_ and the interpolations
   if (t <= t_last_maj_)
     return;
 
@@ -80,18 +80,18 @@ void Op_Diff_PolyMAC_MPFA_base::update_nu() const
       N_nu = nu_.line_size(), N_nu_src = nu_src.line_size(), mult = N_nu / N;
   assert(N_nu % N == 0);
 
-  const bool is_aire_int = sub_type(Aire_interfaciale, equation()); /* cas Aire_interfaciale, pas de nu lam ... */
+  const bool is_aire_int = sub_type(Aire_interfaciale, equation()); /* Aire_interfaciale case: no laminar nu ... */
 
   if (is_aire_int)
     {
       nu_ = 0.;
-      /* modification par une classe fille */
+      /* modification by a derived class */
       modifier_mu(nu_);
       nu_a_jour_ = 1;
       return;
     }
 
-  /* nu_ : si necessaire, on doit etendre la champ source */
+  /* nu_: if necessary, the source field must be extended */
   if (N_nu == N && N_nu_src == N_mil)
     for (e = 0; e < domaine.nb_elem_tot(); e++)
       for (n = 0; n < N; n++)
@@ -110,14 +110,14 @@ void Op_Diff_PolyMAC_MPFA_base::update_nu() const
   else
     abort();
 
-  /* ponderation de nu par la porosite et par alpha (si pb_Multiphase) */
+  /* weighting of nu by porosity and by alpha (if pb_Multiphase) */
   const DoubleTab *alp = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()).equation_masse().inconnue().passe() : nullptr;
   for (e = 0; e < domaine.nb_elem_tot(); e++)
     for (n = 0, i = 0; n < N; n++)
       for (m = 0; m < mult; m++, i++)
         nu_.addr()[N_nu * e + i] *= equation().milieu().porosite_elem()(e) * (alp ? std::max((*alp)(e, n), 1e-8) : 1);
 
-  /* modification par une classe fille */
+  /* modification by a derived class */
   modifier_mu(nu_);
 
   nu_a_jour_ = 1;
@@ -127,7 +127,7 @@ void Op_Diff_PolyMAC_MPFA_base::update_phif(int full_stencil) const
 {
   const Domaine_PolyMAC_MPFA& domaine = ref_cast(Domaine_PolyMAC_MPFA, le_dom_poly_.valeur());
   if (!domaine.domaine().mesh_update_required() && !full_stencil && phif_a_jour_)
-    return; //deja fait, sauf si on demande tout le stencil
+    return; //already done, unless the full stencil is requested
   const Champ_Inc_base& ch = equation().inconnue();
   const IntTab& fcl = sub_type(Champ_Face_PolyMAC_MPFA, ch) ? ref_cast(Champ_Face_PolyMAC_MPFA, ch).fcl() : ref_cast(Champ_Elem_PolyMAC_MPFA, ch).fcl();
   domaine.fgrad(ch.valeurs().line_size(), 0, la_zcl_poly_->les_conditions_limites(), fcl, &nu(), &som_ext, sub_type(Champ_Face_PolyMAC_MPFA, ch), full_stencil, phif_d, phif_e, phif_c);

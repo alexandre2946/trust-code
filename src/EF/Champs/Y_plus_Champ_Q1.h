@@ -24,7 +24,7 @@
 class Domaine_Cl_EF;
 class Champ_Q1_EF;
 
-/*! @brief classe Y_plus_Champ_Q1
+/*! @brief class Y_plus_Champ_Q1
  *
  * @sa Champ_y_plus Champ_Fonc_P0_EF
  */

@@ -129,13 +129,13 @@ const Champ_base& Turbulence_paroi_base::get_champ(const Motcle& nom) const
 {
   if (champ_u_star_ && nom == champ_u_star_->le_nom())
     {
-      // Initialisation a 0 du champ volumique u_star
+      // Initialise the u_star volumetric field to 0
       DoubleTab& valeurs = champ_u_star_->valeurs();
       valeurs = 0;
       const Equation_base& my_eqn = mon_modele_turb_hyd->equation();
       if (tab_u_star_.size_array() > 0)
         {
-          // Boucle sur les frontieres pour recuperer u_star si tab_u_star dimensionne
+          // Loop over boundaries to retrieve u_star if tab_u_star is allocated
           int nb_front = my_eqn.domaine_dis().nb_front_Cl();
           for (int n_bord = 0; n_bord < nb_front; n_bord++)
             {
@@ -148,7 +148,7 @@ const Champ_base& Turbulence_paroi_base::get_champ(const Motcle& nom) const
             }
         }
       valeurs.echange_espace_virtuel();
-      // Met a jour le temps du champ:
+      // Update the field time:
       champ_u_star_->mettre_a_jour(my_eqn.schema_temps().temps_courant());
       return champs_compris_.get_champ(nom);
     }
@@ -166,7 +166,7 @@ void Turbulence_paroi_base::get_noms_champs_postraitables(Noms& nom, Option opt)
     nom.add(noms_compris);
 }
 
-/*! @brief Ouverture/creation d'un fichier d'impression de Face, uplus_, dplus_, tab_u_star, Cisaillement_paroi_
+/*! @brief Opens or creates a print file for Face, uplus_, dplus_, tab_u_star, Cisaillement_paroi_.
  *
  */
 void Turbulence_paroi_base::ouvrir_fichier_partage(EcrFicPartage& Ustar, const Nom& extension) const
@@ -177,12 +177,12 @@ void Turbulence_paroi_base::ouvrir_fichier_partage(EcrFicPartage& Ustar, const N
 
   Nom fichier = Objet_U::nom_du_cas() + "_" + pb.le_nom() + "_" + extension + ".face";
 
-  // On cree le fichier au premier pas de temps si il n'y a pas reprise
+  // Create the file at the first time step if no restart
   if (nb_impr_ == 0 && !pb.reprise_effectuee())
     {
       Ustar.ouvrir(fichier);
     }
-  // Sinon on l'ouvre
+  // Otherwise open in append mode
   else
     {
       Ustar.ouvrir(fichier, ios::app);
@@ -197,7 +197,7 @@ void Turbulence_paroi_base::ouvrir_fichier_partage(EcrFicPartage& Ustar, const N
   nb_impr_++;
 }
 
-/*! @brief Ouverture/creation d'un fichier d'impression de moyennes de uplus_, dplus_, tab_u_star
+/*! @brief Opens or creates a file for printing mean values of uplus_, dplus_, tab_u_star.
  *
  */
 void Turbulence_paroi_base::ouvrir_fichier_partage(EcrFicPartage& fichier, const Nom& nom_fichier, const Nom& extension) const
@@ -205,12 +205,12 @@ void Turbulence_paroi_base::ouvrir_fichier_partage(EcrFicPartage& fichier, const
   const Probleme_base& pb = mon_modele_turb_hyd->equation().probleme();
   Nom nom_fic = nom_fichier + "." + extension;
 
-  // On cree le fichier nom_fichier au premier pas de temps si il n'y a pas reprise
+  // Create the file at the first time step if no restart
   if (nb_impr0_ == 0 && !pb.reprise_effectuee())
     {
       fichier.ouvrir(nom_fic);
     }
-  // Sinon on l'ouvre
+  // Otherwise open in append mode
   else
     {
       fichier.ouvrir(nom_fic, ios::app);
@@ -332,7 +332,7 @@ void Turbulence_paroi_base::imprimer_ustar_mean_only(Sortie& os, int boundaries_
     }
   mp_sum_for_each_item(moy_bords);
 
-// affichages des lignes dans le fichier
+// print lines to the file
   if (je_suis_maitre() && moy_bords(0, 1) != 0)
     {
       fichier << sch.temps_courant() << " \t" << moy_bords(0, 0) / moy_bords(0, 1) << " \t" << moy_bords(0, 2) / moy_bords(0, 1);

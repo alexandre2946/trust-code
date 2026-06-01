@@ -31,9 +31,9 @@ void Probleme_base_interface_proto::initialize_impl(Probleme_base& pb)
 
   Debog::set_nom_pb_actuel(pb.le_nom());
   pb.preparer_calcul();
-  pb.domaine().initialiser(0, pb.domaine_dis(), pb); // Pour le cas de geometries variables (ex. ALE)
-  // on initialise le schema en temps avant le postraitement
-  // ainsi les sources qui dependent du pas de temps fonctionnent
+  pb.domaine().initialiser(0, pb.domaine_dis(), pb); // For the case of variable geometries (ex. ALE)
+  // we initialize the time scheme before post-processing
+  // so that sources depending on the time step work
   pb.schema_temps().initialize();
   pb.init_postraitements();
 
@@ -70,7 +70,7 @@ bool Probleme_base_interface_proto::initTimeStep_impl(Probleme_base& pb, double 
   for (int i = 0; i < pb.nombre_d_equations(); i++)
     ok = ok && pb.equation(i).initTimeStep(dt);
 
-  // Calculs coeffs echange sur l'instant sur lequel doivent agir les operateurs.
+  // Compute exchange coefficients at the time at which the operators must act.
   double tps = pb.schema_temps().temps_defaut();
   for (int i = 0; i < pb.nombre_d_equations(); i++)
     pb.equation(i).domaine_Cl_dis().calculer_coeffs_echange(tps);
@@ -89,7 +89,7 @@ bool Probleme_base_interface_proto::solveTimeStep_impl(Probleme_base& pb)
 
   bool ok = pb.solveTimeStep_pbU(); // call mother's method
 
-  // Calculs coeffs echange sur l'instant sur lequel doivent agir les operateurs.
+  // Compute exchange coefficients at the time at which the operators must act.
   double tps = pb.schema_temps().temps_defaut();
   for (int i = 0; i < pb.nombre_d_equations(); i++)
     pb.equation(i).domaine_Cl_dis().calculer_coeffs_echange(tps);
@@ -112,7 +112,7 @@ bool Probleme_base_interface_proto::iterateTimeStep_impl(Probleme_base& pb, bool
   Debog::set_nom_pb_actuel(pb.le_nom());
   bool ok = pb.schema_temps().iterateTimeStep(converged);
 
-  // Calculs coeffs echange sur l'instant sur lequel doivent agir les operateurs.
+  // Compute exchange coefficients at the time at which the operators must act.
   double tps = pb.schema_temps().temps_defaut();
   for (int i = 0; i < pb.nombre_d_equations(); i++)
     pb.equation(i).domaine_Cl_dis().calculer_coeffs_echange(tps);
@@ -246,7 +246,7 @@ void Probleme_base_interface_proto::getInputFieldsNames_impl(const Probleme_base
   Noms nouveaux_noms(n);
   for (int i = 0; i < n; i++)
     nouveaux_noms[i] = input_fields[i]->le_nom();
-  // GF pour contourner un bug dans add() si vecteur null
+  // GF workaround for a bug in add() when the vector is null
   if (n)
     noms.add(nouveaux_noms);
 }

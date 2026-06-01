@@ -20,10 +20,10 @@
 #include <TRUST_Deriv.h>
 #include <Operateur.h>
 
-/*! @brief classe Operateur_Evanescence Classe generique de la hierarchie des operateurs representant un terme
+/*! @brief Operateur_Evanescence class: generic class in the operator hierarchy representing a term
  *
- *     de gestion de l'evanescence. Un objet Operateur_Evanescence peut referencer n'importe quel
- *     objet derivant de Operateur_Evanescence_base.
+ *     managing evanescence. An Operateur_Evanescence object can reference any
+ *     object derived from Operateur_Evanescence_base.
  *
  * @sa Operateur_base Operateur
  */

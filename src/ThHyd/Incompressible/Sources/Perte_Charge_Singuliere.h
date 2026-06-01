@@ -25,10 +25,9 @@ class Domaine_dis_base;
 class Equation_base;
 class Source_base;
 
-/*! @brief Classe Perte_Charge_Singuliere Cette classe derivee de Perte_Charge est utilisee lorsque l'on veut
+/*! @brief Classe Perte_Charge_Singuliere This class derived from Perte_Charge is used when one wants
  *
- *     modeliser une perte de charge sur une surface (passage d'une grille par exemple)
- *     par exemple)
+ *     to model a pressure drop over a surface (passage through a grid, for example).
  *
  * @sa Perte_Charge Perte_Charge_Reguliere
  */
@@ -43,17 +42,17 @@ public :
   /* by default, reads one { and two } */
   virtual void lire_surfaces(Entree&, const Domaine&, const Domaine_dis_base&, IntVect&, IntVect&, int lire_derniere_accolade = 1);
   inline double K() const;
-  double calculate_Q(const Equation_base& eqn, const IntVect& num_faces, const IntVect& sgn) const; //met a jour le debit a travers la surface et le renvoie
-  void update_K(const Equation_base& eqn, double deb, DoubleVect& bilan);                  //regule K_ a partir du debit calcule par update_Q
+  double calculate_Q(const Equation_base& eqn, const IntVect& num_faces, const IntVect& sgn) const; // updates and returns the flow rate through the surface
+  void update_K(const Equation_base& eqn, double deb, DoubleVect& bilan);                  // regulates K_ from the flow rate computed by update_Q
 
 protected :
 
   double K_ = 1; //default value if K is used as a regulation factor (for instance in Perte_Charge_Regulieres)
 
-  //pour la regulation de K;
-  Nom identifiant_;          //nom pour le fichier de sortie : celui de la surface, ou celui du sous-domaine et de la coupe
-  int regul_;                //1 si regulation activee
-  Parser_U deb_cible_, alpha_; //K_ peut varier pour atteindre deb_cible_(t)
+  // for K regulation;
+  Nom identifiant_;          // name for the output file: that of the surface, or of the sub-domain and cut
+  int regul_;                // 1 if regulation is enabled
+  Parser_U deb_cible_, alpha_; // K_ can vary to reach deb_cible_(t)
 };
 
 

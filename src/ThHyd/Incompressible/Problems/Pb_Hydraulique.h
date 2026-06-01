@@ -22,11 +22,11 @@
 #include <Navier_Stokes_std.h>
 
 
-/*! @brief classe Pb_Hydraulique Cette classe represente un probleme hydraulique standard dans lequel
+/*! @brief Pb_Hydraulique This class represents a standard hydraulic problem in which
  *
- *      on resout les equations de Navier Stokes en regime laminaire
- *      pour un fluide incompressible
- *      La formulation est de type vitesse pression
+ *      the Navier-Stokes equations in laminar regime are solved
+ *      for an incompressible fluid.
+ *      The formulation is of velocity-pressure type.
  *
  * @sa Navier_Stokes_std Pb_Fluide_base Fluide_base
  */

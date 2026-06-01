@@ -23,16 +23,15 @@
 #include <vector>
 #include <set>
 
-/*! @brief Classe Milieu_composite Cette classe represente un fluide reel ainsi que
+/*! @brief Composite medium representing a multiphase fluid and its properties:
  *
- *     ses proprietes:
- *         - viscosite cinematique, (mu)
- *         - viscosite dynamique,   (nu)
- *         - masse volumique,       (rho)
- *         - diffusivite,           (alpha)
- *         - conductivite,          (lambda)
- *         - capacite calorifique,  (Cp)
- *         - dilatabilite thermique du constituant (beta_co)
+ *         - kinematic viscosity, (mu)
+ *         - dynamic viscosity,   (nu)
+ *         - density,             (rho)
+ *         - diffusivity,         (alpha)
+ *         - thermal conductivity,(lambda)
+ *         - heat capacity,       (Cp)
+ *         - thermal expansion coefficient (beta_co)
  *
  * @sa Milieu_base
  */
@@ -69,7 +68,7 @@ protected :
   Noms noms_phases_;
   double t_init_ = -1.;
   bool has_saturation_ = false, has_interface_ = false;
-  bool res_en_T_ = true; // par defaut resolution en T
+  bool res_en_T_ = true; // by default resolution in T
   bool fluid_properties_initialised_ = false;
   std::vector<std::vector<Interface_base *>> tab_interface_;
   std::vector<OWN_PTR(Fluide_base)> fluides_;

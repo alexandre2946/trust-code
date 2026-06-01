@@ -18,10 +18,10 @@
 
 #include <Loi_Etat_Binaire_GP_base.h>
 
-/*! @brief classe Loi_Etat_Binaire_GP_WC Cette classe represente la loi d'etat pour les melanges binaires.
+/*! @brief @brief State law class for binary ideal-gas mixtures in the weakly compressible (WC) framework.
  *
- *      Associe a un fluide dilatable, elle definit un fluide binaire weakly compressible
- *      dont la loi d'eata est :
+ *      Associated with a dilatable fluid, it defines a binary weakly compressible fluid
+ *      whose equation of state is:
  *         Pth = rho*R*T*(Y1/M1+Y2/M2)
  *
  * @sa Loi_Etat_Binaire_GP_base

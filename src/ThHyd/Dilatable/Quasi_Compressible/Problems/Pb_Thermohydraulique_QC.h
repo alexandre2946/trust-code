@@ -21,12 +21,12 @@
 #include <Navier_Stokes_QC.h>
 #include <Pb_QC_base.h>
 
-/*! @brief classe Pb_Thermohydraulique_QC Cette classe represente un probleme de thermohydraulique en fluide quasi compressible:
+/*! @brief Pb_Thermohydraulique_QC class This class represents a thermohydraulic problem for a quasi-compressible fluid:
  *
- *       - Equations de Navier_Stokes en regime laminaire
- *         pour un fluide quasi compressible
- *       - Equation d'energie exprimee en temperature (gaz parfait) ou enthalpie (gaz reel)
- *         en regime laminaire pour un fluide quasi compressible
+ *       - Navier-Stokes equations in laminar regime
+ *         for a quasi-compressible fluid
+ *       - Energy equation expressed as temperature (perfect gas) or enthalpy (real gas)
+ *         in laminar regime for a quasi-compressible fluid
  *
  * @sa Probleme_base Navier_Stokes_QC Convection_Diffusion_Chaleur_QC
  */

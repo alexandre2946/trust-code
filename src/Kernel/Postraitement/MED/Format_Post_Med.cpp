@@ -23,27 +23,27 @@ Implemente_instanciable_sans_constructeur(Format_Post_Med,"Format_Post_Med",Form
 
 
 /////////////////////////////////////////////////////////////////////////////
-//Parametre: med_basename_
-// Signification: debut du nom du fichier
+//Parameter: med_basename_
+// Meaning: beginning of the file name
 //Extension med
 
-//Specificites de ce format
-//Generation d un fichier format.med.data exploitable pour reecrire les donnees a un autre format
-//-Methodes completer_post_med(...) et preparer_post_med(...) pour generer les fichiers
-//-Metode finir_med(...) pour concatener les fichiers crees
+//Specifics of this format
+//Generation of a format.med.data file usable to rewrite data in another format
+//-Methods completer_post_med(...) and preparer_post_med(...) to generate the files
+//-Method finir_med(...) to concatenate the created files
 ///////////////////////////////////////////////////////////////////////////////////////
 
-/*! @brief Constructeur par defaut:
+/*! @brief Default constructor:
  *
  */
 
-//Specifier dans commentaire ce qui est fixe par defaut
+//Specify in comment what is fixed by default
 Format_Post_Med::Format_Post_Med()
 {
   reset();
 }
 
-/*! @brief Remet l'objet dans l'etat obtenu par le constructeur par defaut.
+/*! @brief Resets the object to the state obtained by the default constructor.
  *
  */
 void Format_Post_Med::reset()
@@ -61,7 +61,7 @@ Sortie& Format_Post_Med::printOn(Sortie& os) const
   return os;
 }
 
-/*! @brief Lecture des parametres du postraitement au format "jeu de donnees" Le format attendu est le suivant:
+/*! @brief Reads the post-processing parameters in "data set" format. The expected format is:
  *
  *   {
  *     nom_fichier filename_sans_extension
@@ -79,7 +79,7 @@ void Format_Post_Med::set_param(Param& param) const
   param.ajouter("nom_fichier",&med_basename_,Param::REQUIRED);
 }
 
-/*! @brief Initialisation de la classe avec des parametres par defaut
+/*! @brief Initializes the class with default parameters.
  */
 int Format_Post_Med::initialize_by_default(const Nom& file_basename)
 {
@@ -169,13 +169,13 @@ int Format_Post_Med::ecrire_domaine_dis(const Domaine& domaine,const OBS_PTR(Dom
 
   ecrire_domaine_med(domaine,nom_fic,est_le_premier_post,nom_fich);
 
-  return 1; // ok tout va bien
+  return 1; // ok all is well
 }
 
-/*! @brief commence l'ecriture d'un nouveau pas de temps
+/*! @brief Starts writing a new time step.
  *
- * Ouvre le fichier maitre en mode APPEND et ajoute une ligne
- *    "TEMPS xxxxx" si ce temps n'a pas encore ete ecrit
+ * Opens the master file in APPEND mode and adds a line
+ *    "TEMPS xxxxx" if this time has not yet been written.
  */
 int Format_Post_Med::ecrire_temps(const double temps)
 {
@@ -257,7 +257,7 @@ int Format_Post_Med::finir_med(Nom& nom_fich,int& est_le_dernier_post)
 
   if (!est_le_dernier_post || !Process::je_suis_maitre()) return 1;
 
-  // on veut concatainer les 3 fichiers
+  // we want to concatenate the 3 files
   SFichier file3(nom_fichier+".data");
   SFichier file("postmed.data");
   for (int i=0; i<3; i++)
@@ -421,7 +421,7 @@ int Format_Post_Med::ecrire_champ_med(const Domaine& dom,const Noms& unite_, con
     }
   if (je_suis_maitre())
     {
-      //Ouverture du fichier
+      //Opening the file
       SFichier os;
       os.ouvrir(nom_fich, ios::app);
       os << "champ: " << nom_post << " " << nom_dom << " " << loc_post << finl;
@@ -429,7 +429,7 @@ int Format_Post_Med::ecrire_champ_med(const Domaine& dom,const Noms& unite_, con
 
   Nom type_elem = dom.type_elem()->que_suis_je();
 
-  // modif noms compo
+  // modify component names
   for (int i = 0; i < noms_compo.size(); ++i)
     noms_compo_courts[i] = Motcle(noms_compo_courts[i]).getSuffix(nom_post);
 

@@ -43,7 +43,7 @@ void build_triofield(const Champ_Generique_base& ch, ICoCo::TrioField& afield)
   afield.setName(ch.le_nom().getString());
   afield._time1 = afield._time2 = ch.get_time(), afield._itnumber = 0;
 
-  /* copie des valeurs du champ */
+  /* copy of field values */
   afield._has_field_ownership = true;
   OWN_PTR(Champ_base) espace_stockage;
   const Champ_base& champ_ecriture = ch.get_champ(espace_stockage);
@@ -59,7 +59,7 @@ void build_triofield(const Champ_base& ch, const Domaine_dis_base& dom_dis, ICoC
   afield.setName(ch.le_nom().getString());
   afield._time1 = afield._time2 = 0.0, afield._itnumber = 0;
 
-  /* copie des valeurs du champ */
+  /* copy of field values */
   afield._has_field_ownership = true;
   const DoubleTab& vals = ch.valeurs();
   afield._nb_field_components = vals.nb_dim() > 1 ? vals.dimension(1) : 1;
@@ -73,13 +73,13 @@ void build_triomesh(const Domaine_dis_base& dom_dis, ICoCo::TrioField& afield, i
   afield.clear();
   afield._type = type;
 
-  /* tableau des sommets : copie de celui du domaine */
+  /* node array: copy from the domain */
   const DoubleTab& coord = dom.les_sommets();
   afield._space_dim = dom.dimension;
   afield._nbnodes = coord.dimension(0);
   affecte_double_avec_doubletab(&afield._coords, coord);
 
-  /* dimension des elements du domaine */
+  /* dimension of the domain elements */
   Motcle type_elem_ = dom_dis.domaine().type_elem()->que_suis_je();
   Motcle type_elem(type_elem_);
   type_elem.prefix("_AXI");
@@ -102,36 +102,36 @@ void build_triomesh(const Domaine_dis_base& dom_dis, ICoCo::TrioField& afield, i
       Process::exit();
     }
 
-  /* elements : ceux du domaine si le champ est aux sommets/elements, les faces si le champ est aux faces */
+  /* elements: those of the domain if the field is at nodes/elements, or faces if the field is at faces */
   if (loc_faces) afield._mesh_dim--;
   afield._nb_elems = loc_faces ? zvf.nb_faces() : dom_dis.domaine().nb_elem();
-  if (loc_faces || type_elem != "POLYEDRE") //maillage de faces -> connectivity = face_sommets
+  if (loc_faces || type_elem != "POLYEDRE") //face mesh -> connectivity = face_sommets
     {
       const IntTab& conn = loc_faces ? dom_dis.face_sommets() : dom_dis.domaine().les_elems();
-      //le seul moyen qu'on a d'eviter que des polygones soient pris pour des quadrilateres est d'avoir un tableau de connectivite de largeur > 4...
+      //the only way to prevent polygons from being mistaken for quadrilaterals is to have a connectivity array of width > 4...
       afield._nodes_per_elem = std::max(conn.dimension(1), type_elem == "POLYGONE" || type_elem == "POLYGONE_3D"  || type_elem == "POLYEDRE"  ? (int) 5 : 0);
       afield._connectivity = new int[afield._nb_elems * afield._nodes_per_elem];
       for (int i = 0; i < afield._nb_elems; i++)
         for (int j = 0; j < afield._nodes_per_elem; j++)
           afield._connectivity[afield._nodes_per_elem * i + j] = j < conn.dimension(1) ? conn(i, j) : -1;
     }
-  else //maillage de polyedres -> connectivite au format MEDCoupling, a faire a la main
+  else //polyhedron mesh -> connectivity in MEDCoupling format, to be built manually
     {
       const Polyedre& poly = ref_cast(Polyedre, dom.type_elem().valeur());
       const ArrOfInt& e_fi = poly.getPolyhedronIndex(), &f_si = poly.getFacesIndex(), &sl = poly.getNodes();
       const IntTab& e_s = dom.les_elems();
-      int e, f, s, nef_max = 0, nfs_max = 0; //nb face/elem et som/face max
+      int e, f, s, nef_max = 0, nfs_max = 0; //max nb faces/elem and nodes/face
       for (e = 0; e + 1 < e_fi.size_array(); e++) nef_max = std::max(nef_max, e_fi(e + 1) - e_fi(e));
       for (f = 0; f + 1 < f_si.size_array(); f++) nfs_max = std::max(nfs_max, f_si(f + 1) - f_si(f));
-      afield._nodes_per_elem = std::max(nef_max * (nfs_max + 1), (int) 9); //un -1 apres chaque face : au moins 9 pour eviter un papillonage
+      afield._nodes_per_elem = std::max(nef_max * (nfs_max + 1), (int) 9); //one -1 after each face: at least 9 to avoid butterfly cells
       int *p = afield._connectivity = new int[afield._nb_elems * afield._nodes_per_elem];
       for (e = 0; e < afield._nb_elems; e++)
         {
-          /* insertion de la connectivite de chaque face, suivie d'un -1 */
+          /* insertion of the connectivity of each face, followed by a -1 */
           for (f = e_fi(e); f < e_fi(e + 1); f++, *p = -1, p++)
             for (s = f_si(f); s < f_si(f + 1); s++)
               *p = e_s(e, sl(s)), p++;
-          /* des -1 jusqu'a la ligne suivante */
+          /* fill with -1 up to the next row */
           for ( ; p < afield._connectivity + (e + 1) * afield._nodes_per_elem; p++) *p = -1;
         }
     }
@@ -151,8 +151,12 @@ using std::vector;
 
 
 /*!
+ * @brief Build a MEDDoubleField from a TrioField.
+ *
  * This method is non const only due to this->_field that can be modified (to point to the same domaine than returned object).
  * So \b warning, to access to \a this->_field only when the returned object is alive.
+ * @param triofield the TrioField to convert
+ * @return the corresponding MEDDoubleField
  */
 MEDDoubleField build_medfield(TrioField& triofield)
 {
@@ -171,7 +175,7 @@ MEDDoubleField build_medfield(TrioField& triofield)
         switch (triofield._nodes_per_elem)
           {
           case 0: // cas field vide
-            elemtype=INTERP_KERNEL::NORM_SEG2; // pour eviter warning
+            elemtype=INTERP_KERNEL::NORM_SEG2; // to avoid warning
             break;
           default:
             throw INTERP_KERNEL::Exception("incompatible Trio field - wrong nb of nodes per elem");
@@ -223,7 +227,7 @@ MEDDoubleField build_medfield(TrioField& triofield)
         throw INTERP_KERNEL::Exception("incompatible Trio field - wrong mesh dimension");
       }
     }
-  //creating a connectivity table that complies to MED (1 indexing) <- en fait non
+  //creating a connectivity table that complies to MED (1 indexing) <- actually no
   //and passing it to _mesh
   MEDCoupling::MCAuto<MEDCoupling::MEDCouplingFieldDouble> field;
   int *conn(new int[triofield._nodes_per_elem]);
@@ -236,14 +240,14 @@ MEDDoubleField build_medfield(TrioField& triofield)
         }
       if (elemtype==INTERP_KERNEL::NORM_QUAD4)
         {
-          // dans trio pas la meme numerotation
+          // different node ordering in TRUST
           int tmp=conn[3];
           conn[3]=conn[2];
           conn[2]=tmp;
         }
       if (elemtype==INTERP_KERNEL::NORM_HEXA8)
         {
-          // dans trio pas la meme numerotation
+          // different node ordering in TRUST
           int tmp=conn[3];
           conn[3]=conn[2];
           conn[2]=tmp;
@@ -252,7 +256,7 @@ MEDDoubleField build_medfield(TrioField& triofield)
           conn[6]=tmp;
         }
       int size = triofield._nodes_per_elem;
-      while (conn[size - 1] == -1) size--; //on enleve les -1 a la fin de la connectivite
+      while (conn[size - 1] == -1) size--; //remove trailing -1 values from connectivity
 #if INT_is_64_ == 2
       // Convert int into mcIdType
       std::vector<mcIdType> conn_mc(conn, conn+size);

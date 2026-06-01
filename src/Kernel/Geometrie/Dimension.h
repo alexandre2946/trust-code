@@ -20,7 +20,7 @@
 
 #include <Interprete.h>
 
-/*! @brief classe Dimension Cette classe est un interprete qui lit la dimension d'espace.
+/*! @brief class Dimension This class is an interpreter that reads the spatial dimension.
  *
  *     Directive:
  *           Dimension dim

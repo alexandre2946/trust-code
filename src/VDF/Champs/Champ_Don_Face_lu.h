@@ -18,16 +18,16 @@
 
 #include <Champ_Fonc_Face_VDF.h>
 
-/*! @brief class Champ_Don_Face_lu Cette classe represente un champ de donnees que l'on lit
+/*! @brief class Champ_Don_Face_lu This class represents a data field that is read
  *
- *      dans un fichier avec les conventions suivantes:
- *       - n valeurs du champ sont donnees dans le fichier
- *         n doit etre egal au nombre de faces  du maillage
- *       - le format du fichier est le suivant:
+ *      from a file with the following conventions:
+ *       - n values of the field are given in the file;
+ *         n must be equal to the number of faces of the mesh
+ *       - the file format is:
  *          n
  *          .......................
- *          xi yi (zi) ui (vi) (wi) ou xi yi (zi) sont
- *          les coordonnees du centre de gravite des faces
+ *          xi yi (zi) ui (vi) (wi) where xi yi (zi) are
+ *          the coordinates of the center of gravity of the faces
  *          .......................
  *
  * @sa Champ_Don_base

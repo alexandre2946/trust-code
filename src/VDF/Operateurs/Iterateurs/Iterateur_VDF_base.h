@@ -33,18 +33,18 @@ class Operateur_base;
 class Champ_base;
 class Matrice_Morse;
 
-enum class Type_Operateur { Op_CONV_ELEM , Op_CONV_FACE , Op_DIFF_ELEM , Op_DIFT_ELEM , Op_DIFF_FACE , Op_DIFT_FACE , Op_DIFT_MULTIPHASE_FACE , Op_DIFT_MULTIPHASE_ELEM } ; // ne touche pas !
+enum class Type_Operateur { Op_CONV_ELEM , Op_CONV_FACE , Op_DIFF_ELEM , Op_DIFT_ELEM , Op_DIFF_FACE , Op_DIFT_FACE , Op_DIFT_MULTIPHASE_FACE , Op_DIFT_MULTIPHASE_ELEM } ; // do not touch!
 
 enum Type_Cl_VDF
 {
-  navier,  // Symetrie, frottement paroi
-  sortie_libre, // Neumann_sortie_libre ou derivees
+  navier,  // Symetrie, wall friction
+  sortie_libre, // Neumann_sortie_libre or derived
   entree_fluide, // Dirichlet_entree_fluide
   paroi_fixe, // Dirichlet_paroi_fixe
   paroi_defilante, // Dirichlet_paroi_defilante
-  paroi_scalaire_impose, // Scalaire_impose_paroi ou derivees
-  paroi_dirichlet_loi_paroi, // Dirichlet_loi_paroi pour turbulence
-  paroi_adiabatique, // Neumann_paroi_adiabatique ou derivees
+  paroi_scalaire_impose, // Scalaire_impose_paroi or derived
+  paroi_dirichlet_loi_paroi, // Dirichlet_loi_paroi for turbulence
+  paroi_adiabatique, // Neumann_paroi_adiabatique or derived
   paroi, // Neumann_paroi
   echange_externe_impose, // Echange_externe_impose
   echange_global_impose, // Echange_global_impose

@@ -34,7 +34,7 @@ Sortie& Champ_Generique_Reduction_0D::printOn(Sortie& s ) const
   return s << que_suis_je() << " " << le_nom();
 }
 
-//cf Champ_Gen_de_Champs_Gen::readOn
+//see Champ_Gen_de_Champs_Gen::readOn
 Entree& Champ_Generique_Reduction_0D::readOn(Entree& s )
 {
   LIST(Motcle) mot_compris;
@@ -69,7 +69,7 @@ Entree& Champ_Generique_Reduction_0D::readOn(Entree& s )
   return s ;
 }
 
-//  methode : indique le type de reduction qui va etre realisee
+//  methode : indicates the type of reduction to be performed
 //              (min, max, moyenne, moyenne_ponderee_volume_elem, somme, somme_ponderee)
 void Champ_Generique_Reduction_0D::set_param(Param& param) const
 {
@@ -116,7 +116,7 @@ void Champ_Generique_Reduction_0D::completer(const Postraitement_base& post)
       const Domaine_dis_base& domaine_dis = get_source(0).get_ref_domaine_dis_base();
 
       const Domaine_VF& zvf = ref_cast(Domaine_VF,domaine_dis);
-      // position la plus a gauche
+      // leftmost position
       const DoubleTab& coords=zvf.domaine().les_sommets();
       const IntTab& conn=zvf.domaine().les_elems();
       double minp=mp_min_vect(coords);
@@ -151,7 +151,7 @@ void Champ_Generique_Reduction_0D::completer(const Postraitement_base& post)
             }
         }
       double dming=mp_min(dmin);
-      // on, envoye au maitre
+      // we send to the master
       if (!je_suis_maitre())
         {
           envoyer(dmin,0,97);
@@ -201,9 +201,9 @@ const Champ_base& Champ_Generique_Reduction_0D::get_champ_without_evaluation(OWN
   espace_stockage = creer_espace_stockage(nature_source,nb_comp,es_tmp);
   return espace_stockage;
 }
-/*! @brief Reduction_0D du champ source (au sens qu on le rend uniforme) en fonction de la methode (min, max, moyenne, moyenne_ponderee_volume_elem, somme, somme_ponderee)
+/*! @brief 0D reduction of the source field (in the sense that we make it uniform) according to the method (min, max, moyenne, moyenne_ponderee_volume_elem, somme, somme_ponderee)
  *
- *  Dans le cas ou le champ possede plusieurs composantes, elles sont traitees une par une
+ *  In the case where the field has multiple components, they are processed one by one
  *
  */
 const Champ_base& Champ_Generique_Reduction_0D::get_champ(OWN_PTR(Champ_base)&) const
@@ -215,8 +215,8 @@ const Champ_base& Champ_Generique_Reduction_0D::get_champ(OWN_PTR(Champ_base)&) 
   int order = source.order_field();
   int nb_comp = source.nb_vect_comp();
 
-  // dimension() sur le tableau de valeurs des champs PolyMAC_HFV renvoie -1 (plusieurs supports)
-  // ToDo: reecrire completement cette methode (horrible, tres mal ecrite) en deportant les methodes min/max/sum/... pour chaque OWN_PTR(Champ_base) !
+  // dimension() on the value array of PolyMAC_HFV fields returns -1 (multiple supports)
+  // ToDo: completely rewrite this method (horrible, very poorly written) by delegating the min/max/sum/... methods for each OWN_PTR(Champ_base)!
   if (source.que_suis_je()=="Champ_Face_PolyMAC_HFV" || source.que_suis_je()=="Champ_Face_PolyMAC_MPFA")
     Process::exit("PolyMAC_HFV/PolyMAC_MPFA face field not supported yet for Reduction_0D");
 
@@ -227,12 +227,12 @@ const Champ_base& Champ_Generique_Reduction_0D::get_champ(OWN_PTR(Champ_base)&) 
     espace_stockage_->changer_temps(get_time());
 
   int nb_dim = source.valeurs().nb_dim();
-  // correction pour le 3D
+  // correction for 3D
   if (nb_dim==2)
     nb_dim= source.valeurs().dimension(1);
 
-  ConstDoubleTab_parts valeurs_source_parts(source.valeurs()); // pour ignorer les variables auxiliaires
-  const DoubleTab& valeurs_source = valeurs_source_parts[0];   // de PolyMAC_HFV (sinon : min, moyenne FAUX)
+  ConstDoubleTab_parts valeurs_source_parts(source.valeurs()); // to ignore auxiliary variables
+  const DoubleTab& valeurs_source = valeurs_source_parts[0];   // of PolyMAC_HFV (otherwise: min, moyenne WRONG)
   DoubleTab& espace_valeurs = espace_stockage_->valeurs();
   const Domaine_VF& zvf = ref_cast(Domaine_VF,domaine_dis);
   double val_extraite=-100.;
@@ -294,10 +294,10 @@ const Champ_base& Champ_Generique_Reduction_0D::get_champ(OWN_PTR(Champ_base)&) 
             }
 
           DoubleTrav vect_source;
-          //Pour l'option somme vect_source doit avoir une structure parallele
-          //pour appliquer val_extraite = mp_prodscal(vect_source,un)
-          //Sa dimension est alors fixee par rapport au nombre d items de la source
-          //ex : zvf.nb_faces() si loc==FACE
+          //For the somme option, vect_source must have a parallel structure
+          //to apply val_extraite = mp_prodscal(vect_source,un)
+          //Its dimension is then set relative to the number of items in the source
+          //ex: zvf.nb_faces() if loc==FACE
           if (methode_=="somme" || methode_=="moyenne" || methode_=="sum" || methode_=="average")
             {
               Entity loc = get_localisation();
@@ -310,11 +310,11 @@ const Champ_base& Champ_Generique_Reduction_0D::get_champ(OWN_PTR(Champ_base)&) 
               vect_source = 0.;
             }
           else
-            //Dans le cas VDF avec nb_dim!=nb_comp
-            //Sa dimension est fixee par rapport aux nb_faces dont l orientation est comp
+            //In the VDF case with nb_dim!=nb_comp
+            //Its dimension is set relative to the nb_faces whose orientation is comp
             vect_source.resize(size_vect);
 
-          // Remplissage
+          // Filling
           if (nb_dim==nb_comp)
             {
               CDoubleTabView valeurs = valeurs_source.view_ro();
@@ -341,7 +341,7 @@ const Champ_base& Champ_Generique_Reduction_0D::get_champ(OWN_PTR(Champ_base)&) 
                       }
                   }
             }
-          // Passage si necessaire de la composante pour les Champ_face
+          // Pass the component if necessary for Champ_face fields
           extraire(val_extraite,vect_source,basis_function,(nb_dim==nb_comp?-1:comp));
 
           if (nb_dim==nb_comp)
@@ -367,7 +367,7 @@ const Champ_base& Champ_Generique_Reduction_0D::get_champ(OWN_PTR(Champ_base)&) 
   return espace_stockage_;
 }
 
-//Extrait la valeur du vecteur val_source dans val_extraite
+//Extracts the value from the vector val_source into val_extraite
 void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVect& val_source, const bool basis_function, const int composante_VDF) const
 {
 
@@ -383,8 +383,8 @@ void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVec
     }
   /*
     else if (methode_=="moyenne") {
-    // On n'utilise pas mp_moyenne_vect car probleme en VDF avec un champ vectoriel pour faire un val_source distribue
-  // Pour calculer la moyenne, on utilise somme(val_source)/somme(1)
+    // We do not use mp_moyenne_vect because of problems in VDF with a vector field to make a distributed val_source
+  // To calculate the mean, we use somme(val_source)/somme(1)
   val_extraite = mp_moyenne_vect(val_source);
   } */
   else if (methode_=="euclidian_norm")
@@ -399,10 +399,10 @@ void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVec
     }
   else if (methode_ =="L1_norm" || methode_ =="L2_norm")
     {
-      // Si on est :
-      // - au ELEM -> on pondere par les volumes des elements,
-      // - au FACE -> on pondere par les volumes entrelaces (on ne prend pas en compte les volumes etendues car on n'y a pas acces),
-      // - au NODE -> on pondere par les volumes de controle nodal [Vol(som)= Somme_sur_elem_entourant_som(Vol_elem/nb_som_par_elem)].
+      // If we are:
+      // - at ELEM -> we weight by element volumes,
+      // - at FACE -> we weight by interleaved volumes (we do not account for extended volumes since they are not accessible),
+      // - at NODE -> we weight by nodal control volumes [Vol(som)= Sum_over_elem_surrounding_som(Vol_elem/nb_som_per_elem)].
       const Domaine_dis_base& domaine_dis = get_ref_domaine_dis_base();
       const Domaine_VF& zvf = ref_cast(Domaine_VF,domaine_dis);
       double sum=0;
@@ -415,7 +415,7 @@ void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVec
           exit();
         }
 
-      // au ELEM
+      // at ELEM
       if (get_localisation()==Entity::ELEMENT)
         {
           if (methode_ =="L1_norm")
@@ -433,10 +433,10 @@ void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVec
             }
         }
 
-      // au FACE
+      // at FACE
       if (get_localisation()==Entity::FACE)
         {
-          // Calcul des volumes de controle a chaque face
+          // Computation of control volumes at each face
           int nb_face = zvf.nb_faces();
           if (!volume_controle_.size())
             {
@@ -512,10 +512,10 @@ void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVec
             }
         }
 
-      // au NODE
+      // at NODE
       if (get_localisation()==Entity::NODE)
         {
-          // Calcul des volumes de controle a chaque sommet
+          // Computation of control volumes at each node
           int nb_som = zvf.nb_som();
           if (!volume_controle_.size())
             {
@@ -562,10 +562,10 @@ void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVec
 
   else if (methode_=="weighted_average" || methode_=="weighted_sum" || methode_=="moyenne_ponderee" || methode_=="somme_ponderee")
     {
-      // Si on est :
-      // - au ELEM -> on pondere par les volumes des elements,
-      // - au FACE -> on pondere par les volumes entrelaces (on ne prend pas en compte les volumes etendues car on n'y a pas acces),
-      // - au NODE -> on pondere par les volumes de controle nodal [Vol(som)= Somme_sur_elem_entourant_som(Vol_elem/nb_som_par_elem)].
+      // If we are:
+      // - at ELEM -> we weight by element volumes,
+      // - at FACE -> we weight by interleaved volumes (we do not account for extended volumes since they are not accessible),
+      // - at NODE -> we weight by nodal control volumes [Vol(som)= Sum_over_elem_surrounding_som(Vol_elem/nb_som_per_elem)].
 
       const Domaine_dis_base& domaine_dis = get_ref_domaine_dis_base();
       const Domaine_VF& zvf = ref_cast(Domaine_VF,domaine_dis);
@@ -579,16 +579,16 @@ void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVec
           exit();
         }
 
-      // au ELEM
+      // at ELEM
       if (get_localisation()==Entity::ELEMENT)
         {
           zvf.compute_average(val_source, sum, volume, basis_function, composante_VDF);
         }
 
-      // au FACE
+      // at FACE
       else if (get_localisation()==Entity::FACE)
         {
-          // Calcul des volumes de controle a chaque face
+          // Computation of control volumes at each face
           int nb_face = zvf.nb_faces();
           if (!volume_controle_.size() || zvf.domaine().deformable())
             {
@@ -634,10 +634,10 @@ void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVec
             }
         }
 
-      // au NODE
+      // at NODE
       else if (get_localisation()==Entity::NODE)
         {
-          // Calcul des volumes de controle a chaque sommet
+          // Computation of control volumes at each node
           int nb_som = zvf.nb_som();
           if (!volume_controle_.size())
             {
@@ -669,8 +669,8 @@ void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVec
     }
   else if (methode_=="moyenne_ponderee_porosite" || methode_=="somme_ponderee_porosite" || methode_=="weighted_average_porosity" || methode_=="weighted_sum_porosity")
     {
-      // - au ELEM -> on pondere par les volumes des elements *porosite_volumique
-      // si on n'est pas aux ELEM erreur
+      // - at ELEM -> we weight by element volumes *volumetric_porosity
+      // if not at ELEM, error
 
       const Domaine_dis_base& domaine_dis = get_ref_domaine_dis_base();
       const Domaine_VF& zvf = ref_cast(Domaine_VF,domaine_dis);
@@ -690,7 +690,7 @@ void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVec
           exit();
         }
 
-      // au ELEM
+      // at ELEM
       if (get_localisation()==Entity::ELEMENT)
         {
           OWN_PTR(Champ_base) source_espace_stockage2;
@@ -740,15 +740,15 @@ void Champ_Generique_Reduction_0D::extraire(double& val_extraite,const DoubleVec
       if (methode_=="somme" || methode_=="sum")
         {
           val_extraite = mp_prodscal(val_source,un_);
-          // Pourquoi ne pas utiliser val_extraite = mp_somme_vect(val_source); ?
+          // Why not use val_extraite = mp_somme_vect(val_source); ?
         }
       else if (methode_=="moyenne" || methode_=="average")
         {
           Entity loc = get_localisation();
           if (loc==Entity::FACE && composante_VDF>=0)
             {
-              // Dans le cas vectoriel en VDF, il ne faut compter que les
-              // faces de la composante etudiee :
+              // In the vector case in VDF, we must only count the
+              // faces of the studied component:
               int nb_face = zvf.nb_faces();
               CIntArrView ori = zvf.orientation().view_ro();
               DoubleArrView un = un_.view_wo();
@@ -814,7 +814,7 @@ const Noms Champ_Generique_Reduction_0D::get_property(const Motcle& query) const
   return Champ_Gen_de_Champs_Gen::get_property(query);
 }
 
-//Nomme le champ en tant que source par defaut
+//Name the field as a source by default
 //"Reduction_0D_"+nom_champ_source
 void Champ_Generique_Reduction_0D::nommer_source()
 {

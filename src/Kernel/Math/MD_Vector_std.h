@@ -26,14 +26,14 @@
 #include <TRUSTVect.h>
 #include <ArrOfBit.h>
 
-/*! @brief C'est le plus simple des descripteurs, utilise pour les tableaux de valeurs aux sommets, elements, faces, aretes, faces de bord, etc.
+/*! @brief This is the simplest descriptor, used for arrays of values at vertices, elements, faces, edges, boundary faces, etc.
  *
  * ..
- *   Il supporte la notion d'items "communs" (sommets du maillage partages entre plusieurs processeurs)
- *   et d'items "distants" et "virtuels" (sommets, elements dans l'epaisseur de joint).
+ *   It supports the notion of "shared" items (mesh vertices shared among multiple processors)
+ *   and "distant" and "virtual" items (vertices, elements in the ghost layer).
  *
- *   @sa MD_Vector_composite (descripteur compose d'une reunion de plusieurs descripteurs, pour le P1Bulle
- *   par exemple)
+ *   @sa MD_Vector_composite (descriptor composed of a union of several descriptors, for P1Bulle
+ *   for example)
  *
  */
 class MD_Vector_std : public MD_Vector_mono
@@ -75,22 +75,22 @@ public:
 
 protected:
 
-  // Numeros des processeurs voisins avec qui j'echange des donnees (meme taille que les VECT suivants)
+  // Indices of neighbouring processors with whom I exchange data (same size as the following VECTs)
   ArrOfInt pe_voisins_;
-  // Indices des items individuels a envoyer a chaque voisin (une liste par processeur voisin)
-  //  Les listes contiennent a la fois les items communs a envoyer et les items "distants" qui seront
-  //  stockes dans les espaces virtuels. Les premiers items de cette liste correspondent aux "items_to_recv_"
-  //  sur le processeur voisin, les items suivants aux "blocs_to_recv_".
+  // Indices of individual items to send to each neighbour (one list per neighbouring processor)
+  //  The lists contain both the shared items to send and the "distant" items that will be
+  //  stored in the virtual spaces. The first items in this list correspond to "items_to_recv_"
+  //  on the neighbouring processor, the following items to "blocs_to_recv_".
   Static_Int_Lists items_to_send_;
-  // Parmi les items to send, combien, sur chaque processeur, seront recus dans des "items_to_recv_" ? (les suivants sont recus dans des blocs_to_recv_)
+  // Among the items to send, how many on each processor will be received in "items_to_recv_"? (the following are received in blocs_to_recv_)
   ArrOfInt nb_items_to_items_;
-  // Indices des items individuels a recevoir de chaque voisin (en principe, ce sont les items communs recus, rarement contigus dans les tableaux)
+  // Indices of individual items to receive from each neighbour (in principle, these are the shared items received, rarely contiguous in the arrays)
   Static_Int_Lists items_to_recv_;
-  // Blocs d'items a recevoir
-  // Chaque liste contient debut_bloc1, fin_bloc1, debut_bloc2, fin_bloc2, etc... attention, fin_bloc est l'indice du dernier element + 1
-  // En principe ce sont les items virtuels, qui sont souvent contigus dans les tableaux.
+  // Blocks of items to receive
+  // Each list contains start_bloc1, end_bloc1, start_bloc2, end_bloc2, etc... note that end_bloc is the index of the last element + 1
+  // In principle these are the virtual items, which are often contiguous in the arrays.
   Static_Int_Lists blocs_to_recv_;
-  // Pour accelerer le calcul des tailles de buffer, nombre total d'items mentionnes dans blocs_to_recv_ pour chaque processeur (egal a la somme des fin_bloc-debut_bloc)
+  // To speed up buffer size computation, total number of items mentioned in blocs_to_recv_ for each processor (equal to the sum of end_bloc-start_bloc)
   ArrOfInt blocs_items_count_;
 
 private:
@@ -122,7 +122,7 @@ void MD_Vector_std::initialize_comm_template(const Echange_EV_Options& opt, Sche
       if (have_blocs_to_recv) sz2 += blocs_items_count_[i];
       if (reverse)
         {
-          // Schema a l'envers: lecture dans les items to recv, ecriture dans les items to send
+          // Reverse scheme: read from items to recv, write to items to send
           int tmp = sz1;
           sz1 = sz2;
           sz2 = tmp;

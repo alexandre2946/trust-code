@@ -59,8 +59,8 @@ Champ_Fonc_base& Modele_turbulence_hyd_LES_Wale_VDF::calculer_viscosite_turbulen
     {
       const int nb_elem = domaine_VDF.domaine().nb_elem(), nb_elem_tot = domaine_VDF.nb_elem_tot();
 
-      OP1_.resize(nb_elem_tot);  // OP1 est le premier operateur spatial du modele WALE.
-      OP2_.resize(nb_elem_tot);  // OP2 est le deuxieme operateur spatial du modele WALE.
+      OP1_.resize(nb_elem_tot);  // OP1 is the first spatial operator of the WALE model.
+      OP2_.resize(nb_elem_tot);  // OP2 is the second spatial operator of the WALE model.
 
       calculer_OP1_OP2();
 
@@ -72,7 +72,7 @@ Champ_Fonc_base& Modele_turbulence_hyd_LES_Wale_VDF::calculer_viscosite_turbulen
 
       for (int elem = 0; elem < nb_elem; elem++)
         {
-          if (OP1_[elem] != 0.) // donc sd2 (et OP2 par voie de consequence) sont differents de zero
+          if (OP1_[elem] != 0.) // so sd2 (and OP2 as a consequence) are nonzero
             visco_turb[elem] = cw_ * cw_ * l_(elem) * l_(elem) * OP1_[elem] / OP2_[elem];
           else
             visco_turb[elem] = 0;
@@ -105,7 +105,7 @@ void Modele_turbulence_hyd_LES_Wale_VDF::calculer_OP1_OP2()
 
   for (int elem = 0; elem < nb_elem; elem++)
     {
-      //Calcul du terme gij2
+      //Computation of the term gij2
       for (int i = 0; i < dimension; i++)
         for (int j = 0; j < dimension; j++)
           {
@@ -115,21 +115,21 @@ void Modele_turbulence_hyd_LES_Wale_VDF::calculer_OP1_OP2()
               gij2(i, j) += duidxj(elem, i, k, 0) * duidxj(elem, k, j, 0);
           }
 
-      // Calcul du terme gkk2
+      // Computation of the term gkk2
       gkk2 = 0;
       for (int k = 0; k < dimension; k++)
         gkk2 += gij2(k, k);
 
-      // Calcul de sd
+      // Computation of sd
       for (int i = 0; i < dimension; i++)
         for (int j = 0; j < dimension; j++)
           {
             sd(i, j) = 0.5 * (gij2(i, j) + gij2(j, i));
             if (i == j)
-              sd(i, j) -= gkk2 / 3.; // Terme derriere le tenseur de Kronecker
+              sd(i, j) -= gkk2 / 3.; // Term behind the Kronecker tensor
           }
 
-      // Calcul de sd2 et Sij2
+      // Computation of sd2 and Sij2
       sd2 = 0.;
       Sij2 = 0.;
 
@@ -140,21 +140,21 @@ void Modele_turbulence_hyd_LES_Wale_VDF::calculer_OP1_OP2()
         for (int j = 0; j < dimension; j++)
           {
             sd2 += sd(i, j) * sd(i, j);
-            //Deplacement du calcul de sij
+            //Shifted computation of sij
             Sij = 0.5 * (duidxj(elem, i, j, 0) + duidxj(elem, j, i, 0));
 
-            // PQ : 24/01/07 : le stencil de Sij est par contruction de :
-            //                   -  1 maille pour les termes diagonaux Sii
-            //                   - ~2 mailles pour les termes croises Sij
+            // PQ : 24/01/07 : the stencil of Sij is by construction:
+            //                   -  1 cell for the diagonal terms Sii
+            //                   - ~2 cells for the cross terms Sij
             //
-            // Wale s'appuyant a la fois sur sd2 (porte par Sij) et sur Sij2 (porte principalement par Sii)
-            // est sensible a cette difference de stencil.
-            // En portant le stencil a 3 maille spour le calcul de Sii, on retrouve en THI
-            // le bon taux de dissipation ainsi que des spectres possedant la bonne allure en k^-5/3.
+            // Wale relies on both sd2 (carried by Sij) and Sij2 (carried mainly by Sii)
+            // and is sensitive to this stencil difference.
+            // By extending the stencil to 3 cells for the Sii computation, we recover in HIT
+            // the correct dissipation rate as well as spectra with the correct k^-5/3 shape.
             //
-            // A traiter : Quid sur canal plan ???
+            // To be addressed: what about a plane channel ???
 
-            if (i == j)  // augmentation du stencil de Sii
+            if (i == j)  // extend the Sii stencil
               {
                 face1 = elem_faces(elem, i);
                 face2 = elem_faces(elem, i + dimension);
@@ -162,11 +162,11 @@ void Modele_turbulence_hyd_LES_Wale_VDF::calculer_OP1_OP2()
                 elem1 = face_voisins(face1, 0);
                 elem2 = face_voisins(face2, 1);
 
-                //if(elem1==elem) elem1=face_voisins(face1,1);  // par construction il n'y a pas besoin
-                //if(elem2==elem) elem2=face_voisins(face2,0);  // par construction il n'y a pas besoin
+                //if(elem1==elem) elem1=face_voisins(face1,1);  // by construction this is not needed
+                //if(elem2==elem) elem2=face_voisins(face2,0);  // by construction this is not needed
 
-                // si pas de bord a proximite on passe au stencil de 3 mailles
-                // sinon on reste au stencil a 1 maille
+                // if no boundary is nearby, use a 3-cell stencil
+                // otherwise keep the 1-cell stencil
 
                 if (elem1 >= 0 && elem2 >= 0)
                   Sij = ((duidxj(elem1, i, i, 0) + duidxj(elem, i, i, 0) + duidxj(elem2, i, i, 0))) / 3.;
@@ -175,9 +175,9 @@ void Modele_turbulence_hyd_LES_Wale_VDF::calculer_OP1_OP2()
             Sij2 += Sij * Sij;
           }
 
-      // Calcul de OP1 et OP2
+      // Computation of OP1 and OP2
       OP1_(elem) = pow(sd2, 1.5);
       OP2_(elem) = pow(Sij2, 2.5) + pow(sd2, 1.25);
 
-    }                // fin de la boucle sur les elements
+    }                // end of the loop over elements
 }

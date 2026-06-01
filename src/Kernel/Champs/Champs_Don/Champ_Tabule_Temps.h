@@ -22,11 +22,11 @@
 #include <Table.h>
 
 
-/*! @brief Classe Champ_Tabule_Temps Cette classe derivee de Champ_Uniforme_inst qui represente
+/*! @brief Classe Champ_Tabule_Temps Derived class of Champ_Uniforme_inst that represents
  *
- *     un champ constant dans l'espace et tabule en temps.
- *     La valeur du champ a un instant quelconque est calcule par interpolation
- *     lineaire a partir de la table des valeurs.
+ *     a field that is constant in space and tabulated in time.
+ *     The field value at any given instant is computed by linear interpolation
+ *     from the value table.
  *
  * @sa Champ_Uniforme_inst
  */

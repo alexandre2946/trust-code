@@ -26,15 +26,15 @@ template <typename OP_TYPE>
 class Op_Conv_VDF : public Op_VDF_Elem, public Op_VDF_Face
 {
 protected:
-  // pour operateurs elem
+  // for elem operators
   inline void dimensionner_elem(Matrice_Morse& matrice) const { Op_VDF_Elem::dimensionner(iter_vdf()->domaine(), iter_vdf()->domaine_Cl(), matrice, 0); }
   inline void modifier_pour_Cl_elem(Matrice_Morse& matrice, DoubleTab& secmem) const { Op_VDF_Elem::modifier_pour_Cl(iter_vdf()->domaine(), iter_vdf()->domaine_Cl(), matrice, secmem); }
 
-  // pour operateurs face
+  // for face operators
   inline void dimensionner_face(Matrice_Morse& matrice) const { Op_VDF_Face::dimensionner(iter_vdf()->domaine(), iter_vdf()->domaine_Cl(), matrice); }
   inline void modifier_pour_Cl_face(Matrice_Morse& matrice, DoubleTab& secmem) const { Op_VDF_Face::modifier_pour_Cl(iter_vdf()->domaine(), iter_vdf()->domaine_Cl(), matrice, secmem); }
 
-  // pour les deux !
+  // for both!
   template <Type_Operateur _TYPE_ , typename EVAL_TYPE>
   inline std::enable_if_t<_TYPE_ == Type_Operateur::Op_CONV_ELEM, void>
   associer_impl(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_cl_dis, const Champ_Inc_base& ch_transporte)
@@ -86,11 +86,11 @@ protected:
   }
 
 private:
-  // CRTP pour recuperer l'iter
+  // CRTP to retrieve the iterator
   inline const OWN_PTR(Iterateur_VDF_base)& iter_vdf() const { return static_cast<const OP_TYPE *>(this)->get_iter(); }
   inline OWN_PTR(Iterateur_VDF_base)& iter_vdf() { return static_cast<OP_TYPE *>(this)->get_iter(); }
 
-  // Methode enorme pour tout le monde !
+  // Huge method used by everyone!
   template <typename EVAL_TYPE, bool is_QUICK, bool is_CENTRE4>
   EVAL_TYPE& associer_(const Domaine_dis_base& domaine_dis, const Domaine_Cl_dis_base& domaine_cl_dis)
   {

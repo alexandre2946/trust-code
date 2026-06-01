@@ -18,12 +18,11 @@
 
 #include <Frontiere.h>
 
-/*! @brief Classe Bord Cette classe represente un bord d'un domaine, c'est un type de frontiere
+/*! @brief Class Bord This class represents a boundary of a domain, it is a type of frontier
  *
- *     (derive de Frontiere).
- *     On appelle Bord la surface qui borde un Domaine, pour une equation
- *     donnee l'utilisateur doit fournir une condition aux limites a chaque
- *     Bord.
+ *     (derived from Frontiere).
+ *     Bord refers to the surface bordering a Domain; for a given equation
+ *     the user must provide a boundary condition at each Bord.
  *
  * @sa Frontiere Domaine Bords Domaine
  */

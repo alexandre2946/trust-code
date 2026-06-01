@@ -31,36 +31,36 @@
 #include <Parser_U.h>
 #include <Sondes.h>
 
-/*! @brief classe Postraitement La classe est dotee -d une liste de champs generiques champs_post_complet_ qui contient
+/*! @brief class Postraitement. The class holds -a list of generic fields champs_post_complet_ containing
  *
- *                                  tous les champs generiques du post-traitement
- *                            -d une liste d identifiants noms_champs_a_post_ qui contient l identifiant
- *                             des champs a post-traiter
+ *                                  all generic fields for post-processing
+ *                            -a list of identifiers noms_champs_a_post_ containing the identifiers
+ *                             of the fields to post-process
  *
- *      -Lecture des champs generiques declares dans le bloc "definition_champs" (ajoutes dans  champs_post_complet_)
- *      et ajout dans cette liste des champs crees par macro (declenche par ancienne syntaxe dans "champs" et "statistiques")
- *         Construction de la liste des identifiants noms_champs_a_post_ au cours des operations de lecture
- *      -Mise a jour des champs generiques, en realite mise a jour des operateurs statistiques pour les champs qui en porte
- *      -postraitement realise dans postraiter_champs()
- *         Parcours des identifiants
- *         Le champ generique correspondant a un identifiant est recupere par :             get_champ_post("identifiant")
- *         Pour ce champ generique : on calcul les valeurs a ecrire par :                     get_champ(espace_stockage)
- *                                   on recupere les informations complementaires par : get_property(), get_time() ...
- *         Ecriture des valeurs calculees :                                             postraiter(...)
- *
- *
- *   Les macros utilises pour la creation des champs generiques sont detaillees dans le .cpp de la classe
- *   Voir creer_champ_post() et creer_champ_post_stat()
+ *      -Reading of generic fields declared in the "definition_champs" block (added to champs_post_complet_)
+ *      and adding to this list the fields created by macro (triggered by old syntax in "champs" and "statistiques")
+ *         Building the identifier list noms_champs_a_post_ during the reading operations
+ *      -Updating generic fields, in practice updating the statistical operators for fields that carry one
+ *      -post-processing performed in postraiter_champs()
+ *         Iterating over identifiers
+ *         The generic field corresponding to an identifier is retrieved by:             get_champ_post("identifiant")
+ *         For this generic field: field values to write are computed by:                  get_champ(espace_stockage)
+ *                                  supplementary info is retrieved by: get_property(), get_time() ...
+ *         Writing the computed values:                                                postraiter(...)
  *
  *
- * @sa Hierarchie des champs generiques (Champ_Generique_base), La syntaxe a respecter dans le jdd, Postraitement {, Sondes, {, ..., }, Definition_champs, {, //Specification des champs generiques, }, Champs, {, -Creation de champ generique par macro si utilisation ancienne syntaxe (ex : vitesse elem) et ajout, identifiant dans la liste noms_champs_a_post_, -Ajout dans la liste  noms_champs_a_post_ pour cas d un champ declare dans le bloc "definition_champs", }, Statistiques, {, t_deb val_1 t_fin_val_2, -Creation de champ generique par macro si utilisation ancienne syntaxe (ex : Moyenne vitesse elem) et ajout, identifiant dans la liste noms_champs_a_post_, }, }
+ *   The macros used for creating generic fields are detailed in the .cpp of the class.
+ *   See creer_champ_post() and creer_champ_post_stat()
+ *
+ *
+ * @sa Hierarchy of generic fields (Champ_Generique_base), Syntax to follow in the data file, Postraitement {, Sondes, {, ..., }, Definition_champs, {, //Specification of generic fields, }, Champs, {, -Creation of generic field by macro if using old syntax (e.g. vitesse elem) and adding, identifier to noms_champs_a_post_ list, -Adding to the noms_champs_a_post_ list for a field declared in the "definition_champs" block, }, Statistiques, {, t_deb val_1 t_fin_val_2, -Creation of generic field by macro if using old syntax (e.g. Moyenne vitesse elem) and adding, identifier to noms_champs_a_post_ list, }, }
  */
 class Postraitement : public Postraitement_base
 {
   Declare_instanciable_sans_constructeur(Postraitement);
 public:
   //
-  // Methodes reimplementees :
+  // Overriding methods:
   //
   void associer_nom_et_pb_base(const Nom&, const Probleme_base&) override;
   void postraiter(int forcer) override;
@@ -80,7 +80,7 @@ public:
   void modify_cgns_basenames_and_reinit(const int, const int);
 
   //
-  // Methodes specifiques :
+  // Specific methods:
   //
   Postraitement();
 
@@ -96,10 +96,10 @@ public:
   virtual void postprocess_field_values();
 
   int traiter_champs();
-  virtual int lire_champs_a_postraiter(Entree& is, bool expect_acco);                //Lance eventuellement la creation de champs generiques par macro
-  //et construit la liste noms_champs_a_post_ des champs post-traites
-  int lire_champs_stat_a_postraiter(Entree&, bool expect_acco);        //idem pour statistiques
-  int lire_champs_operateurs(Entree& is);                //Lecture d un champ generique, nomme et complete
+  virtual int lire_champs_a_postraiter(Entree& is, bool expect_acco);                //Optionally triggers creation of generic fields by macro
+  //and builds the noms_champs_a_post_ list of post-processed fields
+  int lire_champs_stat_a_postraiter(Entree&, bool expect_acco);        //same for statistics
+  int lire_champs_operateurs(Entree& is);                //Reads a generic field, named and completed
   void complete_champ(Champ_Generique_base& champ,const Motcle& motlu);
   int postraiter_tableaux();
   int traiter_tableaux();
@@ -126,7 +126,7 @@ public:
   inline LIST(Nom)& noms_champs_a_post() { return noms_champs_a_post_; }
   inline const Liste_Champ_Generique& champs_post_complet() const { return champs_post_complet_; }
 
-  //On distingue le postraitement d un tableau et d un tenseur
+  //We distinguish post-processing of an array and of a tensor
   int postraiter(const Domaine& dom,const Noms& unites,const Noms& noms_compo,const int ncomp,
                  const double temps,
                  Nom nom_post,const Nom& localisation,const Nom& nature,const DoubleTab& valeurs,int tenseur);
@@ -147,7 +147,7 @@ public:
                            const Motcle& motlu3,const Motcle& motlu4,
                            const int trouve);
 
-  //Methodes macro pour generer la creation de :
+  //Macro methods to generate the creation of:
   //-Champ_Generique_Interpolation
   void creer_champ_post(const Motcle& motlu1,const Motcle& motlu2,Entree& s);
   //-Champ_Generique_Interpolation_Statistiques
@@ -156,11 +156,11 @@ public:
   //-Champ_Generique_Morceau_Equation
   void creer_champ_post_moreqn(const Motcle& type,const Motcle& option,const int num_eq,const int num_morceau,const int compo,Entree& s);
 
-  //Methode macro pour le cas des champs med
+  //Macro method for the case of med fields
   void creer_champ_post_med(const Motcle& motlu1,const Motcle& motlu2,Entree& s);
 
-  //Methode comprend_champ_post() qui indique si l identifiant correspond au nom d un Champ_Generique_base
-  //ou a l une de ses composantes-les sources sont testees recusrivement
+  //Method comprend_champ_post() which indicates if the identifier corresponds to the name of a Champ_Generique_base
+  //or to one of its components - sources are tested recursively
   int comprend_champ_post(const Motcle& identifiant) const;
 
   //temporaire a reviser
@@ -185,24 +185,24 @@ public:
 protected:
 
   int est_le_premier_postraitement_pour_nom_fich_, est_le_dernier_postraitement_pour_nom_fich_;
-  double dt_post_;          ///< ecriture des donnees (champs, stats, int_array) tous les dt_post (un temps)
-  int nb_pas_dt_post_;       ///< ecriture des donnees (champs, stats, int_array) tous les dt_post (une periode en nb d'iteration)
+  double dt_post_;          ///< output of data (fields, stats, int_array) every dt_post (a time interval)
+  int nb_pas_dt_post_;       ///< output of data (fields, stats, int_array) every dt_post (a period in number of iterations)
   Parser_U fdt_post_;
 
-  Sondes les_sondes_;           // Sondes a traiter
-  Sondes_Int les_sondes_int_;   // Sondes pour des tableaux d'entiers
-  Operateurs_Statistique_tps les_statistiques_; // Liste d'operateurs statistiques a traiter
+  Sondes les_sondes_;           // Probes to process
+  Sondes_Int les_sondes_int_;   // Probes for integer arrays
+  Operateurs_Statistique_tps les_statistiques_; // List of statistical operators to process
 
-  LIST(Nom) noms_champs_a_post_;                 //contient les identifiants des champs a postraiter
-  Liste_Champ_Generique champs_post_complet_;   //contient l ensemble des champs generiques dedies au post-traitement
+  LIST(Nom) noms_champs_a_post_;                 //contains the identifiers of fields to post-process
+  Liste_Champ_Generique champs_post_complet_;   //contains all generic fields dedicated to post-processing
 
-  //attributs pour sauvegarde-reprise
-  //redondant avec attributs des Champ_Generique_Statistiques
-  //Tout le processus de sauvegarde reprise devrait etre gere par le champ statistique
+  //attributes for save-restart
+  //redundant with attributes of Champ_Generique_Statistiques
+  //The entire save-restart process should be managed by the statistical field
   int nb_champs_stat_;
   double tstat_deb_, tstat_fin_, tstat_dernier_calcul_;
 
-  //Otion a gerer par le champ statistique
+  //Option to be managed by the statistical field
   int lserie_;
   double dt_integr_serie_;
 
@@ -218,7 +218,7 @@ protected:
   int binaire_;
   Nom nom_fich_, format_, option_para_;
   Nom suffix_for_reset_; // Suffix appended to post base name when the method resetTime() was invoked - default to "_AFTER_RESET"
-  double temps_, dernier_temps_; // temps du precedent appel a postraiter()
+  double temps_, dernier_temps_; // time of the previous call to postraiter()
   OBS_PTR(Domaine) le_domaine_;
   OBS_PTR(Domaine_dis_base) domaine_dis_pour_faces_;
 };
@@ -231,7 +231,7 @@ inline int Postraitement::lpost(double temps_courant, double dt_post) const
     return 1;
   else
     {
-      // Voir Schema_Temps_base::limpr pour information sur epsilon et modf
+      // See Schema_Temps_base::limpr for information about epsilon and modf
       double i, j;
       modf(temps_courant/dt_post + epsilon, &i);
       modf(dernier_temps_/dt_post + epsilon, &j);
@@ -239,14 +239,14 @@ inline int Postraitement::lpost(double temps_courant, double dt_post) const
     }
 }
 
-/*! @brief Test de postraitement en tenant compte de l'evolution en temps du champ.
+/*! @brief Post-processing test taking into account the time evolution of the field.
  *
- *     Renvoie VRAI si le champ necessite un postraitement, vu
- *     le temps courant et le pas de temps fourni.
+ *     Returns TRUE if the field requires post-processing, given
+ *     the current time and the time step provided.
  *
- * @param (double temps_courant) le temps courant
- * @param (double dt) le pas de temps qui vient d'etre accompli
- * @return (int) valeur booleenne, VRAI si le pas de temp et le temps courant fournis indique qu'un postraitement est necessaire, FAUX sinon.
+ * @param (double temps_courant) current time
+ * @param (double dt) the time step just completed
+ * @return (int) boolean value, TRUE if the time step and current time provided indicate that post-processing is needed, FALSE otherwise.
  */
 inline int& Postraitement::compteur_champ_stat() { return nb_champs_stat_; }
 inline const double& Postraitement::tstat_deb() const { return tstat_deb_; }

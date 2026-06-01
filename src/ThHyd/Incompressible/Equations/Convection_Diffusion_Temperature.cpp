@@ -44,7 +44,7 @@ Entree& Convection_Diffusion_Temperature::readOn(Entree& is)
   //Nom unite;
   //if (dimension+bidim_axi==2) unite="[W/m]";
   //else unite="[W]";
-  Nom num=inconnue().le_nom(); // On prevoir le cas d'equation de scalaires passifs
+  Nom num=inconnue().le_nom(); // Plan for passive scalar equations
   num.suffix("temperature");
   Nom nom="Convection_chaleur";
   nom+=num;
@@ -116,15 +116,15 @@ int Convection_Diffusion_Temperature::lire_motcle_non_standard(const Motcle& un_
   return 1;
 }
 
-/*! @brief Associe un milieu physique a l'equation, le milieu est en fait caste en Fluide_base.
+/*! @brief Associates a physical medium to the equation; the medium is cast to Fluide_base.
  *
- * @param (Milieu_base& un_milieu)
- * @throws le milieu n'est pas un Fluide_base
+ * @param un_milieu the physical medium to associate
+ * @throws the medium is not of type Fluide_base
  */
 void Convection_Diffusion_Temperature::associer_milieu_base(const Milieu_base& un_milieu)
 {
   if (sub_type(Fluide_base,un_milieu)) associer_fluide(ref_cast(Fluide_base, un_milieu));
-  else Process::exit(que_suis_je() + " : le fluide " + un_milieu.que_suis_je() + " n'est pas de type Fluide_base!");
+  else Process::exit(que_suis_je() + " : the fluid " + un_milieu.que_suis_je() + " is not of type Fluide_base!");
 }
 
 void Convection_Diffusion_Temperature::discretiser()
@@ -236,7 +236,7 @@ bool Convection_Diffusion_Temperature::has_champ(const Motcle& nom, OBS_PTR(Cham
   if (Convection_Diffusion_Temperature_base::has_champ(nom))
     return Convection_Diffusion_Temperature_base::has_champ(nom, ref_champ);
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 bool Convection_Diffusion_Temperature::has_champ(const Motcle& nom) const
@@ -251,7 +251,7 @@ bool Convection_Diffusion_Temperature::has_champ(const Motcle& nom) const
   if (Convection_Diffusion_Temperature_base::has_champ(nom))
     return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 const Champ_base& Convection_Diffusion_Temperature::get_champ(const Motcle& nom) const
@@ -278,11 +278,11 @@ const Champ_base& Convection_Diffusion_Temperature::get_champ(const Motcle& nom)
   return Convection_Diffusion_Temperature_base::get_champ(nom);
 }
 
-/*! @brief Renvoie le nom du domaine d'application de l'equation.
+/*! @brief Returns the name of the application domain of the equation.
  *
- * Ici "Thermique".
+ * Here "Thermique".
  *
- * @return (Motcle&) le nom du domaine d'application de l'equation
+ * @return the name of the application domain of the equation
  */
 const Motcle& Convection_Diffusion_Temperature::domaine_application() const
 {
@@ -302,7 +302,7 @@ DoubleTab& Convection_Diffusion_Temperature::derivee_en_temps_inco(DoubleTab& de
       const double rhoCp = get_time_factor();
       // Specific code if temperature equation is penalized
       derivee=inconnue().valeurs();
-      //   Mise en place d'une methode de mise en place d'un domaine fantome
+      //   Setting up the ghost domain method
       mise_en_place_domaine_fantome(derivee);
       DoubleTab& inc=inconnue().valeurs();
       inc = derivee;
@@ -315,11 +315,11 @@ DoubleTab& Convection_Diffusion_Temperature::derivee_en_temps_inco(DoubleTab& de
           secmem *= rhoCp;
         }
 
-      // Transport des ibcs et de la couche limite
+      // IBC and boundary layer transport
       DoubleTrav secmem_conv_vr(derivee);
-      //on advecte la variable avec la vitesse ibc
+      //advect the variable with the IBC velocity
       transport_ibc(secmem_conv_vr, derivee);
-      //on retranche cette advection
+      //subtract this advection
       secmem -= secmem_conv_vr;
 
       DoubleTab derivee_conv;
@@ -341,7 +341,7 @@ DoubleTab& Convection_Diffusion_Temperature::derivee_en_temps_inco(DoubleTab& de
       solveur_masse->appliquer(secmem);
       Equation_base::Gradient_conjugue_diff_impl(secmem, derivee);
 
-      //  penalisation de la temperature
+      //  temperature penalization
       penalisation_L2(derivee);
       return derivee;
     }
@@ -352,27 +352,27 @@ double Convection_Diffusion_Temperature::get_time_factor() const
   return domaine_dis().nb_elem() ? milieu().capacite_calorifique().valeurs()(0, 0) * milieu().masse_volumique().valeurs()(0, 0) : 1.0;
 }
 
-// ajoute les contributions des operateurs et des sources
+// Adds contributions from operators and sources
 void Convection_Diffusion_Temperature::assembler(Matrice_Morse& matrice, const DoubleTab& inco, DoubleTab& resu)
 {
   const double rhoCp = get_time_factor();
 
-  // Test de verification de la methode contribuer_a_avec
+  // Test of the contribuer_a_avec method
   for (int op=0; op<nombre_d_operateurs(); op++)
     operateur(op).l_op_base().tester_contribuer_a_avec(inco, matrice);
 
-  // Contribution des operateurs et des sources:
-  // [Vol/dt+A]Inco(n+1)=somme(residu)+Vol/dt*Inco(n)
-  // Typiquement: si Op=flux(Inco) alors la matrice implicite A contient une contribution -dflux/dInco
-  // Exemple: Op flux convectif en VDF:
-  // Op=T*u*S et A=-d(T*u*S)/dT=-u*S
+  // Contributions from operators and sources:
+  // [Vol/dt+A]Inco(n+1)=sum(residual)+Vol/dt*Inco(n)
+  // Typically: if Op=flux(Inco) then the implicit matrix A contains a contribution -dflux/dInco
+  // Example: convective flux operator in VDF:
+  // Op=T*u*S and A=-d(T*u*S)/dT=-u*S
   const Discretisation_base::type_calcul_du_residu& type_codage=probleme().discretisation().codage_du_calcul_du_residu();
   if (type_codage==Discretisation_base::VIA_CONTRIBUER_AU_SECOND_MEMBRE)
     {
       if ( probleme().discretisation().que_suis_je() == "EF")
         {
-          // On calcule somme(residu) par contribuer_au_second_membre (typiquement CL non implicitees)
-          // Cette approche necessite de coder 3 methodes (contribuer_a_avec, contribuer_au_second_membre et ajouter pour l'explicite)
+          // Compute sum(residual) via contribuer_au_second_membre (typically for non-implicitized BCs)
+          // This approach requires coding 3 methods (contribuer_a_avec, contribuer_au_second_membre, and ajouter for the explicit scheme)
           sources().contribuer_a_avec(inco,matrice);
           statistics().end_count(STD_COUNTERS::matrix_assembly,0,0);
           sources().ajouter(resu);
@@ -403,15 +403,15 @@ void Convection_Diffusion_Temperature::assembler(Matrice_Morse& matrice, const D
     }
   else if (type_codage==Discretisation_base::VIA_AJOUTER)
     {
-      // On calcule somme(residu) par somme(operateur)+sources+A*Inco(n)
-      // Cette approche necessite de coder seulement deux methodes (contribuer_a_avec et ajouter)
-      // Donc un peu plus couteux en temps de calcul mais moins de code a ecrire/maintenir
+      // Compute sum(residual) via sum(operator)+sources+A*Inco(n)
+      // This approach requires coding only two methods (contribuer_a_avec and ajouter)
+      // Slightly more expensive computationally but less code to write/maintain
       for (int op=0; op<nombre_d_operateurs(); op++)
         {
           Matrice_Morse mat(matrice);
           mat.get_set_coeff() = 0.0;
           operateur(op).l_op_base().contribuer_a_avec(inco, mat);
-          if (op == 1) mat *= rhoCp; // la derivee est multipliee par rhoCp pour la convection
+          if (op == 1) mat *= rhoCp; // the time derivative is multiplied by rhoCp for convection
           matrice += mat;
           statistics().end_count(STD_COUNTERS::matrix_assembly,0,0);
           {
@@ -428,10 +428,10 @@ void Convection_Diffusion_Temperature::assembler(Matrice_Morse& matrice, const D
       statistics().end_count(STD_COUNTERS::matrix_assembly,0,0);
       sources().ajouter(resu);
       statistics().begin_count(STD_COUNTERS::matrix_assembly,statistics().get_last_opened_counter_level()+1);
-      matrice.ajouter_multvect(inco, resu); // Ajout de A*Inco(n)
-      // PL (11/04/2018): On aimerait bien calculer la contribution des sources en premier
-      // comme dans le cas VIA_CONTRIBUER_AU_SECOND_MEMBRE mais le cas Canal_perio_3D (keps
-      // periodique plante: il y'a une erreur de periodicite dans les termes sources du modele KEps...
+      matrice.ajouter_multvect(inco, resu); // Add A*Inco(n)
+      // PL (11/04/2018): It would be nice to compute the source contributions first
+      // as in the VIA_CONTRIBUER_AU_SECOND_MEMBRE case, but Canal_perio_3D (periodic keps
+      // crashes: there is a periodicity error in the source terms of the KEps model...
     }
   else
     {
@@ -498,7 +498,7 @@ void Convection_Diffusion_Temperature::assembler_blocs(matrices_t matrices, Doub
 }
 int Convection_Diffusion_Temperature::verifier_tag_indicatrice_pena_glob()
 {
-  //Les ibcs ont elles ete modifiees ?
+  //Have the IBCs been modified?
   int maj = 0;
   int tag_all = 0;
   for ( int w = 0; w<ref_penalisation_L2_FTD.size() ; ++w)
@@ -512,7 +512,7 @@ int Convection_Diffusion_Temperature::verifier_tag_indicatrice_pena_glob()
 
 int Convection_Diffusion_Temperature::mise_a_jour_tag_indicatrice_pena_glob()
 {
-  //Les ibcs ont elles ete modifiees ?
+  //Have the IBCs been modified?
   int maj = 0;
   int tag_all = 0;
   for ( int w = 0; w<ref_penalisation_L2_FTD.size() ; ++w)
@@ -530,7 +530,7 @@ int Convection_Diffusion_Temperature::mise_a_jour_tag_indicatrice_pena_glob()
 
 void Convection_Diffusion_Temperature::set_indic_pena_globale()
 {
-  //  Set de la fonction characteristique ibc globlale (element et faces)
+  //  Set the global IBC characteristic function (elements and faces)
   int maj = verifier_tag_indicatrice_pena_glob();
   if (maj == 0)
     {
@@ -545,10 +545,10 @@ void Convection_Diffusion_Temperature::transport_ibc(DoubleTrav& secmem_conv_vr,
   secmem_conv_vr = 0.;
   const double rhoCp = get_time_factor();
 
-  //fonction characteristique globale ibc au temps courant
+  //global IBC characteristic function at the current time
   set_indic_pena_globale();
 
-  // on calcule l indicatrice epaisse
+  // compute the thick indicator
   const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis());
   const IntTab& faces_elem = domaine_vf.face_voisins();
   IntTrav indic_pena_global_fat(indic_pena_global);
@@ -562,7 +562,7 @@ void Convection_Diffusion_Temperature::transport_ibc(DoubleTrav& secmem_conv_vr,
           if (voisin_1 >= 0) indic_pena_global_fat(voisin_1) = 1;
         }
     }
-  // post-traitement particulier pour les coins
+  // special post-processing for corners
   const IntTab& elem_faces = domaine_vf.elem_faces();
   const int nb_faces_elem = elem_faces.dimension(1);
   const int nb_elem  = indic_pena_global.dimension(0);
@@ -587,7 +587,7 @@ void Convection_Diffusion_Temperature::transport_ibc(DoubleTrav& secmem_conv_vr,
         }
     }
 
-  // Si on veut un traitement local a chaque indicatrice (necessaire si on utilise vitesse imposee)
+  // For a local treatment per indicatrice (necessary if using imposed velocity)
   // IntTrav indic_pena_fat(indic_pena_global);
   // for (int w = 0; w < ref_penalisation_L2_FTD.size(); w++)
   //   {
@@ -608,14 +608,14 @@ void Convection_Diffusion_Temperature::transport_ibc(DoubleTrav& secmem_conv_vr,
   //     indic_pena_global_fat += indic_pena_fat;
   //   }
 
-  // on convecte le champ de variable avec la vitesse fluide pour les faces ibc
+  // convect the variable field with the fluid velocity for IBC faces
   if ( nombre_d_operateurs() > 1 )
     {
       derivee_en_temps_conv(secmem_conv_vr, inco_conv_vr);
       secmem_conv_vr *= rhoCp;
     }
 
-  //on ne garde la contribution que pour les cellules dont indicatrice fat est <> 0
+  //keep the contribution only for cells whose fat indicator is != 0
   for (int i_elem = 0; i_elem < nb_elem;  i_elem++)
     {
       if (indic_pena_global_fat(i_elem) == 0) secmem_conv_vr(i_elem) = 0.;
@@ -689,9 +689,9 @@ void Convection_Diffusion_Temperature::mise_en_place_domaine_fantome(DoubleTab& 
                     {
                       const int face_v = elem_faces(stok_vois(i_vois), ii_face);
                       const int voisin_v = faces_elem(face_v, 0) + faces_elem(face_v, 1) - stok_vois(i_vois);
-                      if ((voisin_v >= 0) && (voisin_v != i_elem) )// le voisin existe et pas i_elem
+                      if ((voisin_v >= 0) && (voisin_v != i_elem) )// the neighbour exists and is not i_elem
                         {
-                          if ((indic_pena_global(voisin_v) == indicatrice_totale(voisin_v)) &&  (indic_pena_global(voisin_v) == indicatrice_totale(i_elem))) // strictement fluide aux deux pas de temps
+                          if ((indic_pena_global(voisin_v) == indicatrice_totale(voisin_v)) &&  (indic_pena_global(voisin_v) == indicatrice_totale(i_elem))) // strictly fluid at both time steps
                             {
                               somme_inc += solution(voisin_v);
                               ++coeff;
@@ -700,38 +700,38 @@ void Convection_Diffusion_Temperature::mise_en_place_domaine_fantome(DoubleTab& 
                     }
                 }
             }
-          // definition d une nouvelle valleur de la variable pour la cellule fantome
+          // define a new value of the variable for the ghost cell
           if (coeff > 0.)
             {
               solution(i_elem) = somme_inc / coeff;
               k_cor += 1;
             }
         }
-      //cellules actuellement ibc et precedement fluide
+      //cells currently ibc and previously fluid
       if (indic_pena_global(i_elem) == 0 && indicatrice_totale(i_elem) != 0)
         {
           ++u;
-          // boucle sur les faces pour determiner la valeur de la variable pour les cellules voisines strictement ibc
+          // loop over faces to determine the variable value for strictly ibc neighbouring cells
           IntTrav stok_vois(nb_faces_elem);
           for (int i_face = 0; i_face < nb_faces_elem; i_face++)
             {
               const int face = elem_faces(i_elem, i_face);
               const int voisin = faces_elem(face, 0) + faces_elem(face, 1) - i_elem;
-              if (voisin >= 0) // le voisin existe
+              if (voisin >= 0) // the neighbour exists
                 {
-                  // strictement ibc aux deux pas de temps (la meme) car solution a ete modifiee ci-dessus
+                  // strictly ibc at both time steps (the same) because solution was modified above
                   if ((indic_pena_global(voisin) == indicatrice_totale(voisin)) && (indic_pena_global(voisin) == indicatrice_totale(i_elem)))
                     {
                       somme_inc += solution(voisin);
                       ++coeff;
                     }
-                  else     // On sauve le numero du voisin
+                  else     // save the neighbour index
                     {
                       stok_vois(i_face) = voisin;
                     }
                 }
             }
-          // Si on n a pas trouve de cellules ibc, on regarde les voisins des voisins
+          // If no ibc cells found, check neighbours of neighbours
           if (coeff == 0.)
             {
               for (int i_vois = 0; i_vois < nb_faces_elem; i_vois++)
@@ -740,9 +740,9 @@ void Convection_Diffusion_Temperature::mise_en_place_domaine_fantome(DoubleTab& 
                     {
                       const int face_v = elem_faces(stok_vois(i_vois), ii_face);
                       const int voisin_v = faces_elem(face_v, 0) + faces_elem(face_v, 1) - stok_vois(i_vois);
-                      if ((voisin_v >= 0) && (voisin_v != i_elem) )// le voisin existe et pas i_elem
+                      if ((voisin_v >= 0) && (voisin_v != i_elem) )// the neighbour exists and is not i_elem
                         {
-                          if ((indic_pena_global(voisin_v) == indicatrice_totale(voisin_v)) && (indic_pena_global(voisin_v) == indicatrice_totale(i_elem))) // strictement ibc aux deux pas de temps (la meme) car solution a ete modifiee ci-dessus
+                          if ((indic_pena_global(voisin_v) == indicatrice_totale(voisin_v)) && (indic_pena_global(voisin_v) == indicatrice_totale(i_elem))) // strictly ibc at both time steps (the same) because solution was modified above
                             {
                               somme_inc += solution(voisin_v);
                               ++coeff;
@@ -751,7 +751,7 @@ void Convection_Diffusion_Temperature::mise_en_place_domaine_fantome(DoubleTab& 
                     }
                 }
             }
-          // definition d une nouvelle valleur de la variable pour la cellule fantome
+          // define a new value of the variable for the ghost cell
           if (coeff > 0.)
             {
               solution(i_elem) = somme_inc / coeff;
@@ -783,7 +783,7 @@ void Convection_Diffusion_Temperature::mise_en_place_domaine_fantome(DoubleTab& 
 
 DoubleTab& Convection_Diffusion_Temperature::filtrage_si_appart_ibc(DoubleTab& u_conv, DoubleTab& u)
 {
-  // caclul de la fonction caracteristique globale des ibc pour le calcul de T_voisinage
+  // compute the global IBC characteristic function for the neighbourhood temperature T_voisinage
   set_indic_pena_globale();
 
   for (int j = 0 ; j< indic_pena_global.size() ; ++j)
@@ -797,7 +797,7 @@ DoubleTab& Convection_Diffusion_Temperature::filtrage_si_appart_ibc(DoubleTab& u
 
 void Convection_Diffusion_Temperature::calcul_indic_pena_global(IntTab& indicatrice_totale, IntTab& indicatrice_face_totale)
 {
-  // fonction characteristique globale ibc penalisees
+  // global penalized IBC characteristic function
   indicatrice_totale.copy(indic_pena_global);
   indicatrice_face_totale.copy(indic_face_pena_global);
   indicatrice_totale = 0;
@@ -865,16 +865,16 @@ DoubleTab& Convection_Diffusion_Temperature::penalisation_L2(DoubleTab& u)
   const double dt = schema_temps().pas_de_temps();
   DoubleTab u_old(u);
 
-  // caclul de la fonction caracteristique globale des ibc pour le calcul de T_voisinage
+  // compute the global IBC characteristic function for the neighbourhood temperature T_voisinage
   set_indic_pena_globale();
 
-  //calcul de T_voisinage pour tous les elemnts
+  //compute T_voisinage for all elements
   const Domaine_VF& domaine_vf = ref_cast(Domaine_VF, domaine_dis());
   const IntTab& elem_faces = domaine_vf.elem_faces();
   const IntTab& faces_elem = domaine_vf.face_voisins();
   const int nb_faces_elem = elem_faces.dimension(1);
   const DoubleTab& inc=inconnue().valeurs();
-  // inconnue doit etre scalaire
+  // the unknown must be scalar
   assert(inc.line_size() == 1);
   DoubleTrav t_voisinage(inc);
   DoubleTrav u_voisinage(u);
@@ -887,7 +887,7 @@ DoubleTab& Convection_Diffusion_Temperature::penalisation_L2(DoubleTab& u)
 
       if( indic_pena_global(i_elem) != 0)
         {
-          // boucle sur les faces de l element
+          // loop over faces of the element
           for (int i_face = 0; i_face < nb_faces_elem; i_face++)
             {
               const int face = elem_faces(i_elem, i_face);
@@ -911,7 +911,7 @@ DoubleTab& Convection_Diffusion_Temperature::penalisation_L2(DoubleTab& u)
         }
       else
         {
-          // cas pas de voisin dans le fluide
+          // case: no fluid neighbour
           t_voisinage(i_elem) = inc(i_elem);
           u_voisinage(i_elem) = u(i_elem);
         }
@@ -1002,8 +1002,8 @@ DoubleTab& Convection_Diffusion_Temperature::penalisation_L2(DoubleTab& u)
         }
     }
 
-  //  Realisation de la penalisation L2 de la derivee en temps: (dT_t_* + pena_glob) / ( 1 + (dt*Sigma_ibc Ksi_ibc(j)) / eta )
-  // Tref est la moyenne arithmetique de Tref_j lorsque 0<eta<<1
+  //  Apply the L2 penalization of the time derivative: (dT_t_* + pena_glob) / ( 1 + (dt*Sigma_ibc Ksi_ibc(j)) / eta )
+  // Tref is the arithmetic mean of Tref_j when 0<eta<<1
   for (int j = 0 ; j<nb_elem ; ++j)
     {
       u(j) = u_old(j) + pena_glob(j);
@@ -1011,7 +1011,7 @@ DoubleTab& Convection_Diffusion_Temperature::penalisation_L2(DoubleTab& u)
     }
   u.echange_espace_virtuel();
 
-  //  Sauvegarde des flux
+  //  Save fluxes
   ecrire_fichier_pena_th(u_old,u,tab_,denom);
 
   //   Debog::verifier("Convection_Diffusion_Temperature::penalisation_L2 u ",u);
@@ -1069,9 +1069,9 @@ void Convection_Diffusion_Temperature::ecrire_fichier_pena_th(DoubleTab& u_old, 
       const DoubleTab& tab_cp = fluide_inc.capacite_calorifique().valeurs();
       const double cp = tab_cp(0,0);
 
-      //  Methode pour calculer le flux total sur les ibc
+      //  Method to compute the total flux on the IBCs
 
-      //Calcul de T_n+1 apres penalisation
+      //Compute T_n+1 after penalization
       const DoubleTab& inc=inconnue().valeurs();
       const int nb_elem  = u.dimension(0);
       const double dt = schema_temps().pas_de_temps();
@@ -1082,21 +1082,21 @@ void Convection_Diffusion_Temperature::ecrire_fichier_pena_th(DoubleTab& u_old, 
       DoubleTrav F(inc);
       for (int j = 0; j<nb_elem; ++j)  F(j) = (tref(j)-denom(j)*tkp1(j))/eta;
 
-      // boucle sur les IBC
+      // loop over IBCs
 
       DoubleTrav filtre(nb_elem);
       DoubleTrav filtre_glob(nb_elem);
       const double temps_flux = le_schema_en_temps->temps_courant();
       Nom espace=" \t";
 
-      for ( int i = 0 ; i < ref_penalisation_L2_FTD.size() ; ++i) //boucle sur le nombre d'ibc
+      for ( int i = 0 ; i < ref_penalisation_L2_FTD.size() ; ++i) //loop over the number of IBCs
         {
           Transport_Interfaces_base& nom_eq = ref_cast(Transport_Interfaces_base,ref_penalisation_L2_FTD[i].valeur());
           const DoubleTab& indicatrice = nom_eq.get_indicatrice().valeurs();
           double Flux_pena= 0.;
           double Flux_pena_old= 0.;
           double Flux_temp_interne= 0.;
-          //Filtre ibc (1) / non ibc (0)
+          //Filter: ibc (1) / non-ibc (0)
           filtre = 0.;
           for ( int j = 0 ; j<nb_elem ; ++j)
             {
@@ -1106,18 +1106,18 @@ void Convection_Diffusion_Temperature::ecrire_fichier_pena_th(DoubleTab& u_old, 
                   filtre_glob(j)=1.;
                 }
               //bilans
-              //Attention rho et cp constants
+              //Note: rho and cp are constant
               Flux_pena_old += u_old(j) * filtre(j) *rho *cp *vol_maille(j);
               Flux_pena += F(j) * filtre(j) * vol_maille(j) *rho *cp;
               Flux_temp_interne += filtre(j)*rho*cp*vol_maille(j)*u(j);
             }
 
-          // Ajout des differents processeurs en //
+          // Sum over all parallel processes
           Flux_pena_old = mp_sum(Flux_pena_old);
           Flux_pena = mp_sum(Flux_pena);
           Flux_temp_interne = mp_sum(Flux_temp_interne);
 
-          //ecriture
+          //write output
           if (Process::je_suis_maitre())
             {
               SFichier FTE;
@@ -1140,18 +1140,18 @@ void Convection_Diffusion_Temperature::ecrire_fichier_pena_th(DoubleTab& u_old, 
             }
         }
 
-      //bilan Derivee_temps_temperature_fluide
-      //Attention rho et cp constants
+      //budget for Derivee_temps_temperature_fluide
+      //Note: rho and cp are constant
       double Flux_temp_externe= 0.;
       for (int j = 0; j<nb_elem; ++j)
         {
-          Flux_temp_externe += (1.-filtre_glob(j))  *rho *cp *vol_maille(j) * u(j); //fluide
+          Flux_temp_externe += (1.-filtre_glob(j))  *rho *cp *vol_maille(j) * u(j); //fluid
         }
 
-      // Ajout des differents processeurs en //
-      Flux_temp_externe = mp_sum(Flux_temp_externe); //fluide
+      // Sum contributions from all processors in parallel
+      Flux_temp_externe = mp_sum(Flux_temp_externe); //fluid
 
-      //ecriture
+      //write output
       if (Process::je_suis_maitre())
         {
           SFichier fichier;
@@ -1190,10 +1190,10 @@ void Convection_Diffusion_Temperature::calculer_rho_cp_T(const Objet_U& obj, Dou
   for (int i = 0; i < Nl; i++)
     for (int n = 0; n < N; n++) val(i, n) = rho(0, n) * cp(!cCp * i, n) * T(i, n);
 
-  /* on ne peut utiliser valeur_aux_bords que si ch_rho a un domaine_dis_base */
+  /* valeur_aux_bords can only be used if ch_rho has a domaine_dis_base */
   DoubleTab b_cp = cCp ? cp : ch_cp.valeur_aux_bords(), b_T = ch_T.valeur_aux_bords();
   int Nb = b_T.dimension_tot(0);
-  // on suppose que rho est un champ_uniforme : on utilise directement le tableau du champ
+  // rho is assumed to be a champ_uniforme: use the field array directly
   for (int i = 0; i < Nb; i++)
     for (int n = 0; n < N; n++) bval(i, n) = b_cp(!cCp * i, n) * rho(0, n) * b_T(i, n);
 

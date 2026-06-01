@@ -32,10 +32,9 @@
 
 namespace NEPTUNE { class EOS; }
 
-/*! @brief classe EOS_to_TRUST
+/*! @brief Common interface for TRUST and its baltiks to call EOS library methods.
  *
- *  Interface commune pour TRUST et ses baltiks qui permet appeler les methodes de la lib EOS
- *  Methods disponibles en temperature et enthalpie, egalement pour la saturation
+ *  Methods are available as functions of temperature or enthalpy, and also for saturation.
  */
 class EOS_to_TRUST : public TPPI
 {

@@ -22,10 +22,10 @@
 
 class Champ_base;
 
-/*! @brief class Eval_VDF_Face Cette classe represente le prototype fonctionnel des evaluateurs
+/*! @brief class Eval_VDF_Face This class represents the functional prototype for flux evaluators
  *
- *  de flux associes aux equations de conservation integrees
- *  sur les volumes entrelaces
+ *  associated with conservation equations integrated
+ *  over staggered control volumes
  *
  */
 class Eval_VDF_Face

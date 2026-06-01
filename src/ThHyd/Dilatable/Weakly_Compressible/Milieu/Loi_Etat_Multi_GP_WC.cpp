@@ -84,7 +84,7 @@ void Loi_Etat_Multi_GP_WC::initialiser_inco_ch()
   Fluide_Weakly_Compressible& FWC = ref_cast(Fluide_Weakly_Compressible,le_fluide.valeur());
   Champ_Don_base& Yn = FWC.fraction_massique_nonresolue();
   Yn.nommer("fraction_massique_nonresolue");
-  double t = le_fluide->masse_volumique().temps(); // pas 0 car reprise pt etre
+  double t = le_fluide->masse_volumique().temps(); // not 0 because resuming is possible
   update_Yn_values(Yn,t);
   Loi_Etat_Multi_GP_base::initialiser_inco_ch();
 }
@@ -116,7 +116,7 @@ void Loi_Etat_Multi_GP_WC::update_Yn_values(Champ_Don_base& Yn, double temps)
     }
 }
 
-/*! @brief Calcule la masse molaire du melange (M) M depend de la mase molaire de chaque espece et de la composition du melange (Yi)
+/*! @brief Computes the molar mass of the mixture (M). M depends on the molar mass of each species and the mixture composition (Yi).
  *
  */
 void Loi_Etat_Multi_GP_WC::calculer_masse_molaire(DoubleTab& tab_masse_mol_mel) const
@@ -140,12 +140,12 @@ void Loi_Etat_Multi_GP_WC::calculer_masse_molaire(DoubleTab& tab_masse_mol_mel) 
   for (int elem=0; elem<size; elem++) tab_masse_mol_mel(elem,0) = 1.0 / inv_M[elem];
 }
 
-/*! @brief Calcule le Cp du melange Le Cp depend du Cp de chaque espece et de la composition du melange (Yi)
+/*! @brief Computes the Cp of the mixture. Cp depends on the Cp of each species and the mixture composition (Yi).
  *
  */
 void Loi_Etat_Multi_GP_WC::calculer_tab_Cp(DoubleTab& tab_Cp) const
 {
-  // FIXME : Actuellement on suppose que Cp est pris constant pour chacune des especes
+  // FIXME : Currently Cp is assumed constant for each species
   assert (sub_type(Champ_Uniforme,cp_especes()));
 
   tab_Cp = 0;
@@ -156,14 +156,14 @@ void Loi_Etat_Multi_GP_WC::calculer_tab_Cp(DoubleTab& tab_Cp) const
 
   for (int i=0; i<num_espece_; i++)
     {
-      // TODO : FIXME : a voir si Yn.valeurs() est a jour
+      // TODO : FIXME : check whether Yn.valeurs() is up to date
       const DoubleTab& Y_i = (i == num_espece_ -1) ? Yn : liste_Y(i)->valeurs();
       const double cp_i = cp_especes().valeurs()(0,i);
       for (int elem=0; elem<size; elem++) tab_Cp(elem,0) += Y_i(elem,0)*cp_i;
     }
 }
 
-/*! @brief Recalcule la masse volumique
+/*! @brief Recomputes the density.
  *
  */
 void Loi_Etat_Multi_GP_WC::calculer_masse_volumique()
@@ -174,7 +174,7 @@ void Loi_Etat_Multi_GP_WC::calculer_masse_volumique()
   Fluide_Weakly_Compressible& FWC = ref_cast(Fluide_Weakly_Compressible,le_fluide.valeur());
   Champ_Don_base& Yn = FWC.fraction_massique_nonresolue();
   double temps = le_fluide->masse_volumique().temps();
-  update_Yn_values(Yn,temps); // XXX : a voir si l'appel est dans le bon endroit ...
+  update_Yn_values(Yn,temps); // XXX : check whether the call is in the right place ...
   Loi_Etat_Multi_GP_base::calculer_masse_molaire();
 
   assert (tab_rho.line_size() == 1);
@@ -205,7 +205,7 @@ double Loi_Etat_Multi_GP_WC::calculer_masse_volumique(double P, double T) const
   return Loi_Etat_Multi_GP_base::calculer_masse_volumique(P,T);
 }
 
-/*! @brief Calcule la viscosite dynamique de reference (depend des Yi)
+/*! @brief Computes the reference dynamic viscosity (depends on mass fractions Yi).
  *
  * With Wilke formulation: https://aip.scitation.org/doi/pdf/10.1063/1.1747673
  * See also for mass fractions : https://doi.org/10.1016/j.ijheatmasstransfer.2020.120470
@@ -261,7 +261,7 @@ void Loi_Etat_Multi_GP_WC::calculer_mu_wilke()
       const double mu_i = visc_dynamique_especes().valeurs()(0,i);
 
       for (int j=0; j < num_espece_ ; j++)
-        if (j != i) // sinon phi_ii = 1
+        if (j != i) // otherwise phi_ii = 1
           {
             const double M_j = masse_molaire_especes().valeurs()(0,j);
             const double mu_j = visc_dynamique_especes().valeurs()(0,j);
@@ -269,7 +269,7 @@ void Loi_Etat_Multi_GP_WC::calculer_mu_wilke()
             double a = 1. + sqrt( mu_i / mu_j ) * pow( M_j / M_i , 0.25);
             double b = sqrt( 8. * ( 1. + ( M_i / M_j )));
             double phi_ij = ( M_i / M_j ) * a * a / b;
-            // TODO : FIXME : a voir si Yn.valeurs() est a jour
+            // TODO : FIXME : check whether Yn.valeurs() is up to date
             const DoubleTab& y_j = (j == num_espece_ -1) ? Yn : liste_Y(j)->valeurs();
             // node is elem (VDF) or face (VEF)
             for (int node=0; node<y_j.size(); node++) phi(node) += y_j(node,0) * phi_ij;
@@ -282,7 +282,7 @@ void Loi_Etat_Multi_GP_WC::calculer_mu_wilke()
   calculer_tab_mu(mu, size);
 }
 
-/*! @brief Calcule la viscosite dynamique sur Schmidt = rho * D
+/*! @brief Computes the dynamic viscosity divided by the Schmidt number = rho * D.
  *
  */
 void Loi_Etat_Multi_GP_WC::calculer_mu_sur_Sc()
@@ -301,8 +301,8 @@ void Loi_Etat_Multi_GP_WC::calculer_mu_sur_Sc()
   const DoubleTab& tab_rho = rho.valeurs();
   const int n = tab_mu_sur_Sc.size();
 
-  // TODO : FIXME : On a tab_mu_sur_Sc.line_size() = 1 :( :/ :(
-  // BUG : il faut avoir line_size = num_espece_ car on peut avoir D qui varie entre espece
+  // TODO : FIXME : tab_mu_sur_Sc.line_size() = 1 :( :/ :(
+  // BUG : line_size should equal num_espece_ since D can vary between species
 
   if (!sub_type(Champ_Uniforme,mu_sur_Sc))
     {
@@ -314,7 +314,7 @@ void Loi_Etat_Multi_GP_WC::calculer_mu_sur_Sc()
       else
         for (int i=0 ; i<n ; i++)
           {
-            // TODO : FIXME : j'ai pris D de l'espece 1 ...
+            // TODO : FIXME : D from species 1 is used here ...
             tab_mu_sur_Sc(i,0) = tab_rho(i,0) * coeff_diffusion_especes().valeurs()(0,0);
           }
     }
@@ -328,7 +328,7 @@ void Loi_Etat_Multi_GP_WC::calculer_mu_sur_Sc()
   tab_mu_sur_Sc.echange_espace_virtuel();
 }
 
-/*! @brief Calcule la viscosite dynamique sur Schmidt = D
+/*! @brief Computes the kinematic viscosity divided by the Schmidt number = D.
  *
  */
 void Loi_Etat_Multi_GP_WC::calculer_nu_sur_Sc()
@@ -344,10 +344,10 @@ void Loi_Etat_Multi_GP_WC::calculer_nu_sur_Sc()
   DoubleTab& tab_nu_sur_Sc = nu_sur_Sc.valeurs();
   const int n = tab_nu_sur_Sc.size();
 
-  // TODO : FIXME : On a tab_nu_sur_Sc.line_size() = 1 :( :/ :(
-  // BUG : il faut avoir line_size = num_espece_ car on peut avoir D qui varie entre espece
+  // TODO : FIXME : tab_nu_sur_Sc.line_size() = 1 :( :/ :(
+  // BUG : line_size should equal num_espece_ since D can vary between species
 
-  // TODO : FIXME : j'ai pris D de l'espece 1 ...
+  // TODO : FIXME : D from species 1 is used here ...
   for (int i=0 ; i<n ; i++) tab_nu_sur_Sc(i,0) = coeff_diffusion_especes().valeurs()(0,0);
 
   double temps_champ = le_fluide->masse_volumique().temps();

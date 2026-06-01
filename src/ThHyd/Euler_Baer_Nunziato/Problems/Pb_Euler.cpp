@@ -76,15 +76,15 @@ Entree& Pb_Euler::lire_equations(Entree& is, Motcle& mot)
 
   Cerr << "Pb_Euler : Reading of the equations => OK" << finl;
 
-  //correction des donnees lu depuis .data
+  //correction of data read from .data
   Cerr << "Pb_Euler : Initializing mass's equation unknown " << eq_masse_.inconnue().le_nom() << finl;
-  eq_masse_.init_alpha_rho(); // init inco car jdd initialise rho !!
+  eq_masse_.init_alpha_rho(); // init unknown because the data file initializes rho !!
 
   Cerr << "Pb_Euler : Initializing momentum's equation unknown " << eq_qdm_.inconnue().le_nom() << finl;
-  eq_qdm_.init_alpha_rho_u(); // init inco + vitesse phase car jdd initialise vitesse !!
+  eq_qdm_.init_alpha_rho_u(); // init unknown + phase velocity because the data file initializes velocity !!
 
   Cerr << "Pb_Euler : Initializing energy's equation unknown " << eq_energie_.inconnue().le_nom() << finl;
-  eq_energie_.init_energie_tot(); // init inco car jdd initialise rien car on ne sait pas ...
+  eq_energie_.init_energie_tot(); // init unknown because the data file initializes nothing (we don't know the value) ...
 
   return is;
 }
@@ -122,7 +122,7 @@ Equation_base& Pb_Euler::equation(int i)
       Cerr << "Pb_Euler::equation() : Wrong equation number" << i << "!" << finl;
       Process::exit();
     }
-  return eq_qdm_; //pour renvoyer quelque chose
+  return eq_qdm_; //to return something
 }
 
 void Pb_Euler::associer_milieu_base(const Milieu_base& mil)

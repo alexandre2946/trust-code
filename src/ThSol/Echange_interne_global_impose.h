@@ -19,12 +19,13 @@
 #include <Echange_global_impose.h>
 #include <TRUST_Ref.h>
 
-/*! @brief Classe Echange_interne_global_impose: Cette classe represente le cas particulier de la classe
+/*! @brief Class Echange_interne_global_impose: This class represents the special case of
  *
- *     Echange_global_impose ou la paroi d'echange est interne au domaine.
- *     La temperature exterieure definie dans Echange_global_impose devient alors la
- *     temperature situee de l'autre cote de la paroi interne.
- *     L'implicitation de cette CL demande un traitement special, voir Op_Diff_EF::ajouter_contributions_bords()
+ *     Echange_global_impose where the exchange wall is internal to the domain.
+ *     The external temperature defined in Echange_global_impose then becomes the
+ *     temperature on the other side of the internal wall.
+ *     Implicit treatment of this boundary condition requires special handling;
+ *     see Op_Diff_EF::ajouter_contributions_bords().
  *
  * @sa Echange_impose_base Echange_global_impose
  */

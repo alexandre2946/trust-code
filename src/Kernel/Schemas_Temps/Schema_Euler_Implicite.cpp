@@ -34,7 +34,7 @@ Sortie& Schema_Euler_Implicite::printOn(Sortie& s) const
 Entree& Schema_Euler_Implicite::readOn(Entree& s)
 {
   Schema_Implicite_base::readOn(s);
-  if (facsec_max_ == DMAXFLOAT) /* facsec_max non regle par l'utilisateur -> on demande sa preference au solveur */
+  if (facsec_max_ == DMAXFLOAT) /* facsec_max not set by the user -> ask the solver for its preferred value */
     facsec_max_ = le_solveur->get_default_facsec_max();
   dt_gf_ = le_solveur->get_default_growth_factor();
   if(!le_solveur)
@@ -90,7 +90,7 @@ int Schema_Euler_Implicite::lire_motcle_non_standard(const Motcle& mot, Entree& 
       is >> m;
       while (m != "}")
         {
-          if (m == "{") // bloc d'equations resolues ensemble
+          if (m == "{") // block of equations solved together
             {
               std::set<std::string> bloc_domap;
               is >> m;
@@ -200,11 +200,11 @@ bool Schema_Euler_Implicite::initTimeStep(double dt)
 }
 ////////////////////////////////
 //                            //
-// Caracteristiques du schema //
+// Schema characteristics     //
 //                            //
 ////////////////////////////////
 
-/*! @brief Renvoie le nombre de valeurs temporelles a conserver.
+/*! @brief Returns the number of temporal values to keep.
  *
  */
 int Schema_Euler_Implicite::nb_valeurs_temporelles() const
@@ -212,9 +212,9 @@ int Schema_Euler_Implicite::nb_valeurs_temporelles() const
   return 3 ;
 }
 
-/*! @brief Renvoie le nombre de valeurs temporelles futures.
+/*! @brief Returns the number of future temporal values.
  *
- * Ici : n+1, donc 1.
+ * Here: n+1, so 1.
  *
  */
 int Schema_Euler_Implicite::nb_valeurs_futures() const
@@ -222,9 +222,9 @@ int Schema_Euler_Implicite::nb_valeurs_futures() const
   return 1 ;
 }
 
-/*! @brief Renvoie le le temps a la i-eme valeur future.
+/*! @brief Returns the time at the i-th future value.
  *
- * Ici : t(n+1)
+ * Here: t(n+1)
  *
  */
 double Schema_Euler_Implicite::temps_futur(int i) const
@@ -233,9 +233,9 @@ double Schema_Euler_Implicite::temps_futur(int i) const
   return temps_courant()+pas_de_temps();
 }
 
-/*! @brief Renvoie le le temps le temps que doivent rendre les champs a l'appel de valeurs()
+/*! @brief Returns the time that fields must return when valeurs() is called.
  *
- *     Ici : t(n+1)
+ *     Here: t(n+1)
  *
  */
 double Schema_Euler_Implicite::temps_defaut() const
@@ -245,7 +245,7 @@ double Schema_Euler_Implicite::temps_defaut() const
 
 /////////////////////////////////////////
 //                                     //
-// Fin des caracteristiques du schema  //
+// End of schema characteristics       //
 //                                     //
 /////////////////////////////////////////
 
@@ -278,7 +278,7 @@ int Schema_Euler_Implicite::Iterer_Pb(Probleme_base& pb,int compteur, int& ok)
   Cout << "=======================================================================================" << finl;
   for(int i=0; i<pb.nombre_d_equations(); i++)
     {
-      //renverse l'ordre des equations si Faiblement compressible
+      // reverse the order of equations for weakly compressible flow
       if ((drap)&&(i<2))
         ii = 1-i;
       else
@@ -288,20 +288,20 @@ int Schema_Euler_Implicite::Iterer_Pb(Probleme_base& pb,int compteur, int& ok)
       DoubleTab& futur = eqn.inconnue().futur();
       double temps=temps_courant_+dt_;
 
-      // imposer_cond_lim   sert pour la pression et pour les echanges entre pbs
+      // imposer_cond_lim is used for the pressure and for inter-problem exchanges
       eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
       Cout<<"Solving " << eqn.que_suis_je() << " equation :" << finl;
       const DoubleTab& inut=futur;
       convergence_eqn=le_solveur->iterer_eqn(eqn, inut, present, dt_, compteur, ok);
-      if (!ok) return false; //echec total -> on sort sans traiter les equations suivantes
+      if (!ok) return false; // total failure -> exit without processing the following equations
       convergence_pb = convergence_pb&&convergence_eqn;
       futur=present;
       eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
       present=futur;
 
-      // La ligne suivante (commentee) realise:
-      // MAJ NS (donc MAJ inc)
-      // MAJ modele de turbulence donc k-eps
+      // The following (commented-out) line performs:
+      // Update NS (hence update unknowns)
+      // Update turbulence model (k-eps)
       //   eqn.inconnue().mettre_a_jour(temps);
 
       //   eqn.inconnue().reculer();
@@ -315,7 +315,7 @@ void Schema_Euler_Implicite::test_stationnaire(Probleme_base& pb)
 {
   for(int i=0; i<pb.nombre_d_equations(); i++)
     {
-      // traitement de la convergence en temps
+      // time convergence processing
       DoubleTab& passe = pb.equation(i).inconnue().passe();
       DoubleTab& present = pb.equation(i).inconnue().valeurs();
       DoubleTab& futur = pb.equation(i).inconnue().futur();
@@ -364,7 +364,7 @@ bool Schema_Euler_Implicite::iterateTimeStep(bool& converged)
         {
           Cout<<"!!! Schema_Euler_Implicite has not converged at t="<< temps_courant_ << " with dt =" << dt_<< " !!!" << finl;
           converged = false;
-          notify_failed_timestep(); // pour proposer un pas de temps plus bas au prochain essai
+          notify_failed_timestep(); // to propose a lower time step on the next attempt
           return false;
         }
       else
@@ -372,9 +372,9 @@ bool Schema_Euler_Implicite::iterateTimeStep(bool& converged)
           Cout<<"The "<<prob.que_suis_je()<<" problem " << prob.le_nom() << " has converged after "<<compteur<<" implicit iterations."<<finl;
         }
     }
-  //modification : prise en compte de la possibilite de modification du dt dans Itere_Pb
-  //cas du solveur pour compressible : division du pas de temps par 2
-  // si la convergence n'est pas atteinte en un nombre de pas de temps donne
+  // modification: account for the possibility of modifying dt in Itere_Pb
+  // for the compressible solver: divide the time step by 2
+  // if convergence is not reached within a given number of time steps
   //  double temps = dt_ + temps_courant_;
   test_stationnaire(prob);
 
@@ -383,9 +383,9 @@ bool Schema_Euler_Implicite::iterateTimeStep(bool& converged)
 
 int Schema_Euler_Implicite::faire_un_pas_de_temps_pb_couple(Probleme_Couple& pbc, int& ok)
 {
-  // Modif B.M. : Si on fait la sauvegarde entre derivee en temps inco et mettre a jour,
-  //  un calcul avec reprise n'est pas equivalent au calcul ininterrompu
-  //  (front-tracking notamment). Donc je mets la sauvegarde au debut du pas de temps.
+  // Modif B.M.: If the save is done between derivee_en_temps_inco and mettre_a_jour,
+  //  a restarted calculation is not equivalent to an uninterrupted one
+  //  (especially for front-tracking). So the save is placed at the beginning of the time step.
   //if (lsauv())
   //  for (int i=0;i<pbc.nb_problemes();i++)
   //    ref_cast(Probleme_base,pbc.probleme(i)).sauver();
@@ -481,7 +481,7 @@ int Schema_Euler_Implicite::faire_un_pas_de_temps_pb_couple(Probleme_Couple& pbc
                           DoubleTab& futur = eqn.inconnue().futur();
                           double temps = temps_courant_ + dt_;
 
-                          // imposer_cond_lim   sert pour la pression et pour les echanges entre pbs
+                          // imposer_cond_lim is used for the pressure and for inter-problem exchanges
                           eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
                           Cout<<"Solving " << eqn.que_suis_je() << " equation :" << finl;
                           const DoubleTab& inut=futur;
@@ -512,7 +512,7 @@ int Schema_Euler_Implicite::faire_un_pas_de_temps_pb_couple(Probleme_Couple& pbc
       if (!ok || (!convergence_pbc && compteur==nb_ite_max))
         {
           Cout << pbc.le_nom() << (ok ? " : failure" : " : non-convergence") << " at t = "<< temps_courant_ << " with dt = " << dt_<< " !!!" << finl;
-          notify_failed_timestep(); // pour proposer un pas de temps plus bas au prochain essai
+          notify_failed_timestep(); // to propose a lower time step on the next attempt
           return 0;
         }
       else
@@ -542,7 +542,7 @@ int Schema_Euler_Implicite::faire_un_pas_de_temps_eqn_base(Equation_base& eqn)
   bool convergence_eqn = false;
   passe = present;
   // futur=present;
-  // sert pour la pression et les couplages
+  // used for the pressure and inter-problem couplings
   eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
   //present=futur;
 
@@ -556,7 +556,7 @@ int Schema_Euler_Implicite::faire_un_pas_de_temps_eqn_base(Equation_base& eqn)
       Cout<<"==================================================================================" << finl;
       const DoubleTab& inut=futur;
       convergence_eqn=le_solveur->iterer_eqn(eqn, inut, present, dt_, compteur, ok);
-      if (!ok) return 0; //si echec total
+      if (!ok) return 0; // total failure
       futur=present;
       eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
       present=futur;
@@ -591,7 +591,7 @@ int Schema_Euler_Implicite::reprendre(Entree&)
       return 1;
     }
 
-  // Reprise du facsec et du residu dans le fichier .dt_ev s'il existe
+  // Reading facsec and residual from the .dt_ev file if it exists
   double facsec_lu=1.;
   double residu_lu=0;
   double facsec_lu_old;
@@ -605,18 +605,18 @@ int Schema_Euler_Implicite::reprendre(Entree&)
       double temps=0;
       double dt;
       std::string ligne;
-      // Si en tete on lit
+      // Read the header if present
       fichier >> chaine;
       if (chaine=="#")
         {
-          // On lit la ligne complete
+          // Read the full line
           std::getline(fichier.get_ifstream(), ligne);
-        } // Sinon on reouvre
+        } // Otherwise reopen
       else
         {
           fichier.ouvrir(nom_fichier);
         }
-      // Recherche du pas de temps precedant tinit_
+      // Search for the time step preceding tinit_
       fichier >> temps;
       double residu_old_old=0;
       while (!fichier.eof() && temps<tinit_)
@@ -630,7 +630,7 @@ int Schema_Euler_Implicite::reprendre(Entree&)
             residu_old_=residu_lu;
           if (residu_old_old==0)
             residu_old_old=residu_lu;
-          // On lit le reste de la ligne
+          // Read the rest of the line
           std::getline(fichier.get_ifstream(), ligne);
           fichier >> temps;
 
@@ -651,9 +651,9 @@ int Schema_Euler_Implicite::reprendre(Entree&)
   envoyer_broadcast(nb_ite_sans_accel_, 0 /* pe source */);
   envoyer_broadcast(residu_old_, 0 /* pe source */);
 
-  // On prend le facsec lu uniquement s'il est entre les
-  // bornes specifiees dans le jeu de donnees
-  // En effet, on peut faire un calcul explicite puis une reprise en implicite
+  // The read facsec is used only if it is within the bounds
+  // specified in the data set.
+  // Indeed, one may run an explicit calculation and then restart with an implicit scheme.
   residu_ = residu_lu;
   if (facsec_lu>=facsec_)
     {

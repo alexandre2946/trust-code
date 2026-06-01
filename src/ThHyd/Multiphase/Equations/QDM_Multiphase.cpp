@@ -46,19 +46,17 @@ Sortie& QDM_Multiphase::printOn(Sortie& is) const
   return Equation_base::printOn(is);
 }
 
-/*! @brief Appel Equation_base::readOn(Entree& is) En sortie verifie que l'on a bien lu:
+/*! @brief Calls Equation_base::readOn(Entree& is). Verifies that the following have been read:
  *
- *         - le terme diffusif,
- *         - le terme convectif,
- *         - le solveur en pression
+ *         - the diffusive term,
+ *         - the convective term,
+ *         - the pressure solver
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws terme diffusif non specifie dans jeu de donnees, specifier
- * un type negligeable pour l'operateur si il est a negliger
- * @throws terme convectif non specifie dans jeu de donnees, specifier
- * un type negligeable pour l'operateur si il est a negliger
- * @throws solveur pression non defini dans jeu de donnees
+ * @param is Input stream.
+ * @return Modified input stream.
+ * @throws diffusive term not specified in dataset; specify a negligible type for the operator if it is to be neglected
+ * @throws convective term not specified in dataset; specify a negligible type for the operator if it is to be neglected
+ * @throws pressure solver not defined in dataset
  */
 
 Entree& QDM_Multiphase::readOn(Entree& is)
@@ -90,7 +88,7 @@ Entree& QDM_Multiphase::readOn(Entree& is)
         }
     }
 
-  /* champs de vitesse par phase pour le postpro */
+  /* velocity fields per phase for post-processing */
   noms_vit_phases_.dimensionner(pb.nb_phases()), vit_phases_.resize(pb.nb_phases());
   for (int i = 0; i < pb.nb_phases(); i++)
     noms_vit_phases_[i] = Nom("vitesse_") + pb.nom_phase(i);
@@ -128,7 +126,7 @@ int QDM_Multiphase::has_interface_blocs() const
   return ok;
 }
 
-/* l'evanescence passe en dernier */
+/* evanescence is processed last */
 void QDM_Multiphase::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   Navier_Stokes_std::dimensionner_blocs(matrices, semi_impl);
@@ -143,7 +141,7 @@ void QDM_Multiphase::assembler_blocs_avec_inertie(matrices_t matrices, DoubleTab
 
 void QDM_Multiphase::mettre_a_jour(double temps)
 {
-  Equation_base::mettre_a_jour(temps);  //on saute celui de Navier_Stokes_std
+  Equation_base::mettre_a_jour(temps);  // skip Navier_Stokes_std::mettre_a_jour
   pression().mettre_a_jour(temps);
   pression_pa().mettre_a_jour(temps);
 
@@ -156,13 +154,13 @@ void QDM_Multiphase::mettre_a_jour(double temps)
         for (i = 0; i < std::min(psrc.size(), pdst.size()); i++)
           {
             DoubleTab& src = psrc[i], &dst = pdst[i];
-            if (src.line_size() == N) /* une colonne par composante */
+            if (src.line_size() == N) /* one column per component */
               for (j = 0; j < src.dimension_tot(0); j++) dst(j) = src(j, n);
-            else if (src.line_size() == N * D) /* stockage N * d + n */
+            else if (src.line_size() == N * D) /* storage N * d + n */
               for (j = 0; j < src.dimension_tot(0); j++)
                 for (d = 0; d < D; d++)
                   dst(j, d) = src(j, N * d + n);
-            else abort(); //on ne connait pas
+            else abort(); // unknown storage layout
           }
       }
 
@@ -193,7 +191,7 @@ void QDM_Multiphase::mettre_a_jour(double temps)
                       for (int k = 0; k < src.dimension_tot(0); k++)
                         for (int dU = 0; dU < D; dU++)
                           for (int dX = 0; dX < D; dX++)
-                            dst(k, dX + D * dU) = src(k, dX, dU + n * D); // Les lignes et les colonnes sont inversees quand on passe dans DoubleTab_parts
+                            dst(k, dX + D * dU) = src(k, dX, dU + n * D); // rows and columns are swapped when going through DoubleTab_parts
                     }
                 }
           }
@@ -211,11 +209,11 @@ bool QDM_Multiphase::initTimeStep(double dt)
 {
   Schema_Temps_base& sch=schema_temps();
   ConstDoubleTab_parts ppart(pression().valeurs());
-  /* si pression_pa() est plus petit que pression() (ex. : variables auxiliaires PolyMAC_HFV), alors on ne copie que la 1ere partie */
+  /* if pression_pa() is smaller than pression() (e.g., auxiliary variables PolyMAC_HFV), copy only the first part */
   const DoubleTab& p_red = pression_pa().valeurs().dimension_tot(0) < pression().valeurs().dimension_tot(0) ? ppart[0] : pression().valeurs();
   for (int i=1; i<=sch.nb_valeurs_futures(); i++)
     {
-      // Mise a jour du temps dans la pression
+      // Update time in the pressure field
       pression().changer_temps_futur(sch.temps_futur(i),i);
       pression().futur(i)=pression().valeurs();
       pression_pa().changer_temps_futur(sch.temps_futur(i),i);
@@ -237,8 +235,8 @@ void QDM_Multiphase::discretiser_vitesse()
 
 void QDM_Multiphase::discretiser_grad_p()
 {
-// Ne fait rien ! Est appele par defaut dans Navier_Stokes_std.discretiser() mais pas requis en Pb_Multiphase
-// La dicretisation par dans le QDM_Multiphase.creer_champ()
+// Does nothing! Called by default in Navier_Stokes_std.discretiser() but not required in Pb_Multiphase.
+// The discretization happens in QDM_Multiphase.creer_champ()
 }
 
 const Champ_Don_base& QDM_Multiphase::diffusivite_pour_transport() const
@@ -256,12 +254,12 @@ const Champ_base& QDM_Multiphase::vitesse_pour_transport() const
   return la_vitesse;
 }
 
-/*! @brief Complete l'equation base, associe la pression a l'equation,
+/*! @brief Completes the base equation, associates the pressure to the equation,
  *
- *     complete la divergence, le gradient et le solveur pression.
- *     Ajout de 2 termes sources: l'un representant la force centrifuge
- *     dans le cas axi-symetrique,l'autre intervenant dans la resolution
- *     en 2D axisymetrique
+ *     completes the divergence, gradient and pressure solver.
+ *     Adds 2 source terms: one representing the centrifugal force
+ *     in the axisymmetric case, the other involved in the
+ *     2D axisymmetric resolution.
  *
  */
 void QDM_Multiphase::completer()
@@ -273,7 +271,7 @@ void QDM_Multiphase::completer()
   Cerr<<"unknow field name  "<<inconnue().le_nom()<<finl;
   Cerr<<"equation type "<<inconnue().equation().que_suis_je()<<finl;
 
-  /* liste des choses qui doivent etre compatibles avec le multiphase */
+  /* list of things that must be compatible with multiphase */
   std::vector<const MorEqn*> morceaux = { &solveur_masse.valeur(), &les_sources, &terme_convectif.valeur(), &terme_diffusif.valeur(), &gradient.valeur() };
   for (auto mor : morceaux) mor->check_multiphase_compatibility();
 }
@@ -319,7 +317,7 @@ void QDM_Multiphase::creer_champ(const Motcle& motlu)
             noms[ D * dU + dX]=Nom(composantsVitesse[dU] + composantsDerivee[dX]);
             unites[ D * dU + dX] = Nom("m2/s");
           }
-      noms[0] = noms_grad_vit_phases_[i]; // Pour lui donner le bon nom dans discretiser_champ ; consequence : la premiere coordonnee en sortie n'a pas le bon nom
+      noms[0] = noms_grad_vit_phases_[i]; // To give it the correct name in discretiser_champ; consequence: the first output coordinate does not have the right name
       Motcle typeChamp = "champ_elem" ;
       discretisation().discretiser_champ(typeChamp, domaine_dis(), multi_scalaire, noms , unites, D*D, 0, grad_vit_phases_[0]);
       champs_compris_.ajoute_champ(grad_vit_phases_[i]);
@@ -398,9 +396,9 @@ Entree& QDM_Multiphase::lire_cond_init(Entree& is)
 
 int QDM_Multiphase::preparer_calcul()
 {
-  Equation_base::preparer_calcul(); //pour eviter Navier_Stokes_std::preparer_calcul() !
+  Equation_base::preparer_calcul(); // to avoid calling Navier_Stokes_std::preparer_calcul() !
 
-  // XXX Elie Saikali : utile pour cas reprise !
+  // XXX Elie Saikali : useful for restart case!
   const double temps = schema_temps().temps_courant();
   pression().changer_temps(temps);
   pression_pa().changer_temps(temps);

@@ -20,7 +20,7 @@
 #include <TRUSTTabs_forward.h>
 #include <TRUSTTab.h>
 
-/*! @brief Flux interfacial a coefficient constant par phase
+/*! @brief Ranz-Marshall interfacial heat flux correlation.
  *
  */
 

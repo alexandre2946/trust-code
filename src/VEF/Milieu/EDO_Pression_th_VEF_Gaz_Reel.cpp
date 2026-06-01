@@ -28,10 +28,10 @@ Sortie& EDO_Pression_th_VEF_Gaz_Reel::printOn(Sortie& os) const { return os << q
 
 Entree& EDO_Pression_th_VEF_Gaz_Reel::readOn(Entree& is) { return is; }
 
-/*! @brief Resoud l'EDO
+/*! @brief Solves the ODE.
  *
- * @param (double Pth_n) La pression a l'etape precedente
- * @return (double) La nouvelle valeur de la pression
+ * @param (double Pth_n) The pressure at the previous time step
+ * @return (double) The new pressure value
  */
 double EDO_Pression_th_VEF_Gaz_Reel::resoudre(double Pth_n)
 {
@@ -44,23 +44,23 @@ double EDO_Pression_th_VEF_Gaz_Reel::resoudre(double Pth_n)
     }
   double Pth;
   const DoubleTab& tab_vit = ref_cast(Navier_Stokes_std,le_fluide_->vitesse().equation()).vitesse().valeurs();
-  const DoubleTab& tab_hnp1 = le_fluide_->inco_chaleur().valeurs();       //actuel
-  const DoubleTab& tab_hn = le_fluide_->inco_chaleur().passe();        //passe
-  const DoubleTab& tab_rho = le_fluide_->masse_volumique().valeurs();    //actuel
+  const DoubleTab& tab_hnp1 = le_fluide_->inco_chaleur().valeurs();       //current
+  const DoubleTab& tab_hn = le_fluide_->inco_chaleur().passe();        //previous
+  const DoubleTab& tab_rho = le_fluide_->masse_volumique().valeurs();    //current
   const OWN_PTR(Loi_Etat_base)& loi_ = le_fluide_->loi_etat();
   //  const DoubleVect& tab_rhon = loi_->rho_n();                       //passe
 
   int elem, nb_elem = le_dom->nb_elem();
-  double V = 0; //mesure du domaine
-  double Fn = 0; //integrale 1 a l'etape n
-  double Fnp1 = 0; //integrale 1 a l'etape n+1
-  double S = 0; //second membre
+  double V = 0; // domain measure
+  double Fn = 0; // integral 1 at time step n
+  double Fnp1 = 0; // integral 1 at time step n+1
+  double S = 0; // right-hand side
 
   double dt = le_fluide_->vitesse().equation().schema_temps().pas_de_temps();
   double v, al, bn, bnp1, hn, hnp1, divu;
 
   int i, face, nb_faces = le_dom->nb_faces();
-  //calcul T* aux elements
+  // compute T* at elements
   DoubleTab HstarP0(nb_elem);
   DoubleTab gradh(nb_faces, dimension);
   DoubleTab u_gradh(nb_faces);
@@ -77,9 +77,9 @@ double EDO_Pression_th_VEF_Gaz_Reel::resoudre(double Pth_n)
         }
       HstarP0(elem) /= nfe;
     }
-  //calcul gradT*
+  // compute gradT*
   calculer_grad(HstarP0, gradh);
-  //calcul u.gradT*
+  // compute u.gradT*
   for (face = 0; face < nb_faces; face++)
     {
       u_gradh(face) = 0;
@@ -88,7 +88,7 @@ double EDO_Pression_th_VEF_Gaz_Reel::resoudre(double Pth_n)
           u_gradh(face) += gradh(face, i) * tab_vit(face, i);
         }
     }
-  //calcul divU en P0 et P1
+  // compute divU in P0 and P1
   DoubleTrav divUP0(nb_elem);
   ref_cast(Navier_Stokes_std,le_fluide_->vitesse().equation()).operateur_divergence().calculer(tab_vit, divUP0);
   DoubleTrav divU(nb_faces);

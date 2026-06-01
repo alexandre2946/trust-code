@@ -22,9 +22,7 @@
 #include <map>
 #include <string>
 
-/*! @brief classe Loi_paroi_base Classe de base pour les lois de paroi dans pb_mulitphase
- *
- *     Methodes implementees :
+/*! @brief Base class for wall laws in Pb_Multiphase.
  *
  *
  */
@@ -47,7 +45,7 @@ protected:
   double y_p_min_ = 1.e-2; // minimal y_p
 
   IntTab Faces_a_calculer_;
-  std::map<std::string, DoubleTab> valeurs_loi_paroi_; // contient "y_plus", "u_tau" pour toutes les faces
+  std::map<std::string, DoubleTab> valeurs_loi_paroi_; // contains "y_plus", "u_tau" for all faces
   double tps_loc = -1.e8;
 };
 

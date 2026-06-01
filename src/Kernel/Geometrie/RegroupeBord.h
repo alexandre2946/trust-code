@@ -20,8 +20,8 @@
 
 /*! @brief class RegroupeBord Regroupe_bord dom titi { bord1 , bord2 }
  *
- *  regroupe les frontieres bord1 et bord2 dans une frontiere de type bord1
- *  et de nom titi
+ *  merges boundaries bord1 and bord2 into a boundary of type bord1
+ *  and name titi
  *
  *
  * @sa Interprete
@@ -49,7 +49,7 @@ public :
 
   Entree& interpreter_(Entree&) override;
   void regroupe_bord(Domaine_t& dom, Nom nom,const LIST(Nom)& nlistbord);
-  // regroupe les bords de meme nom en un seul bord du meme nom
+  // merge boundaries with the same name into a single boundary of that name
   void rassemble_bords(Domaine_t& dom);
 
 };

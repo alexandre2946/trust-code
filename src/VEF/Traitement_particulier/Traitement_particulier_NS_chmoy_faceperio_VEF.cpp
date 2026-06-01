@@ -26,10 +26,10 @@
 Implemente_instanciable(Traitement_particulier_NS_chmoy_faceperio_VEF,"Traitement_particulier_NS_chmoy_faceperio_VEF",Traitement_particulier_NS_chmoy_faceperio);
 
 
-/*! @brief
+/*! @brief Prints the object to an output stream.
  *
- * @param (Sortie& is) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& is) output stream
+ * @return (Sortie&) modified output stream
  */
 Sortie& Traitement_particulier_NS_chmoy_faceperio_VEF::printOn(Sortie& is) const
 {
@@ -37,10 +37,10 @@ Sortie& Traitement_particulier_NS_chmoy_faceperio_VEF::printOn(Sortie& is) const
 }
 
 
-/*! @brief
+/*! @brief Reads the object from an input stream.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) input stream
+ * @return (Entree&) modified input stream
  */
 Entree& Traitement_particulier_NS_chmoy_faceperio_VEF::readOn(Entree& is)
 {
@@ -52,8 +52,8 @@ void Traitement_particulier_NS_chmoy_faceperio_VEF::init_calcul_stats()
   const Domaine_dis_base& zdisbase=mon_equation->inconnue().domaine_dis_base();
   const Domaine_VEF& domaine_VEF=ref_cast(Domaine_VEF, zdisbase);
   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,mon_equation->domaine_Cl_dis() );
-  const DoubleTab& xv = domaine_VEF.xv();    // centre de gravite des faces
-  // Imprime dans un fichier les faces periodiques (numero+coordonnees du centre)
+  const DoubleTab& xv = domaine_VEF.xv();    // face centers of gravity
+  // Print to a file the periodic faces (index + center coordinates)
   int nb_front=domaine_VEF.nb_front_Cl();
   for (int n_bord=0; n_bord<nb_front; n_bord++)
     {
@@ -88,8 +88,8 @@ void Traitement_particulier_NS_chmoy_faceperio_VEF::calcul_chmoy_faceperio(doubl
   const Domaine_Cl_VEF& domaine_Cl_VEF = ref_cast(Domaine_Cl_VEF,mon_equation->domaine_Cl_dis() );
   const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
 
-  // Calcul de la moyenne temporelle de la vitesse sur les frontieres periodiques:
-  // moy(U)=1/(temps-temps_deb)*Integrale(t=temps_deb a temps)(U(t)*dt)
+  // Compute the temporal average of velocity on periodic boundaries:
+  // avg(U)=1/(temps-temps_deb)*Integral(t=temps_deb to temps)(U(t)*dt)
   chmoy_faceperio*=(temps-un_temps_deb-dt);
   int test_proc=0;
   int nb_front=domaine_VEF.nb_front_Cl();

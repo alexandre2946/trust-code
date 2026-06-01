@@ -19,11 +19,11 @@
 #include <Perte_Charge_PolyMAC_HFV.h>
 #include <PDC_PolyMAC_CDO_impl.h>
 
-//!  Perte de charge directionnelle (selon un vecteur unitaire v)
+//!  Directional pressure drop (along a unit vector v)
 /**
  du/dt = - volume * lambda(Re,x,y,z,t) * u.(v / ||v||) * (v / ||v||) * ||u|| / (2 * Dh)
 
- Lecture des arguments :
+ Reading arguments:
 
  Perte_Charge_Directionnelle_PolyMAC_CDO_Face diametre_hydraulique {
  lambda expression(Re,x,y,z,t)

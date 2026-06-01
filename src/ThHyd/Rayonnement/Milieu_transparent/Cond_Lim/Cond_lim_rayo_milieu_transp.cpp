@@ -32,7 +32,7 @@ void Cond_lim_rayo_milieu_transp::preparer_surface(const Frontiere_dis_base& fr,
   surf_i_.resize(nb_faces_bord);
   teta_i_.resize(nb_faces_bord);
 
-  // recuperation des surfaces de bords.
+  // retrieval of boundary face areas.
   const Domaine_VF& domaine = ref_cast(Domaine_VF, zcl.domaine_dis());
   for (int numfa = 0; numfa < nb_faces_bord; numfa++)
     surf_i_[numfa] = domaine.face_surfaces(numfa + ndeb);

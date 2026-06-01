@@ -12,9 +12,9 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-// Nouveau fluide. c'est un fluide incompressible non newtonien. Il derive donc
-//   de fluide_Incompressible et possede quelques proprietes de plus (K, N)
-//   mu depend de K, N, et de grad(U)
+// New fluid: a non-Newtonian incompressible fluid. It derives from
+//   Fluide_Incompressible and has additional properties (K, N).
+//   mu depends on K, N, and grad(U).
 
 #include <Fluide_Ostwald.h>
 #include <Probleme_base.h>
@@ -64,7 +64,7 @@ void Fluide_Ostwald::discretiser(const Probleme_base& pb, const  Discretisation_
   const Domaine_dis_base& domaine_dis=pb.equation(0).domaine_dis();
   const Discret_Thyd& dis2=ref_cast(Discret_Thyd, dis);
 
-  // avec la signature de Ostwald....
+  // with the Ostwald signature ...
   const Navier_Stokes_std& eqn_hydr=ref_cast(Navier_Stokes_std,pb.equation(0));
   // Typing mu field
   Nom dis_nam = dis.que_suis_je();

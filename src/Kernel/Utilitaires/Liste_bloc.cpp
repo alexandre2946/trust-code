@@ -21,9 +21,9 @@ Entree& Liste_bloc::readOn(Entree& is) { return is; }
 
 Sortie& Liste_bloc::printOn(Sortie& os) const { return os; }
 
-/*! @brief Renvoie le dernier element de la liste
+/*! @brief Returns the last element of the list.
  *
- * @return (Liste_bloc&) le dernier element de la liste
+ * @return (Liste_bloc&) the last element of the list
  */
 Liste_bloc& Liste_bloc::dernier()
 {
@@ -41,7 +41,7 @@ Liste_bloc::~Liste_bloc()
   suivant_ = nullptr;
 }
 
-/*! @brief Vide la liste
+/*! @brief Clears the list.
  *
  */
 void Liste_bloc::vide()
@@ -58,10 +58,10 @@ void Liste_bloc::vide()
   suivant_ = this;
 }
 
-/*! @brief Operateur d'acces au ieme element de la liste
+/*! @brief Access operator to the i-th element of the list.
  *
- * @param (int i) l'indice de l'element a trouver
- * @return (Objet_U&) le ieme element de la liste
+ * @param (int i) the index of the element to find
+ * @return (Objet_U&) the i-th element of the list
  */
 Objet_U& Liste_bloc::operator[](int i)
 {
@@ -82,7 +82,7 @@ Objet_U& Liste_bloc::operator[](int i)
   return curseur.valeur();
 }
 
-/*! @brief Ajout d'un Objet_U a la liste to_add est libere en sortie
+/*! @brief Adds an Objet_U to the list. to_add is released on exit.
  *
  */
 Objet_U& Liste_bloc::add_deplace(DerObjU& to_add)

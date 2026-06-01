@@ -38,11 +38,11 @@ Sortie& Partitionneur_Fichier_Decoupage::printOn(Sortie& os) const
   return os;
 }
 
-/*! @brief Lecture des parametres du partitionneur sur disque.
+/*! @brief Reads the partitioner parameters from disk.
  *
- * Fomat attendu:
+ * Expected format:
  *     { fichier FILENAME }
- *   FILENAME est le nom d'un fichier existant au format ArrOfInt ascii.
+ *   FILENAME is the name of an existing file in ArrOfInt ASCII format.
  *
  */
 void Partitionneur_Fichier_Decoupage::set_param(Param& param) const
@@ -61,7 +61,7 @@ void Partitionneur_Fichier_Decoupage::initialiser(const char *filename)
   filename_ = filename;
 }
 
-/*! @brief Lit le contenu du fichier "filename_" et stocke le resultat dans elem_part
+/*! @brief Reads the content of "filename_" and stores the result in elem_part.
  *
  */
 void Partitionneur_Fichier_Decoupage::construire_partition(IntVect& elem_part, int& nb_parts_tot) const

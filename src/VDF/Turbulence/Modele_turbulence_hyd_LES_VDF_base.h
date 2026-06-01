@@ -22,11 +22,11 @@
 class Domaine_Cl_VDF;
 class Domaine_VDF;
 
-/*! @brief classe Modele_turbulence_hyd_LES_VDF_base Cette classe correspond a la mise en oeuvre des modeles sous
+/*! @brief Modele_turbulence_hyd_LES_VDF_base class
  *
- *  maille en VDF
+ *  @brief This class implements the sub-grid scale turbulence models in VDF.
  *
- *  .SECTION  voir aussi
+ *  .SECTION  see also
  *  Modele_turbulence_hyd_LES_base
  *
  */

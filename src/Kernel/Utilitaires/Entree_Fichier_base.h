@@ -24,9 +24,9 @@ using std::ifstream;
 using std::ofstream;
 using std::streampos;
 
-/*! @brief Fichier en lecture Cette classe est a la classe C++ ifstream ce que la classe Entree est a la
+/*! @brief File for reading. This class is to the C++ ifstream class what the Entree class is to the
  *
- *     classe C++ istream. Elle redefinit de facon virtuelle les operateurs de lecture dans un fichier.
+ *     C++ istream class. It virtually redefines the read operators for a file.
  *
  */
 

@@ -22,7 +22,7 @@
 
 enum class Sens_Orient {DIRECT , INDIRECT};
 
-/*! @brief class Reorienter_triangle Balaye les triangles du maillage pour qu'ils soient directs.
+/*! @brief class Reorienter_triangle Sweeps through the mesh triangles to ensure they are positively oriented.
  *
  * @sa Interprete
  */

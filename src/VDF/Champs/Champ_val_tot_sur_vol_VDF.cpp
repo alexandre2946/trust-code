@@ -53,7 +53,7 @@ DoubleVect& Champ_val_tot_sur_vol_VDF::eval_contrib_loc(const Domaine_dis_base& 
       for (int elem=0; elem<size_sz; elem++)
         {
           el = sz(elem);
-          //On ne retient que les elements reels
+          //Only real elements are retained
           if (el<nb_elem)
             vol_glob_pond(cpt) += vol(el)*por_elem(el);
         }

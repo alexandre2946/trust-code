@@ -109,13 +109,13 @@ void Op_NConserv_HLL_Coloc_Vect::Abgral_scheme(DoubleTab& num_flux_left, DoubleT
         }
       else // faces bords
         {
-          //tableaux de correspondance lies aux CLs : fcl(f, .) = { type de CL, num de la CL, indice de la face dans la CL }
-          //types de CL : 0 -> pas de CL
-          //              1 -> Neumann
-          //              2 -> Navier ou symetrie
-          //              3 -> Dirichlet ou Neumann_homogene
-          //              4 -> Dirichlet_homogene
-          //              5 -> Periodique
+          //lookup arrays for boundary conditions: fcl(f, .) = { BC type, BC index, face index within BC }
+          //BC types: 0 -> no BC
+          //          1 -> Neumann
+          //          2 -> Navier or symmetry
+          //          3 -> Dirichlet or Neumann_homogene
+          //          4 -> Dirichlet_homogene
+          //          5 -> Periodique
 
           assert(er < 0 && el >= 0 && vit_n(f, 0) != -123.123);
           const int e = el;

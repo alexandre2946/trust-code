@@ -30,28 +30,27 @@ Implemente_instanciable(Champ_Front_Fonction,"Champ_Front_Fonction",Ch_front_var
 // XD_CONT the keyword for the field.
 
 
-/*! @brief NE FAIT RIEN
+/*! @brief DOES NOTHING
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Champ_Front_Fonction::printOn(Sortie& os) const
 {
   return os;
 }
 
-/*! @brief Lecture du Champ a partir d'un flot d'entree, (On ne sait traiter que les champs scalaires.
+/*! @brief Read the field from an input stream. (Only scalar fields are handled.)
  *
- * )
- *      exemple:
+ *      example:
  *      Champ_Front_Fonction
- *      1 (nombre de composantes)
- *      temperature  (ch est fonction de la temperature)
- *      val*6 (expression du parser)
+ *      1 (number of components)
+ *      temperature  (ch is a function of temperature)
+ *      val*6 (parser expression)
  *
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
  */
 Entree& Champ_Front_Fonction::readOn(Entree& is)
 {

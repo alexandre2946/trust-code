@@ -76,7 +76,7 @@ double EDO_Pression_th_VDF_Gaz_Parfait::resoudre(double Pth_n)
       double cm = 0;
       const IntTab& face_voisins = le_dom->face_voisins();
       const DoubleVect& Surface = le_dom->face_surfaces();
-      // ce n'est pas la bonne vitesse mais on essaye
+      // not the correct velocity, but attempting this approximation
       const IntVect& orientation = le_dom->orientation();
       for (n_bord = 0; n_bord < le_dom->nb_front_Cl(); n_bord++)
         {
@@ -115,7 +115,7 @@ double EDO_Pression_th_VDF_Gaz_Parfait::resoudre(double Pth_n)
     }
   Cerr << " Utilisez traitement conservation_masse ou constant " << finl;
   abort();
-  // traitement edo ???
+  // ODE treatment ???
   int n_bord;
   for (n_bord = 0; n_bord < le_dom->nb_front_Cl(); n_bord++)
     {
@@ -195,7 +195,7 @@ double EDO_Pression_th_VDF_Gaz_Parfait::resoudre(double Pth_n)
               elem = le_dom->face_voisins(face, 1);
               norm *= -1;
             }
-          //calcul de F=Som(div(U))
+          //compute F=Sum(div(U))
           F += tab_vit(face) * norm;
           //}
         }
@@ -215,14 +215,14 @@ void EDO_Pression_th_VDF_Gaz_Parfait::resoudre(DoubleTab& Pth_n)
 {
   const int traitPth = le_fluide_->getTraitementPth();
   if (traitPth == 2)
-    return; // rien a faire
+    return; // nothing to do
   else if (traitPth == 0)
     {
       for (int n_bord = 0; n_bord < le_dom->nb_front_Cl(); n_bord++)
         {
           const Cond_lim& la_cl = le_dom_Cl->les_conditions_limites(n_bord);
           if (sub_type(Neumann_sortie_libre, la_cl.valeur()))
-            return; // rien a faire
+            return; // nothing to do
         }
 
       Cerr << "EDO_Pression_th_VDF_Gaz_Parfait::" << __func__ << " not yet coded ! Call the 911 !!" << finl;
@@ -230,7 +230,7 @@ void EDO_Pression_th_VDF_Gaz_Parfait::resoudre(DoubleTab& Pth_n)
     }
   else
     {
-      const DoubleTab& tempnp1 = le_fluide_->inco_chaleur().valeurs(); //actuel
+      const DoubleTab& tempnp1 = le_fluide_->inco_chaleur().valeurs(); //current
       const DoubleTab& tempn = le_fluide_->inco_chaleur().passe();
       const double dt = le_fluide_->vitesse().equation().schema_temps().pas_de_temps();
 
@@ -246,7 +246,7 @@ void EDO_Pression_th_VDF_Gaz_Parfait::resoudre(DoubleTab& Pth_n)
       double cm = 0.;
       const IntTab& face_voisins = le_dom->face_voisins();
       const DoubleVect& Surface = le_dom->face_surfaces();
-      // ce n'est pas la bonne vitesse mais on essaye
+      // not the correct velocity, but attempting this approximation
       const IntVect& orientation = le_dom->orientation();
       for (int n_bord = 0; n_bord < le_dom->nb_front_Cl(); n_bord++)
         {

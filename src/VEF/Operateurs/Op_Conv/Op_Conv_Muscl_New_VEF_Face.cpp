@@ -89,9 +89,9 @@ Entree& Op_Conv_Muscl_New_VEF_Face::readOn(Entree& s )
 
 ////////////////////////////////////////////////////////////////////
 //
-//                      Implementation des fonctions
+//                      Implementation of member functions
 //
-//                   de la classe Op_Conv_Muscl_New_VEF_Face
+//                   of class Op_Conv_Muscl_New_VEF_Face
 //
 ////////////////////////////////////////////////////////////////////
 
@@ -126,7 +126,7 @@ void Op_Conv_Muscl_New_VEF_Face::calculer_coefficients_operateur_centre(DoubleTa
     }
 
   //
-  //Calcul des coefficients de l'operateur
+  //Compute the operator coefficients
   //
   CDoubleTabView3 facette_normales = domaine_VEF.facette_normales().view_ro<3>();
   CDoubleTabView3 facette_normales_Cl = domaine_Cl_VEF.normales_facettes_Cl().view_ro<3>();
@@ -202,15 +202,15 @@ void Op_Conv_Muscl_New_VEF_Face::calculer_coefficients_operateur_centre(DoubleTa
         psc/=nb_dim;
 
         Kij(elem,facei_loc,facej_loc)=psc;
-        Kij(elem,facei_loc,facei_loc)-=psc;//pour l'aspect LED
+        Kij(elem,facei_loc,facei_loc)-=psc;//for the LED aspect
         Kij(elem,facej_loc,facei_loc)=-psc;
-        Kij(elem,facej_loc,facej_loc)+=psc;//pour l'aspect LED
+        Kij(elem,facej_loc,facej_loc)+=psc;//for the LED aspect
       }
   });
   end_gpu_timer(__KERNEL_NAME__);
 
   //
-  // Correction des Kij pour Dirichlet !
+  // Correction of Kij for Dirichlet!
   //
   {
     int nb_bord=domaine_Cl_VEF.nb_cond_lim();
@@ -286,8 +286,8 @@ calculer_flux_operateur_centre(DoubleTab& tab_Fij,const DoubleTab& tab_Kij,const
   const int nfa7 = domaine_VEF.type_elem().nb_facette();
   const int nb_dim = Objet_U::dimension;
 
-  //DoubleTab gradient_elem(nb_elem_tot,nb_comp,nb_dim);  //!< (du/dx du/dy dv/dx dv/dy) pour un poly  gradient_elem=0.;
-  if (gradient_elem_.size_array() == 0) gradient_elem_.resize(nb_elem_tot, nb_comp, nb_dim);  // (du/dx du/dy dv/dx dv/dy) pour un poly
+  //DoubleTab gradient_elem(nb_elem_tot,nb_comp,nb_dim);  //!< (du/dx du/dy dv/dx dv/dy) per element  gradient_elem=0.;
+  if (gradient_elem_.size_array() == 0) gradient_elem_.resize(nb_elem_tot, nb_comp, nb_dim);  // (du/dx du/dy dv/dx dv/dy) per element
 
   assert(tab_Fij.nb_dim()==4);
   assert(tab_Fij.dimension(0)==nb_elem_tot);
@@ -296,11 +296,11 @@ calculer_flux_operateur_centre(DoubleTab& tab_Fij,const DoubleTab& tab_Kij,const
   assert(tab_Fij.dimension(3)==nb_comp);
 
   //
-  //Calcul des flux de l'operateur
+  //Compute the fluxes of the operator
   //
   Champ_P1NC::calcul_gradient(tab_transporte,gradient_elem_,domaine_Cl_VEF);
 
-  //Declaration des vues sur les tableaux TRUSTS
+  //Declaration of views on TRUST arrays
   CIntArrView rang_elem_non_std = tab_rang_elem_non_std.view_ro();
   CIntTabView elem_faces = tab_elem_faces.view_ro();
   CIntTabView KEL = tab_KEL.view_ro();
@@ -314,8 +314,8 @@ calculer_flux_operateur_centre(DoubleTab& tab_Fij,const DoubleTab& tab_Kij,const
   CDoubleTabView coord_sommets = tab_coord_sommets.view_ro();
   CDoubleTabView xv = tab_xv.view_ro();
   DoubleTabView4 Fij = tab_Fij.view_wo<4>();
-  CDoubleTabView3 gradient_elem = gradient_elem_.view_ro<3>(); //Gradient elem declare plus haut, je le renome pas _tab dans tout le fichier, donc convection un peu froissee ici
-  CIntTabView sommet_elem = domaine.les_elems().view_ro();//On n'utilise plus la fonction sommet_elem(.,.) de domaine.h
+  CDoubleTabView3 gradient_elem = gradient_elem_.view_ro<3>(); //gradient_elem declared earlier; not renamed to _tab throughout the file, so convection slightly inconsistent here
+  CIntTabView sommet_elem = domaine.les_elems().view_ro();//sommet_elem(.,.) function of domaine.h is no longer used
 
   Kokkos::parallel_for(start_gpu_timer(__KERNEL_NAME__),
                        Kokkos::RangePolicy<>(0, nb_elem_tot), KOKKOS_LAMBDA(const int elem)
@@ -372,7 +372,7 @@ calculer_flux_operateur_centre(DoubleTab& tab_Fij,const DoubleTab& tab_Kij,const
 
         for (int comp = 0; comp < nb_comp; comp++)
           {
-            //Calcul de la valeur de l'inconnue aux points d'integration de la formule de Simspon
+            //Compute the value of the unknown at the integration points of Simpson's formula
             double inco_m = transporteVect(face_amont, comp);
             for (int dim = 0; dim < nb_dim; dim++)
               {
@@ -403,7 +403,7 @@ calculer_flux_operateur_centre(DoubleTab& tab_Fij,const DoubleTab& tab_Kij,const
                 inco_c -= inco_s_array[ip];
               }
 
-            //Calcul du flux final : formule d'integration de Simpson
+            //Compute the final flux: Simpson integration formula
             double flux;
             if (nb_dim == 2)
               {
@@ -419,8 +419,8 @@ calculer_flux_operateur_centre(DoubleTab& tab_Fij,const DoubleTab& tab_Kij,const
                 double sum3 = (inco_s_array[1] + inco_c) * (psc_s_array[1] + psc_c);
                 flux = (sum1 + sum2 + sum3) / 12.0;
               }
-            //Fij(elem,facei_loc,facej_loc,comp) est le flux recu par la facei_loc dans elem
-            //envoye par la face facej_loc dans elem pour la composante comp de l'inconnue
+            //Fij(elem,facei_loc,facej_loc,comp) is the flux received by facei_loc in elem
+            //sent by face facej_loc in elem for component comp of the unknown
             Fij(elem, facei_loc, facej_loc, comp) = flux - psc_m * transporteVect(facei, comp);
             Fij(elem, facej_loc, facei_loc, comp) = psc_m * transporteVect(facej, comp) - flux;
           }
@@ -449,8 +449,8 @@ modifier_flux_operateur_centre(DoubleTab& Fij,const DoubleTab& Kij,const DoubleT
   const int nfa7 = domaine_VEF.type_elem().nb_facette();
   int nb_dim = Objet_U::dimension;
 
-  //DoubleTab gradient_elem(nb_elem_tot,nb_comp,nb_dim);  //!< (du/dx du/dy dv/dx dv/dy) pour un poly  gradient_elem=0.;
-  if (gradient_elem_.size_array() == 0) gradient_elem_.resize(nb_elem_tot, nb_comp, dimension);  // (du/dx du/dy dv/dx dv/dy) pour un poly
+  //DoubleTab gradient_elem(nb_elem_tot,nb_comp,nb_dim);  //!< (du/dx du/dy dv/dx dv/dy) per element  gradient_elem=0.;
+  if (gradient_elem_.size_array() == 0) gradient_elem_.resize(nb_elem_tot, nb_comp, dimension);  // (du/dx du/dy dv/dx dv/dy) per element
   IntTab face(nb_dim+1);
 
   assert(Fij.nb_dim()==4);
@@ -460,7 +460,7 @@ modifier_flux_operateur_centre(DoubleTab& Fij,const DoubleTab& Kij,const DoubleT
   assert(Fij.dimension(3)==nb_comp);
 
   //
-  //Calcul des flux de l'operateur
+  //Compute the fluxes of the operator
   //
   Champ_P1NC::calcul_gradient(transporte,gradient_elem_,domaine_Cl_VEF);
   ToDo_Kokkos("critical");
@@ -471,7 +471,7 @@ modifier_flux_operateur_centre(DoubleTab& Fij,const DoubleTab& Kij,const DoubleT
       for (int facei_loc=0; facei_loc<nb_faces_elem; facei_loc++)
         face(facei_loc)=elem_faces(elem,facei_loc);
 
-      //RAZ des flux des elements a modifier
+      //Reset fluxes of elements to be modified
       if (is_element_for_upwinding_(elem))
         for (int facei_loc=0; facei_loc<nb_faces_elem; facei_loc++)
           for (int facej_loc=0; facej_loc<nb_faces_elem; facej_loc++)
@@ -506,16 +506,16 @@ modifier_flux_operateur_centre(DoubleTab& Fij,const DoubleTab& Kij,const DoubleT
 
                 for (int comp=0; comp<nb_comp; comp++)
                   {
-                    //Calcul de la valeur de l'inconnue aux points d'integration de la formule du point milieu
+                    //Compute the value of the unknown at the integration points of the midpoint formula
                     double inco_m=transporteVect[face_amont*nb_comp+comp];
                     for(int dim=0; dim<nb_dim; dim++)
                       inco_m+=gradient_elem_(elem,comp,dim)*vecteur_face_facette(elem,fa7,dim,dir);
 
-                    //Calcul du flux final : formule du point milieu
+                    //Compute the final flux: midpoint formula
                     double flux=inco_m*psc_m;
 
-                    //Fij(elem,facei_loc,facej_loc,comp) est le flux recu par la facei_loc dans elem
-                    //envoye par la face facej_loc dans elem pour la composante comp de l'inconnue
+                    //Fij(elem,facei_loc,facej_loc,comp) is the flux received by facei_loc in elem
+                    //sent by face facej_loc in elem for component comp of the unknown
                     Fij(elem,facei_loc,facej_loc,comp)=flux-psc_m*transporteVect[facei*nb_comp+comp];
                     Fij(elem,facej_loc,facei_loc,comp)=psc_m*transporteVect[facej*nb_comp+comp]-flux;
                   }
@@ -531,13 +531,13 @@ modifier_flux_operateur_centre(DoubleTab& Fij,const DoubleTab& Kij,const DoubleT
               int facei=face(facei_loc);
               int facej=face(facej_loc);
 
-              //REMARQUE : ON N'OUBLIE PAS QUE LES NORMALES FA7 SONT ORIENTeES DE FACE_LOCI VERS FACE_LOCJ PAR DEFAUT
-              //LE PRODUIT SCALAIRE PSC_M EST DONC CALCULe POUR OBTENIR LE FLUX REcU PAR LA FACE FACE_LOCI
-              //ET EMIS PAR LA FACE_LOCJ
-              //SI L'ON VEUT OBTENIR LE FLUX REcU PAR LA FACE FACE_LOCJ ET EMIS PAR LA FACE_LOCI, IL FAUT MULTIPLIER LE
-              //PRODUIT SCALAIRE PSC_M PAR -1 POUR IMPLICITEMENT ReORIENTER LES NORMALES FA7 DE FACE_LOCJ VERS
+              //NOTE: the FA7 normals are oriented from FACE_LOCI to FACE_LOCJ by default
+              //the dot product PSC_M is therefore computed to obtain the flux received by FACE_LOCI
+              //and emitted by FACE_LOCJ
+              //to obtain the flux received by FACE_LOCJ and emitted by FACE_LOCI, multiply
+              //the dot product PSC_M by -1 to implicitly reorient the FA7 normals from FACE_LOCJ to
               //FACE_LOCI
-              //MEME REMARQUE POUR LE SCALAIRE "FLUX"
+              //same remark for the scalar "flux"
               const double psc_m = Kij(elem,facei_loc,facej_loc);
 
               int face_amont, dir;
@@ -548,22 +548,22 @@ modifier_flux_operateur_centre(DoubleTab& Fij,const DoubleTab& Kij,const DoubleT
 
               for (int comp=0; comp<nb_comp; comp++)
                 {
-                  //Calcul de la valeur de l'inconnue aux points d'integration de la formule du point milieu
+                  //Compute the value of the unknown at the integration points of the midpoint formula
                   double inco_m=transporteVect[face_amont*nb_comp+comp];
                   for(int dim=0; dim<nb_dim; dim++)
                     inco_m+=gradient_elem_(elem,comp,dim)*vecteur_face_facette_Cl(rang,fa7,dim,dir);
 
-                  //Calcul du flux final : formule d'integration du point milieu
+                  //Compute the final flux: midpoint integration formula
                   double flux=inco_m*psc_m;
 
-                  //Fij(elem,facei_loc,facej_loc,comp) est le flux recu par la facei_loc dans elem
-                  //envoye par la face facej_loc dans elem pour la composante comp de l'inconnue
+                  //Fij(elem,facei_loc,facej_loc,comp) is the flux received by facei_loc in elem
+                  //sent by face facej_loc in elem for component comp of the unknown
                   Fij(elem,facei_loc,facej_loc,comp)=flux-psc_m*transporteVect[facei*nb_comp+comp];
                   Fij(elem,facej_loc,facei_loc,comp)=psc_m*transporteVect[facej*nb_comp+comp]-flux;
                 }
             }
         }
-    }//for sur elem
+    }//end of for on elem
 }
 
 void Op_Conv_Muscl_New_VEF_Face::remplir_fluent() const
@@ -571,9 +571,9 @@ void Op_Conv_Muscl_New_VEF_Face::remplir_fluent() const
   const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
   const int nb_faces = domaine_VEF.nb_faces();
   const int dim = dimension;
-  // calcul de la CFL.
-  // On remet a zero le tableau qui sert pour
-  // le calcul du pas de temps de stabilite
+  // CFL computation.
+  // Reset to zero the array used for
+  // the stability time step computation
   CDoubleTabView face_normales=domaine_VEF.face_normales().view_ro();
   CDoubleTabView velocity=vitesse_->valeurs().view_ro();
   DoubleArrView fluent = fluent_.view_wo();
@@ -616,9 +616,9 @@ DoubleTab& Op_Conv_Muscl_New_VEF_Face::ajouter(const DoubleTab& transporte_2,
 
   DoubleTrav transporte_;
   DoubleTrav vitesse_face_;
-  // soit on a transporte=phi*transporte_ et vitesse=vitesse_
-  // soit transporte=transporte_ et vitesse=phi*vitesse_
-  // cela depend si on transporte avec phi u ou avec u.
+  // either transporte=phi*transporte_ and vitesse=vitesse_
+  // or transporte=transporte_ and vitesse=phi*vitesse_
+  // depending on whether transport is done with phi*u or u.
   const DoubleTab& velocity=modif_par_porosite_si_flag(vitesse_2,vitesse_face_,marq,porosite_face);
 
   DoubleTrav Kij(nb_elem_tot,nb_faces_elem,nb_faces_elem);
@@ -627,14 +627,14 @@ DoubleTab& Op_Conv_Muscl_New_VEF_Face::ajouter(const DoubleTab& transporte_2,
   DoubleTrav Sij(nb_elem_tot,nfa7);
   DoubleTrav Sij2(nb_elem_tot,nfa7);
 
-  //Pour tenir compte des conditions de Neumann sortie libre
+  // To account for free outlet Neumann conditions
 
-  // soit on a transporte=phi*transporte_ et vitesse=vitesse_
-  // soit transporte=transporte_ et vitesse=phi*vitesse_
-  // cela depend si on transporte avec phi u ou avec u.
+  // either transporte=phi*transporte_ and vitesse=vitesse_
+  // or transporte=transporte_ and vitesse=phi*vitesse_
+  // depending on whether transport is done with phi*u or u.
   const DoubleTab& transporte=modif_par_porosite_si_flag(transporte_2,transporte_,!marq,porosite_face);
 
-  //Initialisation du tableau flux_bords_ pour le calcul des pertes de charge
+  //Initialize the flux_bords_ array for pressure drop computation
   flux_bords_.resize(domaine_VEF.nb_faces_bord(),nb_comp);
   calculer_flux_bords(Kij,velocity,transporte);
 
@@ -647,7 +647,7 @@ DoubleTab& Op_Conv_Muscl_New_VEF_Face::ajouter(const DoubleTab& transporte_2,
 
   mettre_a_jour_pour_periodicite(Kij,transporte,resu);
 
-  resu*=-1.;//car l'operateur de convection est construit en tant que terme source
+  resu*=-1.;//because the convection operator is built as a source term
   resu+=sauv;
 
   modifier_flux(*this);
@@ -655,7 +655,7 @@ DoubleTab& Op_Conv_Muscl_New_VEF_Face::ajouter(const DoubleTab& transporte_2,
   return resu;
 }
 
-//ALGO TRES GROSSIER MAIS FONCTIONNE FACILEMENT
+//VERY CRUDE ALGORITHM BUT WORKS EASILY
 double Op_Conv_Muscl_New_VEF_Face::calculer_dt_stab() const
 {
   if (!facsec_auto_)
@@ -685,9 +685,9 @@ double Op_Conv_Muscl_New_VEF_Face::calculer_dt_stab() const
       double security_coeff=0.95;
       double dt_corrector=-1.;
 
-      // soit on a transporte=phi*transporte_ et vitesse=vitesse_
-      // soit transporte=transporte_ et vitesse=phi*vitesse_
-      // cela depend si on transporte avec phi u ou avec u.
+      // either transporte=phi*transporte_ and vitesse=vitesse_
+      // or transporte=transporte_ and vitesse=phi*vitesse_
+      // depending on whether transport is done with phi*u or u.
       ToDo_Kokkos("critical DoubleTab -> DoubleTrav");
       DoubleTab vitesse_face_;
       const DoubleTab& velocity=modif_par_porosite_si_flag(vitesse_2,vitesse_face_,marq,porosite_face);
@@ -703,7 +703,7 @@ double Op_Conv_Muscl_New_VEF_Face::calculer_dt_stab() const
         }
       calculer_coefficients_operateur_centre(Kij,Cij,Sij,Sij2,nb_comp,velocity);
 
-      //Debut du calcul
+      //Start of computation
       IntTab plus_tab(nb_faces_tot);
       ToDo_Kokkos("critical");
       for (int elem=0; elem<nb_elem_tot; elem++)
@@ -743,11 +743,11 @@ double Op_Conv_Muscl_New_VEF_Face::calculer_dt_stab() const
                       plus_tab[facei]=plus_tab[faceiAss];
                     }
 
-                }//fin du for sur "ind_face"
+                }//end of for on "ind_face"
 
-            }//fin du if sur "Periodique"
+            }//end of if on "Periodique"
 
-        }//fin du for sur "n_bord"
+        }//end of for on "n_bord"
       int max_int=plus_tab.mp_max_vect();
       max_int=(int)Process::mp_max(max_int);
 
@@ -781,12 +781,12 @@ void Op_Conv_Muscl_New_VEF_Face::calculer_flux_bords(const DoubleTab& Kij, const
     {
       const Cond_lim& la_cl = domaine_Cl_VEF.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
-      int num2 = le_bord.nb_faces();//il ne faut boucler que sur les faces reelles ici
+      int num2 = le_bord.nb_faces();//only loop over real faces here
       CIntArrView le_bord_num_face = le_bord.num_face().view_ro();
       if ( sub_type(Dirichlet_homogene,la_cl.valeur()) )
         {
-          //On ne calcule pas le flux aux bords de Dirichlet_homogene
-        }//fin du if sur "Dirichlet"
+          //Do not compute flux at Dirichlet_homogene boundaries
+        }//end of if on "Dirichlet"
       else if (sub_type(Neumann_sortie_libre,la_cl.valeur()))
         {
           const Neumann_sortie_libre& la_sortie_libre = ref_cast(Neumann_sortie_libre, la_cl.valeur());
@@ -826,7 +826,7 @@ void Op_Conv_Muscl_New_VEF_Face::calculer_flux_bords(const DoubleTab& Kij, const
               flux_bords(facei,dim)=psc*transporte[facei*nb_comp+dim];
           });
           end_gpu_timer(__KERNEL_NAME__);
-        }//fin du if sur "Neumann", "Neumann_homogene", "Symetrie", "Echange_impose_base"
+        }//end of if on "Neumann", "Neumann_homogene", "Symetrie", "Echange_impose_base"
       else if (sub_type(Periodique,la_cl.valeur()))
         {
           const Periodique& la_cl_perio = ref_cast(Periodique, la_cl.valeur());
@@ -917,12 +917,12 @@ Op_Conv_Muscl_New_VEF_Face::ajouter_operateur_centre(const DoubleTab& tab_Kij, c
                            Kokkos::RangePolicy<>(premiere_face_int, nb_faces), KOKKOS_LAMBDA(
                              const int facei)
       {
-        //Premier voisin
+        //First neighbor
         int elem = face_voisins(facei, 0);
         int facei_loc = num_fac_loc(facei, 0);
         double fij = Kij(elem, facei_loc, facei_loc);
 
-        //Deuxieme voisin
+        //Second neighbor
         elem = face_voisins(facei, 1);
         facei_loc = num_fac_loc(facei, 1);
         fij += Kij(elem, facei_loc, facei_loc);
@@ -936,7 +936,7 @@ Op_Conv_Muscl_New_VEF_Face::ajouter_operateur_centre(const DoubleTab& tab_Kij, c
       end_gpu_timer(__KERNEL_NAME__);
     }
 
-  //Faces de bord
+  //Boundary faces
   const Domaine_Cl_VEF& domaine_Cl_VEF = la_zcl_vef.valeur();
 
   const int nb_bord = domaine_Cl_VEF.nb_cond_lim();
@@ -964,16 +964,16 @@ Op_Conv_Muscl_New_VEF_Face::ajouter_operateur_centre(const DoubleTab& tab_Kij, c
             int facei=num_face(ind_face);
             int facei_loc=num_fac_loc(facei,0);
             int elem=face_voisins(facei,0);
-            double psc=Kij(elem,facei_loc,facei_loc);//ATTENTION : SUPPOSE QU'ON EST a DIVERGENCE NULLE
+            double psc=Kij(elem,facei_loc,facei_loc);//WARNING: ASSUMES ZERO DIVERGENCE
 
             if (psc>=0.)
               {
-                //On ne fait rien car on en a deja tenu compte dans l'operateur centre
+                //Do nothing because this is already accounted for in the centered operator
               }
             else
               for (int dim=0; dim<nb_comp; dim++)
                 {
-                  //On modifie car on a tenu compte dans l'operateur centre de psc*tansporteV[ligne]
+                  //Modify because the centered operator already accounts for psc*transporteV[ligne]
                   int ligne=facei*nb_comp+dim;
                   //PL: Wow, fix a bug, ind_face and not facei !
                   //All use of val_ext() in the code has the same mistake !
@@ -983,15 +983,15 @@ Op_Conv_Muscl_New_VEF_Face::ajouter_operateur_centre(const DoubleTab& tab_Kij, c
                   resuV[ligne]+=psc*(val_ext(ind_face,dim)-transporteV[ligne]);
                 }
 
-          });//fin du for sur "face_i"
+          });//end of for on "face_i"
           end_gpu_timer(__KERNEL_NAME__);
 
-        }//fin du if sur "Neumann"
+        }//end of if on "Neumann"
 
-    }//fin du for sur "n_bord"
+    }//end of for on "n_bord"
 
 
-  //Retour du resultat
+  //Return the result
   return tab_resu;
 }
 
@@ -1005,7 +1005,7 @@ Op_Conv_Muscl_New_VEF_Face::ajouter_diffusion(const DoubleTab& tab_Kij,const Dou
   int nb_comp=1;
   if (tab_transporte.nb_dim()!=1) nb_comp=tab_transporte.dimension(1);
   double alpha = alpha_;
-  //Pour les faces internes
+  //For internal faces
   CIntTabView KEL=domaine_VEF.type_elem().KEL().view_ro();
   CIntTabView elem_faces=domaine_VEF.elem_faces().view_ro();
   CDoubleTabView3 Kij = tab_Kij.view_ro<3>();
@@ -1048,10 +1048,10 @@ Op_Conv_Muscl_New_VEF_Face::ajouter_diffusion(const DoubleTab& tab_Kij,const Dou
   });
   end_gpu_timer(__KERNEL_NAME__);
 
-  //Pour les faces de bord :
-  //ON N'A RIEN a FAIRE
+  //For boundary faces:
+  //NOTHING TO DO
 
-  //Retour du resultat
+  //Return the result
   return tab_resu;
 }
 
@@ -1089,7 +1089,7 @@ Op_Conv_Muscl_New_VEF_Face::ajouter_antidiffusion_v2(const DoubleTab& tab_Kij, c
   if (tab_transporte.nb_dim()!=1) nb_comp=tab_transporte.dimension(1);
 
   double alpha = alpha_;
-  //Pour les faces internes
+  //For internal faces
   CIntTabView KEL=domaine_VEF.type_elem().KEL().view_ro();
   CIntTabView elem_faces=domaine_VEF.elem_faces().view_ro();
   CDoubleArrView transporteV = static_cast<const DoubleVect&>(tab_transporte).view_ro();
@@ -1133,7 +1133,7 @@ Op_Conv_Muscl_New_VEF_Face::ajouter_antidiffusion_v2(const DoubleTab& tab_Kij, c
           double fji_low = fij_low;
 
           double R;
-          if (kij >= 0.) //facei amont
+          if (kij >= 0.) //facei is upwind
             {
               if (fij >= 0.) R = (std::fabs(P_plus) < DMINFLOAT) ? 0. : Q_plus / P_plus;
               else R = (std::fabs(P_moins) < DMINFLOAT) ? 0. : Q_moins / P_moins;
@@ -1151,7 +1151,7 @@ Op_Conv_Muscl_New_VEF_Face::ajouter_antidiffusion_v2(const DoubleTab& tab_Kij, c
               Kokkos::atomic_add(&resuV[ligne], tmp);
               Kokkos::atomic_sub(&resuV[colonne], tmp);
             }
-          else     //facej amont
+          else     //facej is upwind
             {
               if (fji <= 0.) R = (std::fabs(P_moins) < DMINFLOAT) ? 0. : Q_moins / P_moins;
               else R = (std::fabs(P_plus) < DMINFLOAT) ? 0. : Q_plus / P_plus;
@@ -1172,11 +1172,11 @@ Op_Conv_Muscl_New_VEF_Face::ajouter_antidiffusion_v2(const DoubleTab& tab_Kij, c
   });
   end_gpu_timer(__KERNEL_NAME__);
 
-  //Pour les faces de bord
-  //IL N'Y A RIEN a FAIRE TOUT EST FAIT DANS LA FONCTION AJOUTER_DIFFUSION
-  //QUI EST PARFAITEMENT COMPLeTER PAR LA FONCTION AJOUTER_ANTIDIFFUSION
+  //For boundary faces
+  //NOTHING TO DO, EVERYTHING IS DONE IN THE AJOUTER_DIFFUSION FUNCTION
+  //WHICH IS PERFECTLY COMPLEMENTED BY THE AJOUTER_ANTIDIFFUSION FUNCTION
 
-  //Retour du resultat
+  //Return the result
   return tab_resu;
 }
 
@@ -1191,7 +1191,7 @@ Op_Conv_Muscl_New_VEF_Face::ajouter_antidiffusion_v1(const DoubleTab& tab_Kij, c
   if (tab_transporte.nb_dim()!=1) nb_comp=tab_transporte.dimension(1);
 
   double alpha = alpha_;
-  //Pour les faces internes
+  //For internal faces
   CIntTabView KEL=domaine_VEF.type_elem().KEL().view_ro();
   CIntTabView elem_faces=domaine_VEF.elem_faces().view_ro();
   CDoubleArrView transporteV = static_cast<const DoubleVect&>(tab_transporte).view_ro();
@@ -1239,22 +1239,22 @@ Op_Conv_Muscl_New_VEF_Face::ajouter_antidiffusion_v1(const DoubleTab& tab_Kij, c
           if (kij >= 0.)
             {
               double Ri, Rj;
-              //Face amont : facei
+              //Upwind face: facei
               if (fij >= 0.)
                 {
                   Ri = (std::fabs(Pi_plus) < DMINFLOAT) ? 0. : Qi_plus / Pi_plus;
                   Rj = (std::fabs(Pj_moins) < DMINFLOAT) ? 0. : Qj_moins /
-                       Pj_moins;//car fji=-fij
+                       Pj_moins;//since fji=-fij
                 }
               else
                 {
                   Ri = (std::fabs(Pi_moins) < DMINFLOAT) ? 0. : Qi_moins / Pi_moins;
                   Rj = (std::fabs(Pj_plus) < DMINFLOAT) ? 0. : Qj_plus /
-                       Pj_plus;//car fji=-fij
+                       Pj_plus;//since fji=-fij
                 }
 
               if (is_dirichlet_faces(facej))
-                Rj = DMAXFLOAT;//on n'a pas besoin de prendre le min quand il y a une face de Dirichlet
+                Rj = DMAXFLOAT;//no need to take the min when there is a Dirichlet face
               double R = (Ri <= Rj) ? Ri : Rj;
               R = minmod(R);
 
@@ -1265,7 +1265,7 @@ Op_Conv_Muscl_New_VEF_Face::ajouter_antidiffusion_v1(const DoubleTab& tab_Kij, c
           else
             {
               double Ri, Rj;
-              //Face amont : facej
+              //Upwind face: facej
               if (fji <= 0.)
                 {
                   Rj = (std::fabs(Pj_moins) < DMINFLOAT) ? 0. : Qj_moins / Pj_moins;
@@ -1278,7 +1278,7 @@ Op_Conv_Muscl_New_VEF_Face::ajouter_antidiffusion_v1(const DoubleTab& tab_Kij, c
                 }
 
               if (is_dirichlet_faces(facei))
-                Ri = DMAXFLOAT;//on n'a pas besoin de prendre le min quand il y a une face de Dirichlet
+                Ri = DMAXFLOAT;//no need to take the min when there is a Dirichlet face
               double R = (Ri <= Rj) ? Ri : Rj;
               R = minmod(R);
 
@@ -1290,16 +1290,16 @@ Op_Conv_Muscl_New_VEF_Face::ajouter_antidiffusion_v1(const DoubleTab& tab_Kij, c
   });
   end_gpu_timer(__KERNEL_NAME__);
 
-  //Pour les faces de bord
-  //IL N'Y A RIEN a FAIRE TOUT EST FAIT DANS LA FONCTION AJOUTER_DIFFUSION
-  //QUI EST PARFAITEMENT COMPLeTER PAR LA FONCTION AJOUTER_ANTIDIFFUSION
+  //For boundary faces
+  //NOTHING TO DO, EVERYTHING IS DONE IN THE AJOUTER_DIFFUSION FUNCTION
+  //WHICH IS PERFECTLY COMPLEMENTED BY THE AJOUTER_ANTIDIFFUSION FUNCTION
 
-  //Retour du resultat
+  //Return the result
   //     resuV+=antidiff;
   return tab_resu;
 }
 
-//ATTENTION : suppose les parametres P_plus, P_moins, Q_plus, Q_moins nuls en entree
+//WARNING: assumes the parameters P_plus, P_moins, Q_plus, Q_moins are zero on entry
 KOKKOS_INLINE_FUNCTION void
 Op_Conv_Muscl_New_VEF_Face::calculer_senseur(CDoubleTabView3 Kij, CDoubleTabView4 Fij, CDoubleArrView transporteV,
                                              const int dim, const int nb_comp, const int face_i,
@@ -1318,13 +1318,13 @@ Op_Conv_Muscl_New_VEF_Face::calculer_senseur(CDoubleTabView3 Kij, CDoubleTabView
           assert(face_i_loc>=0);
           assert(face_i_loc<nb_faces_elem);
 #endif
-          //On travaille sur les faces de "elem"
+          //Work on the faces of "elem"
           for (int face_k_loc=0; face_k_loc<nb_faces_elem; face_k_loc++)
             {
               int face_k=elem_faces(elem,face_k_loc);
               double kik=Kij(elem,face_i_loc,face_k_loc);
               //
-              //Calcul des variables intermediaires
+              //Compute the intermediate variables
               //
               double inci=transporteV[face_i*nb_comp+dim];
               double inck=transporteV[face_k*nb_comp+dim];
@@ -1350,11 +1350,11 @@ Op_Conv_Muscl_New_VEF_Face::calculer_senseur(CDoubleTabView3 Kij, CDoubleTabView
               assert(Q_moins<=0);
 #endif
               //
-              //Fin du calcul des variables intermediaires
+              //End of intermediate variable computation
               //
-            }//fin du for sur "face_k_loc"
-        }//fin du if sur "elem!=-1"
-    }//fin du for sur "elem_voisin"
+            }//end of for on "face_k_loc"
+        }//end of if on "elem!=-1"
+    }//end of for on "elem_voisin"
 }
 
 void Op_Conv_Muscl_New_VEF_Face::mettre_a_jour_pour_periodicite(const DoubleTab& Kij, const DoubleTab& transporte, DoubleTab& tab_resu) const
@@ -1364,7 +1364,7 @@ void Op_Conv_Muscl_New_VEF_Face::mettre_a_jour_pour_periodicite(const DoubleTab&
   const int nb_bord = domaine_Cl_VEF.nb_cond_lim();
   const int nb_comp = (tab_resu.nb_dim()==1) ? 1 : tab_resu.dimension(1);
 
-  //Faces de bord
+  //Boundary faces
   int old_centered = old_centered_;
   for (int n_bord=0; n_bord<nb_bord; n_bord++)
     {
@@ -1400,14 +1400,14 @@ void Op_Conv_Muscl_New_VEF_Face::mettre_a_jour_pour_periodicite(const DoubleTab&
             /*
                           if (old_centered)
                             {
-                              //Pour le 1er element voisin
+                              //For the 1st neighboring element
                               int elem=face_voisins(facei,0);
                               //facei_loc=-1;
                               int facei_loc=num_fac_loc(facei,0);
                               assert(facei_loc!=-1);
                               double kii=Kij(elem,facei_loc,facei_loc);
 
-                              //Pour le 2eme element voisin
+                              //For the 2nd neighboring element
                               elem=face_voisins(facei,1);
                               //facei_loc=-1;
                               facei_loc=num_fac_loc(facei,1);
@@ -1425,19 +1425,19 @@ void Op_Conv_Muscl_New_VEF_Face::mettre_a_jour_pour_periodicite(const DoubleTab&
                                 }
                             } */
 
-          });//fin du for sur "face_i"
+          });//end of for on "face_i"
           end_gpu_timer(__KERNEL_NAME__);
-        }//fin du if sur "Periodique"
+        }//end of if on "Periodique"
 
-    }//fin du for sur "n_bord"
+    }//end of for on "n_bord"
 }
 
-//Fonction qui initialise les attributs "elem_nb_faces_dirichlet_"
-//et "elem_faces_dirichlet_"
-//REMARQUE : "elem_nb_faces_dirichlet_" contient le nombre de faces de Dirichlet
-//pour chaque element du maillage
-//REMARQUE : "elem_faces_dirichlet_" le numero global des faces de Dirichlet
-//contenu dans un element quelconque du maillage
+//Function that initializes the attributes "elem_nb_faces_dirichlet_"
+//and "elem_faces_dirichlet_"
+//NOTE: "elem_nb_faces_dirichlet_" contains the number of Dirichlet faces
+//for each element of the mesh
+//NOTE: "elem_faces_dirichlet_" contains the global indices of Dirichlet faces
+//belonging to any element of the mesh
 void Op_Conv_Muscl_New_VEF_Face::calculer_data_pour_dirichlet()
 {
   const Domaine_VEF& domaine_VEF = le_dom_vef.valeur();
@@ -1452,8 +1452,8 @@ void Op_Conv_Muscl_New_VEF_Face::calculer_data_pour_dirichlet()
   const int nb_som_faces = domaine_VEF.nb_som_face();
   const int nb_som_elem = domaine_VEF.domaine().nb_som_elem();
 
-  //On rajoute un flag aux elements qui ont au moins un sommet qui appartient
-  //une face de Dirichlet ou Dirichlet_homogene
+  //Add a flag to elements that have at least one vertex belonging to
+  //a Dirichlet or Dirichlet_homogene face
   if (old_centered_)
     {
       is_element_for_upwinding_.resize(nb_elem_tot);

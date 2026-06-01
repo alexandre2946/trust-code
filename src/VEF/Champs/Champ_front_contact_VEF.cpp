@@ -35,8 +35,8 @@
 #include <SFichier.h>
 #include <Domaine.h>
 
-// WEC : Attention. D'autres tableaux que le champ_front meriteraient davoir plusieurs valeurs temporelles !
-// En particulier les gradients...
+// WEC : Warning. Other arrays besides the champ_front would benefit from having multiple time values!
+// In particular the gradients...
 
 Implemente_instanciable(Champ_front_contact_VEF,"Champ_front_contact_VEF",Ch_front_var_instationnaire_dep);
 
@@ -56,7 +56,7 @@ Entree& Champ_front_contact_VEF::readOn(Entree& is)
   Cerr << "Champ_front_contact_VEF::readOn : " << nom_pb1 << " " << nom_bord1 << " " << nom_inco << finl;
   Cerr << "      connecte a                : " << nom_pb2 << " " << nom_bord2 << " " << nom_inco << finl;
 
-  fixer_nb_comp(1); // prevu pour la temperature.
+  fixer_nb_comp(1); // intended for temperature.
   if (Process::is_parallel())
     connect_est_remplit = 1;
   else
@@ -70,10 +70,10 @@ int Champ_front_contact_VEF::initialiser(double temps, const Champ_Inc_base& inc
   if (!Ch_front_var_instationnaire_dep::initialiser(temps,inco))
     return 0;
 
-  // WEC : code repris de calculer_coeffs_echange qui faisait des
-  // iniialisations au premier pas de temps.
+  // WEC : code taken from calculer_coeffs_echange which performed
+  // initializations at the first time step.
 
-  // XXX : On rempli les valeurs ici et pas dans le readOn car le milieu de pb2 ets pas encore lu !!!
+  // XXX : We fill the values here and not in readOn because the medium of pb2 is not yet read !!!
   creer(nom_pb1, nom_bord1, nom_pb2, nom_bord2, "temperature");
   remplir_elems_voisin_bord();
 
@@ -98,22 +98,22 @@ int Champ_front_contact_VEF::initialiser(double temps, const Champ_Inc_base& inc
       raccord_distant.initialise(frontiere_locale, domaine_dis_locale, domaine_dis_opposee);
     }
 
-  // remplissage du tableau de connectivite des numeros de faces de bord
-  // entre les deux problemes couples.
+  // filling the connectivity array of boundary face indices
+  // between the two coupled problems.
   if (connect_est_remplit==0)
     {
       remplir_connect_bords();
       connect_est_remplit = 1;
-      //Les elems_voisin_bord_ ont ete remplis pour chaque frontiere portant un Champ_Front_contact_VEF
-      //On peut remplir faces_coin
+      //The elems_voisin_bord_ have been filled for each boundary carrying a Champ_Front_contact_VEF
+      //We can now fill faces_coin
       remplir_faces_coin();
     }
   verification_faces_coin=0;
 
-  // On initialise les references au ch_fr_autre_pb et fr_vf_autre_pb
+  // Initialize the references to ch_fr_autre_pb and fr_vf_autre_pb
   associer_front_vf_et_ch_front_autre_pb();
 
-  // Dimensionnement des tableaux
+  // Array sizing
   int nb_faces=frontiere_dis().frontiere().nb_faces();
   gradient_num_transf.resize(nb_faces);
   gradient_fro_transf.resize(nb_faces);
@@ -123,16 +123,16 @@ int Champ_front_contact_VEF::initialiser(double temps, const Champ_Inc_base& inc
   coeff_amort_num.resize(nb_faces);
   coeff_amort_denum.resize(nb_faces);
 
-  // Est-on dans le probleme conduction ?
-  // (utilise en rayo trans et semi_transp => factorisation)
+  // Are we in a conduction problem?
+  // (used in rayo trans and semi_transp => factorization)
   const Probleme_base& pb = l_inconnue1->equation().probleme();
   if (sub_type(Pb_Conduction,pb))
     is_conduction=1;
   else
     is_conduction=0;
 
-  // Initialisation des tableaux de gradients
-  calculer_coeffs_echange(temps); // sur instant present
+  // Initialization of gradient arrays
+  calculer_coeffs_echange(temps); // at the current time
   return 1;
 }
 
@@ -187,8 +187,8 @@ Champ_front_base& Champ_front_contact_VEF::affecter_(const Champ_front_base& ch)
 
 void Champ_front_contact_VEF::calcul_grads_transf(double temps)
 {
-  // Dans le cas de raccords homogenes, c'est a dire parfaitement coincidents
-  // au niveau du maillage, gradient_num_local = gradient_num_transf et
+  // In the case of homogeneous matching boundaries, i.e. perfectly coincident
+  // at the mesh level, gradient_num_local = gradient_num_transf and
   // gradient_fro_local = gradient_fro_transf
 
   gradient_num_transf.copy_array(gradient_num_local);
@@ -197,7 +197,7 @@ void Champ_front_contact_VEF::calcul_grads_transf(double temps)
 
 void Champ_front_contact_VEF::calcul_grads_locaux(double temps)
 {
-  // collection information problem local
+  // collect information from the local problem
   nom_bord = nom_bord1;
   associer_ch_inc_base(l_inconnue1.valeur());
   const Champ_Inc_base& inco = l_inconnue.valeur();
@@ -218,7 +218,7 @@ void Champ_front_contact_VEF::calcul_grads_locaux(double temps)
 
   DoubleTab coeff_lam, coeff_turb;
 
-  // diffusivite laminaire (lambda ou D)
+  // laminar diffusivity (lambda or D)
   if (!sub_type(Convection_Diffusion_Concentration, inco.equation()))
     coeff_lam = le_milieu.conductivite().valeurs();
   else
@@ -239,12 +239,12 @@ void Champ_front_contact_VEF::calcul_grads_locaux(double temps)
           ind_loi_paroi = 1;
           d_equiv.resize(nb_faces);
 
-          // Recherche du bord correspondant
+          // Search for the corresponding boundary
           int i_bord = -1;
           for (int n_bord = 0; n_bord < le_dom_dis.domaine().nb_front_Cl(); n_bord++)
             if (le_dom_dis.front_VF(n_bord).le_nom() == la_front_vf.le_nom())
               i_bord = n_bord;
-          // Copie des donnees d'un bord dans les tableaux locaux temporaires positions_Pf et d_equiv
+          // Copy data from a boundary into the temporary local arrays positions_Pf and d_equiv
           for (int ind_face = 0; ind_face < nb_faces; ind_face++)
             d_equiv(ind_face) = loipar.equivalent_distance(i_bord, ind_face);
         }
@@ -267,25 +267,25 @@ void Champ_front_contact_VEF::calcul_grads_locaux(double temps)
       if (num < 0)
         num = face_voisins(fac_glob, 1);
 
-      // normale unitaire a la face
+      // unit normal to the face
       double ratio = 0.;
       for (int i = 0; i < dimension; i++)
         ratio += (face_normales(fac_glob, i) * face_normales(fac_glob, i));
       ratio = sqrt(ratio);
 
 
-      // conductivite/diffusivite effective k_eff = n^T K n
+      // effective conductivity/diffusivity k_eff = n^T K n
       double k_eff = 0.;
 
-      int e_idx = 0; // index d’elem
+      int e_idx = 0; // element index
       if (nd >= 1)
         e_idx = is_uniforme ? 0 : num;
 
-      if (nd == 1) // scalaire par maille OU champ_uniforme
+      if (nd == 1) // scalar per cell OR uniform field
         k_eff = coeff_lam(e_idx);
       else if (nd == 2)
         {
-          // XXX Elie Saikali : faut faire qlq chose si l'op de diff est aniso ...
+          // XXX Elie Saikali : need to do something if the diffusion operator is anisotropic ...
           DoubleTrav n(dimension);
           for (int i = 0; i < dimension; i++)
             n[i] = face_normales(fac_glob, i) / ratio;
@@ -309,7 +309,7 @@ void Champ_front_contact_VEF::calcul_grads_locaux(double temps)
                   }
             }
           else
-            k_eff = coeff_lam(e_idx, 0); // XXX comme avant lol
+            k_eff = coeff_lam(e_idx, 0); // XXX same as before
         }
       else if (nd == 3)
         {
@@ -328,12 +328,12 @@ void Champ_front_contact_VEF::calcul_grads_locaux(double temps)
       if (mod)
         k_eff += coeff_turb(num);
 
-      //Calcul de la temperature moyenne dans la maille
+      //Computation of the average temperature in the cell
       surface_face = le_dom_dis.face_surfaces(fac_glob);
       for (int i = 0; i < nb_faces_elem; i++)
         {
-          // On ne tient pas compte de la temperature de paroi
-          // pour calculer la temperature moyenne dans la maille.
+          // The wall temperature is not taken into account
+          // when computing the average temperature in the cell.
           const int j = elem_faces(num, i);
           if (j != fac_glob)
             {
@@ -344,7 +344,7 @@ void Champ_front_contact_VEF::calcul_grads_locaux(double temps)
             }
         }
 
-      // contributions num/fro
+      // num/fro contributions
       for (int fac = 0; fac < dimension + 1; fac++)
         for (int i = 0; i < dimension; i++)
           {
@@ -359,7 +359,7 @@ void Champ_front_contact_VEF::calcul_grads_locaux(double temps)
       gradient_num_local(fac_front) *= (k_eff / vol(num));
       gradient_fro_local(fac_front) *= (k_eff / vol(num));
 
-      // loi de paroi avec distance équivalente
+      // wall law with equivalent distance
       if (ind_loi_paroi == 1)
         {
           gradient_num_local(fac_front) = 0.;
@@ -400,22 +400,22 @@ void Champ_front_contact_VEF::mettre_a_jour(double temps )
   //
   //  gradient_fro_ h
   //  gradient_num_ -h*T
-  // Calcul de la temperature imposee
+  // Computation of the imposed temperature
   for (int fac_front=0; fac_front<nb_faces; fac_front++)
     {
       tab(fac_front,0)= -(gradient_num_local(fac_front) + gradient_num_transf_autre_pb(fac_front))
                         / ( gradient_fro_transf_autre_pb(fac_front) + gradient_fro_local(fac_front)) ;
     }
-  // Verification de la coherence des temperatures de bord calculees
+  // Verification of the consistency of the computed boundary temperatures
   //verifier_scalaire_bord();
 }
 
 
 void Champ_front_contact_VEF::verifier_scalaire_bord(double temps)
 {
-  // Cette methode a pour but de verifier que la temperature de bord calculee pour chaque
-  // face num_face est bien comprise entre les temperatures moyennes sur les elements entourant
-  // num_face dans chaque milieu.
+  // This method verifies that the computed boundary temperature for each
+  // face num_face lies between the average temperatures of the surrounding elements
+  // in each medium.
   const Frontiere& la_front=la_frontiere_dis->frontiere();
   int nb_faces=la_front.nb_faces();
 
@@ -424,7 +424,7 @@ void Champ_front_contact_VEF::verifier_scalaire_bord(double temps)
 
   DoubleTab& tab=valeurs_au_temps(temps);
 
-  // Verification sur les temperatures
+  // Verification of temperatures
   for (int fac_front=0; fac_front<nb_faces; fac_front++)
     {
       if (Scal_moy(fac_front) > Scal_moy_autre_pb(fac_front))
@@ -473,7 +473,7 @@ void Champ_front_contact_VEF::verifier_scalaire_bord(double temps)
 
 void Champ_front_contact_VEF::calculer_coeffs_echange(double temps)
 {
-  // Calcul de la temperature imposee
+  // Computation of the imposed temperature
   calcul_grads_locaux(temps);
   calcul_grads_transf(temps);
 }
@@ -546,7 +546,7 @@ void Champ_front_contact_VEF::calcul_coeff_amort()
       int num = face_voisins(fac,0);
       if (num < 0) num = face_voisins(fac,1);
 
-      // calcul de la surface de la face courante
+      // compute the area of the current face
       double ratio = 0.;
       for (int i=0; i<dimension; i++) ratio += (face_normales(fac,i) * face_normales(fac,i));
       ratio = sqrt(ratio);
@@ -601,21 +601,21 @@ void Champ_front_contact_VEF::associer_front_vf_et_ch_front_autre_pb()
 
 DoubleVect& Champ_front_contact_VEF::trace_face_raccord(const Front_VF& fr_vf,const DoubleVect& y,DoubleVect& x)
 {
-  // On verifie que la frontiere est de type Raccord_distant_homogene
+  // Verify that the boundary is of type Raccord_distant_homogene
   if (sub_type(Raccord_distant_homogene,fr_vf.frontiere()))
     fr_vf.frontiere().trace_face_distant(y,x);
   else
     {
       if (Process::is_parallel())
         {
-          // On teste si on a bien un raccord distant homogene car sinon le tableau connect n'est pas rempli en parallele
-          // En effet remplir_connect_bords n'est fait qu'en sequentiel
+          // Test that we have a homogeneous remote matching boundary, otherwise the connect array is not filled in parallel
+          // Indeed, remplir_connect_bords is only done sequentially
           Cerr << "The boundary named " << fr_vf.frontiere().le_nom() << " is not a 'Raccord Distant Homogene'" << finl;
           Cerr << "Use keyword modif_bord_to_raccord to change the boundary of kind Paroi into a boundary of kind Raccord" << finl;
           Cerr << "after you read the meshes during the partitioning." << finl;
           exit();
         }
-      // On traite un raccord local
+      // Treating a local matching boundary
       int nb_fac_front=x.size();
       for(int fac_front=0; fac_front<nb_fac_front; fac_front++)
         x(fac_front) = y(connect_bords(fac_front));
@@ -627,15 +627,14 @@ DoubleVect& Champ_front_contact_VEF::trace_face_raccord(const Front_VF& fr_vf,co
 
 void Champ_front_contact_VEF::remplir_connect_bords()
 {
-  // Par convention, les grandeurs notees sans indice ainsi que celle notees
-  // avec un indice 1 correspondent au probleme courant, celle notees avec
-  // un indice 2 correspondent aux grandeurs du probleme couple avec le probleme
-  // courant
+  // By convention, quantities without index as well as those with index 1
+  // correspond to the current problem, while those with index 2
+  // correspond to the quantities of the problem coupled with the current problem.
   const Frontiere& la_front = la_frontiere_dis->frontiere();
   int nb_faces = la_front.nb_faces();
 
   //
-  // collection des informations du probleme 1
+  // collect information from problem 1
   //
   nom_bord = nom_bord1 ;
   associer_ch_inc_base(l_inconnue1.valeur()) ;
@@ -653,7 +652,7 @@ void Champ_front_contact_VEF::remplir_connect_bords()
   int ndeb1 = la_front_vf1.num_premiere_face();
 
   //
-  // collection des informations du probleme 2
+  // collect information from problem 2
   //
   nom_bord = nom_bord2 ;
   associer_ch_inc_base(l_inconnue2.valeur()) ;
@@ -666,8 +665,8 @@ void Champ_front_contact_VEF::remplir_connect_bords()
   const DoubleTab& xv2 = le_dom_dis2.xv();
   int ndeb2 = la_front_vf2.num_premiere_face();
 
-  // On verifie que les numerotations des faces sur ce bord sont bien compatibles
-  // pour les deux problemes consideres.
+  // Verify that the face numberings on this boundary are compatible
+  // for both considered problems.
   int i,j,k,temoin,temoin_tot;
 
   double erreur = 0.;
@@ -676,17 +675,17 @@ void Champ_front_contact_VEF::remplir_connect_bords()
     if (std::fabs(xv1(ndeb1,ii) - xv1(ndeb1+nb_faces,ii)) > erreur )
       erreur = std::fabs(xv1(ndeb1,ii) - xv1(ndeb1+nb_faces,ii));
   //
-  // L'erreur est 1.e-5 fois la distance maximale entre deux faces de bord
+  // The error tolerance is 1.e-5 times the maximum distance between two boundary faces
   erreur *=1.e-5;
 
-  //GF la reference pour calculer l'erreur ne correspondait a rien
-  // distance entre la premiere face du bord et la face apres le bord ?????
+  //GF the reference for computing the error did not correspond to anything meaningful
+  // distance between the first face of the boundary and the face after the boundary?????
 
 
 
 
-  // Version PAT
-  // erreur = Objet_U::precision_geom
+  // PAT version
+  // error = Objet_U::precision_geom
   connect_bords.resize(nb_faces);
 
   //assert(la_front_vf2.nb_faces()==la_front_vf1.nb_faces());
@@ -735,17 +734,17 @@ void Champ_front_contact_VEF::remplir_connect_bords()
 
 
 
-  // PQ : 03/03 : redefinition du tableau de connectivite
-  // processus "optimise" et applicable a tout type de configuration
+  // PQ : 03/03 : redefinition of the connectivity array
+  // "optimized" process applicable to any configuration type
 
   temoin_tot=0;
 
   for (i=0; i<nb_faces; i++)
     {
 
-      // on redefinit erreur pour chaque face comme etant:
-      // on cherche l'elt associe a la face, on calcule le min du centre
-      // de gravite de l'elem a ses faces -> d1
+      // redefine the error for each face as:
+      // find the element associated to the face, compute the min distance from the element centroid
+      // to its faces -> d1
       // d1*1e-2
       int elem_voisin=face_voisin(ndeb1+i,0);
       if (elem_voisin==-1)
@@ -764,12 +763,12 @@ void Champ_front_contact_VEF::remplir_connect_bords()
       temoin=0;
       for (j=i; j<nb_faces; j++)
         {
-          // O.C. : dimension plutot que dim1 dans la boucle suivante :
+          // O.C. : use dimension rather than dim1 in the following loop:
           //          for (k=0 ; k<dim1 ; k++)
           for (k=0 ; k<dimension ; k++)
             if (std::fabs(xv1(ndeb1+i,k) - xv2(ndeb2+j,k)) > erreur) break;
-          // Si on a passe le test ci-dessus, c'est que les dim coordonnees de la face
-          // sont les memes (d == dim)
+          // If the above test is passed, then the dim coordinates of the face
+          // are the same (d == dim)
           if (k==dimension)
             {
 
@@ -795,8 +794,8 @@ void Champ_front_contact_VEF::remplir_connect_bords()
             for (k=0 ; k<dimension ; k++)
               if (std::fabs(xv1(ndeb1+i,k) - xv2(ndeb2+j,k)) > erreur) break;
 
-            // Si on a passe le test ci-dessus, c'est que les dim coordonnees de la face
-            // sont les memes (d == dim)
+            // If the above test is passed, then the dim coordinates of the face
+            // are the same (d == dim)
             if (k==dimension)
               {
                 /**  if (j==1)
@@ -831,7 +830,7 @@ void Champ_front_contact_VEF::remplir_connect_bords()
       Cerr<<" Process stopped at Champ_front_contact_VEF::remplir_connect_bords() "<<finl;
       exit();
     }
-  // on verifie que l'on a bien cree une bijection
+  // Verify that a proper bijection has been created
   ArrOfInt inv_connect_bords;
   inv_connect_bords.resize_array(nb_faces, RESIZE_OPTIONS::NOCOPY_NOINIT);
   inv_connect_bords=-1;
@@ -856,7 +855,7 @@ void Champ_front_contact_VEF::remplir_faces_coin()
   int size = elems_voisin_bord_.size();
   int elem_vois, elem_vois_autre_fr;
 
-  //Parcours des faces de la frontiere
+  // Loop over the boundary faces
 
   int elem_vois_face_1, elem_vois_face_2;
   faces_coin.resize(size);
@@ -876,8 +875,8 @@ void Champ_front_contact_VEF::remplir_faces_coin()
         }
     }
 
-  //On tient compte ensuite des faces appaartenant a d autres fontieres
-  //pouvant appartenir a un element coin
+  // Also account for faces belonging to other boundaries
+  // that may belong to a corner element
 
   for (int num_cl=0; num_cl<size_cl; num_cl++)
     {
@@ -988,11 +987,11 @@ void Champ_front_contact_VEF::connectivity_failed(const Domaine_VEF& zvef1, int&
 
   const DoubleTab& xv1  = zvef1.xv();
 
-  int nbf = dimension+1; // nombre de faces par element
+  int nbf = dimension+1; // number of faces per element
   int fac,elem,face1,face2,elem2,trouve;
   int j;
 
-  // Creation du champ P0
+  // Create the P0 field
 
   Champ_Fonc_P0_VEF chp;
   chp.associer_domaine_dis_base(zvef2);
@@ -1023,8 +1022,8 @@ void Champ_front_contact_VEF::connectivity_failed(const Domaine_VEF& zvef1, int&
     }
 
   /////////////////////////////////////////////////////////
-  // Ecriture du fichier Connectivity_failed pour decoupage
-  // a l'aide de l'interprete  Decouper_Bord_coincident
+  // Write the Connectivity_failed file for mesh splitting
+  // using the Decouper_Bord_coincident interpreter
   /////////////////////////////////////////////////////////
 
   SFichier fic(fichier);
@@ -1037,7 +1036,7 @@ void Champ_front_contact_VEF::connectivity_failed(const Domaine_VEF& zvef1, int&
       elem2=face_voisin2(face2,0);
       if (elem2==-1) elem2=face_voisin2(face2,1);
 
-      // recherche de l'indice locale de la face
+      // find the local index of the face
       trouve=0;
       for(j=0; j<nbf; j++)
         if(face2==elem_faces2(elem2,j))
@@ -1056,13 +1055,13 @@ void Champ_front_contact_VEF::connectivity_failed(const Domaine_VEF& zvef1, int&
     }
 
   fic <<(int) -1;
-  // pour forcer l ecriture
+  // force write to disk
   fic.close();
   /////////////////////////////////////////////////////////
-  // Ecriture du fichier MED pour decoupage suivant HOMARD
+  // Write the MED file for mesh splitting using HOMARD
   /////////////////////////////////////////////////////////
 
-  // renormalisation de chp_val
+  // renormalize chp_val
 
   for (elem=0; elem<nb_elem2; elem++)
     {

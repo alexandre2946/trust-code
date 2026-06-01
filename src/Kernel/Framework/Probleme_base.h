@@ -35,21 +35,21 @@ class EcrFicPartageBin;
 class Postraitement;
 class Field_base;
 
-/*! @brief classe Probleme_base C'est un Probleme_U qui n'est pas un couplage.
+/*! @brief class Probleme_base It is a Probleme_U that is not a coupling.
  *
- *      Le role d'un Probleme_base est la resolution sur un domaine des
- *      equations qui le compose.
- *      Ses membres sont les attributs et les methodes communs
- *      a toutes les classes qui representent des problemes.
- *      Un certains nombre d'objets sont associes au probleme pour
- *      le constituer:
- *        - 1 ou plusieurs equations: objet Equation
- *        - 1 Domaine discretise: objet Domaine_Dis
- *        - un postraitement: objet Postraitement
- *        - Une discretisation: objet Discretistaion
- *        - un schema en temps: objet Schema_temp
+ *      The role of a Probleme_base is the resolution on a domain of
+ *      the equations that compose it.
+ *      Its members are the attributes and the common methods
+ *      to all classes that represent problems.
+ *      A certain number of objects are associated with the problem to
+ *      constitute it:
+ *        - 1 or more equations: Equation object
+ *        - 1 discretized domain: Domaine_Dis object
+ *        - a post-processing: Postraitement object
+ *        - A discretization: Discretization object
+ *        - a time scheme: Schema_temp object
  *
- * @sa Probleme, Classe abstraite dont tous les problemes doivent deriver., Methodes abstraites:, int nombre_d_equations() const, const Equation_base& equation(int) const, Equation_base& equation(int)
+ * @sa Probleme, Abstract class from which all problems must derive., Abstract methods:, int nombre_d_equations() const, const Equation_base& equation(int) const, Equation_base& equation(int)
  */
 class Probleme_base : public Champs_compris_interface, public Probleme_U, public Probleme_base_interface_proto
 {
@@ -64,10 +64,10 @@ public:
   virtual const Equation_base& equation(int) const =0;
   virtual Equation_base& equation(int) =0;
 
-  // B.Mathieu: j'aurais voulu rendre ces deux methodes virtuelles, mais
-  //  alors il faut les surcharger dans tous les problemes (function ... hidden by ...)
-  // Rustine: je cree une methode virtuelle avec un autre nom.
-  // WEC : pour supprimer equation(Nom), il faudrait toucher a environ 40 classes...
+  // B.Mathieu: I would have liked to make these two methods virtual, but
+  //  then we have to override them in all problems (function ... hidden by ...)
+  // Workaround: I create a virtual method with another name.
+  // WEC : to remove equation(Nom), we would have to modify approximately 40 classes...
   const Equation_base& equation(const Nom&) const;
   Equation_base& equation(const Nom&);
   int sauvegarder(Sortie& ) const override;
@@ -85,9 +85,9 @@ public:
   virtual double calculer_pas_de_temps() const;
   virtual void mettre_a_jour(double temps) ;
   virtual void preparer_calcul() ;
-  virtual void imprimer(Sortie& os) const; // Appelle imprimer sur chaque equation
+  virtual void imprimer(Sortie& os) const; // Calls print on each equation
 
-  // Methodes d'acces aux membres prives.
+  // Methods for accessing private members.
   int associer_(Objet_U&) override;
   virtual void associer_sch_tps_base(const Schema_Temps_base&);
   virtual void associer_domaine(const Domaine&);
@@ -118,7 +118,7 @@ public:
   inline bool& reprise_effectuee() { return save_restart_.reprise_effectuee(); }
   inline bool reprise_effectuee() const { return save_restart_.reprise_effectuee(); }
 
-  //Methodes de l interface des champs postraitables
+  //Methods of the post-processable fields interface
   /////////////////////////////////////////////////////
   void creer_champ(const Motcle& motlu) override;
   const Champ_base& get_champ(const Motcle& nom) const override;
@@ -127,12 +127,12 @@ public:
   bool has_champ(const Motcle& nom) const override;
   /////////////////////////////////////////////////////
 
-  //Pour acceder a un champ de la liste portee pas le postraitement.
+  //To access a field from the list held by the post-processing.
   virtual const Champ_Generique_base& get_champ_post(const Motcle& nom) const;
   virtual bool has_champ_post(const Motcle& nom) const;
   virtual int comprend_champ_post(const Motcle& nom) const;
 
-  // Fonctions de recherche de IntTab pour le postraitement
+  // Search functions for IntTab for post-processing
   virtual int a_pour_IntVect(const Motcle&, OBS_PTR(IntVect)& ) const;
   virtual void lire_postraitement_interfaces(Entree& is);
   virtual void postraiter_interfaces(const Nom& nom_fich, Sortie& s, const Nom& format, double temps);
@@ -150,7 +150,7 @@ public:
 
   //////////////////////////////////////////////////
   //                                              //
-  // Implementation de l'interface de Probleme_U  //
+  // Implementation of the Probleme_U interface   //
   //                                              //
   //////////////////////////////////////////////////
 
@@ -225,18 +225,18 @@ protected :
   OBS_PTR(Schema_Temps_base) le_schema_en_temps_;
   OBS_PTR(Discretisation_base) la_discretisation_;
   OBS_PTR(Probleme_Couple) pbc_;
-  mutable LIST(OBS_PTR(SFichier)) out_files_; // Liste des SFichier a fermer (.out)
+  mutable LIST(OBS_PTR(SFichier)) out_files_; // List of SFichier to close (.out)
   std::map<std::string, OWN_PTR(Correlation_base)> correlations_;
 
-  LIST(OBS_PTR(Loi_Fermeture_base)) liste_loi_fermeture_; // liste des fermetures associees au probleme
-  LIST(OBS_PTR(Champ_Parametrique)) Champs_Parametriques_; //Champs parametriques a mettre a jour lorsque le calcul courant est fini
-  LIST(OWN_PTR(Equation_base)) eq_opt_; //autres equations (turbulence, aire interfaciale...)
+  LIST(OBS_PTR(Loi_Fermeture_base)) liste_loi_fermeture_; // list of closure laws associated with the problem
+  LIST(OBS_PTR(Champ_Parametrique)) Champs_Parametriques_; //Parametric fields to update when the current computation is done
+  LIST(OWN_PTR(Equation_base)) eq_opt_; //other equations (turbulence, interfacial area...)
 };
 
-/*! @brief Renvoie la discretisation associee au probleme
+/*! @brief Returns the discretization associated with the problem.
  *
- * @return (Discretisation_base&) discretisation associee au probleme
- * @throws la discretisation n'est pas construite
+ * @return (Discretisation_base&) discretization associated with the problem
+ * @throws if the discretization has not been built
  */
 inline const Discretisation_base& Probleme_base::discretisation() const
 {

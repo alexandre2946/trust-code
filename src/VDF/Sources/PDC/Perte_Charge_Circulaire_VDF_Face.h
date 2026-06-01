@@ -18,23 +18,23 @@
 
 #include <Perte_Charge_VDF_base.h>
 
-//!  Perte de charge anisotrope (selon un vecteur unitaire v et dans le plan orthogonal a ce vecteur)
+//!  Anisotropic pressure drop (along a unit vector v and in the plane orthogonal to it)
 /**
-   Correspond a la somme d'une perte de charge d'intensite lambda dans
-   la direction de v, et d'une perte de charge d'intensite
-   lambda_ortho pour toute direction orthogonale a v.
+   Corresponds to the sum of a pressure drop of intensity lambda in
+   the direction of v, and a pressure drop of intensity
+   lambda_ortho for any direction orthogonal to v.
 
-   Ou de facon equivalente a la somme d'une perte de charge isotrope
-   d'intensite lambda_ortho, et d'une perte de charge directionnelle
-   de vecteur v et d'intensite lamba - lambda_ortho. C'est ainsi que
-   le calcul est code.
+   Or equivalently, the sum of an isotropic pressure drop of
+   intensity lambda_ortho, and a directional pressure drop
+   of vector v and intensity lambda - lambda_ortho. This is how
+   the computation is coded.
 
    du/dt =
    - lambda_ortho(Re,x,y,z,t) * u * ||u|| / 2 Dh
    - (lambda(Re,x,y,z,t)-lambda_ortho(Re,x,y,z,t))
    * u.v * v * ||u|| / 2 Dh ||v||^2
 
-   Lecture des arguments :
+   Reading arguments:
 
    Perte_Charge_Circulaire_VDF_Face diametre_hydraulique {
    lambda expression(Re,x,y,z,t)
@@ -60,7 +60,7 @@ public:
 protected:
   void set_param(Param& titi) const override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
-  //! Implemente le calcul effectif de la perte de charge pour un lieu donne
+  //! Implements the effective pressure loss computation for a given location
   void coeffs_perte_charge(const DoubleVect& u, const DoubleVect& pos, double t, double norme_u, double dh, double nu, double reynolds, double& coeff_ortho, double& coeff_long, double& u_l,
                            DoubleVect& v_valeur) const override;
 private:

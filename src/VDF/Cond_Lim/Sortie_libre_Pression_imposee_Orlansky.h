@@ -23,13 +23,12 @@ class Champ_Face_VDF;
 class Champ_P0_VDF;
 class Domaine_VDF;
 
-/*! @brief Sortie_libre_Pression_imposee_Orlansky
+/*! @brief class Sortie_libre_Pression_imposee_Orlansky
  *
- *  Cette classe derive de la classe Neumann_sortie_libre
- *
- *     Elle represente une frontiere ouverte avec condition de gradient de pression impose.
- *     L'objet de type OWN_PTR(Champ_front_base) le_champ_front contient le gradient impose. La fonction flux_impose() renvoie une valeur de pression
- *     a l'exterieur calculee a partir du gradient de pression impose et de la pression a l'interieur du domaine.
+ *   This class derives from Neumann_sortie_libre.
+ *   It represents an open boundary with an imposed pressure gradient condition.
+ *   The OWN_PTR(Champ_front_base) le_champ_front holds the imposed gradient. The flux_impose() function returns an external pressure
+ *   value computed from the imposed pressure gradient and the internal pressure of the domain.
  *
  */
 class Sortie_libre_Pression_imposee_Orlansky: public Neumann_sortie_libre

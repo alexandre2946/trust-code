@@ -80,7 +80,7 @@ Entree& Op_Diff_option_EF::readOn(Entree& s )
   return s ;
 }
 
-/*! @brief associe le champ de diffusivite
+/*! @brief Associates the diffusivity field.
  *
  */
 void Op_Diff_EF::associer_diffusivite(const Champ_base& diffu)
@@ -117,7 +117,7 @@ const Champ_base& Op_Diff_EF::diffusivite_volumique() const
 void Op_Diff_EF::remplir_nu(DoubleTab& nu) const
 {
   const Domaine_EF& domaine_EF = le_dom_EF.valeur();
-  // On dimensionne nu
+  // Size nu
   if (!nu.get_md_vector())
     domaine_EF.domaine().creer_tableau_elements(nu);
   const DoubleTab& diffu=diffusivite().valeurs();
@@ -199,7 +199,7 @@ void Op_Diff_EF::calculer_von_mises(const DoubleTab& deplacement, DoubleTab& def
 
         const double vol = volumes_thilde(elem);
         double inv_vol = 1.0 / vol;
-        // En RZ: Bij_thilde porte r, volumes_thilde porte 2π r ⇒ il faut remonter le facteur 2π
+        // In RZ: Bij_thilde carries r, volumes_thilde carries 2π r ⇒ the factor 2π must be accounted for
         for (int comp = 0; comp < dimension; comp++)
           for (int dir = 0; dir < dimension; dir++)
             grad[comp][dir] *= inv_vol;
@@ -370,7 +370,7 @@ DoubleTab& Op_Diff_EF::ajouter_new(const DoubleTab& tab_inconnue, DoubleTab& res
           }
       }
 
-  // on ajoute la contribution des bords
+  // add the contribution from boundaries
   ajouter_bords(tab_inconnue,resu);
   return resu;
 }
@@ -382,7 +382,7 @@ DoubleTab& Op_Diff_EF::calculer(const DoubleTab& tab_inconnue, DoubleTab& resu) 
 }
 
 /////////////////////////////////////////
-// Methode pour l'implicite
+// Method for the implicit scheme
 /////////////////////////////////////////
 
 // essai
@@ -414,9 +414,8 @@ void Op_Diff_EF::ajouter_contribution(const DoubleTab& transporte, Matrice_Morse
     {
       ajouter_contribution_new(transporte,matrice);
     }
-  // On remplit le tableau nu car l'assemblage d'une
-  // matrice avec ajouter_contribution peut se faire
-  // avant le premier pas de temps
+  // Fill the nu array because matrix assembly with ajouter_contribution
+  // can happen before the first time step
   remplir_nu(nu_);
 
   const int N = transporte.line_size();
@@ -557,9 +556,8 @@ void Op_Diff_EF::ajouter_contribution_diffusivite_volumique(int N, Matrice_Morse
 void Op_Diff_EF::ajouter_contribution_new(const DoubleTab& transporte, Matrice_Morse& matrice ) const
 {
   //Cerr<<" NEW"<<finl;
-  // On remplit le tableau nu car l'assemblage d'une
-  // matrice avec ajouter_contribution peut se faire
-  // avant le premier pas de temps
+  // Fill the nu array because matrix assembly with ajouter_contribution
+  // can happen before the first time step
   remplir_nu(nu_);
 
   const int N = transporte.line_size();
@@ -615,13 +613,13 @@ void Op_Diff_EF::contribuer_au_second_membre(DoubleTab& resu ) const
 }
 void Op_Diff_EF::ajouter_bords(const DoubleTab& tab_inconnue,DoubleTab& resu,  int contrib_interne ) const
 {
-  // a mettre dans calculer_flux_bord....
+  // to be moved to calculer_flux_bord....
 
   const Domaine_Cl_EF& domaine_Cl_EF = la_zcl_EF.valeur();
   const Domaine_EF& domaine_EF = le_dom_EF.valeur();
   flux_bords_=0.;
   // const DoubleTab& tab_inconnue=equation().inconnue().valeurs();
-  // on parcourt toutes les faces de bord et on calcule lambda*gradT
+  // iterate over all boundary faces and compute lambda*gradT
   const Domaine_EF& domaine_ef=ref_cast(Domaine_EF,equation().domaine_dis());
   const IntTab& face_voisins=domaine_ef.face_voisins();
   const DoubleTab& bij=domaine_ef.Bij();

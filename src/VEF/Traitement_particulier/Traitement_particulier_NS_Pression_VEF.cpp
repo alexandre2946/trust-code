@@ -153,7 +153,7 @@ void Traitement_particulier_NS_Pression_VEF::post_traitement_particulier_calcul_
 
   gradient.calculer(mon_equation->pression().valeurs(),gradP);
 
-  //on veut BM-1Bt(psi*Pression)
+  //we want BM-1Bt(psi*Pression)
   mon_equation->solv_masse().appliquer(gradP);
 
   for(i=0; i<nb_face; i++)
@@ -165,8 +165,8 @@ void Traitement_particulier_NS_Pression_VEF::post_traitement_particulier_calcul_
   //mon_equation->solv_masse().appliquer(grad_temp);
   divergence.calculer(grad_temp, secmem);
 
-  secmem *= -1; // car div =-B
-  // Correction du second membre d'apres les conditions aux limites :
+  secmem *= -1; // because div = -B
+  // Correction of the right-hand side according to the boundary conditions:
   mon_equation->assembleur_pression()->modifier_secmem(secmem);
 
   //solveur_pression_.resoudre_systeme(mon_equation->matrice_pression().valeur(),secmem, inc_pre,mon_equation->pression());

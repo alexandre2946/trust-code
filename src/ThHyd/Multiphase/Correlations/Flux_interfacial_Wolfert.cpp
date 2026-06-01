@@ -37,7 +37,7 @@ void Flux_interfacial_Wolfert::completer()
   Pb_Multiphase *pbm = sub_type(Pb_Multiphase, pb_.valeur()) ? &ref_cast(Pb_Multiphase, pb_.valeur()) : nullptr;
 
   if (!pbm || pbm->nb_phases() == 1) Process::exit(que_suis_je() + " : not needed for single-phase flow!");
-  for (int n = 0; n < pbm->nb_phases(); n++) //recherche de n_l, n_g : phase {liquide,gaz}_continu en priorite
+  for (int n = 0; n < pbm->nb_phases(); n++) //search for n_l, n_g: continuous {liquid,gas} phase with priority
     if (pbm->nom_phase(n).debute_par("liquide") && (n_l < 0 || pbm->nom_phase(n).finit_par("continu")))  n_l = n;
 
   if (n_l < 0) Process::exit(que_suis_je() + " : liquid phase not found!");
@@ -57,7 +57,7 @@ void Flux_interfacial_Wolfert::coeffs(const input_t& in, output_t& out) const
 
         double Nu = 12./M_PI*Ja  + 2/std::sqrt(M_PI)*(1+in.nut[n_l]*in.rho[n_l]*in.Cp[n_l]/in.lambda[n_l])*std::sqrt(Pe);
 
-        out.hi(n_l, k) = Nu * in.lambda[n_l] / in.d_bulles[k] * 6 * std::max(in.alpha[k], 1e-4) / in.d_bulles[k] ; // std::max() pour que le flux interfacial sont non nul
+        out.hi(n_l, k) = Nu * in.lambda[n_l] / in.d_bulles[k] * 6 * std::max(in.alpha[k], 1e-4) / in.d_bulles[k] ; // std::max() to ensure non-zero interfacial flux
         out.da_hi(n_l, k, k) = in.alpha[k] > 1e-4 ?
                                Nu * in.lambda[n_l] * 6. / (in.d_bulles[k]*in.d_bulles[k]) :
                                0. ;

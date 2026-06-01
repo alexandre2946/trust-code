@@ -26,18 +26,17 @@
 #include <Interprete.h>
 #include <Verif_Cl.h>
 
-/*! @brief classe Pb_Multiphase Cette classe represente un probleme de thermohydraulique multiphase de type "3*N equations" :
+/*! @brief Multiphase thermohydraulics problem of type "3*N equations":
  *
- *       - QDM_Multiphase : equations de Navier-Stokes et de continuite pour chaque phase
- *                          inconnues : v_k (vitesses par phase)
- *                          champs auxiliaires : pression p, taux de presence a_k (sum a_k = 1)
- *       - Energie_Multiphase : equations de conservation de l'energie pour chaque phase
- *                              inconnues : T_k (temperatures)
- *     schema de resolution typique :
- *       1) QDM_Multiphase -> prediction des vitesses
- *                            conservation de la masse -> Newton (etape "semi-implicite")
- *       3) Energie_Multiphase -> advection/dffusion implicite de l'energie
- *
+ *       - QDM_Multiphase : Navier-Stokes and continuity equations for each phase
+ *                          unknowns : v_k (per-phase velocities)
+ *                          auxiliary fields : pressure p, void fractions a_k (sum a_k = 1)
+ *       - Energie_Multiphase : energy conservation equations for each phase
+ *                              unknowns : T_k (temperatures)
+ *     Typical resolution scheme:
+ *       1) QDM_Multiphase -> velocity prediction
+ *                            mass conservation -> Newton (semi-implicit step)
+ *       2) Energie_Multiphase -> implicit advection/diffusion of energy
  *
  * @sa Pb_Fluide_base QDM_Multiphase Masse_Multiphase Energie_Multiphase
  */
@@ -55,7 +54,7 @@ public:
   int verifier() override;
   void preparer_calcul() override;
 
-  /* nombre de phases du probleme */
+  /* number of phases in the problem */
   int nb_phases() const { return noms_phases_.size(); }
   const Nom& nom_phase(int i) const { return noms_phases_[i]; }
   const Noms& noms_phases() const { return noms_phases_; }
@@ -82,7 +81,7 @@ protected:
   QDM_Multiphase eq_qdm_;
   Energie_Multiphase eq_energie_;
   Masse_Multiphase eq_masse_;
-  // taux de presence minimum pour gestion de l'evanescence (nuls par defaut)
+  // minimum void fractions for evanescence management (zero by default)
   DoubleVect alpha_inf_phases_;
 };
 

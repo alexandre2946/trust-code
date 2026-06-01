@@ -29,7 +29,7 @@ Implemente_instanciable(Lire_Fichier,"Lire_Fichier|Read_file",Interprete);
 // XD attr name_obj chaine name_obj REQ Name of the object to be read.
 // XD attr filename chaine filename REQ Name of the file.
 
-/*! @brief Pas code: exit()
+/*! @brief Not implemented: calls exit().
  *
  */
 Sortie& Lire_Fichier::printOn(Sortie& os) const
@@ -39,7 +39,7 @@ Sortie& Lire_Fichier::printOn(Sortie& os) const
   return os;
 }
 
-/*! @brief Pas code: exit()
+/*! @brief Not implemented: calls exit().
  *
  */
 Entree& Lire_Fichier::readOn(Entree& is)
@@ -49,12 +49,12 @@ Entree& Lire_Fichier::readOn(Entree& is)
   return is;
 }
 
-/*! @brief Deux syntaxes possibles dans le jeu de donnees: Lire_fichier NOM_OBJET NOM_FICHIER
+/*! @brief Two possible syntaxes in the data file: Lire_fichier NOM_OBJET NOM_FICHIER
  *
- *     (lit le contenu du fichier dans l'objet avec readOn de l'objet)
+ *     (reads the file content into the object using the object's readOn method)
  *    Lire_fichier NOM_FICHIER ;
- *     (interprete le fichier dans un interprete local: les objets declares
- *      dans le fichier sont detruits a la fin de la lecture du fichier)
+ *     (interprets the file in a local interpreter: objects declared
+ *      in the file are destroyed at the end of the file reading)
  *
  */
 Entree& Lire_Fichier::interpreter(Entree& is)
@@ -82,8 +82,8 @@ Entree& Lire_Fichier::interpreter(Entree& is)
           check_ICEM_ascii_file(nom2,*this);
           Cerr << "Lire_Fichier: reading ASCII file " << nom2 << " to object " << nom1 << finl;
           LecFicDiffuse fic(nom2);
-          // On ne peut pas activer check_types car certains fichiers geom ont un format louche
-          // ou tout est colle comme ceci : -0.12000000E+01-0.25000000E+00-0.25000000E+00
+          // Cannot activate check_types because some geom files have a strange format
+          // where everything is concatenated like: -0.12000000E+01-0.25000000E+00-0.25000000E+00
           // (exemple croix.geom)
           fic.set_check_types(0);
           Objet_U& ob1 = objet(nom1);
@@ -97,12 +97,12 @@ Entree& Lire_Fichier::interpreter(Entree& is)
       LecFicDiffuse_JDD data_file(nom1);
       data_file.track_lines(false);
       data_file.set_check_types(1);
-      // On cree un nouvel interprete. A la fin de la lecture
-      // les objets seront detruits.
+      // Create a new interpreter. At the end of reading,
+      // the objects will be destroyed.
       Interprete_bloc interp;
       interp.interpreter_bloc(data_file,
-                              Interprete_bloc::BLOC_EOF /* fin du bloc a la fin du fichier */,
-                              0 /* verifie_sans_interpreter=0 */);
+                              Interprete_bloc::BLOC_EOF /* end of block at end of file */,
+                              0 /* check_without_interpreting=0 */);
       Cerr << "Lire_Fichier: end of file " << nom1 << finl;
     }
   Cerr << "Lire_Fichier: end of file " << nom1 << finl;

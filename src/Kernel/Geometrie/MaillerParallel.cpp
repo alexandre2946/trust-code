@@ -52,10 +52,10 @@ Sortie& MaillerParallel::printOn(Sortie& os) const
 struct BlocData
 {
   void add_bloc(Domaine& domaine, const ArrsOfDouble& coord_ijk) const;
-  // xmin_tot = 0 implicitement
-  // xmax_tot = nombre total de sommets dans le maillage
-  // xmax = indice du dernier sommet + 1
-  // xmin = indice du premier sommet (donc xmax - xmin = nombre de sommets du bloc courant)
+  // xmin_tot = 0 implicitly
+  // xmax_tot = total number of vertices in the mesh
+  // xmax = index of the last vertex + 1
+  // xmin = index of the first vertex (so xmax - xmin = number of vertices in the current block)
   ArrOfInt xmax_tot_;
   ArrOfInt xmin_, xmax_;
   Noms bord_xmin_, bord_xmax_;
@@ -78,7 +78,7 @@ void BlocData::add_bloc(Domaine& domaine, const ArrsOfDouble& coord_ijk) const
       Process::exit();
     }
   const int dim = 3;
-  // Les sommets
+  // Vertices
   const int old_nb_som = domaine.les_sommets().dimension(0);
   {
     DoubleTab& sommets = domaine.les_sommets();
@@ -102,17 +102,17 @@ void BlocData::add_bloc(Domaine& domaine, const ArrsOfDouble& coord_ijk) const
           }
       }
   }
-  // Les elements
+  // Elements
   {
     assert(dim==3);
     IntTab& elements = domaine.les_elems();
     const int nb_som_par_element = 8;
 
-    // stride des indices de sommets:
+    // vertex index strides:
     const int dx = 1;
     const int dy = nb_som(0);
     const int dz = dy * nb_som(1);
-    // nombre d'elements dans chaque direction
+    // number of elements in each direction
     const int nx = nb_elem(0);
     const int ny = nb_elem(1);
     const int nz = nb_elem(2);
@@ -142,7 +142,7 @@ void BlocData::add_bloc(Domaine& domaine, const ArrsOfDouble& coord_ijk) const
           }
       }
   }
-  // Les bords
+  // Boundaries
   for (int dir = 0; dir < 3; dir++)
     {
       if (xmin_[dir] == 0)
@@ -255,7 +255,7 @@ void find_matching_coordinates(const DoubleTab& coords,
               min_coord[j] = x;
           }
       }
-    // broadcast a tous les processeurs
+    // broadcast to all processors
     for (i = 0; i < nproc; i++)
       {
         for (j = 0; j < dim; j++)
@@ -431,7 +431,7 @@ static void auto_build_joints(Domaine& domaine, const int epaisseur_joint)
 
   {
     ArrOfInt boundary_nodes_index;
-    boundary_nodes_index = faces; // copie du tableau
+    boundary_nodes_index = faces; // copy of the array
     array_trier_retirer_doublons(boundary_nodes_index);
     const int ncoord = boundary_nodes_index.size_array();
     // Fill nodes coordinates and bounding boxes
@@ -526,7 +526,7 @@ static void auto_build_joints(Domaine& domaine, const int epaisseur_joint)
           }
       }
   }
-  // Tri des joints dans l'ordre croissant des processeurs
+  // Sort the joints in ascending order of processor rank
   Scatter::trier_les_joints(domaine.faces_joint());
 }
 
@@ -700,19 +700,19 @@ Entree& MaillerParallel::interpreter(Entree& is)
       }
   }
   statistics().begin_count(STD_COUNTERS::parallel_meshing,statistics().get_last_opened_counter_level()+1);
-  // Position du bloc correspondant a numproc dans le decoupage i,j,k:
+  // Position of the block corresponding to numproc in the i,j,k partition:
   ArrOfInt i_proc(dim);
   if (mapping.dimension(0) == 0)
     {
-      // Pas de mapping fourni, on prend decoupe par defaut
+      // No mapping provided, using default partition
       int i;
       int reste = numproc;
 
       for (i = 0; i < dim; i++)
         {
-          // Nombre de parties dans la direction dim_2:
+          // Number of parts in direction dim_2:
           const int n_parties = decoupage[i];
-          // Position du processeur courant dans cette direction:
+          // Position of the current processor in this direction:
           i_proc[i] = reste % n_parties;
           reste = reste / n_parties;
         }
@@ -728,16 +728,16 @@ Entree& MaillerParallel::interpreter(Entree& is)
       i_proc[1] = mapping(numproc,1);
       i_proc[2] = mapping(numproc,2);
     }
-  // Indice du premier element du bloc associe au processeur dans la direction i:
-  // Attention, en cas de periodique, i_premier_element sera negatif.
+  // Index of the first element of the block associated with the processor in direction i:
+  // Warning, in the case of periodicity, i_premier_element will be negative.
   ArrOfInt i_premier_element(dim);
-  // Taille du bloc associe au processeur
+  // Size of the block associated with the processor
   ArrOfInt nb_elements(dim);
   {
     int i;
     for (i = 0; i < dim; i++)
       {
-        const int nb_elem_tot = nb_noeuds[i] - 1; // Nb total de noeuds dans la direction i
+        const int nb_elem_tot = nb_noeuds[i] - 1; // Total number of nodes in direction i
         i_premier_element[i] = nb_elem_tot * i_proc[i] / decoupage[i];
         const int i_dernier_element = nb_elem_tot * (i_proc[i] + 1) / decoupage[i] - 1;
         nb_elements[i] = i_dernier_element - i_premier_element[i] + 1;
@@ -802,7 +802,7 @@ Entree& MaillerParallel::interpreter(Entree& is)
       Bord& bord = bords[num_bord];
       bord.associer_domaine(domaine);
       bord.faces().typer(domaine.type_elem()->type_face());
-      // important pour dimensionner le linesize du tableau des faces pour les frontieres vides
+      // important for sizing the linesize of the face array for empty boundaries
       bord.faces().dimensionner(0);
     }
 

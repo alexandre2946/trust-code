@@ -20,10 +20,10 @@
 #include <Iterateur_Source_Face.h>
 #include <Terme_Source_VDF_base.h>
 
-/*! @brief class Source_Forchheimer_VDF_Face Cette classe represente le terme de Forchheimer pour les ecoulement en milieux poreux.
+/*! @brief class Source_Forchheimer_VDF_Face This class represents the Forchheimer term for flows in porous media.
  *
- *  Ce terme doit normalement etre de type "operateur" : pour l'instant il est code comme un terme
- *  source et donc ne  doit etre utilise qu'avec un schema en temps de type explicite.
+ *  This term should normally be of "operator" type: for now it is coded as a source
+ *  term and should therefore only be used with an explicit time scheme.
  *
  */
 class Source_Forchheimer_VDF_Face : public Terme_Source_VDF_base

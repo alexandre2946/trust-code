@@ -52,7 +52,7 @@ public :
   int modifier_secmem_som(const DoubleTab&, DoubleTab&);
   int modifier_secmem_aretes(const DoubleTab&, DoubleTab&);
 
-  // Methodes du changement de base P0+P1<->P1Bulle
+  // Methods for the change of basis P0+P1 <-> P1Bulle
   int changement_base() const
   {
     return (beta_!=0);
@@ -60,7 +60,7 @@ public :
   void changer_base_matrice(Matrice&);              // A->A~ (P0+P1->P1Bulle)
   void changer_base_second_membre(DoubleVect&);     // y->y~ (P0+P1->P1Bulle)
   void changer_base_pression_inverse(DoubleVect&);  // x~->x (P1Bulle->P0+P1)
-  void changer_base_pression(DoubleVect&);          // x->x~ (P0+P1->P1Bulle) Ne sert que pour les tests
+  void changer_base_pression(DoubleVect&);          // x->x~ (P0+P1->P1Bulle) used only for tests
   template <vecteur _v_>
   void changer_base(DoubleVect& v);
 
@@ -69,7 +69,7 @@ protected:
   int init = -1;
   OBS_PTR(Equation_base) mon_equation;
   void projete_L2(DoubleTab&);
-  double alpha_=0., beta_=0.; // Coefficients du changement de base P0+P1<->P1Bulle
+  double alpha_=0., beta_=0.; // Coefficients for the change of basis P0+P1 <-> P1Bulle
 };
 
 #endif

@@ -21,9 +21,9 @@
 #include <iostream>
 #include <assert.h>
 #include <stdio.h>
-#include <cstdio> // Pour EOF sur GNU >= 4.4
-#include <arch.h> // pour LIBLATAFILTER int64
-#include <cstdint>// Pour INT32_MAX sur GNU >= 13
+#include <cstdio> // For EOF on GNU >= 4.4
+#include <arch.h> // for LIBLATAFILTER int64
+#include <cstdint>// For INT32_MAX on GNU >= 13
 
 using std::istream;
 using std::ios;
@@ -41,7 +41,7 @@ class Nom;
 class Entree: public AbstractIO
 {
 public:
-  // Constructeurs
+  // Constructors
   Entree();
   Entree(istream& is);
   Entree(const Entree& is);
@@ -49,7 +49,7 @@ public:
 
   void set_bin(bool bin) override;
 
-  // Operateurs d'affectation
+  // Assignment operators
   Entree& operator=(istream& is);
   Entree& operator=(Entree& is);
 
@@ -101,7 +101,7 @@ public:
   virtual void set_diffuse(bool diffuse);
 
 protected:
-  // methode inline pour traiter rapidement le cas trivial. Sinon, appel a la methode virtuelle error_handle_()
+  // Inline method to handle the trivial case quickly. Otherwise, calls the virtual method error_handle_().
   inline int error_handle(int fail_flag)
   {
     if (!fail_flag) return 1;
@@ -111,7 +111,7 @@ protected:
   virtual int error_handle_(int fail_flag);
   bool check_types_ = false;
   Error_Action error_action_;
-  bool diffuse_; // By default true, but some child classes (eg: LecFicDiffuse) could set temporary to false to not diffuse to other processes
+  bool diffuse_; // By default true, but some child classes (e.g. LecFicDiffuse) can set it temporarily to false to not diffuse to other processes
 
 private:
   istream *istream_;
@@ -131,7 +131,7 @@ void convert_to(const char *s, long long& ob);
 void convert_to(const char *s, float& ob);
 void convert_to(const char *s, double& ob);
 
-// Classe renvoyee par Entree si une exception est levee lors d'une erreur
+// Class returned by Entree when an exception is raised on error
 class Entree_Sortie_Error
 {
 };

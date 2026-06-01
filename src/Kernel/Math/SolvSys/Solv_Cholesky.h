@@ -45,7 +45,7 @@ protected :
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
 
   int Cholesky(const Matrice_Morse_Sym&, const DoubleVect&, DoubleVect& );
-  int Fact_Cholesky(const Matrice_Morse_Sym&, const int ); // met a jour matrice_bande_factorisee_fortran_
+  int Fact_Cholesky(const Matrice_Morse_Sym&, const int ); // updates matrice_bande_factorisee_fortran_
   int largeur_de_bande_ = -100;
   ArrOfDouble matrice_bande_factorisee_fortran_;
   Matrice_Morse_Sym matrice_de_travail;

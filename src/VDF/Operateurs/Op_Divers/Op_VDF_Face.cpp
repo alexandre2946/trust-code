@@ -25,9 +25,9 @@
 // TODO : FIXME : a la poubelle
 void Op_VDF_Face::dimensionner(const Domaine_VDF& le_dom, const Domaine_Cl_VDF& le_dom_cl, Matrice_Morse& la_matrice) const
 {
-  // Dimensionnement de la matrice qui devra recevoir les coefficients provenant de la convection, de la diffusion pour le cas des faces.
-  // Cette matrice a une structure de matrice morse.
-  // Nous commencons par calculer les tailles des tableaux tab1 et tab2.
+  // Sizing of the matrix that will receive the coefficients from convection and diffusion for face unknowns.
+  // This matrix has a Morse matrix structure.
+  // We start by computing the sizes of arrays tab1 and tab2.
 
   const DoubleTab& champ_inconnue = le_dom_cl.equation().inconnue().valeurs();
   const int ndeb = 0, nfin = le_dom.nb_faces_tot(), dimension = Objet_U::dimension, nb_comp = champ_inconnue.line_size();
@@ -60,7 +60,7 @@ void Op_VDF_Face::dimensionner(const Domaine_VDF& le_dom, const Domaine_Cl_VDF& 
         }
     }
 
-  // on balaye les faces pour dimensionner tab1 et tab2
+  // sweep over faces to size tab1 and tab2
   tab1(0) = 1;
   for (int num_face = ndeb; num_face < nfin; num_face++)
     for (int k = 0; k < nb_comp; k++) tab1(num_face*nb_comp+1+k) = rang_voisin(num_face) + tab1(num_face*nb_comp+k);
@@ -89,8 +89,8 @@ void Op_VDF_Face::dimensionner(const Domaine_VDF& le_dom, const Domaine_Cl_VDF& 
         }
     }
 
-  // on traite la condition de periodicite : en effet ce n'est pas sur que les faces de frontiere soient les bonnes
-  // plus precisement a droite on a la face de gauche et non celle de droite
+  // handle the periodicity condition: the boundary faces may not be the correct ones;
+  // more precisely, on the right side we have the left face rather than the right face
   const Conds_lim& les_cl = le_dom_cl.les_conditions_limites();
   const IntTab& faces_voisins = le_dom.face_voisins(), &elem_faces = le_dom.elem_faces();
 
@@ -115,7 +115,7 @@ void Op_VDF_Face::dimensionner(const Domaine_VDF& le_dom, const Domaine_Cl_VDF& 
                 cpt += 3;
                 if (face1b != num_face)
                   {
-                    // on recalcule fac3 fac4
+                    // recompute fac3 fac4
                     const int face3n = face_bord_amont2(le_dom,num_face,(ori+1)%dimension,0), face4n = face_bord_amont2(le_dom,num_face,(ori+1)%dimension,1);
                     if (face3 != -1) { assert(tab2[cpt] == face3+1); tab2[cpt] = face3n+1; cpt++; }
                     if (face4 != -1) { assert(tab2[cpt] == face4+1); tab2[cpt] = face4n+1; cpt++; }
@@ -143,7 +143,7 @@ void Op_VDF_Face::modifier_pour_Cl_(const int face, const int comp, const int nb
   const auto idiag = tab1[face * nb_comp + comp] - 1;
   coeff[idiag] = 1.;
 
-  // pour les voisins
+  // for the neighbors
   const int nbvois = (int)(tab1[face * nb_comp + 1 + comp] - tab1[face * nb_comp + comp]);
   for (int k = 1; k < nbvois; k++) coeff[idiag + k] = 0.;
 }
@@ -169,7 +169,7 @@ void Op_VDF_Face::modifier_pour_Cl(const Domaine_VDF& le_dom, const Domaine_Cl_V
             for (int comp = 0; comp < nb_comp; comp++)
               {
                 modifier_pour_Cl_(face, comp, nb_comp, la_matrice);
-                // pour le second membre [Correction erreur (10/99) : WEC : correction numero de face]
+                // for the right-hand side [Bug fix (10/99) : WEC : face index correction]
                 const int ori = orientation(face);
                 secmem(face, comp) = la_cl_Dirichlet.val_imp(face - numdeb, nb_comp * ori + comp);
               }
@@ -193,7 +193,7 @@ void Op_VDF_Face::modifier_pour_Cl(const Domaine_VDF& le_dom, const Domaine_Cl_V
             for (int comp = 0; comp < nb_comp; comp++)
               {
                 modifier_pour_Cl_(face, comp, nb_comp, la_matrice);
-                // pour le second membre [Correction erreur (10/99) : WEC : correction numero de face]
+                // for the right-hand side [Bug fix (10/99) : WEC : face index correction]
                 const int ori = orientation(face);
                 secmem(face, comp) = la_cl_Dirichlet_homogene.val_imp(face - numdeb, nb_comp * ori + comp);
               }

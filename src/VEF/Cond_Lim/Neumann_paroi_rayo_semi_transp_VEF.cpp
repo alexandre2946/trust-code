@@ -69,9 +69,9 @@ const Cond_lim_base& Neumann_paroi_rayo_semi_transp_VEF::la_cl() const
 void Neumann_paroi_rayo_semi_transp_VEF::calculer_temperature_bord(double temps)
 {
   // Cerr<<"Neumann_paroi_rayo_semi_transp_VEF::calculer_temperature_bord() : Debut"<<finl;
-  // Pour une discretisation VEF, la temperature est codee sur les faces
-  // des elements, il suffit donc ici  de recuperer les valeurs des temperatures
-  // sur les faces de bord.
+  // For a VEF discretization, the temperature is stored on the element faces,
+  // so it is sufficient here to retrieve the temperature values
+  // on the boundary faces.
   DoubleTab& temperature = domaine_Cl_dis().equation().inconnue().valeurs();
   DoubleTab& tab = temperature_bord_->valeurs_au_temps(temps);
 
@@ -102,7 +102,7 @@ void Neumann_paroi_rayo_semi_transp_VEF::completer()
 {
   Neumann_paroi::completer();
 
-  // On type et on dimmensionne le champ_front temperature_bord_
+  // Type and dimension the champ_front temperature_bord_
   const Front_VF& front_vf = ref_cast(Front_VF, frontiere_dis());
   int nb_comp = 1;
 

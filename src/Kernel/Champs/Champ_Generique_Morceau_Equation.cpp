@@ -34,21 +34,21 @@ Sortie& Champ_Generique_Morceau_Equation::printOn(Sortie& s ) const
   return s << que_suis_je() << " " << le_nom();
 }
 
-//cf Champ_Gen_de_Champs_Gen::readOn
+//see Champ_Gen_de_Champs_Gen::readOn
 Entree& Champ_Generique_Morceau_Equation::readOn(Entree& s )
 {
   Champ_Gen_de_Champs_Gen::readOn(s);
   return s ;
 }
 
-//  type          : type du morceau d equation (actuellement "operateur")
-//  numero          : numero du morceau d equation
-//                   (cas operateur : 0 (diffusion) 1 (convection) 2 (gradient) 3 (divergence))
-//  option          : choix de la quantite a postraiter
-//                     (actuellement "stabilite" pour dt_stab "flux_bords" pour flux_bords_)
-//  unite          : pour imposer l'unite du champ
-//  compo            : numero de la composante a postraiter pour le cas des "flux_bords"
-//                     (si plusieurs composantes)
+//  type          : type of equation piece (currently "operateur")
+//  numero          : number of the equation piece
+//                   (operator case: 0 (diffusion) 1 (convection) 2 (gradient) 3 (divergence))
+//  option          : choice of the quantity to post-process
+//                     (currently "stabilite" for dt_stab, "flux_bords" for flux_bords_)
+//  unite          : to impose the unit of the field
+//  compo            : component number to post-process for the "flux_bords" case
+//                     (if multiple components)
 void Champ_Generique_Morceau_Equation::set_param(Param& param) const
 {
   Champ_Gen_de_Champs_Gen::set_param(param);
@@ -67,9 +67,9 @@ void Champ_Generique_Morceau_Equation::set_param(Param& param) const
   // XD_CONT permits to specify the number component of the boundary flux choosen).
 }
 
-//-Initialisation de ref_eq_
-//-Initialisation de localisation_
-//-Appel de la methode de la classe mere
+//-Initialization of ref_eq_
+//-Initialization of localisation_
+//-Call to the parent class method
 void Champ_Generique_Morceau_Equation::completer(const Postraitement_base& post)
 {
   const Probleme_base& Pb = get_ref_pb_base();
@@ -84,8 +84,8 @@ void Champ_Generique_Morceau_Equation::completer(const Postraitement_base& post)
           const Champ_Inc_base& mon_champ_inc = ref_cast(Champ_Inc_base,mon_champ);
 
           {
-            //On recupere l equation alors qu elle n est pas encore associee au Champ_Inc
-            //On parcours les equations du probleme et on identifie celle qui correspond au champ inconnu
+            //We retrieve the equation even though it is not yet associated with Champ_Inc
+            //We iterate over the equations of the problem and identify the one corresponding to the unknown field
 
             int nb_eq = Pb.nombre_d_equations();
             int i=0;
@@ -113,8 +113,8 @@ void Champ_Generique_Morceau_Equation::completer(const Postraitement_base& post)
 
   localisation_ = morceau().get_localisation_pour_post(option_);
 
-  //Appel de la methode de la classe mere fait apres pour que
-  //la methode nommer_source() dispose de ref_eq_ initialise
+  //The parent class method is called after so that
+  //the nommer_source() method has ref_eq_ initialized
   Champ_Gen_de_Champs_Gen::completer(post);
 }
 
@@ -132,7 +132,7 @@ OWN_PTR(Champ_Fonc_base)& Champ_Generique_Morceau_Equation::creer_espace_stockag
   const Discretisation_base&  discr = get_discretisation();
   Motcle directive;
   if ((Motcle(option_)=="flux_bords") || (Motcle(option_)=="flux_surfacique_bords"))
-    directive = "champ_face"; // Pour avoir les flux_bords aux faces et non aux elements en VDF (ex: temperature)
+    directive = "champ_face"; // To have flux_bords at faces and not at elements in VDF (ex: temperature)
   else
     directive = get_directive_pour_discr();
   const Domaine_dis_base& domaine_dis = get_ref_domaine_dis_base();
@@ -148,11 +148,11 @@ OWN_PTR(Champ_Fonc_base)& Champ_Generique_Morceau_Equation::creer_espace_stockag
   return es_tmp;
 }
 
-/*! @brief le morceau d equation lance la discretisation du champ espace_stockage et remplit son tableau de valeurs par la methode calculer_pour_post(.
+/*! @brief The equation piece triggers the discretisation of the storage space field and fills its value array via the calculer_pour_post(.
  *
- * ..)
- *  Rq : Ce procede differe de celui applique dans les autres Champ_Generique_base pour lesquels
- *  le remplissage du tableau de valeurs de espace_stockage n'est pas delegue
+ * ..) method
+ *  Note: This procedure differs from the one applied in the other Champ_Generique_base classes, for which
+ *  the filling of the espace_stockage value array is not delegated
  *
  *
  */
@@ -226,7 +226,7 @@ const Noms Champ_Generique_Morceau_Equation::get_property(const Motcle& query) c
           unites[0] = "s";
         else if (Motcle(option_).debute_par("FLUX_"))
           {
-            // Tres incomplet mais bon...:
+            // Very incomplete but still...:
             if (ref_eq_->inconnue().le_nom()=="vitesse")
               {
                 if (numero_morceau_<2) unites[0]="N";
@@ -246,7 +246,7 @@ const Noms Champ_Generique_Morceau_Equation::get_property(const Motcle& query) c
 Entity Champ_Generique_Morceau_Equation::get_localisation(const int index) const
 {
   Entity loc;
-  //Pour initialisation
+  //For initialization
   loc = Entity::NODE;
 
   if (localisation_=="elem")
@@ -263,7 +263,7 @@ Entity Champ_Generique_Morceau_Equation::get_localisation(const int index) const
   return loc;
 }
 
-//Nomme le champ en tant que source par defaut
+//Name the field as a source by default
 //nom_eq + "_" + type_morceau + "_" + type_option
 void Champ_Generique_Morceau_Equation::nommer_source()
 {
@@ -327,9 +327,9 @@ void Champ_Generique_Morceau_Equation::nommer_source()
 
 }
 
-//Rend le morceau d equation considere pour ce Champ_Generique_base
-//Actuellement seul type de morceau considere : les operateurs
-//Pour considerer  d autres morceaux d equation il faudra tester type_morceau_
+//Returns the equation piece considered for this Champ_Generique_base
+//Currently the only type of piece considered: operators
+//To consider other equation pieces, type_morceau_ will need to be tested
 const MorEqn& Champ_Generique_Morceau_Equation::morceau() const
 {
   int nb_operateurs = ref_eq_->nombre_d_operateurs();

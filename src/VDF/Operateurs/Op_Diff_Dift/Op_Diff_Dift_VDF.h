@@ -101,7 +101,7 @@ protected:
   }
 
   template <typename EVAL_TYPE>
-  const double& alpha_impl(const int i) const // TODO : FIXME : pour multiphase faut ajouter compo
+  const double& alpha_impl(const int i) const // TODO : FIXME : for multiphase need to add compo
   {
     const EVAL_TYPE& eval_diff_turb = static_cast<const EVAL_TYPE&>(iter_vdf()->evaluateur());
     const Champ_base& diffu = eval_diff_turb.get_diffusivite();
@@ -158,9 +158,9 @@ protected:
         if (mod_turb.loi_paroi_non_nulle()) associer_loipar_impl<_TYPE_,EVAL_TYPE>(loipar); // Et YES !
 
         EVAL_TYPE& eval_diff_turb = static_cast<EVAL_TYPE&> (iter_vdf()->evaluateur());
-        eval_diff_turb.init_ind_fluctu_term(); // utile juste pour Const/Var Elem... sinon on fait rien
+        eval_diff_turb.init_ind_fluctu_term(); // useful only for Const/Var Elem... otherwise does nothing
       }
-    else // bizarre mais V2 (on fait comme le cas de l'Op_FACE mais sans assoscier un modele ...)
+    else // unusual but V2 (acts like the Op_FACE case but without associating a model ...)
       {
         const Modele_turbulence_hyd_base& mod_turb = ref_cast(Modele_turbulence_hyd_base,modele_turbulence.valeur());
         const Champ_Fonc_base& alpha_t = mod_turb.viscosite_turbulente();
@@ -181,7 +181,7 @@ protected:
   }
 
 private:
-  // CRTP pour recuperer l'iter
+  // CRTP to retrieve the iterator
   inline const OWN_PTR(Iterateur_VDF_base)& iter_vdf() const { return static_cast<const OP_TYPE *>(this)->get_iter(); }
   inline OWN_PTR(Iterateur_VDF_base)& iter_vdf() { return static_cast<OP_TYPE *>(this)->get_iter(); }
 

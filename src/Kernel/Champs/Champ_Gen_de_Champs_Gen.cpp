@@ -35,10 +35,10 @@ Sortie& Champ_Gen_de_Champs_Gen::printOn(Sortie& os) const
   return os;
 }
 
-//  source :           declenche la lecture du champ genrerique source
-//  sources_reference : declenche la lecture du nom d un ou plusieurs champs generiques qui doivent etre
-//                       deja definis afin de pouvoir initialiser une reference vers ce champ
-//  nom_source : option pour nommer le champ en tant que source (sinon nommer par defaut)
+//  source :           triggers the reading of the generic source field
+//  sources_reference : triggers the reading of the name of one or more generic fields that must
+//                       already be defined in order to initialize a reference to that field
+//  nom_source : option to name the field as a source (otherwise named by default)
 void Champ_Gen_de_Champs_Gen::set_param(Param& param) const
 {
   param.ajouter_non_std("source",(this)); // XD attr source champ_generique_base source OPT the source field.
@@ -156,7 +156,7 @@ OWN_PTR(Champ_Fonc_base)& Champ_Gen_de_Champs_Gen::creer_espace_stockage(const N
 
 const Champ_Generique_base& Champ_Gen_de_Champs_Gen::get_source(int i) const
 {
-  // Si sources_ et source_ref sont vide, on n'a pas a etre ici
+  // If sources_ and source_ref are empty, we should not be here
   if ((sources_reference_.size()==0) && (sources_.size()==0))
     {
       Cerr << finl;
@@ -182,7 +182,7 @@ const Champ_Generique_base& Champ_Gen_de_Champs_Gen::get_source(int i) const
 
 Champ_Generique_base& Champ_Gen_de_Champs_Gen::set_source(int i)
 {
-  // POur eviter de recoder la meme chose que get_source
+  // To avoid recoding the same thing as get_source
   return ref_cast_non_const(Champ_Generique_base,get_source(i));
 }
 
@@ -207,7 +207,7 @@ std::vector<YAML_data> Champ_Gen_de_Champs_Gen::data_a_sauvegarder() const
   return data;
 }
 
-/*! @brief sauvegarde des differentes sources
+/*! @brief save the different sources
  *
  */
 int Champ_Gen_de_Champs_Gen::sauvegarder(Sortie& os) const
@@ -219,7 +219,7 @@ int Champ_Gen_de_Champs_Gen::sauvegarder(Sortie& os) const
   return bytes;
 }
 
-/*! @brief reprise des differentes sources
+/*! @brief resume the different sources
  *
  */
 int Champ_Gen_de_Champs_Gen::reprendre(Entree& is)
@@ -264,7 +264,7 @@ void Champ_Gen_de_Champs_Gen::completer(const Postraitement_base& post)
   nommer_source();
 }
 
-//Methodes complementaires
+//Additional methods
 int Champ_Gen_de_Champs_Gen::get_dimension() const
 {
   return get_source(0).get_dimension();
@@ -306,7 +306,7 @@ const DoubleTab& Champ_Gen_de_Champs_Gen::get_ref_values() const
 void Champ_Gen_de_Champs_Gen::get_copy_values(DoubleTab& values) const
 {
   const DoubleTab& val = get_ref_values();
-  // Cree une copie du tableau
+  // Creates a copy of the array
   values = val;
 }
 
@@ -400,7 +400,7 @@ void Champ_Gen_de_Champs_Gen::nommer_sources(const Postraitement_base& post)
     }
 }
 
-//Cette methode doit etre surchargee pour chacun des Champ_Gen_de_Champs_Gen
+//This method must be overridden for each Champ_Gen_de_Champs_Gen
 void Champ_Gen_de_Champs_Gen::nommer_source()
 {
 
@@ -412,7 +412,7 @@ int Champ_Gen_de_Champs_Gen::get_info_type_post() const
 
 }
 
-//Methodes pour changer t_deb et t_fin pour des reprises de statistiques
+//Methods to change t_deb and t_fin for statistics restarts
 void Champ_Gen_de_Champs_Gen::fixer_serie(const double t1, const double t2)
 {
   const int n = get_nb_sources();;
@@ -461,7 +461,7 @@ bool Champ_Gen_de_Champs_Gen::has_champ_post(const Motcle& nom) const
   if (get_source(0).has_champ_post(nom))
     return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 const Champ_Generique_base& Champ_Gen_de_Champs_Gen::get_champ_post(const Motcle& nom) const

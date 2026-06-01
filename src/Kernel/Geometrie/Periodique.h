@@ -19,13 +19,13 @@
 #include <Cond_lim_base.h>
 #include <TRUSTTab.h>
 
-/*! @brief classe Periodique Cette classe represente une condition aux limites periodique.
+/*! @brief class Periodique This class represents a periodic boundary condition.
  *
- *      On peut specifier une periodicite en X, Y ou Z.
- *      Toutes les faces de la frontiere associee a cette condition doivent
- *      avoir la meme orientation
+ *      Periodicity can be specified in X, Y or Z.
+ *      All faces of the boundary associated with this condition must
+ *      have the same orientation.
  *
- * @sa Cond_lim_base, Toutes les faces de la frontiere associee a cette condition doivent, avoir la meme orientation
+ * @sa Cond_lim_base, All faces of the boundary associated with this condition must have the same orientation
  */
 class Periodique: public Cond_lim_base
 {
@@ -40,12 +40,12 @@ public:
   inline int est_periodique_selon_un_axe() const { return direction_xyz_ >= 0; }
 
 protected:
-  // Tableau de taille nb_faces() + nb_faces_virt()
-  // face_front_associee_[i] est l'indice de la face opposee sur cette frontiere (vaut -1 si la face opposee n'existe pas pour une face virtuelle)
+  // Array of size nb_faces() + nb_faces_virt()
+  // face_front_associee_[i] is the index of the opposite face on this boundary (-1 if the opposite face does not exist for a virtual face)
   ArrOfInt face_front_associee_;
   ArrOfDouble direction_perio_;
   double distance_ = -500.;
-  // -1, 0, 1, ou 2
+  // -1, 0, 1, or 2
   int direction_xyz_ = -100;
   int compatible_avec_eqn(const Equation_base&) const override { return 1; }
   void completer() override;

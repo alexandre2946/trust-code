@@ -31,40 +31,40 @@ class Motcle;
 
 //Description
 //
-//Classe de base des classes dediees a la resolution implicite d une equation
-//L equation est discretisee sous la forme suivante :
+// Base class for implicit equation solvers.
+// The equation is discretised as:
 // (M/dt + C(U) + D)Xn+1 = Sv + Ss + (M/dt)Xn
-// avec
-// C(U) matrice de convection
-// D    matrice de diffusion
-// M    matrice de masse
-// Sv   terme source volumique
-// Ss  terme source surfacique (condition de Neumann)
-// Xn et Xn+1 designe l inconnue respectivement aux temps tn et tn+1
+// where
+// C(U) convection matrix
+// D    diffusion matrix
+// M    mass matrix
+// Sv   volumetric source term
+// Ss   surface source term (Neumann condition)
+// Xn and Xn+1 denote the unknown at times tn and tn+1 respectively
 //
-// A chaque etape en temps (tn) on va traiter la resolution du systeme suivant :
+// At each time step (tn) we solve the following system:
 //         A[Xk] = b[Xk]
-// avec
+// with
 // A[Xk] = (M/dt + C(Uk) + D)
 // b[Xk] = Sv + Ss + (M/dt)Xk
-// k designe un indice d iteration pour la resolution iterative du systeme matriciel (tn fixe)
+// k denotes an iteration index for the iterative resolution of the matrix system (tn fixed)
 
-// La methode de resolution employee pour determiner X est une methode de point fixe :
-// On pose f(Xk) = A[Xk]Xk -b[Xk] ainsi Xsol solution verifie f(Xsol) = 0
-// Le developpement limite au premier ordre donne la relation :
+// The resolution method used to determine X is a fixed-point method:
+// Set f(Xk) = A[Xk]Xk - b[Xk] so that the solution Xsol satisfies f(Xsol) = 0
+// A first-order Taylor expansion gives:
 // Xk - Xk+1 = f(Xk)/f'(Xk)
-// En faisant l hyposthese que f' = A (pas vrai en toute rigueur pour la partie convection)
-// le systeme s ecrit : A[Xk](Xk-Xk+1) = f(Xk) ou encore
-//                                 A[Xk]Xk+1 = A[Xk]Xk - (A[Xk]Xk-Ss) + Sv +(M/dt)Xk
+// Making the hypothesis f' = A (not strictly true for the convection part)
+// the system becomes: A[Xk](Xk-Xk+1) = f(Xk) or equivalently
+//                     A[Xk]Xk+1 = A[Xk]Xk - (A[Xk]Xk-Ss) + Sv +(M/dt)Xk
 //
 //
-// Methode iterer_eqn() pour traiter une equation autre que Navier_Stokes
-// - fait construire la matrice (matrice) et le second membre (resu) par l equation (assembler_avec_inertie(...))
-// - declenche la resolution du systeme matriciel (le_solveur_.resoudre_systeme(...))
+// Method iterer_eqn() for equations other than Navier-Stokes:
+// - builds the matrix (matrice) and right-hand side (resu) from the equation (assembler_avec_inertie(...))
+// - triggers the matrix system resolution (le_solveur_.resoudre_systeme(...))
 
-// Methode iterer_NS() appelee par iterer_eqn() pour traiter le cas specifique de l equation de Navier_Stokes
-// Les algorithmes disponibles sont : Simple - Simpler - Piso - Implicite
-// Voir classes filles de Simpler_base pour la description des algorithmes respectifs
+// Method iterer_NS() called by iterer_eqn() for the specific case of the Navier-Stokes equation.
+// Available algorithms: Simple - Simpler - Piso - Implicite
+// See subclasses of Simpler_base for descriptions of the respective algorithms.
 
 
 class Simpler_Base : public  Solveur_non_lineaire

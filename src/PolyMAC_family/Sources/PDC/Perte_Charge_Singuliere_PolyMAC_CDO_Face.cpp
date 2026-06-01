@@ -30,7 +30,7 @@ Entree& Perte_Charge_Singuliere_PolyMAC_CDO_Face::readOn(Entree& s)
 {
   Perte_Charge_Singuliere::lire_donnees(s);
   remplir_num_faces(s);
-  if (regul_) //fichier de sortie si regulation
+  if (regul_) //output file if regulation
     {
       bilan().resize(3); //K deb cible
       set_fichier(Nom("K_") + identifiant_);

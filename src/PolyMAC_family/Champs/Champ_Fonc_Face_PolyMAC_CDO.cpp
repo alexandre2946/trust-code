@@ -27,16 +27,16 @@ Entree& Champ_Fonc_Face_PolyMAC_CDO::readOn(Entree& is) { return is; }
 
 int Champ_Fonc_Face_PolyMAC_CDO::fixer_nb_valeurs_nodales(int n)
 {
-  // j'utilise le meme genre de code que dans Champ_Fonc_P0_base sauf que je recupere le nombre de faces au lieu du nombre d'elements
-  // je suis tout de meme etonne du code utilise dans Champ_Fonc_P0_base::fixer_nb_valeurs_nodales() pour recuperer le domaine discrete...
+  // use the same kind of code as in Champ_Fonc_P0_base, but retrieve the number of faces instead of the number of elements
+  // note: the code used in Champ_Fonc_P0_base::fixer_nb_valeurs_nodales() to retrieve the discrete domain is somewhat surprising...
   const Champ_Fonc_base& self = ref_cast(Champ_Fonc_base, *this);
   const Domaine_VF& le_dom_vf = ref_cast(Domaine_VF, self.domaine_dis_base());
 
   assert(n == le_dom_vf.nb_faces());
 
   const MD_Vector& md = le_dom_vf.md_vector_faces();
-  // Probleme: nb_comp vaut 2 mais on ne veut qu'une dimension !!!
-  // HACK :
+  // Problem: nb_comp equals 2 but we only want one dimension !!!
+  // HACK:
   int old_nb_compo = nb_compo_;
   if(nb_compo_ >= dimension) nb_compo_ /= dimension;
 

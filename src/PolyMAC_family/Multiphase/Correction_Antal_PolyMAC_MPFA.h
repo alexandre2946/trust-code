@@ -18,7 +18,9 @@
 
 #include <Source_base.h>
 
-/*! @brief classe Correction_Antal_PolyMAC_MPFA Correction de repulsion en paroi d'Antal dans un ecoulement multiphase
+/*! @brief class Correction_Antal_PolyMAC_MPFA
+ *
+ * @brief Antal wall repulsion correction source term in a multiphase flow.
  *
  *
  *
@@ -38,7 +40,7 @@ public :
   void associer_pb(const Probleme_base& ) override { }
   void mettre_a_jour(double temps) override { }
 protected:
-  int n_l = -1; //phase liquide
+  int n_l = -1; //liquid phase
   int is_turb = 0;
   double Cw1_ =  -.1 ; // To adjust the force in .data
   double Cw2_ =  .147 ; // To adjust the force in .data

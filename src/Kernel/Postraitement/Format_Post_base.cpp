@@ -52,11 +52,11 @@ int Format_Post_base::lire_motcle_non_standard(const Motcle& mot, Entree& is)
   return -1;
 }
 
-/*! @brief Initialise le fichier avec des parametres appropries pour son format (exemple: format ascii, efface le fichier existant, un
+/*! @brief Initializes the file with parameters appropriate to its format (e.g. ascii format, deletes the existing file, a
  *
- *   fichier unique pour tous les processeurs etc...)
- *   Methode a surcharger dans les classes derivees.
- *  Valeur de retour: 1 si l'operation a reussi, 0 sinon.
+ *   single file for all processors, etc.)
+ *   Method to override in derived classes.
+ *  Return value: 1 if the operation succeeded, 0 otherwise.
  *
  */
 int Format_Post_base::initialize_by_default(const Nom& file_basename)
@@ -129,17 +129,17 @@ int Format_Post_base::preparer_post(const Nom& id_du_domaine,const int est_le_pr
 }
 
 
-/*! @brief Ecriture d'un maillage.
+/*! @brief Writing a mesh.
  *
- * L'ecriture du domaine a lieu soit au debut, avant le premier appel a ecrire_temps, soit plus tard (maillage dynamique),
- *   mais ce n'est pas forcement supporte par le postraitement.
+ * The domain is written either at the beginning, before the first call to ecrire_temps, or later (dynamic mesh),
+ *   but this is not necessarily supported by all post-processing formats.
  *
  *
- * @param (id_domaine) le nom affecte au domaine dans le fichier lata.
- * @param (type_elem) le type de l'element geometrique (un type supporte par la classe derivee, en general on comprend au moins "TETRAEDRE", "HEXAEDRE", "TRIANGLE" et "RECTANGLE")
- * @param (dimension) la dimension du domaine (nombre de coordonnees des sommets) On peut avoir un domaine de dimension 3 et des elements de type triangle (postraitement d'une interface ou du bord d'un domaine volumique).
- * @param (sommets) Coordonnees des sommets. S'il n'est pas vide, il faut que dimension(1)==dimension
- * @param (elements) Indices des sommets de chaque element. dimension(1) doit correspondre au type de l'element (3 pour un triangle, 4 pour un rectangle ou un tetraedre, etc...)
+ * @param (id_domaine) the name assigned to the domain in the lata file.
+ * @param (type_elem) the type of geometric element (a type supported by the derived class; in general at least "TETRAEDRE", "HEXAEDRE", "TRIANGLE" and "RECTANGLE" are understood)
+ * @param (dimension) the dimension of the domain (number of vertex coordinates). A 3D domain may contain triangle elements (post-processing of an interface or of the boundary of a volumetric domain).
+ * @param (sommets) Vertex coordinates. If non-empty, dimension(1) must equal dimension.
+ * @param (elements) Indices of vertices for each element. dimension(1) must match the element type (3 for a triangle, 4 for a rectangle or tetrahedron, etc.)
  */
 
 int Format_Post_base::ecrire_domaine(const Domaine& domaine,const int est_le_premier_post)
@@ -161,9 +161,9 @@ int Format_Post_base::ecrire_domaine_dis(const Domaine& domaine,const OBS_PTR(Do
   return ecrire_domaine(domaine, est_le_premier_post);
 }
 
-/*! @brief Commence l'ecriture d'un pas de temps.
+/*! @brief Starts writing a time step.
  *
- * La classe derivee doit accepter de recevoir plusieurs appels consecutifs a cette methode avec le meme temps.
+ * The derived class must accept receiving multiple consecutive calls to this method with the same time.
  *
  */
 
@@ -174,12 +174,12 @@ int Format_Post_base::ecrire_temps(const double temps)
   return 0;
 }
 
-/*! @brief Ecriture d'un champ dans le fichier de postraitement.
+/*! @brief Writing a field to the post-processing file.
  *
- * @param (id_du_champ) identifiant du champ (permet d'identifier un champ unique si on donne en plus un numero de pas de temps)
- * @param (id_du_domaine) identifiant du domaine sur lequel le champ est defini Ce domaine doit avoir ete ecrit avant par "ecrire_domaine".
- * @param (localisation) localisation des valeurs du champ (SOMMETS, ELEMENTS, ou tout autre id. de tableau deja ecrit) (tout n'est pas obligatoirement supporte par tous les postraitements)
- * @param (data) tableau de valeurs a postraiter. Le nombre de lignes du tableau doit etre egal au nombre de lignes du tableau "localisation" (nombre de sommets, d'elements ou de faces ou autre). Valeur de retour: 1 si operation reussie, 0 sinon (par exemple, preconditions non remplies ou fonctionnalite non supportee par le format).
+ * @param (id_du_champ) field identifier (allows identifying a unique field when combined with a time step number)
+ * @param (id_du_domaine) identifier of the domain on which the field is defined. This domain must have been written before by "ecrire_domaine".
+ * @param (localisation) location of field values (SOMMETS, ELEMENTS, or any other id of an already written array) (not everything is necessarily supported by all post-processing formats)
+ * @param (data) array of values to post-process. The number of rows must equal the number of rows of the "localisation" array (number of vertices, elements, faces, etc.). Return value: 1 if the operation succeeded, 0 otherwise (e.g., preconditions not met or feature not supported by the format).
  */
 
 int Format_Post_base::ecrire_champ(const Domaine& domaine,const Noms& unite_,const Noms& noms_compo,
@@ -195,12 +195,12 @@ int Format_Post_base::ecrire_champ(const Domaine& domaine,const Noms& unite_,con
   return 0;
 }
 
-/*! @brief Ecriture d'un tableau d'entiers dans le fichier de postraitement
+/*! @brief Writing an integer array to the post-processing file.
  *
  * @sa ecrire_champ
  *
- * @param (reference) Nom d'un autre tableau deja ecrit. data[i] est un indice dans ce tableau (exemple: on peut ecrire le tableau FACES_VOISINS, localisation=FACES, reference=ELEMENTS car le tableau est indexe par un numero de face et contient des indices d'elements) L'ecriture d'un domaine entraine automatiquement l'existence d'une tableau SOMMETS et d'un tableau ELEMENTS
- * @param (reference_size) la taille (locale) du tableau cite en reference (dimension(0) du tableau). Cette dimension est utilisee pour renumeroter le contenu du tableau data afin de creer une numerotation globale lorsque tous les processeurs ecrivent dans un fichier unique.
+ * @param (reference) Name of another array already written. data[i] is an index into that array (e.g., the FACES_VOISINS array can be written with localisation=FACES, reference=ELEMENTS because the array is indexed by face number and contains element indices). Writing a domain automatically creates a SOMMETS array and an ELEMENTS array.
+ * @param (reference_size) the (local) size of the referenced array (dimension(0) of the array). This dimension is used to renumber the contents of the data array to create a global numbering when all processors write to a single file.
  */
 int Format_Post_base::ecrire_item_int(const Nom&   id_item,
                                       const Nom&   id_du_domaine,

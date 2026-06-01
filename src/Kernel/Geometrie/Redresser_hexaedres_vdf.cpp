@@ -49,7 +49,7 @@ Entree& Redresser_hexaedres_vdf::interpreter_(Entree& is)
   int nb_sommets = les_sommets.dimension(0);
   double epsilon = Objet_U::precision_geom;
   int ok=0;
-  // On type en rectangle ou hexaedre
+  // Type as rectangle or hexahedron
   const Elem_geom_base& elem=domaine().type_elem().valeur();
   Cerr << "Attempt on the mesh ";
   if                 (sub_type(Rectangle,elem)) Cerr << "to correct rectangles..." << finl;
@@ -69,23 +69,23 @@ Entree& Redresser_hexaedres_vdf::interpreter_(Entree& is)
       double correction_max = 0;
       Octree_Double octree;
       octree.build_nodes(les_sommets, 0 /* do not include virtual nodes */);
-      // direction indique la coordonnee qu'on va corriger
+      // direction indicates the coordinate to be corrected
       for (int direction = 0; direction < dimension; direction++)
         {
-          ArrOfInt marqueurs(nb_sommets); // initialise a zero
+          ArrOfInt marqueurs(nb_sommets); // initialized to zero
           ArrOfInt liste_sommets;
 
           int prochain_sommet = 0;
           while (prochain_sommet < nb_sommets)
             {
-              // Cherche le prochain sommet non marque:
+              // Find the next unmarked vertex:
               for (; prochain_sommet < nb_sommets; prochain_sommet++)
                 if (! marqueurs[prochain_sommet])
                   break;
               if (prochain_sommet == nb_sommets)
                 break;
-              // Trouver tous les sommets qui sont dans une boite tres grande
-              // en dehors de la direction dir:
+              // Find all vertices that are in a very large box
+              // outside of direction dir:
               double x = les_sommets(prochain_sommet, 0);
               double y = les_sommets(prochain_sommet, 1);
               double z = (dimension == 3) ? les_sommets(prochain_sommet, 2) : 0.;
@@ -96,29 +96,29 @@ Entree& Redresser_hexaedres_vdf::interpreter_(Entree& is)
               double zmin = (direction==2) ? (z-epsilon) : (-DMAXFLOAT);
               double zmax = (direction==2) ? (z+epsilon) : (+DMAXFLOAT);
               octree.search_elements_box(xmin, ymin, zmin, xmax, ymax, zmax, liste_sommets);
-              // Pour chaque sommet, corriger deux des coordonnees
-              // (on met les coordonnees du point trouve)
+              // For each vertex, correct two of the coordinates
+              // (set coordinates to those of the found point)
               const int n = liste_sommets.size_array();
               for (int i = 0; i < n; i++)
                 {
                   const int j = liste_sommets[i];
-                  // le premier sommet sert de reference, ne pas le corriger:
+                  // the first vertex serves as reference, do not correct it:
                   if (j == prochain_sommet)
                     continue;
-                  // coordonnee de reference (on aligne tous les autres points du
-                  // plan de maillage sur celui-la:
+                  // reference coordinate (align all other points of
+                  // the mesh plane on this one):
                   const double coord_ref = les_sommets(prochain_sommet, direction);
 
-                  // verifier que le sommet est bien dans la boite (l'octree
-                  // renvoie les sommets "potentiellement" a l'interieur
+                  // verify that the vertex is indeed in the box (the octree
+                  // returns vertices "potentially" inside)
                   const double coord = les_sommets(j, direction);
                   if (std::fabs(coord-coord_ref) > epsilon)
                     continue;
 
                   correction_max=std::max(correction_max,std::fabs(coord_ref-les_sommets(j, direction)));
-                  // Corriger:
+                  // Correct:
                   les_sommets(j, direction) = coord_ref;
-                  marqueurs[j] = 1; // sommet traite !
+                  marqueurs[j] = 1; // vertex processed!
                 }
               marqueurs[prochain_sommet] = 1;
             }

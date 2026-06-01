@@ -90,7 +90,7 @@ Entree& Solveur_Implicite_base::readOn(Entree& is)
         {
           le_solveur_est_lu = 1;
           SChaine toto;
-          // redefinition de motlu pour garder les minuscules/majuscules
+          // redefine motlu to preserve lowercase/uppercase
           Nom motlubis;
           int nb_acc = 0;
           int ok = 0;
@@ -151,7 +151,7 @@ Entree& Solveur_Implicite_base::readOn(Entree& is)
 
 bool Solveur_Implicite_base::iterer_eqs(LIST(OBS_PTR(Equation_base)) eqs, int n, int& ok)
 {
-  Process::exit("Iterer_eqs non code");
+  Process::exit("Iterer_eqs not coded");
   return false;
 }
 
@@ -162,9 +162,9 @@ Entree& Solveur_Implicite_base::lire(const Motcle& motlu, Entree& is)
   return is;
 }
 
-/*! @brief retourne le parametre_implicte de l'equation si il existe si il n'existe pas le cree.
+/*! @brief Returns the implicit parameter of the equation if it exists, creates it if it does not.
  *
- * .. si les params sont vides on copie ceux du simpler
+ * .. if the parameters are empty, copies those from the simpler solver.
  *
  */
 OWN_PTR(Parametre_equation_base)& Solveur_Implicite_base::get_and_set_parametre_equation(Equation_base& eqn)
@@ -181,7 +181,7 @@ OWN_PTR(Parametre_equation_base)& Solveur_Implicite_base::get_and_set_parametre_
     }
 
   Parametre_implicite& param_impl = ref_cast(Parametre_implicite,param.valeur());
-  // on regarde si il y a des valeurs par defaut a recopier
+  // check if there are default values to copy
   if (param_impl.seuil_convergence_implicite()<0)
     param_impl.seuil_convergence_implicite() = param_defaut_.seuil_convergence_implicite();
   if (param_impl.seuil_verification_solveur()<0)

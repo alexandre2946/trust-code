@@ -23,7 +23,7 @@ class Schema_RK_Williamson
 { };
 /// \endcond
 
-/*! @brief : classe RK2 Cette classe represente un schema en temps de Runge Kutta d'ordre 2, cas 1 de Williamson, s'ecrit :
+/*! @brief : class RK2 This class represents a second-order Runge-Kutta time scheme, case 1 of Williamson, written as:
  *
  *      q1=h f(x0)
  *      x1=x0+b1 q1
@@ -37,7 +37,7 @@ class RK2: public TRUSTSchema_RK<Ordre_RK::DEUX_WILLIAMSON>
 };
 
 
-/*! @brief : classe RK3 Cette classe represente un schema en temps de Runge Kutta d'ordre 3, cas 7 de Williamson, s'ecrit :
+/*! @brief : class RK3 This class represents a third-order Runge-Kutta time scheme, case 7 of Williamson, written as:
  *
  *      q1=h f(x0)
  *      x1=x0+b1 q1
@@ -52,7 +52,7 @@ class RK3: public TRUSTSchema_RK<Ordre_RK::TROIS_WILLIAMSON>
   Declare_instanciable(RK3);
 };
 
-/*! @brief : classe RK4 Cette classe represente un schema en temps de Runge Kutta d'ordre 4 degnere (schema a trois points), cas 17 de Williamson, s'ecrit :
+/*! @brief : class RK4 This class represents a degenerate fourth-order Runge-Kutta time scheme (three-point scheme), case 17 of Williamson, written as:
  *
  *      q1=h f(x0)
  *      x1=x0+b1 q1

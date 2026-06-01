@@ -29,7 +29,7 @@ Entree& Polygone_poly::readOn( Entree& is )
   Elem_poly_base::readOn( is );
   return is;
 }
-/*! @brief remplit le tableau face_normales dans le Domaine_poly
+/*! @brief Fills in the face_normales array in the Domaine_poly.
  *
  */
 void Polygone_poly::normale(int num_Face,DoubleTab& Face_normales,
@@ -59,8 +59,8 @@ void Polygone_poly::normale(int num_Face,DoubleTab& Face_normales,
       int no3;
   int f0;
 
-  // Orientation de la normale de elem1 vers elem2
-  // pour cela recherche du sommet de elem1 qui n'est pas sur la Face
+  // Orient the normal from elem1 to elem2
+  // by searching for the vertex of elem1 that is not on the Face
   int elem1 = Face_voisins(num_Face,0);
   if ( (f0 = elem_faces(elem1,0)) == num_Face )
     f0 = elem_faces(elem1,1);

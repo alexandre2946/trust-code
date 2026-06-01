@@ -22,9 +22,7 @@
 
 class Champ_Inc_base;
 
-/*! @brief classe Loi_Etat_Multi_GP_base Cette classe represente la loi d'etat pour un melange de gaz parfaits.
- *
- *
+/*! @brief Base state law class for a mixture of ideal gases.
  *
  * @sa Fluide_Dilatable_base Loi_Etat_base Loi_Etat_Melange_GP_base
  */
@@ -48,7 +46,7 @@ public:
   virtual void calculer_tab_Cp(DoubleTab& cp) const = 0;
   virtual void calculer_mu_wilke()=0;
 
-  // Methodes inlines
+  // Inline methods
   inline const DoubleTab& masse_molaire() const { return masse_mol_mel; }
   inline DoubleTab& masse_molaire() { return masse_mol_mel; }
   virtual double calculer_masse_volumique(double P,double T,double r) const;

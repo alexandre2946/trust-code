@@ -59,8 +59,8 @@ Entree& SupprimeBord_32_64<_SIZE_>::interpreter_(Entree& is)
     {
 
       {
-        // la recup des bords et des raccords est dans la boucle
-        // pour pouvoir supprimer ...
+        // boundary and connector retrieval is inside the loop
+        // to allow deletion ...
         Bords_t& listbord=dom.faces_bord();
         Raccords_t& listrac=dom.faces_raccord();
         const Nom& nombord=nlistbord[b];

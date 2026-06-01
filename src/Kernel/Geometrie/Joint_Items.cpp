@@ -16,10 +16,10 @@
 #include <Joint_Items.h>
 
 // **********************************************************
-//  Implementation de la classe Joint_Items_32_64
+//  Implementation of the Joint_Items_32_64 class
 // **********************************************************
 
-/*! @brief constructeur par defaut
+/*! @brief default constructor
  *
  */
 template <typename _SIZE_>
@@ -30,7 +30,7 @@ Joint_Items_32_64<_SIZE_>::Joint_Items_32_64()
   flags_init_ = 0;
 }
 
-/*! @brief remise dans l'etat initial obtenu apres constructeur par defaut
+/*! @brief Resets to the initial state obtained after the default constructor.
  *
  */
 template <typename _SIZE_>
@@ -45,10 +45,10 @@ void Joint_Items_32_64<_SIZE_>::reset()
 }
 
 
-/*! @brief Renvoie le tableau items_communs_ pour le remplir.
+/*! @brief Returns the items_communs_ array for filling.
  *
- * (BM: ce tableau n'est pas encore rempli)
- *
+ * @note (BM: this array is not yet filled)
+ * @return Reference to the items_communs_ array.
  */
 template <typename _SIZE_>
 typename Joint_Items_32_64<_SIZE_>::ArrOfInt_t& Joint_Items_32_64<_SIZE_>::set_items_communs()
@@ -57,8 +57,9 @@ typename Joint_Items_32_64<_SIZE_>::ArrOfInt_t& Joint_Items_32_64<_SIZE_>::set_i
   return items_communs_;
 }
 
-/*! @brief Voir items_distants_
+/*! @brief Returns the items_distants_ array (read-only). See items_distants_.
  *
+ * @return Const reference to the items_distants_ array.
  */
 template <typename _SIZE_>
 const typename Joint_Items_32_64<_SIZE_>::ArrOfInt_t& Joint_Items_32_64<_SIZE_>::items_distants() const
@@ -67,11 +68,12 @@ const typename Joint_Items_32_64<_SIZE_>::ArrOfInt_t& Joint_Items_32_64<_SIZE_>:
   return items_distants_;
 }
 
-/*! @brief Renvoie le tableau items_distants_ pour le remplir Voir Scatter::calculer_espace_distant,
+/*! @brief Returns the items_distants_ array for filling.
  *
- *       Scatter::calculer_espace_distant_faces_frontieres,
- *       Scatter::calculer_espace_distant_elements
- *
+ * @sa Scatter::calculer_espace_distant,
+ *     Scatter::calculer_espace_distant_faces_frontieres,
+ *     Scatter::calculer_espace_distant_elements
+ * @return Reference to the items_distants_ array.
  */
 template <typename _SIZE_>
 typename Joint_Items_32_64<_SIZE_>::ArrOfInt_t& Joint_Items_32_64<_SIZE_>::set_items_distants()
@@ -80,8 +82,10 @@ typename Joint_Items_32_64<_SIZE_>::ArrOfInt_t& Joint_Items_32_64<_SIZE_>::set_i
   return items_distants_;
 }
 
-/*! @brief Voir nb_items_virtuels_ Voir Scatter::calculer_nb_items_virtuels
+/*! @brief Sets the number of virtual items. See nb_items_virtuels_.
  *
+ * @sa Scatter::calculer_nb_items_virtuels
+ * @param n Number of virtual items received from the neighboring domain.
  */
 template <typename _SIZE_>
 void Joint_Items_32_64<_SIZE_>::set_nb_items_virtuels(int n)
@@ -90,8 +94,9 @@ void Joint_Items_32_64<_SIZE_>::set_nb_items_virtuels(int n)
   nb_items_virtuels_ = n;
 }
 
-/*! @brief Voir nb_items_virtuels_
+/*! @brief Returns the number of virtual items. See nb_items_virtuels_.
  *
+ * @return Number of virtual items received from the neighboring domain.
  */
 template <typename _SIZE_>
 int Joint_Items_32_64<_SIZE_>::nb_items_virtuels() const
@@ -100,10 +105,11 @@ int Joint_Items_32_64<_SIZE_>::nb_items_virtuels() const
   return nb_items_virtuels_;
 }
 
-/*! @brief Voir renum_items_communs_ Voir Scatter::calculer_colonne0_renum_faces_communes
+/*! @brief Returns the renum_items_communs_ array for filling. See renum_items_communs_.
  *
- *       Scatter::construire_correspondance_sommets_par_coordonnees
- *
+ * @sa Scatter::calculer_colonne0_renum_faces_communes,
+ *     Scatter::construire_correspondance_sommets_par_coordonnees
+ * @return Reference to the renum_items_communs_ array.
  */
 template <typename _SIZE_>
 typename Joint_Items_32_64<_SIZE_>::IntTab_t& Joint_Items_32_64<_SIZE_>::set_renum_items_communs()
@@ -112,8 +118,9 @@ typename Joint_Items_32_64<_SIZE_>::IntTab_t& Joint_Items_32_64<_SIZE_>::set_ren
   return renum_items_communs_;
 }
 
-/*! @brief Voir renum_items_communs_
+/*! @brief Returns the renum_items_communs_ array (read-only). See renum_items_communs_.
  *
+ * @return Const reference to the renum_items_communs_ array.
  */
 template <typename _SIZE_>
 const typename Joint_Items_32_64<_SIZE_>::IntTab_t& Joint_Items_32_64<_SIZE_>::renum_items_communs() const
@@ -122,8 +129,9 @@ const typename Joint_Items_32_64<_SIZE_>::IntTab_t& Joint_Items_32_64<_SIZE_>::r
   return renum_items_communs_;
 }
 
-/*! @brief Pas encore utilise
+/*! @brief Sets the number of real items. Not yet used.
  *
+ * @param n Number of real items.
  */
 template <typename _SIZE_>
 void Joint_Items_32_64<_SIZE_>::set_nb_items_reels(int n)
@@ -133,11 +141,12 @@ void Joint_Items_32_64<_SIZE_>::set_nb_items_reels(int n)
   nb_items_reels_ = n;
 }
 
-/*! @brief Pas encore utilise (prevu pour faciliter la creation des tableaux distribues, mais les joints ne sont pas le bon endroit
+/*! @brief Returns the number of real items. Not yet used.
  *
- *   pour stocker cette valeur: il faut pouvoir la stocker meme s'il n'y
- *   a aucun processeur voisin).
- *
+ * Intended to facilitate creation of distributed arrays, but joints are not
+ * the right place to store this value: it must be storable even when there
+ * is no neighboring processor.
+ * @return Number of real items.
  */
 template <typename _SIZE_>
 int Joint_Items_32_64<_SIZE_>::nb_items_reels() const

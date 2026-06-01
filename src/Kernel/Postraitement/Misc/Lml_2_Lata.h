@@ -18,7 +18,8 @@
 
 #include <Interprete.h>
 
-/*! @brief Classe Lml_2_Lata  Converts lml file to lata
+/*! @brief class Lml_2_Lata
+ * @brief Converts lml file to lata
  *
  */
 class Lml_2_Lata: public Interprete

@@ -48,15 +48,15 @@ void Op_Moyenne::completer(const Probleme_base& Pb, const Nom& prefix)
   Nom pdi_name = prefix + nom_pour_post;
   integrale_champ_.le_champ_calcule().set_pdi_name(pdi_name);
 
-  // Dimensionnement du champ integrale_champ a la meme taille que mon_champ
+  // Size the integrale_champ field to the same size as mon_champ
   OWN_PTR(Champ_base) espace_stockage_source;
   const Champ_base& source = mon_champ->get_champ(espace_stockage_source);
   const DoubleTab& tab1 = source.valeurs();
 
-  // La methode valeurs pour cette classe est surchargee et renvoie
-  // integrale_champ->valeurs(). Il n'y a pas de stockage en memoire
-  // de la moyenne. On stocke l'integrale en temps et on postraite la moyenne
-  // Copie de la structure du vecteur, initialisation a zero.
+  // The valeurs() method for this class is overridden and returns
+  // integrale_champ->valeurs(). The mean is not stored directly in memory;
+  // the time integral is stored and the mean is post-processed from it.
+  // Copy the vector structure and initialize to zero.
   valeurs().copy(tab1, RESIZE_OPTIONS::NOCOPY_NOINIT);
   if (!ch_moyenne_convergee_)
     valeurs() = 0.;

@@ -18,10 +18,10 @@
 
 #include <Source_base.h>
 
-/*! @brief Source couplant gradient de pression et dilatation thermique pour la formulation thermomécanique.
+/*! @brief Source term coupling the pressure gradient and thermal expansion for the thermomechanical formulation.
  *
- *  La classe ne contient pour l'instant que le squelette des méthodes nécessaires. Les contributions
- *  physiques seront ajoutées dans une étape ultérieure.
+ *  The class currently contains only the skeleton of the necessary methods. The physical contributions
+ *  will be added in a later stage.
  */
 class Source_Meca_Grad_Pression_Thermique_EF : public Source_base
 {

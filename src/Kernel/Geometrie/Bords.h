@@ -19,7 +19,7 @@
 #include <TRUST_List.h>
 #include <Bord.h>
 
-/*! @brief Classe Bords Cette classe represente une liste d'objets de type Bord
+/*! @brief Class Bords This class represents a list of objects of type Bord.
  *
  * @sa Bord
  */

@@ -18,10 +18,10 @@
 
 #include <Convection_Diffusion_Espece_Multi_base.h>
 
-/*! @brief classe Convection_Diffusion_Espece_Multi_WC Cas particulier de Convection_Diffusion_Espece_Multi_base
+/*! @brief Convection_Diffusion_Espece_Multi_WC class Special case of Convection_Diffusion_Espece_Multi_base
  *
- *      pour un fluide quasi conpressible quand le scalaire subissant le transport est
- *      la fraction massique
+ *      for a weakly compressible fluid when the transported scalar is
+ *      the mass fraction
  *
  * @sa Convection_Diffusion_Espece_Multi_base
  */

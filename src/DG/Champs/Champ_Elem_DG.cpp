@@ -69,7 +69,7 @@ void Champ_Elem_DG::associer_domaine_dis_base(const Domaine_dis_base& z_dis)
 {
   le_dom_VF = ref_cast(Domaine_VF, z_dis);
 
-  order_ = Option_DG::Get_order_for(nom_);// Todo regler la relation ordre inconnu/quadrature avec dictionnaire ?
+  order_ = Option_DG::Get_order_for(nom_);// Todo fix the relation between unknown order/quadrature with a dictionary?
   nb_bfunc_ = Option_DG::Nb_col_from_order(order_);
 }
 
@@ -87,10 +87,10 @@ Champ_base& Champ_Elem_DG::affecter_(const Champ_base& ch)
 
   const int quad_order = bfunc.get_default_quadrature_order();
 
-  const Quadrature_base& quad = domaine.get_quadrature(quad_order); // if Uniforme remplissage automatique
-  //sinon interdit d'avoir 1
+  const Quadrature_base& quad = domaine.get_quadrature(quad_order); // if Uniform type, fills automatically
+  // otherwise having 1 is not allowed
 
-  //creation d'un DoubleTab intermediaire pour recuperer les valeurs du champ ch sur les points de quadrature ?
+  // create an intermediate DoubleTab to retrieve the field ch values at quadrature points
   const DoubleTab& integ_points = quad.get_integ_points();
   int nb_pts_integ_max = quad.nb_pts_integ_max();
 
@@ -161,7 +161,7 @@ DoubleTab& Champ_Elem_DG::valeur_aux(const DoubleTab& positions, DoubleTab& tab_
   IntVect les_polys;
   les_polys.resize(tab_valeurs.dimension(0), RESIZE_OPTIONS::NOCOPY_NOINIT);
 
-  domaine.chercher_elements(positions, les_polys); //TODO DG selectionner uniquement la premiere valeur de tab_valeurs (on refait plein de fois le même truc)
+  domaine.chercher_elements(positions, les_polys); //TODO DG select only the first value of tab_valeurs (the same thing is done many times)
 
   const Champ_base& ch_base = le_champ();
   const DoubleTab& values = ch_base.valeurs();
@@ -183,7 +183,7 @@ DoubleTab& Champ_Elem_DG::valeur_aux(const DoubleTab& positions, DoubleTab& tab_
           for (int j = 0; j < quad.nb_pts_integ(cell); j++)
             for (int k = 0; k<dim; k++)
               coords(j,k) = positions(quad.ind_pts_integ(cell) +j, k);
-//          coords.ref_tab(positions, i*nb_points, nb_points); //pas possible car const
+//          coords.ref_tab(positions, i*nb_points, nb_points); // not possible because of const
 
           bfunc.eval_bfunc(coords, cell, fbase);
 
@@ -191,7 +191,7 @@ DoubleTab& Champ_Elem_DG::valeur_aux(const DoubleTab& positions, DoubleTab& tab_
             {
               tab_valeurs(i,j) = 0.;
               for (int l =0; l<nb_bfunc_; l++)
-                tab_valeurs(i,j) += values(cell,l) * fbase(l,j); // reconstruction valeurs du champ aux points d'integrations
+                tab_valeurs(i,j) += values(cell,l) * fbase(l,j); // reconstruct field values at integration points
             }
         }
     }
@@ -230,7 +230,7 @@ DoubleTab& Champ_Elem_DG::eval_elem(DoubleTab& tab_valeurs) const
           for (int j = 0; j < quad.nb_pts_integ(i) ; j++)
             {
               for (int l =0; l<nb_bfunc_; l++)
-                tab_valeurs(i,j+d*nb_pts_integ_max) += values(i,l+d*nb_bfunc_) * fbase(l,j); // reconstruction valeurs du champ aux points d'integrations
+                tab_valeurs(i,j+d*nb_pts_integ_max) += values(i,l+d*nb_bfunc_) * fbase(l,j); // reconstruct field values at integration points
             }
         }
     }
@@ -278,7 +278,7 @@ DoubleTab& Champ_Elem_DG::valeur_aux_elems(const DoubleTab& positions, const Int
               product = 0.;
               for (int k = 0; k < quad.nb_pts_integ(cell) ; k++)
                 for (int l =0; l<nb_bfunc_; l++)
-                  product(k) += values(cell,j*nb_bfunc_ + l) * fbase(l,k); // reconstruction valeurs du champ aux points coords
+                  product(k) += values(cell,j*nb_bfunc_ + l) * fbase(l,k); // reconstruct field values at coordinate points
 
               result(i,j) = quad.compute_integral_on_elem(cell, product);
               result(i,j) /= volume(cell);

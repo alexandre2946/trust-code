@@ -98,8 +98,8 @@ void Paroi_flux_impose_rayo_transp_VDF::calculer_Teta_i()
 
   for (int numfa = 0; numfa < nb_faces_bord; numfa++)
     {
-      // QUI QU'A BU ?????
-      // T_f (numfa)!!!! balaise Tf(elem) plus judicieux!!!
+      // WHO DID THIS ?????
+      // T_f (numfa)!!!! Tf(elem) would be more sensible!!!
       int elem = face_voisins(numfa + ndeb, 0);
       if (elem < 0)
         elem = face_voisins(numfa + ndeb, 1);

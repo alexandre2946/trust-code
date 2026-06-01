@@ -78,7 +78,7 @@ double largest_angle(const DoubleTab& coords)
       if (Vecteur3::produit_scalaire(normals[n],opp)<0)
         normals[n]*=-1;
     }
-  // on a les 4 normals orientes vers l'interieur
+  // we have the 4 normals oriented toward the interior
   double max_pscal=-100;
   for (int n1=0; n1<nb_face; n1++)
     for (int n2=n1+1; n2<nb_face; n2++)
@@ -88,7 +88,7 @@ double largest_angle(const DoubleTab& coords)
         if (pscal>max_pscal)
           max_pscal=pscal;
       }
-  double tet=acos(max_pscal<=1. ? max_pscal : 1.)/acos(-1.)*180; // acos(-1) ne compile pas avec xlC
+  double tet=acos(max_pscal<=1. ? max_pscal : 1.)/acos(-1.)*180; // acos(-1) does not compile with xlC
 
   tet=180-tet;
   return tet;
@@ -149,7 +149,7 @@ void histogramme_angle(const Domaine_32_64<_SIZE_>& dom, Sortie& out, int nb_his
       for (int h=0; h<nb_histo; h++)
         {
           histo[h]=static_cast<int>(Process::mp_sum(histo[h]));  // should remain within 'int' range
-          // Pas d'angles en dessous de 60 forcement
+          // No angles below 60 necessarily
           if (180/nb_histo*h>=60)
             {
               obtuse_cells_proportion=histo[h]*100./(double)nb_elem_tot;

@@ -27,14 +27,14 @@ class Discretisation_base;
 class Domaine_Cl_dis_base;
 class Equation_base;
 
-/*! @brief classe Cond_lim_base Classe de base pour la hierarchie des classes qui representent les differentes conditions aux limites (Dirichlet, Neumann ...).
+/*! @brief class Cond_lim_base Base class for the hierarchy of classes that represent the different boundary conditions (Dirichlet, Neumann ...).
  *
- *      Un objet condition aux limite sert a definir, pour une equation donnee, les conditions aux limites a appliquer sur une frontiere d'un domaine.
- *      Chaque objet Cond_lim_base contient une reference vers l'objet Domaine_Cl_dis_base dont il fait partie.
- *      Chaque objet contient egalement un objet OWN_PTR(Champ_front_base) contenant les valeurs a imposer sur la frontiere.
+ *      A boundary condition object serves to define, for a given equation, the boundary conditions to apply on a boundary of a domain.
+ *      Each Cond_lim_base object contains a reference to the Domaine_Cl_dis_base object it is part of.
+ *      Each object also contains an OWN_PTR(Champ_front_base) object containing the values to impose on the boundary.
  *
- * @sa Cond_lim Domaine_Cl_dis_base Frontiere_dis_base, Classe abstraite dont toutes les objets representant des conditions, aux limites doivent deriver.,
- *     Methode abstraite:, int compatible_avec_eqn(const Equation_base&) const
+ * @sa Cond_lim Domaine_Cl_dis_base Frontiere_dis_base, Abstract class from which all objects representing boundary conditions must derive.,
+ *     Abstract method:, int compatible_avec_eqn(const Equation_base&) const
  */
 class Cond_lim_base : public Objet_U
 {
@@ -65,21 +65,21 @@ public:
 
   virtual int a_mettre_a_jour_ss_pas_dt();
 
-  // methode pour positionner le drapeau modifier_val_impl
+  // method to set the modifier_val_impl flag
   inline void set_modifier_val_imp(int);
   virtual void changer_temps_futur(double temps, int i);
   virtual int avancer(double temps);
   virtual int reculer(double temps);
 
-  // methode virtuelle pour les CL rayonnement ! Attention, Cond_lim_rayo_milieu_transp et Cond_lim_rayo_semi_transp ne derive pas d'objet_U
+  // virtual methods for radiation BCs! Note: Cond_lim_rayo_milieu_transp and Cond_lim_rayo_semi_transp do not derive from Objet_U
   virtual bool is_bc_rayo_milieu_transp(Cond_lim_rayo_milieu_transp*& la_cl_rayo)
   {
-    return false; /* par defaut pas rayo ! */
+    return false; /* not radiation by default! */
   }
 
   virtual bool is_bc_rayo_semi_transp(Cond_lim_rayo_semi_transp*& la_cl_rayo)
   {
-    return false; /* par defaut pas rayo ! */
+    return false; /* not radiation by default! */
   }
 
 protected:
@@ -90,44 +90,44 @@ protected:
   void err_pas_compatible(const Equation_base&) const;
   void err_pas_compatible(const Discretisation_base&) const;
 
-  // ajout drapeau pour modifier ou pas la valeur imposee sur la condition limite
+  // flag to indicate whether or not to modify the imposed value on the boundary condition
   int modifier_val_imp = 0;
 };
 
-/*! @brief Renvoie la frontiere discretisee a laquelle les conditions aux limites s'appliquent.
+/*! @brief Returns the discretized boundary to which the boundary conditions apply.
  *
- * @return (Frontiere_dis_base&) la frontiere discretisee a laquelle les conditions aux limites sont associees
+ * @return (Frontiere_dis_base&) the discretized boundary to which the boundary conditions are associated
  */
 inline Frontiere_dis_base& Cond_lim_base::frontiere_dis()
 {
   return le_champ_front->frontiere_dis();
 }
 
-/*! @brief Renvoie la frontiere discretisee a laquelle les conditions aux limites s'appliquent.
+/*! @brief Returns the discretized boundary to which the boundary conditions apply.
  *
- *     (version const)
+ *     (const version)
  *
- * @return (Frontiere_dis_base&) la frontiere discretisee a laquelle les conditions aux limites sont associees
+ * @return (Frontiere_dis_base&) the discretized boundary to which the boundary conditions are associated
  */
 inline const Frontiere_dis_base& Cond_lim_base::frontiere_dis() const
 {
   return le_champ_front->frontiere_dis();
 }
 
-/*! @brief Renvoie le domaine des conditions aux limites discretisee dont l'objet fait partie.
+/*! @brief Returns the domain of discretized boundary conditions to which the object belongs.
  *
- * @return (Domaine_Cl_dis_base&) le domaine des conditions aux limites discretisee dont l'objet fait partie
+ * @return (Domaine_Cl_dis_base&) the domain of discretized boundary conditions to which the object belongs
  */
 inline Domaine_Cl_dis_base& Cond_lim_base::domaine_Cl_dis()
 {
   return mon_dom_cl_dis.valeur();
 }
 
-/*! @brief Renvoie le domaine des conditions aux limites discretisee dont l'objet fait partie.
+/*! @brief Returns the domain of discretized boundary conditions to which the object belongs.
  *
- *     (version const)
+ *     (const version)
  *
- * @return (Domaine_Cl_dis_base&) le domaine des conditions aux limites discretisee dont l'objet fait partie
+ * @return (Domaine_Cl_dis_base&) the domain of discretized boundary conditions to which the object belongs
  */
 inline const Domaine_Cl_dis_base& Cond_lim_base::domaine_Cl_dis() const
 {
@@ -144,22 +144,22 @@ inline const Champ_front_base& Cond_lim_base::champ_front() const
   return le_champ_front;
 }
 
-/*! @brief Positionne le drapeau modifier_val_imp a la valeur donnee : - si drap == 1 : modifier_val_imp=1
+/*! @brief Sets the modifier_val_imp flag to the given value: - if drap == 1: modifier_val_imp=1
  *
- *     - sinon        : modifier_val_imp=0
- *     Ce drapeau permet a la CL de savoir si elle doit renvoyer la valeur stockee
- *     telle quelle, ou si elle doit la traduire pour l'objet appelant
- *     A la CL de savoir ensuite quelle traduction faire.
- *     Voir application dans Temperature_imposee_paroi_H, ou la CL renvoie l'enthalpie
- *     par defaut (modifier_val_imp=1), ou la temperature sinon (cas de l'operateur de diffusion)
- *     Le drapeau est positionne dans le equation.derivee_en_temps_inco
- *     selon l'operateur qui va etre appele
+ *     - otherwise    : modifier_val_imp=0
+ *     This flag allows the BC to know whether it should return the stored value
+ *     as-is, or whether it should translate it for the calling object.
+ *     It is up to the BC to then decide what translation to perform.
+ *     See application in Temperature_imposee_paroi_H, where the BC returns the enthalpy
+ *     by default (modifier_val_imp=1), or the temperature otherwise (case of the diffusion operator).
+ *     The flag is set in equation.derivee_en_temps_inco
+ *     according to the operator that will be called.
  *
- * @param (drap) valeur a donner au drapeau
+ * @param (drap) value to assign to the flag
  */
 inline void Cond_lim_base::set_modifier_val_imp(int drap)
 {
-  //positionne le drapeau a 0 ou 1
+  // set the flag to 0 or 1
   modifier_val_imp = (drap==1);
 }
 

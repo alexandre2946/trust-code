@@ -29,18 +29,18 @@ Sortie& Op_Diff_negligeable::printOn(Sortie& os) const { return os; }
 
 Entree& Op_Diff_negligeable::readOn(Entree& is) { return is; }
 
-/*! @brief Associe la diffusivite a l'operateur.
+/*! @brief Associates the diffusivity to the operator.
  *
- * @param (Champ_Don_base& ch) le champ representant la diffusivite
+ * @param (Champ_Don_base& ch) the field representing the diffusivity
  */
 void Op_Diff_negligeable::associer_diffusivite(const Champ_base& ch)
 {
   la_diffusivite=ch;
 }
 
-/*! @brief Renvoie le champ representant la diffusivite.
+/*! @brief Returns the field representing the diffusivity.
  *
- * @return (Champ_Don_base&) le champ representant la diffusivite
+ * @return (Champ_Don_base&) the field representing the diffusivity
  */
 const Champ_base& Op_Diff_negligeable::diffusivite() const
 {

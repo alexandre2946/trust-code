@@ -19,7 +19,7 @@
 
 
 
-/*! @brief Classe Dilate x->alpha x
+/*! @brief Class Dilate x->alpha x
  *
  * @sa Interprete Pave
  */

@@ -19,9 +19,9 @@
 #include <Sources_Multiphase_base.h>
 #include <Matrix_tools.h>
 
-/*! @brief classe Force_Tchen Force de Tchen dans un ecoulement multiphase
+/*! @brief Tchen force in a multiphase flow.
  *
- *       Forme F_Tchen = alpha_v * rho_l * du_l/dt
+ *       Form: F_Tchen = alpha_v * rho_l * du_l/dt
  *
  */
 class Source_Force_Tchen_base: public Sources_Multiphase_base

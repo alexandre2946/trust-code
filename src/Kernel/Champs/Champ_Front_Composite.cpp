@@ -27,7 +27,7 @@ Sortie& Champ_Front_Composite::printOn(Sortie& os) const {  return Champ_front_b
 
 Entree& Champ_Front_Composite::readOn(Entree& is)
 {
-  nommer(que_suis_je()); // pour printOn
+  nommer(que_suis_je()); // for printOn
 
   Motcle motlu, acc_ouv("{"), acc_fer("}");
   is >> dim_;
@@ -50,7 +50,7 @@ Entree& Champ_Front_Composite::readOn(Entree& is)
       Process::exit();
     }
 
-  // XXX : On verifie qu'on a lu les memes types de champs ...
+  // XXX : We verify that we have read the same field types ...
   for (int i = 1; i < dim_ ; i++)
     if (z_fld_[i]->que_suis_je() != z_fld_[0]->que_suis_je())
       {
@@ -58,7 +58,7 @@ Entree& Champ_Front_Composite::readOn(Entree& is)
         Process::exit();
       }
 
-  // pour la methode valeurs()
+  // for the valeurs() method
   const int ncompo = z_fld_[0]->nb_comp() * dim_, nnodes = z_fld_[0]->valeurs().dimension_tot(0);
   fixer_nb_comp(ncompo);
   les_valeurs->valeurs().resize(nnodes, nb_compo_);
@@ -68,7 +68,7 @@ Entree& Champ_Front_Composite::readOn(Entree& is)
   return is;
 }
 /*
- * On stock comme ca : X X X ... Y Y Y ... Z Z Z ...
+ * Stored as: X X X ... Y Y Y ... Z Z Z ...
  */
 void Champ_Front_Composite::fill_valeurs_composite()
 {
@@ -91,14 +91,14 @@ int Champ_Front_Composite::initialiser(double temps, const Champ_Inc_base& inco)
 
 void Champ_Front_Composite::valeurs_face(int face, DoubleVect& var) const
 {
-  // Bricorama ....
-  assert (nb_compo_ == z_fld_[0]->nb_comp() * dim_); // pour micho :-)
+  // Workaround ....
+  assert (nb_compo_ == z_fld_[0]->nb_comp() * dim_); // sanity check
   var.resize(nb_compo_);
   for (int nbp = 0; nbp < dim_; nbp++)
     {
       DoubleVect tmp;
       z_fld_[nbp]->valeurs_face(face,tmp);
-      assert (var.size() == dim_ * tmp.size()); // pour micho :-)
+      assert (var.size() == dim_ * tmp.size()); // sanity check
       for (int j = 0; j < tmp.size(); j++)
         var(nbp + j * dim_) = tmp(j);
     }

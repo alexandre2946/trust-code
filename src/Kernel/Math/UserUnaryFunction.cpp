@@ -22,7 +22,7 @@ Implemente_instanciable(UserUnaryFunction,"UserUnaryFunction",UnaryFunction);
 
 
 
-/*! @brief Ecriture sur un flot de sortie Ecrit la valeur de la constante
+/*! @brief Writes to an output stream. Writes the value of the constant
  *
  * @param (Sortie& os) le flot de sortie a utiliser
  * @return (Sortie&) le flot de sortie modifie
@@ -34,10 +34,10 @@ Sortie& UserUnaryFunction::printOn(Sortie& os) const
 }
 
 
-/*! @brief Lit la valeur de la constante
+/*! @brief Reads the value of the constant
  *
- * @param (Entree& is) le flot d'entree a utiliser
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) the input stream to use
+ * @return (Entree&) the modified input stream
  */
 Entree& UserUnaryFunction::readOn(Entree& is)
 {

@@ -22,14 +22,14 @@ class Domaine_Cl_dis_base;
 class Domaine_dis_base;
 class Champ_Inc_base;
 
-/*! @brief Classe Opnegligeable Cette classe definit l'interface d'un operateur negligeable
+/*! @brief Classe Opnegligeable This class defines the interface of a negligible operator
  *
- *     en definissant des methodes ajouter,calculer et mettre_a_jour
- *     qui ne font aucun calcul.
- *     Cette classe est utilisee lors de la definition d'operateurs
- *     negligeable par heritage multiple.
+ *     by defining ajouter, calculer and mettre_a_jour methods
+ *     that perform no computation.
+ *     This class is used when defining negligible operators
+ *     through multiple inheritance.
  *
- * @sa Op_Diff_negligeable Op_Diff_K_Eps_negligeable Op_Conv_negligeable, Classe interface, hors hierarchie operateurs TrioU., Doit faire partie d'un heritage multiple pour etre, utile a la definition d'un operateur negligeable instanciable.
+ * @sa Op_Diff_negligeable Op_Diff_K_Eps_negligeable Op_Conv_negligeable, Interface class, outside the TRUST operator hierarchy., Must be part of a multiple inheritance to be, useful for defining an instantiable negligible operator.
  */
 class Operateur_negligeable
 {
@@ -45,13 +45,13 @@ protected :
 
 
 
-/*! @brief Ajout de la contribution d'un operateur negligeable a un tableau.
+/*! @brief Adds the contribution of a negligible operator to an array.
  *
- *     NE FAIT RIEN, renvoie le parametre tableau sans le modifie.
+ *     DOES NOTHING, returns the array parameter unmodified.
  *
- * @param (DoubleTab&) le tableau sur lequel on applique l'operateur
+ * @param (DoubleTab&) the array on which the operator is applied
  * @param (DoubleTab& x)
- * @return (DoubleTab&) le parametre d'entree x non modifie
+ * @return (DoubleTab&) the input parameter x unmodified
  */
 inline DoubleTab& Operateur_negligeable::ajouter(const DoubleTab&, DoubleTab& x) const
 {
@@ -59,11 +59,11 @@ inline DoubleTab& Operateur_negligeable::ajouter(const DoubleTab&, DoubleTab& x)
 }
 
 
-/*! @brief Initialise le parametre tableau avec la contribution de l'operateur negligeable: initialise le tableau a ZERO.
+/*! @brief Initializes the array parameter with the contribution of the negligible operator: initializes the array to ZERO.
  *
- * @param (DoubleTab&) le tableau sur lequel on applique l'operateur
+ * @param (DoubleTab&) the array on which the operator is applied
  * @param (DoubleTab& x)
- * @return (DoubleTab&) le tableau d'entree mis a zero
+ * @return (DoubleTab&) the input array set to zero
  */
 inline DoubleTab& Operateur_negligeable::calculer(const DoubleTab&,
                                                   DoubleTab& x) const
@@ -72,7 +72,7 @@ inline DoubleTab& Operateur_negligeable::calculer(const DoubleTab&,
 }
 
 
-/*! @brief Mise a jour en temps d'un operateur negligeable: NE FAIT RIEN
+/*! @brief Time update of a negligible operator: DOES NOTHING
  *
  * @param (double)
  */
@@ -81,7 +81,7 @@ inline void Operateur_negligeable::mettre_a_jour(double )
 }
 
 
-/*! @brief Associe divers objets a un operateurs negligeable: NE FAIT RIEN
+/*! @brief Associates various objects to a negligible operator: DOES NOTHING
  *
  * @param (Domaine_dis_base&)
  * @param (Domaine_Cl_dis_base&)

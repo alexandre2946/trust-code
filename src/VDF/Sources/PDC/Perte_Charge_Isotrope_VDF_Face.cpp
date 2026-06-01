@@ -23,7 +23,7 @@ Entree& Perte_Charge_Isotrope_VDF_Face::readOn(Entree& s) { return Perte_Charge_
 void Perte_Charge_Isotrope_VDF_Face::coeffs_perte_charge(const DoubleVect& u, const DoubleVect& pos, double t, double norme_u, double dh, double nu, double reynolds, double& coeff_ortho,
                                                          double& coeff_long, double& u_l, DoubleVect& v_valeur) const
 {
-  // Calcul de lambda
+  // Compute lambda
   lambda.setVar(0, reynolds);
   lambda.setVar(1, t);
   lambda.setVar(2, pos[0]);
@@ -32,10 +32,10 @@ void Perte_Charge_Isotrope_VDF_Face::coeffs_perte_charge(const DoubleVect& u, co
   if (dimension > 2)
     lambda.setVar(4, pos[2]);
 
-  // Calcul du resultat
+  // Compute the result
   coeff_ortho = lambda.eval() * norme_u / 2. / dh;
   coeff_long = coeff_ortho;
-  // v ne sert pas, car coeff_ortho=coeff_long
+  // v is not used, since coeff_ortho=coeff_long
   //  for (int dim=0;dim<dimension;dim++)
   //  p_charge[dim] = -lambda.eval()*norme_u/2./dh*u[dim];
   u_l = 0;

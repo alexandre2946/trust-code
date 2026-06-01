@@ -75,9 +75,7 @@ void Partitionneur_Parmetis::associer_domaine(const Domaine& domaine)
   ref_domaine_ = domaine;
 }
 
-/*! @brief Calcule le graphe de connectivite pour parmetis, appelle le partitionneur et remplit elem_part (pour chaque element, numero de la partie qui lui
- *
- *   est attribuee).
+/*! @brief @brief Computes the connectivity graph for parmetis, calls the partitioner and fills elem_part (for each element, the number of the part assigned to it).
  *
  */
 void Partitionneur_Parmetis::construire_partition(IntVect& elem_part, int& nb_parts_tot) const
@@ -100,7 +98,7 @@ void Partitionneur_Parmetis::construire_partition(IntVect& elem_part, int& nb_pa
       exit();
     }
 
-  // Cas particulier: si nb_parts == 1, METIS ne veut rien faire...
+  // Special case: if nb_parts == 1, METIS does nothing...
   //ToDo: I don't know is that's the case with ParMetis
   if (nb_parties_ == 1)
     {
@@ -127,16 +125,16 @@ void Partitionneur_Parmetis::construire_partition(IntVect& elem_part, int& nb_pa
   std::vector<idx_t> partition(graph.nvtxs);
 
   idx_t int_parts = nb_parties_;
-  idx_t edgecut = 0; // valeur renvoyee par parmetis (nombre total de faces de joint)
+  idx_t edgecut = 0; // value returned by parmetis (total number of joint faces)
   Cerr << " Call for PARMETIS" << finl;
   idx_t options[3];
   options[0] = 1; //personnalized options
-  options[1] = 111111111; // Mode verbose maximal;
+  options[1] = 111111111; // Maximum verbosity mode
   options[2] = 0; //random seed
 
   idx_t ncon=1;
   real_t ubvec = 1.05f; //recommanded value
-  idx_t numflag = 0; //numerotation C
+  idx_t numflag = 0; //C numbering
   std::vector<real_t> tpwgts(ncon*int_parts, (real_t)(1.0/nb_parties_)); //we want the weight to be equally distributed on each sub_somain
   MPI_Comm comm = Comm_Group_MPI::get_trio_u_world();
   int status = ParMETIS_V3_PartKway(graph.vtxdist.addr(), graph.xadj.addr(), graph.adjncy.addr(),
@@ -162,7 +160,7 @@ void Partitionneur_Parmetis::construire_partition(IntVect& elem_part, int& nb_pa
   for (int i = 0; i < n; i++)
     elem_part[i] = static_cast<int>(partition[i]);  // partition[i] is a a proc number...
 
-  // Correction de la partition pour la periodicite. (***)
+  // Correction of the partition for periodicity. (***)
   if (graph_elements_perio.get_nb_lists() > 0)
     {
       Cerr << "Correction of the partition for the periodicity" << finl;

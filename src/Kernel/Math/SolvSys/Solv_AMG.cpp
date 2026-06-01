@@ -100,8 +100,8 @@ void Solv_AMG::create_block_amg(int n, Nom precond)
 -pc_type fieldsplit \
 -pc_fieldsplit_type additive";
   // Gamg is using MPI GPU-Aware but less robust than Boomeramg
-  // Il faut -pc_gamg_agg_nsmooths 0 (defaut 1) si crash mais plus lent
-  // Ajouter sur Nvidia -mat aijkokkos
+  // Use -pc_gamg_agg_nsmooths 0 (default 1) if it crashes, but it will be slower
+  // On Nvidia, add -mat aijkokkos
   if (precond=="gamg")
     {
       Cerr << "If Gamg setup crashes during MatProductSymbolic_SeqAIJCUSPARSE_SeqAIJCUSPARSE, it is related to not enough RAM device." << finl;
@@ -220,9 +220,9 @@ void Solv_AMG::create_amg()
     {
       if (st_>=0) Process::exit("st option not supported yet in Solv_AMG");
       if (Process::is_parallel())
-        chaine_lue_ += " { precond ua-amg { }";  // Converge mais plus lent que sa-amg
+        chaine_lue_ += " { precond ua-amg { }";  // Converges but slower than sa-amg
       else
-        chaine_lue_ += " { precond sa-amg { }";  // Crash en parallele
+        chaine_lue_ += " { precond sa-amg { }";  // Crashes in parallel
     }
   else
     chaine_lue_ += boomeramg(st_); // Best GPU solver (// sa-amg is slow...)

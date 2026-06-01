@@ -23,9 +23,9 @@
 #include <SolveurSys.h>
 #include <Matrice_Morse.h>
 
-/*! @brief classe Parametre_diffusion_implicite Un objet Parametre_diffusion_implicite est un objet regroupant les differentes
+/*! @brief class Parametre_diffusion_implicite A Parametre_diffusion_implicite object groups together the various
  *
- *      options specifiques pour diffusion_implicite
+ *      options specific to diffusion_implicite
  *
  *
  *
@@ -58,7 +58,7 @@ protected:
   int crank_;
   int nb_it_max_;
   double seuil_diffusion_implicite_;
-  SolveurSys solveur_;  // Solveur utilise pour la resolution diffusion implicite
-  Matrice_Morse matrice_; // Matrice pour  la resolution diffusion implicite
+  SolveurSys solveur_;  // Solver used for the implicit diffusion resolution
+  Matrice_Morse matrice_; // Matrix for the implicit diffusion resolution
 };
 #endif

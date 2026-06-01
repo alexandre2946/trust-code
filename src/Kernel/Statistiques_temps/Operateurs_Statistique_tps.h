@@ -23,9 +23,10 @@
 class Postraitement;
 class Motcle;
 
-/*! @brief classe Operateurs_Statistique_tps Cette classe represente une liste d'operateurs statistiques en temps.
+/*! @brief class Operateurs_Statistique_tps
  *
- *      Les objets Postraitement portent un objet de ce type.
+ * @brief Represents a list of time-statistical operators.
+ *      Postraitement objects carry an object of this type.
  *
  * @sa Postraitement
  */

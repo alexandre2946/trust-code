@@ -18,10 +18,10 @@
 
 Implemente_instanciable_32_64(Triangle_32_64,"Triangle",Elem_geom_base_32_64<_T_>);
 
-/*! @brief des faces du triangle de reference: 3 faces de deux sommets.
+/*! @brief Faces of the reference triangle: 3 faces of two vertices each.
  *
- *   La face i est la face opposee au sommet i
- *  (voir get_tab_faces_sommets_locaux)
+ * Face i is the face opposite to vertex i
+ * (see get_tab_faces_sommets_locaux).
  *
  */
 static int faces_sommets_triangle[3][2] =
@@ -44,9 +44,9 @@ Entree& Triangle_32_64<_SIZE_>::readOn(Entree& s )
 }
 
 
-/*! @brief Renvoie le nom LML d'un triangle = "PRISM6".
+/*! @brief Returns the LML name of a triangle = "PRISM6".
  *
- * @return (Nom&) toujours egal a "PRISM6"
+ * @return Always equal to "PRISM6" (or "TRIANGLE_3D" in 3D).
  */
 template <typename _SIZE_>
 const Nom& Triangle_32_64<_SIZE_>::nom_lml() const
@@ -57,14 +57,13 @@ const Nom& Triangle_32_64<_SIZE_>::nom_lml() const
 }
 
 
-/*! @brief Renvoie 1 si l'element ielem du domaine associe a l'element geometrique contient le point
+/*! @brief Returns 1 if element "ielem" of the domain associated with this geometric element contains the point
  *
- *               de coordonnees specifiees par le parametre "pos".
- *     Renvoie 0 sinon.
+ * with coordinates specified by "pos". Returns 0 otherwise.
  *
- * @param (DoubleVect& pos) coordonnees du point que l'on cherche a localiser
- * @param (int ielem) le numero de l'element du domaine dans lequel on cherche le point.
- * @return (int) 1 si le point de coordonnees specifiees appartient a l'element ielem 0 sinon
+ * @param pos Coordinates of the point to locate.
+ * @param ielem Index of the domain element in which to search for the point.
+ * @return 1 if the point belongs to element "ielem", 0 otherwise.
  */
 template <typename _SIZE_>
 int Triangle_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t ielem) const
@@ -80,9 +79,8 @@ int Triangle_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t ielem) const
   assert((som2>=0) && (som2<dom.nb_som_tot()));
   double prod,p0,p1,p2;
 
-  // On regarde tout d'abord si le point cherche n'est pas un des
-  // sommets du triangle
-  // GF on retire le test pour etre coherent avec tetraedre contient et pour eviter des erreurs dans Champ_implementation_P1::form_function, ou il n'y a pas ce test
+  // First check if the point is one of the triangle vertices.
+  // GF: this test is removed to be consistent with Tetraedre::contient and to avoid issues in Champ_implementation_P1::form_function, which does not have this test.
   /*
     if( (est_egal(dom.coord(som0,0),pos(0)) && est_egal(dom.coord(som0,1),pos(1)))
     || (est_egal(dom.coord(som1,0),pos(0)) && est_egal(dom.coord(som1,1),pos(1)))
@@ -90,11 +88,11 @@ int Triangle_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t ielem) const
     return 1;
 
   */
-  // Attention les sommets sont ranges de facon quelconque.
-  // Il faut donc determiner le sens (trigo ou anti trigo) pour la numerotation :
-  // Calcul de prod = 01 vectoriel 02 selon z
-  // prod > 0 : sens trigo
-  // prod < 0 : sens anti trigo
+  // Note: vertices are stored in arbitrary order.
+  // Determine the orientation (counter-clockwise or clockwise) for the vertex numbering:
+  // Compute prod = 01 cross 02 along z
+  // prod > 0 : counter-clockwise
+  // prod < 0 : clockwise
   prod = (dom.coord(som1,0)-dom.coord(som0,0))*(dom.coord(som2,1)-dom.coord(som0,1))
          - (dom.coord(som1,1)-dom.coord(som0,1))*(dom.coord(som2,0)-dom.coord(som0,0));
   double signe;
@@ -102,15 +100,15 @@ int Triangle_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t ielem) const
     signe = 1;
   else
     signe = -1;
-  // Calcul de p0 = 0M vectoriel 1M selon z
+  // Compute p0 = 0M cross 1M along z
   p0 = (pos[0]-dom.coord(som0,0))*(pos[1]-dom.coord(som1,1))
        - (pos[1]-dom.coord(som0,1))*(pos[0]-dom.coord(som1,0));
   p0 *= signe;
-  // Calcul de p1 = 1M vectoriel 2M selon z
+  // Compute p1 = 1M cross 2M along z
   p1 = (pos[0]-dom.coord(som1,0))*(pos[1]-dom.coord(som2,1))
        - (pos[1]-dom.coord(som1,1))*(pos[0]-dom.coord(som2,0));
   p1 *= signe;
-  // Calcul de p2 = 2M vectoriel 0M selon z
+  // Compute p2 = 2M cross 0M along z
   p2 = (pos[0]-dom.coord(som2,0))*(pos[1]-dom.coord(som0,1))
        - (pos[1]-dom.coord(som2,1))*(pos[0]-dom.coord(som0,0));
   p2 *= signe;
@@ -122,13 +120,13 @@ int Triangle_32_64<_SIZE_>::contient(const ArrOfDouble& pos, int_t ielem) const
 }
 
 
-/*! @brief Renvoie 1 si les sommets specifies par le parametre "pos" sont les sommets de l'element "element" du domaine associe a
+/*! @brief Returns 1 if the vertices specified by "som" are the vertices of element "element"
  *
- *     l'element geometrique.
+ * in the domain associated with this geometric element. Returns 0 otherwise.
  *
- * @param (IntVect& pos) les numeros des sommets a comparer avec ceux de l'elements "element"
- * @param (int element) le numero de l'element du domaine dont on veut comparer les sommets
- * @return (int) 1 si les sommets passes en parametre sont ceux de l'element specifie, 0 sinon
+ * @param som Vertex indices to compare with those of element "element".
+ * @param element Index of the domain element whose vertices are to be compared.
+ * @return 1 if the specified vertices are those of the given element, 0 otherwise.
  */
 template <typename _SIZE_>
 int Triangle_32_64<_SIZE_>::contient(const SmallArrOfTID_t& som, int_t element ) const
@@ -142,9 +140,9 @@ int Triangle_32_64<_SIZE_>::contient(const SmallArrOfTID_t& som, int_t element )
     return 0;
 }
 
-/*! @brief Calcule les volumes des elements du domaine associe.
+/*! @brief Computes the volumes (areas) of the elements of the associated domain.
  *
- * @param (DoubleVect& volumes) le vecteur contenant les valeurs  des des volumes des elements du domaine
+ * @param volumes Vector to fill with the volumes of domain elements.
  */
 template <typename _SIZE_>
 void Triangle_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const
@@ -166,10 +164,10 @@ void Triangle_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const
     }
 }
 
-/*! @brief Calcule les normales aux faces des elements du domaine associe.
+/*! @brief Computes the face normals of the elements of the associated domain.
  *
- * @param (IntTab& face_sommets) les numeros des sommets des faces dans la liste des sommets du domaine associe
- * @param (DoubleTab& face_normales)
+ * @param Face_sommets Vertex indices of the faces in the domain vertex list.
+ * @param face_normales Output array to fill with face normals.
  */
 template <typename _SIZE_>
 void Triangle_32_64<_SIZE_>::calculer_normales(const IntTab_t& Face_sommets, DoubleTab_t& face_normales) const
@@ -190,7 +188,7 @@ void Triangle_32_64<_SIZE_>::calculer_normales(const IntTab_t& Face_sommets, Dou
     }
 }
 
-/*! @brief voir ElemGeomBase::get_tab_faces_sommets_locaux
+/*! @brief See ElemGeomBase::get_tab_faces_sommets_locaux.
  *
  */
 template <typename _SIZE_>

@@ -39,26 +39,27 @@ Entree& Loi_Etat_base::readOn(Entree& is)
   return is;
 }
 
-/*! @brief Associe le fluide a la loi d'etat
+/*! @brief Associates the fluid with the state law.
  *
- * @param (Fluide_Dilatable_base& fl) le fluide associe
+ * @param fl The dilatable fluid to associate.
  */
 void Loi_Etat_base::associer_fluide(const Fluide_Dilatable_base& fl)
 {
   le_fluide = fl;
 }
 
-/*! @brief Associe le probleme a la loi d'etat
+/*! @brief Associates the problem with the state law.
  *
- * @param (Fluide_Dilatable_base& fl) le fluide associe
+ * @param pb The problem to associate.
  */
 void Loi_Etat_base::assoscier_probleme(const Probleme_base& pb)
 {
   le_prob_ = pb;
 }
 
-/*! @brief Renvoie le champ de le temperature
+/*! @brief Returns the temperature field.
  *
+ * @return The temperature field (const reference).
  */
 const Champ_Don_base& Loi_Etat_base::ch_temperature() const
 {
@@ -70,7 +71,7 @@ Champ_Don_base& Loi_Etat_base::ch_temperature()
   return temperature_.valeur();
 }
 
-/*! @brief Initialise l'inconnue de l'equation de chaleur : ne fai rien
+/*! @brief Initialises the heat equation unknown; sets rho arrays and updates density.
  *
  */
 void Loi_Etat_base::initialiser_inco_ch()
@@ -85,7 +86,7 @@ void Loi_Etat_base::initialiser_inco_ch()
   tab_rho_np1.echange_espace_virtuel();
 }
 
-/*! @brief Prepare le fluide au calcul.
+/*! @brief Prepares the fluid for computation by filling temperature and computing density.
  *
  */
 void Loi_Etat_base::preparer_calcul()
@@ -96,20 +97,20 @@ void Loi_Etat_base::preparer_calcul()
   mettre_a_jour(t);
 }
 
-/*! @brief Met a jour la loi d'etat et le champ rho
+/*! @brief Updates the state law and the density field.
  *
- * @param (double temps) le temps de calcul
+ * @param temps The current simulation time.
  */
 void Loi_Etat_base::mettre_a_jour(double temps)
 {
-  //remplissage de rho avec rho(n+1)
+  //filling rho with rho(n+1)
   DoubleTab& tab_rho = le_fluide->masse_volumique().valeurs();
   tab_rho_n = tab_rho_np1;
   tab_rho = tab_rho_np1;
   le_fluide->masse_volumique().mettre_a_jour(temps);
 }
 
-/*! @brief Calcule la viscosite
+/*! @brief Computes the dynamic viscosity.
  *
  */
 void Loi_Etat_base::calculer_mu()
@@ -117,7 +118,7 @@ void Loi_Etat_base::calculer_mu()
   Champ_Don_base& mu = le_fluide->viscosite_dynamique();
   if (!sub_type(Champ_Uniforme,mu))
     {
-      // E. Saikali : Pourquoi pas Champ_fonc_xyz pour mu ???
+      // E. Saikali : Why not Champ_fonc_xyz for mu ???
       if (sub_type(Champ_Fonc_Tabule,mu) || sub_type(Champ_Don_base,mu))
         mu.mettre_a_jour(temperature_->temps());
       else
@@ -128,7 +129,7 @@ void Loi_Etat_base::calculer_mu()
     }
 }
 
-/*! @brief Calcule la conductivite
+/*! @brief Computes the thermal conductivity.
  *
  */
 void Loi_Etat_base::calculer_lambda()
@@ -140,7 +141,7 @@ void Loi_Etat_base::calculer_lambda()
   DoubleTab& tab_lambda = lambda.valeurs();
   ToDo_Kokkos("critical");
   int i, n = tab_lambda.size();
-  // La conductivite est soit un champ uniforme soit calculee a partir de la viscosite dynamique et du Pr
+  // The conductivity is either a uniform field or computed from the dynamic viscosity and Pr
   if (!sub_type(Champ_Uniforme,lambda))
     {
       if (sub_type(Champ_Uniforme,mu))
@@ -156,7 +157,7 @@ void Loi_Etat_base::calculer_lambda()
   tab_lambda.echange_espace_virtuel();
 }
 
-/*! @brief Calcule la viscosite cinematique
+/*! @brief Computes the kinematic viscosity.
  *
  */
 void Loi_Etat_base::calculer_nu()
@@ -197,7 +198,7 @@ void Loi_Etat_base::calculer_nu()
   Debog::verifier("Loi_Etat_base::calculer_nu tab_nu",tab_nu);
 }
 
-/*! @brief Calcule la diffusivite
+/*! @brief Computes the thermal diffusivity.
  *
  */
 void Loi_Etat_base::calculer_alpha()
@@ -220,7 +221,7 @@ void Loi_Etat_base::calculer_alpha()
 }
 
 
-/*! @brief Ne fait rien Surcharge dans Loi_Etat_Melange_GP
+/*! @brief Does nothing; overloaded in Loi_Etat_Melange_GP.
  *
  */
 void Loi_Etat_base::calculer_mu_sur_Sc()
@@ -228,7 +229,7 @@ void Loi_Etat_base::calculer_mu_sur_Sc()
   /* Do nothing : overloaded later */
 }
 
-/*! @brief Ne fait rien Surcharge dans Loi_Etat_Melange_Binaire
+/*! @brief Does nothing; overloaded in Loi_Etat_Melange_Binaire.
  *
  */
 void Loi_Etat_base::calculer_nu_sur_Sc()
@@ -236,7 +237,7 @@ void Loi_Etat_base::calculer_nu_sur_Sc()
   /* Do nothing : overloaded later */
 }
 
-/*! @brief Recalcule la masse volumique
+/*! @brief Recomputes the density (masse volumique).
  *
  */
 void Loi_Etat_base::calculer_masse_volumique()
@@ -261,8 +262,11 @@ void Loi_Etat_base::compute_tab_rho(DoubleTab& tab_rho)
       tab_rho(som, 0) = 0.5 * (tab_rho_n(som) + tab_rho_np1(som));
     }
 }
-/*! @brief Cas gaz parfait : ne fait rien Cas gaz Reel : doit recalculer l'enthalpie a partir de la pression et la temperature
+/*! @brief For ideal gases: does nothing. For real gases: must recompute enthalpy from pressure and temperature.
  *
+ * @param Pth_ Thermodynamic pressure.
+ * @param T_ Temperature.
+ * @return The computed enthalpy (or temperature unchanged for ideal gases).
  */
 double Loi_Etat_base::calculer_H(double Pth_, double T_) const
 {

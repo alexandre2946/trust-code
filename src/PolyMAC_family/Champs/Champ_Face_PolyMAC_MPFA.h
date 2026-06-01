@@ -22,9 +22,9 @@
 
 /*! @brief : class Champ_Face_PolyMAC_MPFA
  *
- *  Champ correspondant a une inconnue decrite par ses tangentes aux faces duales (ligne amont-aval, type vitesse)
- *  Les flux aux faces sont accessibles par les methodes valeurs_normales(), avec synchro automatique
- *  Degres de libertes : composantes tangentielles aux faces duales
+ *  @brief Field corresponding to an unknown described by its tangential components on dual faces (upstream-downstream line, e.g. velocity).
+ *  Face fluxes are accessible via the valeurs_normales() methods, with automatic synchronization.
+ *  Degrees of freedom: tangential components on dual faces.
  *
  *
  */
@@ -37,7 +37,7 @@ public :
   inline const Domaine_PolyMAC_MPFA& domaine_PolyMAC_MPFA() const { return ref_cast(Domaine_PolyMAC_MPFA, le_dom_VF.valeur()); }
 
   int fixer_nb_valeurs_nodales(int n) override;
-  void init_auxiliary_variables() override; /* demande l'ajout des variables auxiliaires (\vec v aux elements) */
+  void init_auxiliary_variables() override; /* request addition of auxiliary variables (\vec v at elements) */
   int reprendre(Entree& fich) override;
 
   DoubleTab& valeur_aux_elems(const DoubleTab& positions, const IntVect& polys, DoubleTab& result) const override;
@@ -47,16 +47,16 @@ public :
 
   Champ_base& affecter_(const Champ_base& ) override;
 
-  //interpolations vitesse aux faces -> vitesse aux elems
-  void update_ve(DoubleTab& val) const; //ordre 1
+  //interpolations of velocity at faces -> velocity at elements
+  void update_ve(DoubleTab& val) const; //first-order
 
-  void init_ve2() const; //ordre 2 -> avec une matrice
+  void init_ve2() const; //second-order -> using a matrix
   mutable IntTab ve2d, ve2j, ve2bj;
   mutable DoubleTab ve2c, ve2bc;
   void update_ve2(DoubleTab& val, int incr = 0) const;
 
-  /* utilitaire pour le calcul des termes sources : calcule le vecteur v_e + n_f (v_f - v_e. n_f)
-     retour : le vecteur, sa norme et les derivees de celle-ci selon v_e et v_f
+  /* utility for computing source terms: computes the vector v_e + n_f (v_f - v_e . n_f)
+     returns: the vector, its norm and its derivatives with respect to v_e and v_f
   */
   inline double v_norm(const DoubleTab& val, const DoubleTab& val_f, int e, int f, int k, int l, double *v_ext, double *dnv) const
   {

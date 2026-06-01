@@ -61,9 +61,9 @@ void Cond_lim_utilisateur_base::complement(Nom&)
   Cerr << "Cond_lim_utilisateur_base::complement(Nom& ) does nothing" << finl;
 }
 
-/*! @brief renvoit 0 si le pb n'est pas rayonnant 1 si il est semi_transp
+/*! @brief Returns 0 if the problem is not radiating, 1 if it is semi-transparent,
  *
- *                      2 si il est transparent
+ *                      2 if it is transparent.
  *
  */
 int Cond_lim_utilisateur_base::is_pb_rayo()

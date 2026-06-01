@@ -34,10 +34,10 @@ public:
   virtual void imprimer(double) const;
   virtual int limpr(double, double) const;
 
-  // Elle se charge de renvoyer la valeur du coefficient d'echange sur la maille i.
+  // Returns the heat exchange coefficient value on cell i.
   virtual double calculer_coefficient_echange(int i);
 
-  // Renvoie U et T et les proprietes physiques sur la maille 1D i
+  // Returns U, T and physical properties on the 1D cell i
   inline double getU(int i) const { return U(i); }
   inline double getT(int i) const { return T(i); }
   inline double getMu(int i) const { return mu(i); }
@@ -67,8 +67,8 @@ protected:
   DoubleTab autre_h;
   bool Reprise_temperature = false;
 
-  double T_CL0 = -100., T_CL1 = -100.; // CL sur le domaine. En seq. = Tinf et Tsup ; En parallele = Tvoisin
-  double Tinf = -100., Tsup = -100.; // Temperature entree, sortie
+  double T_CL0 = -100., T_CL1 = -100.; // BC on the domain. Sequential: = Tinf and Tsup; Parallel: = neighbor temperature
+  double Tinf = -100., Tsup = -100.; // Inlet and outlet temperature
   int dir = -1; // Direction du cylindre
   Parser_U lambda_T;
   Parser_U mu_T;
@@ -81,16 +81,16 @@ protected:
   double debit = -100.;
   double xinf = -100., xsup = -100.;
 
-  DoubleVect vol; // volumes des tranches Sdz du volume suivant la direction de l'ecoulement
-  DoubleVect coord; // coordonnees des points de discretisation 1D
+  DoubleVect vol; // volumes of the Sdz slices along the flow direction
+  DoubleVect coord; // coordinates of the 1D discretization points
 
-  int N = -1;   // nb de points du maillage 1D pour la vitesse et la temperature
-  DoubleVect U, T; // inconnues fluides vitesse et temperature
-  DoubleVect Qvol; // puissance volumique dans le fluide 1D
-  DoubleVect rho, mu, lambda, diam; // tableau des proprietes physiques du fluide a un instant donne
-  DoubleVect h_correlation; // le coeff d'echange par correlation
-  DoubleTab h_solide; // le coeff d'echange par correlation
-  DoubleVect flux_radiatif; // le flux radiatif entre patch
+  int N = -1;   // number of 1D mesh points for velocity and temperature
+  DoubleVect U, T; // fluid unknowns: velocity and temperature
+  DoubleVect Qvol; // volumetric power in the 1D fluid
+  DoubleVect rho, mu, lambda, diam; // array of fluid physical properties at a given instant
+  DoubleVect h_correlation; // heat exchange coefficient from correlation
+  DoubleTab h_solide; // heat exchange coefficient from correlation
+  DoubleVect flux_radiatif; // radiative flux between patches
 
 private:
   int avec_rayo = -1;

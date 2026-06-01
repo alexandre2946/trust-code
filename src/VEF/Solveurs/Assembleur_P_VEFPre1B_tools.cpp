@@ -59,12 +59,12 @@ projette(ArrOfDouble& grad, int face, const DoubleTab& normales)
 }
 //
 
-// renvoie la premiere face non Dirichlet
-//                            2 si Perio
-//                            3 si Neumann
-//                            4 si Symetrie
-//                            1 sinon
-// et face_associee=-1 sauf si perio (face_associee=face associee)
+// returns the first non-Dirichlet face
+//                            2 if Perio
+//                            3 if Neumann
+//                            4 if Symmetry
+//                            1 otherwise
+// and face_associee=-1 except if periodic (face_associee=associated face)
 static inline int okface(int& ind_face, int& face, const Cond_lim& la_cl)
 {
   face_associee=-1;
@@ -81,7 +81,7 @@ static inline int okface(int& ind_face, int& face, const Cond_lim& la_cl)
         }
       else if (sub_type(Periodique,la_cl.valeur()))
         {
-          //periodicite
+          //periodicity
           const Periodique& la_cl_perio = ref_cast(Periodique, la_cl.valeur());
           face_associee=le_bord.num_face(la_cl_perio.face_associee(ind_face));
           ok=2;
@@ -93,7 +93,7 @@ static inline int okface(int& ind_face, int& face, const Cond_lim& la_cl)
         }
       else if (sub_type(Symetrie, la_cl.valeur()))
         {
-          //symetrie
+          //symmetry
           ok=4;
         }
     }
@@ -120,7 +120,7 @@ inline int verifier_complet(const Assembleur_P_VEFPreP1B& ass,
   DoubleTab tab(pression);
   DoubleTab resu(tab), resu2(tab);
 
-  // On calcule un champ de pression quelconque
+  // Compute an arbitrary pressure field
   exemple_champ_non_homogene(domaine_VEF, tab);
 
   DoubleTab gradP(eqn.inconnue().valeurs());
@@ -202,18 +202,18 @@ int verifier( const Assembleur_P_VEFPreP1B& ass,
               //Cerr << finl;
             }
           double verifie=mp_max_vect(pre);
-          //verifie=1;pre(i)=1; // On teste tout
+          //verifie=1;pre(i)=1; // Test everything
           if (verifie)
             {
               pre.echange_espace_virtuel();
-              /* Inutile le debog ce n'est pas comparable le sequentiel et le parallele
+              /* The debug check is useless here: sequential and parallel results are not comparable.
                  Nom ch;
-                 ch="pre pour la ligne ";
-                 ch+=(Nom)i+" du processeur ";
+                 ch="pre for row ";
+                 ch+=(Nom)i+" of processor ";
                  ch+=(Nom)proc+" =";
                  Debog::verifier(ch,pre);
               */
-              // Calcul par Div(Grad(P))
+              // Compute via Div(Grad(P))
               grad.calculer(pre, gradP);
               {
                 int nbf=inverse_quantitee_entrelacee.size();
@@ -224,13 +224,13 @@ int verifier( const Assembleur_P_VEFPreP1B& ass,
               }
               //solvm.appliquer(gradP);
               div.calculer(gradP, resu);
-              // Calcul par -Lap(P)
+              // Compute via -Lap(P)
               matrice.multvect(pre, resu2);
-              // On doit trouver erreur nul
+              // The error should be zero
               erreur=resu2;
               erreur+=resu;
               resu*=-1;
-              // Cas ou la diagonale est *2, on corrige:
+              // Case where the diagonal is *2, correct it:
               if (est_egal(2*resu(i),resu2(i))) erreur(i)=0;
               // Optimization: combine 3 mp_norme_vect into 1 collective call
               double erreur_carre = local_carre_norme_vect(erreur);
@@ -332,12 +332,12 @@ static inline void swap (int& i, int& j)
 }
 
 //
-// rempli sommets, faces_op1 et faces_op2
-// ou sommets contient les sommets de face et les sommets de elem1 et elem2
-// qui ne sont pas dans face. face_op1(i) est le numero de la face opposee a sommets(i)
-// dans elem1. face_op2(i) est ... dans elem2. (si elem2=-1, alors face_op2=-1)
-// les dimension premiers sommets sont ceux de face
-// le dernier est dans elem2
+// Fill sommets, faces_op1 and faces_op2,
+// where sommets contains the vertices of face and the vertices of elem1 and elem2
+// that are not in face. face_op1(i) is the index of the face opposite to sommets(i)
+// in elem1. face_op2(i) is ... in elem2. (if elem2=-1, then face_op2=-1)
+// The first 'dimension' entries are the vertices of face
+// the last one is in elem2
 static inline void remplir_sommets(const Domaine_VEF& domaine_VEF,
                                    int face, int elem1, int elem2,
                                    ArrOfInt& sommets,
@@ -404,7 +404,7 @@ static inline void remplir_sommets(const Domaine_VEF& domaine_VEF,
               if(j==sommets[k])
                 faces_op2[k]=elem_faces(elem2, i);
           }
-      // A cause de mise en commentaire de ok=1 assert(ok==1);
+      // assert(ok==1) is commented out because ok=1 is commented out
     }
   else
     {
@@ -414,8 +414,8 @@ static inline void remplir_sommets(const Domaine_VEF& domaine_VEF,
     }
 }
 
-// calcule le gradient a la face separant elem1 et elem2
-// de la fonction de forme associee au sommet s
+// compute the gradient at the face separating elem1 and elem2
+// of the shape function associated with vertex s
 //
 static void calculer_grad(const IntTab& face_voisins,
                           int elem1, int elem2,
@@ -447,8 +447,8 @@ static void calculer_grad(const IntTab& face_voisins,
     }
 }
 
-// calcule le gradient a la face separant elem1 et elem2
-// de la fonction de forme associee au sommet s
+// compute the gradient at the face separating elem1 and elem2
+// of the shape function associated with vertex s
 //
 static void calculer_grad_arete(int face,
                                 const IntTab& face_voisins,
@@ -472,7 +472,7 @@ static void calculer_grad_arete(int face,
       if(!(fop4==-1) && !( face_voisins(fop4,0)==elem2))
         signe4=-1;
     }
-  if(j<3) // une arete de la face
+  if(j<3) // an edge of the face
     {
       if(elem2!=-1)
         {
@@ -491,13 +491,13 @@ static void calculer_grad_arete(int face,
         }
 
     }
-  else if (j==3) // une arete de elem1 mais pas de face
+  else if (j==3) // an edge of elem1 but not of a face
     {
       for(int comp=0; comp<3; comp++)
         grad[comp]=1./15.*(signe1*normales(fop1,comp)
                            +signe3*normales(fop3,comp));
     }
-  else // une arete de elem2 mais pas de face
+  else // an edge of elem2 but not of a face
     {
       assert(j==4);
       for(int comp=0; comp<3; comp++)
@@ -596,8 +596,8 @@ static void contribuer_matriceP1P1(int elem1, int elem2, const ArrOfInt& sommets
   int dimension=Objet_U::dimension,
       dplusdeux=dimension+2;
 
-  // On ne traite pas les sommets -1 qui
-  // sont en fin de tableau sommets:
+  // Skip vertices -1 which
+  // are at the end of the sommets array:
   while (sommets[dplusdeux-1]==-1)
     dplusdeux--;
 
@@ -639,8 +639,8 @@ static void update_matriceP1P1(const Domaine_VEF& domaine_VEF,
   int nb_som_tot=domaine_VEF.nb_som();
   int i,j;
 
-  // On ne traite pas les sommets -1 qui
-  // sont en fin de tableau sommets:
+  // Skip vertices -1 which
+  // are at the end of the sommets array:
   while (sommets[dplusdeux-1]==-1)
     dplusdeux--;
 
@@ -751,8 +751,8 @@ static void update_matricePaPa(const Domaine_VEF& domaine_VEF,
   int nb_aretes_tot=domaine_VEF.domaine().nb_aretes();
   int i, j, k, l;
   double psc;
-  // On ne traite pas les sommets -1 qui
-  // sont en fin de tableau sommets:
+  // Skip vertices -1 which
+  // are at the end of the sommets array:
   //while (sommets(dplusdeux-1)==-1)
   //   dplusdeux--;
 
@@ -1869,7 +1869,7 @@ void assemblerP1P1(const Domaine_dis_base& z,
   ArrOfInt sommets(dimension+2);
   ArrOfInt face_opp1(dimension+2);
   ArrOfInt face_opp2(dimension+2);
-  // Faces de bord :
+  // Boundary faces:
   for(int i=0; i<les_cl.size(); i++)
     {
       const Cond_lim& la_cl = les_cl[i];
@@ -1901,7 +1901,7 @@ void assemblerP1P1(const Domaine_dis_base& z,
     {
       elem1=face_voisins(face, 0);
       elem2=face_voisins(face, 1);
-      if (!domaine_VEF.est_une_face_virt_bord(face)) // On ne traite que les faces internes
+      if (!domaine_VEF.est_une_face_virt_bord(face)) // Process internal faces only
         {
           remplir_sommets(domaine_VEF, face, elem1, elem2, sommets, face_opp1, face_opp2);
           sort(sommets, face_opp1, face_opp2);
@@ -1938,7 +1938,7 @@ void updateP1P1(const Domaine_dis_base& z,
   Matrice_Morse& ARV=ref_cast(Matrice_Morse, A.get_bloc(0,1).valeur());
   Matrice_Morse& AVR=ref_cast(Matrice_Morse, A.get_bloc(1,0).valeur());
   Matrice_Morse& AVV=ref_cast(Matrice_Morse, A.get_bloc(1,1).valeur());
-  // Faces de bord :
+  // Boundary faces:
   for (auto &itr : les_cl)
     {
       const Cond_lim& la_cl = itr;
@@ -1966,7 +1966,7 @@ void updateP1P1(const Domaine_dis_base& z,
     {
       elem1 = face_voisins(face, 0);
       elem2 = face_voisins(face, 1);
-      if (!domaine_VEF.est_une_face_virt_bord(face)) // On ne traite que les faces internes
+      if (!domaine_VEF.est_une_face_virt_bord(face)) // Process internal faces only
         {
           remplir_sommets(domaine_VEF, face, elem1, elem2, sommets, face_opp1, face_opp2);
           sort(sommets, face_opp1, face_opp2);
@@ -2002,7 +2002,7 @@ void modifieP1P1neumann(const Domaine_dis_base& z,
   //ArrOfInt face_opp2(dimension+2);
   Matrice_Bloc& A=ref_cast(Matrice_Bloc, matrice.valeur());
   Matrice_Morse_Sym& ARR=ref_cast(Matrice_Morse_Sym, A.get_bloc(0,0).valeur());
-  // Faces de bord :
+  // Boundary faces:
   assert(ref_cast(Domaine_VEF, z).get_cl_pression_sommet_faible()==0);
   int nb_som_tot=z.nb_som();
   for(auto& itr : les_cl)
@@ -2052,7 +2052,7 @@ void assemblerPaPa(const Domaine_dis_base& z,
   ArrOfInt sommets(dimension+2);
   ArrOfInt face_opp1(dimension+2);
   ArrOfInt face_opp2(dimension+2);
-  // Faces de bord :
+  // Boundary faces:
   for(int i=0; i<les_cl.size(); i++)
     {
       const Cond_lim& la_cl = les_cl[i];
@@ -2083,7 +2083,7 @@ void assemblerPaPa(const Domaine_dis_base& z,
     {
       elem1=face_voisins(face, 0);
       elem2=face_voisins(face, 1);
-      if (!domaine_VEF.est_une_face_virt_bord(face)) // On ne traite que les faces internes
+      if (!domaine_VEF.est_une_face_virt_bord(face)) // Process internal faces only
         {
           remplir_sommets(domaine_VEF, face, elem1, elem2, sommets, face_opp1, face_opp2);
           contribuer_matricePaPa(domaine_VEF, elem1, elem2, sommets, voisins, coeffs);
@@ -2121,7 +2121,7 @@ void updatePaPa(const Domaine_dis_base& z,
   Matrice_Morse& ARV=ref_cast(Matrice_Morse, A.get_bloc(0,1).valeur());
   Matrice_Morse& AVR=ref_cast(Matrice_Morse, A.get_bloc(1,0).valeur());
   Matrice_Morse& AVV=ref_cast(Matrice_Morse, A.get_bloc(1,1).valeur());
-  // Faces de bord :
+  // Boundary faces:
   for (auto &itr : les_cl)
     {
       const Cond_lim& la_cl = itr;
@@ -2148,7 +2148,7 @@ void updatePaPa(const Domaine_dis_base& z,
     {
       elem1 = face_voisins(face, 0);
       elem2 = face_voisins(face, 1);
-      if (!domaine_VEF.est_une_face_virt_bord(face)) // On ne traite que les faces internes
+      if (!domaine_VEF.est_une_face_virt_bord(face)) // Process internal faces only
         {
           remplir_sommets(domaine_VEF, face, elem1, elem2, sommets, face_opp1, face_opp2);
           update_matricePaPa(domaine_VEF, inverse_quantitee_entrelacee, face, elem1, elem2, sommets, face_opp1, face_opp2, ARR, ARV, AVR, AVV);
@@ -2185,7 +2185,7 @@ void assemblerP0Pa(const Domaine_dis_base& z,
   ArrOfInt sommets(dimension+2);
   ArrOfInt face_opp1(dimension+2);
   ArrOfInt face_opp2(dimension+2);
-  // Faces de bord :
+  // Boundary faces:
   for(int i=0; i<les_cl.size(); i++)
     {
       const Cond_lim& la_cl = les_cl[i];
@@ -2205,7 +2205,7 @@ void assemblerP0Pa(const Domaine_dis_base& z,
             }
           else if(ok==4)
             {
-              ; // RIEN
+              ; // NOTHING
             }
           else
             contribuer_matriceP0Pa(domaine_VEF, elem1, elem2, sommets, voisins, coeffs);
@@ -2216,7 +2216,7 @@ void assemblerP0Pa(const Domaine_dis_base& z,
     {
       elem1=face_voisins(face, 0);
       elem2=face_voisins(face, 1);
-      if (!domaine_VEF.est_une_face_virt_bord(face)) // On ne traite que les faces internes
+      if (!domaine_VEF.est_une_face_virt_bord(face)) // Process internal faces only
         {
           remplir_sommets(domaine_VEF, face, elem1, elem2, sommets,
                           face_opp1, face_opp2);
@@ -2250,7 +2250,7 @@ void updateP0Pa(const Domaine_dis_base& z,
   Matrice_Morse& ARV=ref_cast(Matrice_Morse, A.get_bloc(0,1).valeur());
   Matrice_Morse& AVR=ref_cast(Matrice_Morse, A.get_bloc(1,0).valeur());
   Matrice_Morse& AVV=ref_cast(Matrice_Morse, A.get_bloc(1,1).valeur());
-  // Faces de bord :
+  // Boundary faces:
   for (auto &itr : les_cl)
     {
       const Cond_lim& la_cl = itr;
@@ -2276,7 +2276,7 @@ void updateP0Pa(const Domaine_dis_base& z,
     {
       elem1 = face_voisins(face, 0);
       elem2 = face_voisins(face, 1);
-      if (!domaine_VEF.est_une_face_virt_bord(face)) // On ne traite que les faces internes
+      if (!domaine_VEF.est_une_face_virt_bord(face)) // Process internal faces only
         {
           remplir_sommets(domaine_VEF, face, elem1, elem2, sommets, face_opp1, face_opp2);
           update_matriceP0Pa(domaine_VEF, inverse_quantitee_entrelacee, face, elem1, elem2, sommets, face_opp1, face_opp2, ARR, ARV, AVR, AVV);
@@ -2305,7 +2305,7 @@ void assemblerP1Pa(const Domaine_dis_base& z,
   ArrOfInt sommets(dimension+2);
   ArrOfInt face_opp1(dimension+2);
   ArrOfInt face_opp2(dimension+2);
-  // Faces de bord :
+  // Boundary faces:
   for(int i=0; i<les_cl.size(); i++)
     {
       const Cond_lim& la_cl = les_cl[i];
@@ -2336,7 +2336,7 @@ void assemblerP1Pa(const Domaine_dis_base& z,
     {
       elem1=face_voisins(face, 0);
       elem2=face_voisins(face, 1);
-      if (!domaine_VEF.est_une_face_virt_bord(face)) // On ne traite que les faces internes
+      if (!domaine_VEF.est_une_face_virt_bord(face)) // Process internal faces only
         {
           remplir_sommets(domaine_VEF, face, elem1, elem2, sommets,
                           face_opp1, face_opp2);
@@ -2375,7 +2375,7 @@ void updateP1Pa(const Domaine_dis_base& z,
   Matrice_Morse& ARV=ref_cast(Matrice_Morse, A.get_bloc(0,1).valeur());
   Matrice_Morse& AVR=ref_cast(Matrice_Morse, A.get_bloc(1,0).valeur());
   Matrice_Morse& AVV=ref_cast(Matrice_Morse, A.get_bloc(1,1).valeur());
-  // Faces de bord :
+  // Boundary faces:
   for (auto &itr : les_cl)
     {
       const Cond_lim& la_cl = itr;
@@ -2402,7 +2402,7 @@ void updateP1Pa(const Domaine_dis_base& z,
     {
       elem1 = face_voisins(face, 0);
       elem2 = face_voisins(face, 1);
-      if (!domaine_VEF.est_une_face_virt_bord(face)) // On ne traite que les faces internes
+      if (!domaine_VEF.est_une_face_virt_bord(face)) // Process internal faces only
         {
           remplir_sommets(domaine_VEF, face, elem1, elem2, sommets, face_opp1, face_opp2);
           update_matriceP1Pa(domaine_VEF, inverse_quantitee_entrelacee, face, elem1, elem2, sommets, face_opp1, face_opp2, coef_som, ARR, ARV, AVR, AVV);
@@ -2432,7 +2432,7 @@ void assemblerP0P1(const Domaine_dis_base& z,
   ArrOfInt sommets(dimension+2);
   ArrOfInt face_opp1(dimension+2);
   ArrOfInt face_opp2(dimension+2);
-  // Faces de bord :
+  // Boundary faces:
   for(int i=0; i<les_cl.size(); i++)
     {
       const Cond_lim& la_cl = les_cl[i];
@@ -2452,7 +2452,7 @@ void assemblerP0P1(const Domaine_dis_base& z,
             }
           else if(ok==4)
             {
-              ;// RIEN
+              ;// NOTHING
             }
           else
             contribuer_matriceP0P1(elem1, elem2, sommets, voisins, coeffs);
@@ -2463,7 +2463,7 @@ void assemblerP0P1(const Domaine_dis_base& z,
     {
       elem1=face_voisins(face, 0);
       elem2=face_voisins(face, 1);
-      if (!domaine_VEF.est_une_face_virt_bord(face)) // On ne traite que les faces internes
+      if (!domaine_VEF.est_une_face_virt_bord(face)) // Process internal faces only
         {
           remplir_sommets(domaine_VEF, face, elem1, elem2, sommets, face_opp1, face_opp2);
           sort(sommets, face_opp1, face_opp2);
@@ -2498,7 +2498,7 @@ void updateP0P1(const Domaine_dis_base& z,
   Matrice_Morse& ARV=ref_cast(Matrice_Morse, A.get_bloc(0,1).valeur());
   Matrice_Morse& AVR=ref_cast(Matrice_Morse, A.get_bloc(1,0).valeur());
   Matrice_Morse& AVV=ref_cast(Matrice_Morse, A.get_bloc(1,1).valeur());
-  // Faces de bord :
+  // Boundary faces:
   for (auto &itr : les_cl)
     {
       const Cond_lim& la_cl = itr;
@@ -2525,7 +2525,7 @@ void updateP0P1(const Domaine_dis_base& z,
     {
       elem1=face_voisins(face, 0);
       elem2=face_voisins(face, 1);
-      if (!domaine_VEF.est_une_face_virt_bord(face)) // On ne traite que les faces internes
+      if (!domaine_VEF.est_une_face_virt_bord(face)) // Process internal faces only
         {
           remplir_sommets(domaine_VEF, face, elem1, elem2, sommets,
                           face_opp1, face_opp2);

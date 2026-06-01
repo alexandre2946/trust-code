@@ -16,9 +16,9 @@
 #ifndef Schema_Euler_Implicite_included
 #define Schema_Euler_Implicite_included
 
-/*! @brief class Schema_Euler_Implicite Il herite de schema implicite base et porte un solveur par exemple
+/*! @brief class Schema_Euler_Implicite It inherits from the implicit base scheme and carries a solver, for example
  *
- *   le Simpler pour effectuer les Faire_un_pas_de_temps..
+ *   the Simpler solver, to perform the time-stepping operations.
  *
  */
 
@@ -40,7 +40,7 @@ public :
 
   ////////////////////////////////
   //                            //
-  // Caracteristiques du schema //
+  // Schema characteristics     //
   //                            //
   ////////////////////////////////
 
@@ -51,7 +51,7 @@ public :
 
   /////////////////////////////////////////
   //                                     //
-  // Fin des caracteristiques du schema  //
+  // End of schema characteristics       //
   //                                     //
   /////////////////////////////////////////
 

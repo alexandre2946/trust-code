@@ -55,10 +55,10 @@ Implemente_instanciable_sans_constructeur_ni_destructeur(Postraitement,"Postrait
 // XD attr nom chaine nom REQ Name of the post-processing.
 // XD attr post postraitement_base post REQ the post
 
-/*! @brief Constructeur par defaut.
+/*! @brief Default constructor.
  *
- * Les frequences de postraitement prennent la valeur
- *     par defaut 1e6. Et aucun postraitement n'est demande.
+ * @brief Post-processing frequencies are set to 1e6 by default.
+ *     No post-processing is requested initially.
  *
  */
 Postraitement::Postraitement():
@@ -92,9 +92,9 @@ void Postraitement::associer_nom_et_pb_base(const Nom& nom,
   Postraitement_base::associer_nom_et_pb_base(nom, pb);
 }
 
-// Si forcer != 0, on postraite quel que soit le temps courant,
-// sinon on postraite si l'intervalle entre les postraitements demandes
-// est ecoule.
+// If forcer != 0, post-processing is done regardless of the current time,
+// otherwise post-processing is done if the requested interval between
+// post-processings has elapsed.
 void Postraitement::postraiter(int forcer)
 {
   if (forcer)
@@ -111,7 +111,7 @@ void Postraitement::postraiter(int forcer)
     }
   dernier_temps_=mon_probleme->schema_temps().temps_courant();
 
-  // Cas des statistiques en serie, il faut traiter APRES le postraitement
+  // Case of series statistics, processing must happen AFTER post-processing
   if (lserie_)
     {
       if (sup_ou_egal(dernier_temps_-tstat_deb_,dt_integr_serie_))
@@ -134,15 +134,15 @@ void Postraitement::postraiter(int forcer)
 
 void Postraitement::mettre_a_jour(double temps)
 {
-  //Mise a jour des operateurs statistiques portes par les Champ_Generique_Statistiques
+  //Update the statistical operators carried by Champ_Generique_Statistiques
   for (auto &itr : champs_post_complet_) itr->mettre_a_jour(temps);
 
   if ( inf_ou_egal(tstat_deb_,temps) &&  inf_ou_egal(temps,tstat_fin_) )
-    tstat_dernier_calcul_ =  temps;// Il y a eu mise a jour effective des integrales
-  if ( sup_ou_egal(temps, tstat_fin_))  // si reprise du calcul apres la fin des stats
+    tstat_dernier_calcul_ =  temps;// There has been an effective update of the integrals
+  if ( sup_ou_egal(temps, tstat_fin_))  // if computation is resumed after the end of stats
     {
-      double dt=probleme().schema_temps().pas_de_temps(); // si dt cst !!!
-      if (sup_strict(dt,0)) // pour eviter une division par 0
+      double dt=probleme().schema_temps().pas_de_temps(); // if dt is constant !!!
+      if (sup_strict(dt,0)) // to avoid a division by zero
         tstat_dernier_calcul_ =  floor(tstat_fin_/dt)*dt;
     }
 }
@@ -259,23 +259,23 @@ Sortie& Postraitement::printOn(Sortie& s ) const
   return s << finl;
 }
 
-/*! @brief Lit les directives de postraitement sur un flot d'entree.
+/*! @brief Reads the post-processing directives from an input stream.
  *
- * Format:
+ * @brief Expected format:
  *     Postraitement
  *     {
- *       Sondes bloc de lecture des sondes |
- *       Champs bloc de lecture des champs a postraiter |
- *       Statistiques bloc de lecture objet statistique |
+ *       Sondes probes reading block |
+ *       Champs fields to post-process reading block |
+ *       Statistiques statistics reading block |
  *       Fichier
  *     }
  *
- * @param (Entree& s) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws accolade ouverte attendue
- * @throws lecture des champs: mot clef "dt_post" attendu
- * @throws lecture du bloc statistique: mot clef "dt_post" attendu
- * @throws mot clef inconnu
+ * @param s an input stream
+ * @return the modified input stream
+ * @throws open brace expected
+ * @throws fields reading: keyword "dt_post" expected
+ * @throws statistics block reading: keyword "dt_post" expected
+ * @throws unknown keyword
  */
 Entree& Postraitement::readOn(Entree& s)
 {
@@ -346,17 +346,17 @@ Entree& Postraitement::readOn(Entree& s)
   nom_fich_ += ".";
   nom_fich_ += format_;
 
-  // Les sondes sont completees (en effet, si les sondes ont des champs statistiques, on n'a besoin d'avoir
-  // lu le bloc statistiques ET le bloc sondes)
+  // Probes are completed (indeed, if probes have statistical fields, one needs to have
+  // read both the statistics block AND the probes block)
   les_sondes_.completer();
 
   Nom type_format = "Format_Post_";
   type_format += format_;
   format_post_.typer(type_format.getChar());
 
-  format_post_->set_single_lata_option(is_single_lata); // utile pour single_lata ...
+  format_post_->set_single_lata_option(is_single_lata); // useful for single_lata ...
 
-  // pour cgns ...
+  // for cgns ...
   if (le_pb.has_domaine_dis())
     format_post_->set_discr_type(le_pb.domaine_dis().que_suis_je());
 
@@ -657,13 +657,13 @@ void Postraitement::set_param(Param& param) const
 int Postraitement::lire_motcle_non_standard(const Motcle& mot, Entree& s)
 {
   ////////////////////////////////////////
-  // Creation d'alias pour certains champs
+  // Creation of aliases for certain fields
   ////////////////////////////////////////
   {
     Noms liste_noms;
     const Probleme_base& Pb = probleme();
     Pb.get_noms_champs_postraitables(liste_noms);
-    // On ajoute temperature_physique aux champs definis
+    // Add temperature_physique to the defined fields
     if (liste_noms.rang("temperature") != -1 && !comprend_champ_post("temperature_physique"))
       {
         Motcle disc(probleme().discretisation().que_suis_je());
@@ -757,8 +757,8 @@ int Postraitement::lire_motcle_non_standard(const Motcle& mot, Entree& s)
           s >> nb_pas_dt_post_;
           expect_acco = true;
         }
-      //La methode lire_champs_a_postraiter() va generer auatomatiquement un Champ_Generique_base
-      //en fonction des indications du jeu de donnees (ancienne formulation)
+      //The method lire_champs_a_postraiter() will automatically generate a Champ_Generique_base
+      //based on the indications in the data file (old syntax)
 
       if (!expect_acco && motlu != "{")
         Process::exit("We expected { to start the reading of the fields to postprocess!");
@@ -793,8 +793,8 @@ int Postraitement::lire_motcle_non_standard(const Motcle& mot, Entree& s)
         }
       if (!expect_acco && motlu != "{")
         Process::exit("We expected { to start the reading of the fields to postprocess!");
-      //La methode lire_champs_stat_a_postraiter() va generer auatomatiquement un Champ_Generique_base
-      //en fonction des indications du jeu de donnees (ancienne formulation)
+      //The method lire_champs_stat_a_postraiter() will automatically generate a Champ_Generique_base
+      //based on the indications in the data file (old syntax)
 
       if (keyword=="Statistics_file")
         {
@@ -805,7 +805,7 @@ int Postraitement::lire_motcle_non_standard(const Motcle& mot, Entree& s)
       else
         lire_champs_stat_a_postraiter(s,expect_acco);
 
-      //Activer pour lancer la sauvegarde et la reprise des statistiques
+      //Enable to trigger saving and restarting of statistics
       stat_demande_ = 1;
       return 1;
     }
@@ -831,7 +831,7 @@ int Postraitement::lire_motcle_non_standard(const Motcle& mot, Entree& s)
           exit();
         }
 
-      // Recuperation du sous-domaine
+      // Retrieval of the sub-domain
       Nom nom_du_sous_domaine;
       s >> nom_du_sous_domaine;
       Sous_Domaine le_sous_domaine;
@@ -842,7 +842,7 @@ int Postraitement::lire_motcle_non_standard(const Motcle& mot, Entree& s)
         }
       le_sous_domaine=ref_cast(Sous_Domaine,Interprete_bloc::objet_global(nom_du_sous_domaine));
 
-      // Declaration du domaine
+      // Declaration of the domain
       Nom nom_du_dom(le_sous_domaine.domaine().le_nom());
       Nom nom_du_nouveau_dom = nom_du_dom + Nom("_") + nom_du_sous_domaine;
 
@@ -852,7 +852,7 @@ int Postraitement::lire_motcle_non_standard(const Motcle& mot, Entree& s)
       EChaine IN(in);
       Interprete_bloc::interprete_courant().interpreter_bloc(IN, Interprete_bloc::BLOC_EOF, 0);
 
-      // Definition du domaine a partir du sous-domaine
+      // Definition of the domain from the sub-domain
       in = "Create_domain_from_sub_domain { domaine_final ";
       in += nom_du_nouveau_dom;
       in += " par_sous_zone ";
@@ -933,8 +933,8 @@ int Postraitement::lire_motcle_non_standard(const Motcle& mot, Entree& s)
     }
   else if (keyword=="Definition_champs")
     {
-      //La methode lire_champs_operateurs() permet la lecture d un champ a postraiter avec
-      //la nouvelle formulation dans le jeu de donnees
+      //The method lire_champs_operateurs() allows reading a field to post-process with
+      //the new syntax in the data file
       lire_champs_operateurs(s);
       return 1;
     }
@@ -1025,7 +1025,7 @@ int Postraitement::sauvegarder(Sortie& os) const
     {
       const Schema_Temps_base& sch = mon_probleme->schema_temps();
       double temps_courant = sch.temps_courant();
-      // le test est necessaire pour avoir une ecriture lecture symetrique
+      // this test is necessary to ensure symmetric write-read operations
       if (temps_courant>tstat_deb_)
         {
           // en mode ecriture special seul le maitre ecrit l'entete
@@ -1033,13 +1033,13 @@ int Postraitement::sauvegarder(Sortie& os) const
           EcritureLectureSpecial::is_ecriture_special(special,a_faire);
           if (a_faire)
             {
-              //On veut retrouver le nom precedent pour relecture des statistiques (format xyz)
+              //We want to recover the previous name for re-reading statistics (xyz format)
               Nom mon_ident("Operateurs_Statistique_tps");
               mon_ident += probleme().domaine().le_nom();
               double temps = probleme().schema_temps().temps_courant();
               mon_ident += Nom(temps,"%e");
               os << mon_ident << finl;
-              //On veut retrouver le nom precedent pour relecture des statistiques (format xyz)
+              //We want to recover the previous name for re-reading statistics (xyz format)
               os << "Operateurs_Statistique_tps" << finl;
               os << nb_champs_stat_ << finl;
               os << tstat_deb_ << finl;
@@ -1107,8 +1107,8 @@ int Postraitement::reprendre(Entree& is)
                   is >> bidon;
                   if (bidon=="fin")
                     {
-                      // Ce test evite un beau segmentation fault a la lecture
-                      // du deuxieme bidon lors d'une sauvegarde/reprise au format binaire
+                      // This test avoids a nasty segmentation fault when reading
+                      // the second dummy variable during save/restart in binary format
                       Cerr << "End of the resumption file reached...." << finl;
                       Cerr << "This file contains no statistics." << finl;
                       Cerr << "The tinit time of resumption (= " << tinit << " ) must be less" << finl;
@@ -1130,7 +1130,7 @@ int Postraitement::reprendre(Entree& is)
                 }
               else if ((!est_egal(tstat_deb_sauv,tstat_deb_)) && (!lserie_))
                 {
-                  // t_deb est modifie : on refait une statistique sans reprendre dans certains cas
+                  // t_deb has been modified: restarting statistics without resumption in some cases
                   if (inf_strict(tstat_deb_,tinit,1.e-5))
                     {
                       Cerr << "You have changed t_deb (old= " << tstat_deb_sauv << " new= " << tstat_deb_ << " ) to make a new statistical computing without resumption" << finl;
@@ -1149,12 +1149,12 @@ int Postraitement::reprendre(Entree& is)
                         }
                     }
                 }
-              else // tinit=>temps_derniere_mise_a_jour_stats : on fait la reprise
+              else // tinit=>temps_derniere_mise_a_jour_stats: we perform the restart
                 {
                   champs_post_complet_.reprendre(is);
 
-                  // On modifie l'attribut tstat_deb_ et l'attribut t_debut_ des champs
-                  // pour tenir compte de la reprise
+                  // Modify the tstat_deb_ attribute and the t_debut_ attribute of fields
+                  // to account for the restart
                   tstat_deb_ = tstat_deb_sauv;
 
                   for (auto &itr : champs_post_complet_)
@@ -1218,7 +1218,7 @@ void Postraitement::completer_sondes()
  *     }
  *
  * @param (Entree& s) un flot d'entree
- * @return (int) renvoie toujours 1
+ * @return (int) always returns 1
  * @throws accolade ouvrante attendue
  */
 int Postraitement::lire_champs_a_postraiter(Entree& s, bool expect_acco)
@@ -1286,11 +1286,11 @@ int Postraitement::lire_champs_a_postraiter(Entree& s, bool expect_acco)
       else
         {
 
-          //On teste la distinction entre un Champ_Generique_base a creer par macro (sans som specifie)
-          //et l ajout d un Champ_Generique_base deja cree (existant dans champs_post_complet_)
-          //On va tester si le motlu correpond au nom d un champ porte par le probleme
-          //Si c est le cas on cree un Champ_Generique_base par macro sinon on va recuperer le Champ_Generique_base dans la liste complete
-          //et on l ajoute dans la liste des champs a postraiter
+          //We test the distinction between a Champ_Generique_base to create by macro (without specified som)
+          //and the addition of an already created Champ_Generique_base (existing in champs_post_complet_)
+          //We test whether motlu corresponds to the name of a field carried by the problem
+          //If so we create a Champ_Generique_base by macro, otherwise we retrieve the Champ_Generique_base from the full list
+          //and add it to the list of fields to post-process
 
           Motcles mots_compare(liste_noms.size());
           for (int i=0; i<liste_noms.size(); i++)
@@ -1459,7 +1459,7 @@ int Postraitement::cherche_stat_dans_les_sources(const Champ_Gen_de_Champs_Gen& 
 {
   if (sub_type(Champ_Generique_Statistiques_base,ch))
     {
-      // Activer pour lancer la sauvegarde et la reprise des statistiques
+      // Enable to trigger saving and restarting of statistics
       stat_demande_definition_champs_ = 1;
       const Champ_Generique_Statistiques_base& champ_stat = ref_cast(Champ_Generique_Statistiques_base,ch);
       if (tstat_deb_>-1 && champ_stat.tstat_deb()!=tstat_deb_)
@@ -1536,8 +1536,8 @@ void Postraitement::complete_champ(Champ_Generique_base& champ,const Motcle& mot
         nb_champs_stat_ += 1;
     }
   champ.nommer(motlu);
-  //On teste le nom du champ et de ses sources si elles ont ete specifiees par l utilisateur
-  //Methode suivante a reviser ou a ne pas utiliser
+  //We test the field name and its sources if they have been specified by the user
+  //Following method to be revised or not used
   verifie_nom_et_sources(champ);
 
   OWN_PTR(Champ_Generique_base)& champ_a_completer = champs_post_complet_.add_if_not(champ);
@@ -1562,7 +1562,7 @@ int Postraitement::lire_tableaux_a_postraiter(Entree& s)
   motlu = nom_tab;
   while (motlu != accolade_fermee)
     {
-      // Recherche du tableau a postraiter
+      // Search for the array to post-process
       OBS_PTR(IntVect) ch_tab;
       Noms liste_noms;
       mon_probleme->get_noms_champs_postraitables(liste_noms);
@@ -1595,15 +1595,15 @@ int Postraitement::lire_tableaux_a_postraiter(Entree& s)
   return 1;
 }
 
-// E Saikali : on ajoute cette liste qui est utile pour un probleme couple
-// dans le cas ou on ecrit sur le meme domaine
+// E Saikali : we add this list which is useful for a coupled problem
+// in the case where we write on the same domain
 static Noms liste_dom_ecrit;
 
-/*! @brief Initialise le postraitement.
+/*! @brief Initializes the post-processing.
  *
- * Cree le fichier associe au postraitement, ecrit
- *     des infos sur TrioU. Ecrit le probleme sur
- *     le fichier.
+ * Creates the file associated with the post-processing, writes
+ *     info about TrioU. Writes the problem to
+ *     the file.
  *
  */
 void Postraitement::init()
@@ -1628,8 +1628,8 @@ void Postraitement::init()
     }
   ////////////////////////////////////////////////////////////////////////
 
-  // S'il existe un champ a postraiter aux faces, on stocke ici une ref au domaine dis base du champ
-  // PQ : 13/06/13 : mis en attribut de la classe pour gerer les champs FACES en maillage deformable
+  // If a field to post-process at faces exists, we store here a ref to the base discretised domain of the field
+  // PQ : 13/06/13 : moved to class attribute to handle FACES fields on deformable meshes
 
   {
     Nom le_nom_champ_post;
@@ -1686,8 +1686,8 @@ void Postraitement::init()
               }
 
 
-            // il n'existe pas d'interpolation aux faces pour les champs qui ne sont pas naturellement localises aux faces
-            // test pour gerer la problematique du post-traitement aux faces non pris en compte
+            // there is no interpolation to faces for fields not naturally located at faces
+            // test to handle the issue of face post-processing not being taken into account
             Nom nomposttmp(le_nom_champ_post) ;
             Nom& locpostjdd=nomposttmp.prefix(nom_du_domaine);
             locpostjdd.prefix("_");
@@ -1771,7 +1771,7 @@ void Postraitement::finir()
  *
  * Mets a jour les champs crees.
  *
- * @return (int) renvoie toujours 1
+ * @return (int) always returns 1
  */
 int Postraitement::postraiter_champs()
 {
@@ -1866,11 +1866,11 @@ void Postraitement::postprocess_field_values()
       const Noms& noms_compo = champ.get_property("composantes");
       int tenseur = champ.get_info_type_post();
 
-      //Etape pour savoir si on doit postraiter un champ ou une de ses composantes
+      //Step to determine whether to post-process a field or one of its components
 
       int ncomp = Champ_Generique_base::composante(itr,nom_post[0],noms_compo,champ.get_property("synonyms"));
 
-      //La distinction du type de postraitement (tableau ou tenseur) est fait dans la methode postraiter par la valeur de tenseur
+      //The distinction of post-processing type (array or tensor) is handled in the postraiter method via the tensor value
       Nom nature("scalar");
       if (champ_ecriture.is_vectorial()) nature="vector";
       postraiter(dom,unites,noms_compo,ncomp,temps_courant,itr,localisation,nature,valeurs_post,tenseur);
@@ -1919,7 +1919,7 @@ int Postraitement::postraiter_tableaux()
 
 /*! @brief Effectue le postraitement des Champs si cela est necessaire.
  *
- * @return (int) renvoie toujours 1
+ * @return (int) always returns 1
  */
 int Postraitement::traiter_champs()
 {
@@ -1951,7 +1951,7 @@ int Postraitement::traiter_tableaux()
 
 /*! @brief Effectue le postraitement lie au sondes de facon imperative.
  *
- * @return (int) renvoie toujours 1
+ * @return (int) always returns 1
  */
 int Postraitement::postraiter_sondes()
 {
@@ -1962,7 +1962,7 @@ int Postraitement::postraiter_sondes()
 
 /*! @brief Mets a jour (en temps) le sondes.
  *
- * @return (int) renvoie toujours 1
+ * @return (int) always returns 1
  */
 int Postraitement::traiter_sondes()
 {
@@ -2131,12 +2131,12 @@ void Postraitement::add_locs_required_if_not(const Motcle& motlu2)
 //pour lancer la requete d un champ a postraiter (ex : vitesse elem) mais aussi generer un
 //champ generique pour creer une sonde d 'un champ discret du probleme
 //
-//Les etapes sont les suivantes :
-// -creation d une chaine de caracteres pour indiquer le type de champ generique a creer
-// -lecture du champ generique
-// -association du domaine au champ et creation d un domaine discretise si le domaine n est pas celui du calcul
-// -le champ est nomme
-// -les sources sont nommees (sauf si creation d un Champ_Generique_refChamp)
+//The steps are as follows:
+// -creation of a string indicating the type of generic field to create
+// -reading of the generic field
+// -association of the domain with the field and creation of a discretised domain if it is not the computation domain
+// -the field is named
+// -the sources are named (unless creating a Champ_Generique_refChamp)
 //  et les composantes sont fixees (permet de tester la non regression avec format lml)
 // -le champ est ajoute a la liste champs_post_complet_
 // -l identifiant du champ est ajoute a la liste noms_champs_a_post_
@@ -2288,12 +2288,12 @@ void Postraitement::creer_champ_post(const Motcle& motlu1,const Motcle& motlu2,E
 //Cette methode a pour objectif de pouvoir utiliser l ancienne syntaxe dans le jeu de donnees
 //pour lancer la requete de statistiques (ex : Moyenne vitesse elem)
 
-//Les etapes sont les suivantes :
-// -creation d une chaine de caracteres pour indiquer le type de champ generique a creer
-// -lecture du champ generique
-// -association du domaine au champ et creation d un domaine discretise si le domaine n est pas celui du calcul
-// -le champ est nomme
-// -les composantes sont fixees (permet de tester la non regression avec format lml)
+//The steps are as follows:
+// -creation of a string indicating the type of generic field to create
+// -reading of the generic field
+// -association of the domain with the field and creation of a discretised domain if it is not the computation domain
+// -the field is named
+// -the components are set (allows regression testing with lml format)
 // -le champ est complete
 // -le champ est ajoute a la liste champs_post_complet_
 // -l identifiant du champ est ajoute a la liste noms_champs_a_post_
@@ -2420,14 +2420,14 @@ void Postraitement::creer_champ_post_stat(const Motcle& motlu1,const Motcle& mot
 
 }
 
-//Creation d un champ generique en fonction des parametres qui sont passes a la methode
-//Cette methode a pour objectif de creer un Champ_Generique_base de type Champ_Generique_Morceau_Equation
-//Les etapes sont les suivantes :
-// -creation d une chaine de caracteres pour indiquer le type de champ generique a creer
-// -lecture du champ generique
-// -le champ est nomme
-// -le champ est ajoute a la liste champs_post_complet_ et completer
-// -les sources son nommees
+//Create a generic field based on the parameters passed to the method
+//The purpose of this method is to create a Champ_Generique_base of type Champ_Generique_Morceau_Equation
+//The steps are as follows:
+// -creation of a string indicating the type of generic field to create
+// -reading of the generic field
+// -the field is named
+// -the field is added to the champs_post_complet_ list and completed
+// -the sources are named
 // -l identifiant du champ est ajoute a la liste noms_champs_a_post_
 // -type de champ cree :
 //        Morceau_Equation { type "type_moreqn" numero "numero_moreqn" option "type_option" [ compo "num_compo" ]
@@ -2592,7 +2592,7 @@ bool Postraitement::has_champ_post(const Motcle& nom) const
     if (itr->has_champ_post(nom))
       return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 const Champ_Generique_base& Postraitement::get_champ_post(const Motcle& nom) const

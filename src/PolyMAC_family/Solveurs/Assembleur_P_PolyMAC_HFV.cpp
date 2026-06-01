@@ -53,22 +53,22 @@ int  Assembleur_P_PolyMAC_HFV::assembler_mat(Matrice& la_matrice,const DoubleVec
   const DoubleVect& pe = equation().milieu().porosite_elem(), &pf = equation().milieu().porosite_face(), &vf = domaine.volumes_entrelaces();
   int i, j, e, f, fb, ne = domaine.nb_elem(), ne_tot = domaine.nb_elem_tot(), nf = domaine.nb_faces(), nf_tot = domaine.nb_faces_tot();
 
-  DoubleTrav w2; //matrice W2 (de Domaine_PolyMAC_HFV) par element
+  DoubleTrav w2; //W2 matrix (from Domaine_PolyMAC_HFV) per element
 
 
-  /* 1. stencil de la matrice en pression : seulement au premier passage */
-  if (!stencil_done) /* premier passage: calcul */
+  /* 1. pressure matrix stencil: only on the first pass */
+  if (!stencil_done) /* first pass: compute */
     {
       Stencil stencil(0, 2);
 
       for (e = 0; e < ne; e++)
-        for (stencil.append_line(e, e), i = 0; i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++) /* blocs "elem-elem" et "elem-face" */
-          stencil.append_line(e, ne_tot + f); //toutes les faces (sauf bord de Neumann)
+        for (stencil.append_line(e, e), i = 0; i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++) /* "elem-elem" and "elem-face" blocks */
+          stencil.append_line(e, ne_tot + f); //all faces (except Neumann boundaries)
       for (e = 0; e < ne_tot; e++)
-        for (domaine.W2(nullptr, e, w2), i = 0; i < w2.dimension(1); i++) /* blocs "face-elem" et "face-face" */
-          if (fcl(f = e_f(e, i), 0) == 1 && f < nf) stencil.append_line(ne_tot + f, ne_tot + f); //Neumann : ligne "dpf = 0"
+        for (domaine.W2(nullptr, e, w2), i = 0; i < w2.dimension(1); i++) /* "face-elem" and "face-face" blocks */
+          if (fcl(f = e_f(e, i), 0) == 1 && f < nf) stencil.append_line(ne_tot + f, ne_tot + f); //Neumann: row "dpf = 0"
           else if (f < nf)
-            for (stencil.append_line(ne_tot + f, e), j = 0; j < w2.dimension(1); j++) /* sinon : ligne sum w2_{ff'} (pf' - pe) */
+            for (stencil.append_line(ne_tot + f, e), j = 0; j < w2.dimension(1); j++) /* otherwise: row sum w2_{ff'} (pf' - pe) */
               if (w2(i, j, 0)) stencil.append_line(ne_tot + f, ne_tot + e_f(e, j));
 
       tableau_trier_retirer_doublons(stencil);
@@ -76,7 +76,7 @@ int  Assembleur_P_PolyMAC_HFV::assembler_mat(Matrice& la_matrice,const DoubleVec
       tab1.ref_array(mat.get_set_tab1()), tab2.ref_array(mat.get_set_tab2());
       stencil_done = 1;
     }
-  else /* passages suivants : recyclage */
+  else /* subsequent passes: recycle */
     {
       mat.get_set_tab1().ref_array(tab1);
       mat.get_set_tab2().ref_array(tab2);
@@ -87,8 +87,8 @@ int  Assembleur_P_PolyMAC_HFV::assembler_mat(Matrice& la_matrice,const DoubleVec
   /* 2. coefficients */
   for (e = 0; e < ne_tot; e++)
     {
-      domaine.W2(nullptr, e, w2); //calcul de W2
-      double m_ee = 0, m_fe, m_ef, coeff; //coefficients (elem, elem), (elem, face) et (face, elem)
+      domaine.W2(nullptr, e, w2); //compute W2
+      double m_ee = 0, m_fe, m_ef, coeff; //coefficients (elem, elem), (elem, face) and (face, elem)
       for (i = 0; i < w2.dimension(0); i++, m_ee += m_ef)
         {
           f = e_f(e, i), coeff = diag.size_totale() ? pf(f) * vf(f) / diag(f) : 1;
@@ -96,17 +96,17 @@ int  Assembleur_P_PolyMAC_HFV::assembler_mat(Matrice& la_matrice,const DoubleVec
             if (w2(i, j, 0))
               {
                 fb = e_f(e, j);
-                if (f < domaine.nb_faces() && fcl(f, 0) != 1) mat(ne_tot + f, ne_tot + fb) += coeff * pe(e) * w2(i, j, 0); //interne ou Dirichlet
-                else if (f < domaine.nb_faces() && i == j) mat(ne_tot + f, ne_tot + fb) = 1; //f Neumann : ligne dpf = 0
-                m_ef += coeff * pe(e) * w2(i, j, 0),  m_fe += coeff * pe(e) * w2(i, j, 0); //accumulation dans m_ef, m_fe
+                if (f < domaine.nb_faces() && fcl(f, 0) != 1) mat(ne_tot + f, ne_tot + fb) += coeff * pe(e) * w2(i, j, 0); //internal or Dirichlet
+                else if (f < domaine.nb_faces() && i == j) mat(ne_tot + f, ne_tot + fb) = 1; //f Neumann: row dpf = 0
+                m_ef += coeff * pe(e) * w2(i, j, 0),  m_fe += coeff * pe(e) * w2(i, j, 0); //accumulation in m_ef, m_fe
               }
           if (e < domaine.nb_elem()) mat(e, ne_tot + f) -= m_ef;
-          if (f < domaine.nb_faces() && fcl(f, 0) != 1) mat(ne_tot + f, e) -= m_fe; //si f non Neumann : coef (face, elem)
+          if (f < domaine.nb_faces() && fcl(f, 0) != 1) mat(ne_tot + f, e) -= m_fe; //if f not Neumann: coeff (face, elem)
         }
       if (e < domaine.nb_elem()) mat(e, e) += m_ee; //coeff (elem, elem)
     }
 
-  //en l'absence de CLs en pression, on ajoute P(0) = 0 sur le process 0
+  //in the absence of pressure BCs, we add P(0) = 0 on process 0
   has_P_ref=0;
   for (int n_bord=0; n_bord<le_dom_PolyMAC_CDO->nb_front_Cl(); n_bord++)
     if (sub_type(Neumann_sortie_libre, le_dom_Cl_PolyMAC_CDO->les_conditions_limites(n_bord).valeur()) )
@@ -117,7 +117,7 @@ int  Assembleur_P_PolyMAC_HFV::assembler_mat(Matrice& la_matrice,const DoubleVec
   return 1;
 }
 
-/* equations sum_k alpha_k = 1, [grad p]_{fe} = [grad p]_{fe'} en Pb_Multiphase */
+/* equations sum_k alpha_k = 1, [grad p]_{fe} = [grad p]_{fe'} in Pb_Multiphase */
 void Assembleur_P_PolyMAC_HFV::dimensionner_continuite(matrices_t matrices, int aux_only) const
 {
   const Domaine_PolyMAC_HFV& domaine = ref_cast(Domaine_PolyMAC_HFV, le_dom_PolyMAC_CDO.valeur());
@@ -131,12 +131,12 @@ void Assembleur_P_PolyMAC_HFV::dimensionner_continuite(matrices_t matrices, int 
   if (!aux_only)
     for (e = 0; e < domaine.nb_elem(); e++)
       for (n = 0; n < N; n++) sten_a.append_line(e, N * e + n);
-  /* equations sur les p_f : continuite du gradient si interne, p = p_f si Neumann, sum_k alpha_k v_k = sum_k alpha_k v_k,imp si Dirichlet */
+  /* equations on p_f: gradient continuity if internal, p = p_f if Neumann, sum_k alpha_k v_k = sum_k alpha_k v_k,imp if Dirichlet */
   for (e = 0; e < domaine.nb_elem_tot(); e++)
     for (domaine.W2(nullptr, e, w2), i = 0; i < w2.dimension(0); i++)
-      if ((f = e_f(e, i)) >= domaine.nb_faces()) continue; //faces virtuelles
+      if ((f = e_f(e, i)) >= domaine.nb_faces()) continue; //virtual faces
       else if (!fcl(f, 0))
-        for (sten_p.append_line(!aux_only * ne_tot + f, e), j = 0; j < w2.dimension(1); j++) //face interne
+        for (sten_p.append_line(!aux_only * ne_tot + f, e), j = 0; j < w2.dimension(1); j++) //internal face
           {
             if (w2(i, j, 0) && fcl(fb = e_f(e, j), 0) != 1)
               for (m = 0; m < M; m++)
@@ -169,48 +169,48 @@ void Assembleur_P_PolyMAC_HFV::assembler_continuite(matrices_t matrices, DoubleT
   secmem = 0, fac = 1;
 
   /* equations sum alpha_k = 1 */
-  /* second membre : on multiplie par porosite * volume pour que le systeme en P soit symetrique en cartesien */
+  /* right-hand side: multiply by porosity * volume so the P system is symmetric in Cartesian coordinates */
   if (!aux_only)
     for (e = 0; e < domaine.nb_elem(); e++)
       for (secmem(e) = -pe(e) * ve(e), n = 0; n < N; n++) secmem(e) += pe(e) * ve(e) * (*alpha)(e, n);
-  /* matrice */
+  /* matrix */
   if (!aux_only)
     for (e = 0; e < domaine.nb_elem(); e++)
       for (n = 0; n < N; n++) (*mat_a)(e, N * e + n) = -pe(e) * ve(e);
 
-  /* equations sur les p_f : continuite du gradient si interne, p = p_f si Neumann, sum_k alpha_k v_k = sum_k alpha_k v_k,imp si Dirichlet */
+  /* equations on p_f: gradient continuity if internal, p = p_f if Neumann, sum_k alpha_k v_k = sum_k alpha_k v_k,imp if Dirichlet */
   for (mat_p.get_set_coeff() = 0, mat_v.get_set_coeff() = 0, e = 0; e < ne_tot; e++)
     for (domaine.W2(nullptr, e, w2), i = 0; i < w2.dimension(0); i++)
-      if ((f = e_f(e, i)) >= domaine.nb_faces()) continue; //faces virtuelles
-      else if (!fcl(f, 0)) //face interne
+      if ((f = e_f(e, i)) >= domaine.nb_faces()) continue; //virtual faces
+      else if (!fcl(f, 0)) //internal face
         {
           for (acc = 0, j = 0; j < w2.dimension(1); acc+= pe(e) * vf(f) * w2(i, j, 0), j++)
-            for (m = 0; m < M; m++) //second membre
+            for (m = 0; m < M; m++) //right-hand side
               secmem(!aux_only * ne_tot + f, m) -= pe(e) * vf(f) * w2(i, j, 0) * (press(ne_tot + e_f(e, j), m) - press(e, m));
           for (m = 0; m < M; m++) mat_p(M * (!aux_only * ne_tot + f) + m, M * e + m) -= acc;
-          for (j = 0; j < w2.dimension(1); j++) //matrice (sauf bords de Meumann)
+          for (j = 0; j < w2.dimension(1); j++) //matrix (except Neumann boundaries)
             if (w2(i, j, 0) && fcl(fb = e_f(e, j), 0) != 1)
               for (m = 0; m <M; m++)
                 mat_p(M * (!aux_only * ne_tot + f) + m, M * (ne_tot + fb) + m) += pe(e) * vf(f) * w2(i, j, 0);
         }
-      else if (fcl(f, 0) == 1) //Neumann -> egalites p_f = p_imp
+      else if (fcl(f, 0) == 1) //Neumann -> equalities p_f = p_imp
         {
           for (m = 0; m < M; m++) secmem(M * (!aux_only * ne_tot + f) + m) = fs(f) * (ref_cast(Neumann, cls[fcl(f, 1)].valeur()).flux_impose(fcl(f, 2), m) - press(ne_tot + f, m));
           for (m = 0; m < M; m++) mat_p(M * (!aux_only * ne_tot + f) + m, M * (ne_tot + f) + m) = fs(f);
         }
-      else  //Dirichlet -> egalite flux_tot_imp - flux_tot = 0
+      else  //Dirichlet -> equality flux_tot_imp - flux_tot = 0
         {
-          if (M == 1 && N > 1) //une pression, plusieurs vitesses -> on ne peut imposer qu'une ponderation : on choisit celle ocrrespondant aux flux de masse total
+          if (M == 1 && N > 1) //one pressure, multiple velocities -> only one weighting can be imposed: choose the one corresponding to total mass flux
             {
               for (ar_tot = 0, n = 0; n < N; n++) ar_tot += (*alpha_rho)(e, n);
               for (n = 0; n < N; n++) fac(n) = (*alpha_rho)(e, n) / ar_tot;
             }
-          else if (M != N) abort(); //sinon, il faut autant de pressions que de vitesses
+          else if (M != N) abort(); //otherwise, there must be as many pressures as velocities
 
           for (n = 0, m = 0; n < N; n++, m += (M > 1)) secmem(!aux_only * ne_tot + f, m) += vf(f) * fac(n) * vit(f, n);
           if (fcl(f, 0) == 3)
             for (d = 0; d < D; d++)
-              for (n = 0, m = 0; n < N; n++, m += (M > 1)) //contrib de la valeur imposee: Dirichlet non homogene seulement
+              for (n = 0, m = 0; n < N; n++, m += (M > 1)) //contribution of the imposed value: non-homogeneous Dirichlet only
                 secmem(!aux_only * ne_tot + f, m) -= vf(f) * fac(n) * nf(f, d) / fs(f) * ref_cast(Dirichlet, cls[fcl(f, 1)].valeur()).val_imp(fcl(f, 2), N * d + n);
           for (n = 0, m = 0; n < N; n++, m += (M > 1)) mat_v(M * (!aux_only * ne_tot + f) + m, N * f + n) -= vf(f) * fac(n);
         }
@@ -229,7 +229,7 @@ void Assembleur_P_PolyMAC_HFV::modifier_secmem_pour_incr_p(const DoubleTab& pres
         secmem(ne_tot + f, m) = (ref_cast(Neumann_sortie_libre, cls[fcl(f, 1)].valeur()).flux_impose(fcl(f, 2), m) - press(ne_tot + f, m)) / fac;
 }
 
-/* norme pour assembler_continuite */
+/* norm for assembler_continuite */
 DoubleTab Assembleur_P_PolyMAC_HFV::norme_continuite() const
 {
   const DoubleVect& pe= equation().milieu().porosite_elem(), &ve = le_dom_PolyMAC_CDO->volumes();

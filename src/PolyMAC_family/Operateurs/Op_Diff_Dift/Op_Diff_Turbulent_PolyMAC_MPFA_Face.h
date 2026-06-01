@@ -21,8 +21,8 @@
 
 /*! @brief : class Op_Diff_Turbulent_PolyMAC_MPFA_Face
  *
- *  Operateur de diffusion de vitesse prenant en compte l'effet de la turbulence par le biais d'une correlation de type Viscosite_turbulente_base.
- *
+ *  Velocity diffusion operator that accounts for turbulence effects
+ *  through a Viscosite_turbulente_base correlation.
  *
  */
 
@@ -36,7 +36,7 @@ public:
   void preparer_calcul() override;
   void mettre_a_jour(double temps) override;
   void completer() override;
-  void modifier_mu(DoubleTab&) const override; //prend en compte la diffusivite turbulente
+  void modifier_mu(DoubleTab&) const override; //accounts for turbulent diffusivity
   bool is_turb() const override { return true; }
   const Correlation_base* correlation_viscosite_turbulente() const override { return &(corr_.valeur()); }
 };

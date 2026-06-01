@@ -23,16 +23,16 @@
 
 class Domaine_dis_base;
 
-/*! @brief Cette classe est a la base de la hierarchie des sous-domaines discretises.
- * Au moment de la discretisation du domaine, de meme qu'un
- * Domaine_dis est creee pour chaque domaine, un Sous_domaine_dis_base est
- * cree pour chaque Sous_Domaine et discretise.
+/*! @brief This class is at the base of the discretized sub-domain hierarchy.
+ * At the time of domain discretization, just as a
+ * Domaine_dis is created for each domain, a Sous_domaine_dis_base is
+ * created for each Sous_Domaine and discretized.
  *
- * Les classes qui heritent de Sous_domaine_dis_base doivent surcharger la methode discretiser();
+ * Classes inheriting from Sous_domaine_dis_base must override the discretiser() method;
  *
- * L Sous_Domaine definit un sous-ensemble des elements du Domaine.
- * De meme, le Sous_domaine_dis_base definit un sous_ensemble des attributs
- * du Domaine_dis, en particulier des faces.
+ * The Sous_Domaine defines a subset of the elements of the Domaine.
+ * Similarly, the Sous_domaine_dis_base defines a subset of the attributes
+ * of Domaine_dis, in particular of faces.
  *
  * @sa Domaine_dis, Sous_Domaine, Domaine_dis_base, Sous_Domaine_VF
 */
@@ -44,13 +44,13 @@ public:
   void associer_sous_domaine(const Sous_Domaine&);
   void associer_domaine_dis(const Domaine_dis_base&);
 
-  // Methodes d'acces aux REFs
+  // REF accessor methods
   const Sous_Domaine& sous_domaine() const;
   Sous_Domaine& sous_domaine();
   const Domaine_dis_base& domaine_dis() const;
   Domaine_dis_base& domaine_dis();
 
-  // Methodes propres :
+  // Specific methods:
   virtual void discretiser() = 0;
 
 protected:

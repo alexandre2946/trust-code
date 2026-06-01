@@ -201,7 +201,7 @@ double Milieu_MUSIG::get_Diameter_Inf(int iPhaseMilieu) const
     }
   diametre = fluideMUSIG.get_Diametres()[index[2]];
 
-  // A decommenter si verification du tableau indexMilieuToIndexFluide_
+  // Uncomment to verify the indexMilieuToIndexFluide_ array
   // std::vector<int> indexPhase;
   // const int N = (int)fluides_.size();
   // for (int n = 0; n < N; n++)
@@ -213,7 +213,7 @@ double Milieu_MUSIG::get_Diameter_Inf(int iPhaseMilieu) const
   //     cout << endl;
   //   }
 
-  // A decommenter si necessaire
+  // Uncomment if needed
   //const int N = (int)fluides_.size();
   // for (int k = 0; k < N; k++)
   //   {

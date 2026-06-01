@@ -18,7 +18,7 @@
 
 void Solv_tools::construit_renum(const DoubleVect& b)
 {
-  // Initialisation du tableau items_to_keep_ si ce n'est pas deja fait
+  // Initialize the items_to_keep_ array if not already done
   nb_items_to_keep_ = b.get_md_vector()->get_sequential_items_flags(items_to_keep_, b.line_size());
 
   // Compute important value:
@@ -40,8 +40,8 @@ void Solv_tools::construit_renum(const DoubleVect& b)
   }
   int cpt=0;
   int size=items_to_keep_.size_array();
-  renum_ = INT_MAX; //pour crasher si le MD_Vector est incoherent
-  ArrOfTID& renum_array = renum_;  // tableau vu comme lineaire
+  renum_ = INT_MAX; //to crash if the MD_Vector is inconsistent
+  ArrOfTID& renum_array = renum_;  // array viewed as linear
   for(int i=0; i<size; i++)
     if(items_to_keep_[i])
       {
@@ -50,10 +50,10 @@ void Solv_tools::construit_renum(const DoubleVect& b)
       }
 
   renum_.echange_espace_virtuel();
-  // Construction de index_
+  // Build index_
   index_.resize(size);
   int index = 0;
-  // ToDo OpenMP factoriser avec ix car index_=ix-decalage_local_global_
+  // ToDo OpenMP: factorize with ix since index_=ix-decalage_local_global_
   for (int i=0; i<size; i++)
     {
       if (items_to_keep_[i])
@@ -64,7 +64,7 @@ void Solv_tools::construit_renum(const DoubleVect& b)
       else
         index_[i] = -1;
     }
-  // Construction de ix
+  // Build ix
   size=b.size_array();
   auto colonne_globale=decalage_local_global_;
   ix.resize(size);

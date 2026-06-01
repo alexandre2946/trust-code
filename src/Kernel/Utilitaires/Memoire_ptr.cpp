@@ -16,9 +16,9 @@
 #include <Memoire_ptr.h>
 #include <TRUSTVect.h>
 
-/*! @brief Constructeur
+/*! @brief Constructor.
  *
- * @param (Objet_U* ptr) l'Objet_U sur lequel pointer
+ * @param ptr the Objet_U to point to
  */
 Memoire_ptr::Memoire_ptr(Objet_U* ptr) : o_ptr(ptr)
 {

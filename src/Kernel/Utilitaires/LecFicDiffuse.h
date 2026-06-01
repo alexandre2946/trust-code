@@ -21,17 +21,17 @@
 
 class Objet_U;
 
-/*! @brief Cette classe implemente les operateurs et les methodes virtuelles de la classe EFichier de la facon suivante : Le fichier a lire est physiquement localise sur le disque de la machine hebergeant la tache maitre de l'application Trio-U (le processus de rang 0 dans le groupe "tous")
+/*! @brief This class implements the operators and virtual methods of the EFichier class as follows: The file to read is physically located on the disk of the machine hosting the master task of the Trio-U application (the process of rank 0 in the "tous" group),
  *
- *     et chaque item lu dans ce fichier est diffuse a tous les autres processus du groupe tous.
- *     Il en est de meme pour les methodes d'inspection de l'etat d'un fichier.
+ *     and each item read from this file is broadcast to all other processes in the group.
+ *     The same applies to the methods for inspecting the state of a file.
  *
  */
 
 class LecFicDiffuse : public Lec_Diffuse_base
 {
   Declare_instanciable_sans_constructeur(LecFicDiffuse);
-  // le maitre lit le fichier et propage l'information
+  // the master reads the file and propagates the information
 public:
   LecFicDiffuse();
   LecFicDiffuse(const char* name, IOS_OPEN_MODE mode=ios::in);

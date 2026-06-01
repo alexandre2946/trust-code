@@ -46,248 +46,249 @@ public:
 KOKKOS_INLINE_FUNCTION void calcul_vc_tetra(const int* Face, double *vc, const double * vs, const double * vsom,
                                             const double* vitesse,int type_cl, const double* poro)
 {
-  // Passage (justifie vue la taille) en int de type_cl et comp car bug nvc++ sinon
+  // Casting (justified by size) type_cl and comp to True_int to avoid nvc++ bug
   int comp;
   switch(type_cl)
     {
 
-    case 0: // le tetraedre n'a pas de Face de Dirichlet
+    case 0: // the tetrahedron has no Dirichlet face
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = 0.25*vs[comp];
         break;
       }
 
-    case 1: // le tetraedre a une Face de Dirichlet : KEL3
+    case 1: // the tetrahedron has one Dirichlet face: KEL3
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = vitesse[9+comp] * poro[3];
         break;
       }
 
-    case 2: // le tetraedre a une Face de Dirichlet : KEL2
+    case 2: // the tetrahedron has one Dirichlet face: KEL2
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = vitesse[6+comp]  *  poro[2];
         break;
       }
 
-    case 4: // le tetraedre a une Face de Dirichlet : KEL1
+    case 4: // the tetrahedron has one Dirichlet face: KEL1
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = vitesse[3+comp]  *  poro[1];
         break;
       }
 
-    case 8: // le tetraedre a une Face de Dirichlet : KEL0
+    case 8: // the tetrahedron has one Dirichlet face: KEL0
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = vitesse[comp] *  poro[0];
         break;
       }
 
-    case 3: // le tetraedre a deux faces de Dirichlet : KEL3 et KEL2
+    case 3: // the tetrahedron has two Dirichlet faces: KEL3 and KEL2
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = 0.5* (vsom[comp] + vsom[3+comp]);
         break;
       }
 
-    case 5: // le tetraedre a deux faces de Dirichlet : KEL3 et KEL1
+    case 5: // the tetrahedron has two Dirichlet faces: KEL3 and KEL1
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = 0.5* (vsom[comp] + vsom[6+comp]);
         break;
       }
 
-    case 6: // le tetraedre a deux faces de Dirichlet : KEL1 et KEL2
+    case 6: // the tetrahedron has two Dirichlet faces: KEL1 and KEL2
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = 0.5* (vsom[comp] + vsom[9+comp]);
         break;
       }
 
-    case 9: // le tetraedre a deux faces de Dirichlet : KEL0 et KEL3
+    case 9: // the tetrahedron has two Dirichlet faces: KEL0 and KEL3
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = 0.5* (vsom[3+comp] + vsom[6+comp]);
         break;
       }
 
-    case 10: // le tetraedre a deux faces de Dirichlet : KEL0 et KEL2
+    case 10: // the tetrahedron has two Dirichlet faces: KEL0 and KEL2
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = 0.5* (vsom[3+comp] + vsom[9+comp]);
         break;
       }
 
-    case 12: // le tetraedre a deux faces de Dirichlet : KEL0 et KEL1
+    case 12: // the tetrahedron has two Dirichlet faces: KEL0 and KEL1
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = 0.5*(vsom[6+comp] + vsom[9+comp]);
         break;
       }
 
-    case 7: // le tetraedre a trois faces de Dirichlet : KEL1, KEL2 et KEL3
+    case 7: // the tetrahedron has three Dirichlet faces: KEL1, KEL2 and KEL3
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = vsom[comp];
         break;
       }
 
-    case 11: // le tetraedre a trois faces de Dirichlet : KEL0,KEL2 et KEL3
+    case 11: // the tetrahedron has three Dirichlet faces: KEL0, KEL2 and KEL3
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = vsom[3+comp];
         break;
       }
 
-    case 13: // le tetraedre a trois faces de Dirichlet : KEL0, KEL1 et KEL3
+    case 13: // the tetrahedron has three Dirichlet faces: KEL0, KEL1 and KEL3
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = vsom[6+comp];
         break;
       }
 
-    case 14: // le tetraedre a trois faces de Dirichlet : KEL0, KEL1 et KEL2
+    case 14: // the tetrahedron has three Dirichlet faces: KEL0, KEL1 and KEL2
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = vsom[9+comp];
         break;
       }
 
-    } // fin du switch
+    } // end of switch
 
 }
 
 KOKKOS_INLINE_FUNCTION void calcul_vc_tetra_views(const int* Face, double *vc, const double * vs, const double * vsom,
                                                   CDoubleTabView vitesse,int type_cl, CDoubleArrView porosite_face)
 {
-  // Passage (justifie vue la taille) en int de type_cl et comp car bug nvc++ sinon
+  // Casting (justified by size) type_cl and comp to True_int to avoid nvc++ bug
   int comp;
   switch(type_cl)
     {
 
-    case 0: // le tetraedre n'a pas de Face de Dirichlet
+    case 0: // the tetrahedron has no Dirichlet face
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = 0.25*vs[comp];
         break;
       }
 
-    case 1: // le tetraedre a une Face de Dirichlet : KEL3
+    case 1: // the tetrahedron has one Dirichlet face: KEL3
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = vitesse(Face[3], comp) * porosite_face(Face[3]);
         break;
       }
 
-    case 2: // le tetraedre a une Face de Dirichlet : KEL2
+    case 2: // the tetrahedron has one Dirichlet face: KEL2
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = vitesse(Face[2], comp) * porosite_face(Face[2]);
         break;
       }
 
-    case 4: // le tetraedre a une Face de Dirichlet : KEL1
+    case 4: // the tetrahedron has one Dirichlet face: KEL1
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = vitesse(Face[1], comp) * porosite_face(Face[1]);
         break;
       }
 
-    case 8: // le tetraedre a une Face de Dirichlet : KEL0
+    case 8: // the tetrahedron has one Dirichlet face: KEL0
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = vitesse(Face[0], comp) * porosite_face(Face[0]);
         break;
       }
 
-    case 3: // le tetraedre a deux faces de Dirichlet : KEL3 et KEL2
+    case 3: // the tetrahedron has two Dirichlet faces: KEL3 and KEL2
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = 0.5* (vsom[comp] + vsom[3+comp]);
         break;
       }
 
-    case 5: // le tetraedre a deux faces de Dirichlet : KEL3 et KEL1
+    case 5: // the tetrahedron has two Dirichlet faces: KEL3 and KEL1
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = 0.5* (vsom[comp] + vsom[6+comp]);
         break;
       }
 
-    case 6: // le tetraedre a deux faces de Dirichlet : KEL1 et KEL2
+    case 6: // the tetrahedron has two Dirichlet faces: KEL1 and KEL2
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = 0.5* (vsom[comp] + vsom[9+comp]);
         break;
       }
 
-    case 9: // le tetraedre a deux faces de Dirichlet : KEL0 et KEL3
+    case 9: // the tetrahedron has two Dirichlet faces: KEL0 and KEL3
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = 0.5* (vsom[3+comp] + vsom[6+comp]);
         break;
       }
 
-    case 10: // le tetraedre a deux faces de Dirichlet : KEL0 et KEL2
+    case 10: // the tetrahedron has two Dirichlet faces: KEL0 and KEL2
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = 0.5* (vsom[3+comp] + vsom[9+comp]);
         break;
       }
 
-    case 12: // le tetraedre a deux faces de Dirichlet : KEL0 et KEL1
+    case 12: // the tetrahedron has two Dirichlet faces: KEL0 and KEL1
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = 0.5*(vsom[6+comp] + vsom[9+comp]);
         break;
       }
 
-    case 7: // le tetraedre a trois faces de Dirichlet : KEL1, KEL2 et KEL3
+    case 7: // the tetrahedron has three Dirichlet faces: KEL1, KEL2 and KEL3
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = vsom[comp];
         break;
       }
 
-    case 11: // le tetraedre a trois faces de Dirichlet : KEL0,KEL2 et KEL3
+    case 11: // the tetrahedron has three Dirichlet faces: KEL0, KEL2 and KEL3
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = vsom[3+comp];
         break;
       }
 
-    case 13: // le tetraedre a trois faces de Dirichlet : KEL0, KEL1 et KEL3
+    case 13: // the tetrahedron has three Dirichlet faces: KEL0, KEL1 and KEL3
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = vsom[6+comp];
         break;
       }
 
-    case 14: // le tetraedre a trois faces de Dirichlet : KEL0, KEL1 et KEL2
+    case 14: // the tetrahedron has three Dirichlet faces: KEL0, KEL1 and KEL2
       {
         for (comp=0; comp<3; comp++)
           vc[comp] = vsom[9+comp];
         break;
       }
 
-    } // fin du switch
+    } // end of switch
 
 }
 
-/*! @brief calcule les coord xg du centre d'un element non standard calcule aussi idirichlet=nb de faces de Dirichlet de l'element
+/*! @brief Computes the coordinates xg of the center of a non-standard element.
+ * Also computes idirichlet = number of Dirichlet faces of the element.
  *
  */
 KOKKOS_INLINE_FUNCTION
 void calcul_xg_tetra(double * xg, const double *x, const int type_elem_Cl, int& idirichlet,int& n1,int& n2,int& n3)
 {
-  // Passage (justifie vue la taille) en int de type_elem_cl et comp car bug nvc++ sinon
+  // Casting (justified by size) type_elem_cl and comp to True_int to avoid nvc++ bug
   int dim = 3;
   switch(type_elem_Cl)
     {
-    case 0:  // le tetraedre n'a pas de Face de Dirichlet. Il a 6 Facettes
+    case 0:  // the tetrahedron has no Dirichlet face. It has 6 facets
       {
         for (int j=0; j<dim; j++)
           xg[j]=0.25*(x[j]+x[dim+j]+x[2*dim+j]+x[3*dim+j]);
@@ -296,13 +297,12 @@ void calcul_xg_tetra(double * xg, const double *x, const int type_elem_Cl, int& 
         break;
       }
 
-    case 1:  // le tetraedre a une Face de Dirichlet.  Le 'centre'
-      // du tetraedre est au milieu de la Face 3 qui a pour sommets
-      // 0, 1, 2
-      // Il a 3 Facettes reelles : 0   aux noeuds 2 3 xg
-      //                           1   aux noeuds 1 3 xg
-      //                           3   aux noeuds 3 0 xg
-      // les 3 autres Facettes sont sur la Face 3
+    case 1:  // the tetrahedron has one Dirichlet face. The 'center'
+      // of the tetrahedron is at the midpoint of face 3 with vertices 0, 1, 2.
+      // It has 3 real facets: 0   at nodes 2 3 xg
+      //                       1   at nodes 1 3 xg
+      //                       3   at nodes 3 0 xg
+      // the 3 other facets are on face 3
 
       {
         for (int j=0; j<dim; j++)
@@ -313,12 +313,11 @@ void calcul_xg_tetra(double * xg, const double *x, const int type_elem_Cl, int& 
 
       }
 
-    case 2:  // le tetraedre a une Face de Dirichlet.  Le 'centre'
-      // du tetraedre est au milieu de la Face 2 qui a pour sommets
-      // 0, 1, 3
-      // Il a 3 Facettes reelles : 0   aux noeuds 2 3 xg
-      //                           2   aux noeuds 1 2 xg
-      //                           4   aux noeuds 2 0 xg
+    case 2:  // the tetrahedron has one Dirichlet face. The 'center'
+      // of the tetrahedron is at the midpoint of face 2 with vertices 0, 1, 3.
+      // It has 3 real facets: 0   at nodes 2 3 xg
+      //                       2   at nodes 1 2 xg
+      //                       4   at nodes 2 0 xg
 
       {
         for (int j=0; j<dim; j++)
@@ -328,12 +327,11 @@ void calcul_xg_tetra(double * xg, const double *x, const int type_elem_Cl, int& 
         break;
       }
 
-    case 4:  // le tetraedre a une Face de Dirichlet.  Le 'centre'
-      // du tetraedre est au milieu de la Face 1 qui a pour sommets
-      // 0, 2, 3
-      // Il a 3 Facettes reelles : 1   aux noeuds 1 3 xg
-      //                           2   aux noeuds 1 2 xg
-      //                           5   aux noeuds 1 0 xg
+    case 4:  // the tetrahedron has one Dirichlet face. The 'center'
+      // of the tetrahedron is at the midpoint of face 1 with vertices 0, 2, 3.
+      // It has 3 real facets: 1   at nodes 1 3 xg
+      //                       2   at nodes 1 2 xg
+      //                       5   at nodes 1 0 xg
 
       {
         for (int j=0; j<dim; j++)
@@ -343,12 +341,11 @@ void calcul_xg_tetra(double * xg, const double *x, const int type_elem_Cl, int& 
         break;
       }
 
-    case 8:  // le tetraedre a une Face de Dirichlet.  Le 'centre'
-      // du tetraedre est au milieu de la Face 0 qui a pour sommets
-      // 1, 2, 3
-      // Il a 3 Facettes reelles : 3   aux noeuds 3 0 xg
-      //                           4   aux noeuds 2 0 xg
-      //                           5   aux noeuds 1 0 xg
+    case 8:  // the tetrahedron has one Dirichlet face. The 'center'
+      // of the tetrahedron is at the midpoint of face 0 with vertices 1, 2, 3.
+      // It has 3 real facets: 3   at nodes 3 0 xg
+      //                       4   at nodes 2 0 xg
+      //                       5   at nodes 1 0 xg
 
       {
         for (int j=0; j<dim; j++)
@@ -358,9 +355,9 @@ void calcul_xg_tetra(double * xg, const double *x, const int type_elem_Cl, int& 
         break;
       }
 
-    case 3:  // le tetraedre a deux faces de Dirichlet 2 et 3. Le 'centre'
-      // du tetraedre est au milieu de l'arete qui a pour extremites 0, 1.
-      // Il a 1 Facette nulle: 5
+    case 3:  // the tetrahedron has two Dirichlet faces 2 and 3. The 'center'
+      // is at the midpoint of the edge with endpoints 0, 1.
+      // It has 1 null facet: 5
 
       {
         for (int j=0; j<dim; j++)
@@ -372,9 +369,9 @@ void calcul_xg_tetra(double * xg, const double *x, const int type_elem_Cl, int& 
       }
 
 
-    case 5:  // le tetraedre a deux faces de Dirichlet 3 et 1. Le 'centre'
-      // du tetraedre est au milieu de l'arete qui a pour extremites 0, 2.
-      // Il a 1 Facette  nulle  : 4
+    case 5:  // the tetrahedron has two Dirichlet faces 3 and 1. The 'center'
+      // is at the midpoint of the edge with endpoints 0, 2.
+      // It has 1 null facet: 4
 
       {
         for (int j=0; j<dim; j++)
@@ -385,9 +382,9 @@ void calcul_xg_tetra(double * xg, const double *x, const int type_elem_Cl, int& 
         break;
       }
 
-    case 6:  // le tetraedre a deux faces de Dirichlet 1 et 2. Le 'centre'
-      // du tetraedre est au milieu de l'arete qui a pour extremites 0, 3.
-      // Il a 1 Facette  nulle: 3
+    case 6:  // the tetrahedron has two Dirichlet faces 1 and 2. The 'center'
+      // is at the midpoint of the edge with endpoints 0, 3.
+      // It has 1 null facet: 3
 
       {
         for (int j=0; j<dim; j++)
@@ -398,9 +395,9 @@ void calcul_xg_tetra(double * xg, const double *x, const int type_elem_Cl, int& 
         break;
       }
 
-    case 9:  // le tetraedre a deux faces de Dirichlet 0 et 3. Le 'centre'
-      // du tetraedre est au milieu de l'arete qui a pour extremites 1, 2
-      // Il a 1 Facette  nulle: 2
+    case 9:  // the tetrahedron has two Dirichlet faces 0 and 3. The 'center'
+      // is at the midpoint of the edge with endpoints 1, 2.
+      // It has 1 null facet: 2
 
       {
         for (int j=0; j<dim; j++)
@@ -411,9 +408,9 @@ void calcul_xg_tetra(double * xg, const double *x, const int type_elem_Cl, int& 
         break;
       }
 
-    case 10:  // le tetraedre a deux faces de Dirichlet 0 et 2. Le 'centre'
-      // du tetraedre est au milieu de l'arete qui a pour extremites 1, 3.
-      // Il a 1 Facette  nulle: 1
+    case 10:  // the tetrahedron has two Dirichlet faces 0 and 2. The 'center'
+      // is at the midpoint of the edge with endpoints 1, 3.
+      // It has 1 null facet: 1
 
       {
         for (int j=0; j<dim; j++)
@@ -425,9 +422,9 @@ void calcul_xg_tetra(double * xg, const double *x, const int type_elem_Cl, int& 
       }
 
 
-    case 12:  // le tetraedre a deux faces de Dirichlet 0 et 1. Le 'centre'
-      // du tetraedre est au milieu de l'arete qui a pour sommets 2, 3.
-      // Il a 1 Facette  nulle
+    case 12:  // the tetrahedron has two Dirichlet faces 0 and 1. The 'center'
+      // is at the midpoint of the edge with vertices 2, 3.
+      // It has 1 null facet
 
       {
         for (int j=0; j<dim; j++)
@@ -438,8 +435,8 @@ void calcul_xg_tetra(double * xg, const double *x, const int type_elem_Cl, int& 
         break;
       }
 
-    case 7:  // trois faces de Dirichlet : 1,2,3. Le centre est au sommet 0
-      // il y 3 Facettes nulles: 3,4,5
+    case 7:  // three Dirichlet faces: 1, 2, 3. The center is at vertex 0.
+      // There are 3 null facets: 3, 4, 5
 
       {
         for (int j=0; j<dim; j++)
@@ -453,8 +450,8 @@ void calcul_xg_tetra(double * xg, const double *x, const int type_elem_Cl, int& 
 
       }
 
-    case 11:  // trois faces de Dirichlet : 0,2,3. Le centre est au sommet 1
-      // il y 3 Facettes nulles: 1, 2, 5
+    case 11:  // three Dirichlet faces: 0, 2, 3. The center is at vertex 1.
+      // There are 3 null facets: 1, 2, 5
 
       {
         for (int j=0; j<dim; j++)
@@ -468,8 +465,8 @@ void calcul_xg_tetra(double * xg, const double *x, const int type_elem_Cl, int& 
 
       }
 
-    case 13:  // trois faces de Dirichlet : 0,1,3. Le centre est au sommet 2
-      // il y 3 Facettes nulles: 0, 2, 4
+    case 13:  // three Dirichlet faces: 0, 1, 3. The center is at vertex 2.
+      // There are 3 null facets: 0, 2, 4
 
       {
         for (int j=0; j<dim; j++)
@@ -482,8 +479,8 @@ void calcul_xg_tetra(double * xg, const double *x, const int type_elem_Cl, int& 
         break;
 
       }
-    case 14:  // trois faces de Dirichlet : 0,1,2. Le centre est au sommet 3
-      // il y 3 Facettes nulles: 0, 1, 3
+    case 14:  // three Dirichlet faces: 0, 1, 2. The center is at vertex 3.
+      // There are 3 null facets: 0, 1, 3
 
       {
         for (int j=0; j<dim; j++)

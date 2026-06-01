@@ -23,20 +23,20 @@ Implemente_instanciable(Symetrie,"Symetrie",Navier);
 
 
 
-/*! @brief Ecrit le type de l'objet sur un flot de sortie.
+/*! @brief Writes the type of the object to an output stream.
  *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& s) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Symetrie::printOn(Sortie& s ) const
 {
   return s << que_suis_je() << finl;
 }
 
-/*! @brief Type le champ a la frontiere en "Champ_front_uniforme" Ne lit rien sur le flot passe en parametre
+/*! @brief Types the boundary field as "Champ_front_uniforme". Does not read anything from the input stream passed as parameter.
  *
- * @param (Entree& s) un flot d'entree
- * @return (Entree& s) le flot d'entree
+ * @param (Entree& s) an input stream
+ * @return (Entree& s) the input stream
  */
 Entree& Symetrie::readOn(Entree& s )
 {

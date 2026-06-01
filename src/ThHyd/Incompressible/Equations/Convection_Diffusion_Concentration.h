@@ -21,11 +21,11 @@
 
 class Constituant;
 
-/*! @brief classe Convection_Diffusion_Concentration Cas particulier de Convection_Diffusion_std
+/*! @brief Convection_Diffusion_Concentration Special case of Convection_Diffusion_std
  *
- *      pour un ou plusieurs constituants.
- *      Dans le cas de plusieurs constituants les champs
- *      concentration et diffusivite sont vectoriels.
+ *      for one or more constituents.
+ *      In the case of multiple constituents, the concentration
+ *      and diffusivity fields are vectorial.
  *
  * @sa Convection_Diffusion_std
  */
@@ -65,9 +65,9 @@ protected :
 };
 
 
-/*! @brief Associe un constituant a l'equation.
+/*! @brief Associates a constituent to the equation.
  *
- * @param (Constituant& un_constituant) un constituant a associer a l'equation
+ * @param (Constituant& un_constituant) the constituent to associate with the equation
  */
 inline void Convection_Diffusion_Concentration::associer_constituant(const Constituant& un_constituant)
 {
@@ -75,11 +75,11 @@ inline void Convection_Diffusion_Concentration::associer_constituant(const Const
 }
 
 
-/*! @brief Renvoie le champ inconnue de l'equation: la concentration.
+/*! @brief Returns the unknown field of the equation: the concentration.
  *
- * (version const)
+ * (const version)
  *
- * @return (Champ_Inc_base&) le champ inconnue de l'equation, la concentration.
+ * @return (Champ_Inc_base&) the unknown field of the equation, the concentration.
  */
 inline const Champ_Inc_base& Convection_Diffusion_Concentration::inconnue() const
 {
@@ -87,9 +87,9 @@ inline const Champ_Inc_base& Convection_Diffusion_Concentration::inconnue() cons
 }
 
 
-/*! @brief Renvoie le champ inconnue de l'equation: la concentration.
+/*! @brief Returns the unknown field of the equation: the concentration.
  *
- * @return (Champ_Inc_base&) le champ inconnue de l'equation, la concentration.
+ * @return (Champ_Inc_base&) the unknown field of the equation, the concentration.
  */
 inline Champ_Inc_base& Convection_Diffusion_Concentration::inconnue()
 {
@@ -97,9 +97,9 @@ inline Champ_Inc_base& Convection_Diffusion_Concentration::inconnue()
 }
 
 
-/*! @brief Renvoie le nombre de constituants du "Constituant" de l'equation.
+/*! @brief Returns the number of constituents of the "Constituant" of the equation.
  *
- * @return (int) le nombre de constituants de l'equation
+ * @return (int) the number of constituents of the equation
  */
 inline int Convection_Diffusion_Concentration::nb_constituants() const
 {

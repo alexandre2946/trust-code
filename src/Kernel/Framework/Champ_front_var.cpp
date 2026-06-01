@@ -19,10 +19,10 @@
 Implemente_base(Champ_front_var,"Champ_front_var",Champ_front_base);
 
 
-/*! @brief Imprime le nom du champ sur un flot de sortie
+/*! @brief Prints the field name to an output stream
  *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& s) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Champ_front_var::printOn(Sortie& s ) const
 {
@@ -30,12 +30,12 @@ Sortie& Champ_front_var::printOn(Sortie& s ) const
 }
 
 
-/*! @brief NE FAIT RIEN A surcharger dans les classes derivees
+/*! @brief DOES NOTHING must be overridden in derived classes
  *
- *     Doit dans tous les cas fixer nb_comp
+ *     Must in all cases set nb_comp
  *
  * @param (Entree& is)
- * @return (Entree&) le flot d'entree modifie
+ * @return (Entree&) the modified input stream
  */
 Entree& Champ_front_var::readOn(Entree& s )
 {
@@ -44,12 +44,12 @@ Entree& Champ_front_var::readOn(Entree& s )
 }
 
 
-/*! @brief Initialisation en debut de calcul.
+/*! @brief Initialization at the beginning of the calculation.
  *
- * Dimensionne le tableau de valeurs et cree son espace virtuel.
- *     Les classes derivees doivent imperativement appeler cette methode.
+ * Sizes the value array and creates its virtual space.
+ *     Derived classes must imperatively call this method.
  *
- * @return (0 en cas d'erreur, 1 sinon.)
+ * @return (0 in case of error, 1 otherwise.)
  */
 int Champ_front_var::initialiser(double temps, const Champ_Inc_base& inco)
 {
@@ -59,10 +59,10 @@ int Champ_front_var::initialiser(double temps, const Champ_Inc_base& inco)
   for(int i = 0; i < n; i++)
     {
       DoubleTab& tab = les_valeurs[i].valeurs();
-      // B.M. la methode completer dimensionne parfois le tableau.
-      // On a un peut tout et n'importe quoi en entree: parfois tableau vide,
-      // parfois nb_dim==1, etc...
-      // Attention, les valeurs existantes doivent etre conservees s'il y en a !
+      // B.M. the completer method sometimes sizes the array.
+      // We have a bit of everything in input: sometimes empty array,
+      // sometimes nb_dim==1, etc...
+      // Be careful, existing values must be preserved if there are any!
       if (tab.nb_dim()!=2 || tab.dimension(1)!=nbc)
         {
           tab.resize(tab.dimension(0), nbc);

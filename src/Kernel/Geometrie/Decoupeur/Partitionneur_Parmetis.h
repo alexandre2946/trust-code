@@ -21,9 +21,9 @@
 
 #include <Domaine_forward.h>
 
-/*! @brief Partition d'un domaine en nb_parties parties equilibrees en utilisant la librairie PARMETIS.
+/*! @brief Partition of a domain into nb_parties balanced parts using the PARMETIS library.
  *
- * Voir construire_partition
+ * See construire_partition.
  *
  */
 
@@ -42,11 +42,11 @@ public:
 
 private:
 
-  // Parametres du partitionneur
+  // Partitioner parameters
   OBS_PTR(Domaine) ref_domaine_;
   int nb_parties_ = -1;
 
-  // Drapeau: utiliser ou pas la ponderation des edges dans parmetis.
+  // Flag: whether to use edge weighting in parmetis.
   bool use_weights_ = false;
 
 };

@@ -19,12 +19,12 @@
 
 #include <Elem_geom_base.h>
 
-/*! @brief Classe Hexaedre_VEF Cette classe represente l'element geometrique Hexaedre_VEF.
+/*! @brief Class Hexaedre_VEF: represents the geometric element Hexaedre_VEF.
  *
- *     Un Hexaedre_VEF est un polyedre qui a 4 faces, 4 sommets et
- *     un seul type de face ayant 3 sommets par face.
+ *     A Hexaedre_VEF is a polyhedron with 6 faces, 8 vertices, and
+ *     a single face type with 4 vertices per face.
  *
- * @sa Elem_geom_base Elem_geom, C'est un element utilisable en 3D
+ * @sa Elem_geom_base Elem_geom, This element is usable in 3D
  */
 template <typename _SIZE_>
 class Hexaedre_VEF_32_64  : public Elem_geom_base_32_64<_SIZE_>
@@ -68,11 +68,11 @@ private:
 };
 
 
-/*! @brief Renvoie le numero du j-ieme sommet de la i-ieme face de l'element.
+/*! @brief Returns the index of the j-th vertex of the i-th face of the element.
  *
- * @param (int i) un numero de face
- * @param (int j) un numero de sommet
- * @return (int) le numero du j-ieme sommet de la i-ieme face
+ * @param i a face index
+ * @param j a vertex index
+ * @return the index of the j-th vertex of the i-th face
  */
 template <typename _SIZE_>
 inline int Hexaedre_VEF_32_64<_SIZE_>::face_sommet(int i, int j) const
@@ -98,10 +98,10 @@ inline int Hexaedre_VEF_32_64<_SIZE_>::face_sommet(int i, int j) const
 }
 
 
-/*! @brief Renvoie le nombre de faces du type specifie que possede l'element geometrique.
+/*! @brief Returns the number of faces of the specified type that the geometric element has.
  *
- * @param (int i) le type de face
- * @return (int) le nombre de faces de type i
+ * @param i the face type
+ * @return the number of faces of type i
  */
 template <typename _SIZE_>
 inline int Hexaedre_VEF_32_64<_SIZE_>::nb_faces(int i) const
@@ -111,10 +111,10 @@ inline int Hexaedre_VEF_32_64<_SIZE_>::nb_faces(int i) const
 }
 
 
-/*! @brief Renvoie le nombre de sommets des faces du type specifie.
+/*! @brief Returns the number of vertices of faces of the specified type.
  *
- * @param (int i) le type de face
- * @return (int) le nombre de sommets des faces de type i
+ * @param i the face type
+ * @return the number of vertices of faces of type i
  */
 template <typename _SIZE_>
 inline int Hexaedre_VEF_32_64<_SIZE_>::nb_som_face(int i) const
@@ -124,10 +124,10 @@ inline int Hexaedre_VEF_32_64<_SIZE_>::nb_som_face(int i) const
 }
 
 
-/*! @brief Renvoie le numero du i-ieme sommet de la face 0
+/*! @brief Returns the index of the i-th vertex of face 0.
  *
- * @param (int i) le numero du sommet a renvoyer
- * @return (int) le numero du i-ieme sommet de la face 0
+ * @param i the index of the vertex to return
+ * @return the index of the i-th vertex of face 0
  */
 template <typename _SIZE_>
 inline int Hexaedre_VEF_32_64<_SIZE_>::face_sommet0(int i) const
@@ -138,10 +138,10 @@ inline int Hexaedre_VEF_32_64<_SIZE_>::face_sommet0(int i) const
 }
 
 
-/*! @brief Renvoie le numero du i-ieme sommet de la face 1
+/*! @brief Returns the index of the i-th vertex of face 1.
  *
- * @param (int i) le numero du sommet a renvoyer
- * @return (int) le numero du i-ieme sommet de la face 1
+ * @param i the index of the vertex to return
+ * @return the index of the i-th vertex of face 1
  */
 template <typename _SIZE_>
 inline int Hexaedre_VEF_32_64<_SIZE_>::face_sommet1(int i) const
@@ -166,10 +166,10 @@ inline int Hexaedre_VEF_32_64<_SIZE_>::face_sommet1(int i) const
 }
 
 
-/*! @brief Renvoie le numero du i-ieme sommet de la face 2
+/*! @brief Returns the index of the i-th vertex of face 2.
  *
- * @param (int i) le numero du sommet a renvoyer
- * @return (int) le numero du i-ieme sommet de la face 2
+ * @param i the index of the vertex to return
+ * @return the index of the i-th vertex of face 2
  */
 template <typename _SIZE_>
 inline int Hexaedre_VEF_32_64<_SIZE_>::face_sommet2(int i) const
@@ -180,10 +180,10 @@ inline int Hexaedre_VEF_32_64<_SIZE_>::face_sommet2(int i) const
 }
 
 
-/*! @brief Renvoie le numero du i-ieme sommet de la face 3
+/*! @brief Returns the index of the i-th vertex of face 3.
  *
- * @param (int i) le numero du sommet a renvoyer
- * @return (int) le numero du i-ieme sommet de la face 3
+ * @param i the index of the vertex to return
+ * @return the index of the i-th vertex of face 3
  */
 template <typename _SIZE_>
 inline int Hexaedre_VEF_32_64<_SIZE_>::face_sommet3(int i) const
@@ -193,10 +193,10 @@ inline int Hexaedre_VEF_32_64<_SIZE_>::face_sommet3(int i) const
   return 2*i+1;
 }
 
-/*! @brief Renvoie le numero du i-ieme sommet de la face 4
+/*! @brief Returns the index of the i-th vertex of face 4.
  *
- * @param (int i) le numero du sommet a renvoyer
- * @return (int) le numero du i-ieme sommet de la face 4
+ * @param i the index of the vertex to return
+ * @return the index of the i-th vertex of face 4
  */
 template <typename _SIZE_>
 inline int Hexaedre_VEF_32_64<_SIZE_>::face_sommet4(int i) const
@@ -220,10 +220,10 @@ inline int Hexaedre_VEF_32_64<_SIZE_>::face_sommet4(int i) const
     }
 }
 
-/*! @brief Renvoie le numero du i-ieme sommet de la face 5
+/*! @brief Returns the index of the i-th vertex of face 5.
  *
- * @param (int i) le numero du sommet a renvoyer
- * @return (int) le numero du i-ieme sommet de la face 5
+ * @param i the index of the vertex to return
+ * @return the index of the i-th vertex of face 5
  */
 template <typename _SIZE_>
 inline int Hexaedre_VEF_32_64<_SIZE_>::face_sommet5(int i) const
@@ -234,12 +234,12 @@ inline int Hexaedre_VEF_32_64<_SIZE_>::face_sommet5(int i) const
 }
 
 
-/*! @brief Renvoie le i-ieme type de face.
+/*! @brief Returns the i-th face type.
  *
- * Un Hexaedre_VEF n'a qu'un seul type de face.
+ * A Hexaedre_VEF has only one face type.
  *
- * @param (int i) le rang du type de face a renvoyer
- * @return (Type_Face) un type de face
+ * @param i the rank of the face type to return
+ * @return a face type
  */
 template <typename _SIZE_>
 inline Type_Face Hexaedre_VEF_32_64<_SIZE_>::type_face(int i) const

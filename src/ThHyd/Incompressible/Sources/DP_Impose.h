@@ -20,9 +20,9 @@
 
 class Champ_Don_base;
 
-/*! @brief Classe DP_Impose Cette classe derivee de Perte_Charge_Singuliere est utilisee lorsque l'on veut
+/*! @brief Classe DP_Impose This class derived from Perte_Charge_Singuliere is used when one wants
  *
- *     impose un Delta P (pour simuler une pompe) depuis un champ exterieur
+ *     to impose a Delta P (to simulate a pump) from an external field.
  *
  * @sa Perte_Charge Perte_Charge_Reguliere
  */
@@ -32,11 +32,11 @@ public:
   ~DP_Impose() override { }
   Entree& lire_donnees(Entree&);
   void mettre_a_jour(double temps);
-  void update_dp_regul(const Equation_base& eqn, double deb, DoubleVect& bilan); //regule dp_regul_ a partir du debit calcule par update_Q
+  void update_dp_regul(const Equation_base& eqn, double deb, DoubleVect& bilan); //regulates dp_regul_ from the flow rate computed by update_Q
 
 protected:
-  OWN_PTR(Champ_Don_base) DP_; //le champ de delta P qu'on veut imposer
-  mutable Parser_U f_DP_; //DP a reguler par fac_regul_ (peut dependre de t)
+  OWN_PTR(Champ_Don_base) DP_; // the delta P field to impose
+  mutable Parser_U f_DP_; // DP to regulate via fac_regul_ (may depend on t)
   double fac_regul_ = 1;
 };
 

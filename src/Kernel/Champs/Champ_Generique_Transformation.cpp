@@ -54,17 +54,17 @@ Entree& Champ_Generique_Transformation::readOn(Entree& s )
   return s ;
 }
 
-//-methode : type de transformation a realiser
-// methodes possible :
-//        formule : fonction de champs generiques sources, x, y, z et t
-//        vecteur : construction d un vecteur a partir des donnees fournies
-//        produit_scalaire : produit scalaire de deux vecteurs specifies
-//        norme : norme d un vecteur specifie
-//        composante : creation d un champ scalaire a partir d une composante d un champ vectoriel
-//-expression : expression de la transformation (cas des methodes formule et vecteur)
-//-numero : numero de la composante a extraire (uniquement pour le cas de la methode composante)
-//-localisation : localisation du champ de stockage
-//-unite : pour specifier l'unite d'un champ pour ameliorer la lisibilite des postraitements
+//-methode : type of transformation to perform
+// possible methods :
+//        formule : function of generic source fields, x, y, z and t
+//        vecteur : construction of a vector from the provided data
+//        produit_scalaire : dot product of two specified vectors
+//        norme : norm of a specified vector
+//        composante : creation of a scalar field from a component of a vector field
+//-expression : expression of the transformation (for the formule and vecteur methods)
+//-numero : number of the component to extract (only for the composante method)
+//-localisation : localization of the storage field
+//-unite : to specify the unit of a field to improve the readability of post-processings
 void Champ_Generique_Transformation::set_param(Param& param) const
 {
   Champ_Gen_de_Champs_Gen::set_param(param);
@@ -111,9 +111,9 @@ int Champ_Generique_Transformation::lire_motcle_non_standard(const Motcle& mot, 
       is >> num_compo;
       nb_comp_ = 1;
       nature_ch = scalaire;
-      /*     test numero composante : on ne peut pas se baser sur la dimension de l'espace dans le cas d'un champ multi_scalaire
-             Probleme : c'est nb_comp_ qui portera par la suite la dimension des composantes et il est ici initialise a 1 pour eviter bug
-             Le test est deplace dans Champ_Generique_Transformation::get_champ
+      /*     test component number: we cannot rely on the space dimension in the case of a multi_scalaire field
+             Problem: it is nb_comp_ that will subsequently carry the component dimension and it is initialized to 1 here to avoid a bug
+             The test is moved to Champ_Generique_Transformation::get_champ
 
              if ((num_compo<0) || (num_compo>dimension-1))
              {
@@ -159,10 +159,10 @@ void Champ_Generique_Transformation::verifier_coherence_donnees()
 
   if ((Motcle(methode_) == "vecteur"))
     {
-      // On essaie de fixer de suite le nombre de composantes avec vecteur
+      // We try to set the number of components immediately with vecteur
       nb_comp_ = les_fct.size();
 
-      // la verification des sources est faite lors du completer pour les sources reference
+      // the verification of sources is done during completer for reference sources
     }
 }
 void Champ_Generique_Transformation::verifier_localisation()
@@ -225,7 +225,7 @@ void Champ_Generique_Transformation::completer(const Postraitement_base& post)
       if (get_nb_sources()>1)
         {
           assert( sources_.size( ) == 1 );
-          // on a rajoute une source pour rien ...
+          // a source was added unnecessarily ...
           sources_.vide();
           nb_source_fictive = 0;
         }
@@ -233,9 +233,9 @@ void Champ_Generique_Transformation::completer(const Postraitement_base& post)
 
   nb_sources = get_nb_sources();
 
-  //On determine le nombre de composantes qui sera attribue
-  //a l espace de stockage rendu par ce champ de postraitement en
-  //recherchant la source qui possede le plus grand nombre de composantes
+  //Determine the number of components to be assigned
+  //to the storage space returned by this post-processing field by
+  //searching for the source that has the largest number of components
 
   nb_comp_ = 1;
   nature_ch = scalaire;
@@ -265,8 +265,8 @@ void Champ_Generique_Transformation::completer(const Postraitement_base& post)
             nature_ch = multi_scalaire;
         }
     }
-  //Si aucun champ source n a ete specifie on en ajoute une
-  //pour donner acces au domaine discretise ...
+  //If no source field was specified, we add one
+  //to provide access to the discretized domain ...
 
   Noms sources_location;
 
@@ -276,7 +276,7 @@ void Champ_Generique_Transformation::completer(const Postraitement_base& post)
       //the user needs to provide a location
       if( localisation_ == "??" )
         {
-          // On prend la localisation de l'inconnue
+          // Take the localization of the unknown
 
 
           Cerr << "Error in Champ_Generique_Transformation::completer "<<finl;
@@ -458,7 +458,7 @@ void Champ_Generique_Transformation::completer(const Postraitement_base& post)
 
   if (Motcle(methode_)=="formule")
     {
-      // on redemande le nb_sources car on a ajoute des sources par completer
+      // we re-query nb_sources because sources may have been added by completer
       nb_sources = get_nb_sources();
       fxyz.dimensionner(1);
       fxyz[0].setNbVar(4+nb_sources);
@@ -520,11 +520,11 @@ void projette(DoubleTab& valeurs_espace,const DoubleTab& val_source,const Domain
     }
 
 }
-//Construction de l espace de stockage rendu par ce champ de postraitement
-//-Caracterisation de l espace de stockage rendu par ce champ de postraitement (Typage ...)
-//-Construction du tableau positions qui contient les coordonnees des points de calcul (support)
-//-Interpolation des valeurs des sources sur le support retenu
-//-Evaluation des valeurs de l espace de stockage en fonction de la fonction (les_fct)
+//Construction of the storage space returned by this post-processing field
+//-Characterization of the storage space returned by this post-processing field (typing ...)
+//-Construction of the positions array containing the coordinates of the computation points (support)
+//-Interpolation of source values on the retained support
+//-Evaluation of the storage space values as a function of (les_fct)
 
 const Champ_base& Champ_Generique_Transformation::get_champ_without_evaluation(OWN_PTR(Champ_base)&) const
 {
@@ -550,13 +550,13 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
   if (get_source(0).get_discretisation().is_vdf() || get_source(0).get_discretisation().is_poly_family())
     champ_normal_faces = 1;
 
-  //Construction du tableau positions qui contient les coordonnees
-  //des points (support) ou vont etre evaluees les valeurs de l espace
-  //de stockage
+  //Construction of the positions array containing the coordinates
+  //of the points (support) where the values of the storage
+  //space will be evaluated
   DoubleTrav positions;
   if (localisation_ == "elem")
     {
-      if (zvf.xp().nb_dim() != 2) /* xp() non initialise */
+      if (zvf.xp().nb_dim() != 2) /* xp() not initialized */
         zvf.domaine().calculer_centres_gravite(positions);
       else
         zvf.get_position(positions);
@@ -583,7 +583,7 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
       exit();
     }
 
-  //Interpolation des valeurs des sources sur le support retenu et stockage dans sources_val
+  //Interpolation of source values on the retained support and storage in sources_val
 
   int nb_sources = get_nb_sources();
   int nb_pos = positions.dimension(0);
@@ -602,7 +602,7 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
   Noms compo(dim_compo);
   double temps;
   temps = get_time();
-  int nb_compso = 0; // deplacement du parametre pour qu'il soit reconnu par l'ensemble des methodes en vue test (voir methode composante ci-dessous)
+  int nb_compso = 0; // parameter offset so that it is recognized by all methods under test (see the composante method below)
   for (int so=0; so<nb_sources; so++)
     {
       const Champ_Generique_base& source = get_source(so);
@@ -623,8 +623,8 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
             compo[so*dimension+comp] = compo_ch[comp];
         }
 
-      //Si VDF et traitement d un produit scalaire ou d une norme alors on interpole
-      //pour recuperer un tableau avec autant de composantes que la dimension du probleme
+      //If VDF and processing a dot product or a norm, then interpolate
+      //to retrieve an array with as many components as the problem dimension
       if (directive!=directive_so)
         {
           sources_val[so].resize(nb_pos,nb_compso);
@@ -663,9 +663,9 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
             }
         }
     }
-  //Fin du remplissage de sources_val
+  //End of filling sources_val
 
-  //Calcul des valeurs de l espace de stockage en fonction de methode_ selectionne
+  //Computation of storage space values according to the selected methode_
   if ((Motcle(methode_)=="produit_scalaire") || (Motcle(methode_)=="norme"))
     {
       ParserView parser(fxyz[0]);
@@ -891,7 +891,7 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
     }
   else if (Motcle(methode_)=="formule")
     {
-      //Evaluation des valeurs de l espace de stockage en fonction de la fonction (les_fct)
+      //Evaluation of the storage space values as a function of (les_fct)
       ParserView parser(fxyz[0]);
       parser.parseString();
       int special=0;
@@ -992,15 +992,15 @@ const Champ_base& Champ_Generique_Transformation::get_champ(OWN_PTR(Champ_base)&
           end_gpu_timer(__KERNEL_NAME__);
         }
     }
-  // PL: Suppression d'une synchronisation couteuse tres souvent inutile
-  // Voir Champ_Generique_Interpolation (localisation = som) pour le report de l'echange_espace_virtuel
+  // PL: Removal of a costly synchronization that is very often unnecessary
+  // See Champ_Generique_Interpolation (localization = som) for the deferred echange_espace_virtuel
   // valeurs_espace.echange_espace_virtuel();
   return espace_stockage_;
 }
 
-//Les localisations elem som faces peuvent etre retenues pour le postraitement
-//La localisation elem_som sert uniquement pour l evaluation des valeurs de l espace
-//de stockage mais ne peut pas etre retenue comme localisation de postraitement
+//The elem, som and faces localizations can be retained for post-processing
+//The elem_som localization is used only for evaluating the values of the storage space
+//but cannot be retained as a post-processing localization
 
 Entity Champ_Generique_Transformation::get_localisation(const int index) const
 {
@@ -1077,7 +1077,7 @@ const Motcle Champ_Generique_Transformation::get_directive_pour_discr() const
   return directive;
 }
 
-//Nomme le champ en tant que source par defaut
+//Names the field as default source
 //"Combinaison_"+"les_fct"
 void Champ_Generique_Transformation::nommer_source()
 {
@@ -1108,8 +1108,8 @@ void Champ_Generique_Transformation::nommer_source()
     }
 }
 
-//Renvoie le nombre de composantes a manipuler dans l expression
-//Verifie la coherence des donnees pour la methode choisie
+//Returns the number of components to manipulate in the expression
+//Verifies the consistency of the data for the chosen method
 int Champ_Generique_Transformation::preparer_macro()
 {
   int nb_sources = get_nb_sources();
@@ -1142,12 +1142,12 @@ int Champ_Generique_Transformation::preparer_macro()
           msg = "Exactly one vector source field must be specified.";
           erreur = 1;
         }
-      // la suite est faite si on n a pas d'erreur
+      // the rest is done if there is no error
       if ( erreur==0 )
         {
           nb_comp_ = 1;
           nature_ch = scalaire;
-          // L'appel a creer_expression_macro est fait si on a un vecteur car elle fait appel aux composantes !
+          // The call to creer_expression_macro is done if we have a vector because it uses the components!
           creer_expression_macro();
           fxyz.dimensionner(1);
           fxyz[0].setNbVar(nb_var);
@@ -1197,8 +1197,8 @@ int Champ_Generique_Transformation::preparer_macro()
           msg = "Exactly one vector source field must be specified.";
           erreur = 1;
         }
-      // La suite est faite si on n'a pas d'erreur !!
-      if (erreur==0) // 1 source pas la peine de faire une boucle
+      // The rest is done if there is no error !!
+      if (erreur==0) // 1 source, no need to loop
         {
           OWN_PTR(Champ_base) source_espace_stockage;
           const Champ_base& source = get_source(0).get_champ_without_evaluation(source_espace_stockage);
@@ -1234,8 +1234,8 @@ int Champ_Generique_Transformation::preparer_macro()
   return nb_var;
 }
 
-//Cree des expressions pour des operations specifiques :
-//produit scalaire et norme
+//Creates expressions for specific operations:
+//dot product and norm
 void Champ_Generique_Transformation::creer_expression_macro()
 {
   if ((Motcle(methode_)=="produit_scalaire") || (Motcle(methode_)=="norme"))

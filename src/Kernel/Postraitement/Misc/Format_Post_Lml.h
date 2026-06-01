@@ -19,18 +19,18 @@
 #include <Format_Post_base.h>
 #include <EcrFicPartage.h>
 
-/*! @brief : Classe de postraitement des champs euleriens au format lml.
+/*! @brief : Post-processing class for Eulerian fields in LML format.
  *
  * Only works for small enough domains (domain exceeding the 32b limit can not be written in LML).
  *
- *    Pour creer un fichier valide, il faut faire:
- *    (initialisation) initialize("base_nom_fichier",...);
- *                      // base_nom_fichier indique le nom du fichier sans extension ".lml"
- *                      // met eventuellement en jeux les informations d autres postraitements
+ *    To create a valid file, the following steps are needed:
+ *    (initialization) initialize("base_file_name",...);
+ *                      // base_file_name specifies the file name without the ".lml" extension
+ *                      // optionally involves information from other post-processings
  *                     ecrire_entete(temps_courant,reprise,est_le_premier_post)
  *                     ecrire_domaine(domaine,est_le_premier_post)
  *
- *    (pour chaque dt) ecrire_temps(temps_courant)
+ *    (for each dt)    ecrire_temps(temps_courant)
  *                     ecrire_champ(const Domaine& domaine, const Noms& unite_, const Noms& noms_compo,
  *                                      int ncomp,double temps_,double temps_courant
  *                                      const Nom  & id_du_champ,
@@ -39,14 +39,14 @@
  *                                    const DoubleTab & data)
  *                    [ecrire_champ(..., data)]
  *
- *    (finir)          finir(est_le_dernier_post)
+ *    (finalize)       finir(est_le_dernier_post)
 */
 class Format_Post_Lml : public Format_Post_base
 {
   Declare_instanciable_sans_constructeur(Format_Post_Lml);
 public:
-  // Methodes declarees dans la classe de base (interface commune a tous
-  // les formats de postraitment de champs):
+  // Methods declared in the base class (common interface for all
+  // field post-processing formats):
   void reset() override;
   void set_param(Param& param) const override;
   int initialize_by_default(const Nom& file_basename) override;
@@ -64,7 +64,7 @@ public:
 
   int ecrire_item_int(const Nom& id_item, const Nom& id_du_domaine, const Nom& id_domaine, const Nom& localisation, const Nom& reference, const IntVect& data, const int reference_size) override;
 
-  // Methodes statiques specifiques a ce format:
+  // Static methods specific to this format:
 
   static int ecrire_domaine_lml(const Domaine& domaine, Nom& nom_fic);
   static int ecrire_temps_lml(const double temps, Nom& nom_fic);

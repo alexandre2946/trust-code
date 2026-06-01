@@ -16,16 +16,14 @@
 #ifndef Domaine_Cl_VEF_included
 #define Domaine_Cl_VEF_included
 
-/*! @brief class Domaine_Cl_VEF Cette classe porte les tableaux qui servent a mettre en oeuvre
+/*! @brief class Domaine_Cl_VEF
  *
- *   les condition aux limites dans la formulation VEF
- *   volumes_entrelaces_Cl_ : volumes des polyedres entrelaces autour des faces
- *                            non standard
- *   normales_facettes_Cl_ : normales aux facettes situees dans des polyedres
- *                           non standard
- *   type_elem_Cl_: type des polyedres non standard. Le type_elem_Cl d'un element
- *                  non standard depend de son nombre de faces de Dirichlet et de
- *                  la position de ces faces dans l'element (voir Tri_VEF et Tetra_VEF)
+ * @brief This class holds the arrays used to implement boundary conditions in the VEF formulation.
+ *   volumes_entrelaces_Cl_ : volumes of the interlaced polyhedra around non-standard faces
+ *   normales_facettes_Cl_ : normals to facets located in non-standard polyhedra
+ *   type_elem_Cl_: type of non-standard polyhedra. The type_elem_Cl of a non-standard element
+ *                  depends on its number of Dirichlet faces and the position of those faces
+ *                  in the element (see Tri_VEF and Tetra_VEF)
  *
  *
  * @sa Domaine_Cl_dis_base

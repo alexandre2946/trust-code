@@ -41,7 +41,7 @@ Sortie& Partitionneur_Tranche_32_64<_SIZE_>::printOn(Sortie& os) const
   return os;
 }
 
-/*! @brief La syntaxe est { Tranches nx ny [ nz ] }
+/*! @brief The syntax is { Tranches nx ny [ nz ] }
  */
 template <typename _SIZE_>
 void Partitionneur_Tranche_32_64<_SIZE_>::set_param(Param& param) const
@@ -55,7 +55,7 @@ void Partitionneur_Tranche_32_64<_SIZE_>::set_param(Param& param) const
 
 }
 
-/*! @brief La syntaxe est { Tranches nx ny [ nz ] }
+/*! @brief The syntax is { Tranches nx ny [ nz ] }
  */
 template <typename _SIZE_>
 void Partitionneur_Tranche_32_64<_SIZE_>::validate_params() const
@@ -70,7 +70,7 @@ void Partitionneur_Tranche_32_64<_SIZE_>::validate_params() const
     }
 }
 
-/*! @brief Premiere etape d'initialisation du partitionneur: on associe un domaine.
+/*! @brief First initialization step of the partitioner: associates a domain.
  *
  */
 template <typename _SIZE_>
@@ -81,9 +81,9 @@ void Partitionneur_Tranche_32_64<_SIZE_>::associer_domaine(const Domaine_t& doma
   nb_tranches_ = -1;
 }
 
-/*! @brief Deuxieme etape d'initialisation: on definit le nombre de tranches.
+/*! @brief Second initialization step: defines the number of slabs.
  *
- * (on peut utiliser readOn a la place).
+ * (readOn can be used instead).
  *
  */
 template <typename _SIZE_>
@@ -97,10 +97,10 @@ void Partitionneur_Tranche_32_64<_SIZE_>::initialiser(const ArrOfInt& nb_tranche
   nb_tranches_ = nb_tranches;
 }
 
-/*! @brief Remplissage du tableau directions perio a partir des noms des bords periodiques.
+/*! @brief Fills the directions_perio array from the names of the periodic boundaries.
  *
- * Pour 0 <= i < Objet_U::dimension directions_perio[i] vaut 1 s'il
- *   existe un bord periodique pour lequel le vecteur delta est dirige dans la direction i.
+ * For 0 <= i < Objet_U::dimension, directions_perio[i] is 1 if
+ *   there exists a periodic boundary whose delta vector is directed in direction i.
  *
  */
 template <typename _SIZE_>
@@ -175,12 +175,11 @@ void Partitionneur_Tranche_32_64<_SIZE_>::construire_partition(BigIntVect_& elem
 
   const int dim = Objet_U::dimension;
 
-  // Pour chaque dimension d'espace, cette direction est-elle
-  // une direction de periodicite
+  // For each space dimension, is this direction a periodic direction?
   ArrOfInt directions_perio;
   this->chercher_direction_perio(dom, directions_perio);
 
-  // Centre de gravite des elements:
+  // Center of gravity of the elements:
   Cerr << "Calculation of centers of gravity of the elements" << finl;
   DoubleTab_t coord_g;
   dom.calculer_centres_gravite(coord_g);
@@ -188,8 +187,8 @@ void Partitionneur_Tranche_32_64<_SIZE_>::construire_partition(BigIntVect_& elem
   assert(coord_g.dimension(1) == dim);
 
   Cerr << "Moving of centers of gravity" << finl;
-  // Deplacement des coordonnees pour qu'il y ait une vraie relation d'ordre
-  // dans chaque direction (en VDF, eviter les coordonnees identiques)
+  // Shift coordinates so there is a strict ordering
+  // in each direction (in VDF, avoid identical coordinates)
   {
     for (int_t i = 0; i < nb_elem; i++)
       {
@@ -203,43 +202,43 @@ void Partitionneur_Tranche_32_64<_SIZE_>::construire_partition(BigIntVect_& elem
       }
   }
 
-  // Nombre d'elements dans chaque partie
-  //  (initialisation: une partie contenant nb_elem elements)
+  // Number of elements in each part
+  //  (initialization: one part containing nb_elem elements)
   SmallArrOfTID_T<_SIZE_> nb_elem_part(1);
   nb_elem_part= nb_elem;
 
-  // Dans l'ordre croissant des parties, liste des elements
-  // contenus dans la partie
-  // (exemple:
-  //  de 0..nb_elem_part[0]-1                (elements de la partie 0)
-  //  de nb_elem_part[0]..nb_elem_part[0]+nb_elem_part[1]-1 (partie 1)
-  // Initialisation: une seule grosse partie, tous les elements
+  // In ascending order of parts, list of elements
+  // contained in the part
+  // (example:
+  //  from 0..nb_elem_part[0]-1                (elements of part 0)
+  //  from nb_elem_part[0]..nb_elem_part[0]+nb_elem_part[1]-1 (part 1)
+  // Initialization: one large part, all elements
   ArrOfInt_t listes_elem(nb_elem);
   for (int_t i = 0; i < nb_elem; i++)
     listes_elem[i] = i;
 
   SmallArrOfTID_T<_SIZE_> new_nb_elem_part;
 
-  // Index utilise pour trier les elements
+  // Index used for sorting elements
   ArrOfInt_t index;
 
-  // Algorithme: on cree nb_tranches[0] tranches dans la direction x,
-  //  chaque tranche compte le meme nombre d'elements du domaine.
-  //  Puis on prend chacune de ces tranches et on la decoupe en nb_tranches[1]
-  //  parties dans la direction y, elles aussi equilibrees.
-  //  Enfin, on prend chacune des parties obtenues et on la coupe en nb_tranches[2]
-  //  parties dans la direction z.
-  // Attention: si le domaine n'est pas un parallelipipede, le decoupage
-  //  n'est pas forcement cartesien:
+  // Algorithm: create nb_tranches[0] slabs in the x direction,
+  //  each slab having the same number of domain elements.
+  //  Then take each slab and split it into nb_tranches[1]
+  //  parts in the y direction, also balanced.
+  //  Finally, take each resulting part and cut it into nb_tranches[2]
+  //  parts in the z direction.
+  // Note: if the domain is not a parallelepiped, the partitioning
+  //  is not necessarily Cartesian:
   //    ------------------
   //    |       |        |
   //    |-------|        |
-  //    |       |--------| <- les coins des tranches ne coincident pas forcement
+  //    |       |--------| <- slab corners do not necessarily coincide
   //    ------------------
 
   for (int direction = 0; direction < dim; direction++)
     {
-      // Nombre de tranches a creer dans cette direction
+      // Number of slabs to create in this direction
       const int nb_tranches = nb_tranches_[direction];
 
       int_t index_debut_partie = 0;
@@ -249,27 +248,27 @@ void Partitionneur_Tranche_32_64<_SIZE_>::construire_partition(BigIntVect_& elem
       Cerr << "The mesh contains " << nb_parts << " parts. ";
       Cerr << "Splitting in the direction " << direction << finl;
 
-      // Boucle sur les parties deja creees. On divise chaque partie
-      // en nb_tranches sous-parties:
+      // Loop over already created parts. Divide each part
+      // into nb_tranches sub-parts:
       for (int part = 0; part < nb_parts; part++)
         {
           Cerr << " Splitting of subpart " << part << finl;
-          // Extraction de la liste des elements de cette partie:
-          //  on fait pointer le tableau index vers une sous-partie de listes_elem
+          // Extract the element list for this part:
+          //  point the index array to a sub-portion of listes_elem
           const int_t nb_elem_partie = nb_elem_part[part];
           assert(index_debut_partie >= 0 && index_debut_partie + nb_elem_partie <= nb_elem);
           index.ref_data(listes_elem.addr()+index_debut_partie, nb_elem_partie);
-          // Tri des elements de cette partie dans l'ordre croissant
-          // de la coordonnee (index pointe sur une partie de liste_elem, on trie
-          // donc en realite une partie du tableau liste_elem)
+          // Sort elements of this part in ascending order
+          // of the coordinate (index points to a portion of liste_elem, so
+          // actually a portion of the liste_elem array is sorted)
           std::sort(index.begin(), index.end(), [&](int_t a, int_t b)
           {
             return ( coord_g(a,direction)<coord_g(b,direction) );
           });
 
-          // Si cette direction est periodique, permutation circulaire de
-          //  nb_elem_partie/(nb_tranches*2) elements pour que les elements de l'extremite
-          //  se retrouvent sur la meme partie que ceux de l'extremite opposee
+          // If this direction is periodic, perform a circular shift by
+          //  nb_elem_partie/(nb_tranches*2) elements so that elements at one end
+          //  end up in the same part as those at the opposite end
           if (directions_perio[direction])
             {
               ArrOfInt_t copie(nb_elem_partie);
@@ -282,8 +281,8 @@ void Partitionneur_Tranche_32_64<_SIZE_>::construire_partition(BigIntVect_& elem
                     j = 0;
                 }
             }
-          // Construction d'une partition en nb_tranches parties, par
-          // ordre croissant des coordonnees
+          // Build a partition of nb_tranches parts in
+          // ascending coordinate order
           {
             int_t n = 0;
             for (int i = 0; i < nb_tranches; i++)
@@ -302,10 +301,10 @@ void Partitionneur_Tranche_32_64<_SIZE_>::construire_partition(BigIntVect_& elem
       nb_elem_part = new_nb_elem_part;
     }
 
-  // Partition initiale du domaine: au depart tout dans 0
+  // Initial partition of the domain: everything in partition 0 at the start
   elem_part.resize(nb_elem);
   elem_part = 0;
-  // Construction de elem_part
+  // Build elem_part
   const int nb_parts = nb_elem_part.size_array();
   int_t index_fin = 0, i = 0;
   for (int part = 0; part < nb_parts; part++)

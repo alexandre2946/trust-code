@@ -28,7 +28,7 @@ int Paroi_rayo_transp::initialiser(double temps)
 {
   assert(!le_modele_rayo_);
 
-  // on recupere le modele rayo seulement si pb fluide et rayo ... !
+  // retrieve the radiation model only if the problem is a fluid + radiation problem ... !
   const Probleme_base& this_pb = domaine_Cl_dis().equation().probleme();
 
   if (sub_type(Pb_Fluide_base, this_pb))

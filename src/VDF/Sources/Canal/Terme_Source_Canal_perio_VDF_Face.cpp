@@ -51,14 +51,14 @@ void Terme_Source_Canal_perio_VDF_Face::ajouter_blocs(matrices_t matrices, Doubl
   int ncomp;
   ArrOfDouble s(source());
 
-  // Boucle sur les conditions limites pour traiter les faces de bord
+  // Loop over boundary conditions to process boundary faces
   int n_bord, ndeb, nfin;
   for (n_bord = 0; n_bord < domaine_VF.nb_front_Cl(); n_bord++)
     {
 
-      // pour chaque Condition Limite on regarde son type
-      // Si face de Dirichlet ou de Symetrie on ne fait rien
-      // Si face de Neumann on calcule la contribution au terme source
+      // for each boundary condition, check its type
+      // If Dirichlet or Symmetry face, do nothing
+      // If Neumann face, compute the contribution to the source term
 
       const Cond_lim& la_cl = domaine_Cl_dis.les_conditions_limites(n_bord);
 
@@ -82,7 +82,7 @@ void Terme_Source_Canal_perio_VDF_Face::ajouter_blocs(matrices_t matrices, Doubl
         }
     }
 
-  // Boucle sur les faces internes
+  // Loop over internal faces
   ndeb = domaine_VF.premiere_face_int();
   int nb_faces = domaine_VF.nb_faces();
   for (int num_face = ndeb; num_face < nb_faces; num_face++)
@@ -120,11 +120,11 @@ void Terme_Source_Canal_perio_VDF_Face::calculer_debit(double& debit_e) const
 
               if (equation().probleme().is_dilatable() == 1)
                 {
-                  // Si l'on est en Quasi/Weakly Compressible, il faut conserver
-                  // le debit massique et non pas le debit volumique.
-                  // C'est pour cela que dans le cas QC/WC, on multiplie les vecteurs vitesse
-                  // par la masse volumique discretisee aux faces pour que lorsqu'on integre sur la surface,
-                  // on obtienne bien un debit massique et non pas un debit volumique.
+                  // In Quasi/Weakly Compressible mode, the mass flow rate must be conserved
+                  // rather than the volumetric flow rate.
+                  // This is why, in the QC/WC case, the velocity vectors are multiplied
+                  // by the density discretized at the faces so that when integrating over the surface,
+                  // a mass flow rate is obtained rather than a volumetric flow rate.
                   const DoubleTab& tab_rho_face = ref_cast(Fluide_Dilatable_base,equation().milieu()).rho_discvit();
 
                   for (num_face = ndeb; num_face < nfin; num_face++)

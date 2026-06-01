@@ -79,22 +79,22 @@ public :
   inline const IntVect& type_arete_coin() const { return type_arete_coin_; }
 
 private:
-  //  type des aretes bord:
-  //  type = 0 si l'arete separe deux faces de paroi
-  //  type = 1 si l'arete separe deux faces "fluide"
-  //  type = 2 si l'arete separe une face de paroi et une face "fluide"
-  //  type = 3 si l'arete separe deux faces de navier (symmetrie/paroi frottante)
-  //  type = 3 si l'arete separe deux faces de periodicite
-  //  type = 5 si l'arete separe une face de navier (symmetrie/paroi frottante) et une face de paroi
-  //  type = 6 si l'arete separe une face de navier (symmetrie/paroi frottante) et une face "fluide"
+  //  type of boundary edges:
+  //  type = 0 if the edge separates two wall faces
+  //  type = 1 if the edge separates two "fluid" faces
+  //  type = 2 if the edge separates a wall face and a "fluid" face
+  //  type = 3 if the edge separates two Navier faces (symmetry/slip wall)
+  //  type = 3 if the edge separates two periodicity faces
+  //  type = 5 if the edge separates a Navier face (symmetry/slip wall) and a wall face
+  //  type = 6 if the edge separates a Navier face (symmetry/slip wall) and a "fluid" face
   IntVect type_arete_bord_;
 
-  //  type des aretes coin:
-  //  type = 0 si l'arete contient deux faces de periodicite
-  //  type = 1 si l'arete contient une face de periodicite et une face de paroi
+  //  type of corner edges:
+  //  type = 0 if the edge contains two periodicity faces
+  //  type = 1 if the edge contains one periodicity face and one wall face
   IntVect type_arete_coin_;
 
-  //  pour chaque face de bord numero de la condition limite a laquelle elle se rattache
+  //  for each boundary face, the index of the boundary condition it belongs to
   IntVect num_Cl_face_;
 };
 

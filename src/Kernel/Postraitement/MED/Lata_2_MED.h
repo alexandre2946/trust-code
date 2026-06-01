@@ -16,7 +16,8 @@
 #ifndef Lata_2_MED_included
 #define Lata_2_MED_included
 
-/*! @brief Classe Lata_2_MED  Converts lata file to med
+/*! @brief class Lata_2_MED
+ * @brief Converts lata file to med
  *
  */
 #include <Interprete.h>

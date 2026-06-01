@@ -20,7 +20,7 @@
 #include <Matrice_Morse_Sym.h>
 #include <SFichier.h>
 #include <petsc_for_kernel.h>
-#undef setbit // Car sinon conflit avec Petsc
+#undef setbit // Otherwise conflict with PETSc
 #include <MD_Vector_tools.h>
 #include <Perf_counters.h>
 
@@ -140,7 +140,7 @@ int test_solveur(SolveurSys& solveur,  const Matrice_Base& matrice , const Doubl
   temps=best_time;
   return numero_best;
 }
-/*! @brief genere un fichier de solveur a tester different selon si la matrice peut etre resolue avec ou sans GCP
+/*! @brief Generates a solver test file that differs based on whether the matrix can be solved with or without GCP.
  *
  */
 void generate_defaut(const Matrice_Base& matrice, const double seuil, Sortie& sortie, int limpr=0)
@@ -159,8 +159,8 @@ void generate_defaut(const Matrice_Base& matrice, const double seuil, Sortie& so
         }
       else
         {
-          // on a une matrice de type pression (?)
-          // Mise a jour des solveurs testes 24/05/2012
+          // pressure-type matrix (?)
+          // Update of tested solvers 24/05/2012
           sortie <<" solveur gcp       { precond ssor       { omega 1.6 }       seuil "<<seuil <<" "<<impr<<"}"<<finl;
 #ifdef __PETSCKSP_H
           sortie <<" solveur petsc gcp { precond ssor       { omega 1.6 }       seuil "<<seuil <<" "<<impr<<"}"<<finl;
@@ -168,12 +168,12 @@ void generate_defaut(const Matrice_Base& matrice, const double seuil, Sortie& so
             sortie <<" solveur petsc cholesky { impr }"<< finl;
           else
             {
-              // Pour les tres grands calculs on bascule de Cholesky a BICGSTAB ILU_SP(1) par bloc
+              // For very large runs, switch from Cholesky to BICGSTAB ILU_SP(1) block preconditioner
               sortie <<" solveur petsc bicgstab { precond block_jacobi_icc { level 1 } seuil "<<seuil <<" "<<impr<<"}"<<finl;
-              // Voire CG ILU_SP(1) par bloc car BICGSTAB peut avoir du mal a converger lors de la projection initiale...
+              // Consider CG ILU_SP(1) by block because BICGSTAB may struggle to converge during the initial projection...
               sortie <<" solveur petsc gcp { precond block_jacobi_icc { level 1 } seuil "<<seuil <<" "<<impr<<"}"<<finl;
             }
-          // SPAI n'a jamais fait ses preuves (comme tous les preconditionnements de Hypre), on l'enleve
+          // SPAI has never proven effective (like all Hypre preconditioners), so it is removed
           //sortie <<" solveur petsc gcp { precond spai       { level 2 epsilon 0.2 } seuil "<<seuil <<" "<<impr<<"}"<<finl;
 #endif
         }
@@ -193,24 +193,24 @@ Entree& Test_solveur::interpreter(Entree& is)
   double seuil_verification=DMAXFLOAT;
   SolveurSys solveur;
   double seuil_list=0;
-  int nb_test=2; // On teste 2 fois un solveur car la premiere fois, le cout du preconditionnement peut penaliser
+  int nb_test=2; // Each solver is tested twice because the first run may be penalised by preconditioning cost
   Param  param((*this).que_suis_je());
-  param.ajouter("fichier_secmem",&fichier_secmem);  // nom du fichier contenant le second membre (Secmem.sa par defaut)
-  param.ajouter("fichier_matrice",&fichier_matrice);  // nom du fichier contenant la matrice (Matrice.sa par defaut)
-  param.ajouter("fichier_solution",&fichier_solution);  // nom du fichier contenant la solution (Solution.sa par defaut)
-  param.ajouter("nb_test",&nb_test);  // nb de resolution pour mesurer le temps (un seul preconditionnemt)
-  param.ajouter_flag("impr",&limpr_); // impr des solveurs
-  param.ajouter("solveur",&solveur); // pour specifier un solveur
-  param.ajouter("fichier_solveur",&fichier_solveur); // pour specifier un fichier contenant des solveurs
-  param.ajouter("genere_fichier_solveur",&seuil_list); // genere le fichier de solveur avec un seuil donne
-  param.ajouter("seuil_verification",&seuil_verification); // verifie si la soulution trouvee par la resolution est telle que Ax -b < seuil_verification
-  param.ajouter_flag("pas_de_solution_initiale",&pas_de_solution_init); // pas_de_solution_initiale : on n'initialise pas la resolution avec la solution
-  param.ajouter_flag("ascii",&ascii); // dans le cas ou les fichiers sont ascii
+  param.ajouter("fichier_secmem",&fichier_secmem);  // filename containing the right-hand side (Secmem.sa by default)
+  param.ajouter("fichier_matrice",&fichier_matrice);  // filename containing the matrix (Matrice.sa by default)
+  param.ajouter("fichier_solution",&fichier_solution);  // filename containing the solution (Solution.sa by default)
+  param.ajouter("nb_test",&nb_test);  // number of solves to measure time (single preconditioning)
+  param.ajouter_flag("impr",&limpr_); // enable solver output
+  param.ajouter("solveur",&solveur); // specify a solver
+  param.ajouter("fichier_solveur",&fichier_solveur); // specify a file containing solvers
+  param.ajouter("genere_fichier_solveur",&seuil_list); // generate the solver file with a given threshold
+  param.ajouter("seuil_verification",&seuil_verification); // check if the solution satisfies ||Ax-b|| < seuil_verification
+  param.ajouter_flag("pas_de_solution_initiale",&pas_de_solution_init); // pas_de_solution_initiale: do not initialize the solve with the current solution
+  param.ajouter_flag("ascii",&ascii); // when files are in ASCII format
   param.lire_avec_accolades_depuis(is);
   int binaire=1;
   if (ascii)
     binaire=0;
-  // On relit la matrice et le secmem
+  // Re-read the matrix and the right-hand side
   {
     LecFicDistribue entree;
     entree.set_bin(binaire);
@@ -272,7 +272,7 @@ Entree& Test_solveur::interpreter(Entree& is)
   return is;
 }
 
-static int numero_solv_optimal=0; // numero du solveur pour avoir des noms de fichiers solveurs par defaut differents pour chaque solveur
+static int numero_solv_optimal=0; // solver number, used to give distinct default solver file names to each solver
 Solv_Optimal::Solv_Optimal():n_resol_(0),n_reinit_(0)
 {
   freq_recalc_ = (int)(pow(2.0,(double)((sizeof(int)*8)-1))-1);
@@ -296,13 +296,13 @@ Entree& Solv_Optimal::readOn(Entree& is )
   bool impr = false;
   bool quiet = false;
   Param param((*this).que_suis_je());
-  param.ajouter("seuil",&seuil_,Param::REQUIRED); // seuil de resolution
-  param.ajouter_flag("impr",&impr); // active impression des solveurs
+  param.ajouter("seuil",&seuil_,Param::REQUIRED); // convergence threshold
+  param.ajouter_flag("impr",&impr); // enable solver output
   param.ajouter_flag("quiet",&quiet);
-  param.ajouter("save_matrice|save_matrix",&save_matrice_); // pour sauvegarder A,x,b
-  param.ajouter("frequence_recalc",&freq_recalc_); // frequence pour reevaluer le solveur optimal
-  param.ajouter("nom_fichier_solveur",&fichier_solveur_); //nom du fichier contenant les solveurs testes
-  param.ajouter_flag("fichier_solveur_non_recree",&fichier_solveur_non_recree_); //  si flag mis alors le fichier n'est pas cree au debut du calcul
+  param.ajouter("save_matrice|save_matrix",&save_matrice_); // save the linear system A, x, b
+  param.ajouter("frequence_recalc",&freq_recalc_); // frequency for re-evaluating the optimal solver
+  param.ajouter("nom_fichier_solveur",&fichier_solveur_); // filename containing the tested solvers
+  param.ajouter_flag("fichier_solveur_non_recree",&fichier_solveur_non_recree_); // if set, the file is not created at the start of the computation
   param.lire_avec_accolades_depuis(is);
   fixer_limpr(impr);
   if (quiet)
@@ -311,19 +311,20 @@ Entree& Solv_Optimal::readOn(Entree& is )
   return is;
 }
 
-/*! @brief methode clef de Solv_Optimal a la premiere iteration
+/*! @brief Key method of Solv_Optimal: at the first iteration,
  *
- *     genere le fichier fichier_solveur_ contenant la liste des solveurs a tester
- *     prend le premier solveur du fichier
- *     A la 3 ite et avec la frequence freq_recalc_ cherche le solveur le + rapide, en prenant en compte le fait que la matrice a change ou non
- *     appel test_solveur
+ *     generates the file fichier_solveur_ containing the list of solvers to test,
+ *     picks the first solver from the file.
+ *     At iteration 3 and every freq_recalc_ iterations thereafter, finds the fastest solver,
+ *     taking into account whether the matrix has changed.
+ *     Calls test_solveur.
  *
  */
 void Solv_Optimal::prepare_resol(const Matrice_Base& matrice, const DoubleVect& secmem, DoubleVect& solution, int nmax)
 {
   if (n_resol_==0)
     {
-      // premiere chose on genere le fichier par defaut, puis on cree le solveur avec le premier du fichier
+      // First generate the default file, then create the solver from the first entry in the file
 
       if ((!fichier_solveur_non_recree_)&&(je_suis_maitre()))
         {
@@ -342,9 +343,9 @@ void Solv_Optimal::prepare_resol(const Matrice_Base& matrice, const DoubleVect& 
       LecFicDiffuse list_solveur(fichier_solveur_);
       int nb_ite;
       if (n_reinit_<2)
-        nb_ite=2; // Matrice constante (on resout 2 fois pour ne retenir que le 2eme temps exempt d'eventuel preconditionnement)
+        nb_ite=2; // Constant matrix (solved twice; only the second time is kept, free of any preconditioning overhead)
       else
-        nb_ite=1; // Matrice non constante (on resout 1 seul fois)
+        nb_ite=1; // Non-constant matrix (solved only once)
       ArrOfDouble temps(nb_ite);
       statistics().end_count(STD_COUNTERS::system_solver,0,0);
       int numero_best=test_solveur(le_solveur_,  matrice , secmem , solution  , nmax, temps,list_solveur,seuil_);

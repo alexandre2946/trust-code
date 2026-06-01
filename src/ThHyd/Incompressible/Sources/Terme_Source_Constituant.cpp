@@ -39,7 +39,7 @@ int Terme_Source_Constituant::completer(const Champ_Inc_base& inco)
 
 void Terme_Source_Constituant::ouvrir_fichier(const Equation_base& eq, const Nom& out, const Nom& qsj, const Nom& description, SFichier& os,const Nom& type, const int flag) const
 {
-  // flag nul on n'ouvre pas le fichier
+  // null flag, file is not opened
   if (flag==0)
     return ;
 
@@ -50,7 +50,7 @@ void Terme_Source_Constituant::ouvrir_fichier(const Equation_base& eq, const Nom
   if (type!="") nomfichier+=(Nom)"_"+type;
   nomfichier+=".out";
 
-  // On cree le fichier a la premiere impression avec l'en tete
+  // Create the file at the first print with the header
   const int wcol = std::max(colw_, sch.wcol());
   os.set_col_width(wcol);
   if (sch.nb_impr()==1 && !pb.reprise_effectuee())
@@ -68,7 +68,7 @@ void Terme_Source_Constituant::ouvrir_fichier(const Equation_base& eq, const Nom
         fic.add_col(eq.inconnue().noms_compo()[i].getChar());
       fic << finl;
     }
-  // Sinon on l'ouvre
+  // Otherwise open it
   else
     {
       os.ouvrir(nomfichier,ios::app);

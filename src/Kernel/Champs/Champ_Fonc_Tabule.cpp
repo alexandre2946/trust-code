@@ -63,21 +63,20 @@ Sortie& Champ_Fonc_Tabule::printOn(Sortie& os) const
   return os;
 }
 
-/*! @brief Lecture du Champ a partir d'un flot d'entree, (On ne sait traiter que les champs scalaires.
+/*! @brief Read the field from an input stream. (Only scalar fields are handled.)
  *
- * )
- *      exemple:
- *      Champ_Fonc_Tabule { probleme ch }
- *      1 (nombre de composantes)
+ *      example:
+ *      Champ_Fonc_Tabule { problem ch }
+ *      1 (number of components)
  *      {
  *      2
  *      0 500 0 250  (ch(0)=0 && ch(500)=250
  *      }
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws accolade fermante attendue
- * @throws accolade ouvrante attendue
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
+ * @throws closing brace expected
+ * @throws opening brace expected
  */
 Entree& Champ_Fonc_Tabule::readOn(Entree& is)
 {
@@ -110,7 +109,7 @@ Entree& Champ_Fonc_Tabule::readOn(Entree& is)
   is >> motlu;
   if (motlu == accolade_ouverte)
     {
-      /* 1. lecture de la grille de parametres */
+      /* 1. reading the parameter grid */
       DoubleVects params;
       for (int n = 0; n < nb_param; n++)
         {
@@ -121,13 +120,13 @@ Entree& Champ_Fonc_Tabule::readOn(Entree& is)
           params.add(param);
         }
 
-      /* 2. lecture des valeurs des parametres */
-      // taille totale du tableau de valeurs
+      /* 2. reading the parameter values */
+      // total size of the values array
       int size = nbcomp;
       for (int n = 0; n < nb_param; n++)
         size *= params[n].size();
 
-      // lecture : tout dans un tableau 1D
+      // reading: all values in a 1D array
       DoubleVect tab_valeurs(size);
       for (int i = 0; i < size; i++)
         is >> tab_valeurs[i];

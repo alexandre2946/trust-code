@@ -22,10 +22,10 @@
 Implemente_base(Traitement_particulier_NS_Pression,"Traitement_particulier_NS_Pression",Traitement_particulier_NS_base);
 
 
-/*! @brief
+/*! @brief Prints the object to an output stream.
  *
- * @param (Sortie& is) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param is an output stream
+ * @return the modified output stream
  */
 Sortie& Traitement_particulier_NS_Pression::printOn(Sortie& is) const
 {
@@ -33,10 +33,10 @@ Sortie& Traitement_particulier_NS_Pression::printOn(Sortie& is) const
 }
 
 
-/*! @brief
+/*! @brief Reads the object from an input stream.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param is an input stream
+ * @return the modified input stream
  */
 Entree& Traitement_particulier_NS_Pression::readOn(Entree& is)
 {

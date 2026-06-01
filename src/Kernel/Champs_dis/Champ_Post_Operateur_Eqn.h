@@ -22,20 +22,20 @@
 
 class Equation_base;
 
-/*! @brief class Champ_Post_Operateur_Eqn OWN_PTR(Champ_base) destine a post-traiter le gradient d un champ generique
+/*! @brief class Champ_Post_Operateur_Eqn OWN_PTR(Champ_base) intended to post-process the gradient of a generic field
  *
- *  La classe porte un operateur statistique "gradient"
+ *  The class carries a statistical operator "gradient"
  *
- *  Syntaxe a respecter pour jdd
+ *  Syntax to follow for the data file
  *
- *  nom_choisi operateur_eqn
+ *  chosen_name operateur_eqn
  *    {
  *      sources { refchamp { pb_champ nom_pb nom_inconnue } }
  *      numero_source/numero op 1
  *    }
- * Il faut entrer le nom de l'inconnue et pas celui de l'equation
- * Le numero des termes sources est celui du jdd, bien respecter l'ordre
- * Pour les operateurs : 0 diffusion, 1 convection
+ * The name of the unknown must be entered, not that of the equation
+ * The number of source terms is that of the data file, the order must be respected
+ * For operators: 0 diffusion, 1 convection
  *
  */
 
@@ -67,7 +67,7 @@ protected:
   OBS_PTR(Equation_base) ref_eq_;
   bool sans_solveur_masse_ = false;
   Entity localisation_inco_ = Entity::NODE;
-  int compo_ = -1;                            //Pour identifier la composante a recuperer
+  int compo_ = -1;                            //To identify the component to retrieve
 };
 
 #endif

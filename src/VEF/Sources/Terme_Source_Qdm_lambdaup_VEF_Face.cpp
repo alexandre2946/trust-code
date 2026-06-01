@@ -92,7 +92,7 @@ Entree& Terme_Source_Qdm_lambdaup_VEF_Face::readOn(Entree& is )
             if(motlu!=accfermee)
               {
                 Cerr << motlu
-                     << " non compris dans terme source lambda uprime "
+                     << " not recognised in lambda uprime source term "
                      << finl;
                 Process::exit();
               }
@@ -217,40 +217,40 @@ double Terme_Source_Qdm_lambdaup_VEF_Face::norme_H1(const DoubleTab& vitesse) co
   double dnorme_H1,norme_H1_comp,int_grad_elem,norme_grad_elem;
   int face_globale;
 
-  //On va calculer la norme H1 d'une inconnue P1NC.
-  //L'algorithme tient compte des contraintes suivantes:
-  //- l'inconnue peut avoir plusieurs composantes
-  //  (i.e etre un scalaire ou etre un vecteur)
-  //- la dimension du probleme est arbitraire (1, 2 ou 3).
-  //ATTENTION: les prismes ne sont pas supportes.
+  //Compute the H1 norm of a P1NC unknown.
+  //The algorithm accounts for the following constraints:
+  //- the unknown may have multiple components
+  //  (i.e. be a scalar or a vector)
+  //- the problem dimension is arbitrary (1, 2 or 3).
+  //WARNING: prisms are not supported.
 
   dnorme_H1=0.;
   for (int composante=0; composante<vitesse.line_size(); composante++)
     {
-      norme_H1_comp=0.; //pour eviter les accumulations
-      for (int K=0; K<domaine.nb_elem(); K++) //boucle sur les elements
+      norme_H1_comp=0.; //to avoid accumulation
+      for (int K=0; K<domaine.nb_elem(); K++) //loop over elements
         {
-          norme_grad_elem=0.; //pour eviter les accumulations
-          for (int i=0; i<dimension; i++) //boucle sur la dimension du pb
+          norme_grad_elem=0.; //to avoid accumulation
+          for (int i=0; i<dimension; i++) //loop over problem dimension
             {
-              int_grad_elem=0.; //pour eviter les accumulations
-              for (int face=0; face<domaine.nb_faces_elem(); face++) //boucle sur les faces d'un "K"
+              int_grad_elem=0.; //to avoid accumulation
+              for (int face=0; face<domaine.nb_faces_elem(); face++) //loop over faces of element "K"
                 {
                   face_globale = domaine_VEF.elem_faces(K,face);
 
                   int_grad_elem += vitesse(face_globale,composante)*
                                    domaine_VEF.face_normales(face_globale,i)*
                                    domaine_VEF.oriente_normale(face_globale,K);
-                } //fin du for sur "face"
+                } //end of for loop over "face"
 
               norme_grad_elem += int_grad_elem*int_grad_elem;
-            } //fin du for sur "i"
+            } //end of for loop over "i"
 
           norme_H1_comp += norme_grad_elem/domaine_VEF.volumes(K);
-        } //fin du for sur "K"
+        } //end of for loop over "K"
 
       dnorme_H1 += norme_H1_comp;
-    } // fin du for sur "composante"
+    } // end of for loop over "composante"
 
   return sqrt(dnorme_H1);
 }

@@ -16,7 +16,7 @@
 #ifndef Op_Conv_VDF_Elem_leaves_included
 #define Op_Conv_VDF_Elem_leaves_included
 
-#include <Eval_Conv_VDF_Face_leaves.h> // pour les compilos (templates :-) )
+#include <Eval_Conv_VDF_Face_leaves.h> // for compilers (templates :-) )
 #include <Eval_Conv_VDF_Elem_leaves.h>
 #include <Iterateur_VDF_Elem.h>
 #include <Op_Conv_VDF.h>
@@ -27,10 +27,10 @@ class Op_Conv_VDF_Elem_leaves
 { };
 /// \endcond
 
-/*! @brief class Op_Conv_Amont_VDF_Elem Cette classe represente l'operateur de convection associe a une equation de transport d'un scalaire.
+/*! @brief class Op_Conv_Amont_VDF_Elem This class represents the convection operator associated with a scalar transport equation.
  *
- *   La discretisation est VDF. Le champ convecte est scalaire. Le schema de convection est du type Amont
- *   L'iterateur associe est de type Iterateur_VDF_Elem. L'evaluateur associe est de type Eval_Amont_VDF_Elem
+ *   The discretization is VDF. The convected field is scalar. The convection scheme is of upwind type.
+ *   The associated iterator is of type Iterateur_VDF_Elem. The associated evaluator is of type Eval_Amont_VDF_Elem
  *
  */
 class Op_Conv_Amont_VDF_Elem : public Op_Conv_VDF_base, public Op_Conv_VDF<Op_Conv_Amont_VDF_Elem>
@@ -48,13 +48,13 @@ public:
   inline void dimensionner_blocs(matrices_t mats, const tabs_t& semi_impl) const override { Op_Conv_VDF_base::dimensionner_blocs_elem(mats, semi_impl); }
 
 protected:
-  inline Op_Conv_Amont_VDF_Elem(const Iterateur_VDF_base& it) : Op_Conv_VDF_base(it) { } // Ce constructeur permet de creer des classes filles (exemple : front_tracking)
+  inline Op_Conv_Amont_VDF_Elem(const Iterateur_VDF_base& it) : Op_Conv_VDF_base(it) { } // This constructor allows creating derived classes (example: front_tracking)
 };
 
-/*! @brief class Op_Conv_Centre_VDF_Elem Cette classe represente l'operateur de convection associe a une equation de transport d'un scalaire.
+/*! @brief class Op_Conv_Centre_VDF_Elem This class represents the convection operator associated with a scalar transport equation.
  *
- *   La discretisation est VDF. Le champ convecte est scalaire. Le schema de convection est du type Centre (sur 2 points)
- *   L'iterateur associe est de type Iterateur_VDF_Elem. L'evaluateur associe est de type Eval_Centre_VDF_Elem
+ *   The discretization is VDF. The convected field is scalar. The convection scheme is of centered type (2-point centered).
+ *   The associated iterator is of type Iterateur_VDF_Elem. The associated evaluator is of type Eval_Centre_VDF_Elem
  *
  */
 class Op_Conv_Centre_VDF_Elem : public Op_Conv_VDF_base, public Op_Conv_VDF<Op_Conv_Centre_VDF_Elem>
@@ -71,10 +71,10 @@ public:
   inline void dimensionner_blocs(matrices_t mats, const tabs_t& semi_impl) const override { Op_Conv_VDF_base::dimensionner_blocs_elem(mats, semi_impl); }
 };
 
-/*! @brief class Op_Conv_Centre4_VDF_Elem Cette classe represente l'operateur de convection associe a une equation de transport d'un scalaire.
+/*! @brief class Op_Conv_Centre4_VDF_Elem This class represents the convection operator associated with a scalar transport equation.
  *
- *   La discretisation est VDF. Le champ convecte est scalaire. Le schema de convection est du type Centre (sur 4 points)
- *   L'iterateur associe est de type Iterateur_VDF_Elem. L'evaluateur associe est de type Eval_Centre4_VDF_Elem
+ *   The discretization is VDF. The convected field is scalar. The convection scheme is of centered type (4-point centered).
+ *   The associated iterator is of type Iterateur_VDF_Elem. The associated evaluator is of type Eval_Centre4_VDF_Elem
  *
  */
 class Op_Conv_Centre4_VDF_Elem : public Op_Conv_VDF_base, public Op_Conv_VDF<Op_Conv_Centre4_VDF_Elem>
@@ -89,10 +89,10 @@ public:
   inline const Champ_base& vitesse() const override { return vitesse_impl<Eval_Centre4_VDF_Elem>(); }
 };
 
-/*! @brief class Op_Conv_Quick_VDF_Elem Cette classe represente l'operateur de convection associe a une equation de transport d'un scalaire.
+/*! @brief class Op_Conv_Quick_VDF_Elem This class represents the convection operator associated with a scalar transport equation.
  *
- *   La discretisation est VDF. Le champ convecte est scalaire. Le schema de convection est du type Quick
- *   L'iterateur associe est de type Iterateur_VDF_Elem. L'evaluateur associe est de type Eval_Quick_VDF_Elem
+ *   The discretization is VDF. The convected field is scalar. The convection scheme is of Quick type.
+ *   The associated iterator is of type Iterateur_VDF_Elem. The associated evaluator is of type Eval_Quick_VDF_Elem
  *
  */
 class Op_Conv_Quick_VDF_Elem : public Op_Conv_VDF_base, public Op_Conv_VDF<Op_Conv_Quick_VDF_Elem>

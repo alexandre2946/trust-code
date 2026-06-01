@@ -37,7 +37,7 @@ protected:
   DoubleTab dt_vitesse;
 };
 
-/*! @brief constructeur par defaut
+/*! @brief Default constructor.
  *
  */
 inline Eval_Conv_PolyMAC_CDO::Eval_Conv_PolyMAC_CDO()

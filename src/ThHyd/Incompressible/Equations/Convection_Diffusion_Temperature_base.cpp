@@ -34,10 +34,10 @@ const Fluide_base& Convection_Diffusion_Temperature_base::fluide() const
 }
 
 
-/*! @brief Renvoie le fluide associe a l'equation.
+/*! @brief Returns the fluid associated with the equation.
  *
- * @return (Fluide_base&) le fluide associe a l'equation
- * @throws pas de fluide associe a l'eqaution
+ * @return the fluid associated with the equation
+ * @throws no fluid associated with the equation
  */
 Fluide_base& Convection_Diffusion_Temperature_base::fluide()
 {
@@ -49,15 +49,15 @@ Fluide_base& Convection_Diffusion_Temperature_base::fluide()
   return le_fluide.valeur();
 }
 
-/*! @brief Associe un milieu physique a l'equation, le milieu est en fait caste en Fluide_base.
+/*! @brief Associates a physical medium to the equation; the medium is cast to Fluide_base.
  *
- * @param (Milieu_base& un_milieu)
- * @throws le milieu n'est pas un Fluide_base
+ * @param un_milieu the physical medium to associate
+ * @throws the medium is not of type Fluide_base
  */
 void Convection_Diffusion_Temperature_base::associer_milieu_base(const Milieu_base& un_milieu)
 {
   if (sub_type(Fluide_base,un_milieu)) associer_fluide(ref_cast(Fluide_base, un_milieu));
-  else Process::exit(que_suis_je() + " : le fluide " + un_milieu.que_suis_je() + " n'est pas de type Fluide_base!");
+  else Process::exit(que_suis_je() + " : the fluid " + un_milieu.que_suis_je() + " is not of type Fluide_base!");
 }
 
 void Convection_Diffusion_Temperature_base::creer_champ(const Motcle& motlu)
@@ -86,7 +86,7 @@ bool Convection_Diffusion_Temperature_base::has_champ(const Motcle& nom, OBS_PTR
   if (Convection_Diffusion_std::has_champ(nom))
     return Convection_Diffusion_std::has_champ(nom, ref_champ);
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 bool Convection_Diffusion_Temperature_base::has_champ(const Motcle& nom) const
@@ -97,7 +97,7 @@ bool Convection_Diffusion_Temperature_base::has_champ(const Motcle& nom) const
   if (Convection_Diffusion_std::has_champ(nom))
     return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 const Champ_base& Convection_Diffusion_Temperature_base::get_champ(const Motcle& nom) const

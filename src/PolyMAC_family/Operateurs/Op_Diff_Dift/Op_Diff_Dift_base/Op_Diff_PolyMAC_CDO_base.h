@@ -40,11 +40,11 @@ public:
   inline void remplir_nu_ef(int e, DoubleTab& nu_ef) const;
 
 protected:
-  mutable DoubleTab nu_fac_mod; //facteur multiplicatif "utilisateur" a appliquer a nu_fac
-  mutable DoubleTab nu_fac_; //conductivite aux elements, facteur multiplicatif a appliquer par face
+  mutable DoubleTab nu_fac_mod; //user-defined multiplicative factor to apply to nu_fac
+  mutable DoubleTab nu_fac_; //conductivity at elements, multiplicative factor to apply per face
 };
 
-/* diffusivite a l'interieur d'un element e : nu_ef(i, n) : diffusivite de la composante n entre le centre de l'element et celui de la face i */
+/* diffusivity inside element e: nu_ef(i, n): diffusivity of component n between the element center and that of face i */
 inline void Op_Diff_PolyMAC_CDO_base::remplir_nu_ef(int e, DoubleTab& nu_ef) const
 {
   const Domaine_PolyMAC_CDO& domaine = le_dom_poly_.valeur();
@@ -56,7 +56,7 @@ inline void Op_Diff_PolyMAC_CDO_base::remplir_nu_ef(int e, DoubleTab& nu_ef) con
   for (i = 0; i < domaine.m2d(e + 1) - domaine.m2d(e); i++)
     {
       f = e_f(e, i);
-      /* diffusivite de chaque composante dans la direction (xf - xe) */
+      /* diffusivity of each component in the direction (xf - xe) */
       if (N_nu == N)
         for (n = 0; n < N; n++)
           nu_ef(i, n) = nu_(e, n); //isotrope

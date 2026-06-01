@@ -24,12 +24,7 @@
 
 class Fluide_Dilatable_base;
 
-/*! @brief class Source_Gravite_Fluide_Dilatable_base
- *
- *   Cette classe represente un terme source supplementaire
- *   a prendre en compte dans les equations de quantite de mouvement
- *   dans le cas ou le fluide est dilatable et s'il y a gravite
- *
+/*! @brief Additional gravity source term for the momentum equation when the fluid is dilatable.
  *
  * @sa Source_base Fluide_Dilatable_base
  */
@@ -45,7 +40,7 @@ public:
   //if neither ajouter nor ajouter_blocs is coded in derived classes, the code will crash (but at runtime and not at compile time...)
   //virtual DoubleTab& ajouter(DoubleTab& ) const = 0;
 
-  // Methodes inlines
+  // Inline methods
   inline void mettre_a_jour(double) override { }
   inline void associer_pb(const Probleme_base& ) override { }
 

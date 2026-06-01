@@ -101,7 +101,7 @@ void Neumann_paroi_rayo_semi_transp_VDF::calculer_temperature_bord(double temps)
   double d_Cp, d_rho, d_Lambda;
   if (Cp.get_md_vector() || rho.get_md_vector() || Lambda.get_md_vector())
     {
-      // L'un des champs n'est pas uniforme
+      // One of the fields is not uniform
       ArrOfDouble tmp(3);
       tmp[0] = local_max_vect(Cp);
       tmp[1] = local_max_vect(rho);
@@ -113,7 +113,7 @@ void Neumann_paroi_rayo_semi_transp_VDF::calculer_temperature_bord(double temps)
     }
   else
     {
-      // Tous les champs sont uniforme. Raccourci car mp_max penalisant
+      // All fields are uniform. Shortcut because mp_max is costly
       d_Cp = Cp(0, 0);
       d_rho = rho(0, 0);
       d_Lambda = Lambda(0, 0);
@@ -139,7 +139,7 @@ void Neumann_paroi_rayo_semi_transp_VDF::calculer_temperature_bord(double temps)
       int elem = face_voisins(num_face, 0);
       if (elem < 0)
         elem = face_voisins(num_face, 1);
-      // Pour eviter division par 0 au 1er pas de temps:
+      // To avoid division by zero at the first time step:
       // double omega=1./(1.+eF*eF*d_rho*d_Cp/d_Lambda/dt);
       double omega = d_Lambda * dt / (d_Lambda * dt + eF * eF * d_rho * d_Cp);
       //      Cerr << "omega=" << omega << finl;
@@ -170,7 +170,7 @@ void Neumann_paroi_rayo_semi_transp_VDF::completer()
 {
   Neumann_paroi::completer();
 
-  // On type et on dimmensionne le champ_front temperature_bord_
+  // Type and dimension the boundary field temperature_bord_
   //  const Milieu_base& mil=mon_dom_cl_dis->equation().milieu();
   const Front_VF& front_vf = ref_cast(Front_VF, frontiere_dis());
   int nb_comp = 1;
@@ -179,15 +179,15 @@ void Neumann_paroi_rayo_semi_transp_VDF::completer()
   DoubleTab& tab = temperature_bord_->valeurs();
   tab.resize(front_vf.nb_faces(), nb_comp);
 
-  // On initialise le tableau des temperatures de bord egale a la
-  // temperature initiale du milieu courant
+  // Initialize the boundary temperature array to the
+  // initial temperature of the current medium
   const Domaine_VDF& zvdf = ref_cast(Domaine_VDF, domaine_Cl_dis().domaine_dis());
   int ndeb = front_vf.num_premiere_face();
   const IntTab& face_voisins = zvdf.face_voisins();
   const DoubleTab& T = mon_dom_cl_dis->equation().inconnue().valeurs();
   int face = 0;
   //
-  // Debut de la boucle sur les faces de bord
+  // Start of the loop over boundary faces
   //
 
   for (face = 0; face < front_vf.nb_faces(); face++)

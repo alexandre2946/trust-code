@@ -28,7 +28,7 @@ Implemente_instanciable_sans_constructeur_ni_destructeur(Solv_Cholesky,"Solv_Cho
 // XD attr impr rien impr OPT Keyword which may be used to print the resolution time.
 // XD attr quiet rien quiet OPT To disable printing of information
 
-// printOn et readOn
+// printOn and readOn
 
 Sortie& Solv_Cholesky::printOn(Sortie& s ) const
 {
@@ -83,7 +83,7 @@ int Solv_Cholesky::resoudre_systeme(const Matrice_Base& la_matrice,
     {
       if(sub_type(Matrice_Bloc_Sym,la_matrice))
         {
-          // Conversion d'une matrice au format Matrice_Bloc_Sym au format Matrice Morse
+          // Convert a Matrice_Bloc_Sym matrix to Matrice_Morse format
           if (nouvelle_matrice())
             ref_cast(Matrice_Bloc_Sym,la_matrice).BlocSymToMatMorseSym(matrice_de_travail);
           return Cholesky(matrice_de_travail,secmem,solution);
@@ -120,11 +120,10 @@ int Solv_Cholesky::Cholesky(const Matrice_Morse_Sym& matrice,
   if (nouvelle_matrice())
     {
       fixer_nouvelle_matrice(0);
-      // On rend definie la matrice dans le cas sequentiel ou Cholesky est le solveur en pression
-      // En parallele, Cholesky est utilise en preconditionnement local et il ne faut
-      // pas modifier la matrice locale.
+      // Make the matrix positive-definite in sequential mode where Cholesky is the pressure solver
+      // In parallel, Cholesky is used as a local preconditioner and the local matrix must not be modified.
       Cerr << "Order of the matrix : " << matrice.ordre() << finl;
-      // Les champs P1bulle n'ont pas de size_reelle et en parallele ca ne marche pas...
+      // P1bulle fields have no size_reelle and this does not work in parallel...
       const int sz = secmem.size_totale();
       if(matrice.get_est_definie()==0 && nproc()==1)
         {
@@ -185,7 +184,7 @@ int Solv_Cholesky::Cholesky(const Matrice_Morse_Sym& matrice,
 int Solv_Cholesky::Fact_Cholesky(const Matrice_Morse_Sym& mat1, const int size_reelle)
 {
   largeur_de_bande_ = mat1.largeur_de_bande();
-  // stockage de la matrice en format bande FORTRAN
+  // store the matrix in FORTRAN band format
   matrice_bande_factorisee_fortran_.resize_array(size_reelle*largeur_de_bande_);
 
   for (int j=0; j<size_reelle; j++)
@@ -207,13 +206,13 @@ int Solv_Cholesky::Fact_Cholesky(const Matrice_Morse_Sym& mat1, const int size_r
         }
     }
 
-  // Factorisation de Cholesky
+  // Cholesky factorization
 
   // int DBG=1;
   // int PRC=0;
   char UPLO = 'U';
   int N = size_reelle;
-  int KD = largeur_de_bande_ - 1;// mu nbre de diagonales superieures
+  int KD = largeur_de_bande_ - 1;// mu: number of super-diagonals
   int LDAB = largeur_de_bande_; //n_
   int INFO = 0;
 
@@ -250,7 +249,7 @@ int Solv_Cholesky::Fact_Cholesky(const Matrice_Morse_Sym& mat1, const int size_r
       exit();
     };
 
-  // rovisoire : on pourrait vider matrice et matrice_renumerotee
+  // TODO: could free matrice and matrice_renumerotee here
   return 1;
 
 }

@@ -29,7 +29,7 @@
 #include <paraconf.h>
 #endif
 
-/*! @brief classe TRUST_2_PDI Encapsulation of PDI methods (library used for IO operations). See the website pdi.dev for more info
+/*! @brief TRUST_2_PDI Encapsulation of PDI methods (library used for IO operations). See the website pdi.dev for more info
  *
  * PDI needs to be initialized with a YAML file, containing all the data that we want to exchange with the outside world (see the class Ecrire_YAML for details).
  * Note that every data that will be handled via PDI first needs to be declared in the YAML file that has been used to initialize it!

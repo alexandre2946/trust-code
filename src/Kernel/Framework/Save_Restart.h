@@ -83,19 +83,19 @@ private:
   // (useful if the current node partition is different than the one for checkpoint)
   OWN_PTR(Comm_Group) restartComm_;
 
-  static long int File_size_;        // Espace disque pris par les sauvegarde XYZ
-  static int Bad_allocate_;        // 1 si allocation reussi, 0 sinon
-  static int Nb_pb_total_;        // Nombre total de probleme
-  static int Num_pb_;                // numero du probleme
-  mutable Nom error_;                // Erreur d'allocation
+  static long int File_size_;        // Disk space used by XYZ checkpoints
+  static int Bad_allocate_;        // 1 if allocation succeeded, 0 otherwise
+  static int Nb_pb_total_;        // Total number of problems
+  static int Num_pb_;                // problem index
+  mutable Nom error_;                // Allocation error
 
 };
 
 // Method which may be called from anywhere:
 inline const char* time_format_from(const int reprise_version)
 {
-  // Depuis la 155 le format de la balise temps est en scientifique
-  // pour eviter des erreurs (incoherence entre temps)
+  // Since version 155, the time tag format is in scientific notation
+  // to avoid errors (inconsistency between times)
   if (reprise_version<155)
     return "%f";
   else

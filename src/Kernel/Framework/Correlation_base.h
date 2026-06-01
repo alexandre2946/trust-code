@@ -34,7 +34,7 @@ public:
 
   static void typer_lire_correlation(OWN_PTR(Correlation_base)&, const Probleme_base&, const Nom&, Entree&);
 
-  //Methodes de l interface des champs postraitables
+  //Methods of the post-processable fields interface
   void creer_champ(const Motcle& motlu) override { }
   const Champ_base& get_champ(const Motcle& nom) const override { throw std::runtime_error(std::string("Field ") + nom.getString() + std::string(" not found !")); }
   void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override { }

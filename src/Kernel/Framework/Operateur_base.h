@@ -30,19 +30,19 @@ class EcrFicPartage;
 class Conds_lim;
 class SFichier;
 
-/*! @brief classe Operateur_base Classe est la base de la hierarchie des objets representant un
+/*! @brief class Operateur_base This class is the base of the hierarchy of objects representing an
  *
- *      operateur utilise dans des equations de TRUST. Ses membres sont
- *      les attributs et les methodes communs a toutes les classes qui
- *      representent un operateur. Un Operateur est un morceau d'equation
- *      c'est pourquoi il derive de MorEqn qui lui permet d'avoir une
- *      reference sur l'equation auquel il est attache.
- *      Exemple de classe d'operateur: Op_Diff_K_Eps_negligeable,
- *                                     Operateur_Div_base
+ *      operator used in TRUST equations. Its members are
+ *      the attributes and methods common to all classes that
+ *      represent an operator. An Operateur is a piece of an equation,
+ *      which is why it derives from MorEqn, giving it a
+ *      reference to the equation to which it is attached.
+ *      Example of operator classes: Op_Diff_K_Eps_negligeable,
+ *                                   Operateur_Div_base
  *
  * @sa MorEqn Operateur Equation_base
  *
- * Classe abstraite. Un certain nombre de methodes DOIVENT etre, surchargees dans les classes derivees.
+ * Abstract class. A number of methods MUST be overridden in derived classes.
  */
 class Operateur_base : public Objet_U, public MorEqn, public Champs_compris_interface
 {
@@ -57,7 +57,7 @@ public:
   virtual void dimensionner_bloc_vitesse(Matrice_Morse& matrice) const;
   virtual void modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const /* =0 */;
   virtual void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const /* =0 */;
-  /* permet de remplir des dependances en d'autres variables */
+  /* allows filling dependencies on other variables */
   virtual void contribuer_bloc_vitesse(const DoubleTab&, Matrice_Morse&) const;
   virtual void contribuer_au_second_membre(DoubleTab&) const /* =0 */;
   void tester_contribuer_a_avec(const DoubleTab&, const Matrice_Morse&);
@@ -107,7 +107,7 @@ public:
   inline DoubleTab& flux_bords() { return flux_bords_; }
   inline DoubleTab& flux_bords() const { return flux_bords_; }
 
-  //Methodes de l interface des champs postraitables
+  // Methods of the post-processable fields interface
   /////////////////////////////////////////////////////
   void creer_champ(const Motcle& motlu) override { }
   const Champ_base& get_champ(const Motcle& nom) const override;
@@ -118,14 +118,14 @@ public:
   void calculer_pour_post(Champ_base& espace_stockage, const Nom& option, int comp) const override;
   Motcle get_localisation_pour_post(const Nom& option) const override;
 
-  // Je rajoute deux methodes pour le calcul du flux
+  // Adding two methods for flux computation
   virtual void ajouter_flux(const DoubleTab& inconnue, DoubleTab& contribution) const;
   virtual void calculer_flux(const DoubleTab& inconnue, DoubleTab& flux) const;
 
-  // Je rajoute une methode preparer_calcul() appelee lors du preparer_calcul() de l'equation
-  // Ca me permet de coder plus facilement les operateurs de diffusion selon
-  // que la diffusivite varie ou non.
-  // L'implementation par defaut dans Operateur_base.cpp ne fait rien
+  // Adding a preparer_calcul() method called during the equation's preparer_calcul()
+  // This makes it easier to implement diffusion operators depending on
+  // whether diffusivity varies or not.
+  // The default implementation in Operateur_base.cpp does nothing
   virtual void preparer_calcul();
   int col_width_; // minimal size of a column for .out files (based on cl name length)
   bool has_impr_file() const { return out_ != "??"; }
@@ -135,9 +135,9 @@ protected:
   int nb_ss_pas_de_temps;
   SolveurSys solveur;
   Matrice matrice_;
-  Nom out_;                                 // Nom du fichier .out pour l'impression
+  Nom out_;                                 // Name of the .out file for printing
   Nom description_;
-  mutable DoubleTab flux_bords_;         // Tableau contenant les flux sur les bords de l'operateur
+  mutable DoubleTab flux_bords_;         // Array containing the fluxes on the boundaries of the operator
 
   Champs_compris champs_compris_;
   OBS_PTR(Champ_Inc_base) le_champ_inco;
@@ -145,11 +145,11 @@ protected:
 };
 
 
-/*! @brief Associe une equation a l'operateur.
+/*! @brief Associates an equation with the operator.
  *
- * Simple Appel a MorEqn::associer_eqn(const Equation_base&)
+ * Simple call to MorEqn::associer_eqn(const Equation_base&)
  *
- * @param (Equation_base& eqn) l'equation a laquelle l'operateur doit etre associe
+ * @param (Equation_base& eqn) the equation to which the operator must be associated
  */
 inline void Operateur_base::associer_eqn(const Equation_base& eqn)
 {

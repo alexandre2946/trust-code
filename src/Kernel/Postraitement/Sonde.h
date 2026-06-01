@@ -28,12 +28,12 @@ class Postraitement;
 class Champ_base;
 #include <Domaine_forward.h>
 
-/*! @brief classe Sonde Cette classe permet d'effectuer l'evolution d'un champ au cours du temps.
+/*! @brief class Sonde. This class allows tracking the evolution of a field over time.
  *
- *      On choisit l'ensemble des points sur lesquels on veut sonder un champ et
- *      la periodicite des observations. Les objets Postraitement porte des
- *      des sondes sur les champs a observer, une sonde porte d'ailleurs une
- *      reference sur un postraitement.
+ *      The set of points at which the field is to be probed and
+ *      the observation period are chosen. Postraitement objects hold
+ *      probes on the fields to observe; a probe also holds a
+ *      reference to a post-processing object.
  *
  * @sa Postraitement Sondes
  */
@@ -53,9 +53,9 @@ public :
   virtual void completer();
   inline void fermer_fichier();
   inline const Champ_Generique_base& le_champ() const;
-  inline const DoubleTab& les_positions_sondes_initiales() const; // Positions initiales
-  inline const DoubleTab& les_positions_sondes() const; // Positions apres deplacement
-  inline const DoubleTab& les_positions() const; // Positions locales au proc
+  inline const DoubleTab& les_positions_sondes_initiales() const; // Initial positions
+  inline const DoubleTab& les_positions_sondes() const; // Positions after displacement
+  inline const DoubleTab& les_positions() const; // Proc-local positions
   inline const IntVect& les_poly() const;
   inline void fixer_periode(double);
   inline double temps() const;
@@ -66,10 +66,10 @@ public :
   inline const int& get_dim() const { return dim ; }
   inline void nommer(const Nom& n) override { nom_ = n; }
 
-  // Traitement des bords (option "gravcl")
   virtual void ajouter_bords(const DoubleTab& coords_bords);
   virtual void init_bords();
   virtual void mettre_a_jour_bords();
+  // Boundary processing (option "gravcl")
   void resetTime(double time) { nb_bip = time/periode; };
 
 protected :
@@ -96,45 +96,45 @@ protected :
   virtual void update_source(double un_temps);
 
   OBS_PTR(Postraitement) mon_post;
-  Nom nom_;                               ///< le nom de la sonde
-  Nom nom_fichier_;                       ///< le nom du fichier contenant la sonde
-  int dim;                                ///< la dimension de la sone (point:0,segment:1,plan:2,volume:3)
+  Nom nom_;                               ///< the probe name
+  Nom nom_fichier_;                       ///< the name of the file containing the probe
+  int dim;                                ///< the dimension of the probe (point:0,segment:1,plan:2,volume:3)
   OBS_PTR(Champ_Generique_base) mon_champ;
-  OBS_PTR(Operateur_Statistique_tps_base) operateur_statistique_;        // Reference vers un operateur statistique eventuel
-  /** Numero de la composante a sonder. Si ncomp = -1 la sonde s'applique a toutes les
-   * composantes du champ */
+  OBS_PTR(Operateur_Statistique_tps_base) operateur_statistique_;        // Reference to an optional statistical operator
+  /** Index of the component to probe. If ncomp = -1 the probe applies to all
+   * components of the field */
   int ncomp;
-  DoubleTab les_positions_sondes_initiales_;   ///< les coordonnees des sondes ponctuelles initiales
-  DoubleTab les_positions_sondes_;             ///< les coordonnees des sondes sur tout le domaine apres deplacement (uniquement sur le maitre)
-  DoubleTab les_positions_;               ///< les coordonnees des sondes locales sur chaque proc
-  int numero_elem_;                       ///< vaut -1 si pas defini et vaut le numero de l'elem sur le maitre
-  IntVect elem_;                          ///< les elements contenant les sondes ponctuelles locales
-  double periode;                         ///< periode d'echantillonnage
-  /** cles pour typage des sondes (sondes redefinies aux noeuds ou d'apres les valeurs aux sommets ou au centre de gravite ou aux sommets)
+  DoubleTab les_positions_sondes_initiales_;   ///< coordinates of the initial point probes
+  DoubleTab les_positions_sondes_;             ///< coordinates of probes across the whole domain after displacement (master only)
+  DoubleTab les_positions_;               ///< coordinates of probes local to each proc
+  int numero_elem_;                       ///< equals -1 if undefined, otherwise the element number on the master
+  IntVect elem_;                          ///< elements containing the local point probes
+  double periode;                         ///< sampling period
+  /** keys for probe typing (probes redefined at nodes or from values at vertices or at the center of gravity or at vertices)
    */
   bool nodes = false;
   bool chsom = false;
   bool grav = false;
-  bool gravcl = false; // Valeurs aux centres de gravite (comme grav) mais avec ajout eventuel des valeurs aux bords via domaine Cl du champ post-traite
+  bool gravcl = false; // Values at centers of gravity (like grav) but with optional addition of boundary values via the CL domain of the post-processed field
   bool som = false;
-  DoubleTab valeurs_locales,valeurs_sur_maitre;     ///< valeurs_locales les valeurs sur chaque proc, valeurs_sur_maitre les valeurs regroupes sur le maitre
+  DoubleTab valeurs_locales,valeurs_sur_maitre;     ///< valeurs_locales: values on each proc, valeurs_sur_maitre: values gathered on the master
   double nb_bip;
   SFichier le_fichier_;
   Motcle nom_champ_lu_;
-  ArrsOfInt participant ;            // sur le maitre: participant[pe][i] -> le ieme point sur pe correspond  la  participant [pe][i]  eme position
+  ArrsOfInt participant ;            // on the master: participant[pe][i] -> the i-th point on pe corresponds to the participant[pe][i]-th position
   Nom type_;
   int orientation_faces_;
 
-  // Traitement des bords (option "gravcl")
+  // Boundary processing (option "gravcl")
   ArrOfInt faces_bords_;                  ///< array containing the indices of the boundary faces hit by the probe
   IntTab rang_cl_;                        ///< for a given face, index of the CL that this face bears
-  int nbre_points1 = -1,nbre_points2 = -1,nbre_points3 = -1;        ///< faire des sonde_segment,sonde_plan,etc...
+  int nbre_points1 = -1,nbre_points2 = -1,nbre_points3 = -1;        ///< used to create sonde_segment, sonde_plan, etc...
 };
 
 
-/*! @brief Le temps ecoule.
+/*! @brief The elapsed time.
  *
- * @return (double) le temps ecoule
+ * @return (double) the elapsed time
  */
 inline double Sonde::temps() const
 {
@@ -143,7 +143,7 @@ inline double Sonde::temps() const
 
 
 
-/*! @brief Ferme le fichier sur laquelle la sonde ecrit.
+/*! @brief Closes the file to which the probe writes.
  *
  */
 inline void Sonde::fermer_fichier()
@@ -152,9 +152,9 @@ inline void Sonde::fermer_fichier()
 }
 
 
-/*! @brief Fixe la periode avec laquelle on sonde le champ.
+/*! @brief Sets the period at which the field is probed.
  *
- * @param (double pe) la periode de sondage du champ
+ * @param (double pe) the probing period for the field
  */
 inline void Sonde::fixer_periode(double pe)
 {
@@ -162,9 +162,9 @@ inline void Sonde::fixer_periode(double pe)
 }
 
 
-/*! @brief Renvoie le champ associe.
+/*! @brief Returns the associated field.
  *
- * @return (Champ_base&) le champ associe
+ * @return (Champ_base&) the associated field
  */
 inline const Champ_Generique_base& Sonde::le_champ() const
 {
@@ -172,9 +172,9 @@ inline const Champ_Generique_base& Sonde::le_champ() const
 }
 
 
-/*! @brief Renvoie le tableau des positions du champ qui sont sondees.
+/*! @brief Returns the array of positions of the field that are probed.
  *
- * @return (DoubleTab&) les positions sondees
+ * @return (DoubleTab&) the probed positions
  */
 
 inline const DoubleTab& Sonde::les_positions_sondes_initiales() const
@@ -192,9 +192,9 @@ inline const DoubleTab& Sonde::les_positions() const
   return les_positions_;
 }
 
-/*! @brief Renvoie le tableau des elements qui sont sondes.
+/*! @brief Returns the array of elements that are probed.
  *
- * @return (IntVect&) les ments qui sont sondes
+ * @return (IntVect&) the elements that are probed
  */
 inline const IntVect& Sonde::les_poly() const
 {
@@ -202,18 +202,18 @@ inline const IntVect& Sonde::les_poly() const
 }
 
 
-/*! @brief Renvoie un flot de sortie Fichier, pointant sur le fichier de sortie utilise par la sonde.
+/*! @brief Returns an output file stream pointing to the output file used by the probe.
  *
- * @return (SFichier&) le fichier de sortie utilise par la sonde
+ * @return (SFichier&) the output file used by the probe
  */
 inline SFichier& Sonde::fichier()
 {
   return le_fichier_;
 }
 
-/*! @brief Destructeur.
+/*! @brief Destructor.
  *
- * Ferme le fichier avant de detruire l'objet.
+ * Closes the file before destroying the object.
  *
  */
 inline Sonde::~Sonde()

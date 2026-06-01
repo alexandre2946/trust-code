@@ -54,7 +54,7 @@ void Echange_contact_Correlation_VDF::set_param(Param& param) const
 {
   param.ajouter("dir",&dir); // XD_ADD_P entier
   // XD_CONT Direction (0 : axis X, 1 : axis Y, 2 : axis Z) of the 1D model.
-  param.ajouter_condition("(value_of_dir_ge_0)_AND_(value_of_dir_le_2)", "La direction doit etre 0, 1 ou 2 dans Echange_contact_Correlation_VDF");
+  param.ajouter_condition("(value_of_dir_ge_0)_AND_(value_of_dir_le_2)", "The direction must be 0, 1 or 2 in Echange_contact_Correlation_VDF");
   param.ajouter("Tinf",&Tinf); // XD_ADD_P floattant
   // XD_CONT Inlet fluid temperature of the 1D model (oC or K).
   param.ajouter("Tsup",&Tsup); // XD_ADD_P floattant
@@ -78,7 +78,7 @@ void Echange_contact_Correlation_VDF::set_param(Param& param) const
   // XD_CONT surface (S) of the meshed boundary.
   param.ajouter_non_std("Nu",(this)); // XD_ADD_P chaine
   // XD_CONT Nusselt number which may be a function of the Reynolds number (Re) and the Prandtl number (Pr).
-  // Rajout Cyril MALOD (14/09/2006)
+  // Added by Cyril MALOD (14/09/2006)
   param.ajouter_flag("Reprise_correlation",&Reprise_temperature); // XD_ADD_P rien
   // XD_CONT Keyword in the case of a resuming calculation with this correlation.
 }
@@ -141,11 +141,11 @@ int Echange_contact_Correlation_VDF::lire_motcle_non_standard(const Motcle& mot,
 
 
 /**
- * Calcule le coeff d echange local dans la maille solide.
+ * @brief Computes the local heat exchange coefficient in the solid cell.
  */
 void Echange_contact_Correlation_VDF::calculer_h_mon_pb(DoubleTab& tab)
 {
-  // forcement local
+  // necessarily local
   const Equation_base& mon_eqn = domaine_Cl_dis().equation();
   const Milieu_base& mon_milieu = mon_eqn.milieu();
   const Domaine_VDF& ma_zvdf = ref_cast(Domaine_VDF,domaine_Cl_dis().domaine_dis());
@@ -156,7 +156,7 @@ void Echange_contact_Correlation_VDF::calculer_h_mon_pb(DoubleTab& tab)
 
 
 /**
- * Complete et initialise les attributs de la classe
+ * @brief Completes and initializes the class attributes.
  */
 void Echange_contact_Correlation_VDF::completer()
 {
@@ -190,16 +190,16 @@ void Echange_contact_Correlation_VDF::completer()
 
   init_tab_echange();
 
-  //Mise a jour car pas de dependance a des donnees d un autre probleme
-  //dans le cas de probleme couple
-  //Methode completer() peut etre a remplacer par methode initialiser()
+  //Update because there is no dependency on data from another problem
+  //in the case of coupled problems.
+  //The completer() method may need to be replaced by the initialiser() method.
   Equation_base& mon_eqn = domaine_Cl_dis().equation();
   const double temps = mon_eqn.schema_temps().temps_courant();
   mettre_a_jour(temps);
 }
 
 /**
- * Initialise le tab tab_ech pour le parallele
+ * @brief Initializes the tab_ech array for parallel execution.
  */
 void Echange_contact_Correlation_VDF::init_tab_echange()
 {
@@ -236,7 +236,7 @@ void Echange_contact_Correlation_VDF::init_tab_echange()
 
 
 /**
- * Calcule rho, mu et lambda du fluide pour la temperature courante
+ * @brief Computes rho, mu and lambda of the fluid at the current temperature.
  */
 void Echange_contact_Correlation_VDF::calculer_prop_physique()
 {
@@ -252,7 +252,7 @@ void Echange_contact_Correlation_VDF::calculer_prop_physique()
 }
 
 /**
- * Calcule le coeff d echange suivant la correlation entree dans le jdd
+ * @brief Computes the heat exchange coefficient using the correlation entered in the data file.
  */
 double Echange_contact_Correlation_VDF::calculer_coefficient_echange(int i)
 {
@@ -265,7 +265,7 @@ double Echange_contact_Correlation_VDF::calculer_coefficient_echange(int i)
 }
 
 /**
- * Calcul du terme source  de puissance volumique dans l'equation d'energie 1D fluide.
+ * @brief Computes the volumetric power source term in the 1D fluid energy equation.
  */
 void Echange_contact_Correlation_VDF::calculer_Q()
 {
@@ -308,7 +308,7 @@ void Echange_contact_Correlation_VDF::trier_coord()
   const DoubleTab& xv = ma_zvdf.xv();
   int i, j ,tmp;
 
-  // On trie les faces par coordonnees croissante (selon la coordonnee correspondante a la direction du tube)
+  // Sort faces by increasing coordinate (along the coordinate corresponding to the tube direction)
   if (nb_faces_bord>1)
     {
       for(i=0; i<nb_faces_bord; i++)
@@ -326,10 +326,10 @@ void Echange_contact_Correlation_VDF::trier_coord()
           face_triee(j+1) = tmp;
         }
     }
-  // On determine le nb de mailles 1D dans le fluide fictif
-  // et on remplit les correspondances elements solides -> elements fluides
+  // Determine the number of 1D cells in the fictitious fluid
+  // and fill the solid-to-fluid element correspondence array
   correspondance_solide_fluide.resize(nb_faces_bord);
-  N=3; // on rajoute les noeuds des bords
+  N=3; // add the boundary nodes
   correspondance_solide_fluide(face_triee(0)-ndeb) = 1;
   for(i=1; i<nb_faces_bord; i++)
     {
@@ -350,30 +350,33 @@ void Echange_contact_Correlation_VDF::trier_coord()
 
 
 
-  // calcul des volumes des tranches
+  // Compute slice volumes
   DoubleVect surf(N);
   surf=0.;
   vol=0.;
-  surf(0) = surf(N-1) = 0.; // ne sert pas
+  surf(0) = surf(N-1) = 0.; // not used
   for(int iface=0; iface<nb_faces_bord; iface++)
     {
       int corresp = correspondance_solide_fluide(iface);
       surf(corresp)+=surfaces(ndeb+iface);
       coord(corresp) = xv(ndeb+iface,dir);
     }
-  coord(0) = coord(1)-0.5*(coord(2)-coord(1)); // le premier point du maillage
-  coord(N-1) = coord(N-2)+0.5*(coord(N-2)-coord(N-3)); // le dernier point du maillage
+  coord(0) = coord(1)-0.5*(coord(2)-coord(1)); // the first mesh point
+  coord(N-1) = coord(N-2)+0.5*(coord(N-2)-coord(N-3)); // the last mesh point
   for (i=1; i<N-1; i++)
     {
       vol(i)=volume(surf(i),diam);
     }
-  vol(0) = vol(N-1) = 1.; // ne sert pas mais evite une division par zero dans le calcul de Qvol.
+  vol(0) = vol(N-1) = 1.; // not used, but avoids a division by zero in the Qvol computation.
 }
 
 
 
 /**
- * Calcule le volume d'une tranche de la section de surface laterale s et de diametre hydraulique d.
+ * @brief Computes the volume of a slice with lateral surface area s and hydraulic diameter d.
+ * @param s Lateral surface area of the slice.
+ * @param d Hydraulic diameter.
+ * @return Volume of the slice.
  */
 double Echange_contact_Correlation_VDF::volume(double s, double d)
 {
@@ -385,7 +388,7 @@ double Echange_contact_Correlation_VDF::volume(double s, double d)
 
 
 /**
- * Calcule les CL a appliquer sur l'equation d'energie
+ * @brief Computes the boundary conditions to apply to the energy equation.
  */
 void Echange_contact_Correlation_VDF::calculer_CL()
 {
@@ -433,7 +436,7 @@ void Echange_contact_Correlation_VDF::calculer_CL()
 
 
 /**
- * Calcule la vitesse par conservation de la masse
+ * @brief Computes the velocity from mass conservation.
  */
 void Echange_contact_Correlation_VDF::calculer_Vitesse()
 {
@@ -443,17 +446,17 @@ void Echange_contact_Correlation_VDF::calculer_Vitesse()
 
 
 /**
- * Calcule la temperature 1D dans le fluide en resolvant la conservation de l'energie
+ * @brief Computes the 1D temperature in the fluid by solving energy conservation.
  */
 void Echange_contact_Correlation_VDF::calculer_Tfluide()
 {
   const Equation_base& mon_eqn = domaine_Cl_dis().equation();
   const double dt = mon_eqn.schema_temps().pas_de_temps();
-  DoubleVect ma(N); // diagonale
-  DoubleVect mb(N-1); // sous-diagonale
-  DoubleVect mc(N-1); // sur-diagonale
+  DoubleVect ma(N); // diagonal
+  DoubleVect mb(N-1); // sub-diagonal
+  DoubleVect mc(N-1); // super-diagonal
   DoubleVect sm(N);
-  const int sgn = (debit>0) ? 1 : -1; // schema amont pour le transport
+  const int sgn = (debit>0) ? 1 : -1; // upwind scheme for transport
 
 
   ma(0) = 1.;
@@ -495,18 +498,18 @@ void Echange_contact_Correlation_VDF::calculer_Tfluide()
 
 
 /**
- * Mise a jour de la vitesse, temperature fluide et coeff d'echange
+ * @brief Updates the velocity, fluid temperature and heat exchange coefficient.
  */
 void Echange_contact_Correlation_VDF::mettre_a_jour(double temps)
 {
 
-  // Nom des fichiers de sauvegarde
+  // Name of the backup files
   Nom Fichier_sauv_nom=domaine_Cl_dis().equation().probleme().le_nom();
   Fichier_sauv_nom+="_";
   Fichier_sauv_nom+=frontiere_dis().frontiere().le_nom();
   Fichier_sauv_nom+=".sauv";
 
-  // Operation de reprise du champ de temperature dans le fluide
+  // Resume operation for the fluid temperature field
   const int ME = Process::me();
   const int nbproc = Process::nproc();
   FILE *Fichier_sauv;
@@ -641,22 +644,22 @@ void Echange_contact_Correlation_VDF::mettre_a_jour(double temps)
 
   Echange_global_impose::mettre_a_jour(temps);
 
-  // Operation de sauvegarde du champ de temperature dans le fluide en vue d'une reprise
+  // Save operation for the fluid temperature field for a future restart
   if (nbproc>1)
     {
-      envoyer(T,ME,0,ME);                                                                // J'envoie T au processeur maitre
+      envoyer(T,ME,0,ME);                                                                // send T to the master processor
       if (je_suis_maitre())
         {
-          Fichier_sauv=fopen(Fichier_sauv_nom,"w");                // J'ouvre le fichier de sauvegarde en ecriture
-          fprintf(Fichier_sauv,"Temps\t=\t%f\n",temps);                                // J'imprime le temps
+          Fichier_sauv=fopen(Fichier_sauv_nom,"w");                // open the backup file in write mode
+          fprintf(Fichier_sauv,"Temps\t=\t%f\n",temps);                                // print the time
           int j=0;
-          for (int p=0; p<nbproc; p++)                                              // Je boucle sur le nombre de processeur
+          for (int p=0; p<nbproc; p++)                                              // loop over the number of processors
             {
               DoubleVect T_tmp;
-              recevoir(T_tmp,p,0,p);                                                // Je recupere les temperature de chaque processeur
+              recevoir(T_tmp,p,0,p);                                                // retrieve temperatures from each processor
               for (int i=0; i<T_tmp.size(); i++)
                 {
-                  fprintf(Fichier_sauv,"T(%i)\t=\t%f\n",(int)j,T_tmp(i));        // J'imprime les temperatures dans le fichier de sauvegarde
+                  fprintf(Fichier_sauv,"T(%i)\t=\t%f\n",(int)j,T_tmp(i));        // print the temperatures in the backup file
                   j=j+1;
                 }
             }
@@ -689,7 +692,7 @@ void Echange_contact_Correlation_VDF::calculer_h_solide(DoubleTab& tab,const Equ
   for (int face=ndeb; face<nfin; face++)
     e(face-ndeb) = zvdf_2.dist_norm_bord(face);
 
-  // Calcul de tab = 1/(e/lambda + 1/h_paroi) =1/(e/lambda+invhparoi)
+  // Compute tab = 1/(e/lambda + 1/h_paroi) =1/(e/lambda+invhparoi)
   if(!sub_type(Champ_Uniforme,le_milieu.conductivite()))
     {
       //Cerr << "raccord local homogene et conductivite non uniforme" << finl;
@@ -706,7 +709,7 @@ void Echange_contact_Correlation_VDF::calculer_h_solide(DoubleTab& tab,const Equ
             }
         }
     }
-  else  // la conductivite est un OWN_PTR(Champ_base) uniforme
+  else  // the conductivity is a uniform OWN_PTR(Champ_base)
     {
       for (int face=ndeb; face<nfin; face++)
         {
@@ -721,17 +724,17 @@ void Echange_contact_Correlation_VDF::calculer_h_solide(DoubleTab& tab,const Equ
 
 
 /**
- * Teste si l'impression est demandee
+ * @brief Tests whether printing is requested.
  */
 int Echange_contact_Correlation_VDF::limpr(double temps_courant,double dt) const
 {
   const Schema_Temps_base& sch = domaine_Cl_dis().equation().schema_temps();
-  // Test un peu tordu, mais ca fonctionne !!!! (CM 05/07/2007)
+  // Slightly convoluted test, but it works !!!! (CM 05/07/2007)
   if (dt_impr<=dt || ((sch.temps_max()<=temps_courant || sch.nb_pas_dt_max()<=(sch.nb_pas_dt()+1) || (temps_courant!=sch.temps_courant() && sch.nb_pas_dt()==0)) && dt_impr!=1e10))
     return 1;
   else
     {
-      // Voir Schema_Temps_base::limpr pour information sur epsilon et modf
+      // See Schema_Temps_base::limpr for information on epsilon and modf
       static const double epsilon = 1.e-9;
       double i, j;
       modf(temps_courant/dt_impr + epsilon, &i);
@@ -742,7 +745,7 @@ int Echange_contact_Correlation_VDF::limpr(double temps_courant,double dt) const
 
 
 /**
- * Imprime les resultats
+ * @brief Prints the results.
  */
 void Echange_contact_Correlation_VDF::imprimer(double temps) const
 {

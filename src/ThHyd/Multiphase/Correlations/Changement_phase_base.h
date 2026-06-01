@@ -20,25 +20,25 @@
 #include <Correlation_base.h>
 #include <Saturation_base.h>
 
-/*! @brief classe Changement_phase_base correlations de changement de phase
+/*! @brief Base class for phase change correlations.
  *
- *       G_{kl} = G(alpha, p, T) (a remplir pour k liquide, l vapeur)
- *       cette classe definit une fonction flux avec :
- *     entrees :
- *         k, l      -> paire de phases
- *         D_h       -> diametre hyd
- *         alpha[n]  -> taux de presence de la phase n
- *         T[n]      -> temperature de la phase n
- *         p         -> pression
- *         nv[n]     -> norme de la vitesse de la phase n
- *         lambda[n], mu[n], rho[n], Cp[n] -> diverses proprietes physiques de la phase n
- *         sat       -> objet "saturation" associe au couple (k, l)
+ *       G_{kl} = G(alpha, p, T) (to fill for k liquid, l vapor)
+ *       This class defines a flux function with:
+ *     inputs:
+ *         k, l      -> pair of phases
+ *         D_h       -> hydraulic diameter
+ *         alpha[n]  -> void fraction of phase n
+ *         T[n]      -> temperature of phase n
+ *         p         -> pressure
+ *         nv[n]     -> norm of velocity of phase n
+ *         lambda[n], mu[n], rho[n], Cp[n] -> various physical properties of phase n
+ *         sat       -> "saturation" object associated with the (k, l) pair
  *
- *     sorties :
- *     retour  -> flux de masse G de k vers l
- *     dT_G(n) -> derivee de G en T[n]
- *     da_G(n) -> derivee de G en a[n]
- *     dp_G    -> derivee de G en p
+ *     outputs:
+ *     return  -> mass flux G from k to l
+ *     dT_G(n) -> derivative of G w.r.t. T[n]
+ *     da_G(n) -> derivative of G w.r.t. a[n]
+ *     dp_G    -> derivative of G w.r.t. p
  *
  *
  */

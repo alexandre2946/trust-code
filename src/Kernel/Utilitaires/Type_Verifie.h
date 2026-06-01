@@ -19,9 +19,9 @@
 #include <Noms.h>
 
 /*
-  Ce fichier contient 2 fonctions:
-  cherche_dans_les_releases_notes:-Analyse des Releases Notes
-  verifie:                        -Verification des mots cles obsoletes
+  This file contains 2 functions:
+  cherche_dans_les_releases_notes: - Analysis of Release Notes
+  verifie:                         - Verification of obsolete keywords
 */
 inline void cherche_dans_les_releases_notes(const Nom& type)
 {
@@ -29,6 +29,6 @@ inline void cherche_dans_les_releases_notes(const Nom& type)
 }
 
 
-// Parcours du jeu de donnees pour verification des mots cles obsoletes
+// Traversal of the data set to check for obsolete keywords
 void verifie(const Nom& type);
 #endif

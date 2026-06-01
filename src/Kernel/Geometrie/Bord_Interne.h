@@ -18,12 +18,12 @@
 
 #include <Frontiere.h>
 
-/*! @brief Classe Bord_Interne La classe sert a representer un ensemble de faces qui sont internes
+/*! @brief Class Bord_Interne The class serves to represent a set of faces that are internal
  *
- *     d'un point de vue geometrique mais qui sont traitees comme des faces
- *     frontieres par les operateurs.
- *     On se sert des Bords_Internes pour representer des plaques a l'interieur
- *     d'un domaine fluide par exemple
+ *     from a geometric point of view but which are treated as boundary
+ *     faces by the operators.
+ *     Internal Boundaries are used to represent plates inside
+ *     a fluid domain for example
  *
  * @sa Frontiere Domaine
  */

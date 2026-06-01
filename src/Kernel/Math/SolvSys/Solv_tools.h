@@ -26,14 +26,14 @@ public:
   const ArrOfTID& get_ix() const { return ix; }
 
 protected:
-  TIDTab renum_;                // Tableau de renumerotation globale lignes matrice TRUST -> matrice CSR
-  IntTab index_;                // Tableau de renumerotation locale
-  ArrOfBit items_to_keep_;      // Faut t'il conserver dans la matrice CSR la ligne item de la matrice TRUST ?
-  ArrOfTID ix;                  // Tableau de travail pour remplissage Vec plus rapide
-  int nb_items_to_keep_ = -1;        // Nombre local d'items a conserver
-  int nb_rows_ = -1;                 // Nombre de lignes locales de la matrice TRUST
-  trustIdType nb_rows_tot_ = -1;             // Nombre de lignes globales de la matrice TRUST
-  trustIdType decalage_local_global_ = -1;   // Decalage numerotation local/global pour matrice CSR et vecteur
+  TIDTab renum_;                // Global row renumbering table: TRUST matrix -> CSR matrix
+  IntTab index_;                // Local renumbering table
+  ArrOfBit items_to_keep_;      // Whether to keep row item in the CSR matrix from the TRUST matrix
+  ArrOfTID ix;                  // Work array for faster Vec filling
+  int nb_items_to_keep_ = -1;        // Local number of items to keep
+  int nb_rows_ = -1;                 // Number of local rows in the TRUST matrix
+  trustIdType nb_rows_tot_ = -1;             // Number of global rows in the TRUST matrix
+  trustIdType decalage_local_global_ = -1;   // Local/global index offset for the CSR matrix and vector
   int secmem_sz_ = -1;               // (Local) second member size
 };
 

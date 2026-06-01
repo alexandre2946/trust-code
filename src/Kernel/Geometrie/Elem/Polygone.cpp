@@ -132,9 +132,9 @@ int Polygone_32_64<_SIZE_>::get_nb_som_elem_max() const
     return mon_dom->les_elems().dimension_int(1);
 }
 
-/*! @brief Renvoie le nom LML d'un polyedre = "POLYEDRE_"+nb_som_max.
+/*! @brief Returns the LML name of a polygon = "POLYEDRE_" + 2*nb_som_max (or "POLYGONE_" + nb_som_max in 3D).
  *
- * @return (Nom&) toujours egal a "PRISM6"
+ * @return LML name string for this polygon type.
  */
 template <typename _SIZE_>
 const Nom& Polygone_32_64<_SIZE_>::nom_lml() const
@@ -149,16 +149,16 @@ const Nom& Polygone_32_64<_SIZE_>::nom_lml() const
 }
 
 
-// ToDo a mettre dans triangle
+// ToDo move to Triangle
 template <typename _SIZE_>
 int contient_triangle(const ArrOfDouble& pos, _SIZE_ som0, _SIZE_ som1, _SIZE_ som2, const TRUSTTab<double, _SIZE_>& coord)
 {
   double prod,p0,p1,p2;
 
-  // Il faut donc determiner le sens (trigo ou anti trigo) pour la numerotation :
-  // Calcul de prod = 01 vectoriel 02 selon z
-  // prod > 0 : sens trigo
-  // prod < 0 : sens anti trigo
+  // Determine the orientation (counter-clockwise or clockwise) for the vertex numbering:
+  // Compute prod = 01 cross 02 along z
+  // prod > 0 : counter-clockwise
+  // prod < 0 : clockwise
   prod = (coord(som1,0)-coord(som0,0))*(coord(som2,1)-coord(som0,1))
          - (coord(som1,1)-coord(som0,1))*(coord(som2,0)-coord(som0,0));
   double signe;
@@ -166,15 +166,15 @@ int contient_triangle(const ArrOfDouble& pos, _SIZE_ som0, _SIZE_ som1, _SIZE_ s
     signe = 1;
   else
     signe = -1;
-  // Calcul de p0 = 0M vectoriel 1M selon z
+  // Compute p0 = 0M cross 1M along z
   p0 = (pos[0]-coord(som0,0))*(pos[1]-coord(som1,1))
        - (pos[1]-coord(som0,1))*(pos[0]-coord(som1,0));
   p0 *= signe;
-  // Calcul de p1 = 1M vectoriel 2M selon z
+  // Compute p1 = 1M cross 2M along z
   p1 = (pos[0]-coord(som1,0))*(pos[1]-coord(som2,1))
        - (pos[1]-coord(som1,1))*(pos[0]-coord(som2,0));
   p1 *= signe;
-  // Calcul de p2 = 2M vectoriel 0M selon z
+  // Compute p2 = 2M cross 0M along z
   p2 = (pos[0]-coord(som2,0))*(pos[1]-coord(som0,1))
        - (pos[1]-coord(som2,1))*(pos[0]-coord(som0,0));
   p2 *= signe;
@@ -185,16 +185,13 @@ int contient_triangle(const ArrOfDouble& pos, _SIZE_ som0, _SIZE_ som1, _SIZE_ s
     return 0;
 }
 
-/*! @brief NE FAIT RIEN: A CODER, renvoie toujours 0.
+/*! @brief Returns 1 if element "num_poly" of the domain associated with this geometric element contains the point with coordinates "pos_r".
  *
- * Renvoie 1 si l'element "element" du domaine associe a
- *               l'element geometrique contient le point
- *               de coordonnees specifiees par le parametre "pos".
- *     Renvoie 0 sinon.
+ * Returns 0 otherwise. Implemented by decomposing the polygon into triangles.
  *
- * @param (DoubleVect& pos) coordonnees du point que l'on cherche a localiser
- * @param (int element) le numero de l'element du domaine dans lequel on cherche le point.
- * @return (int) 1 si le point de coordonnees specifiees appartient a l'element "element" 0 sinon
+ * @param pos_r Coordinates of the point to locate.
+ * @param num_poly Index of the domain element in which to search for the point.
+ * @return 1 if the point belongs to element "num_poly", 0 otherwise.
  */
 template <typename _SIZE_>
 int Polygone_32_64<_SIZE_>::contient(const ArrOfDouble& pos_r, int_t num_poly ) const
@@ -203,7 +200,7 @@ int Polygone_32_64<_SIZE_>::contient(const ArrOfDouble& pos_r, int_t num_poly ) 
   const IntTab_t& elem=domaine.les_elems();
   const DoubleTab_t& coord=domaine.coord_sommets();
   //DoubleTab pos(3,dimension);
-  // on decoupe le polygone en triangle ayany tous le sommet 0.
+  // decompose the polygon into triangles all sharing vertex 0.
 
   int_t s0=elem(num_poly,0);
   for (int s=1; s<nb_som_elem_max_-1 ; s++)
@@ -221,14 +218,11 @@ int Polygone_32_64<_SIZE_>::contient(const ArrOfDouble& pos_r, int_t num_poly ) 
 }
 
 
-/*! @brief NE FAIT RIEN: A CODER, renvoie toujours 0 Renvoie 1 si les sommets specifies par le parametre "pos"
+/*! @brief Not yet implemented — always returns 0. Returns 1 if the vertices specified by "pos" are those of element "element" in the associated domain.
  *
- *     sont les sommets de l'element "element" du domaine associe a
- *     l'element geometrique.
- *
- * @param (IntVect& pos) les numeros des sommets a comparer avec ceux de l'elements "element"
- * @param (int element) le numero de l'element du domaine dont on veut comparer les sommets
- * @return (int) 1 si les sommets passes en parametre sont ceux de l'element specifie, 0 sinon
+ * @param pos Vertex indices to compare.
+ * @param element Index of the domain element whose vertices are to be compared.
+ * @return 1 if the vertices match, 0 otherwise.
  */
 template <typename _SIZE_>
 int Polygone_32_64<_SIZE_>::contient(const SmallArrOfTID_t& pos, int_t element ) const
@@ -238,9 +232,9 @@ int Polygone_32_64<_SIZE_>::contient(const SmallArrOfTID_t& pos, int_t element )
 }
 
 
-/*! @brief NE FAIT RIEN: A CODER Calcule les volumes des elements du domaine associe.
+/*! @brief Computes the volumes (areas) of the elements of the associated domain.
  *
- * @param (DoubleVect& volumes) le vecteur contenant les valeurs  des des volumes des elements du domaine
+ * @param volumes Vector to fill with the volumes of domain elements.
  */
 template <typename _SIZE_>
 void Polygone_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const
@@ -277,17 +271,15 @@ void Polygone_32_64<_SIZE_>::calculer_volumes(DoubleVect_t& volumes) const
   return;
 }
 
-/*! @brief remplit le tableau faces_som_local(i,j)
+/*! @brief Fills faces_som_local(i,j) giving for 0 <= i < nb_faces() and 0 <= j < nb_som_face(i) the local vertex index on the element.
  *
- *  Celui-ci donne pour 0 <= i < nb_faces()  et  0 <= j < nb_som_face(i) le numero local du sommet
- *  sur l'element.
+ * We have 0 <= faces_sommets_locaux(i,j) < nb_som().
+ * If faces do not all have the same number of vertices, the number of columns
+ * equals the maximum, and unused entries are set to -1.
+ * Returns 1 if all faces have the same vertex count, 0 otherwise.
  *
- *  On a  0 <= faces_sommets_locaux(i,j) < nb_som()
- *
- *  Si toutes les faces de l'element n'ont pas le meme nombre de sommets, le nombre
- *  de colonnes du tableau est le plus grand nombre de sommets, et les cases inutilisees
- *  du tableau sont mises a -1
- *  On renvoie 1 si toutes les faces ont le meme nombre d'elements, 0 sinon.
+ * @param faces_som_local Table to fill with local face-vertex indices.
+ * @return 1 if all faces have the same vertex count, 0 otherwise.
  */
 template <typename _SIZE_>
 int Polygone_32_64<_SIZE_>::get_tab_faces_sommets_locaux(IntTab& faces_som_local) const
@@ -301,7 +293,7 @@ int Polygone_32_64<_SIZE_>::get_tab_faces_sommets_locaux(IntTab& faces_som_local
   faces_som_local.resize(nb_face_elem_max_,nb_som_face());
   faces_som_local=-1;
 
-  // on cherche les faces de l'elt
+  // look for the faces of the element
   int nb_face = static_cast<int>(PolygonIndex_[ele+1]-PolygonIndex_[ele]); // always within int
 
   // [ABN] Duh?! always assume consecutive connectivity??
@@ -319,13 +311,13 @@ int Polygone_32_64<_SIZE_>::get_tab_faces_sommets_locaux(IntTab& faces_som_local
   return 1;
 }
 
-// Desctiption : a partir des tableaux d'indirection FacesIndex PolygonIndex
-// on calcul les elems, nb_som_face_max_, nb_face_elem_max_ nb_som_elem_max_
+// From the indirection arrays FacesIndex and PolygonIndex,
+// compute les_elems, nb_som_face_max_, nb_face_elem_max_, nb_som_elem_max_.
 template <typename _SIZE_>
 void Polygone_32_64<_SIZE_>::affecte_connectivite_numero_global(const ArrOfInt_t& FacesIndex,const ArrOfInt_t& PolygonIndex,IntTab_t& les_elems)
 {
   nb_som_elem_max_=0;
-  // detremination de nbsom_max
+  // determine the maximum number of vertices per element
   TRUSTList<_SIZE_> prov;
   nb_face_elem_max_=0;
   int_t nelem=PolygonIndex.size_array()-1;
@@ -344,7 +336,7 @@ void Polygone_32_64<_SIZE_>::affecte_connectivite_numero_global(const ArrOfInt_t
   Cerr<<" Polygon information nb_som_elem_max "<< nb_som_elem_max_<<" nb_face_elem_max "<<nb_face_elem_max_<<finl;
   les_elems.resize(nelem,nb_som_elem_max_);
   les_elems=-1;
-  // on refait un tour pour determiiner les elems
+  // second pass to determine les_elems
   for (int_t ele=0; ele<nelem; ele++)
     {
       prov.vide();

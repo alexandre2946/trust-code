@@ -33,8 +33,8 @@ Entree& Viscosite_turbulente_l_melange::readOn(Entree& is)
   param.lire_avec_accolades_depuis(is);
   Cerr << "l_melange = " << l_melange_ << finl ;
 
-  pb_->creer_champ("taux_cisaillement"); //On en aura besoin pour le calcul de la viscosite turbulente
-  pb_->creer_champ("distance_paroi_globale"); // Besoin de distance a la paroi
+  pb_->creer_champ("taux_cisaillement"); //needed for the computation of the turbulent viscosity
+  pb_->creer_champ("distance_paroi_globale"); // wall distance required
 
   return is ;
 }
@@ -44,7 +44,7 @@ void Viscosite_turbulente_l_melange::eddy_viscosity(DoubleTab& nu_t) const
   const DoubleTab& tc = pb_->get_champ("taux_cisaillement").valeurs(),
                    &y_elem = ref_cast(Domaine_VF, pb_->domaine_dis()).y_elem();
   assert(nu_t.dimension_tot(0) == tc.dimension_tot(0) && tc.dimension(1) <= nu_t.dimension(1));
-  //on met 0 pour les composantes au-dela de k.dimension(1) (ex. : vapeur dans Pb_Multiphase)
+  //set to 0 for components beyond k.dimension(1) (e.g. vapor in Pb_Multiphase)
   for (int i = 0; i < nu_t.dimension_tot(0); i++)
     for (int n = 0; n < nu_t.dimension(1); n++)
       nu_t(i, n) = n < 1 ? tc(i, n) * l_melange_ * y_elem(i) * l_melange_ * y_elem(i) : 0; // Does weird things when non zero on gas phase. Is this the real problem ?

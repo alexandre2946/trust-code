@@ -39,7 +39,7 @@ Entree& MD_Vector_composite::readOn(Entree& is)
       is >> md_ptr.valeur();
       if (1)
         {
-          // Creation du MD_Vector attache au tableau
+          // Create the MD_Vector attached to the array
           data_.add(MD_Vector());
           MD_Vector& mdV =data_[p];
           mdV.copy(md_ptr.valeur());

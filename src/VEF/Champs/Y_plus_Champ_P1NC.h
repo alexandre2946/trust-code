@@ -24,7 +24,7 @@
 class Domaine_Cl_VEF;
 class Champ_P1NC;
 
-/*! @brief classe Y_plus_Champ_P1NC
+/*! @brief class Y_plus_Champ_P1NC
  *
  * @sa Champ_y_plus Champ_Fonc_P0_VEF
  */

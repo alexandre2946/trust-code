@@ -23,14 +23,14 @@
 #include <Domaine_forward.h>
 #include <Bord.h>
 
-/*! @brief Classe Extruder Cette classe est un interprete qui sert a lire et executer
+/*! @brief class Extruder This class is an interpreter used to read and execute
  *
- *     la directive Extruder:
- *         Extruder nom_domaine
- *     Cette directive est a utiliser en discretisation VEF 2D pour obtenir
- *     un maillage 3D par extrusion puis decoupage.
+ *     the Extruder directive:
+ *         Extruder domain_name
+ *     This directive is intended for VEF 2D discretization to obtain
+ *     a 3D mesh by extrusion followed by cutting.
  *
- * @sa Interprete Extruder, Cette classe est utilisable en 3D
+ * @sa Interprete Extruder, this class is also usable in 3D
  */
 
 template <typename _SIZE_>

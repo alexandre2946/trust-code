@@ -26,7 +26,7 @@ Sortie& Flux_interfacial_Coef_Constant::printOn(Sortie& os) const
 Entree& Flux_interfacial_Coef_Constant::readOn(Entree& is)
 {
   Param param(que_suis_je());
-  //un parametre par phase du probleme
+  //one parameter per phase of the problem
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, pb_.valeur());
   h_phase.resize(pbm.nb_phases());
   for (int n = 0; n < pbm.nb_phases(); n++)
@@ -39,5 +39,5 @@ void Flux_interfacial_Coef_Constant::coeffs(const input_t& in, output_t& out) co
 {
   int k, l, N = out.hi.dimension(0);
   for (k = 0; k < N; k++)
-    for (l = 0; l < N; l++) out.hi(k, l) = h_phase(k); //ne depend que de la phase de depart
+    for (l = 0; l < N; l++) out.hi(k, l) = h_phase(k); //depends only on the source phase
 }

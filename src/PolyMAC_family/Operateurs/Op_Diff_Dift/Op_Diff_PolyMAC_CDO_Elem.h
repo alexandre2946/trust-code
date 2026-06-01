@@ -45,18 +45,18 @@ public :
   void update_auxiliary_variables(DoubleTab& inco);
   void update_auxiliary_variables();
 
-  /* correction non lineaire de Le Potier / Mahamane : facteurs delta_e aux elements, delta_f aux faces */
-  int stab_ = 0;                                    //1 si elle est activee
-  void update_delta_int() const; //met a jour le tableau intermediaire delta_f_int et remplit delta_e
-  mutable DoubleTab delta_f_int;         //tableaux intermediaires : delta_x_int(i, n, 0/1) : numerateur / denominateur de l'expression de delta_e/f (sans contrib externe)
-  void update_delta() const;     //met a jour le tableau final delta_f
-  mutable DoubleTab delta_e, delta_f;    //facteurs finaux (apres prise en compte des CL Echange_contact)
+  /* nonlinear correction of Le Potier / Mahamane: correction factors delta_e at elements, delta_f at faces */
+  int stab_ = 0;                                    //1 if it is activated
+  void update_delta_int() const; //updates the intermediate array delta_f_int and fills delta_e
+  mutable DoubleTab delta_f_int;         //intermediate arrays: delta_x_int(i, n, 0/1): numerator / denominator of the expression of delta_e/f (without external contribution)
+  void update_delta() const;     //updates the final array delta_f
+  mutable DoubleTab delta_e, delta_f;    //final factors (after taking into account the Echange_contact BCs)
 
 private:
-  mutable int delta_int_a_jour_ = 0, delta_a_jour_ = 0; //si on doit calculer update_delta_{int,}_
+  mutable int delta_int_a_jour_ = 0, delta_a_jour_ = 0; //whether update_delta_{int,}_ needs to be called
 };
 
-/* comme des synonymes, mais avec l'info de ce qu'on est dans que_suis_je() */
+/* treated as synonyms, but with the identity exposed through que_suis_je() */
 class Op_Diff_Nonlinear_PolyMAC_CDO_Elem: public Op_Diff_PolyMAC_CDO_Elem
 {
   Declare_instanciable( Op_Diff_Nonlinear_PolyMAC_CDO_Elem );

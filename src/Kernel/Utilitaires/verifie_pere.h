@@ -14,7 +14,7 @@
 *****************************************************************************/
 #ifndef verifie_pere_h
 #define verifie_pere_h
-// methode pouvant etre appele pour verifier les peres declares
+// method that can be called to verify the declared parent objects
 class Objet_U;
 void verifie_pere(const Objet_U&);
 #endif

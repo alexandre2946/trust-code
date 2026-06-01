@@ -61,25 +61,25 @@ void Frottement_interfacial_PolyMAC_MPFA::ajouter_blocs(matrices_t matrices, Dou
 
   int e, f, c, i, j, k, l, n, N = inco.line_size(), Np = press.line_size(), d, D = dimension, nf_tot = domaine.nb_faces_tot(),
                               cR = (rho.dimension_tot(0) == 1), cM = (mu.dimension_tot(0) == 1);
-  DoubleTrav a_l(N), p_l(N), T_l(N), rho_l(N), mu_l(N), sigma_l(N*(N-1)/2), dv(N, N), ddv(N, N, 4), d_bulles_l(N), coeff(N, N, 2); //arguments pour coeff
+  DoubleTrav a_l(N), p_l(N), T_l(N), rho_l(N), mu_l(N), sigma_l(N*(N-1)/2), dv(N, N), ddv(N, N, 4), d_bulles_l(N), coeff(N, N, 2); //arguments for coeff
   double ddv_c[4] = {0., 0., 0., 0. };
   double dh;
   const Frottement_interfacial_base& correlation_fi = ref_cast(Frottement_interfacial_base, correlation_.valeur());
 
 
-  // Et pour les methodes span de la classe Saturation
-  const int ne_tot = domaine.nb_elem_tot(), nb_max_sat =  N * (N-1) /2; // oui !! suite arithmetique !!
+  // And for the span methods of the Saturation class
+  const int ne_tot = domaine.nb_elem_tot(), nb_max_sat =  N * (N-1) /2; // yes !! arithmetic series !!
   DoubleTrav Sigma_tab(ne_tot,nb_max_sat);
 
-  // remplir les tabs ...
+  // fill the arrays ...
   for (k = 0; k < N; k++)
     for (l = k + 1; l < N; l++)
       {
         if (milc.has_saturation(k, l))
           {
             const Saturation_base& z_sat = milc.get_saturation(k, l);
-            const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Et oui ! matrice triang sup !
-            // recuperer sigma ...
+            const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // yes !! upper triangular matrix !
+            // retrieve sigma ...
             const DoubleTab& sig = z_sat.get_sigma_tab();
             // fill in the good case
             for (int ii = 0; ii < ne_tot; ii++) Sigma_tab(ii, ind_trav) = sig(ii);
@@ -87,7 +87,7 @@ void Frottement_interfacial_PolyMAC_MPFA::ajouter_blocs(matrices_t matrices, Dou
         else if (milc.has_interface(k, l))
           {
             Interface_base& sat = milc.get_interface(k,l);
-            const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // Et oui ! matrice triang sup !
+            const int ind_trav = (k*(N-1)-(k-1)*(k)/2) + (l-k-1); // yes !! upper triangular matrix !
             const DoubleTab& sig = sat.get_sigma_tab();
             for (int ii = 0; ii < ne_tot; ii++) Sigma_tab(ii, ind_trav) = sig(ii);
           }
@@ -126,13 +126,13 @@ void Frottement_interfacial_PolyMAC_MPFA::ajouter_blocs(matrices_t matrices, Dou
             for (j = 0; j < 2; j++)
               coeff(k, l, j) *= 1 + (a_l(k) > 1e-8 ? std::pow(a_l(k) / a_res_, -exp_res) : 0) + (a_l(l) > 1e-8 ? std::pow(a_l(l) / a_res_, -exp_res) : 0);
 
-        /* contributions : on prend le max entre les deux cotes */
+        /* contributions : we take the max between the two sides */
         for (k = 0; k < N; k++)
           for (l = 0; l < N; l++)
             if (k != l)
               {
                 double fac = beta_ * pf(f) * vf(f);
-                /* on essaie d'impliciter coeff sans ralentir la convergence en en faisant un developpement limite autour de pvit (dans la direction d'interet seulement) */
+                /* we try to implicitize coeff without slowing convergence by doing a Taylor expansion around pvit (in the direction of interest only) */
                 secmem(f, k) -= fac * (coeff(k, l, 0) * (inco(f, k) - inco(f, l)) + coeff(k, l, 1) * ddv(k, l, 3) * (pvit(f, k) - pvit(f, l)) * ((inco(f, k) - inco(f, l)) - (pvit(f, k) - pvit(f, l))));
                 if (mat)
                   for (j = 0; j < 2; j++) (*mat)(N * f + k, N * f + (j ? l : k)) += fac * (j ? -1 : 1) * (coeff(k, l, 0) + coeff(k, l, 1) * ddv(k, l, 3) * (pvit(f, k) - pvit(f, l)));
@@ -142,7 +142,7 @@ void Frottement_interfacial_PolyMAC_MPFA::ajouter_blocs(matrices_t matrices, Dou
   /* elements */
   for (e = 0; e < domaine.nb_elem_tot(); e++)
     {
-      /* arguments de coeff */
+      /* coefficient arguments */
       for (n = 0; n < N; n++)
         {
           a_l(n)   = alpha(e, n);
@@ -166,7 +166,7 @@ void Frottement_interfacial_PolyMAC_MPFA::ajouter_blocs(matrices_t matrices, Dou
       for (k = 0; k < N; k++)
         for (l = 0; l < N; l++)
           {
-            coeff(k, l, 1) *= (dv(k, l) > dv_min); //pas de derivee si dv < dv_min
+            coeff(k, l, 1) *= (dv(k, l) > dv_min); //no derivative if dv < dv_min
             for (j = 0; j < 2; j++)
               coeff(k, l, j) *= 1 + (a_l(k) > 1e-8 ? std::pow(a_l(k) / a_res_, -exp_res) : 0) + (a_l(l) > 1e-8 ? std::pow(a_l(l) / a_res_, -exp_res) : 0);
           }
@@ -177,7 +177,7 @@ void Frottement_interfacial_PolyMAC_MPFA::ajouter_blocs(matrices_t matrices, Dou
             if (k != l)
               {
                 double fac = beta_ * pe(e) * ve(e);
-                /* on essaie d'impliciter coeff sans ralentir la convergence en en faisant un developpement limite autour de pvit (dans la direction d'interet seulement) */
+                /* we try to implicitize coeff without slowing convergence by doing a Taylor expansion around pvit (in the direction of interest only) */
                 secmem(i, k) -= fac * (coeff(k, l, 0) * (inco(i, k) - inco(i, l)) + coeff(k, l, 1) * ddv(k, l, d) * (pvit(i, k) - pvit(i, l)) * ((inco(i, k) - inco(i, l)) - (pvit(i, k) - pvit(i, l))));
                 if (mat)
                   for (j = 0; j < 2; j++) (*mat)(N * i + k, N * i + (j ? l : k)) += fac * (j ? -1 : 1) * (coeff(k, l, 0) + coeff(k, l, 1) * ddv(k, l, d) * (pvit(i, k) - pvit(i, l)));

@@ -53,7 +53,7 @@ std::string ptrToString(const void* adr)
   return ss.str();
 }
 
-// Voir AmgXWrapper (src/init.cpp)
+// See AmgXWrapper (src/init.cpp)
 int AmgXWrapperScheduling(int rank, int nRanks, int nDevs)
 {
   int devID;
@@ -79,7 +79,7 @@ void init_device()
   statistics().set_init_device(true);
   if (getenv("TRUST_CLOCK_ON")!= nullptr) statistics().set_gpu_verbose(true);
   if (getenv("TRUST_DISABLE_FENCE")!=nullptr) statistics().set_gpu_fence(false);
-  Process::imprimer_ram_totale(); // Impression avant copie des donnees sur GPU
+  Process::imprimer_ram_totale(); // Print before copying data to GPU
 }
 #endif
 
@@ -88,24 +88,24 @@ void init_device()
 #include <cuda_runtime.h>
 void init_cuda()
 {
-  // Necessaire sur JeanZay pour utiliser GPU Direct (http://www.idris.fr/jean-zay/gpu/jean-zay-gpu-mpi-cuda-aware-gpudirect.html)
-  // mais performances moins bonnes (trust PAR_gpu_3D 2) donc desactive en attendant d'autres tests:
-  // Absolument necessaire sur JeanZay (si OpenMPU-Cuda car sinon plantages lors des IO)
-  // Voir: https://www.open-mpi.org/faq/?category=runcuda#mpi-cuda-aware-support pour activer ou non a la compilation !
+  // Necessary on JeanZay to use GPU Direct (http://www.idris.fr/jean-zay/gpu/jean-zay-gpu-mpi-cuda-aware-gpudirect.html)
+  // but performance is worse (trust PAR_gpu_3D 2) so disabled pending further tests:
+  // Absolutely necessary on JeanZay (if OpenMPI-Cuda because otherwise crashes during IO)
+  // See: https://www.open-mpi.org/faq/?category=runcuda#mpi-cuda-aware-support to enable or disable at compile time!
 #if defined(MPIX_CUDA_AWARE_SUPPORT) && MPIX_CUDA_AWARE_SUPPORT
   char* local_rank_env;
   cudaError_t cudaRet;
-  /* Recuperation du rang local du processus via la variable d'environnement
-     positionnee par Slurm, l'utilisation de MPI_Comm_rank n'etant pas encore
-     possible puisque cette routine est utilisee AVANT l'initialisation de MPI */
-  // ToDo pourrait etre appelee plus tard dans AmgX ou PETSc GPU...
+  /* Retrieve the local rank of the process via the environment variable
+     set by Slurm; using MPI_Comm_rank is not yet possible
+     since this routine is called BEFORE MPI initialization */
+  // ToDo could be called later in AmgX or PETSc GPU...
   local_rank_env = getenv("SLURM_LOCALID");
   if (local_rank_env)
     {
       int rank = atoi(local_rank_env);
       int nRanks = atoi(getenv("SLURM_NTASKS"));
       if (rank==0) printf("The MPI library has CUDA-aware support and TRUST will try using this feature...\n");
-      /* Definition du GPU a utiliser pour chaque processus MPI */
+      /* Define the GPU to use for each MPI process */
       int nDevs = 0;
       cudaGetDeviceCount(&nDevs);
       int devID = AmgXWrapperScheduling(rank, nRanks, nDevs);
@@ -195,7 +195,7 @@ template <typename _TYPE_, typename _SIZE_>
 _TYPE_* allocateOnDevice(_TYPE_* ptr, _SIZE_ size)
 {
 #ifdef TRUST_USE_GPU
-  assert(!isAllocatedOnDevice(ptr)); // Verifie que la zone n'est pas deja allouee
+  assert(!isAllocatedOnDevice(ptr)); // Verify that the region is not already allocated
   statistics().begin_count(STD_COUNTERS::gpu_malloc_free,statistics().get_last_opened_counter_level()+1);
   size_t bytes = sizeof(_TYPE_) * size;
   size_t free_bytes  = DeviceMemory::deviceMemGetInfo(0);
@@ -281,7 +281,7 @@ _TYPE_* mapToDevice_(TRUSTArray<_TYPE_,_SIZE_>& tab, DataLocation nextLocation)
   _TYPE_ *tab_addr = tab.data();
 #ifdef TRUST_USE_GPU
   DataLocation currentLocation = tab.get_data_location();
-  tab.set_data_location(nextLocation); // Important de specifier le nouveau status avant la recuperation du pointeur:
+  tab.set_data_location(nextLocation); // Important to specify the new status before retrieving the pointer:
   // Important for ref_array/ref_tab support, we take the size of the memory allocated, not the size of the array (tab.size_array()):
   //int memory_size = tab.size_array();
   int memory_size = tab.size_mem();
@@ -503,7 +503,7 @@ template void copyFromDevice<float, trustIdType>(const TRUSTArray<float,trustIdT
 template void copyFromDevice<double, trustIdType>(const TRUSTArray<double,trustIdType>& tab);
 
 
-// Timers GPU (avec possibilite de desactiver avec if (timer) dans certains Kernels critiques sur CPU):
+// GPU timers (with ability to disable with if (timer) in some CPU-critical kernels):
 std::string start_gpu_timer(std::string str, int bytes)
 {
 #ifdef TRUST_USE_GPU
@@ -552,7 +552,7 @@ void end_gpu_timer(const std::string& str, int onDevice, int bytes) // Return in
     }
   if (bytes == -1)
     statistics().end_count(STD_COUNTERS::gpu_kernel,onDevice);
-  if (statistics().is_gpu_verbose_on() && Process::je_suis_maitre()) // Affichage
+  if (statistics().is_gpu_verbose_on() && Process::je_suis_maitre()) // Display
     {
       std::string clock(Process::is_parallel() ? "[clock]#" + std::to_string(Process::me()) : "[clock]  ");
       double ms = 1000 * statistics().stop_gpu_timer_and_compute_gpu_time();

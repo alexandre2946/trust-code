@@ -22,10 +22,10 @@
 Implemente_base(Traitement_particulier_NS_Profils,"Traitement_particulier_NS_Profils",Traitement_particulier_NS_base);
 
 
-/*! @brief
+/*! @brief Prints the object to an output stream.
  *
- * @param (Sortie& is) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param is an output stream
+ * @return the modified output stream
  */
 Sortie& Traitement_particulier_NS_Profils::printOn(Sortie& is) const
 {
@@ -33,10 +33,10 @@ Sortie& Traitement_particulier_NS_Profils::printOn(Sortie& is) const
 }
 
 
-/*! @brief
+/*! @brief Reads the object from an input stream.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param is an input stream
+ * @return the modified input stream
  */
 Entree& Traitement_particulier_NS_Profils::readOn(Entree& is)
 {
@@ -106,9 +106,9 @@ Entree& Traitement_particulier_NS_Profils::lire(Entree& is)
               }
             case 2 :
               {
-                // Pour u_inst
-                is >> dt_post_inst;      // intervalle de temps de sortie des moyennes spatiales
-                // initialisation pour le calcul des stats spat.
+                // For u_inst
+                is >> dt_post_inst;      // time interval for printing spatial averages
+                // initialisation for spatial stats computation
                 oui_u_inst = 1;
                 Cerr << "Spatial average parameters read..." << finl;
                 Cerr << "dt_post_inst : " << dt_post_inst << finl;
@@ -120,11 +120,11 @@ Entree& Traitement_particulier_NS_Profils::lire(Entree& is)
                 is >> temps_deb;     // Initial time for time average statistics.
                 is >> temps_fin;     // Final time for time average statistics.
                 is >> dt_post_stat;  // Output intervalfor time average statistics.
-                oui_stat=1;          // =1 : on calcule des stats temp.
+                oui_stat=1;          // =1 : computing temporal stats
                 Cerr << "Reading time statitics parameters..." << finl;
                 Cerr << "Initial time : " << temps_deb << " End time : " << temps_fin << finl;
                 Cerr << "Time interval for output : " << dt_post_stat << finl;
-                // Verif ensuite pour voir si on a rentrer les valeurs specifiques aux calculs des stats spat.
+                // Check whether values specific to spatial stats computations have been provided
                 break;
               }
             case 4 :
@@ -148,7 +148,7 @@ Entree& Traitement_particulier_NS_Profils::lire(Entree& is)
             case 5 :
               {
                 oui_repr = 1;
-                is  >> fich_repr_u ;  // indication du nom du fichier de reprise des stats
+                is  >> fich_repr_u ;  // name of the stats restart file
                 Cerr << "The time statistics file is : " << fich_repr_u << finl;
                 break;
               }
@@ -156,7 +156,7 @@ Entree& Traitement_particulier_NS_Profils::lire(Entree& is)
               {
                 // For eddy viscosity profile Reprise
                 oui_repr_nu_t = 1;
-                is  >> fich_repr_nu_t ;  // indication du nom du fichier de reprise des stats de nut
+                is  >> fich_repr_nu_t ;  // name of the nut stats restart file
                 Cerr << "Continuing statistics on eddy-viscosity : OK!" << finl;
                 break;
               }
@@ -230,7 +230,7 @@ void Traitement_particulier_NS_Profils::preparer_calcul_particulier()
 
 void Traitement_particulier_NS_Profils::init_calcul_stats()
 {
-  if (oui_repr!=1) // ce n'est pas une reprise des stats specifiques = pas de lecture dans un fichier
+  if (oui_repr!=1) // this is not a stats restart, so no reading from a file
     {
       u_moy_temp_x.resize(n_probes,Nap);
       u_moy_temp_x=0;
@@ -240,7 +240,7 @@ void Traitement_particulier_NS_Profils::init_calcul_stats()
       u_moy_temp_z=0;
 
       uv_moy_temp.resize(n_probes,Nap);
-      uv_moy_temp=0; //  uv_moy moyenne en temps
+      uv_moy_temp=0; //  uv_moy time average
 
       u2_moy_temp.resize(n_probes,Nap);
       u2_moy_temp=0;

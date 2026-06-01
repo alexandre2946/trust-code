@@ -20,10 +20,10 @@
 #include <TRUSTVect.h>
 #include <math.h>
 
-/*! @brief Classe Perte_Charge_Reguliere Cette classe derivee de Perte_Charge est utiliseelorsque l'on veut
+/*! @brief Classe Perte_Charge_Reguliere This class derived from Perte_Charge is used when one wants
  *
- *     modeliser un domaine de l'ecoulement dans lequel des obstacles sont
- *     immerges (faisceau de tubes par exemple)
+ *     to model a region of the flow in which obstacles are
+ *     immersed (tube bundle, for example).
  *
  * @sa Perte_Charge Perte_Charge_Singuliere
  */

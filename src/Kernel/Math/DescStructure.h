@@ -20,7 +20,7 @@
 #include <Esp_Virt.h>
 #include <Esp_Dist.h>
 
-/*! @brief Sert a relire ancinne structure parallele
+/*! @brief Used to re-read the old parallel structure
  *
  */
 class DescStructure : public Objet_U

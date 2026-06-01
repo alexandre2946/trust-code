@@ -22,7 +22,7 @@
 class Domaine_Cl_VEF;
 class Champ_P1NC;
 
-/*! @brief classe Taux_cisaillement_P0_VEF
+/*! @brief class Taux_cisaillement_P0_VEF
  *
  */
 class Taux_cisaillement_P0_VEF : public Champ_Fonc_P0_VEF

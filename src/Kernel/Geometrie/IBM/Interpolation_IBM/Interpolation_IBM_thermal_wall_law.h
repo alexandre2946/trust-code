@@ -32,8 +32,8 @@ public :
   void set_param(Param&) const override;
 
 protected :
-  int formulation_Tp_ = 0; // Choix loi de theta+
-  int boundary_type_ = 0; // Choix du type de condition limite (0 = temp imp., 1 = flux imp.)
+  int formulation_Tp_ = 0; // Choice of theta+ law
+  int boundary_type_ = 0; // Choice of boundary condition type (0 = imposed temp., 1 = imposed flux)
   double T_inlet_ = 0.0;
   double Prandlt_mol_ = 0.0;
 };

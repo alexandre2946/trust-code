@@ -101,42 +101,42 @@ void Champ_input_P0::getTemplate(TrioField& afield) const
 
   afield._nb_field_components=nb_comp();
 
-  /* coordonnees */
+  /* coordinates */
   const DoubleTab& sommets=mon_pb->domaine().les_sommets();
   afield._nbnodes=sommets.dimension(0);
   afield._mesh_dim = afield._space_dim = sommets.dimension(1);
   affecte_double_avec_doubletab(&afield._coords,sommets);
 
-  /* connectivites */
+  /* connectivities */
   const Domaine_VF& zvf = domaine_vf();
   afield._nb_elems = mon_sous_domaine ? nb_elems_reels_sous_domaine_ : zvf.nb_elem();
   Motcle type_elem = zvf.domaine().type_elem()->que_suis_je();
   if (type_elem != "POLYEDRE") //cas simple -> il suffit de copier les_elems
     {
       const IntTab& conn = zvf.domaine().les_elems();
-      //le seul moyen qu'on a d'eviter que des polygones soient pris pour des quadrilateres est d'avoir un tableau de connectivite de largeur > 4...
+      //the only way to avoid polygons being mistaken for quadrilaterals is to have a connectivity array wider than 4...
       afield._nodes_per_elem = std::max(conn.dimension(1), type_elem == "POLYGONE" ? (int) 5 : 0);
       afield._connectivity = new int[afield._nb_elems * afield._nodes_per_elem];
       for (int i = 0; i < afield._nb_elems; i++)
         for (int j = 0; j < afield._nodes_per_elem; j++)
           {
-            const int e = mon_sous_domaine ? mon_sous_domaine.valeur()[i] : i; //numero de l'element
+            const int e = mon_sous_domaine ? mon_sous_domaine.valeur()[i] : i; //element number
             afield._connectivity[afield._nodes_per_elem * i + j] = j < conn.dimension(1) ? conn(e, j) : -1;
           }
     }
-  else //polyedres -> il faut reconstruire une connectivite de type MEDCoupling a la main
+  else //polyhedra -> we need to reconstruct a MEDCoupling-type connectivity by hand
     {
-      afield._nodes_per_elem = zvf.elem_faces().dimension(1) * (zvf.face_sommets().dimension(1) + 1); //un -1 apres chaque face
+      afield._nodes_per_elem = zvf.elem_faces().dimension(1) * (zvf.face_sommets().dimension(1) + 1); //a -1 after each face
       int *p = afield._connectivity = new int[afield._nb_elems * afield._nodes_per_elem];
       for (int i = 0, j, k, e, f, s; i < (mon_sous_domaine ? mon_sous_domaine->nb_elem_tot() : zvf.nb_elem()); i++)
         {
-          if (mon_sous_domaine && mon_sous_domaine.valeur()[i] >= zvf.nb_elem()) continue; //element non reel du sous-domaine -> on saute
-          e = mon_sous_domaine ? mon_sous_domaine.valeur()[i] : i; //numero de l'element
-          int *pf = p + afield._nodes_per_elem; //fin de la ligne
-          /* insertion de la connectivite de chaque face, suivie d'un -1 */
+          if (mon_sous_domaine && mon_sous_domaine.valeur()[i] >= zvf.nb_elem()) continue; //non-real element of sous-domaine -> skip
+          e = mon_sous_domaine ? mon_sous_domaine.valeur()[i] : i; //element number
+          int *pf = p + afield._nodes_per_elem; //end of line
+          /* insert the connectivity of each face, followed by a -1 */
           for (j = 0; j < zvf.elem_faces().dimension(1) && (f = zvf.elem_faces(e, j)) >= 0; j++, *p = -1, p++)
             for (k = 0; k < zvf.face_sommets().dimension(1) && (s = zvf.face_sommets(f, k)) >= 0; k++) *p = s, p++;
-          /* des -1 jusqu'a la ligne suivante */
+          /* -1 until the next line */
           for ( ; p < pf; p++) *p = -1;
         }
     }

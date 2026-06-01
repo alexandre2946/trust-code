@@ -19,16 +19,15 @@
 #include <TRUSTTab.h>
 #include <Matrix_tools.h>
 
-/*! @brief Classe Matrice_Base Classe de base de la hierarchie des matrices.
+/*! @brief Matrice_Base class - Base class of the matrix hierarchy.
  *
- *     Cette classe definie l'interface generique d'une matrice telle
- *     qu'elle est utilisee dans Trio-U. En consequence elle n'est pas
- *     instanciable. Toutes les types de matrices devront deriver de cette
- *     classe de base et implementer ses methodes abstraites.
+ *     This class defines the generic interface of a matrix as used in Trio-U.
+ *     Consequently it is not instantiable. All matrix types must derive from
+ *     this base class and implement its abstract methods.
  *
- *     Dans les commentaires des methodes A represente un objet Matrice_base.
+ *     In the method comments, A represents a Matrice_base object.
  *
- * @sa Classe abstraite, Methodes abstraites:, DoubleVect& multvect_(const DoubleVect&, DoubleVect& ) const, int ordre() const
+ * @sa Abstract class, Abstract methods:, DoubleVect& multvect_(const DoubleVect&, DoubleVect& ) const, int ordre() const
  */
 
 class Matrice_Base : public Objet_U
@@ -44,21 +43,21 @@ public :
   /// Return local number of columns (=size on the current proc)
   virtual int nb_colonnes() const=0;
 
-  // Methodes pour le calcul de r+=Ax codees dans les classes filles
+  // Methods for computing r+=Ax, implemented in derived classes
   virtual DoubleVect& ajouter_multvect_(const DoubleVect& x, DoubleVect& r) const =0;
   virtual DoubleVect& ajouter_multvectT_(const DoubleVect& x, DoubleVect& r) const =0;
   virtual DoubleTab& ajouter_multTab_(const DoubleTab& x, DoubleTab& r) const =0;
-  // Methodes pour le calcul de r+=Ax avec echange_espace_virtuel() codees dans Matrice_Base
+  // Methods for computing r+=Ax with echange_espace_virtuel(), implemented in Matrice_Base
   virtual inline DoubleVect& ajouter_multvect(const DoubleVect& x, DoubleVect& r) const;
   virtual inline DoubleVect& ajouter_multvectT(const DoubleVect& x, DoubleVect& r) const;
   virtual inline DoubleTab& ajouter_multTab(const DoubleTab& , DoubleTab& r) const;
-  // Methodes pour le calcul de r=Ax codees dans Matrice_Base
+  // Methods for computing r=Ax, implemented in Matrice_Base
   virtual inline DoubleVect& multvect_(const DoubleVect&, DoubleVect& ) const;
   virtual inline DoubleVect& multvect(const DoubleVect&, DoubleVect& ) const;
   virtual inline DoubleVect& multvectT_(const DoubleVect&, DoubleVect& ) const;
   virtual inline DoubleVect& multvectT(const DoubleVect&, DoubleVect& ) const;
   virtual inline DoubleTab& multTab(const DoubleTab& , DoubleTab& r) const;
-  // Methodes d'impression d'une matrice
+  // Matrix printing methods
   virtual inline Sortie& imprimer(Sortie&) const;
   virtual inline Sortie& imprimer_formatte(Sortie& s) const;
 
@@ -66,7 +65,7 @@ public :
 
   virtual void scale(const double x) =0;
 
-  // Mise a zero des valeurs de la matrice
+  // Zero out the matrix values
   virtual void clean() { Process::exit("Matrice_base::clean() not implemented.");};
 
   virtual void get_stencil(Stencil& stencil) const;
@@ -92,13 +91,13 @@ protected:
 
 
 
-/*! @brief Multiplication d'un vecteur par la matrice.
+/*! @brief Multiplication of a vector by the matrix.
  *
  * Operation: r = A*x
  *
- * @param (DoubleVect& x) le vecteur a multiplier
- * @param (DoubleVect& r) le vecteur resultat de l'operation
- * @return (DoubleVect&) le vecteur resultat de l'operation
+ * @param (DoubleVect& x) the vector to multiply
+ * @param (DoubleVect& r) the result vector of the operation
+ * @return (DoubleVect&) the result vector of the operation
  */
 inline DoubleVect& Matrice_Base::
 multvect(const DoubleVect& x, DoubleVect& r) const
@@ -116,13 +115,13 @@ multvect_(const DoubleVect& x, DoubleVect& r) const
   return r;
 }
 
-/*! @brief Multiplication d'un vecteur par la matrice transposee.
+/*! @brief Multiplication of a vector by the transposed matrix.
  *
  * Operation: r = AT*x
  *
- * @param (DoubleVect& x) le vecteur a multiplier
- * @param (DoubleVect& r) le vecteur resultat de l'operation
- * @return (DoubleVect&) le vecteur resultat de l'operation
+ * @param (DoubleVect& x) the vector to multiply
+ * @param (DoubleVect& r) the result vector of the operation
+ * @return (DoubleVect&) the result vector of the operation
  */
 inline DoubleVect& Matrice_Base::
 multvectT(const DoubleVect& x, DoubleVect& r) const
@@ -140,14 +139,14 @@ multvectT_(const DoubleVect& x, DoubleVect& r) const
   return r;
 }
 
-/*! @brief NON CODE Multiplication d'une matrice representee par un tableau par la matrice.
+/*! @brief NOT IMPLEMENTED Multiplication of a matrix represented by an array by the matrix.
  *
  *     Operation: R = A*X
  *
- * @param (DoubleTab&) la matrice a multiplier
- * @param (DoubleTab& r) la matrice resultat de l'operation
- * @return (DoubleTab&) la matrice resultat de l'operation
- * @throws NON CODE
+ * @param (DoubleTab&) the matrix to multiply
+ * @param (DoubleTab& r) the result matrix of the operation
+ * @return (DoubleTab&) the result matrix of the operation
+ * @throws NOT IMPLEMENTED
  */
 inline DoubleTab& Matrice_Base::
 multTab(const DoubleTab& x, DoubleTab& r) const
@@ -159,13 +158,13 @@ multTab(const DoubleTab& x, DoubleTab& r) const
 }
 
 
-/*! @brief Operation de multiplication-accumulation (saxpy) matrice vecteur.
+/*! @brief Matrix-vector multiply-accumulate operation (saxpy).
  *
  * Operation: r = r + A*x
  *
- * @param (DoubleVect& x) le vecteur a multiplier
- * @param (DoubleVect& r) le vecteur resultat de l'operation
- * @return (DoubleVect&) le vecteur resultat de l'operation
+ * @param (DoubleVect& x) the vector to multiply
+ * @param (DoubleVect& r) the result vector of the operation
+ * @return (DoubleVect&) the result vector of the operation
  */
 inline DoubleVect& Matrice_Base::
 ajouter_multvect(const DoubleVect& x, DoubleVect& r) const
@@ -175,13 +174,13 @@ ajouter_multvect(const DoubleVect& x, DoubleVect& r) const
   return r;
 }
 
-/*! @brief Operation de multiplication-accumulation (saxpy) matrice vecteur.
+/*! @brief Matrix-vector multiply-accumulate operation (saxpy).
  *
  * Operation: r = r + A*x
  *
- * @param (DoubleVect& x) le vecteur a multiplier
- * @param (DoubleVect& r) le vecteur resultat de l'operation
- * @return (DoubleVect&) le vecteur resultat de l'operation
+ * @param (DoubleVect& x) the vector to multiply
+ * @param (DoubleVect& r) the result vector of the operation
+ * @return (DoubleVect&) the result vector of the operation
  */
 inline DoubleVect& Matrice_Base::
 ajouter_multvectT(const DoubleVect& x, DoubleVect& r) const
@@ -191,15 +190,15 @@ ajouter_multvectT(const DoubleVect& x, DoubleVect& r) const
   return r;
 }
 
-/*! @brief NON CODE Operation de multiplication-accumulation (saxpy) matrice matrice
+/*! @brief NOT IMPLEMENTED Matrix-matrix multiply-accumulate operation (saxpy)
  *
- *     (matrice represente par un tableau)
+ *     (matrix represented by an array)
  *     Operation: R = R + A*X
  *
- * @param (DoubleTab&) la matrice a multiplier
- * @param (DoubleTab& r) la matrice resultat de l'operation
- * @return (DoubleTab&) la matrice resultat de l'operation
- * @throws NON CODE
+ * @param (DoubleTab&) the matrix to multiply
+ * @param (DoubleTab& r) the result matrix of the operation
+ * @return (DoubleTab&) the result matrix of the operation
+ * @throws NOT IMPLEMENTED
  */
 inline DoubleTab& Matrice_Base::
 ajouter_multTab(const DoubleTab& x, DoubleTab& r) const
@@ -210,13 +209,13 @@ ajouter_multTab(const DoubleTab& x, DoubleTab& r) const
 }
 
 
-/*! @brief Fonction (hors classe) amie de la classe Matrice_Base.
+/*! @brief Friend function (outside the class) of the Matrice_Base class.
  *
- * Operateur de multiplication: renvoie (A*vect)
+ * Multiplication operator: returns (A*vect)
  *
- * @param (Matrice_Base& A) la matrice multiplicatrice
- * @param (DoubleVect& vect) le vecteur a multiplier
- * @return (DoubleVect) le vecteur resultat de l'operation
+ * @param (Matrice_Base& A) the multiplying matrix
+ * @param (DoubleVect& vect) the vector to multiply
+ * @return (DoubleVect) the result vector of the operation
  */
 DoubleVect operator * (const Matrice_Base& A, const DoubleVect& vect);
 

@@ -18,11 +18,11 @@
 
 #include <Champ_front_var.h>
 
-/*! @brief classe Ch_front_var_stationnaire Cette classe abstraite represente un champ sur une frontiere,
+/*! @brief class Ch_front_var_stationnaire This abstract class represents a field on a boundary,
  *
- *      variable en espace mais stationnaire en temps.
- *      De ce fait, la methode initialiser doit calculer le champ une fois
- *      pour toutes, et la methode mettre_a_jour ne doit rien faire.
+ *      variable in space but stationary in time.
+ *      For this reason, the initialize method must compute the field once
+ *      and for all, and the update method must do nothing.
  *
  */
 

@@ -22,24 +22,24 @@
 #include <Domaine_forward.h>
 
 
-/*! @brief Decoupeur permettant de decouper des sous-domaines (se recouvrant potentiellement)  crees par Create_domain_from_sub_domain de maniere "conforme" : le sous-domaine est decoupe de maniere
+/*! @brief Partitioner allowing the splitting of sub-domains (potentially overlapping) created by Create_domain_from_sub_domain in a "conforming" manner: the sub-domain is split in a way
  *
- *   "conforme" avec le domaine complet.
+ *   that is "conforming" with the full domain.
  *
- *   Utilisation:
- *       - creer un domaine global, et deux sous-domaines (qui se recouvrent partiellement) pour Domaine1 et Domaine2
- *       - decouper le domaine global et ecrire le fichier de decoupe
- *       - creer Domaine1 et Domaine2 par Create_domain_from_sub_domain
- *       - decouper D1 et D2 par Partitionneur sous_domaine en prenant pour source le decoupage du domaine global.
+ *   Usage:
+ *       - create a global domain, and two sub-domains (which partially overlap) for Domaine1 and Domaine2
+ *       - split the global domain and write the splitting file
+ *       - create Domaine1 and Domaine2 via Create_domain_from_sub_domain
+ *       - split D1 and D2 with Partitionneur sous_domaine, using the global domain splitting as the source.
  *
- *   Syntaxe:
+ *   Syntax:
  *     Decouper dom_N
  *     {
  *         partitionneur sous_domaine
  *         {
  *              fichier     decoup/domaine_glob.txt
  *              fichier_ssz sous_domaine_dom_N.file
- *              OU
+ *              OR
  *              nom_ssz     sous_domaine
  *         }
  *         Nom_Domaines decoup/dom_N
@@ -60,9 +60,9 @@ public:
   void construire_partition(IntVect& elem_part, int& nb_parts_tot) const override;
 
 protected:
-  // Parametres du partitionneur
-  Nom filename_ = "";      ///! Nom du fichier de decoupe globale
-  Nom filename_ssz_ = ""; ///! Nom du fichier de sous-domaines
-  Nom name_ssz_ = ""; ///! Nom du sous_domaine (declare dans le jdd)
+  // Partitioner parameters
+  Nom filename_ = "";      ///! Name of the global splitting file
+  Nom filename_ssz_ = ""; ///! Name of the sub-domain file
+  Nom name_ssz_ = ""; ///! Name of the sub-domain (declared in the data file)
 };
 #endif

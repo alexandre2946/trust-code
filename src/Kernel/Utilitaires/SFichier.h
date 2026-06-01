@@ -18,7 +18,9 @@
 
 #include <Sortie_Fichier_base.h>
 
-/*! @brief Cette classe est a la classe C++ ofstream ce que la classe Sortie est a la classe C++ ostream Elle redefinit de facon virtuelle les operateurs d'ecriture dans un fichier
+/*! @brief SFichier is to the C++ ofstream class what Sortie is to the C++ ostream class.
+ *
+ * It redefines the write operators virtually for writing to a file.
  *
  * @sa EFichier
  */

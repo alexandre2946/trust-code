@@ -16,7 +16,7 @@
 #ifndef Debog_Pb_TPP_included
 #define Debog_Pb_TPP_included
 
-// Dans gdb: mettre le numero du message entre parentheses dans cette variable avec "set msg_debog_breakpoint=x" et un point d'arret dans la methode debog_breakpoint()
+// In gdb: set the message number in parentheses in this variable with "set msg_debog_breakpoint=x" and a breakpoint in the debog_breakpoint() method
 static int msg_debog_breakpoint = 0;
 inline void debog_breakpoint() { }
 inline void debog_break_test(int msg) { if (msg == msg_debog_breakpoint) debog_breakpoint(); }
@@ -34,7 +34,7 @@ void Debog_Pb::verifier_gen(const char *const msg, const TRUSTVect<_TYPE_>& arr,
       return;
     }
 
-  if (test_ignore_msg(msg)) return; // Ignorer ce test
+  if (test_ignore_msg(msg)) return; // Ignore this test
 
   goto_msg(msg);
   const TRUSTTab<_TYPE_>* scalT = dynamic_cast<const TRUSTTab<_TYPE_>*>(&arr);
@@ -77,19 +77,19 @@ void Debog_Pb::verifier_partie(const TRUSTVect<_TYPE_>& reference, const TRUSTVe
       int index = 0;
       for (int i = 0; i < n; i++)
         {
-          // Construction de la sous-partie de reference:
-          // (le tableau de reference contient toutes les valeurs sequentielles, sous-partie par sous-partie, la taille de la sous-partie est egale au nombre total
-          // d'items sequentiels multiplie par le linesize de la sous-partie). Attention, toutes les sous-parties n'ont pas forcement la meme linesize
+          // Build the reference sub-part:
+          // (the reference array contains all sequential values, sub-part by sub-part; the size of a sub-part equals the total number
+          // of sequential items multiplied by the linesize of that sub-part). Note: not all sub-parts necessarily have the same linesize
           const TRUSTTab<_TYPE_>& part = parts[i];
           const trustIdType s0 = part.get_md_vector()->nb_items_seq_tot();
           if (s0 > std::numeric_limits<int>::max())
             Process::exit("Debog_Pb::verifier_partie() - case is too big to be checked with Debog_Pb!!");
           const int sequential_size = static_cast<int>(s0);
           const int line_size = part.line_size();
-          // ref_array() veut un tableau non const, mais on va l'utiliser uniquement en const...
+          // ref_array() requires a non-const array, but we will use it as const only...
           TRUSTArray<_TYPE_>& cast_array = ref_cast_non_const(TRUSTArray<_TYPE_>, reference);
           ref_part.ref_array(cast_array, index, sequential_size * line_size);
-          // Appel recursif pour la sous-partie:
+          // Recursive call for the sub-part:
           verifier_partie(ref_part, part, arr_ref);
           index += sequential_size * line_size;
         }
@@ -100,14 +100,14 @@ template <typename _TYPE_>
 void Debog_Pb::verifier_partie_std(const TRUSTVect<_TYPE_>& reference, const TRUSTVect<_TYPE_>& array, TRUSTVect<_TYPE_> *arr_reference)
 {
   TRUSTVect<_TYPE_> arr(array);
-  // Verification sanitaire si HostDevice (ex: le tableau a ete modifie sur le host via des pointeurs mais flag non mis a jour!)
+  // Sanity check if HostDevice (e.g.: the array was modified on the host via pointers but the flag was not updated!)
   if (array.get_data_location()==DataLocation::HostDevice)
     {
-      // Force la copie sur le host:
+      // Force copy to host:
       arr.set_data_location(DataLocation::Device);
       copyFromDevice(arr);
       assert(arr.get_data_location()==DataLocation::HostDevice);
-      // Comparaison avec array:
+      // Comparison with array:
       int size = arr.size_array();
       for (int i = 0; i < size; i++)
         if (arr.addr()[i] != array.addr()[i])
@@ -117,21 +117,21 @@ void Debog_Pb::verifier_partie_std(const TRUSTVect<_TYPE_>& reference, const TRU
           }
     }
   else
-    copyFromDevice(arr); // Copie sur le host si Device
+    copyFromDevice(arr); // Copy to host if Device
 
   static constexpr bool IS_DOUBLE = std::is_same<_TYPE_,double>::value;
   Nom identificateur;
-  // Recherche du descripteur du tableau arr parmi les descripteurs connus
+  // Search for the descriptor of array arr among the known descriptors
   const IntVect& renum = find_renum_vector(arr.get_md_vector(), identificateur);
 
   _TYPE_ adim = 0;
   if (IS_DOUBLE)
     {
-      // Calcul d'une valeur de reference pour adimensionnaliser:
-      // Le tableau reference est sequentiel: tous les processeurs ont le meme
+      // Compute a reference value for non-dimensionalization:
+      // The reference array is sequential: all processors have the same
       const _TYPE_ adim1 = local_max_abs_vect(reference);
-      // Le tableau arr est parallele. On calcule la reference en utilisant uniquement
-      //  la partie reele (eventuellement la partie virtuelle a le droit de ne pas etre a jour)
+      // The arr array is parallel. We compute the reference using only
+      //  the real part (the virtual part may not be up to date)
       const _TYPE_ adim2 = mp_max_abs_vect(arr, VECT_REAL_ITEMS);
       adim = std::max(adim1, adim2);
 
@@ -142,7 +142,7 @@ void Debog_Pb::verifier_partie_std(const TRUSTVect<_TYPE_>& reference, const TRU
         }
       if (adim < seuil_absolu_)
         {
-          // Toutes les valeurs sont inferieures au seuil absolu => ok
+          // All values are below the absolute threshold => ok
           if (Process::je_suis_maitre())
             {
               log_file_ << " OK            : All values below seuil_absolu_ (" << seuil_absolu_ << ") id=" << identificateur << finl;
@@ -157,7 +157,7 @@ void Debog_Pb::verifier_partie_std(const TRUSTVect<_TYPE_>& reference, const TRU
   _TYPE_ max_err_items_reels = 0, max_err_items_virt = 0;
 
   int outbounds = 0;
-  // items reels, puis items virtuels
+  // real items, then virtual items
   for (int step = 0; step < 2; step++)
     {
       int n;
@@ -179,18 +179,18 @@ void Debog_Pb::verifier_partie_std(const TRUSTVect<_TYPE_>& reference, const TRU
         {
           if (renum[i]>=0)
             {
-              const int i1 = i * ls; // indice dans "arr"
-              const int i2 = renum[i] * ls; // indice dans "reference"
+              const int i1 = i * ls; // index in "arr"
+              const int i2 = renum[i] * ls; // index in "reference"
               for (int j = 0; j < ls; j++)
                 {
-                  const _TYPE_ x = arr_ptr[i1 + j]; // ne pas passer par operator[] pour ne pas planter sur DMAXFLOAT
+                  const _TYPE_ x = arr_ptr[i1 + j]; // do not use operator[] to avoid crashing on DMAXFLOAT
                   const _TYPE_ y = reference[i2 + j];
-                  // Comparaison de x et y
+                  // Comparison of x and y
                   if (IS_DOUBLE)
                     {
                       const _TYPE_ delta = (_TYPE_)std::fabs(x - y) / adim;
                       max_err = std::max(max_err, delta);
-                      // pour les items reels, indiquer si on est hors bornes:
+                      // for real items, indicate if out of bounds:
                       if (step == 0 && !(x >= -DMAXFLOAT && x <= DMAXFLOAT))
                         outbounds = 1;
                       if (delta > seuil_relatif_)
@@ -273,12 +273,12 @@ void Debog_Pb::verifier_partie_std(const TRUSTVect<_TYPE_>& reference, const TRU
         {
           if (renum[ibis]>=0)
             {
-              const int i1 = ibis * ls; // indice dans "arr"
-              const int i2 = renum[ibis] * ls; // indice dans "reference"
+              const int i1 = ibis * ls; // index in "arr"
+              const int i2 = renum[ibis] * ls; // index in "reference"
               for (int j = 0; j < ls; j++)
                 {
                   const _TYPE_ y = reference[i2 + j];
-                  arr_ptr[i1 + j] = y; // ne pas passer par operator[] pour ne pas planter sur DMAXFLOAT
+                  arr_ptr[i1 + j] = y; // do not use operator[] to avoid crashing on DMAXFLOAT
                 }
             }
         }
@@ -378,7 +378,7 @@ Debog_Pb::verifier(const char *const msg, _TYPE_ x, _TYPE_ *ref_value)
 
   if (nom_pb_ != nom_pb_actuel_) return;
 
-  if (test_ignore_msg(msg)) return; // Ignorer ce test
+  if (test_ignore_msg(msg)) return; // Ignore this test
 
   debog_break_test (debog_msg_count_);
   if (mode_db_ == 0)

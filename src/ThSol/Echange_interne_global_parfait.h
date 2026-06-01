@@ -19,9 +19,9 @@
 #include <Echange_interne_global_impose.h>
 
 
-/*! @brief Classe Echange_interne_global_parfait Cette classe represente le cas particulier d'un echange interne parfait (h=+inf)
+/*! @brief Class Echange_interne_global_parfait: Special case of a perfect internal exchange (h=+inf).
  *
- *     Marche seulement en EF pour le moment.
+ *     Currently only works with EF discretisation.
  *
  *
  * @sa Echange_impose_base Echange_interne_global_impose

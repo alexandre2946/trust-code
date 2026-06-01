@@ -42,7 +42,7 @@ public:
   DoubleTab& calculer(DoubleTab& ) const override;
   void mettre_a_jour(double ) override;
 
-  //Methodes de l interface des champs postraitables
+  //Methods of the postprocessable fields interface
   /////////////////////////////////////////////////////
   void creer_champ(const Motcle& motlu) override;
   const Champ_base& get_champ(const Motcle& nom) const override;
@@ -57,8 +57,8 @@ protected:
   OBS_PTR(Domaine_Cl_EF) le_dom_Cl_EF;
   void associer_domaines(const Domaine_dis_base& ,const Domaine_Cl_dis_base& ) override;
 
-  OWN_PTR(Champ_Don_base) la_source_lu;   //!< Champ lu si non uniforme
-  mutable OWN_PTR(Champ_Fonc_base)  champ_source_qdm_;     //!< Champ pour postraitement
+  OWN_PTR(Champ_Don_base) la_source_lu;   //!< Field read if non-uniform
+  mutable OWN_PTR(Champ_Fonc_base)  champ_source_qdm_;     //!< Field for post-processing
 };
 
 #endif

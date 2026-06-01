@@ -24,11 +24,11 @@ Entree& Modele_turbulence_hyd_Longueur_Melange_base::readOn(Entree& is) { return
 
 void Modele_turbulence_hyd_Longueur_Melange_base::calculer_energie_cinetique_turb()
 {
-  // PQ : 11/08/06 :    L'estimation de k repose sur les expressions :
+  // PQ: 11/08/06:    The estimation of k is based on the expressions:
   //                                 - nu_t = C_mu * k^2 / eps
   //                                - eps = k^(3/2) / l
   /////////////////////////////////////////////////////////////////////////////////////////////////
-  // pour des raisons de commodite, l'estimation de k est realisee dans calculer_viscosite_turbulente()
+  // for convenience, the estimation of k is performed in calculer_viscosite_turbulente()
   /////////////////////////////////////////////////////////////////////////////////////////////////
 
   energie_cinetique_turb_->changer_temps(mon_equation_->inconnue().temps());

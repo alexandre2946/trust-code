@@ -18,10 +18,11 @@
 
 #include <EDO_Pression_th_VDF.h>
 
-/*! @brief classe EDO_Pression_th_VDF_Gaz_Reel Cette classe represente l'EDO sur la pression associee au schema de
+/*! @brief class EDO_Pression_th_VDF_Gaz_Reel
  *
- *      de calcul pour les fluides faiblement compressibles, et relatif a
- *      discretisation de type VDF et pour les gaz reels.
+ * @brief Represents the ODE on the thermodynamic pressure associated with the
+ *        computation scheme for weakly compressible fluids, using a VDF
+ *        discretization for real gases.
  *
  * @sa Fluide_Quasi_Compressible EDO_Pression_th_base
  */

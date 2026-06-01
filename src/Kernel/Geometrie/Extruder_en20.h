@@ -21,14 +21,13 @@
 #include <Domaine_forward.h>
 #include <Domaine_forward.h>
 
-/*! @brief Classe Extruder_en20 Cette classe est un interprete qui sert a lire et executer
+/*! @brief Extruder_en20 class — interpreter that reads and executes the Extruder_en20 directive:
  *
- *     la directive Extruder_en20:
- *         Extruder_en20 nom_domaine
- *     Cette directive est a utiliser en discretisation VEF 2D pour obtenir
- *     un maillage 3D par extrusion puis decoupage.
+ *     Extruder_en20 domain_name
+ *     This directive is used with 2D VEF discretization to obtain
+ *     a 3D mesh by extrusion followed by splitting.
  *
- * @sa Interprete Extruder_en20, Cette classe est utilisable en 3D
+ * @sa Interprete Extruder_en20, This class is also usable in 3D
  */
 class Extruder_en20 : public Interprete_geometrique_base
 {

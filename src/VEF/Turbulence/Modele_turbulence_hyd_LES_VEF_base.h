@@ -22,9 +22,9 @@
 class Domaine_Cl_VEF;
 class Domaine_VEF;
 
-/*! @brief classe Modele_turbulence_hyd_LES_VEF_base Cette classe correspond a la mise en oeuvre des modeles sous
+/*! @brief Class Modele_turbulence_hyd_LES_VEF_base
  *
- *  maille en VEF
+ * @brief This class implements the subgrid turbulence models in VEF.
  *
  */
 class Modele_turbulence_hyd_LES_VEF_base: public Modele_turbulence_hyd_LES_base

@@ -79,7 +79,7 @@ void Vitesse_derive_Forces::evaluate_C0_vg0(const input_t& in) const
       Dispersion_bulles_base::output_t out_td;
       out_td.Ctd.resize(N,N);
       dv(n_g,n_l) = ( dv(n_l,n_g) = dv0) ;
-      correlation_fi.coefficient(alpha_l, p, T, in.rho, in.mu, in.sigma, in.dh, dv, in.d_bulles, coeff);		// MAJ du coeff frottement interf
+      correlation_fi.coefficient(alpha_l, p, T, in.rho, in.mu, in.sigma, in.dh, dv, in.d_bulles, coeff);		// update interfacial friction coefficient
       in_td.alpha = alpha_l, in_td.rho = in.rho, in_td.mu = in.mu, in_td.sigma = in.sigma, in_td.nut = in.nut, in_td.k_turb = in.k, in_td.d_bulles = in.d_bulles, in_td.nv = dv;
       correlation_db.coefficient(in_td, out_td); // correlation identifies the liquid phase
       for (int d = 0; d < D; d++) forces(d) +=  - out_td.Ctd(n_g, n_l) * in.gradAlpha(d, n_g) + out_td.Ctd(n_l, n_g) * in.gradAlpha(d, n_l);
@@ -92,7 +92,7 @@ void Vitesse_derive_Forces::evaluate_C0_vg0(const input_t& in) const
       Portance_interfaciale_base::output_t out_pi;
       out_pi.Cl.resize(N,N);
       dv(n_g,n_l) = ( dv(n_l,n_g) = dv0) ;
-      correlation_fi.coefficient(alpha_l, p, T, in.rho, in.mu, in.sigma, in.dh, dv, in.d_bulles, coeff);		// MAJ du coeff frottement interf
+      correlation_fi.coefficient(alpha_l, p, T, in.rho, in.mu, in.sigma, in.dh, dv, in.d_bulles, coeff);		// update interfacial friction coefficient
       in_pi.alpha = alpha_l, in_pi.rho = in.rho, in_pi.mu = in.mu, in_pi.sigma = in.sigma, in_pi.k_turb = in.k, in_pi.d_bulles = in.d_bulles, in_pi.nv = dv;
       correlation_pi.coefficient(in_pi, out_pi); // correlation identifies the liquid phase
       if (D==2)

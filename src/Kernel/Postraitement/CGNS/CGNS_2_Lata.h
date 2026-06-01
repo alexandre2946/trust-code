@@ -18,7 +18,8 @@
 
 #include <Interprete.h>
 
-/*! @brief Classe CGNS_2_Lata  Converts CGNS file to single_lata file
+/*! @brief class CGNS_2_Lata
+ * @brief Converts CGNS file to single_lata file
  *
  */
 class CGNS_2_Lata: public Interprete

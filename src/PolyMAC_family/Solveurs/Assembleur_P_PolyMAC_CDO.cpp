@@ -69,13 +69,13 @@ int Assembleur_P_PolyMAC_CDO::assembler_mat(Matrice& la_matrice, const DoubleVec
   DoubleTrav W(e_f.dimension(1), e_f.dimension(1)), W0(e_f.dimension(1), e_f.dimension(1));
 
 
-  //en l'absence de CLs en pression, on ajoute P(0) = 0 sur le process 0
+  //in the absence of pressure BCs, we add P(0) = 0 on process 0
   has_P_ref = 0;
   for (int n_bord = 0; n_bord < le_dom_PolyMAC_CDO->nb_front_Cl(); n_bord++)
     if (sub_type(Neumann_sortie_libre, le_dom_Cl_PolyMAC_CDO->les_conditions_limites(n_bord).valeur()))
       has_P_ref = 1;
 
-  /* 1. stencils de la matrice en pression et de rec : seulement au premier passage */
+  /* 1. pressure matrix stencil and rec stencil: only on the first pass */
   if (!stencil_done)
     {
       Stencil stencil_M(0, 2), stencil_R(0, 2);
@@ -109,7 +109,7 @@ int Assembleur_P_PolyMAC_CDO::assembler_mat(Matrice& la_matrice, const DoubleVec
       tab1.ref_array(mat.get_set_tab1()), tab2.ref_array(mat.get_set_tab2());
       stencil_done = 1;
     }
-  else //sinon, on recycle
+  else //otherwise, reuse existing
     {
       mat.get_set_tab1().ref_array(tab1);
       mat.get_set_tab2().ref_array(tab2);
@@ -118,7 +118,7 @@ int Assembleur_P_PolyMAC_CDO::assembler_mat(Matrice& la_matrice, const DoubleVec
       rec.get_set_coeff() = 0;
     }
 
-  /* 2. remplissage des coefficients */
+  /* 2. fill the coefficients */
   for (e = 0; e < ne_tot; e++)
     {
       n_f = domaine.m2d(e + 1) - domaine.m2d(e), W0.resize(n_f, n_f), W.resize(n_f, n_f);
@@ -126,16 +126,16 @@ int Assembleur_P_PolyMAC_CDO::assembler_mat(Matrice& la_matrice, const DoubleVec
         for (k = domaine.w2i(j); k < domaine.w2i(j + 1); k++)
           W0(i, domaine.w2j(k)) = domaine.w2c(k);
       if (!diag.size())
-        W = W0; //pas de correction diagonale -> on prend W telle quelle
-      else //correction diagonale -> on re-inverse m2 + diag
+        W = W0; //no diagonal correction -> take W as is
+      else //diagonal correction -> re-invert m2 + diag
         {
-          //matrice m2 + correction diagonale
+          //matrix m2 + diagonal correction
           for (i = 0, j = domaine.m2d(e), W = 0; i < n_f; i++, j++)
             for (k = domaine.m2i(j); k < domaine.m2i(j + 1); k++)
               W(i, domaine.m2j(k)) = domaine.m2c(k);
           for (i = 0; i < n_f; i++)
             f = e_f(e, i), W(i, i) += diag(f) * domaine.volumes_entrelaces_dir()(f, e != f_e(f, 0)) / domaine.volumes_entrelaces(f) / ve(e);
-          //inversion par Cholesky (Lapack) + annulation des petits coeffs + remplissage a la main de la partir triangulaire inf
+          //Cholesky inversion (Lapack) + zeroing small coefficients + manual fill of lower triangular part
           char uplo = 'U';
           F77NAME(dpotrf)(&uplo, &n_f, W.addr(), &n_f, &infoo);
           F77NAME(dpotri)(&uplo, &n_f, W.addr(), &n_f, &infoo);
@@ -148,9 +148,9 @@ int Assembleur_P_PolyMAC_CDO::assembler_mat(Matrice& la_matrice, const DoubleVec
                 W(i, j) = 0;
         }
 
-      //remplissage de la matrice en (dPe, dPf)
-      //sur les CLs de Neumann, on remplace l'equation sur dPf par dPf = 0 et on retire dPf des autres equations (pour symetrie)
-      double mee, mef, mff, rfe, rff; //a ajouter a m[e][e], m[e][f] / m[f][e], m[f][f'], r[f][e], r[f][f']
+      //filling the matrix in (dPe, dPf)
+      //on Neumann BCs, replace the equation on dPf by dPf = 0 and remove dPf from other equations (for symmetry)
+      double mee, mef, mff, rfe, rff; //to add to m[e][e], m[e][f] / m[f][e], m[f][f'], r[f][e], r[f][f']
       for (i = 0, mee = 0; i < n_f; mee += mef, i++)
         {
           for (f = e_f(e, i), mef = 0, rfe = 0, j = 0; f < nf && j < n_f; mef += mff, rfe += rff, j++, mff = 0, rff = 0)
@@ -185,11 +185,11 @@ int Assembleur_P_PolyMAC_CDO::assembler_mat(Matrice& la_matrice, const DoubleVec
   return 1;
 }
 
-/*! @brief Assemble la matrice de pression pour un fluide quasi compressible laplacein(P) est remplace par div(grad(P)/rho).
+/*! @brief Assemble the pressure matrix for a quasi-compressible fluid; laplacian(P) is replaced by div(grad(P)/rho).
  *
- * @param (DoubleTab& tab_rho) mass volumique Valeurs par dPolyMAC_CDOaut:
- * @return (int) renvoie toujours 1
- * @throws PolyMAC_CDOfets de bord:
+ * @param (DoubleTab& tab_rho) mass density. Default values:
+ * @return (int) always returns 1
+ * @throws PolyMAC_CDO boundary effects:
  */
 int Assembleur_P_PolyMAC_CDO::assembler_QC(const DoubleTab& tab_rho, Matrice& matrice)
 {
@@ -221,7 +221,7 @@ int Assembleur_P_PolyMAC_CDO::modifier_secmem(DoubleTab& secmem)
   int nb_cond_lim = le_dom_cl.nb_cond_lim();
   const IntTab& face_voisins = le_dom.face_voisins();
 
-  // Modification du second membre :
+  // Modification of the right-hand side:
   int i;
   for (i = 0; i < nb_cond_lim; i++)
     {
@@ -231,7 +231,7 @@ int Assembleur_P_PolyMAC_CDO::modifier_secmem(DoubleTab& secmem)
       int ndeb = la_front_dis.num_premiere_face();
       int nfin = ndeb + la_front_dis.nb_faces();
 
-      // GF on est passe en increment de pression
+      // GF switched to pressure increment formulation
       if ((sub_type(Neumann_sortie_libre, la_cl_base)) && (!get_resoudre_increment_pression()))
         {
           double Pimp, coPolyMAC_CDO;
@@ -271,7 +271,7 @@ int Assembleur_P_PolyMAC_CDO::modifier_secmem(DoubleTab& secmem)
 int Assembleur_P_PolyMAC_CDO::modifier_solution(DoubleTab& pression)
 {
   Debog::verifier("pression dans modifier solution in", pression);
-  //on ne considere pas les pressions aux faces dans le min (solveur_U_P ne les met pas a jour)
+  //face pressures are not considered in the min (solveur_U_P does not update them)
   DoubleTab_parts ppart(pression);
   if (!has_P_ref) pression -= mp_min_vect(ppart[0]);
   return 1;

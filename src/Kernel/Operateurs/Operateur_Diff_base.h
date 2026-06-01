@@ -23,14 +23,14 @@
 
 class Champ_base;
 
-/*! @brief classe Operateur_Diff_base Cette classe est la base de la hierarchie des operateurs representant
+/*! @brief Operateur_Diff_base This class is the base of the hierarchy of operators representing
  *
- *     un terme de diffusion dans une equation. Le choix du terme depend
- *     de la modelisation laminaire ou turbulente de l'ecoulement, de la
- *     discretisation et du type du champ de diffusivite. Ces variantes
- *     donneront lieu a des classes filles de Operateur_Diff_base.
+ *     a diffusion term in an equation. The choice of term depends
+ *     on the laminar or turbulent modelling of the flow, on the
+ *     discretisation and on the type of the diffusivity field. These variants
+ *     give rise to derived classes of Operateur_Diff_base.
  *
- * @sa Operateur_base Operateur_Diff, Classe abstraite, Methode abstraite, void associer_diffusivite(const Champ_Don_base& ), const Champ_Don_base& diffusivite() const
+ * @sa Operateur_base Operateur_Diff, Abstract class, Abstract method, void associer_diffusivite(const Champ_Don_base& ), const Champ_Don_base& diffusivite() const
  */
 class Operateur_Diff_base  : public Operateur_base,
   public Support_Champ_Masse_Volumique
@@ -43,9 +43,9 @@ public:
   virtual const Champ_base& diffusivite() const=0;
   inline virtual void calculer_borne_locale(DoubleVect& ,double,double ) const {};
 
-  //liste d'Op_Diff de problemes resolus simultanement (thermique monolithique)
+  //list of Op_Diff from problems solved simultaneously (monolithic thermal)
   mutable std::vector<const Operateur_Diff_base *> op_ext;
-  virtual void init_op_ext() const { op_ext = { this }; }    //remplissage de op_ext (ne peut pas etre fait dans completer(), trop tot)
+  virtual void init_op_ext() const { op_ext = { this }; }    //filling of op_ext (cannot be done in completer(), too early)
 
   virtual bool is_turb() const { return false; }
   virtual const Correlation_base* correlation_viscosite_turbulente() const { return nullptr; }

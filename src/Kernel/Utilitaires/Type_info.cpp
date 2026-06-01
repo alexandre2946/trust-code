@@ -18,22 +18,18 @@
 #include <Synonyme_info.h>
 
 // B.Mathieu, 08/2004
-//  Le processus d'initialisation de ces membres statiques est tres
-//  important : il faut absolument qu'ils soient initialises AVANT
-//  le premier appel au constructeur Type_info::Type_info(...).
-//  Or ce constructeur est appele pour initialiser le membre statique info_obj
-//  de tous les Objet_U.
-//  Risque de "static initialization order fiasco"
-//    (voir http://www.parashift.com/c++-faq-lite/ctors.html   [10.11])
-//  Pour l'instant c'est ok parce qu'on initialise avec une constante...
+//  The initialization of these static members is very important: they MUST be initialized
+//  BEFORE the first call to the constructor Type_info::Type_info(...).
+//  That constructor is called when initializing the static member info_obj of all Objet_U objects.
+//  Risk of "static initialization order fiasco"
+//    (see http://www.parashift.com/c++-faq-lite/ctors.html   [10.11])
+//  Currently OK because initialization is done with a constant value.
 
-// Tableau de pointeurs sur les types enregistres lors de la construction
-// des Type_info. Si plusieurs types on le meme nom (Type_info::n), alors
-// on n'en enregistre qu'un seul dans Type_info::les_types.
+// Array of pointers to types registered during construction of Type_info objects.
+// If multiple types share the same name (Type_info::n), only one is registered in Type_info::les_types.
 const Type_info** Type_info::les_types=0;
-// Pour chaque elements du tableau "les_types", ce nombre vaut 1 si le
-// nom du type est commun a plusieurs types, 0 sinon.
-// Voir "ajouter_type"
+// For each element of the "les_types" array, this value is 1 if the type name
+// is shared by multiple types, 0 otherwise. See "ajouter_type".
 int * Type_info::types_homonymes=0;
 
 int Type_info::nb_classes=0;
@@ -57,11 +53,10 @@ static inline int strcmp_uppercase(const char *n1, const char *n2)
   return delta;
 }
 
-// GF pour liberer correctement la memoire il faut au moins detruire
-// le Nom
+// GF: to correctly free memory, at minimum the Nom must be destroyed.
 Type_info::~Type_info()
 {
-  // On cherche ou retirer le type dans le tableau :
+  // Find where to remove the type in the array:
   int index;
   int existe_deja = search_type_info_name(name(), index);
   if (existe_deja)
@@ -90,24 +85,26 @@ Type_info::~Type_info()
     }
 }
 
-/*! @brief Recherche le type de nom "nom" dans la liste de types enregistres par une recherche binaire.
+/*! @brief Searches for the type named "nom" in the list of registered types using binary search.
  *
- *   On compare les chaines converties en majuscules.
- *   On range dans "index" l'indice du type, s'il a ete trouve
- *   et sinon l'indice du type juste apres (dans ce cas, on a
- *    les_types[index-1]->n < nom < les_types[index]->n )
- *   Si le type a ete trouve on renvoie 1, sinon 0.
+ * Strings are compared after conversion to uppercase.
+ * On return, "index" holds the index of the found type, or the index of the first type after it
+ * if not found (i.e. les_types[index-1]->n < nom < les_types[index]->n).
+ * Returns 1 if found, 0 otherwise.
  *
+ * @param nom The type name to search for.
+ * @param index On return, the index of the type or the insertion point.
+ * @return 1 if the type was found, 0 otherwise.
  */
 int Type_info::search_type_info_name(const char *nom, int& index)
 {
   assert(nom != 0);
-  // [imin..imax] est l'intervalle ou se trouve l'index recherche
+  // [imin..imax] is the interval where the searched index lies
   int imin = 0;
   int imax = nb_classes;
   while (imax > imin)
     {
-      // On a toujours milieu < imax
+      // milieu is always < imax
       int milieu = (imin + imax) / 2;
       int comparaison = strcmp_uppercase(nom, les_types[milieu]->name());
       if (comparaison == 0)
@@ -117,26 +114,24 @@ int Type_info::search_type_info_name(const char *nom, int& index)
         }
       if (comparaison < 0)
         {
-          // nom < les_types[milieu]
-          // l'index recherche est donc inferieur ou egal a "milieu"
+          // nom < les_types[milieu]: searched index is <= milieu
           imax = milieu;
         }
       else
         {
-          // nom > les_types[milieu]
-          // l'index recherche est donc strictement superieur a "milieu"
+          // nom > les_types[milieu]: searched index is strictly > milieu
           imin = milieu + 1;
         }
     }
   index = imax;
   return 0;
 }
-/*! @brief Constructeur par un nom, un tableau de meres.
+/*! @brief Constructor from a name and an array of base types.
  *
- * @param (const char* nom) le nom du type a creer
- * @param (int nb_base) le nombre de meres dans le tableau bases
- * @param (const Type_info* bases[]) le tableau specifiant les types de bases (meres) du type a creer
- * @throws Sort en erreur si le nom n'est pas defini (null)
+ * @param un_nom The name of the type to create.
+ * @param nb_base Number of base types in the bases array.
+ * @param the_bases Array specifying the base (parent) types of the type to create.
+ * @throws Exits with an error if the name is null.
  */
 Type_info::Type_info(const char* un_nom, int nb_base, const Type_info** the_bases) :
   names_(un_nom),
@@ -156,15 +151,15 @@ Type_info::Type_info(const char* un_nom, int nb_base, const Type_info** the_base
   ajouter_type(*this);
 }
 
-/*! @brief Constructeur par un nom, une fonction et un tableau de meres.
+/*! @brief Constructor from a name, a factory function, and an array of base types.
  *
- * La fonction permet de creer une instance du bon type.
+ * The function is used to create an instance of the appropriate type.
  *
- * @param (const char* nom) le nom du type a creer
- * @param (Objet_U* (*f)()) fonction pour creer une instance du type considere
- * @param (int nb_base) le nombre de meres dans le tableau bases[]
- * @param (const Type_info* bases[]) le tableau specifiant les types de bases (meres) du type a creer
- * @throws Sort en erreur si le nom donne n'est pas defini (null)
+ * @param un_nom The name of the type to create.
+ * @param f Factory function that creates an instance of this type.
+ * @param nb_base Number of base types in the bases array.
+ * @param the_bases Array specifying the base (parent) types of the type to create.
+ * @throws Exits with an error if the name is null.
  */
 Type_info::Type_info(const char* un_nom,
                      Objet_U* (*f)(),
@@ -187,10 +182,11 @@ Type_info::Type_info(const char* un_nom,
   ajouter_type(*this);
 }
 
-/*! @brief Methode statique appelee par les constructeurs de Type_info pour ajouter un nouveau type a la liste des types enregistres.
+/*! @brief Static method called by Type_info constructors to add a new type to the list of registered types.
  *
- *   Verifie que le nom du type n'existe pas encore.
+ * Verifies that the type name does not already exist.
  *
+ * @param type_info The Type_info to register.
  */
 void Type_info::ajouter_type(const Type_info& type_info)
 {
@@ -242,11 +238,11 @@ void Type_info::ajouter_type(const Type_info& type_info)
       synonym_name_ = new Nom(B);
       synonym_ = new Synonyme_info(synonym_name_->getChar(),name_->getChar());
     }
-  // Verifie qu'il y a assez de place dans le tableau :
+  // Check that there is enough space in the array:
   if (les_types_memsize <= nb_classes + 1)
     {
       static const int INCREMENT = 512;
-      // Plus assez de place dans le tableau: on redimensionne.
+      // Not enough space in the array: resize it.
       les_types_memsize += INCREMENT;
       const Type_info** nouveau = new const Type_info*[les_types_memsize];
       for (int j = 0; j < nb_classes; j++)
@@ -261,7 +257,7 @@ void Type_info::ajouter_type(const Type_info& type_info)
       types_homonymes = temp;
     }
 
-  // On cherche ou mettre le type dans le tableau :
+  // Find where to insert the type in the array:
   int existe_deja=Synonyme_info::est_un_synonyme(type_info.name());
   if (existe_deja)
     {
@@ -273,8 +269,8 @@ void Type_info::ajouter_type(const Type_info& type_info)
   if (existe_deja)
     {
       types_homonymes[index] = 1;
-      // GF: si on a un homonyme que la macro string_macro_trio fonctionne
-      // on a un pb sauf pour les iterateurs
+      // GF: if we have a homonym and the string_macro_trio macro works,
+      // there is a problem except for iterators
       if (strcmp(string_macro_trio("VECT",titi),"VECT"))
         {
           if (strncmp(type_info.name(),"Iterateur_",10))
@@ -286,7 +282,7 @@ void Type_info::ajouter_type(const Type_info& type_info)
     }
   else
     {
-      // Ajout du type dans le tableau a l'indice "index":
+      // Insert the type in the array at position "index":
       for (int j = nb_classes; j > index; j--)
         {
           les_types[j] = les_types[j-1];
@@ -298,10 +294,10 @@ void Type_info::ajouter_type(const Type_info& type_info)
     }
 }
 
-/*! @brief Ecriture des bases du type considere sur un flot de sortie
+/*! @brief Writes the base types of the current type to an output stream.
  *
- * @param (Sortie& os) flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param os Output stream.
+ * @return Reference to the modified output stream.
  */
 Sortie& Type_info::bases(Sortie& os) const
 {
@@ -311,10 +307,10 @@ Sortie& Type_info::bases(Sortie& os) const
   return os << finl;
 }
 
-/*! @brief Ecriture de toute la hierarchie du type considere sur un flix de sortie
+/*! @brief Writes the full hierarchy of the considered type to an output stream.
  *
- * @param (Sortie& os) flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Type_info::hierarchie(Sortie& os)
 {
@@ -328,14 +324,13 @@ Sortie& Type_info::hierarchie(Sortie& os)
   return os << flush;
 }
 
-/*! @brief Instanciation d'un Objet_U du type indique S'il existe une classe T dont le Type_info a
+/*! @brief Instantiates an Objet_U of the given type. If a class T whose Type_info has the name typ exists,
  *
- *      le nom typ, alors instance renvoie un pointeur
- *      sur une nouvelle instance de T.
- *      renvoie le pointeur nul sinon.
+ *      instance returns a pointer to a new instance of T.
+ *      Returns the null pointer otherwise.
  *
- * @param (const char* typ) chaine de caractere associee a un type
- * @return (Objet_U*) pointeur sur un nouvel Objet_U du type typ
+ * @param (const char* typ) string associated with a type
+ * @return (Objet_U*) pointer to a new Objet_U of type typ
  */
 Objet_U* Type_info::instance(const char* typ)
 {
@@ -348,7 +343,7 @@ Objet_U* Type_info::instance(const char* typ)
   return instance;
 }
 
-/*! @brief Cree une instance de la classe associee au type_info.
+/*! @brief Creates an instance of the class associated with the type_info.
  *
  */
 Objet_U* Type_info::instance() const
@@ -364,13 +359,12 @@ Objet_U* Type_info::instance() const
   return ainstance;
 }
 
-/*! @brief Test d'existence d'une classe du type indique si il existe une classe T dont le Type_info a
+/*! @brief Tests whether a class of the given type exists. If a class T whose Type_info has the name nom exists,
  *
- *      le nom nom, alors est_un_type renvoie 1
- *      renvoie le pointeur nul sinon.
+ *      est_un_type returns 1, null pointer otherwise.
  *
- * @param (const char* nom) chaine de caractere associee a un type
- * @return (int) code de retour (0 ou  1)
+ * @param (const char* nom) string associated with a type
+ * @return (int) return code (0 or 1)
  */
 int Type_info::est_un_type(const char* nom)
 {
@@ -378,27 +372,24 @@ int Type_info::est_un_type(const char* nom)
   return (type != 0);
 }
 
-/*! @brief Test d'appartenance d'un type dans les types de bases du type considere si direct == 0
+/*! @brief Tests whether a type belongs to the base types of the considered type. If direct == 0,
  *
- *      renvoie 1 si (*p) fait partie des bases de (*this)
- *      renvoie 0 sinon.
- *      si direct != 0
- *      renvoie 1 si (*p) fait partie des bases de (*this)
- *      ou des meres directes ou non de (*this)
- *      renvoie 0 sinon.
+ *      returns 1 if (*p) is among the bases of (*this), 0 otherwise.
+ *      If direct != 0, returns 1 if (*p) is among the bases of (*this)
+ *      or any direct or indirect parent of (*this), 0 otherwise.
  *
- * @param (const Type_info* p) le pointeur sur le type a rechercher
- * @param (int direct) 0 pour une recherche dans toute la hierarchie des bases, non nul pour une recherche directe
- * @return (int) code de retour (0 ou 1)
+ * @param (const Type_info* p) pointer to the type to search for
+ * @param (int direct) 0 to search the entire base hierarchy, non-zero for a direct search
+ * @return (int) return code (0 or 1)
  */
 int Type_info::has_base(const Type_info* p, int direct) const
 {
-  //recherche de p->name() dans b
-  // si trouve return 1
-  // sinon si pas direct return 0;
-  //        sinon recherche dans les bases de b
-  // Modif de B. Mathieu: test uniquement sur l'adresse du type_info,
-  // pas sur le nom du type...
+  // Search for p->name() in b
+  // if found return 1
+  // else if not direct return 0;
+  //      else search in the bases of b
+  // B. Mathieu modification: test only on the address of type_info,
+  // not on the type name...
   if (p == 0)
     {
       return 0;
@@ -416,7 +407,7 @@ int Type_info::has_base(const Type_info* p, int direct) const
               return 1;
           if (!direct)
             {
-              // Verifier les ancetres de niveau superieur
+              // Verify ancestors at higher levels
               for (int i = 0; i < nb_bases_; i++)
                 if (b[i]->has_base(p, direct)) return 1;
             }
@@ -425,37 +416,33 @@ int Type_info::has_base(const Type_info* p, int direct) const
   return 0;
 }
 
-/*! @brief Test d'appartenance d'un type dans les types de bases du type considere Le type a rechercher est identifie par son nom
+/*! @brief Tests whether a type belongs to the base types of the considered type. The type to search for is identified by its name.
  *
- *      si direct == 0
- *      renvoie 1 si le type de nom name fait partie des bases de (*this)
- *      renvoie 0 sinon.
- *      si direct != 0
- *      renvoie 1 si le type de nom name fait partie des bases de (*this)
- *      ou des meres directes ou non de (*this)
- *      renvoie 0 sinon.
+ *      If direct == 0, returns 1 if the type named name is among the bases of (*this), 0 otherwise.
+ *      If direct != 0, returns 1 if the type named name is among the bases of (*this)
+ *      or any direct or indirect parent of (*this), 0 otherwise.
  *
- * @param (const Nom& name) le nom du type a rechercher
- * @param (int direct) 0 pour une recherche dans toute la hierarchie des bases, non nul pour une recherche directe
- * @return (int) code de retour (0 ou 1)
+ * @param (const Nom& name) the name of the type to search for
+ * @param (int direct) 0 to search the entire base hierarchy, non-zero for a direct search
+ * @return (int) return code (0 or 1)
  */
 int Type_info::has_base(const Nom& aname, int direct) const
 {
-  //recherche de aname dans b
-  // si trouve return 1
-  // sinon si pas direct return 0;
-  //        sinon recherche dans les bases de b
-  // Modif B. Mathieu: comparaison des adresses du Type_info uniquement,
-  //                   pas du nom du type.
+  // Search for aname in b
+  // if found return 1
+  // else if not direct return 0;
+  //      else search in the bases of b
+  // B. Mathieu modification: compare Type_info addresses only,
+  //                          not the type name.
 
   const Type_info * type = type_info_from_name(aname);
   int resultat = has_base(type, direct);
   return resultat;
 }
 
-/*! @brief Comparaison sur le nom d'un type Retourne 1 si les chaines de caracteres des noms du type considere et du nom indique sont identiques
+/*! @brief Comparison on the name of a type. Returns 1 if the name string of the considered type and the given name are identical.
  *
- *      Retour 0 sinon
+ *      Returns 0 otherwise.
  *
  */
 int Type_info::same(const Nom& other_name) const
@@ -463,7 +450,7 @@ int Type_info::same(const Nom& other_name) const
   return strcmp(name(),other_name)==0;
 }
 
-/*! @brief Renvoie 1 si this==p, 0 sinon.
+/*! @brief Returns 1 if this==p, 0 otherwise.
  *
  */
 int Type_info::same(const Type_info* p) const
@@ -471,17 +458,17 @@ int Type_info::same(const Type_info* p) const
   return (this == p);
 }
 
-/*! @brief Donne les noms des sous-types, un type mere etant donne
+/*! @brief Returns the names of the subtypes for a given parent type.
  *
- * @param (const Type_info& mere) le type sur lequel rechercher les sous-types
- * @param (Noms& les_sous_types) les noms des sous-types
- * @return (int) nombre de sous-types retournes
+ * @param (const Type_info& mere) the parent type to search subtypes of
+ * @param (Noms& les_sous_types) the names of the subtypes
+ * @return (int) number of subtypes returned
  */
 int Type_info::les_sous_types(const Type_info& mere, Noms& les_sous_types)
 {
   int compteur=0;
   int i= nb_classes;
-  // Modif B. Mathieu: name() ne renvoie plus un static.
+  // Modif B. Mathieu: name() no longer returns a static.
   const Nom& nom_mere = mere.name();
   // Cerr << "---------" << (const char*) nom_mere << finl;
   while(i--)
@@ -508,12 +495,12 @@ int Type_info::les_sous_types(const Type_info& mere, Noms& les_sous_types)
   return compteur;
 }
 
-/*! @brief Donne les noms des sous-types, un type mere etant donne par son nom
+/*! @brief Returns the names of the subtypes for a parent type identified by name.
  *
- * @param (const Nom& type) le nom du type sur lequel rechercher les sous-types
- * @param (Noms& les_sous_types) les noms des sous-types
- * @return (int) nombre de sous-types retournes
- * @throws Sort en erreur si le nom indique ne correspond pas a un type existant dans TRUST
+ * @param (const Nom& type) the name of the parent type to search subtypes of
+ * @param (Noms& les_sous_types) the names of the subtypes
+ * @return (int) number of subtypes returned
+ * @throws Exits with an error if the given name does not correspond to a type known to TRUST
  */
 int Type_info::les_sous_types(const Nom& type, Noms& sous_types)
 {
@@ -534,10 +521,9 @@ int Type_info::les_sous_types(const Nom& type, Noms& sous_types)
   return 0;
 }
 
-/*! @brief Methode statique qui renvoie un pointeur vers le Type_info dont le nom est "type_name".
+/*! @brief Static method that returns a pointer to the Type_info whose name is "type_name".
  *
- * Si type_name n'est pas un type,
- *   renvoie un pointeur nul.
+ * If type_name is not a known type, returns a null pointer.
  *
  */
 
@@ -555,8 +541,8 @@ const Type_info * Type_info::type_info_from_name(const char * type_name)
             }
           else
             {
-              // Le type est enregistre mais le nom correspond
-              // a plusieurs types...
+              // The type is registered but the name corresponds
+              // to multiple types...
               Cerr << "const Type_info * Type_info::type_info_from_name(const char * type_name)\n";
               Cerr << " The type " << type_name << " has several homonymous\n";
               Cerr << " We doing as if the type is unknown..." << finl;
@@ -566,7 +552,7 @@ const Type_info * Type_info::type_info_from_name(const char * type_name)
   return type_info;
 }
 
-/*! @brief Renvoie 1 si le type associe est instanciable (cree_instance non nul) renvoie 0 sinon.
+/*! @brief Returns 1 if the associated type is instantiable (cree_instance is non-null), 0 otherwise.
  *
  */
 int Type_info::instanciable() const

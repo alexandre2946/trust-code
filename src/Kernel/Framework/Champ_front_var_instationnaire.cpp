@@ -17,10 +17,10 @@
 
 Implemente_base(Champ_front_var_instationnaire,"Champ_front_var_instationnaire",Champ_front_var);
 
-/*! @brief Imprime le nom du champ sur un flot de sortie
+/*! @brief Prints the field name on an output stream
  *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& s) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Champ_front_var_instationnaire::printOn(Sortie& s ) const
 {
@@ -28,10 +28,10 @@ Sortie& Champ_front_var_instationnaire::printOn(Sortie& s ) const
 }
 
 
-/*! @brief NE FAIT RIEN A surcharger dans les classes derivees
+/*! @brief DOES NOTHING TO override in derived classes
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
  */
 Entree& Champ_front_var_instationnaire::readOn(Entree& s )
 {
@@ -39,7 +39,7 @@ Entree& Champ_front_var_instationnaire::readOn(Entree& s )
 }
 
 
-/*! @brief Surcharge Champ_front_base::fixer_nb_valeurs_temporelles
+/*! @brief Overrides Champ_front_base::fixer_nb_valeurs_temporelles
  *
  */
 void Champ_front_var_instationnaire::fixer_nb_valeurs_temporelles(int nb_cases)
@@ -47,9 +47,9 @@ void Champ_front_var_instationnaire::fixer_nb_valeurs_temporelles(int nb_cases)
   les_valeurs->fixer_nb_cases(nb_cases);
 }
 
-/*! @brief Initialise le temps courant et Gpoint
+/*! @brief Initializes the current time and Gpoint
  *
- * @param (double tps) le temps de mise a jour
+ * @param (double tps) the update time
  */
 int Champ_front_var_instationnaire::initialiser(double temps, const Champ_Inc_base& inco)
 {
@@ -82,9 +82,9 @@ bool Champ_front_var_instationnaire::has_valeurs_au_temps(double temps) const
   return false;
 }
 
-/*! @brief Renvoie les valeurs au temps desire.
+/*! @brief Returns the values at the desired time.
  *
- * Sinon, sort en erreur.
+ * Otherwise, exits with an error.
  *
  */
 DoubleTab& Champ_front_var_instationnaire::valeurs_au_temps(double temps)
@@ -103,9 +103,9 @@ DoubleTab& Champ_front_var_instationnaire::valeurs_au_temps(double temps)
   return valeurs(); // For compilers
 }
 
-/*! @brief Renvoie les valeurs au temps desire.
+/*! @brief Returns the values at the desired time.
  *
- * Sinon, sort en erreur.
+ * Otherwise, exits with an error.
  *
  */
 const DoubleTab& Champ_front_var_instationnaire::valeurs_au_temps(double temps) const
@@ -124,15 +124,15 @@ const DoubleTab& Champ_front_var_instationnaire::valeurs_au_temps(double temps) 
   return valeurs(); // For compilers
 }
 
-/*! @brief Avance jusqu'au temps desire.
+/*! @brief Advances to the desired time.
  *
- * Sinon, sort en erreur.
+ * Otherwise, exits with an error.
  *
  */
 int Champ_front_var_instationnaire::avancer(double temps)
 {
 
-  // S"agit-il bien d'une avance en temps ?
+  // Is it indeed an advance in time?
   assert(temps>les_valeurs->temps());
 
   for(int i=1; i<les_valeurs->nb_cases(); i++)
@@ -150,15 +150,15 @@ int Champ_front_var_instationnaire::avancer(double temps)
   return 0;
 }
 
-/*! @brief Recule jusqu'au temps desire.
+/*! @brief Goes back to the desired time.
  *
- * Sinon, sort en erreur.
+ * Otherwise, exits with an error.
  *
  */
 int Champ_front_var_instationnaire::reculer(double temps)
 {
 
-  // S"agit-il bien d'un recul en temps ?
+  // Is it indeed a rewind in time?
   assert(temps<les_valeurs->temps());
 
   for(int i=les_valeurs->nb_cases()-1; i>=1; i++)

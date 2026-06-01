@@ -25,21 +25,21 @@ class Solveur_Implicite_base : public  Objet_U
 public :
   virtual bool iterer_eqn(Equation_base& equation, const DoubleTab& inconnue, DoubleTab& result, double dt, int numero_iteration, int& ok) =0;
   virtual bool iterer_eqs(LIST(OBS_PTR(Equation_base)) eqs, int n, int& ok);
-  virtual bool est_compatible_avec_th_mono() const /* ce solveur est-il  compatible avec une resolution monolithique de la thermique ? */
+  virtual bool est_compatible_avec_th_mono() const /* is this solver compatible with a monolithic thermal resolution? */
   {
-    return 1; /* par defaut oui */
+    return 1; /* default: yes */
   }
-  virtual int nb_valeurs_temporelles_pression() const /* nombre de valeurs temporelles des champs de pression dont le solveur a besoin */
+  virtual int nb_valeurs_temporelles_pression() const /* number of temporal values of pressure fields needed by the solver */
   {
-    return 1; /* par defaut 1 */
+    return 1; /* default: 1 */
   }
-  virtual double get_default_facsec_max() const /* facsec_max recommande pour ce schema */
+  virtual double get_default_facsec_max() const /* recommended facsec_max for this scheme */
   {
-    return DMAXFLOAT; /* par defaut pas de limite : on est en implicite */
+    return DMAXFLOAT; /* default: no limit (we are in implicit) */
   }
-  virtual double get_default_growth_factor() const /* taux de croissance du pas de temps */
+  virtual double get_default_growth_factor() const /* time step growth factor */
   {
-    return DMAXFLOAT; /* par defaut pas de limite : on est en implicite */
+    return DMAXFLOAT; /* default: no limit (we are in implicit) */
   }
   virtual OWN_PTR(Parametre_equation_base)& get_and_set_parametre_equation(Equation_base&);
   Parametre_implicite& get_and_set_parametre_implicite(Equation_base& eqn)

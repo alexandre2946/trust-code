@@ -21,7 +21,7 @@
 
 class Nom;
 
-/*! @brief Classe Extraire_domaine Lecture d'un fichier
+/*! @brief Class Extraire_domaine Reading a file
  *
  * @sa Interprete
  */

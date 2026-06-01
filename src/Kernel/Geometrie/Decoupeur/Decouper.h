@@ -27,8 +27,8 @@ enum class DomainesFileOutputType { BINARY_MULTIPLE, HDF5_SINGLE };
 
 /*! @brief Interprete Decouper.
  *
- * Aucun algorithme ici, uniquement lecture de parametres dans le fichier .data et execution du partitionneur
- *   et du decoupeur. Voir la methode interprete()
+ * No algorithm here, only reading of parameters from the .data file and execution of the partitioner
+ *   and the cutter. See the interprete() method.
  *
  */
 template <typename _SIZE_>
@@ -47,12 +47,12 @@ public:
   using Partitionneur_base_t = Partitionneur_base_32_64<_SIZE_>;
   using Static_Int_Lists_t = Static_Int_Lists_32_64<_SIZE_>;
 
-  Entree& lire(Entree& is);                 //lecture des parametres
+  Entree& lire(Entree& is);                 //reading of parameters
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
   Entree& interpreter(Entree& is) override;
 
-  /** Ecriture d'une partition elem_part donnee
-   *   som_raccord (optionnel) : som_raccord[s] -> process auxquels est raccorde le sommet s par un raccord a un autre domaine
+  /** Writing of a given elem_part partition.
+   *   som_raccord (optional) : som_raccord[s] -> processes to which vertex s is connected by a connector to another domain.
    */
   void ecrire(const Static_Int_Lists_t *som_raccord=nullptr);
 
@@ -66,7 +66,7 @@ protected:
   // Result of the partitionning process:
   BigIntVect_t elem_part_;
 
-  // Parametres du decoupage (remplis par lire()):
+  // Splitting parameters (filled by lire()):
   Nom nom_domaine_;
   int epaisseur_joint_ = 1;
   Nom nom_domaines_decoup_ = "?";

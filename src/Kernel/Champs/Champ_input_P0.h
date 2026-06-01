@@ -21,8 +21,8 @@
 
 /*! @brief class Champ_input_P0
  *
- *      Cette classe represente un champ accessible par setInputField
- *      defini sur le domane avec une valeur par element.
+ *      This class represents a field accessible via setInputField
+ *      defined on the domain with one value per element.
  *
  *
  * @sa Champ_Input_Proto

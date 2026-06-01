@@ -19,7 +19,7 @@
 #include <TRUSTTabs_forward.h>
 #include <Matrice_Base.h>
 
-/*! @brief Classe Matrice_Diagonale Represente une matrice diagonale.
+/*! @brief Matrice_Diagonale class - Represents a diagonal matrix.
  *
  * @sa Matrice_Base
  */

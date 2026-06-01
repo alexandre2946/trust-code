@@ -19,11 +19,11 @@
 
 
 
-/*! @brief classe Champ_Critere_Q Permet de visualiser les tourbillons sans etre polluer par les gradients
+/*! @brief class Champ_Critere_Q Allows visualization of vortices without being polluted by gradients
  *
  *        = 0.5*(\Omega_{ij}*\Omega_{ij}-S_{ij}*S_{ij})
  *
- * @sa Classe abstraite, Methode abstraite, void me_calculer(double )
+ * @sa Abstract class, Abstract method, void me_calculer(double )
  */
 class Champ_Critere_Q
 {

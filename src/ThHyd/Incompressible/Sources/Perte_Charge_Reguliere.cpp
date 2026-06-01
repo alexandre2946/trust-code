@@ -73,14 +73,13 @@ Perte_Charge_Reguliere::Perte_Charge_Reguliere() : Perte_Charge( )
 
 }
 
-/*! @brief Lit les specifications d'une perte de charge reguliere a partir d'un flot d'entree.
+/*! @brief Reads the specifications of a regular pressure drop from an input stream.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws mot cle inattendu, on attendait "X","Y" ou "Z"
- * @throws mot cle inattendu, on attendait "d"
- * @throws mot cle inattendu, on attendait "longitudinale" ou
- * "transversale"
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
+ * @throws unexpected keyword, expected "X","Y" or "Z"
+ * @throws unexpected keyword, expected "d"
+ * @throws unexpected keyword, expected "longitudinale" or "transversale"
  */
 Entree& Perte_Charge_Reguliere::lire_donnees(Entree& is)
 {

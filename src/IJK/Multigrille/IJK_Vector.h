@@ -19,11 +19,11 @@
 #include <TRUST_Vector.h>
 #include <TRUSTTab.h>
 
-/*! @brief classe IJK_Vector
+/*! @brief class IJK_Vector
  *
- *  - La classe template IJK_Vector derive de la classe template TRUST_Vector
+ *  - The template class IJK_Vector derives from the template class TRUST_Vector
  *
- *  - Elle demande 2 template arguments
+ *  - It requires 2 template arguments
  */
 template<template<typename, typename> class _TRUST_TABL_, typename _TYPE_, typename _TYPE_ARRAY_>
 class IJK_Vector: public TRUST_Vector<_TRUST_TABL_<_TYPE_, _TYPE_ARRAY_>>

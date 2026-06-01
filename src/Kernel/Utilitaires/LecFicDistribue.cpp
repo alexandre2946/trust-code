@@ -40,13 +40,13 @@ LecFicDistribue::~LecFicDistribue()
   EFichier::close();
 }
 
-/*! @brief Constructeur Ouvre le fichier avec les parametres mode et prot donnes
+/*! @brief Constructor. Opens the file with the given mode and prot parameters.
  *
- *     Ces parametres sont les parametres de la methode open standard
+ *     These parameters are the parameters of the standard open method.
  *
- * @param (const char* name) nom du fichier
- * @param (int mode) parametre passe a open
- * @param (int prot) parametre passe a open
+ * @param (const char* name) file name
+ * @param (int mode) parameter passed to open
+ * @param (int prot) parameter passed to open
  */
 LecFicDistribue::LecFicDistribue(const char* name, IOS_OPEN_MODE mode)
 {
@@ -54,11 +54,11 @@ LecFicDistribue::LecFicDistribue(const char* name, IOS_OPEN_MODE mode)
 }
 
 
-/*! @brief Ouvre le fichier avec les parametres mode et prot donnes Ces parametres sont les parametres de la methode open standard
+/*! @brief Opens the file with the given mode and prot parameters. These parameters are the parameters of the standard open method.
  *
- * @param (const char* name) nom du fichier
- * @param (int mode) parametre passe a open
- * @param (int prot) parametre passe a open
+ * @param (const char* name) file name
+ * @param (int mode) parameter passed to open
+ * @param (int prot) parameter passed to open
  * @return (Entree&) *this
  */
 int LecFicDistribue::ouvrir(const char* name, IOS_OPEN_MODE mode)

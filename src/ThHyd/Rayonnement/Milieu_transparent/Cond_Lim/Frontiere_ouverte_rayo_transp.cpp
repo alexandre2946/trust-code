@@ -31,7 +31,7 @@ int Frontiere_ouverte_rayo_transp::initialiser(double temps)
 {
   assert(!le_modele_rayo_);
 
-  // on recupere le modele rayo ... !
+  // retrieve the radiation model ... !
   const Probleme_base& this_pb = domaine_Cl_dis().equation().probleme();
   if (sub_type(Pb_Fluide_base, this_pb))
     {

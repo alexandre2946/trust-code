@@ -18,10 +18,10 @@
 
 #include <Loi_Etat_Binaire_GP_base.h>
 
-/*! @brief classe Loi_Etat_Binaire_GP_QC Cette classe represente la loi d'etat pour les melanges binaires.
+/*! @brief @brief State law class for binary ideal-gas mixtures in the quasi-compressible (QC) framework.
  *
- *      Associe a un fluide dilatable, elle definit un fluide binaire quasi compressible
- *      dont la loi d'eata est :
+ *      Associated with a dilatable fluid, it defines a binary quasi-compressible fluid
+ *      whose equation of state is:
  *         Pth = rho*R*T*(Y1/M1+Y2/M2)
  *
  * @sa Loi_Etat_Binaire_GP_base

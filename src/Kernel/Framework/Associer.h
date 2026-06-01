@@ -21,9 +21,9 @@
 
 #include <Interprete.h>
 
-/*! @brief classe Associer Interprete qui associe deux objets obj1 et obj2:
+/*! @brief Associer class, Interprete that associates two objects obj1 and obj2:
  *
- *      [DANS LE JEU DE DONNEES] Associer ob1 ob2
+ *      [IN THE DATASET] Associer ob1 ob2
  *
  * @sa Interprete
  */

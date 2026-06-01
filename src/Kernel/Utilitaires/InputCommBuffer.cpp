@@ -25,8 +25,8 @@ InputCommBuffer::InputCommBuffer()
   avoid_conversion_ = true;
   memorysize_ = 16;
   size_ = 0;
-  // On alloue toujours quelque chose (create_stream a besoin d'un octet au moins
-  // pour creer un stream de taille nulle)
+  // Always allocate something (create_stream needs at least one byte
+  // to create a stream of size zero)
   buffer_ = new char[memorysize_]();
   stream_ = 0;
 }
@@ -57,11 +57,10 @@ void InputCommBuffer::create_stream()
 {
   assert(stream_ == 0);
   assert(size_ >= 0);
-  // (Voir documentation de istrstream) :
-  // Si size_ > 0 istrstream(buf, size_) cree un buffer de taille size_.
-  // Si size_ = 0, istrstream(buf, size_) suppose que buf est une chaine
-  //  de caracteres terminee par zero. Pour creer un stream de taille nulle,
-  //  il faut donc faire ceci:
+  // (See documentation of istrstream):
+  // If size_ > 0, istrstream(buf, size_) creates a buffer of size size_.
+  // If size_ = 0, istrstream(buf, size_) assumes that buf is a null-terminated
+  //  string. To create a stream of size zero, do the following:
   if (size_ == 0)
     buffer_[0] = 0;
   stream_ = new istringstream(std::string(buffer_, size_));
@@ -74,11 +73,10 @@ void InputCommBuffer::create_stream_from_output_stream(OutputCommBuffer& output_
   const char nullchar = 0;
   const char * buffer = output_buf.get_buffer();
   const int size = output_buf.get_buffer_size();
-  // (Voir documentation de istrstream) :
-  // Si size_ > 0 istrstream(buf, size_) cree un buffer de taille size_.
-  // Si size_ = 0, istrstream(buf, size_) suppose que buf est une chaine
-  //  de caracteres terminee par zero. Pour creer un stream de taille nulle,
-  //  il faut donc faire ceci:
+  // (See documentation of istrstream):
+  // If size_ > 0, istrstream(buf, size_) creates a buffer of size size_.
+  // If size_ = 0, istrstream(buf, size_) assumes that buf is a null-terminated
+  //  string. To create a stream of size zero, do the following:
   if (size == 0)
     buffer = &nullchar;
   stream_ = new istringstream(std::string(buffer, size));

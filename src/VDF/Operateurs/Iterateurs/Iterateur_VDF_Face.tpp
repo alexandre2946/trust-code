@@ -60,7 +60,7 @@ void Iterateur_VDF_Face<_TYPE_>::ajouter_blocs(matrices_t mats, DoubleTab& secme
         ajouter_pour_compressible<ArrOfDouble>(ncomp, mats, secmem, semi_impl);
     }
 
-  // On multiplie les flux au bord par rho en hydraulique (sert uniquement a la sortie)
+  // Multiply boundary fluxes by rho in hydraulics (used only for output)
   if (!is_pb_multi) multiply_by_rho_if_hydraulique(tab_flux_bords);
 }
 
@@ -132,7 +132,7 @@ Iterateur_VDF_Face<_TYPE_>::ajouter_blocs_aretes_bords_(const int n_arete, const
             }
         }
 
-      // derivees : champ convecte
+      // derivatives: convected field
       Matrice_Morse *matrice = (is_pb_multi && is_conv_op_) ? (mats.count(nom_ch_inco_) && !semi_impl.count(nom_ch_inco_) ? mats.at(nom_ch_inco_) : nullptr) :
                                  (mats.count(nom_ch_inco_) ? mats.at(nom_ch_inco_) : nullptr);
       if (matrice)
@@ -175,7 +175,7 @@ Iterateur_VDF_Face<_TYPE_>::ajouter_blocs_aretes_bords_(const int n_arete, const
             for (int k = 0; k < ncomp; k++) tab_flux_bords(fac2, orientation(fac3)) -= 0.5 * signe * flux3[k];
         }
 
-      // derivees : champ convecte
+      // derivatives: convected field
       Matrice_Morse *matrice = (is_pb_multi && is_conv_op_) ? (mats.count(nom_ch_inco_) && !semi_impl.count(nom_ch_inco_) ? mats.at(nom_ch_inco_) : nullptr) :
                                  (mats.count(nom_ch_inco_) ? mats.at(nom_ch_inco_) : nullptr);
       if (matrice)
@@ -212,7 +212,7 @@ Iterateur_VDF_Face<_TYPE_>::ajouter_blocs_aretes_bords_(const int n_arete, const
 
       fill_resu_tab < Type_Double > (fac1, fac2, ncomp, flux1_2, secmem);
 
-      // derivees : champ convecte
+      // derivatives: convected field
       Matrice_Morse *matrice = (is_pb_multi && is_conv_op_) ? (mats.count(nom_ch_inco_) && !semi_impl.count(nom_ch_inco_) ? mats.at(nom_ch_inco_) : nullptr) :
                                  (mats.count(nom_ch_inco_) ? mats.at(nom_ch_inco_) : nullptr);
       if (matrice)
@@ -293,7 +293,7 @@ Iterateur_VDF_Face<_TYPE_>::ajouter_blocs_aretes_coins_(const int n_arete, const
             tab_flux_bords(fac1, orientation(fac3)) -= 0.5 * signe * flux[k];
         }
 
-      // derivees : champ convecte
+      // derivatives: convected field
       Matrice_Morse *matrice = (is_pb_multi && is_conv_op_) ? (mats.count(nom_ch_inco_) && !semi_impl.count(nom_ch_inco_) ? mats.at(nom_ch_inco_) : nullptr) :
                                  (mats.count(nom_ch_inco_) ? mats.at(nom_ch_inco_) : nullptr);
       if (matrice)
@@ -328,7 +328,7 @@ Iterateur_VDF_Face<_TYPE_>::ajouter_blocs_aretes_coins_(const int n_arete, const
           if (fac1 < n) tab_flux_bords(fac1, orientation(fac3)) -= 0.5 * signe * flux3[k];
         }
 
-      // derivees : champ convecte
+      // derivatives: convected field
       Matrice_Morse *matrice = (is_pb_multi && is_conv_op_) ? (mats.count(nom_ch_inco_) && !semi_impl.count(nom_ch_inco_) ? mats.at(nom_ch_inco_) : nullptr) :
                                  (mats.count(nom_ch_inco_) ? mats.at(nom_ch_inco_) : nullptr);
       if (matrice)
@@ -364,7 +364,7 @@ Iterateur_VDF_Face<_TYPE_>::ajouter_blocs_aretes_coins_(const int n_arete, const
           secmem(fac2, k) -= 0.5 * flux1_2[k];
         }
 
-      // derivees : champ convecte
+      // derivatives: convected field
       Matrice_Morse *matrice = (is_pb_multi && is_conv_op_) ? (mats.count(nom_ch_inco_) && !semi_impl.count(nom_ch_inco_) ? mats.at(nom_ch_inco_) : nullptr) :
                                  (mats.count(nom_ch_inco_) ? mats.at(nom_ch_inco_) : nullptr);
       if (matrice)
@@ -403,7 +403,7 @@ template <class _TYPE_> template <bool should_calc_flux, Type_Flux_Arete Arete_T
 std::enable_if_t<Arete_Type == Type_Flux_Arete::INTERNE || Arete_Type == Type_Flux_Arete::MIXTE, void>
 Iterateur_VDF_Face<_TYPE_>::ajouter_blocs_aretes_generique_(const int debut, const int fin, const int ncomp, matrices_t mats, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  // XXX : tab_flux_bords rempli seulement si MIXTE ... ie pas INTERNE !
+  // XXX : tab_flux_bords filled only if MIXTE ... i.e. not INTERNE!
   if (should_calc_flux)
     {
       constexpr bool is_MIXTE = (Arete_Type == Type_Flux_Arete::MIXTE);
@@ -466,7 +466,7 @@ Iterateur_VDF_Face<_TYPE_>::ajouter_blocs_aretes_generique_(const int debut, con
             }
         }
 
-      // derivees : champ convecte
+      // derivatives: convected field
       Matrice_Morse *matrice = (is_pb_multi && is_conv_op_) ? (mats.count(nom_ch_inco_) && !semi_impl.count(nom_ch_inco_) ? mats.at(nom_ch_inco_) : nullptr) : (mats.count(nom_ch_inco_) ? mats.at(nom_ch_inco_) : nullptr);
       if (matrice)
         for (int n_arete = debut; n_arete < fin; n_arete++)
@@ -519,7 +519,7 @@ void Iterateur_VDF_Face<_TYPE_>::ajouter_blocs_fa7_sortie_libre(const int ncomp,
 template <class _TYPE_> template <bool should_calc_flux, Type_Flux_Fa7 Fa7_Type, typename Type_Double>
 void Iterateur_VDF_Face<_TYPE_>::ajouter_blocs_fa7_sortie_libre_(const int num_cl, const int ncomp , matrices_t mats, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  // TODO : FIXME : tab_flux_bords pas rempli ...
+  // TODO : FIXME : tab_flux_bords not filled ...
   if (should_calc_flux)
     {
       Type_Double flux(ncomp), aii(ncomp), ajj(ncomp);
@@ -542,7 +542,7 @@ void Iterateur_VDF_Face<_TYPE_>::ajouter_blocs_fa7_sortie_libre_(const int num_c
             for (int k = 0; k < ncomp; k++) secmem(face, k) -= flux[k];
         }
 
-      // derivees : champ convecte
+      // derivatives: convected field
       Matrice_Morse *matrice = (is_pb_multi && is_conv_op_) ? (mats.count(nom_ch_inco_) && !semi_impl.count(nom_ch_inco_) ? mats.at(nom_ch_inco_) : nullptr) :
                                  (mats.count(nom_ch_inco_) ? mats.at(nom_ch_inco_) : nullptr);
       if (matrice)
@@ -588,7 +588,7 @@ void Iterateur_VDF_Face<_TYPE_>::ajouter_blocs_fa7_elem(const int ncomp, matrice
           for (int k = 0; k < ncomp; k++) tab_flux_bords(fac2, orientation(fac2)) -= flux[k];
       }
 
-  // derivees : champ convecte
+  // derivatives: convected field
   Matrice_Morse *matrice = (is_pb_multi && is_conv_op_) ? (mats.count(nom_ch_inco_) && !semi_impl.count(nom_ch_inco_) ? mats.at(nom_ch_inco_) : nullptr) :
                              (mats.count(nom_ch_inco_) ? mats.at(nom_ch_inco_) : nullptr);
   if (matrice)
@@ -633,7 +633,7 @@ void Iterateur_VDF_Face<_TYPE_>::corriger_fa7_elem_periodicite(const int ncomp, 
               for (int k = 0; k < ncomp; k++) secmem(face, k) += signe * flux[k];
             }
 
-          // derivees : champ convecte
+          // derivatives: convected field
           if (matrice)
             for (int face = ndeb; face < nfin; face++)
               {
@@ -693,10 +693,10 @@ void Iterateur_VDF_Face<_TYPE_>::corriger_fa7_elem_periodicite__(const int face,
 template<class _TYPE_> template<typename Type_Double>
 void Iterateur_VDF_Face<_TYPE_>::ajouter_pour_compressible(const int ncomp, matrices_t mats, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  // on a secmem calcule comme : div(alpha rho v x v)
+  // secmem is computed as: div(alpha rho v x v)
   const DoubleTab& vit = le_champ_convecte_ou_inc->valeurs();
 
-  // etape 1 : calcule de la terme div(alpha rho v)
+  // step 1: compute the term div(alpha rho v)
   DoubleTrav unite(secmem), resu(secmem);
   unite  = 1.;
   resu = 0.;
@@ -712,10 +712,10 @@ void Iterateur_VDF_Face<_TYPE_>::ajouter_pour_compressible(const int ncomp, matr
   ajouter_blocs_fa7_sortie_libre<Type_Double>(ncomp, mats, resu, tabsT);
   ajouter_blocs_fa7_elem<Type_Double>(ncomp, mats, resu, tabsT);
 
-  // etape 2 : on multiplie par v pour avoir : v . div(alpha rho v)
+  // step 2: multiply by v to obtain: v . div(alpha rho v)
   resu *= vit;
 
-  // etape 3 : finalement,  alpha rho v grad v = div(alpha rho v x v) - v . div(alpha rho v)
+  // step 3: finally, alpha rho v grad v = div(alpha rho v x v) - v . div(alpha rho v)
   secmem -= resu;
 }
 

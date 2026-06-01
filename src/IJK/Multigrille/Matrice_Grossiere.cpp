@@ -24,7 +24,7 @@ void Matrice_Grossiere::add_virt_bloc(int pe, int& count, int imin, int jmin, in
   const int nk = renum_.dimension(0) - 2;
   if (pe == Process::me())
     {
-      // Frontiere periodique avec cote oppose sur meme processeur
+      // Periodic boundary with the opposite side on the same processor
       for (int k = kmin; k < kmax; k++)
         for (int j = jmin; j < jmax; j++)
           for (int i = imin; i < imax; i++)
@@ -38,7 +38,7 @@ void Matrice_Grossiere::add_virt_bloc(int pe, int& count, int imin, int jmin, in
     }
   else
     {
-      // cas ou la frontiere nest pas des deux cotes sur le meme proc...
+      // case where the boundary is not on both sides on the same proc...
 
       virt_blocs.append_array(count);
 
@@ -75,7 +75,7 @@ void Matrice_Grossiere::add_dist_bloc(int pe, int imin, int jmin, int kmin,
 void Matrice_Grossiere::interpolation_for_shear_periodicity(const int i, const int send_i /*offset2*/, const double istmp/*istmp*/,
                                                             const int real_size_i /*ni*/, const double shear_perio)
 {
-  // renvoi la valeur interpolee pour la condition de shear-periodicity
+  // returns the interpolated value for the shear-periodicity condition
   const int nb_points = order_interpolation_poisson_solver_+1;
   ArrOfInt x;
   ArrOfDouble a;
@@ -168,7 +168,7 @@ void Matrice_Grossiere::interpolation_for_shear_periodicity(const int i, const i
 }
 
 
-/*! @brief ajoute deux coefficients diagonal/extra-diagonal a la matrice
+/*! @brief Adds two diagonal/off-diagonal coefficients to the matrix
  *
  */
 void Matrice_Grossiere::ajoute_coeff(int i, int j, int k,
@@ -180,15 +180,15 @@ void Matrice_Grossiere::ajoute_coeff(int i, int j, int k,
 
   const bool voisin_shear = !(shear_perio == 0.);
 
-  // coefficient extra diagonal (- surface_face / distance_centres_elements)
+  // off-diagonal coefficient (- face_area / distance_between_element_centres)
   const double x = -coeff;
   if (indice_voisin > indice)
     {
-      // Coefficient dans la partie triangulaire superieure, a stocker.
+      // Coefficient in the upper triangular part, to be stored.
       const int nreels = coeff_diag_.size_array();
       if (indice_voisin < nreels)
         {
-          // Element reel
+          // Real element
 
           if(voisin_shear)
             {
@@ -217,7 +217,7 @@ void Matrice_Grossiere::ajoute_coeff(int i, int j, int k,
         }
       else
         {
-          // Element virtuel
+          // Virtual element
 
           if(voisin_shear)
             {
@@ -247,11 +247,11 @@ void Matrice_Grossiere::ajoute_coeff(int i, int j, int k,
         }
     }
 
-  // Contribution a la diagonale
+  // Contribution to the diagonal
   coeff_diag_[indice] -= x;
 }
 
-/*! @brief ajoute deux coefficients diagonal/extra-diagonal a la matrice
+/*! @brief Adds two diagonal/off-diagonal coefficients to the matrix
  *
  */
 void Matrice_Grossiere::ajoute_coeff2(int i, int j, int k,
@@ -263,13 +263,13 @@ void Matrice_Grossiere::ajoute_coeff2(int i, int j, int k,
 
   const bool voisin_shear = !(shear_perio == 0.);
 
-  // coefficient extra diagonal (- surface_face / distance_centres_elements)
+  // off-diagonal coefficient (- face_area / distance_between_element_centres)
   const double x = -coeff;
 
   const int nreels = coeff_diag_.size_array();
   if ( (0 <= indice_voisin) && ( indice_voisin < nreels ) )
     {
-      // Element reel
+      // Real element
 
       if(voisin_shear)
         {
@@ -298,7 +298,7 @@ void Matrice_Grossiere::ajoute_coeff2(int i, int j, int k,
     }
   else
     {
-      // Element virtuel
+      // Virtual element
 
       if(voisin_shear)
         {
@@ -327,7 +327,7 @@ void Matrice_Grossiere::ajoute_coeff2(int i, int j, int k,
 
     }
 
-  // Contribution a la diagonale
+  // Contribution to the diagonal
   coeff_diag_[indice] -= x;
 }
 
@@ -338,11 +338,11 @@ void Matrice_Grossiere::ajoute_coeff(int i, int j, int k,
   const int indice=renum(i, j, k);
   const int indice_voisin = renum(i_voisin, j_voisin, k_voisin);
 
-  // coefficient extra diagonal (- surface_face / distance_centres_elements)
+  // off-diagonal coefficient (- face_area / distance_between_element_centres)
   const double x = -coeff;
   if (indice_voisin > indice)
     {
-      // Coefficient dans la partie triangulaire superieure, a stocker.
+      // Coefficient in the upper triangular part, to be stored.
       const int nreels = coeff_diag_.size_array();
       if (indice_voisin < nreels)
         {
@@ -356,7 +356,7 @@ void Matrice_Grossiere::ajoute_coeff(int i, int j, int k,
         }
     }
 
-  // Contribution a la diagonale
+  // Contribution to the diagonal
   coeff_diag_[indice] -= x;
 }
 
@@ -367,7 +367,7 @@ void Matrice_Grossiere::ajoute_coeff2(int i, int j, int k,
   const int indice=renum(i, j, k);
   const int indice_voisin = renum(i_voisin, j_voisin, k_voisin);
 
-  // coefficient extra diagonal (- surface_face / distance_centres_elements)
+  // off-diagonal coefficient (- face_area / distance_between_element_centres)
   const double x = -coeff;
 
   const int nreels = coeff_diag_.size_array();
@@ -382,7 +382,7 @@ void Matrice_Grossiere::ajoute_coeff2(int i, int j, int k,
       coeffs_virt_2_[indice].add(x);
     }
 
-  // Contribution a la diagonale
+  // Contribution to the diagonal
   coeff_diag_[indice] -= x;
 
 

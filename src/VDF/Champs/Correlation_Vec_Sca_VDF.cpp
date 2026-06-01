@@ -39,13 +39,11 @@ void Correlation_Vec_Sca_VDF::mettre_a_jour(double tps)
 
   DoubleTab& correlation = valeurs();
 
-  // Interpolation du champ scalaire de la correlation au
-  // centre des mailles.
+  // Interpolation of the scalar correlation field at cell centers.
   DoubleTab valeurs_Sca(nb_elem, mon_champ_Sca_->nb_comp());
   mon_champ_Sca_->valeur_aux_centres_de_gravite(dom, valeurs_Sca);
 
-  // Interpolation du champ vecteur de la correlation au
-  // centre des mailles.
+  // Interpolation of the vector correlation field at cell centers.
   DoubleTab valeurs_Vec(nb_elem, mon_champ_Vec_->nb_comp());
   mon_champ_Vec_->valeur_aux_centres_de_gravite(dom, valeurs_Vec);
 

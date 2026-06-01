@@ -43,7 +43,7 @@ DoubleTab& Source_WC_Chaleur::ajouter(DoubleTab& resu) const
   return ajouter_(resu);
 }
 
-/*! @brief Ajoute le terme source weakly compressible d P_tot / d t = del P / del t + u.
+/*! @brief Adds the weakly compressible source term d P_tot / d t = del P / del t + u.
  *
  * grad(P_tot)
  *
@@ -52,14 +52,14 @@ DoubleTab& Source_WC_Chaleur::ajouter(DoubleTab& resu) const
 DoubleTab& Source_WC_Chaleur::ajouter_(DoubleTab& resu) const
 {
   double dt_ = mon_equation->schema_temps().temps_courant() - mon_equation->schema_temps().temps_precedent();
-  if (dt_ <= 0.) return resu; // On calcul pas ce terme source si dt<=0
+  if (dt_ <= 0.) return resu; // Do not compute this source term if dt<=0
 
   Fluide_Weakly_Compressible& FWC = ref_cast_non_const(Fluide_Weakly_Compressible,le_fluide.valeur());
-  DoubleTab& Ptot = FWC.pression_th_tab(), &Ptot_n = FWC.pression_thn_tab(); // present & passe
+  DoubleTab& Ptot = FWC.pression_th_tab(), &Ptot_n = FWC.pression_thn_tab(); // present & previous
 
   Ptot.echange_espace_virtuel();
 
-  DoubleTab UgradP(Ptot); // champ elem en vdf et face en vef
+  DoubleTab UgradP(Ptot); // element field in VDF and face field in VEF
   UgradP = 0.;
 
   // Only if non uniform and if the flag use_grad_pression_eos is 1
@@ -84,7 +84,7 @@ const DoubleTab& Source_WC_Chaleur::correct_grad_boundary(const Domaine_VF& doma
     {
       const Cond_lim& la_cl = domaine_cl.les_conditions_limites(n_bord);
       const Front_VF& le_bord = ref_cast(Front_VF,la_cl->frontiere_dis());
-      // recuperer face et remplace gradient par 0
+      // retrieve face and replace gradient by 0
       const int ndeb = le_bord.num_premiere_face(), nfin = ndeb + le_bord.nb_faces();
       for (int num_face=ndeb; num_face<nfin; num_face++) grad_Ptot(num_face,0) = 0.;
     }

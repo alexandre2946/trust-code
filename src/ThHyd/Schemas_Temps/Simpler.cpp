@@ -60,8 +60,8 @@ Entree& Simpler::readOn(Entree& is )
   return Simple::readOn(is);
 }
 
-// calcul D correction_en_vitesse= E current + resu )
-// avec D diagonale de la matrice et E = D-matrice =-(matrice-D)
+// compute D correction_en_vitesse= E current + resu )
+// with D = diagonal of the matrix and E = D-matrix =-(matrix-D)
 int inverser_par_diagonale(const Matrice_Morse& matrice,const DoubleTrav& resu,const DoubleTab& current,DoubleTrav& correction_en_vitesse)
 {
   const auto& tab1 = matrice.get_tab1();
@@ -165,9 +165,9 @@ int inverser_par_diagonale(const Matrice_Morse& matrice,const DoubleTrav& resu,c
 }
 
 
-//Entree : Uk-1 ; Pk-1
-//Sortie Uk ; Pk
-//k designe une iteration
+//Input: Uk-1 ; Pk-1
+//Output: Uk ; Pk
+//k denotes an iteration
 
 void Simpler::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pression,double dt,Matrice_Morse& matrice,double seuil_resol,DoubleTrav& secmem,int nb_ite,int& converge, int& ok)
 {
@@ -199,11 +199,11 @@ void Simpler::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pressio
   //if (nb_dim==2)
   //  nb_comp = current.dimension(1);
 
-  //Construction de matrice et resu
+  //Build matrix and residual
   //matrice = A[Uk-1] = M/dt + CONV +DIFF
   //resu =  A[Uk-1]Uk-1 -(A[Uk-1]Uk-1-Ss) + Sv -BtPk-1
   gradient.calculer(pression,gradP);
-  if (eqnNS.has_interface_blocs()) /* si assembler_blocs est disponible */
+  if (eqnNS.has_interface_blocs()) /* if assembler_blocs is available */
     eqnNS.assembler_blocs_avec_inertie({{ "vitesse", &matrice }}, resu);
   else
     {
@@ -213,59 +213,59 @@ void Simpler::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pressio
 
   le_solveur_->reinit();
 
-  //Resolution du systeme : D[Uk-1]UPk = E[Uk-1]Uk-1 + Sv + Ss -BtPk-1 + (M/dt)Uk-1
-  //matrice = A[Uk-1] = D - E avec D partie diagonale de A
+  //Solve the system: D[Uk-1]UPk = E[Uk-1]Uk-1 + Sv + Ss -BtPk-1 + (M/dt)Uk-1
+  //matrice = A[Uk-1] = D - E with D the diagonal part of A
   //correction_en_vitesse = UPk ; current = Uk-1 ; resu = Sv + Ss -BtPk-1
   int status = inverser_par_diagonale(matrice,resu,current,correction_en_vitesse);
   if (status!=0) exit();
   Debog::verifier("Simpler::iterer_NS correction_en_vitesse",correction_en_vitesse);
 
-  //Construction de matrice_en_pression_2 = BD-1Bt[Uk-1]
+  //Build matrice_en_pression_2 = BD-1Bt[Uk-1]
   Matrice& matrice_en_pression_2 = eqnNS.matrice_pression();
   assembler_matrice_pression_implicite(eqnNS,matrice,matrice_en_pression_2);
   SolveurSys& solveur_pression_ = eqnNS.solveur_pression();
   solveur_pression_->reinit();
 
-  //Calcul de BUPk
+  //Compute BUPk
   divergence.calculer(correction_en_vitesse,secmem);
   secmem *= -1;
   secmem.echange_espace_virtuel();
   if (nb_ite==1)
     eqnNS.assembleur_pression()->modifier_secmem(secmem);
 
-  //Resolution du systeme (BD-1Bt)P*_k = BUPk
+  //Solve the system (BD-1Bt)P*_k = BUPk
   //correction_en_pression = P*_k ; secmem = BUPk
   solveur_pression_.resoudre_systeme(matrice_en_pression_2.valeur(),
                                      secmem,correction_en_pression);
 
-  //Calcul de Pk = Pk-1 + P*_k
+  //Compute Pk = Pk-1 + P*_k
   operator_add(pression, correction_en_pression, VECT_ALL_ITEMS);
 
   eqnNS.assembleur_pression()->modifier_solution(pression);
 
-  //Calcul de Bt P*_k et ajustement de resu a -Bt Pk
+  //Compute Bt P*_k and adjust resu to -Bt Pk
   gradient->multvect(correction_en_pression,gradP);
   resu -= gradP;
   resu.echange_espace_virtuel();
   Debog::verifier("Simpler::iterer_NS resu",resu);
 
-  //Resolution du systeme : A[Uk-1]U*_k = -BtPk + Sv + Ss + (M/dt)Uk-1
+  //Solve the system: A[Uk-1]U*_k = -BtPk + Sv + Ss + (M/dt)Uk-1
   //current = U*_k ; resu = A[Uk-1]Uk-1 - (A[Uk-1]Uk-1-Ss) + Sv -BtPk + (M/dt)Uk-1
   le_solveur_.resoudre_systeme(matrice,resu,current);
 
-  //Calcul de BU*_k
+  //Compute BU*_k
   divergence.calculer(current,secmem);
   secmem *= -1;
   secmem.echange_espace_virtuel();
   Debog::verifier("Simpler::iterer_NS secmem",secmem);
 
-  //Resolution du systeme (BD-1Bt)P'k = BU*_k
+  //Solve the system (BD-1Bt)P'k = BU*_k
   //correction_en_pression = P'k ; secmem = BU*_k
   correction_en_pression = 0;
   solveur_pression_.resoudre_systeme(matrice_en_pression_2.valeur(),
                                      secmem,correction_en_pression);
 
-  //Resolution du systeme D[Uk-1](Uk-U*_k) = -BtP'k
+  //Solve the system D[Uk-1](Uk-U*_k) = -BtP'k
   //correction_en_vitesse = U'k = Uk-U*_k ; correction_en_pression = P'k
   calculer_correction_en_vitesse(correction_en_pression,gradP,correction_en_vitesse,matrice,gradient);
 
@@ -279,7 +279,7 @@ void Simpler::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pressio
 
     }
 
-  //Calcul de Uk = U*_k + U'k
+  //Compute Uk = U*_k + U'k
   current += correction_en_vitesse;
   current.echange_espace_virtuel();
   Debog::verifier("Simpler::iterer_NS current",current);

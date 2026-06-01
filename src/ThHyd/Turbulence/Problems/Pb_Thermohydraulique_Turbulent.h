@@ -20,14 +20,12 @@
 #include <Navier_Stokes_Turbulent.h>
 #include <Pb_Fluide_base.h>
 
-/*! @brief classe Pb_Thermohydraulique_Turbulent Cette classe represente un probleme de thermohydraulique
+/*! @brief Turbulent thermohydraulics problem.
  *
- *     avec modelisation de la turbulence:
- *      - Equations de Navier_Stokes en regime turbulent
- *        pour un fluide incompressible
- *      - Equation d'energie en regime turbulent
- *     L'hydraulique et la thermique sont couplees par des forces de volume
- *     (approximation de Boussinesq)
+ *      Couples:
+ *      - Turbulent Navier-Stokes equations for an incompressible fluid
+ *      - Turbulent energy equation
+ *      Hydraulics and thermics are coupled through body forces (Boussinesq approximation).
  *
  * @sa Pb_Fluide_base Pb_Thermohydraulique Terme_Boussinesq_base
  */

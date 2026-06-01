@@ -27,12 +27,11 @@
 
 enum class AJOUTE_COND { GEN , D3_81 , D3_82 , D2_41 , D2_42 };
 
-/*! @brief class Op_Conv_EF Cette classe represente l'operateur de convection associe a une equation de
+/*! @brief class Op_Conv_EF Represents the convection operator associated with a scalar transport equation.
  *
- *   transport d'un scalaire.
- *   La discretisation est EF
- *   Le champ convecte est scalaire ou vecteur de type Champ_P1NC
- *   Le schema de convection est du type Decentre ou Centre
+ *   The discretization is EF.
+ *   The convected field is a scalar or vector of type Champ_P1NC.
+ *   The convection scheme is of type Upwind or Centered.
  *
  */
 class Op_Conv_EF : public Op_Conv_EF_base
@@ -46,7 +45,7 @@ public:
   double calculer_dt_stab() const override ;
 
   //virtual void remplir_fluent() const;
-  // Methodes pour l implicite.
+  // Methods for the implicit scheme.
   inline void dimensionner(Matrice_Morse& matrice) const override { Op_EF_base::dimensionner(le_dom_EF.valeur(),la_zcl_EF.valeur(), matrice); }
   inline void modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const override { Op_EF_base::modifier_pour_Cl(le_dom_EF.valeur(),la_zcl_EF.valeur(), matrice, secmem); }
   inline void contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& matrice) const override { ajouter_contribution(inco, matrice); }
@@ -67,15 +66,15 @@ public:
 
 protected:
   double hourglass;
-  int hourglass_impl_,btd_impl_,centre_impl_; // flag pour savoir si les termes sont implicites
+  int hourglass_impl_,btd_impl_,centre_impl_; // flag to indicate whether terms are implicit
   int hourglass_hors_conv_,btd_hors_conv_;
   double f_lu_;
   enum type_operateur { amont, muscl, centre };
   int calcul_dt_stab_;
   type_operateur type_op=amont;
 
-  // pour supg
-  mutable double max_ue_=1e-8,min_dx_=1e37;// comme G2
+  // for supg
+  mutable double max_ue_=1e-8,min_dx_=1e37;// like G2
   mutable Champ_Uniforme coefficient_correcteur_supg_;
 
 // optimisation

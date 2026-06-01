@@ -18,12 +18,12 @@
 
 #include <Cond_lim_base.h>
 
-/*! @brief Classe Dirichlet_homogene Cette classe est la classe de base de la hierarchie des conditions aux limites de type Dirichlet homogene.
+/*! @brief Classe Dirichlet_homogene This class is the base class of the hierarchy of homogeneous Dirichlet-type boundary conditions.
  *
- *     Une condition aux limites de type Dirichlet homogene impose une valeur nulle au champ inconnue sur une frontiere, ce qui correspond a:
+ *     A homogeneous Dirichlet boundary condition imposes a zero value on the unknown field at a boundary, which corresponds to:
  *
- *      - vitesse imposee a zero pour l'equation de Navier-Stokes
- *      - scalaire impose a zero pour l'equation de transport d'un scalaire
+ *      - velocity imposed at zero for the Navier-Stokes equation
+ *      - scalar imposed at zero for the scalar transport equation
  *
  * @sa Cond_lim_base Dirichlet
  */

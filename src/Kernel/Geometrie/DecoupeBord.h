@@ -21,9 +21,9 @@
 #include <Domaine.h>
 #include <Domaine_forward.h>
 
-/*! @brief class DecoupeBord Realise un maillage en decoupant chaque pave en 40 tetraedres
+/*! @brief class DecoupeBord Generates a mesh by splitting each block into 40 tetrahedra.
  *
- *  Le maillage obtenu n'a pas de directions preferentielles
+ *  The resulting mesh has no preferential directions.
  *
  * @sa Interprete
  */

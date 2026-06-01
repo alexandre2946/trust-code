@@ -23,12 +23,12 @@ Implemente_instanciable(Resoudre,"Resoudre|Solve",Interprete);
 // XD solve interprete resoudre NO_BRACE Interpretor to start calculation with TRUST.
 // XD attr pb ref_pb_gen_base pb REQ Name of problem to be solved.
 
-/*! @brief Simple appel a: Interprete::printOn(Sortie&)
+/*! @brief Simple call to: Interprete::printOn(Sortie&)
  *
- *     Imprime l'interprete sur un flot de sortie
+ *     Prints the interpreter to an output stream
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Resoudre::printOn(Sortie& os) const
 {
@@ -36,10 +36,10 @@ Sortie& Resoudre::printOn(Sortie& os) const
 }
 
 
-/*! @brief Simple appel a: Interprete::readOn(Entree&)
+/*! @brief Simple call to: Interprete::readOn(Entree&)
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
  */
 Entree& Resoudre::readOn(Entree& is)
 {

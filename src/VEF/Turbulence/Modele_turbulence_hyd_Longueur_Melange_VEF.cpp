@@ -127,7 +127,7 @@ Champ_Fonc_base& Modele_turbulence_hyd_Longueur_Melange_VEF::calculer_viscosite_
       exit();
     }
 
-  //    CANAL PLAN suivant (Ox - h=2) **********************************
+  //    PLANE CHANNEL along (Ox - h=2) **********************************
   if (cas_ == 1)
     {
       for (int elem = 0; elem < nb_elem; elem++)
@@ -141,7 +141,7 @@ Champ_Fonc_base& Modele_turbulence_hyd_Longueur_Melange_VEF::calculer_viscosite_
         }
     }
   else
-    //    CYLINDRE suivant (D=2) ************************************
+    //    CYLINDER along (D=2) ************************************
 
     if ((cas_ == 2) || (cas_ == 21) || (cas_ == 22))
       {
@@ -150,17 +150,17 @@ Champ_Fonc_base& Modele_turbulence_hyd_Longueur_Melange_VEF::calculer_viscosite_
 
         if (cas_ == 2)
           {
-            dir1 = 0;  //Tuyau suivant z
+            dir1 = 0;  //Pipe along z
             dir2 = 1;
           }
         else if (cas_ == 21)
           {
-            dir1 = 1;  //Tuyau suivant x
+            dir1 = 1;  //Pipe along x
             dir2 = 2;
           }
         else
           {
-            dir1 = 0;  //Tuyau suivant y
+            dir1 = 0;  //Pipe along y
             dir2 = 2;
           }
 
@@ -174,7 +174,7 @@ Champ_Fonc_base& Modele_turbulence_hyd_Longueur_Melange_VEF::calculer_viscosite_
             k(elem) = pow(visco_turb(elem) / (Cmu * (1. - r)), 2);
           }
       }
-  //    CAS NON TYPE ***************************************************
+  //    GENERIC CASE ***************************************************
     else if (cas_ == 4)
       {
         calculer_f_amortissement();
@@ -221,7 +221,7 @@ void Modele_turbulence_hyd_Longueur_Melange_VEF::calculer_Sij2()
   Sij2_ = 0.;
 
   DoubleTab ubar(la_vitesse);
-  //  ch.filtrer_L2(ubar);                // Patrick : on travaille sur le champ filtre.
+  //  ch.filtrer_L2(ubar);                // Patrick: we work on the filtered field.
 
   ch.calcul_gradient(ubar, duidxj, domaine_Cl_VEF);
 
@@ -230,7 +230,7 @@ void Modele_turbulence_hyd_Longueur_Melange_VEF::calculer_Sij2()
       for (i = 0; i < dimension; i++)
         for (j = 0; j < dimension; j++)
           {
-            //Deplacement du calcul de Sij
+            //Sij computation moved here
             Sij = 0.5 * (duidxj(elem, i, j) + duidxj(elem, j, i));
             Sij2_(elem) += Sij * Sij;
           }
@@ -240,7 +240,7 @@ void Modele_turbulence_hyd_Longueur_Melange_VEF::calculer_Sij2()
 void Modele_turbulence_hyd_Longueur_Melange_VEF::lire_distance_paroi()
 {
 
-  // PQ : 25/02/04 recuperation de la distance a la paroi dans Wall_length.xyz
+  // PQ: 25/02/04 retrieval of wall distance from Wall_length.xyz
 
   const Domaine_VEF& domaine_VEF = ref_cast(Domaine_VEF, le_dom_VF_.valeur());
   DoubleTab& wall_length = wall_length_->valeurs();
@@ -265,7 +265,7 @@ void Modele_turbulence_hyd_Longueur_Melange_VEF::lire_distance_paroi()
       for (int b = 0; b < nom_paroi.size(); b++)
         {
           Cerr << nom_paroi[b] << finl;
-          //test pour s'assurer de la coherence de Wall_length.xyz avec le jeu de donnees :
+          //test to ensure consistency between Wall_length.xyz and the dataset:
           domaine_VEF.rang_frontiere(nom_paroi[b]);
         }
     }
@@ -277,17 +277,17 @@ void Modele_turbulence_hyd_Longueur_Melange_VEF::calculer_f_amortissement()
   const double Kappa = 0.415;
   const double A_plus = 26.;
 
-  // PQ : 23/02/04 calcul de la fonction d'amortissement de Van Driest
-  //            a partir de la distance a la paroi et d'une approximation
-  //            du frottement
+  // PQ : 23/02/04 compute the Van Driest damping function
+  //            from the wall distance and an approximation
+  //            of the friction
 
-  // la fonction d'amortissement f_vd = 1 - exp(-y+/A+) intervient dans le calcul de nu_t
-  // la puissance 4 (calibrage issu d'un canal plan donnant les "meilleurs" resultats).
+  // the damping function f_vd = 1 - exp(-y+/A+) appears in the computation of nu_t
+  // to the power 4 (calibration from a plane channel giving the "best" results).
   //
-  // on restreint le calcul de f_vd qu'aux valeurs de y+ t.q. : f_vd^4 < 0.99
-  // soit : y+ < -A+. ln(1-0.99^(1/4)) = 155
-  // soit, encore d'apres la loi de Reichard   u+ < 17.96
-  // d'ou  :
+  // we restrict the computation of f_vd to y+ values such that: f_vd^4 < 0.99
+  // i.e.: y+ < -A+. ln(1-0.99^(1/4)) = 155
+  // i.e., according to Reichardt's law: u+ < 17.96
+  // hence:
   //                 f_vd^4 < 0.99          =>   u+.y+ < 2784
   //
 
@@ -323,7 +323,7 @@ void Modele_turbulence_hyd_Longueur_Melange_VEF::calculer_f_amortissement()
     l_unif = 0;
 
   if ((!l_unif) && (tab_visco.local_min_vect() < DMINFLOAT))
-    //   on ne doit pas changer tab_visco ici !
+    //   tab_visco must not be modified here!
     {
       Cerr << "In Modele_turbulence_hyd_Longueur_Melange_VEF::calculer_f_amortissement : visco = " << tab_visco.local_min_vect() << " <= 0 ? " << finl;
       exit();
@@ -353,12 +353,12 @@ void Modele_turbulence_hyd_Longueur_Melange_VEF::calculer_f_amortissement()
 
       u_plus_d_plus = norm_v * dist / d_visco;
 
-      if (u_plus_d_plus < 1.) // pour eviter de faire tourner la procedure iterative
+      if (u_plus_d_plus < 1.) // to avoid running the iterative procedure
         {
           y_plus = sqrt(u_plus_d_plus);
           f_amortissement_(elem) -= exp(-y_plus / A_plus);
         }
-      else if (u_plus_d_plus < 2784.) // cf. explication plus haut
+      else if (u_plus_d_plus < 2784.) // cf. explanation above
         {
           up1 = u_plus_d_plus / 100.;
           iter = 0;
@@ -367,7 +367,7 @@ void Modele_turbulence_hyd_Longueur_Melange_VEF::calculer_f_amortissement()
           while ((iter++ < itmax) && (r > seuil))
             {
               dp = u_plus_d_plus / up1;
-              up2 = ((1 / Kappa) * log(1 + Kappa * dp)) + 7.8 * (1 - exp(-dp / 11.) - exp(-dp / 3.) * dp / 11.); // Equation de Reichardt
+              up2 = ((1 / Kappa) * log(1 + Kappa * dp)) + 7.8 * (1 - exp(-dp / 11.) - exp(-dp / 3.) * dp / 11.); // Reichardt's equation
               up1 = 0.5 * (up1 + up2);
               r = std::fabs(up1 - up2) / up1;
             }
@@ -382,8 +382,8 @@ void Modele_turbulence_hyd_Longueur_Melange_VEF::calculer_f_amortissement()
 
 int Modele_turbulence_hyd_Longueur_Melange_VEF::preparer_calcul()
 {
-  // On ne doit pas lire_distance_paroi dans le cas ou on post-traite le champs Distance_paroi
-  // car c'est deja fait dans la classe mere Modele_turbulence_hyd_base
+  // lire_distance_paroi must not be called when postprocessing the Distance_paroi field
+  // because it is already done in the base class Modele_turbulence_hyd_base
   bool contient_distance_paroi = false;
   for (auto &itr : equation().probleme().postraitements())
     if (!contient_distance_paroi)

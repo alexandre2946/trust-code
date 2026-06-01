@@ -62,11 +62,11 @@ Entree& Interprete_geometrique_base_32_64<_SIZE_>::interpreter(Entree& is)
 {
   Cerr << "Execution of the interpreter " << que_suis_je() << finl;
   Process::imprimer_ram_totale();
-  // Appel a l'interprete fils
+  // Call the child interpreter
   interpreter_(is);
 
-  // On met a jour un certain nombre de choses
-  // suite a la modification des domaines
+  // Update a number of things
+  // following the modification of the domains
   for (int j=0; j<domains_.size(); j++)
     {
       Domaine_t& dom = domaine(j);
@@ -84,7 +84,7 @@ Entree& Interprete_geometrique_base_32_64<_SIZE_>::interpreter(Entree& is)
   return is;
 }
 
-/*! Ajoute dans les sous-domaines les nouveaux elements
+/*! @brief Adds the new elements into the sub-domains.
  *
  */
 template <typename _SIZE_>

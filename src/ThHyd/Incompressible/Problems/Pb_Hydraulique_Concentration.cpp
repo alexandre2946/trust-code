@@ -28,10 +28,10 @@ Implemente_instanciable(Pb_Hydraulique_Concentration,"Pb_Hydraulique_Concentrati
 // XD attr convection_diffusion_concentration convection_diffusion_concentration convection_diffusion_concentration OPT
 // XD_CONT Constituent transport vectorial equation (concentration diffusion convection).
 
-/*! @brief Simple appel a: Pb_Fluide_base::printOn(Sortie&) Ecrit le probleme sur un flot de sortie.
+/*! @brief Simple call to: Pb_Fluide_base::printOn(Sortie&) Writes the problem to an output stream.
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param os an output stream
+ * @return the modified output stream
  */
 Sortie& Pb_Hydraulique_Concentration::printOn(Sortie& os) const
 {
@@ -39,37 +39,36 @@ Sortie& Pb_Hydraulique_Concentration::printOn(Sortie& os) const
 }
 
 
-/*! @brief Simple appel a: Pb_Fluide_base::readOn(Entree&) Lit le probleme a partir d'un flot d'entree.
+/*! @brief Simple call to: Pb_Fluide_base::readOn(Entree&) Reads the problem from an input stream.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param is an input stream
+ * @return the modified input stream
  */
 Entree& Pb_Hydraulique_Concentration::readOn(Entree& is)
 {
   return Pb_Fluide_base::readOn(is);
 }
 
-/*! @brief Renvoie le nombre d'equation, Renvoie 2 car il y a 2 equations a un probleme
+/*! @brief Returns the number of equations. Returns 2 since a hydraulic problem with transport has 2 equations:
  *
- *     hydraulique avec transport:
- *       - l'equation de Navier Stokes
- *       - une equation de convection-diffusion (eventuellement vectorielle)
+ *       - the Navier-Stokes equation
+ *       - a convection-diffusion equation (possibly vectorial)
  *
- * @return (int) le nombre d'equation
+ * @return the number of equations
  */
 int Pb_Hydraulique_Concentration::nombre_d_equations() const
 {
   return 2;
 }
 
-/*! @brief Renvoie l'equation d'hydraulique de type Navier_Stokes_std si i=0 Renvoie l'equation de convection-diffusion de type
+/*! @brief Returns the hydraulic equation of type Navier_Stokes_std if i=0, returns the convection-diffusion equation of type
  *
- *     Convection_Diffusion_Concentration si i=1
- *     (l'equation de convection diffusion peut-etre vectorielle)
- *     (version const)
+ *     Convection_Diffusion_Concentration if i=1
+ *     (the convection-diffusion equation may be vectorial)
+ *     (const version)
  *
- * @param (int i) l'index de l'equation a renvoyer
- * @return (Equation_base&) l'equation correspondante a l'index
+ * @param i the index of the equation to return
+ * @return the equation corresponding to the index
  */
 const Equation_base& Pb_Hydraulique_Concentration::equation(int i) const
 {
@@ -84,13 +83,13 @@ const Equation_base& Pb_Hydraulique_Concentration::equation(int i) const
     return eq_concentration;
 }
 
-/*! @brief Renvoie l'equation d'hydraulique de type Navier_Stokes_std si i=0 Renvoie l'equation de convection-diffusion de type
+/*! @brief Returns the hydraulic equation of type Navier_Stokes_std if i=0, returns the convection-diffusion equation of type
  *
- *     Convection_Diffusion_Concentration si i=1
- *     (l'equation de convection diffusion peut-etre vectorielle)
+ *     Convection_Diffusion_Concentration if i=1
+ *     (the convection-diffusion equation may be vectorial)
  *
- * @param (int i) l'index de l'equation a renvoyer
- * @return (Equation_base&) l'equation correspondante a l'index
+ * @param i the index of the equation to return
+ * @return the equation corresponding to the index
  */
 Equation_base& Pb_Hydraulique_Concentration::equation(int i)
 {
@@ -106,14 +105,14 @@ Equation_base& Pb_Hydraulique_Concentration::equation(int i)
 }
 
 
-/*! @brief Associe un milieu au probleme, Si le milieu est de type
+/*! @brief Associates a medium to the problem. If the medium is of type:
  *
- *       - Fluide_Incompressible, il sera associe a l'equation de l'hydraulique
- *       - Constituant, il sera associe a l'equation de convection-diffusion
- *     Un autre type de milieu provoque une erreur
+ *       - Fluide_Incompressible, it will be associated with the hydraulic equation
+ *       - Constituant, it will be associated with the convection-diffusion equation
+ *     Any other medium type causes an error.
  *
- * @param (Milieu_base& mil) le milieu physique a associer au probleme
- * @throws mauvais type de milieu physique
+ * @param mil the physical medium to associate with the problem
+ * @throws wrong type of physical medium
  */
 void Pb_Hydraulique_Concentration::associer_milieu_base(const Milieu_base& mil)
 {

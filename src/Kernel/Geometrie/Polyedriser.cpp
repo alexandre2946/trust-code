@@ -21,8 +21,8 @@
 
 
 
-// Convention de numerotation
-//    sommets         faces         4(face z=1)
+// Numbering convention
+//    vertices        faces         4(face z=1)
 //      6------7            *------*
 //     /|     /|           /| 3   /|
 //    2------3 |          *------* |
@@ -187,11 +187,11 @@ void Polyedriser_32_64<_SIZE_>::polyedriser(Domaine_t& domaine) const
       int_t node = 0;
       for (int_t e = 0; e < nb_elems; e++)
         {
-          Pi[e] = face; // Index des polyedres
+          Pi[e] = face; // Index of polyhedra
 
           for(int f=0; f<6; f++)
             {
-              Fi[face] = face*4; // Index des faces:
+              Fi[face] = face*4; // Index of faces:
               for(int s=0; s<4; s++)
                 {
                   int som_loc = faces_sommets_poly[f][s];

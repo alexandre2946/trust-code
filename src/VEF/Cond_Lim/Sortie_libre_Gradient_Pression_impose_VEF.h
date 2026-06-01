@@ -24,11 +24,11 @@ class Domaine_VEF;
 
 /*! @brief Sortie_libre_Gradient_Pression_impose_VEF
  *
- *  Cette classe derive de la classe Neumann_sortie_libre
+ *  This class derives from the class Neumann_sortie_libre.
  *
- *     Elle represente une frontiere ouverte avec condition de gradient de pression impose.
- *     L'objet de type OWN_PTR(Champ_front_base) le_champ_front contient le gradient impose. La fonction flux_impose() renvoie une valeur de pression
- *     a l'exterieur calculee a partir du gradient de pression impose et de la pression a l'interieur du domaine.
+ *     It represents an open boundary with an imposed pressure gradient condition.
+ *     The object of type OWN_PTR(Champ_front_base) le_champ_front contains the imposed gradient. The flux_impose() function returns
+ *     an external pressure value computed from the imposed pressure gradient and the interior pressure.
  *
  */
 class Sortie_libre_Gradient_Pression_impose_VEF: public Neumann_sortie_libre
@@ -41,7 +41,7 @@ public:
 protected:
   OBS_PTR(Domaine_VEF) le_dom_VEF;
   OBS_PTR(Champ_P0_VEF) pression_interne;
-  DoubleVect trace_pression_int;   // pression interne sur les mailles de bord
+  DoubleVect trace_pression_int;   // internal pressure on the boundary cells
   DoubleVect coeff;
 };
 

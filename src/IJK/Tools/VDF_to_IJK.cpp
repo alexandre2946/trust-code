@@ -52,9 +52,9 @@ static void pack_lists(const VECT(ArrOfInt) & src, ArrOfInt& non_empty, Static_I
   dest.set(tmp);
 }
 
-// Returns 0 if valeur < tab[1],
-// returns tab.size_array() - 1 if valeur >= tab[size_array()-1]
-// returns n if valeur >= tab[n] && valeur < tab[n+1]
+// Returns 0 if value < tab[1],
+// returns tab.size_array() - 1 if value >= tab[size_array()-1]
+// returns n if value >= tab[n] && value < tab[n+1]
 //
 static int bsearch_double(const ArrOfDouble& tab, double valeur)
 {
@@ -64,7 +64,7 @@ static int bsearch_double(const ArrOfDouble& tab, double valeur)
     return j;
   while (j > i + 1)
     {
-      // Le tableau doit etre trie
+      // The array must be sorted
       assert(j == tab.size_array() || tab[i] <= tab[j]);
       const int milieu = (i + j) / 2;
       const double val = tab[milieu];
@@ -123,7 +123,7 @@ void VDF_to_IJK::initialize(const Domaine_VF& domaine_vf, const Domaine_IJK& spl
 
 
   {
-    // Ajout pour limiter la porte de la variable !!!
+    // Scope added to limit the variable scope
     int pe;
     for (pe = 0; pe < np; pe++)
       if (pe != moi)
@@ -145,8 +145,8 @@ void VDF_to_IJK::initialize(const Domaine_VF& domaine_vf, const Domaine_IJK& spl
 
   // Coordinates of geometric items:
   int nb_items;
-  // attention, coords.dimension(0) inclut les mailles virtuelles pour le tableau des elements, c'est pas bon,
-  // il faut recuperer nb_elem reels...
+  // Warning: coords.dimension(0) includes ghost cells for the element array, which is incorrect;
+  // the real nb_elem must be retrieved.
   const DoubleTab& coords = get_items_coords(domaine_vf, localisation, nb_items);
   const IntVect& orientation = domaine_vf.orientation();
 

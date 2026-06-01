@@ -22,7 +22,7 @@
 class Domaine_Cl_VDF;
 class Champ_Face_VDF;
 
-/*! @brief classe grad_U_Champ_Face
+/*! @brief class grad_U_Champ_Face
  *
  */
 class grad_U_Champ_Face : public Champ_Fonc_P0_VDF

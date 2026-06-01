@@ -18,9 +18,9 @@
 
 #include <TRUSTArray.h>
 
-/*! @brief Structure outil contenant la correspondance entre les indices de sommets et d'elements du domaine global et d'un sous-domaine.
+/*! @brief Helper structure holding the correspondence between vertex and element indices of the global domain and a sub-domain.
  *
- *   Les champs de cette classe sont remplis par DomaineCutter::construire_sous_domaine()
+ *   The fields of this class are filled by DomaineCutter::construire_sous_domaine()
  *
  */
 template <typename _SIZE_>
@@ -30,17 +30,17 @@ public:
   using SmallArrOfTID_t = SmallArrOfTID_T<_SIZE_>;  // a small number of big values -> typically an array of global indices
   using BigArrOfInt_t = BigArrOfInt_T<_SIZE_>;      // a big number of small values -> typically a (huge) array of local indices
 
-  // Le numero du sous-domaine construit
+  // The index of the constructed sub-domain
   int partie_ = -1;
-  // Correspondance sommets local/global:
-  //   indice_som_global = liste_sommets[indice_local]
+  // Local/global vertex correspondence:
+  //   global_vertex_index = liste_sommets[local_index]
   SmallArrOfTID_t liste_sommets_;
-  // Correspondance sommets global/local:
-  //   indice_local = liste_inverse_sommets_[indice_som_global]
-  //   egal -1 si le sommet n'est pas dans la partie
+  // Global/local vertex correspondence:
+  //   local_index = liste_inverse_sommets_[global_vertex_index]
+  //   equals -1 if the vertex is not in the part
   BigArrOfInt_t liste_inverse_sommets_;
-  // Correspondance elements global/local:
-  //   indice_local = liste_inverse_elements_[indice_elem_global]
+  // Global/local element correspondence:
+  //   local_index = liste_inverse_elements_[global_element_index]
   BigArrOfInt_t liste_inverse_elements_;
 };
 

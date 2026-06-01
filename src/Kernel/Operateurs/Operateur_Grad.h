@@ -20,10 +20,10 @@
 #include <TRUST_Deriv.h>
 #include <Operateur.h>
 
-/*! @brief Classe Operateur_Grad Classe generique de la hierarchie des operateurs calculant le gradient
+/*! @brief Classe Operateur_Grad Generic class of the hierarchy of operators computing the gradient
  *
- *     d'un champ. Un objet Operateur_Grad peut referencer n'importe quel
- *     objet derivant de Operateur_Grad_base.
+ *     of a field. An Operateur_Grad object can reference any object
+ *     derived from Operateur_Grad_base.
  *
  * @sa Operateur_Grad_base Operateur
  */
@@ -42,17 +42,17 @@ public :
 
 };
 
-/*! @brief Renvoie l'objet sous-jacent upcaste en Operateur_base
+/*! @brief Returns the underlying object upcast to Operateur_base
  *
- * @return (Operateur_base&) l'objet sous-jacent upcaste en Operateur_base
+ * @return (Operateur_base&) the underlying object upcast to Operateur_base
  */
 inline Operateur_base& Operateur_Grad::l_op_base()
 {
   return valeur();
 }
-/*! @brief Renvoie l'objet sous-jacent upcaste en Operateur_base (version const)
+/*! @brief Returns the underlying object upcast to Operateur_base (const version)
  *
- * @return (Operateur_base&) l'objet sous-jacent upcaste en Operateur_base
+ * @return (Operateur_base&) the underlying object upcast to Operateur_base
  */
 inline const Operateur_base& Operateur_Grad::l_op_base() const
 {

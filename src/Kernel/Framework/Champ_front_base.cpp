@@ -21,37 +21,37 @@ Implemente_base_sans_constructeur(Champ_front_base,"Champ_front_base",Field_base
 // XD front_field_base objet_u champ_front_base INHERITS_BRACE Basic class for fields at domain boundaries.
 
 Champ_front_base::Champ_front_base() { temps_defaut = -1.; }
-/*! @brief Imprime le nom du champ sur un flot de sortie
+/*! @brief Prints the field name to an output stream
  *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& s) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Champ_front_base::printOn(Sortie& s ) const { return s << que_suis_je() << " " << le_nom(); }
 
 /*! @brief DOES NOTHING - to override in derived classes.
  *
- * @param (Entree& s) un flot d'entree
- * @return (Entree&) le flot d'entree
+ * @param (Entree& s) an input stream
+ * @return (Entree&) the input stream
  */
 Entree& Champ_front_base::readOn(Entree& s ) { return s ; }
 
 
-/*! @brief Initialisation en debut de calcul.
+/*! @brief Initialization at the beginning of calculation.
  *
- * Imperativement cette methode ne doit pas utiliser de donnees
- *     externes a l'equation (couplage). Si mettre_a_jour le fait,
- *     alors initialiser ne doit pas appeler mettre_a_jour.
+ * Imperatively this method must not use data
+ *     external to the equation (coupling). If mettre_a_jour does,
+ *     then initializer must not call mettre_a_jour.
  *
- * @return (0 en cas d'erreur, 1 sinon.)
+ * @return (0 in case of error, 1 otherwise.)
  */
 int Champ_front_base::initialiser(double temps, const Champ_Inc_base& inco)
 {
   return 1;
 }
 
-/*! @brief Associe une frontiere discretisee au champ.
+/*! @brief Associates a discretized boundary with the field.
  *
- * @param (Frontiere_dis_base& fr) la frontiere discretisee a associer au champ
+ * @param (Frontiere_dis_base& fr) the discretized boundary to associate with the field
  */
 void Champ_front_base::associer_fr_dis_base(const Frontiere_dis_base& fr)
 {
@@ -59,13 +59,13 @@ void Champ_front_base::associer_fr_dis_base(const Frontiere_dis_base& fr)
 }
 
 
-/*! @brief NE FAIT RIEN, a surcharger.
+/*! @brief DOES NOTHING, to override.
  *
- * Cette methode est appelee au debut de chaque pas de temps ou
- *    sous-pas-de-temps, elle peut eventuellement utiliser des donnees
- *    exterieures a l'equation. A charge a l'algorithme de s'assurer
- *    que ces donnees sont pertinentes...
- *    Calcule la valeur de la condition aux limites au temps demande.
+ * This method is called at the beginning of each time step or
+ *    sub-time-step, it may possibly use data
+ *    external to the equation. It is up to the algorithm to ensure
+ *    that this data is relevant...
+ *    Calculates the value of the boundary condition at the requested time.
  *
  * @param (double)
  */
@@ -73,20 +73,20 @@ void Champ_front_base::mettre_a_jour(double temps)
 {
 }
 
-/*! @brief Appele par Conds_lim::completer Par defaut ne fait rien.
+/*! @brief Called by Conds_lim::completer. By default does nothing.
  *
- *      A surcharger dans les champs_front instationnaires.
+ *      To override in unsteady front fields.
  *
  */
 void Champ_front_base::fixer_nb_valeurs_temporelles(int nb_cases)
 {
 }
 
-/*! @brief NE FAIT RIEN, a surcharger Cette methode peut calculer et stocker des donnees utiles a la
+/*! @brief DOES NOTHING, to override. This method can calculate and store useful data for the
  *
- *    CL, et dependant uniquement de l'inconnue sur laquelle porte
- *    cette CL (pas de l'exterieur). cf Champ_front_contact_VEF par exemple.
- *    Elle est appelee lorsque l'inconnue est modifiee.
+ *    BC, and depending only on the unknown on which it acts
+ *    this BC (not from outside). cf Champ_front_contact_VEF for example.
+ *    It is called when the unknown is modified.
  *
  * @param (double)
  */
@@ -94,22 +94,22 @@ void Champ_front_base::calculer_coeffs_echange(double temps)
 {
 }
 
-/*! @brief Renvoie le vecteur des valeurs du champ pour la face donnee.
+/*! @brief Returns the vector of field values for the given face.
  *
- * Par defaut pour les champs fonc, on suppose que le tableau des
- *     valeurs porte nb_faces * nb_compo_ valeurs.
- *     Exemple de cas particulier: champ_front_uniforme::valeurs_face
+ * By default for func fields, we assume that the values array
+ *     holds nb_faces * nb_compo_ values.
+ *     Special case example: champ_front_uniforme::valeurs_face
  *
- * @param (num_face) l'indice d'une face sur la frontiere 0 <= num_face < frontiere_dis().frontiere().nb_faces()
- * @param (val) On resize ce tableau et on le remplit.
+ * @param (num_face) the index of a face on the boundary 0 <= num_face < frontiere_dis().frontiere().nb_faces()
+ * @param (val) Resize this array and fill it.
  */
 void Champ_front_base::valeurs_face(int num_face, DoubleVect& val) const
 {
 #ifndef NDEBUG
   const int nb_faces = frontiere_dis().frontiere().nb_faces();
-  // Si plantage ici, c'est que le tableau des valeurs ne contient pas une
-  // valeur pour chaque face, il faut reimplementer la methode dans la
-  // classe derivee...
+  // If crash here, it means the values array does not contain a
+  // value for each face, you need to reimimplement the method in the
+  // derived class...
   assert(num_face >= 0 && num_face < nb_faces);
   assert(valeurs().dimension(0) == nb_faces);
 #endif
@@ -126,12 +126,12 @@ const Domaine_dis_base& Champ_front_base::domaine_dis() const
 }
 
 
-/*! @brief A implementer dans les classes derivees.
+/*! @brief To implement in derived classes.
  *
- * Avance en temps : le nouveau temps present sera le temps passe
- *      en parametre.
+ * Advances in time: the new current time will be the time passed
+ *      as a parameter.
  *
- * @return (int) 1 si OK, 0 sinon
+ * @return (int) 1 if OK, 0 otherwise
  */
 int Champ_front_base::avancer(double temps)
 {
@@ -140,12 +140,12 @@ int Champ_front_base::avancer(double temps)
   return 0;
 }
 
-/*! @brief A implementer dans les classes derivees.
+/*! @brief To implement in derived classes.
  *
- * Recule en temps : le nouveau temps present sera le temps passe
- *      en parametre.
+ * Rewinds in time: the new current time will be the time passed
+ *      as a parameter.
  *
- * @return (int) 1 si OK, 0 sinon
+ * @return (int) 1 if OK, 0 otherwise
  */
 int Champ_front_base::reculer(double temps)
 {
@@ -154,7 +154,7 @@ int Champ_front_base::reculer(double temps)
   return 0;
 }
 
-/*! @brief Change la valeur du temps pour la ieme valeur temporelle apres le present
+/*! @brief Changes the time value for the i-th temporal value after the present
  *
  */
 void Champ_front_base::changer_temps_futur(double temps,int i)
@@ -162,7 +162,7 @@ void Champ_front_base::changer_temps_futur(double temps,int i)
   les_valeurs->futur(i).changer_temps(temps);
 }
 
-/*! @brief Calcule le taux d'accroissement du champ entre t1 et t2 et le stocke dans Gpoint_
+/*! @brief Computes the rate of change of the field between t1 and t2 and stores it in Gpoint_
  *
  */
 void Champ_front_base::calculer_derivee_en_temps(double t1, double t2)
@@ -177,7 +177,7 @@ void Champ_front_base::calculer_derivee_en_temps(double t1, double t2)
       const DoubleTab& v2 = valeurs_au_temps(t2);
       if (!Gpoint_.get_md_vector() && v1.dimension(0) == 1)
         {
-          // Champ instationnaire uniforme
+          // Uniform unsteady field
           int dim = v1.dimension(1);
           Gpoint_.resize(dim);
           for (int i = 0; i < dim; i++)
@@ -185,7 +185,7 @@ void Champ_front_base::calculer_derivee_en_temps(double t1, double t2)
         }
       else
         {
-          // Champs instationnaire variable
+          // Variable unsteady field
           Gpoint_ = v1;
           Gpoint_ *= -1;
           Gpoint_ += v2;

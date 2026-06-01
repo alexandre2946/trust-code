@@ -108,10 +108,10 @@ void Interpolation_IBM_elem_fluid::computeFluidElems(Domaine_dis_base& le_dom_di
   DoubleTab& fluid_points_ref = fluid_points_->valeurs();
   DoubleTab& solid_points_ref = solid_points_->valeurs();
 
-  // La numerotation des elements peut avoir changee entre l'etape pre_pro et
-  // l'etape calcul (cas du pre_pro Salome)
-  // On utilise un champ d'etiquette pour fluid_elems_ (par exemple le no elem Salome)
-  // et un champ d'element reprenant ces etiquettes
+  // The element numbering may have changed between the pre_pro step and
+  // the computation step (case of Salome pre_pro)
+  // A label field is used for fluid_elems_ (e.g. the Salome element number)
+  // and an element field that reuses these labels
   if (corresp_elems_)
     {
       DoubleTab& corresp_elems_ref = corresp_elems_->valeurs();
@@ -160,7 +160,7 @@ void Interpolation_IBM_elem_fluid::computeFluidElems(Domaine_dis_base& le_dom_di
                       double zs = solid_points_ref(i,2);
                       double d = (x-xs)*(x-xs)+(y-ys)*(y-ys)+(z-zs)*(z-zs);
                       if (d < eps)
-                        // A ne pas considerer si points fluide et solide sont confondus (erreur prepro)
+                        // Skip if fluid and solid points coincide (prepro error)
                         {
                           elems_fluid_ref(i) = elems_fluid_trust(indexr);
                         }

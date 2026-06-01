@@ -94,7 +94,7 @@ int Navier_Stokes_IBM_Turbulent::typer_lire_mod_turb_hyd(Entree& s)
   le_modele_turbulence.typer(nom1);
   le_modele_turbulence->associer_eqn(*this);
   le_modele_turbulence->associer(domaine_dis(), domaine_Cl_dis());
-  s >> le_modele_turbulence.valeur(); // on lit !
+  s >> le_modele_turbulence.valeur(); // read it!
 
   le_modele_turbulence->discretiser();
   RefObjU le_modele;
@@ -114,15 +114,15 @@ const Champ_base& Navier_Stokes_IBM_Turbulent::diffusivite_pour_pas_de_temps() c
   return fluide().viscosite_cinematique();
 }
 
-// Lecture et typage de l'operateur diffusion turbulente.
-// Attention : il faut avoir fait "terme_diffusif.associer_diffusivite" avant d'enter ici.
+// Reading and typing of the turbulent diffusion operator.
+// Note: "terme_diffusif.associer_diffusivite" must have been called before entering here.
 Entree& Navier_Stokes_IBM_Turbulent::lire_op_diff_turbulent(Entree& is)
 {
   Motcle accouverte = "{", accfermee = "}";
   Nom type = "Op_Dift_";
 
   Nom discr = discretisation().que_suis_je();
-  // les operateurs de diffusion sont communs aux discretisations VEF et VEFP1B
+  // diffusion operators are shared between VEF and VEFP1B discretisations
   if (discr == "VEFPreP1B") discr = "VEF";
 
   type += discr;
@@ -225,12 +225,11 @@ Entree& Navier_Stokes_IBM_Turbulent::lire_op_diff_turbulent(Entree& is)
   return is;
 }
 
-/*! @brief Prepare le calcul.
+/*! @brief Prepares the computation.
  *
- * Simple appe a Modele_turbulence_hyd_base->preparer_caclul() sur
- *     le membre reprresentant la turbulence.
+ * @brief Simple call to Modele_turbulence_hyd_base->preparer_calcul() on the turbulence member.
  *
- * @return (int) renvoie toujours 1
+ * @return Always returns 1.
  */
 int Navier_Stokes_IBM_Turbulent::preparer_calcul()
 {
@@ -262,10 +261,10 @@ std::vector<YAML_data> Navier_Stokes_IBM_Turbulent::data_a_sauvegarder() const
   return data;
 }
 
-/*! @brief Sauvegarde l'equation (et son modele de turbulence) sur un flot de sortie.
+/*! @brief Saves the equation (and its turbulence model) to an output stream.
  *
- * @param (Sortie& os) un flot de sortie
- * @return (int) renvoie toujours 1
+ * @param os The output stream.
+ * @return Always returns 1.
  */
 int Navier_Stokes_IBM_Turbulent::sauvegarder(Sortie& os) const
 {
@@ -277,11 +276,11 @@ int Navier_Stokes_IBM_Turbulent::sauvegarder(Sortie& os) const
   return bytes;
 }
 
-/*! @brief Reprise de l'equation et de son modele de turbulence a partir d'un flot d'entree.
+/*! @brief Restores the equation and its turbulence model from an input stream.
  *
- * @param (Entree& is) un flot d'entree
- * @return (int) renvoie toujours 1
- * @throws fin de fichier rencontre pendant la reprise
+ * @param is The input stream.
+ * @return Always returns 1.
+ * @throws End of file encountered during restart.
  */
 int Navier_Stokes_IBM_Turbulent::reprendre(Entree& is)
 {
@@ -307,9 +306,9 @@ int Navier_Stokes_IBM_Turbulent::reprendre(Entree& is)
   return 1;
 }
 
-/*! @brief Appels successifs a: Navier_Stokes_IBM::completer()
+/*! @brief Successive calls to: Navier_Stokes_IBM::completer()
  *
- *       Mod_Turb_Hyd::completer() [sur le membre concerne]
+ *       Mod_Turb_Hyd::completer() [on the relevant member]
  *
  */
 void Navier_Stokes_IBM_Turbulent::completer()
@@ -319,9 +318,9 @@ void Navier_Stokes_IBM_Turbulent::completer()
   le_modele_turbulence->loi_paroi().completer();
 }
 
-/*! @brief Effecttue une mise a jour en temps de l'equation.
+/*! @brief Performs a time update of the equation.
  *
- * @param (double temps) le temps de mise a jour
+ * @param temps The update time.
  */
 void Navier_Stokes_IBM_Turbulent::mettre_a_jour(double temps)
 {
@@ -338,7 +337,7 @@ bool Navier_Stokes_IBM_Turbulent::has_champ(const Motcle& nom, OBS_PTR(Champ_bas
     if (le_modele_turbulence->has_champ(nom, ref_champ))
       return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 bool Navier_Stokes_IBM_Turbulent::has_champ(const Motcle& nom) const
@@ -350,7 +349,7 @@ bool Navier_Stokes_IBM_Turbulent::has_champ(const Motcle& nom) const
     if (le_modele_turbulence->has_champ(nom))
       return true;
 
-  return false; /* rien trouve */
+  return false; /* nothing found */
 }
 
 const Champ_base& Navier_Stokes_IBM_Turbulent::get_champ(const Motcle& nom) const

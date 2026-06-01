@@ -35,7 +35,7 @@ Sortie& Sous_Domaines::printOn(Sortie& s) const
   return VECT(Sous_Domaine)::printOn(s);
 }
 
-// Syntaxe identique au decoupeur tranches mais en specifiant un domaine pour la bounding box: { bounding_box domaine_name tranches Nx Ny [Nz] }
+// Syntax identical to the tranches partitioner but specifying a domain for the bounding box: { bounding_box domaine_name tranches Nx Ny [Nz] }
 Entree& Sous_Domaines::readOn(Entree& s)
 {
   Motcle ouvert,ferme,bounding_box,tranches;
@@ -49,7 +49,7 @@ Entree& Sous_Domaines::readOn(Entree& s)
     Process::exit("Syntax is: Lire|Read Sous_Domaines { bounding_box domaine_name tranches Nx Ny [Nz] }");
   DoubleTab BB = ref_cast(Domaine, Interprete::objet(nom_domaine)).getBoundingBox();
   ArrOfDouble cotes(dimension);
-  double alpha = 1.0001; // Astuce pour pouvoir decouper par faisceau ou demi-faisceau si le canal de croix est maille (mais alors decoupage non equilibre)
+  double alpha = 1.0001; // Trick to allow splitting by beam or half-beam when the cross-channel is meshed (but then the split may be unbalanced)
   for (int dir=0; dir<dimension; dir++)
     {
       BB(dir, 0) = mp_min(BB(dir, 0));
@@ -64,7 +64,7 @@ Entree& Sous_Domaines::readOn(Entree& s)
     for (int j=0; j<n[1]; j++)
       for (int k=0; k<n[2]; k++)
         {
-          // Creation d'une Sous_Domaine de type Rectangle/Boite
+          // Create a Sous_Domaine of type Rectangle/Boite
           Nom tmp("{ ");
           tmp+=(dimension==2 ? "Rectangle " : "Boite ");
           tmp+=" Origine";
@@ -110,7 +110,7 @@ int Sous_Domaines::associer_(Objet_U& ob)
 {
   if (sub_type(Domaine, ob))
     {
-      // Creation d'une premiere sous_domaine pour stocker reference vers domaine/domaine
+      // Create an initial sous_domaine to store the reference to the domain
       Sous_Domaine& ssz = add(Sous_Domaine());
       ssz.associer_domaine(ref_cast(Domaine, ob));
       return 1;

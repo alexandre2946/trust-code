@@ -34,14 +34,14 @@ Sortie& Partitionneur_Sous_Domaine::printOn(Sortie& os) const
   return os;
 }
 
-/*! @brief Lecture des parametres du partitionneur sur disque.
+/*! @brief Reads the partitioner parameters from disk.
  *
- * Fomat attendu:
+ * Expected format:
  *     {
  *         fichier FILENAME
  *         fichier_ssz FILENAME
  *     }
- *   FILENAME est le nom d'un fichier existant au format ArrOfInt ascii.
+ *   FILENAME is the name of an existing file in ArrOfInt ASCII format.
  *
  */
 void Partitionneur_Sous_Domaine::set_param(Param& param) const
@@ -54,7 +54,7 @@ void Partitionneur_Sous_Domaine::set_param(Param& param) const
   param.ajouter("fichier_ssz",&filename_ssz_); // XD_ADD_P chaine
   // XD_CONT fichier sous zone
   param.ajouter("name_ssz",&name_ssz_); // XD_ADD_P chaine
-  // XD_CONT nom sous zone (nom d'un objet Sous_Domaine declare dans le jdd)
+  // XD_CONT name of sub-domain (name of a Sous_Domaine object declared in the data file)
 }
 
 void Partitionneur_Sous_Domaine::validate_params() const
@@ -68,7 +68,7 @@ void Partitionneur_Sous_Domaine::validate_params() const
   Cerr << " name_ssz : " << name_ssz_ << finl;
 }
 
-/*! @brief Lit le contenu du fichier "filename_" et stocke le resultat dans elem_part
+/*! @brief Reads the content of "filename_" and stores the result in elem_part.
  *
  */
 void Partitionneur_Sous_Domaine::construire_partition(IntVect& elem_part, int& nb_parts_tot) const
@@ -111,7 +111,7 @@ void Partitionneur_Sous_Domaine::construire_partition(IntVect& elem_part, int& n
   else
     elem_ssz = ref_cast(Sous_Domaine, Interprete::objet(name_ssz_)).les_elems();
 
-  /* remplissage de elem_part */
+  /* fill elem_part */
   elem_part.resize(elem_ssz.size_array());
   for (int i = 0; i < elem_ssz.size_array(); i++)
     nb_parts_tot = std::max(nb_parts_tot, 1 + (elem_part[i] = elem_part_glob[elem_ssz[i]]));

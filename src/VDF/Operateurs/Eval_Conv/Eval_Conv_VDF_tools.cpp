@@ -15,14 +15,14 @@
 
 #include <Eval_Conv_VDF_tools.h>
 
-// quick pour un champ face
+// quick scheme for a face field
 double Eval_Conv_VDF_tools::conv_quick_sharp_plus_impl(const double psc,const double vit_0, const double vit_1,
                                                        const double vit_0_0, const double dx,
                                                        const double dm, const double dxam) const
 {
   double cf, curv, delta_0 = vit_0 - vit_0_0, delta = vit_1 - vit_0, dd1,utc, delta_delta;
   curv = (delta/dx - delta_0/dxam)/dm ;
-  // Calcul de cf:
+  // Compute cf:
   delta_delta = delta_0+delta;
   dd1 = std::fabs(delta_delta);
   if (dd1 < 1.e-5) cf = 0.125;
@@ -34,14 +34,14 @@ double Eval_Conv_VDF_tools::conv_quick_sharp_plus_impl(const double psc,const do
   return (0.5*(vit_0 + vit_1) - cf*(dx*dx)*curv)*psc;
 }
 
-// quick pour un champ face
+// quick scheme for a face field
 double Eval_Conv_VDF_tools::conv_quick_sharp_moins_impl(const double psc,const double vit_0,const double vit_1,
                                                         const double vit_1_1,const double dx,
                                                         const double dm,const double dxam) const
 {
   double cf, curv, delta_1 = vit_1_1 - vit_1, delta = vit_1 - vit_0, dd1,utc, delta_delta;
   curv = ( delta_1/dxam - delta/dx )/dm ;
-  // Calcul de cf:
+  // Compute cf:
   delta_delta = delta_1+delta;
   dd1 = std::fabs(delta_delta);
   if (dd1 < 1.e-5) cf = 0.125;
@@ -109,7 +109,7 @@ double Eval_Conv_VDF_tools::dist_elem_axi_impl(int n1, int n2, int k, const Doub
   return dist ;
 }
 
-// Calcul des coefficients g1,g2,g3,g4 a partir de dxam,dx,dxav
+// Compute coefficients g1,g2,g3,g4 from dxam,dx,dxav
 void Eval_Conv_VDF_tools::calcul_g_impl(const double dxam, const double dx, const double dxav, double& g1, double& g2, double& g3, double& g4) const
 {
   g1 = -dx*dx*(dx/2+dxav)/(4*(dx+dxam+dxav)*(dx+dxam)*dxam);

@@ -19,7 +19,7 @@
 #include <Champ_Generique_base.h>
 #include <TRUST_List.h>
 
-/*! @brief classe List_Champ_Generique Represente une liste de Champ_Generique_base
+/*! @brief List_Champ_Generique Represents a list of Champ_Generique_base objects
  *
  */
 class Liste_Champ_Generique : public LIST(OWN_PTR(Champ_Generique_base))

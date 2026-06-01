@@ -18,7 +18,7 @@
 
 #include <TRUST_Deriv.h>
 
-/*! @brief La classe Liste_bloc et Liste_bloc_curseur represente une liste de Deriv<Objet_U> et un curseur associe.
+/*! @brief The Liste_bloc and Liste_bloc_curseur classes represent a list of Deriv<Objet_U> elements and an associated cursor.
  *
  */
 class Liste_bloc: public Objet_U

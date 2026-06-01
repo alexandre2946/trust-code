@@ -46,7 +46,7 @@ Entree& RegroupeBord_32_64<_SIZE_>::interpreter_(Entree& is)
   is >> nom;
 
   //is>>nlistbord;
-  // recodage pour ne pas mettre les virgules
+  // re-coded to avoid requiring commas
   {
     Nom mot;
     is >>mot;
@@ -64,9 +64,9 @@ Entree& RegroupeBord_32_64<_SIZE_>::interpreter_(Entree& is)
   }
 
   Domaine_t& dom = this->domaine();
-  // test pour savoir si la frontiere a regrouper est valide
-  // i.e : si frontiere est une frontiere du domaine  : on applique regroupe_bord()
-  LIST(Nom) nlistbord_dom; // liste stockant tous les noms de frontiere du domaine
+  // test to check whether the boundary to be grouped is valid
+  // i.e.: if the boundary belongs to the domain: apply regroupe_bord()
+  LIST(Nom) nlistbord_dom; // list storing all boundary names of the domain
   int nbfr=dom.nb_front_Cl();
   for (int b=0; b<nbfr; b++)
     {
@@ -101,7 +101,7 @@ void RegroupeBord_32_64<_SIZE_>::rassemble_bords(Domaine_t& dom)
       LIST(Nom) listn;
       listn.add(nom_bord);
       regroupe_bord(dom,nom_bord,listn);
-      // si on a detruit des bords on revient sur b
+      // if we deleted some boundaries, restart from b
       if (nbfr!=dom.nb_front_Cl())
         {
           Cerr<<"Boundary "<<nom_bord<<" has been collected"<<finl;
@@ -162,8 +162,8 @@ void RegroupeBord_32_64<_SIZE_>::regroupe_bord(Domaine_t& dom, Nom nom,const LIS
 
   for (int b=0; b<nbfr; b++)
     {
-      // la recup des bords et des raccords est dans la boucle
-      // pour pouvoir supprimer ...
+      // boundary and connector retrieval is inside the loop
+      // to allow deletion ...
       Bords_t& listbord=dom.faces_bord();
       Raccords_t& listrac=dom.faces_raccord();
       //const Nom& nombord=nlistbord[b];
@@ -180,9 +180,9 @@ void RegroupeBord_32_64<_SIZE_>::regroupe_bord(Domaine_t& dom, Nom nom,const LIS
             else
               listrac.suppr(dom.raccord(nombord));
 
-            // on supprime un bord
+            // delete a boundary
             nbfr--;
-            b--; // on veut verifie que le suivant n'est pas dans la liste
+            b--; // verify that the next one is not in the list
 
           }
 

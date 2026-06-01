@@ -29,13 +29,13 @@ Ch_front_Vortex::~Ch_front_Vortex()
   sauvegarder_vortex();
 }
 
-/*! @brief Imprime le champ sur flot de sortie.
+/*! @brief Prints the field to an output stream.
  *
- * Imprime la taille du champ et la valeur (constante) sur
- *     la frontiere.
+ * Prints the size of the field and the (constant) value on
+ *     the boundary.
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Ch_front_Vortex::printOn(Sortie& os) const
 {
@@ -46,13 +46,13 @@ Sortie& Ch_front_Vortex::printOn(Sortie& os) const
   return os;
 }
 
-/*! @brief Lit le champ a partir d'un flot d'entree.
+/*! @brief Reads the field from an input stream.
  *
  * Format:
  *       Champ_front_Vortex nb_compo vrel_1 ... [vrel_i]
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree& is) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree& is) the modified input stream
  */
 Entree& Ch_front_Vortex::readOn(Entree& is)
 {
@@ -72,10 +72,10 @@ Entree& Ch_front_Vortex::readOn(Entree& is)
   return is;
 }
 
-/*! @brief Renvoie l'objet upcaste en Champ_front_base&
+/*! @brief Returns the object upcast to Champ_front_base&
  *
  * @param (Champ_front_base& ch)
- * @return (Champ_front_base&) (*this) upcaste en Champ_front_base&
+ * @return (Champ_front_base&) (*this) upcast to Champ_front_base&
  */
 Champ_front_base& Ch_front_Vortex::affecter_(const Champ_front_base& ch)
 {
@@ -198,7 +198,7 @@ int Ch_front_Vortex::initialiser(double un_temps, const Champ_Inc_base& inco)
 
 
   /////////////////////////////////////////////////////////
-  // caracteristiques geometriques associees a la frontiere
+  // geometric characteristics associated with the boundary
   /////////////////////////////////////////////////////////
 
   if(geom=="circle")
@@ -286,11 +286,11 @@ int Ch_front_Vortex::initialiser(double un_temps, const Champ_Inc_base& inco)
   else if(geom=="channel")
     {
       //
-      // le canal est suppose etre oriente suivant x,
-      // periodique suivant z (et x)
-      // la frontiere d'entree centree sur l'origine
-      // de hauteur et largeur: 2
-      // soit (x,y,z) : [0;0]x[-1;+1]x[-1;+1]
+      // the channel is assumed to be oriented along x,
+      // periodic along z (and x)
+      // the inlet boundary centered at the origin
+      // with height and width: 2
+      // i.e. (x,y,z) : [0;0]x[-1;+1]x[-1;+1]
 
       R=1.;
 
@@ -302,7 +302,7 @@ int Ch_front_Vortex::initialiser(double un_temps, const Champ_Inc_base& inco)
     }
 
   ///////////////////////////////////////////////////////////////
-  // repere local (t1;t2) associe a la frontiere (supposee plane)
+  // local frame (t1;t2) associated with the boundary (assumed to be planar)
   ///////////////////////////////////////////////////////////////
   if (nb_faces==0)
     {
@@ -310,7 +310,7 @@ int Ch_front_Vortex::initialiser(double un_temps, const Champ_Inc_base& inco)
     }
   else
     {
-      nx=-zvf.face_normales(ndeb,0);  // normales orientees vers l'interieur du domaine
+      nx=-zvf.face_normales(ndeb,0);  // normals oriented towards the interior of the domain
       ny=-zvf.face_normales(ndeb,1);
       nz=-zvf.face_normales(ndeb,2);
 
@@ -349,7 +349,7 @@ int Ch_front_Vortex::initialiser(double un_temps, const Champ_Inc_base& inco)
            Cerr << " t2z " << t2z << finl;
       */
       ///////////////////////////////////////////////////////////////////
-      // initialisation des champ de : vitesse - k - epsilon (analytique)
+      // initialization of the fields: velocity - k - epsilon (analytical)
       ///////////////////////////////////////////////////////////////////
 
       double d,dplus,Reytau;
@@ -368,11 +368,11 @@ int Ch_front_Vortex::initialiser(double un_temps, const Champ_Inc_base& inco)
 
           if(geom=="circle")
             {
-              d = R - sqrt(dx*dx+dy*dy+dz*dz) ;  // distance a la paroi
+              d = R - sqrt(dx*dx+dy*dy+dz*dz) ;  // distance to the wall
             }
           else
             {
-              d = R - std::fabs(y) ;  // distance a la paroi
+              d = R - std::fabs(y) ;  // distance to the wall
             }
 
           if(d<=0.)
@@ -396,11 +396,11 @@ int Ch_front_Vortex::initialiser(double un_temps, const Champ_Inc_base& inco)
 
           if(dplus<11.)
             {
-              dudy(face) = utau*utau/nu ;  // -> gradient dudy discontinu a dplus = 11
+              dudy(face) = utau*utau/nu ;  // -> discontinuous dudy gradient at dplus = 11
             }
           else
             {
-              dudy(face) = utau/(kappa*d) ;  // -> genere une discontinuite sur u' en cette position
+              dudy(face) = utau/(kappa*d) ;  // -> generates a discontinuity on u' at this location
             }
 
           k(face)   = utau*utau * ( 0.07*dplus*dplus*exp(-dplus/8)+4.5*(1.-exp(-dplus/20.))/(1.+4.*dplus/Reytau) ) ;
@@ -410,7 +410,7 @@ int Ch_front_Vortex::initialiser(double un_temps, const Champ_Inc_base& inco)
       u = u_moy;
 
       //////////////////////////////////
-      // evaluation du nombre de vortex
+      // evaluation of the number of vortices
       /////////////////////////////////
 
       double sigma_moy = 0.;
@@ -426,8 +426,8 @@ int Ch_front_Vortex::initialiser(double un_temps, const Champ_Inc_base& inco)
         }
       sigma_moy *= pow(C_mu,0.75);
       sigma_moy /= surf;
-      // On ne peut pas utiliser modf (voir Schema_Temps_base::limpr) car
-      // nb_vortex sert a dimensionner des tableaux !
+      // We cannot use modf (see Schema_Temps_base::limpr) because
+      // nb_vortex is used to size arrays!
       nb_vortex = (int) ( surf / (M_PI * sigma_moy *sigma_moy) );
     }
   Cerr << "nb_vortex " <<nb_vortex << finl;
@@ -445,12 +445,12 @@ int Ch_front_Vortex::initialiser(double un_temps, const Champ_Inc_base& inco)
   sigma.resize(nb_vortex);
 
   //////////////////////////////////////////////////////
-  // Calcul du temps de duree de vie minimum des vortex
+  // Computation of the minimum lifetime of the vortices
   //////////////////////////////////////////////////////
 
   double dt_vortex,dt_min=1.e6;
 
-  for (int i=0; i<nb_faces; i++) // estimation du dt_min requis
+  for (int i=0; i<nb_faces; i++) // estimation of the required dt_min
     {
       dt_vortex=5.*C_mu*pow(k(i),3./2.)/(eps(i)*u_moy(i));
       if(dt_vortex<dt_min) dt_min=dt_vortex;
@@ -459,11 +459,11 @@ int Ch_front_Vortex::initialiser(double un_temps, const Champ_Inc_base& inco)
   Cerr << " DT_MIN VORTEX " << dt_min << finl;
 
   /////////////////////////////////////////////////
-  // initialisation des vortex par tirage aleatoire
+  // vortex initialisation by random drawing
   /////////////////////////////////////////////////
 
   /*
-           for (int i=0;i<nb_vortex;i++)  // random different a chaque nouveau tirage
+           for (int i=0;i<nb_vortex;i++)  // different random at each new draw
            {
            int face = my_rand() % nb_faces;
            double rand1 = (my_rand() % 100)/100.;
@@ -483,7 +483,7 @@ int Ch_front_Vortex::initialiser(double un_temps, const Champ_Inc_base& inco)
            }
   */
 
-  for (int i=0; i<nb_vortex; i++) // random identique a chaque nouveau tirage
+  for (int i=0; i<nb_vortex; i++) // identical random sequence at each new draw
     {
       int face = (int)(nb_faces*drand48());
       xvort(i)=xv(face,0);
@@ -550,12 +550,12 @@ void Ch_front_Vortex::mettre_a_jour(double tps)
       init=0;
       temps=tps;
 
-      if(temps!=0.) // il s'agit d'une reprise
+      if(temps!=0.) // this is a restart
         reprendre_vortex();
     }
 
   //////////////////////////////////////////////////
-  // caracteristiques des vortex (position-vorticite)
+  // vortex characteristics (position-vorticity)
   //////////////////////////////////////////////////
   if (nb_vortex!=0)
     alpha = 4.*sqrt(M_PI*surf/(3.*nb_vortex*(2.*log(3.)-3.*log(2.))));
@@ -585,7 +585,7 @@ void Ch_front_Vortex::mettre_a_jour(double tps)
     }
 
   ///////////////////////////////////////////////////////////////////////////////////
-  // calcul de la vitesse induite par les vortex en chacune des faces de la frontiere
+  // computation of the velocity induced by the vortices at each face of the boundary
   ///////////////////////////////////////////////////////////////////////////////////
 
   for(int face=ndeb; face<nfin; face++)
@@ -594,12 +594,12 @@ void Ch_front_Vortex::mettre_a_jour(double tps)
       yter=xv(face,1);
       z=xv(face,2);
 
-      x -= Ox ;  // ATTENTION : Pour des raisons pratiques,
-      yter -= Oy ;  // les coordonnees des points sont exprimees
-      z -= Oz ;  // en fonction de l'origine Ox,Oy,Oz de la frontiere
+      x -= Ox ;  // NOTE: For practical reasons,
+      yter -= Oy ;  // point coordinates are expressed
+      z -= Oz ;  // relative to the boundary origin Ox,Oy,Oz
 
-      v(face) = 0.;  // vitesse induite par les vortex a la face suivant t1
-      w(face) = 0.;  // vitesse induite par les vortex a la face suivant t2
+      v(face) = 0.;  // velocity induced by vortices at the face along t1
+      w(face) = 0.;  // velocity induced by vortices at the face along t2
 
       for (int i=0; i<nb_vortex; i++)
         {
@@ -611,11 +611,11 @@ void Ch_front_Vortex::mettre_a_jour(double tps)
 
 
           ////////////////////////////////////
-          // traitement des conditions limites
+          // boundary condition treatment
           ////////////////////////////////////
 
           //***************************************
-          // Parois : traitement des vortex miroirs
+          // Walls: mirror vortex treatment
           //***************************************
 
           if(geom=="circle")
@@ -644,7 +644,7 @@ void Ch_front_Vortex::mettre_a_jour(double tps)
 
 
           //***************************************
-          // Periodicite : canal plan uniquement
+          // Periodicity: planar channel only
           //***************************************
 
           if(geom=="channel")
@@ -663,11 +663,11 @@ void Ch_front_Vortex::mettre_a_jour(double tps)
 
             }
 
-        }//boucle sur vortex
+        }//loop over vortices
 
 
       ////////////////////////////////////////////////////////////////////////////
-      // calcul de la fluctuation de vitesse logitudinale par equation de Langevin
+      // computation of the longitudinal velocity fluctuation via the Langevin equation
       ////////////////////////////////////////////////////////////////////////////
 
 
@@ -685,7 +685,7 @@ void Ch_front_Vortex::mettre_a_jour(double tps)
           vp = costheta*v(face) + sintheta*w(face) ;
         }
 
-      ///// processus de Wiener : tirage aleatoire "gaussien" verifiant <dW>=0 et <dW^2>=1 /////////
+      ///// Wiener process: "Gaussian" random draw satisfying <dW>=0 and <dW^2>=1 /////////
       /////
       ///// http://www.taygeta.com/random/gaussian.html
 
@@ -699,8 +699,8 @@ void Ch_front_Vortex::mettre_a_jour(double tps)
         }
       while ( ybis >= 1. );
 
-      Wkp1     =  x1 * sqrt( (-1.0 * log( ybis ) ) / ybis );  // On travaille sur dW -> pour assurer <dW^2>=1, on doit modifier le coef
-      dW       =  Wkp1 - Wk(face) ;                       // par rapport a la formulation proposee dans 'taygeta'
+      Wkp1     =  x1 * sqrt( (-1.0 * log( ybis ) ) / ybis );  // Working on dW -> to ensure <dW^2>=1, the coefficient must be modified
+      dW       =  Wkp1 - Wk(face) ;                       // compared to the formulation proposed in 'taygeta'
       Wk(face) =  Wkp1 ;
 
       /*
@@ -730,14 +730,14 @@ void Ch_front_Vortex::mettre_a_jour(double tps)
 
       double dt = tps - temps;
 
-      if(dt!=0.) // codage conforme a these Sergent + papier eDF (au coef 2/3 pres vis-a-vis de C2)
+      if(dt!=0.) // implementation following Sergent's thesis + EDF paper (up to a factor 2/3 relative to C2)
         {
           up += dt*( -(C1/(2.*T))*up  + (C2-1.)*dudy(face)*vp + sqrt(C0*eps(face))*dW/dt );
 
           //        up += dt*( -(C1/(2.*T))*up  + ((2./3.)*C2-1.)*dudy(face)*vp + sqrt(C0*eps(face))*dW/dt );
         }
       /*
-             if(dt!=0.) // codage conforme a ce qui est code dans Saturne
+             if(dt!=0.) // implementation following what is coded in Saturne
              {
              up += dt*(-(1.-(2./3.)*C2)*dudy(face)*vp)  + 2.*sqrt((2./3.)*(C1-1.)*eps(face)*dt)*dW;
              up /= (1.+5.*C1*dt/T);
@@ -762,11 +762,11 @@ void Ch_front_Vortex::mettre_a_jour(double tps)
         les_val(face,2) =  u_moy(face)  ;
 
       */
-    }//boucle sur face
+    }//loop over faces
 
 
   //////////////////////////
-  // deplacement des vortex
+  // vortex displacement
   //////////////////////////
 
 
@@ -778,30 +778,30 @@ void Ch_front_Vortex::mettre_a_jour(double tps)
     {
       int face = fvort[i];
 
-      x = xvort(i) + dt * ( v(face)*t1x + w(face)*t2x ); // Les deplacements des vortex ne s'operent
-      yter = yvort(i) + dt * ( v(face)*t1y + w(face)*t2y ); // que dans le plan d'entree. D'ou les composantes
-      z = zvort(i) + dt * ( v(face)*t1z + w(face)*t2z ); // u.n proscrites
+      x = xvort(i) + dt * ( v(face)*t1x + w(face)*t2x ); // Vortex displacements only occur
+      yter = yvort(i) + dt * ( v(face)*t1y + w(face)*t2y ); // in the inlet plane, hence the u.n
+      z = zvort(i) + dt * ( v(face)*t1z + w(face)*t2z ); // components are excluded
 
-      x -= Ox ;  // ATTENTION : Pour des raisons pratiques,
-      yter -= Oy ;  // les coordonnees des points sont exprimees
-      z -= Oz ;  // en fonction de l'origine Ox,Oy,Oz de la frontiere
+      x -= Ox ;  // NOTE: For practical reasons,
+      yter -= Oy ;  // point coordinates are expressed
+      z -= Oz ;  // relative to the boundary origin Ox,Oy,Oz
 
 
-      if( (geom=="circle") && ((x*x+yter*yter+z*z)>=(R*R)) ) //paroi
+      if( (geom=="circle") && ((x*x+yter*yter+z*z)>=(R*R)) ) //wall
         {
-          // paroi : On ne fait rien - on laisse le vortex a sa position
+          // wall: do nothing - leave the vortex at its current position
         }
-      else if( (geom=="channel") && (std::fabs(yter)>R) ) //paroi
+      else if( (geom=="channel") && (std::fabs(yter)>R) ) //wall
         {
-          // paroi : On ne fait rien - on laisse le vortex a sa position
+          // wall: do nothing - leave the vortex at its current position
         }
-      else if( (geom=="channel") && (z>R) ) //periodicite
+      else if( (geom=="channel") && (z>R) ) //periodicity
         {
           xvort(i) = x + Ox;
           yvort(i) = yter + Oy;
           zvort(i) = -2.*R + z + Oz;
         }
-      else if( (geom=="channel") && (z<-R) ) //periodicite
+      else if( (geom=="channel") && (z<-R) ) //periodicity
         {
           xvort(i) = x + Ox;
           yvort(i) = yter + Oy;
@@ -816,17 +816,17 @@ void Ch_front_Vortex::mettre_a_jour(double tps)
     }
 
   ///////////////////////////////////////////////////////
-  // fin de vie des vortex - generation de nouveau vortex
+  // end of vortex lifetime - generation of new vortex
   ///////////////////////////////////////////////////////
 
   for (int i=0; i<nb_vortex; i++)
     {
       tvort(i) -= dt ;
 
-      if(tvort(i)<=0.)// fin de vie du vortex
+      if(tvort(i)<=0.)// end of vortex lifetime
         {
           /*
-            int face = my_rand() % nb_faces;            // random different a chaque nouveau tirage
+            int face = my_rand() % nb_faces;            // different random at each new draw
             //       double rand1 = (my_rand() % 100)/100.;
             double rand2 = (my_rand() % 100)/100.;
             xvort(i)=xv(face,0);
@@ -836,7 +836,7 @@ void Ch_front_Vortex::mettre_a_jour(double tps)
             if (rand2<0.5) svort(i)=-1.;
             else svort(i)=1.;
           */
-          int face = (int)(nb_faces*drand48());       // random identique a chaque execution
+          int face = (int)(nb_faces*drand48());       // identical random sequence at each execution
           xvort(i)=xv(face,0);
           yvort(i)=xv(face,1);
           zvort(i)=xv(face,2);

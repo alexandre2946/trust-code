@@ -22,15 +22,15 @@
 #include <Domaine_forward.h>
 #include <Domaine_forward.h>
 
-/*! @brief Classe Extruder_en3 Cette classe est un interprete qui sert a lire et executer
+/*! @brief Class Extruder_en3 This class is an interpreter that serves to read and execute
  *
- *     la directive Extruder_en3 :
- *         Extruder_en3 { nb_domaine nom_domaine1 nom_domaine2 .. direction nb_tranches }
- *     Cette directive est a utiliser en discretisation VEF 2D pour obtenir
- *     un maillage 3D par extrusion puis decoupage.
- *    Ici chaque triangle est extruder en prisme, puis decoupe en 3 tetras.
+ *     the Extruder_en3 directive:
+ *         Extruder_en3 { nb_domain domain_name1 domain_name2 .. direction nb_slices }
+ *     This directive is to be used in VEF 2D discretization to obtain
+ *     a 3D mesh by extrusion then cutting.
+ *    Here each triangle is extruded into a prism, then cut into 3 tetrahedra.
  *
- * @sa Interprete Extruder_en3, Cette classe est utilisable en 3D
+ * @sa Interprete Extruder_en3, This class is usable in 3D
  */
 class Extruder_en3 : public Interprete_geometrique_base
 {

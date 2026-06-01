@@ -30,8 +30,8 @@ void Courant_maille_Champ_Face::associer_champ(const Champ_Face_VDF& la_vitesse,
   sch_ = sch;
 }
 
-// XXX : Elie Saikali : pas utilise ... commente
-// Methode de calcul de la valeur sur une face d'un champ uniforme ou non a plusieurs composantes
+// XXX : Elie Saikali : not used ... commented out
+// Method to compute the value on a face for a uniform or multi-component field
 //inline double valeur(const DoubleTab &champ, const int face, const int compo, const Domaine_VDF &le_dom_VDF)
 //{
 //  if (champ.dimension(0) == 1) return champ(0, compo); // Champ uniforme
@@ -47,13 +47,13 @@ void Courant_maille_Champ_Face::associer_champ(const Champ_Face_VDF& la_vitesse,
 void Courant_maille_Champ_Face::mettre_a_jour(double tps)
 {
   const int nb_faces = domaine_vdf().nb_faces();
-  DoubleTab& co = valeurs(); // Courant de maille
+  DoubleTab& co = valeurs(); // Cell Courant number
   double dt = sch_->pas_de_temps();
   for (int face = 0; face < nb_faces; face++)
     {
-      // Calcul de la taille de maille entourant la face
+      // Compute the cell size surrounding the face
       double taille_maille = domaine_vdf().volumes_entrelaces()(face) / domaine_vdf().face_surfaces(face);
-      // Calcul du Courant de maille
+      // Compute the cell Courant number
       co(face) = std::fabs(vitesse_->valeurs()(face)) * dt / taille_maille; // Courant_maille = |Uface| * dt / taille_maille
     }
 

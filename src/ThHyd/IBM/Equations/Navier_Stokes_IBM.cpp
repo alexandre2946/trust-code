@@ -80,7 +80,7 @@ void Navier_Stokes_IBM::modify_initial_gradP(DoubleTrav& gradP)
     }
 }
 
-// assemblage du systeme en pression
+// assembly of the pressure system
 int Navier_Stokes_IBM::preparer_calcul()
 {
   const double temps = schema_temps().temps_courant();
@@ -203,20 +203,20 @@ int Navier_Stokes_IBM::preparer_calcul()
           inc_pre.echange_espace_virtuel();
         }
 
-      // On veut que l'espace virtuel soit a jour, donc all_items
+      // Ensure the virtual space is up to date, hence all_items
       operator_add(la_pression->valeurs(), inc_pre, VECT_ALL_ITEMS);
     }
-  // Mise a jour pression
+  // Update pressure
   la_pression->changer_temps(temps);
   calculer_la_pression_en_pa();
-  // Calcul des forces de pression:
+  // Compute pressure forces:
   gradient->calculer_flux_bords();
 
-  // Calcul gradient_P (ToDo rendre coherent avec ::mettre_a_jour()):
+  // Compute gradient_P (ToDo make consistent with ::mettre_a_jour()):
   gradient.calculer(la_pression->valeurs(), gradient_P->valeurs());
   gradient_P->changer_temps(temps);
 
-  // Calcul divergence_U
+  // Compute divergence_U
   divergence.calculer(la_vitesse->valeurs(), divergence_U->valeurs());
   divergence_U->changer_temps(temps);
 
@@ -278,13 +278,13 @@ bool Navier_Stokes_IBM::initTimeStep(double dt)
   return ddt;
 }
 
-// ajoute les contributions des operateurs et des sources
+// adds contributions from operators and sources
 void Navier_Stokes_IBM::assembler(Matrice_Morse& matrice, const DoubleTab& inco, DoubleTab& resu)
 {
   assembler_ibm_proto(matrice, inco, resu);
 }
 
-// for IBM methods; on ajoute source PDF au RHS
+// for IBM methods; adds PDF source to RHS
 void Navier_Stokes_IBM::derivee_en_temps_inco_sources(DoubleTrav& secmem)
 {
   derivee_en_temps_inco_ibm_proto(secmem);

@@ -35,15 +35,15 @@ double distance_2D(int fac,int elem,const Domaine_EF& domaine);
 double distance_3D(int fac,int elem,const Domaine_EF& domaine);
 double distance_face_elem(int fac,int elem,const Domaine_EF& domaine);
 
-// Fonctions inlinees pour optimisation
+// Inlined functions for optimisation
 inline double vitesse_tangentielle(const double& v0,const double& v1,const double& r0,const double& r1)
 {
-  // On prend fabs car mathematiquement la valeur est >=0
+  // We use fabs because mathematically the value is >=0
   return sqrt(std::fabs(carre(v0)+carre(v1)-carre(v0*r0+v1*r1)));
 }
 inline double vitesse_tangentielle(const double& v0,const double& v1,const double& v2,const double& r0,const double& r1,const double& r2)
 {
-  // On prend fabs car mathematiquement la valeur est >=0
+  // We use fabs because mathematically the value is >=0
   return sqrt(std::fabs(carre(v0)+carre(v1)+carre(v2)-carre(v0*r0+v1*r1+v2*r2)));
 }
 
@@ -70,7 +70,7 @@ inline void calcule_r0r1r2(const DoubleTab& face_normale, int& fac, double& r0, 
 inline double distance_face(int fac,int fac1,const Domaine_EF& domaine)
 {
   int dimension=Objet_U::dimension;
-  const DoubleTab& xv = domaine.xv();    // centre de gravite des faces
+  const DoubleTab& xv = domaine.xv();    // face centre of gravity
   const DoubleTab& face_normale = domaine.face_normales();
   double r0,r1;
   double x0=xv(fac,0);

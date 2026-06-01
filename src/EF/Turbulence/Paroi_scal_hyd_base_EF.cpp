@@ -40,7 +40,7 @@ void Paroi_scal_hyd_base_EF::associer(const Domaine_dis_base& domaine_dis, const
 {
   le_dom_dis_ = ref_cast(Domaine_VF, domaine_dis);
   le_dom_Cl_dis_ = domaine_Cl_dis;
-  // On initialise tout de suite la loi de paroi
+  // Initialize the wall law immediately
   Paroi_scal_hyd_base_EF::init_lois_paroi();
 }
 
@@ -89,9 +89,9 @@ int Paroi_scal_hyd_base_EF::init_lois_paroi()
 
           int size = le_bord.nb_faces();
           DoubleVect& dist_equiv = equivalent_distance_[n_bord];
-          // Note B.M.: on passe ici deux fois: une fois au readOn (par Paroi_scal_hyd_base_EF::associer())
-          //  et une fois par Modele_turbulence_scal_base::preparer_calcul())
-          // donc tester si pas deja fait:
+          // Note B.M.: we pass here twice: once during readOn (via Paroi_scal_hyd_base_EF::associer())
+          //  and once via Modele_turbulence_scal_base::preparer_calcul())
+          // so check if it was already done:
           if (!dist_equiv.get_md_vector())
             le_bord.frontiere().creer_tableau_faces(dist_equiv, RESIZE_OPTIONS::NOCOPY_NOINIT);
           //assert(dist_equiv.get_md_vector() == le_bord.frontiere().md_vector_faces());
@@ -166,7 +166,7 @@ void Paroi_scal_hyd_base_EF::compute_nusselt() const
 
               lambda_t = conductivite_turbulente(elem);
 
-              // temperature tparoi face CL
+              // wall temperature tparoi at BC face
               double tparoi = 0.;
               nodes_face = 0;
               for (int jsom = 0; jsom < nsom; jsom++)
@@ -176,7 +176,7 @@ void Paroi_scal_hyd_base_EF::compute_nusselt() const
                   tparoi += temperature(num_som) / nsom;
                 }
 
-              // on doit calculer Tfluide premiere maille sans prendre en compte Tparoi
+              // compute Tfluide in the first cell without accounting for Tparoi
               double tfluide = 0.;
               for (int i = 0; i < nsom_elem; i++)
                 {
@@ -199,7 +199,7 @@ void Paroi_scal_hyd_base_EF::compute_nusselt() const
               tab_(num_face, 4) = tparoi;
               if (sub_type(Neumann_paroi, la_cl_th.valeur()))
                 {
-                  // dans ce cas on va imprimer Tfluide (moyenne premiere maille), Tface et on Tparoi recalcule avec d_equiv
+                  // in this case, print Tfluide (first-cell average), Tface, and Tparoi recomputed with d_equiv
                   const Neumann_paroi& la_cl_neum = ref_cast(Neumann_paroi, la_cl_th.valeur());
                   double flux = la_cl_neum.flux_impose(num_face - ndeb);
                   double tparoi_equiv = tfluide + flux / (lambda + lambda_t) * d_equiv;
@@ -320,7 +320,7 @@ void Paroi_scal_hyd_base_EF::imprimer_nusselt(Sortie& os) const
                 }
               else
                 {
-                  // on imprime Tfluide seulement car normalement Tface=Tparoi est connu
+                  // print only Tfluide since Tface=Tparoi is normally known
                   for (int i=0; i<4; i++)
                     Nusselt << "\t| " << tab_(num_face, i);
                   Nusselt << finl;

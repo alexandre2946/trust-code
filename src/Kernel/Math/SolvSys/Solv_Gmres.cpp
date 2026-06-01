@@ -40,7 +40,7 @@ Solv_Gmres::Solv_Gmres()
   dim_espace_Krilov_=10;
 }
 
-// printOn et readOn
+// printOn and readOn
 Sortie& Solv_Gmres::printOn(Sortie& s ) const
 {
   s<<" { seuil "<<seuil_;
@@ -145,16 +145,16 @@ int Solv_Gmres::resoudre_systeme(const Matrice_Base& la_matrice,
 
 int Solv_Gmres::gmres_local(const Matrice_Morse& A, const DoubleVect& b, DoubleVect& tab_x)
 {
-  // PL c'est pas joli et c'est de moi mais je ne comprends pas pourquoi
-  // l'utilisation de b.size_reelle() plante sur la matrice en pression depuis la 1.6.0 (non teste)
-  // Qu'est ce qui est fait en implicite pour b.size_reelle() soit >=0 ???
+  // PL: not elegant, but the reason why using b.size_reelle() crashes
+  // on the pressure matrix since version 1.6.0 is not understood (untested)
+  // What implicit mechanism makes b.size_reelle() >= 0 ???
   const int ns=(b.size_reelle_ok()?b.size_reelle():b.size_array());
   int nb_ligne_tot=(int)Process::mp_sum((double) ns);
 
-  // A present dans le jdd
+  // Now read from the dataset
   double epsGMRES=1.e-10*0;
   //int nkr_min = 10;
-  //int nkr=std::max(nkr_min,nb_ligne_tot/2);                         // dimension de l'espace de Krylov
+  //int nkr=std::max(nkr_min,nb_ligne_tot/2);                         // Krylov subspace dimension
   int nkr = dim_espace_Krilov_;
   int nit1_min = 20;
   int nit1=std::max(nit1_min,nb_ligne_tot);
@@ -257,7 +257,7 @@ int Solv_Gmres::gmres_local(const Matrice_Morse& A, const DoubleVect& b, DoubleV
           }
           v[j] = tab_v0;
           tab_v0 = tab_v1 ;
-          // Modifie par DJ
+          // Modified by DJ
           //---------------
           double tem;
           if (legacy)
@@ -338,7 +338,7 @@ l5:
       tab_v0 *= -1. ;
       tab_v0 += b;
 
-      // calcul du residu sans le precond....
+      // compute the unpreconditioned residual...
       double res2=mp_norme_vect(tab_v0);
       if ((it>0) && (controle_residu_==1) && (sup_strict(res2,res2_old)))
         {
@@ -351,10 +351,10 @@ l5:
       if (limpr()==1)
         Cout<<" - At it = "<< it+1 <<", residu scalar = "<< res2 << finl;
 
-      // Test d'arret sur le residu
+      // Stop test on the residual
       if(res2<rec_min)
         {
-          // Ajoute par DJ
+          // Added by DJ
           //--------------
           if (limpr()>-1)
             {
@@ -364,7 +364,7 @@ l5:
             }
           return it+1;
         }
-      // Test d'arret sur le nombre d'iterations max
+      // Stop test on the maximum number of iterations
       else if (it==nit-1)
         {
           if (limpr()>-1)
@@ -384,7 +384,7 @@ l5:
           return it+1;
         }
 
-      // Calcul du residu avec preconditionnement
+      // Compute the preconditioned residual
       {
         CDoubleArrView Diag = tab_Diag.view_ro();
         DoubleArrView v0 = tab_v0.view_rw();

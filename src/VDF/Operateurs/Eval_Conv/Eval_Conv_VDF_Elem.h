@@ -56,7 +56,7 @@ public:
   template <typename Type_Double> inline void coeffs_face(const DoubleTab&, const int, const int, const int, const int, const Echange_externe_impose&, Type_Double&, Type_Double& ) const { /* Do nothing */ }
   template <typename Type_Double> inline void coeffs_faces_interne(const int, Type_Double&, Type_Double& ) const;
 
-  // contribution de la derivee en vitesse d'une equation scalaire
+  // contribution of the velocity derivative in a scalar equation
   template <typename BC, typename Type_Double> // Generic return
   inline void coeffs_face_bloc_vitesse(const DoubleTab&, const DoubleTab&, const int, const BC&, const int, Type_Double& ) const { /* Do nothing */ }
 
@@ -67,7 +67,7 @@ public:
   template <typename Type_Double> inline void coeffs_face_bloc_vitesse(const DoubleTab&, const DoubleTab&, const int, const int, const int, const Echange_externe_impose&, const int, Type_Double& ) const { /* Do nothing */ }
   template <typename Type_Double> inline void coeffs_faces_interne_bloc_vitesse(const DoubleTab&, const int, Type_Double& ) const;
 
-  // A virer un jour .. voir avec le baltik Rayonnement
+  // To be removed someday .. check with the Rayonnement baltik
   template <typename BC, typename Type_Double> inline void secmem_face(const int, const BC&, const int, Type_Double& ) const { throw; }
   template <typename Type_Double> inline void secmem_face(const int, const int, const int, const Echange_externe_impose&, const int, Type_Double& ) const { throw; }
   template <typename Type_Double> inline void secmem_faces_interne(const int, Type_Double& ) const { throw; }

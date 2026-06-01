@@ -18,11 +18,11 @@
 
 /*! @brief Sortie_libre_Gradient_Pression_libre_VEFPreP1B
  *
- *  Cette classe derive de la classe Neumann_sortie_libre
+ *  This class derives from the class Neumann_sortie_libre.
  *
- *     Elle represente une frontiere ouverte avec condition de gradient de pression calculer.
- *     La fonction flux_impose() renvoie une valeur de pression a l'exterieur calculee a partir du gradient de pression impose
- *     et de la pression a l'interieur du domaine.
+ *     It represents an open boundary with a computed pressure gradient condition.
+ *     The flux_impose() function returns an external pressure value computed from the imposed pressure gradient
+ *     and the interior pressure.
  *
  */
 #include <Neumann_sortie_libre.h>

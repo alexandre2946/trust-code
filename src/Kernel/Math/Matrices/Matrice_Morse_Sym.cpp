@@ -23,10 +23,10 @@
 
 Implemente_instanciable_sans_constructeur(Matrice_Morse_Sym,"Matrice_Morse_Sym",Matrice_Morse);
 
-/*! @brief Ecrit les trois tableaux de la structure de stockage Morse sur un flot de sortie.
+/*! @brief Writes the three arrays of the Morse storage structure to an output stream.
  *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie& s) le flot de sortie modifie
+ * @param (Sortie& s) an output stream
+ * @return (Sortie& s) the modified output stream
  */
 Sortie& Matrice_Morse_Sym::printOn(Sortie& s) const
 {
@@ -35,11 +35,11 @@ Sortie& Matrice_Morse_Sym::printOn(Sortie& s) const
 }
 
 
-/*! @brief NON CODE
+/*! @brief NOT IMPLEMENTED
  *
- * @param (Entree& s) un flot d'entree
- * @return (Entree& s) le flot d'entree
- * @throws NON CODE
+ * @param (Entree& s) an input stream
+ * @return (Entree& s) the input stream
+ * @throws NOT IMPLEMENTED
  */
 Entree& Matrice_Morse_Sym::readOn(Entree& s)
 {
@@ -49,16 +49,16 @@ Entree& Matrice_Morse_Sym::readOn(Entree& s)
   return Matrice_Morse::readOn(s) ;
 }
 
-/*! @brief Constructeur d'une Matrice_Morse_Sym comportant n1 lignes et pouvant stocker n2 elements non-nuls (au maximum).
+/*! @brief Constructor of a Matrice_Morse_Sym with n1 rows and capable of storing at most n2 non-zero elements.
  *
- *     Les elements de la matrice et la table des connectivites
- *     sont donnes dans les 3 derniers parametres.
+ *     The matrix elements and the connectivity table
+ *     are given in the last 3 parameters.
  *
- * @param (int n1) le nombre de ligne de la matrice
- * @param (int n2) le nombre d'element non nuls stockable par la matrice
- * @param (IntLists& voisins) liste des voisins de chaque lignes
- * @param (DoubleLists& valeurs) liste des valeurs
- * @param (DoubleVect& terme_diag) le vecteur des termes diagonaux
+ * @param (int n1) the number of rows of the matrix
+ * @param (int n2) the maximum number of non-zero elements storable by the matrix
+ * @param (IntLists& voisins) list of neighbours for each row
+ * @param (DoubleLists& valeurs) list of values
+ * @param (DoubleVect& terme_diag) the vector of diagonal terms
  */
 Matrice_Morse_Sym::Matrice_Morse_Sym(int n1, int n2, const IntLists& voisins,
                                      const DoubleLists& valeurs,
@@ -71,9 +71,9 @@ Matrice_Morse_Sym::Matrice_Morse_Sym(int n1, int n2, const IntLists& voisins,
 }
 
 
-/*! @brief Constructeur d'une Matrice_Morse_Sym par copie d'une Matrice_Morse.
+/*! @brief Copy constructor of a Matrice_Morse_Sym from a Matrice_Morse.
  *
- * @param (Matrice_Morse& acopier) la matrice a copier
+ * @param (Matrice_Morse& acopier) the matrix to copy
  */
 Matrice_Morse_Sym::Matrice_Morse_Sym(const Matrice_Morse& A)
   :Matrice_Morse(A)
@@ -117,9 +117,9 @@ Matrice_Morse_Sym& Matrice_Morse_Sym::operator=(const Matrice& A)
   return *this;
 }
 
-/*! @brief Constructeur d'une Matrice_Morse_Sym par copie d'une Matrice_Morse.
+/*! @brief Copy constructor of a Matrice_Morse_Sym from a Matrice_Morse.
  *
- * @param (Matrice_Morse& acopier) la matrice a copier
+ * @param (Matrice_Morse& acopier) the matrix to copy
  */
 Matrice_Morse_Sym::Matrice_Morse_Sym(const Matrice_Morse_Sym& acopier) :
   Matrice_Morse(acopier),Matrice_Sym()
@@ -129,14 +129,14 @@ Matrice_Morse_Sym::Matrice_Morse_Sym(const Matrice_Morse_Sym& acopier) :
   morse_matrix_structure_has_changed_=1;
 }
 
-/*! @brief Operation de multiplication-accumulation (saxpy) matrice matrice (matrice represente par un tableau)
+/*! @brief Matrix-matrix multiply-accumulate operation (saxpy) where the matrix is represented by an array.
  *
  *     Operation: RESU = RESU + A*X
  *
- * @param (DoubleTab& x) la matrice a multiplier
- * @param (DoubleTab& resu) la matrice resultat de l'operation
- * @return (DoubleTab&) la matrice resultat de l'operation
- * @throws taille du resultat incompatible avec la taille de x
+ * @param (DoubleTab& x) the matrix to multiply
+ * @param (DoubleTab& resu) the result matrix of the operation
+ * @return (DoubleTab&) the result matrix of the operation
+ * @throws result size incompatible with the size of x
  */
 DoubleTab& Matrice_Morse_Sym::ajouter_multTab_(const DoubleTab& x, DoubleTab& resu) const
 {
@@ -202,7 +202,7 @@ double Matrice_Morse_Sym::multvect_et_prodscal(const DoubleVect& x, DoubleVect& 
         auto j = index1[i];
         auto j_next= index1[i+1];
         //int ncoeffs = j_next - j;
-        assert(i==index2[j]); // La diagonale meme nulle doit etre stockee dans une Mat_Morse_Sym
+        assert(i==index2[j]); // Even a zero diagonal element must be stored in a Mat_Morse_Sym
         double xi = xx[i];
         double resu_tmp = res[i] + thecoef[j] * xi;
         j++;
@@ -223,13 +223,13 @@ double Matrice_Morse_Sym::multvect_et_prodscal(const DoubleVect& x, DoubleVect& 
 }
 
 
-/*! @brief Operation de multiplication-accumulation (saxpy) matrice vecteur.
+/*! @brief Matrix-vector multiply-accumulate operation (saxpy).
  *
  * Operation: resu = resu + A*x
  *
- * @param (DoubleVect& x) le vecteur a multiplier
- * @param (DoubleVect& resu) le vecteur resultat de l'operation
- * @return (DoubleVect&) le vecteur resultat de l'operation
+ * @param (DoubleVect& x) the vector to multiply
+ * @param (DoubleVect& resu) the result vector of the operation
+ * @return (DoubleVect&) the result vector of the operation
  */
 
 DoubleVect& Matrice_Morse_Sym::ajouter_multvect_(const DoubleVect& x, DoubleVect& resu) const
@@ -255,7 +255,7 @@ DoubleVect& Matrice_Morse_Sym::ajouter_multvect_(const DoubleVect& x, DoubleVect
       {
         auto j = index1[i];
         auto j_next= index1[i+1];
-        assert(i==index2[j]); // La diagonale meme nulle doit etre stockee dans une Mat_Morse_Sym
+        assert(i==index2[j]); // Even a zero diagonal element must be stored in a Mat_Morse_Sym
 #if 0
         // Note B.M.: sur les procs intel ce deroulage n'a aucun effet benefique.
         int ncoeffs = j_next - j;
@@ -305,7 +305,7 @@ DoubleVect& Matrice_Morse_Sym::ajouter_multvect_(const DoubleVect& x, DoubleVect
       l=m;
       m=tab1_(i+1);
       t = coeff_(l-1)*xi;
-      assert(i==tab2(l-1)-1); // La diagonale meme nulle doit etre stockee dans une Mat_Morse_Sym
+      assert(i==tab2(l-1)-1); // Even a zero diagonal element must be stored in a Mat_Morse_Sym
       //aij=coeff_(tab1_(i)-1);
       fin2=m-1;
       for (k=l; k<fin2; k++)
@@ -323,13 +323,13 @@ DoubleVect& Matrice_Morse_Sym::ajouter_multvect_(const DoubleVect& x, DoubleVect
 }
 
 
-/*! @brief Operation de multiplication-accumulation (saxpy) matrice vecteur, par la matrice transposee.
+/*! @brief Transposed-matrix-vector multiply-accumulate operation (saxpy).
  *
  *     Operation: resu = resu + A^{T}*x
  *
- * @param (DoubleVect& x) le vecteur a multiplier
- * @param (DoubleVect& resu) le vecteur resultat de l'operation
- * @return (DoubleVect&) le vecteur resultat de l'operation
+ * @param (DoubleVect& x) the vector to multiply
+ * @param (DoubleVect& resu) the result vector of the operation
+ * @return (DoubleVect&) the result vector of the operation
  */
 DoubleVect& Matrice_Morse_Sym::ajouter_multvectT_(const DoubleVect& x,DoubleVect& resu) const
 {
@@ -339,7 +339,7 @@ DoubleVect& Matrice_Morse_Sym::ajouter_multvectT_(const DoubleVect& x,DoubleVect
 }
 
 
-/*! @brief Fonction (hors classe) amie de la classe Matrice_Morse_Sym NE FAIT RIEN : NON CODE
+/*! @brief Friend function (non-member) of class Matrice_Morse_Sym. DOES NOTHING: NOT IMPLEMENTED
  *
  * @param (Matrice_Morse_Sym&)
  * @param (Matrice_Morse_Sym&)
@@ -347,7 +347,7 @@ DoubleVect& Matrice_Morse_Sym::ajouter_multvectT_(const DoubleVect& x,DoubleVect
  */
 Matrice_Morse_Sym operator+(const Matrice_Morse_Sym& A,const Matrice_Morse_Sym& B)
 {
-  //Il faut evidemment que les matrices soient de meme taille
+  //The two matrices must obviously have the same size
   if (A.nb_lignes() != B.nb_lignes())
     {
       Cerr << "Error in Matrice_Morse_Sym::operator+" << finl;
@@ -363,20 +363,20 @@ Matrice_Morse_Sym operator+(const Matrice_Morse_Sym& A,const Matrice_Morse_Sym& 
   DoubleList coeffs_A_ligne_i,coeffs_B_ligne_i;
   double coeff_A,coeff_B;
 
-  //Pour s'assurer que compacte() va marcher
+  //To ensure that compacte() will work
   for (auto i=0; i<somme.get_coeff().size(); i++)
     somme.get_set_coeff()(i) = 0.;
 
-  //On va remplir tab2_ par ordre croissant de colonnes
+  //Fill tab2_ in ascending column order
   somme.get_set_tab1()(0) = 1;
-  for (int i=0; i<A.nb_lignes(); i++) //boucle sur les lignes
+  for (int i=0; i<A.nb_lignes(); i++) //loop over rows
     {
-      //Pour eviter les effets de bord
+      //To avoid boundary effects
       if (!colonnes_A_ligne_i.est_vide()) colonnes_A_ligne_i.vide();
       if (!colonnes_B_ligne_i.est_vide()) colonnes_B_ligne_i.vide();
 
-      //Initialisation des colonnes_A et colonnes_B
-      //ATTENTION a la numerotation C++
+      //Initialisation of colonnes_A and colonnes_B
+      //BEWARE of C++ indexing
       for (auto j=0; j<A.get_tab1()(i+1)-A.get_tab1()(i); j++)
         {
           colonnes_A_ligne_i.add_if_not(A.get_tab2()(A.get_tab1()(i)+j-1));
@@ -389,13 +389,13 @@ Matrice_Morse_Sym operator+(const Matrice_Morse_Sym& A,const Matrice_Morse_Sym& 
           coeffs_B_ligne_i.add(B.get_coeff()(B.get_tab1()(i)+j-1));
         }//fin for
 
-      //On initialise d'autres varibles
+      //Initialize other variables
       non_nuls_ligne_i = 0;
 
-      //Debut de l'algorithme
+      //Start of the algorithm
       while (!colonnes_A_ligne_i.est_vide() || !colonnes_B_ligne_i.est_vide())
         {
-          //Si l'une des listes est vide et pas l'autre
+          //If one list is empty but not the other
           if (colonnes_A_ligne_i.est_vide() && !colonnes_B_ligne_i.est_vide())
             {
               somme.get_set_tab2()(somme.get_tab1()(i)+non_nuls_ligne_i-1) =
@@ -422,7 +422,7 @@ Matrice_Morse_Sym operator+(const Matrice_Morse_Sym& A,const Matrice_Morse_Sym& 
               non_nuls_ligne_i++;
             }//fin if
 
-          //Aucune des deux listes n'est vide
+          //Neither list is empty
           min_colonnes_A = colonnes_A_ligne_i[0];
           min_colonnes_B = colonnes_B_ligne_i[0];
           coeff_A = coeffs_A_ligne_i[0];
@@ -471,12 +471,12 @@ Matrice_Morse_Sym operator+(const Matrice_Morse_Sym& A,const Matrice_Morse_Sym& 
 }
 
 
-/*! @brief Fonction (hors classe) amie de la classe Matrice_Morse_Sym NE FAIT RIEN : NON CODE
+/*! @brief Friend function (non-member) of class Matrice_Morse_Sym. DOES NOTHING: NOT IMPLEMENTED
  *
  * @param (double)
  * @param (Matrice_Morse_Sym& A)
  * @return (Matrice_Morse_Sym)
- * @throws NON CODE
+ * @throws NOT IMPLEMENTED
  */
 Matrice_Morse_Sym operator *(double x, const Matrice_Morse_Sym& A)
 {
@@ -487,11 +487,11 @@ Matrice_Morse_Sym operator *(double x, const Matrice_Morse_Sym& A)
 }
 
 
-/*! @brief Fonction (hors classe) amie de la classe Matrice_Morse_Sym Simple appel a operator*(double,const Matrice_Morse_Sym&) (qui est NON CODE)
+/*! @brief Friend function (non-member) of class Matrice_Morse_Sym. Simply calls operator*(double,const Matrice_Morse_Sym&) (which is NOT IMPLEMENTED)
  *
- * @param (Matrice_Morse_Sym& A) la matrice a multiplier par x
- * @param (double x) un scalaire
- * @return (Matrice_Morse_Sym) le resultat de l'appel sous-jacent
+ * @param (Matrice_Morse_Sym& A) the matrix to multiply by x
+ * @param (double x) a scalar
+ * @return (Matrice_Morse_Sym) the result of the underlying call
  */
 Matrice_Morse_Sym operator *(const Matrice_Morse_Sym& A, double x)
 {
@@ -499,11 +499,11 @@ Matrice_Morse_Sym operator *(const Matrice_Morse_Sym& A, double x)
 }
 
 
-/*! @brief NE FAIT RIEN : NON CODE
+/*! @brief DOES NOTHING: NOT IMPLEMENTED
  *
  * @param (double)
  * @return (Matrice_Morse_Sym)
- * @throws NON CODE
+ * @throws NOT IMPLEMENTED
  */
 Matrice_Morse_Sym& Matrice_Morse_Sym::operator *=( double x )
 {
@@ -643,9 +643,9 @@ void Matrice_Morse_Sym::get_symmetric_stencil_and_coefficients( Stencil&      st
   coefficients.resize_array( new_size );
 }
 
-/*! @brief Operateur de negation unaire, renvoie l'opposee de la matrice:  - A.
+/*! @brief Unary negation operator, returns the opposite of the matrix: -A.
  *
- *     Appelle operator*(const Matrice_Morse_Sym&,double)
+ *     Calls operator*(const Matrice_Morse_Sym&,double)
  *
  */
 Matrice_Morse_Sym Matrice_Morse_Sym::operator -() const
@@ -685,10 +685,10 @@ static int commun(const ArrOfInt& items,
 */
 
 
-/*! @brief Operateur d'affectatiob d'une Matrice_Morse_Sym dans une Matrice_Morse_Sym.
+/*! @brief Assignment operator of a Matrice_Morse_Sym into a Matrice_Morse_Sym.
  *
- * @param (Matrice_Morse_Sym& a) la partie droite de l'affectation
- * @return (Matrice_Morse_Sym&) le resultat de l'affectation (*this)
+ * @param (Matrice_Morse_Sym& a) the right-hand side of the assignment
+ * @return (Matrice_Morse_Sym&) the result of the assignment (*this)
  */
 Matrice_Morse_Sym& Matrice_Morse_Sym::operator=(const Matrice_Morse_Sym& a )
 {
@@ -729,15 +729,15 @@ Sortie& Matrice_Morse_Sym::imprimer_formatte(Sortie& s) const
   return Matrice_Morse::imprimer_formatte(s, 1);
 }
 
-/*! @brief Suppression des doublons on ordonne tab2;
+/*! @brief Remove duplicates by sorting tab2.
  *
- *     Verification de la diagonale: tous ses elements doivent etre stockes
+ *     Check the diagonal: all diagonal elements must be stored.
  *
  */
 void Matrice_Morse_Sym::compacte(int elim_coeff_nul)
 {
   Matrice_Morse::compacte(elim_coeff_nul);
-  // Verification si tous les elements de la diagonale sont bien stockes
+  // Check whether all diagonal elements are properly stored
   int n=nb_lignes();
   int elements_diagonaux_non_stockes=0;
   auto size_tab2_ = tab2_.size_array();
@@ -754,14 +754,14 @@ void Matrice_Morse_Sym::compacte(int elim_coeff_nul)
     }
   if (elements_diagonaux_non_stockes)
     {
-      // On resize
+      // Resize
       auto nnz=size_tab2_+elements_diagonaux_non_stockes;
       tab2_.resize(nnz);
       coeff_.resize(nnz);
-      // On change la matrice en partant de la fin
+      // Modify the matrix starting from the end
       for (int i=n-1; i>=0; i--)
         {
-          // On copie en decalant
+          // Copy with shift
           auto k1=tab1_(i)-1;
           auto k2=tab1_(i+1)-1;
           for (auto j=k2-1; j>=k1; j--)
@@ -773,7 +773,7 @@ void Matrice_Morse_Sym::compacte(int elim_coeff_nul)
 
           if (k1>=size_tab2_ || i!=tab2_(k1)-1)
             {
-              // On insere l'element diagonal nul manquant
+              // Insert the missing zero diagonal element
               elements_diagonaux_non_stockes--;
               tab2_(k1+elements_diagonaux_non_stockes)=i+1;
               coeff_(k1+elements_diagonaux_non_stockes)=0.;
@@ -784,7 +784,7 @@ void Matrice_Morse_Sym::compacte(int elim_coeff_nul)
   morse_matrix_structure_has_changed_=1;
 }
 
-/*! @brief Renumerotation d'une matrice afin de reduire la largeur de bande
+/*! @brief Renumbers a matrix to reduce its bandwidth.
  *
  */
 void Matrice_Morse_Sym::renumerote() const
@@ -794,7 +794,7 @@ void Matrice_Morse_Sym::renumerote() const
   const Matrice_Morse_Sym& matrice_initial = *this;
   ArrOfInt& tab_iperm = matrice_initial.permutation_inverse();
 
-  // transformation d une matrice morse symetrique en matrice morse
+  // convert a symmetric Morse matrix to a general Morse matrix
   Matrice_Morse matrice2(matrice_initial);
   Matrice_Morse matrice(matrice_initial);
 
@@ -803,7 +803,7 @@ void Matrice_Morse_Sym::renumerote() const
   for (int i=0; i<mon_ordre; i++) matrice2(i, i) = 0.;
   matrice2 += matrice ;
 
-  // calcul de la permutation a effectuer
+  // compute the permutation to apply
   const int n = mon_ordre;
   matrice2.set_tab1_int32();
   const int* tab1tmp = matrice2.get_tab1_int32().addr();
@@ -816,11 +816,11 @@ void Matrice_Morse_Sym::renumerote() const
   for (int i=0 ; i<n; i++) masktmp[i] = 1;
   const int* mask = (const int*) masktmp;
   const int maskval = 1;
-  // GF passage a n+1 pour permettre de faire du Cholesky sur 1 maillage 1xN
+  // GF: changed to n+1 to allow Cholesky on a 1xN mesh
   int* level = new int[n+1];
   int nlev;
 
-  // renumerotation des noeuds
+  // renumber the nodes
   // subroutine perphn(n,ja,ia,init,iperm,mask,maskval,nlev,riord,levels)
   // SPARSKIT2/ORDERINGS/levset.f
   F77NAME(PERPHN)(&n, tab2tmp, tab1tmp, &init,  mask, &maskval,
@@ -850,8 +850,8 @@ void Matrice_Morse_Sym::renumerote() const
   const int* perm_inv = tab_iperm.addr();//normalement inutile
   const int job = 1;
 
-  // permutation de la matrice2 i.e. calcul de P A tP
-  // ici on ne permute que la partie superieure
+  // permute matrice2, i.e. compute P A tP
+  // only the upper part is permuted here
 
   // subroutine dperm (nrow,a,ja,ia,ao,jao,iao,perm,qperm,job)
   // SPARSKIT2/FORMATS/unary.f
@@ -865,7 +865,7 @@ void Matrice_Morse_Sym::renumerote() const
   matrice_renumerotee_.typer("Matrice_Morse_Sym");
   ref_cast(Matrice_Morse_Sym,matrice_renumerotee_.valeur()) = matrice;
 
-  // Construction de permutation() rovisoire deja fait avec
+  // Build permutation() - provisional, already done with
   int size=permutation_inverse().size_array();
   permutation().resize_array(size);
   for(int i=0; i<size; i++)

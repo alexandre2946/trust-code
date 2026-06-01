@@ -27,9 +27,9 @@ class Probleme_base;
 class Domaine_Cl_VDF;
 class Domaine_VDF;
 
-/*! @brief class Terme_Source_Canal_RANS_LES_VDF_Face Cette classe concerne un terme source calcule en partie grace
+/*! @brief class Terme_Source_Canal_RANS_LES_VDF_Face This class concerns a source term computed partly using
  *
- *   a un calcul RANS preliminaire et applique au calcul LES en cours
+ *   a preliminary RANS computation and applied to the current LES computation
  *
  *
  */
@@ -66,7 +66,7 @@ protected :
   OBS_PTR(Domaine_Cl_VDF) le_dom_Cl_VDF;
 
 private :
-  int moyenne= 0; //type de moyenne
+  int moyenne= 0; //type of average
   int cpt= 0, compteur_reprise= 0;
   double alpha_tau = -100., Ly= -100.;
   double f_start= 0., t_av=-1;
@@ -91,9 +91,9 @@ private :
 
   DoubleVect utemp_gliss, utemp, utemp_sum;
 
-  DoubleVect Yu, Yv, Yw;                      // Coordonnees des points ou est definie la vitesse
-  IntVect compt_x,compt_y,compt_z ;            // Nombre de points a meme Y pour chaque grandeur
-  IntVect corresp_u, corresp_v, corresp_w; // Correspondance numerotation globale -> numerotation locale dans Yxx
+  DoubleVect Yu, Yv, Yw;                      // Coordinates of points where the velocity is defined
+  IntVect compt_x,compt_y,compt_z ;            // Number of points at the same Y for each quantity
+  IntVect corresp_u, corresp_v, corresp_w; // Correspondence global numbering -> local numbering in Yxx
 
   Nom nom_pb_rans;
 

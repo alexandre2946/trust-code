@@ -22,7 +22,7 @@ TRUSTSchema_RK<_ORDRE_>::faire_un_pas_de_temps_eqn_base_generique(Equation_base&
 {
   static constexpr int NB_PTS = (_ORDRE_ == Ordre_RK::DEUX_WILLIAMSON) ? 2 : 3;
 
-  // Warning sur les 100 premiers pas de temps si facsec est egal a 1 pour faire reflechir l'utilisateur
+  // Warning on the first 100 time steps if facsec equals 1 to prompt the user to reconsider
   if (nb_pas_dt() >= 0 && nb_pas_dt() <= NW && facsec_ == 1) print_warning(NW);
 
   DoubleTab& xi = eqn.inconnue().valeurs(), &xip1 = eqn.inconnue().futur();
@@ -32,11 +32,11 @@ TRUSTSchema_RK<_ORDRE_>::faire_un_pas_de_temps_eqn_base_generique(Equation_base&
 
   for (int i = 0; i < NB_PTS; i++)
     {
-      // on fait ca : q_i = a_{i-1} * q_{i-1} + dt * f(x_{i-1})
+      // compute: q_i = a_{i-1} * q_{i-1} + dt * f(x_{i-1})
       qi *= get_a<_ORDRE_,NB_PTS>()[i];
       qi.ajoute(dt_, eqn.derivee_en_temps_inco(xip1));
 
-      // on fait ca : x_i = x_{i-1} + b_i * q_i
+      // compute: x_i = x_{i-1} + b_i * q_i
       xi.ajoute(get_b<_ORDRE_,NB_PTS>()[i], qi);
     }
 
@@ -59,7 +59,7 @@ template <Ordre_RK _ORDRE_ > template<Ordre_RK _O_>
 std::enable_if_t<_O_ == Ordre_RK::DEUX_CLASSIQUE || _O_ == Ordre_RK::TROIS_CLASSIQUE || _O_ == Ordre_RK::QUATRE_CLASSIQUE || _O_ == Ordre_RK::QUATRE_CLASSIQUE_3_8, int>
 TRUSTSchema_RK<_ORDRE_>::faire_un_pas_de_temps_eqn_base_generique(Equation_base& eqn)
 {
-  // Warning sur les 100 premiers pas de temps si facsec est egal a 1 pour faire reflechir l'utilisateur
+  // Warning on the first 100 time steps if facsec equals 1 to prompt the user to reconsider
   if (nb_pas_dt() >= 0 && nb_pas_dt() <= NW && facsec_ == 1) print_warning(NW);
 
   static constexpr bool IS_DEUX = (_O_ == Ordre_RK::DEUX_CLASSIQUE) , IS_TROIS = (_O_ == Ordre_RK::TROIS_CLASSIQUE), IS_QUATRE = (_O_ == Ordre_RK::QUATRE_CLASSIQUE);

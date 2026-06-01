@@ -109,7 +109,7 @@ int Solv_GCP_NS::resoudre_systeme(const Matrice_Base& matrice, const DoubleVect&
   // X1 = A11^(-1) (F1 - A10 X0)
   // X0 = (A00 -A01 A11^(-1) A10) (F0 - A01 A11^(-1) F1)
   //
-  // Gradient conjugue sur ce systeme preconditionne par A00
+  // Conjugate gradient on this system preconditioned by A00
   //
   //Cerr << "resoudre_systeme : secmem" << secmem << finl;
 
@@ -133,7 +133,7 @@ int Solv_GCP_NS::resoudre_systeme(const Matrice_Base& matrice, const DoubleVect&
   double dold, dnew, alfa;
 
   solution = 0.0;
-  // Creation de tableaux distribues X1 et F1 sur les sommets
+  // Create distributed arrays X1 and F1 on the vertices
   ConstDoubleTab_parts mo_solution(solution);
   DoubleVect X1 = mo_solution[1];
   // DoubleVect X1;
@@ -144,7 +144,7 @@ int Solv_GCP_NS::resoudre_systeme(const Matrice_Base& matrice, const DoubleVect&
 
   //DoubleVect resu(solution);
 
-  // Creation de tableaux distribues X0 et F0 sur les elements
+  // Create distributed arrays X0 and F0 on the elements
   //DoubleVect X0;
   //champ.domaine().creer_tableau_elements(X0);
   //  ConstDoubleTab_parts mo_solution(solution);

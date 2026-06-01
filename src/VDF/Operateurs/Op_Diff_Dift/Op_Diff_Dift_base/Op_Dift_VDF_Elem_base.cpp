@@ -39,7 +39,7 @@ double Op_Dift_VDF_Elem_base::calculer_dt_stab_elem() const
   ArrOfInt numfa(2*dimension);
   for (int elem = 0; elem < domaine_VDF.nb_elem(); elem++)
     {
-      // choix du facteur
+      // choice of factor
       double rcp = 1.;
       if (!is_concentration)
         {
@@ -52,8 +52,8 @@ double Op_Dift_VDF_Elem_base::calculer_dt_stab_elem() const
       double moy = 0.;
       for (int i = 0; i < 2 * dimension; i++) numfa[i] = elem_faces(elem, i);
 
-      // XXX : E Saikali j'ai corrige pour multi inco parce que c'etait 1/dx et pas 1/dx^2 ... donc attention si ecart !
-      // c'etait comme ca : for (int d = 0; d < dimension; d++) moy += 1. / (domaine_VDF.dist_face(numfa[d], numfa[dimension + d], d));
+      // XXX : E Saikali fixed for multi-inco because it was 1/dx instead of 1/dx^2 ... watch out for discrepancies!
+      // it was like this: for (int d = 0; d < dimension; d++) moy += 1. / (domaine_VDF.dist_face(numfa[d], numfa[dimension + d], d));
       for (int d = 0; d < dimension; d++)
         {
           const double hd = domaine_VDF.dist_face(numfa[d], numfa[dimension + d], d);
@@ -147,7 +147,7 @@ double Op_Dift_VDF_Elem_base::calculer_dt_stab_elem_var_axi() const
 void Op_Dift_VDF_Elem_base::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   const std::string& nom_inco = equation().inconnue().le_nom().getString();
-  if (!matrices.count(nom_inco) || semi_impl.count(nom_inco)) return; //semi-implicite ou pas de bloc diagonal -> rien a faire
+  if (!matrices.count(nom_inco) || semi_impl.count(nom_inco)) return; //semi-implicit or no diagonal block -> nothing to do
 
   Matrice_Morse *mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : nullptr, mat2;
   Op_VDF_Elem::dimensionner(iter_->domaine(), iter_->domaine_Cl(), mat2, equation().diffusion_multi_scalaire());

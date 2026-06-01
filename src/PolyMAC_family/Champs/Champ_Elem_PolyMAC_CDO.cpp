@@ -55,9 +55,9 @@ int Champ_Elem_PolyMAC_CDO::imprime(Sortie& os, int ncomp) const
 
 int Champ_Elem_PolyMAC_CDO::fixer_nb_valeurs_nodales(int n)
 {
-  if (n == domaine_dis_base().domaine().nb_elem()) //champ sans flux aux faces (ex. aiguilles)
+  if (n == domaine_dis_base().domaine().nb_elem()) //field without face fluxes (e.g. needles)
     creer_tableau_distribue(domaine_dis_base().domaine().md_vector_elements());
-  else //champ avec flux
+  else //field with face fluxes
     creer_tableau_distribue(ref_cast(Domaine_PolyMAC_CDO, domaine_dis_base()).mdv_elems_faces);
   return n;
 }
@@ -77,14 +77,14 @@ DoubleTab& Champ_Elem_PolyMAC_CDO::valeur_aux_faces(DoubleTab& dst) const
   const IntTab& f_e = domaine.face_voisins();
   const DoubleTab& src = valeurs();
 
-  /* vals doit etre pre-dimensionne */
+  /* vals must be pre-dimensioned */
   int i, e, f, n, N = (src.nb_dim() == 1 ? 1 : src.dimension(1));
   assert(dst.dimension(0) == domaine.xv().dimension(0) && N == (dst.nb_dim() == 1 ? 1 : dst.dimension(1)));
 
-  if (src.dimension_tot(0) > domaine.nb_elem_tot()) //on a les valeurs aux faces
+  if (src.dimension_tot(0) > domaine.nb_elem_tot()) //face values are available
     for (f = 0; f < dst.dimension(0); f++)
       for (n = 0; n < N; n++) dst(f, n) = src(domaine.nb_elem_tot() + f, n);
-  else for (f = 0; f < dst.dimension(0); f++) //on prend (amont + aval) / 2
+  else for (f = 0; f < dst.dimension(0); f++) //take (upstream + downstream) / 2
       for (i = 0; i < 2 && (e = f_e(f, i)) >= 0; i++)
         for (n = 0; n < N; n++)
           dst(f, n) += src(e, n) * (f < domaine.premiere_face_int() ? 1 : 0.5);

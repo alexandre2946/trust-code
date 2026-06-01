@@ -33,13 +33,13 @@ Entree& Schema_Explicite_Multi_TimeStep_base::readOn(Entree& s)
 
 ////////////////////////////////
 //                            //
-// Caracteristiques du schema //
+// Schema characteristics     //
 //                            //
 ////////////////////////////////
 
-/*! @brief Renvoie le nombre de valeurs temporelles futures.
+/*! @brief Returns the number of future temporal values.
  *
- * Ici : n+1, donc 1.
+ * Here: n+1, so 1.
  *
  */
 int Schema_Explicite_Multi_TimeStep_base::nb_valeurs_futures() const
@@ -47,9 +47,9 @@ int Schema_Explicite_Multi_TimeStep_base::nb_valeurs_futures() const
   return 1 ;
 }
 
-/*! @brief Renvoie le le temps a la i-eme valeur future.
+/*! @brief Returns the time at the i-th future value.
  *
- * Ici : t(n+1)
+ * Here: t(n+1)
  *
  */
 double Schema_Explicite_Multi_TimeStep_base::temps_futur(int i) const
@@ -58,9 +58,9 @@ double Schema_Explicite_Multi_TimeStep_base::temps_futur(int i) const
   return temps_courant()+pas_de_temps();
 }
 
-/*! @brief Renvoie le le temps le temps que doivent rendre les champs a l'appel de valeurs()
+/*! @brief Returns the time that fields must return when valeurs() is called.
  *
- *     Ici : t(n+1)
+ *     Here: t(n+1)
  *
  */
 double Schema_Explicite_Multi_TimeStep_base::temps_defaut() const
@@ -70,14 +70,14 @@ double Schema_Explicite_Multi_TimeStep_base::temps_defaut() const
 
 /////////////////////////////////////////
 //                                     //
-// Fin des caracteristiques du schema  //
+// End of schema characteristics       //
 //                                     //
 /////////////////////////////////////////
 
-/*! @brief Effectue un pas de temps d'Euler explicite sur l'equation passee en parametre.
+/*! @brief Performs an explicit Euler time step on the equation passed as parameter.
  *
- * @param (Equation_base& eqn) l'equation que l'on veut faire avancer d'un pas de temps
- * @return (int) renvoie toujours 1
+ * @param (Equation_base& eqn) the equation to advance by one time step
+ * @return (int) always returns 1
  */
 int Schema_Explicite_Multi_TimeStep_base::faire_un_pas_de_temps_eqn_base(Equation_base& eqn)
 {
@@ -93,7 +93,7 @@ int Schema_Explicite_Multi_TimeStep_base::faire_un_pas_de_temps_eqn_base(Equatio
   // Un+1
   DoubleTab& futur   = eqn.inconnue().futur();
 
-  // sert pour la pression et les couplages
+  // used for the pressure and inter-problem couplings
   eqn.domaine_Cl_dis().imposer_cond_lim(eqn.inconnue(),temps_courant()+pas_de_temps());
 
   DoubleTab dudt(futur);
@@ -110,7 +110,7 @@ int Schema_Explicite_Multi_TimeStep_base::faire_un_pas_de_temps_eqn_base(Equatio
   // Compute du/dt
   eqn.derivee_en_temps_inco(dudt);
 
-  //Contribution de l'inconnue au temps n
+  // Contribution of the unknown at time n
   futur = dudt;
   futur *= time_step;
   futur += present;

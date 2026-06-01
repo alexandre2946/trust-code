@@ -21,14 +21,12 @@
 #include <Navier_Stokes_Turbulent.h>
 #include <Pb_Fluide_base.h>
 
-/*! @brief Classe Pb_Thermohydraulique_Concentration_Turbulent Cette classe represente un probleme de thermohydraulique
+/*! @brief Turbulent thermohydraulics problem with species transport (one or more concentrations).
  *
- *     avec modelisation de la turbulence:
- *      - Equations de Navier_Stokes en regime turbulent
- *        pour un fluide incompressible
- *      - Equation d'energie en regime turbulent
- *      - Equation de Convection-Diffusion d'une ou plusieurs concentrations
- *        en regime turbulent
+ *      Couples:
+ *      - Turbulent Navier-Stokes equations for an incompressible fluid
+ *      - Turbulent energy equation
+ *      - Turbulent convection-diffusion equation(s) for one or more concentrations
  *
  * @sa Pb_Fluide_base
  */

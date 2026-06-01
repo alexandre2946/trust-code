@@ -47,12 +47,10 @@ void Solide::set_param(Param& param) const
   param.ajouter_non_std("user_field",(this));
 }
 
-/*! @brief Verifie que les champs caracterisant le milieu solide qui on ete lu par readOn(Entree&) sont coherents.
+/*! @brief Verifies that the fields characterising the solid medium read by readOn(Entree&) are consistent.
  *
- * @throws la conductivite (lambda) n'est pas strictement positive
- * @throws l'une des proprietes physique du solide: masse volumique (rho),
- * capacite calorifique (Cp) ou conductivite (lambda) n'a pas
- * ete definie.
+ * @throws Conductivity (lambda) is not strictly positive.
+ * @throws One of the physical properties of the solid (density rho, specific heat Cp, or conductivity lambda) has not been defined.
  */
 void Solide::verifier_coherence_champs(int& err,Nom& msg)
 {

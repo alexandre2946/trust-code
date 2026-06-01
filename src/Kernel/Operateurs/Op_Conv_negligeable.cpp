@@ -22,18 +22,18 @@ Sortie& Op_Conv_negligeable::printOn(Sortie& os) const { return os; }
 
 Entree& Op_Conv_negligeable::readOn(Entree& is) { return is; }
 
-/*! @brief Associe la vitesse a l'operateur.
+/*! @brief Associates the velocity to the operator.
  *
- * @param (Champ_Inc_base& ch) le champ inconnue representant la vitesse
+ * @param (Champ_Inc_base& ch) the unknown field representing the velocity
  */
 void Op_Conv_negligeable::associer_vitesse(const Champ_base& ch)
 {
   la_vitesse = ch;
 }
 
-/*! @brief Renvoie le champ inconnue representant la vitesse
+/*! @brief Returns the unknown field representing the velocity.
  *
- * @return (Champ_Inc_base&) le champ inconnue representant la vitesse
+ * @return (Champ_Inc_base&) the unknown field representing the velocity
  */
 const Champ_base& Op_Conv_negligeable::vitesse() const
 {

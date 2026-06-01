@@ -14,7 +14,7 @@
 *****************************************************************************/
 #ifndef Ok_Perio_H
 #define Ok_Perio_H
-// Definition pro_visoire (B.Mathieu) pour coder les integrales volumique comme avant (donc fausses en periodique !)
-// a supprimer quand on aura tout corrige.
+// Provisional definition (B.Mathieu) to code volumetric integrals as before (thus wrong in periodic cases!)
+// to be removed once everything has been corrected.
 enum Ok_Perio { JUSTE_EN_PERIO, FAUX_EN_PERIO };
 #endif

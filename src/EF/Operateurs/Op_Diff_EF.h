@@ -26,11 +26,11 @@ class Domaine_Cl_EF;
 class Domaine_EF;
 class Matrice_Morse;
 
-/*! @brief class Op_Diff_EF Cette classe represente l'operateur de diffusion
+/*! @brief class Op_Diff_EF Represents the diffusion operator.
  *
- *   La discretisation est EF
- *   Le champ diffuse est scalaire
- *   Le champ de diffusivite est uniforme
+ *   The discretization is EF.
+ *   The diffused field is scalar.
+ *   The diffusivity field is uniform.
  *
  */
 class Op_Diff_EF : public Op_Diff_EF_base
@@ -51,7 +51,7 @@ public:
   void remplir_lambda(DoubleTab&) const;
   void calculer_von_mises(const DoubleTab& deplacement, DoubleTab& deformation, DoubleTab& contraintes, DoubleTab& von_mises) const override;
 
-  // Methodes pour l implicite.
+  // Methods for the implicit scheme.
   inline void dimensionner(Matrice_Morse& matrice) const override { Op_EF_base::dimensionner(le_dom_EF.valeur(), la_zcl_EF.valeur(), matrice); }
   inline void modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const override { Op_EF_base::modifier_pour_Cl(le_dom_EF.valeur(),la_zcl_EF.valeur(), matrice, secmem); }
   inline void contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& matrice) const override { ajouter_contribution(inco, matrice); }
@@ -65,8 +65,8 @@ public:
   void ajouter_cas_vectoriel(const DoubleTab& inconnue, DoubleTab& resu, DoubleTab& flux_bords, DoubleTab& nu, const Domaine_Cl_EF& domaine_Cl_EF, const Domaine_EF& domaine_EF, int nb_comp) const;
 
 protected :
-  int transpose_;   // vaurt zero si on ne veut pas calculer grad u transpose
-  int transpose_partout_ ; // vaut 1 si on veut calculer grad_u_transpose meme au bord
+  int transpose_;   // zero if grad u transpose is not to be computed
+  int transpose_partout_ ; // 1 if grad_u_transpose is to be computed even at boundaries
   int nouvelle_expression_;
   OBS_PTR(Champ_base) diffusivite_;
   OBS_PTR(Champ_base) diffusivite_volumique_;
@@ -150,7 +150,7 @@ DoubleTab& Op_Diff_EF::ajouter_scalaire_template(const DoubleTab& tab_inconnue, 
           }
       }
 
-  // on ajoute la contribution des bords
+  // add the contribution from boundaries
   ajouter_bords(tab_inconnue, resu);
   return resu;
 
@@ -221,7 +221,7 @@ DoubleTab& Op_Diff_EF::ajouter_vectoriel_template(const DoubleTab& tab_inconnue,
           }
       }
 
-  // on ajoute la contribution des bords
+  // add the contribution from boundaries
   ajouter_bords(tab_inconnue, resu);
   return resu;
 

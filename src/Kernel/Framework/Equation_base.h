@@ -46,21 +46,21 @@ class Param;
 
 enum Type_modele { TURBULENCE };
 
-/*! @brief classe Equation_base Le role d'une equation est le calcul d'un ou plusieurs champs. Cette classe est la base de la hierarchie des equations.
+/*! @brief class Equation_base The role of an equation is the calculation of one or more fields. This class is the base of the equations hierarchy.
  *
- *      Ses membres sont les attributs et les methodes communs a toutes les classes qui representent des equations.
- *      Une equation est modelisee de la facon suivante:
+ *      Its members are the attributes and methods common to all classes that represent equations.
+ *      An equation is modeled in the following way:
  *
- *          M * dU_h/dt + Somme_i(Op_i(U_h)) = Somme(Sources);
+ *          M * dU_h/dt + Sum_i(Op_i(U_h)) = Sum(Sources);
  *
- *      M est la matrice masse representee par un objet "Solveur_Masse"
- *      U_h est l'inconnue representee par un objet "Champ_Inc"
- *      Op_i est le i-eme operateur de l'equation represente par un objet "Operateur"
- *      Sources sont les termes sources (eventuellement inexistant) de l'equation represente par des objets "Source".
- *      Une equation est lie a un probleme par une reference contenue dans le membre OBS_PTR(Probleme_base) mon_probleme.
+ *      M is the mass matrix represented by a "Solveur_Masse" object
+ *      U_h is the unknown represented by a "Champ_Inc" object
+ *      Op_i is the i-th operator of the equation represented by an "Operateur" object
+ *      Sources are the source terms (possibly non-existent) of the equation represented by "Source" objects.
+ *      An equation is linked to a problem by a reference contained in the member OBS_PTR(Probleme_base) mon_probleme.
  *
- *      Classe abstraite dont toutes les equations doivent deriver.
- *      Methodes abstraites:
+ *      Abstract class from which all equations must derive.
+ *      Abstract methods:
  *        int nombre_d_operateurs() const
  *        const Operateur& operateur(int) const
  *        Operateur& operateur(int)
@@ -69,7 +69,7 @@ enum Type_modele { TURBULENCE };
  *        void associer_milieu_base(const Milieu_base&)
  *        const Milieu_base& milieu() const
  *        Milieu_base& milieu()
- *        Entree& lire(const Motcle&, Entree&) [protegee]
+ *        Entree& lire(const Motcle&, Entree&) [protected]
  *
  */
 class Equation_base : public Champs_compris_interface, public Objet_U
@@ -77,9 +77,9 @@ class Equation_base : public Champs_compris_interface, public Objet_U
   Declare_base(Equation_base);
 
 public :
-  // Methode surchargee de Objet_U:
+  // Overridden method from Objet_U:
   void nommer(const Nom& nom) override;
-  // MODIF ELI LAUCOIN (22/11/2007) : je rajoute un avancer et un reculer
+  // MODIF ELI LAUCOIN (22/11/2007) : adding a forward and a backward method
   virtual void avancer(int i=1);
   virtual void reculer(int i=1);
   // FIN MODIF ELI LAUCOIN (22/11/2007)
@@ -151,15 +151,15 @@ public :
   virtual void imprime_residu(SFichier&);
   virtual Nom expression_residu();
 
-  // methodes pour l'implicite
-  virtual void dimensionner_matrice(Matrice_Morse& mat_morse); //memorise le stencil de la matrice apres le 1er appel
-  virtual void dimensionner_matrice_sans_mem(Matrice_Morse& mat_morse); //methode interne appellee par celle ci-dessus
+  // methods for implicit scheme
+  virtual void dimensionner_matrice(Matrice_Morse& mat_morse); //memorizes the matrix stencil after the 1st call
+  virtual void dimensionner_matrice_sans_mem(Matrice_Morse& mat_morse); //internal method called by the above
 
-  // ajoute les contributions des operateurs et des sources
+  // adds contributions from operators and sources
   virtual void assembler( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem) ;
-  // modifie la matrice et le second mmebre en fonction des CL
+  // modifies the matrix and the right-hand side according to boundary conditions
   virtual void modifier_pour_Cl( Matrice_Morse& mat_morse,DoubleTab& secmem) const;
-  // assemble, ajoute linertie,et modifie_pour_cl.
+  // assembles, adds inertia, and modifies for boundary conditions.
   virtual void assembler_avec_inertie( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem) ;
   virtual void dimensionner_termes_croises(Matrice_Morse& matrice, const Probleme_base& autre_pb, int nl, int nc);
   virtual void ajouter_termes_croises(const DoubleTab& inco, const Probleme_base& autre_pb, const DoubleTab& autre_inco, DoubleTab& resu) const;
@@ -167,12 +167,12 @@ public :
 
   /*
     interface {dimensionner/ajouter/assembler}_blocs
-    specificites : - has_interface_blocs() renvoie 1 si tous les termes de l'equation supportent cette interface
-                   - dimensionner_blocs() non memoize (a gerer par l'appelant) / appelable sur des matrices non vides
-                   - assembler_blocs() utilise les valeurs des inconnues/champs a l'instant present (genre inconnue().valeurs())
-                   - assembler_blocs_*() raisonne en increments : M.dInco = S -> attention aux seuils des solveurs
-                   - certaines variables (ensemble semi_impl) peuvent etre traitees en "semi-implicite"
-                     (on utilise des valeurs predites, pas de derivees renseignees)
+    specificities: - has_interface_blocs() returns 1 if all terms of the equation support this interface
+                   - dimensionner_blocs() not memoized (to be managed by the caller) / callable on non-empty matrices
+                   - assembler_blocs() uses the values of unknowns/fields at the current time (like inconnue().valeurs())
+                   - assembler_blocs_*() reasons in increments: M.dInco = S -> beware of solver thresholds
+                   - certain variables (semi_impl set) can be treated as "semi-implicit"
+                     (predicted values are used, no derivatives provided)
   */
   virtual int  has_interface_blocs() const;
   virtual double get_time_factor() const { return 1.; }
@@ -180,32 +180,32 @@ public :
   virtual void assembler_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const;
   virtual void assembler_blocs_avec_inertie(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {});
 
-  /* methodes auxiliaires de l'interface _blocs : champ conserve par l'equation et ses valeurs sur les CLs de type Dirichlet ou Neumann_val_ext
-     par defaut, champ_conserve = coefficient_temporel * inconnue
-     ce champ est mutable pour que le schema en temps puisse le mettre a jour
+  /* auxiliary methods of the _blocs interface: field conserved by the equation and its values on Dirichlet or Neumann_val_ext boundary conditions
+     by default, champ_conserve = temporal_coefficient * unknown
+     this field is mutable so that the time scheme can update it
   */
-  //le champ  : autant de valeurs spatiales / temporelles que l'inconnue
+  //the field: as many spatial/temporal values as the unknown
   Champ_Inc_base& champ_conserve() const { return champ_conserve_.valeur(); }
   int has_champ_conserve() const { return bool(champ_conserve_); }
 
-  void init_champ_conserve() const; //a appeller dans le completer() des operateurs/sources qui auront besoin de champ_conserve_
-  /* fonction de calcul par defaut de champ_conserve */
+  void init_champ_conserve() const; //to be called in completer() of operators/sources that will need champ_conserve_
+  /* default computation function for champ_conserve */
   static void calculer_champ_conserve(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv);
-  /* renvoie le nom du champ conserve et la fonction pour le calculer -> a surcharger  */
+  /* returns the name of the conserved field and the function to compute it -> to be overridden  */
   virtual std::pair<std::string, fonc_calc_t> get_fonc_champ_conserve() const
   {
     return { inconnue().le_nom().getString(), calculer_champ_conserve};
   }
 
-  //par defaut le champ conserve
+  //by default the conserved field
   virtual Champ_Inc_base& champ_convecte() const { return champ_conserve_.valeur(); }
   virtual int has_champ_convecte() const { return bool(champ_conserve_); }
   virtual void init_champ_convecte() const { init_champ_conserve(); }
-  //mise a jour de champ_conserve / champ_convecte : appele par Probleme_base::mettre_a_jour() apres avoir mis a jour le milieu
-  //si reset = 1, force le calcul de toutes les valeurs temporelles (et pas seulement de la valeur courante)
+  //update of champ_conserve / champ_convecte: called by Probleme_base::mettre_a_jour() after updating the medium
+  //if reset = 1, forces computation of all temporal values (not just the current value)
   virtual void mettre_a_jour_champs_conserves(double temps, int reset = 0);
 
-  //Methodes de l interface des champs postraitables
+  //Methods of the post-processable fields interface
   /////////////////////////////////////////////////////
   void creer_champ(const Motcle& motlu) override;
   const Champ_base& get_champ(const Motcle& nom) const override;
@@ -238,7 +238,7 @@ public :
   virtual int equation_non_resolue() const;
   int disable_equation_residual() const { return disable_equation_residual_; };
 
-  //pour les schemas en temps a pas multiples
+  //for multi-step time schemes
   inline virtual const Champ_Inc_base& derivee_en_temps() const { return derivee_en_temps_; }
   inline virtual Champ_Inc_base& derivee_en_temps() { return derivee_en_temps_; }
   void set_calculate_time_derivative(int i) { calculate_time_derivative_=i; }
@@ -276,8 +276,8 @@ protected :
   virtual Entree& lire_cl(Entree&);
   virtual int verif_Cl() const;
   mutable DoubleList dt_op_bak;
-  //Methode lire avec signature specifique pour faire echouer
-  //la compilation en cas de presence de l'ancienne methode lire
+  //Method lire with a specific signature to cause a compilation failure
+  //if the old lire method is present
   //virtual Entree& lire(const Motcle&, Entree&)
   virtual void lire() { exit(); }
 
@@ -286,7 +286,7 @@ protected :
   bool has_time_factor_; // Parameter set to 1 if convection has a prefactor (eg rhoCp in energy)
   OWN_PTR(Parametre_equation_base) parametre_equation_;
 
-  LIST(RefObjU) liste_modeles_; //Le premier element de la liste est le modele nul
+  LIST(RefObjU) liste_modeles_; //The first element of the list is the null model
   Champs_compris champs_compris_;
   Champs_Fonc list_champ_combi;
 
@@ -294,7 +294,7 @@ protected :
   mutable Matrice_Morse matrice_stockee;
   mutable int matrice_init;
 
-  //pour l'interface assembler_blocs
+  //for the assembler_blocs interface
   mutable OWN_PTR(Champ_Inc_base) champ_conserve_;
   mutable OWN_PTR(Champ_Inc_base) champ_convecte_;
 
@@ -302,8 +302,8 @@ protected :
   OWN_PTR(Champ_Inc_base) derivee_en_temps_;
   int calculate_time_derivative_;
 
-  // pour une positivation du terme en fin d'iteration si necessaire
-  // renvoie 1 pour un champ positif, 0 pour un champ negatif
+  // for positivization of the term at the end of an iteration if necessary
+  // returns 1 for a positive field, 0 for a negative field
 
   bool diffusion_multi_scalaire_ = false;
 
@@ -313,11 +313,11 @@ private :
 
   Ecrire_fichier_xyz_valeur xyz_field_values_file_;
 
-  //!SC: passage en protected (surcharge de get_champ dans Equation_Diphasique_base)
+  //!SC: moved to protected (override of get_champ in Equation_Diphasique_base)
 //  Champs_Fonc list_champ_combi;
   DoubleVect residu_;
   DoubleVect residu_initial_;
-  // retourne le CHAMP (et non la norme) des residus de chaque inconnu du probleme
+  // returns the FIELD (not the norm) of the residuals for each unknown of the problem
   OWN_PTR(Champ_Fonc_base)  field_residu_;
 
   mutable DoubleTab NULL_;
@@ -327,18 +327,18 @@ private :
 };
 
 
-/*! @brief Renvoie le nom de l'equation.
+/*! @brief Returns the name of the equation.
  *
- * @return (Nom&) le nom de l'equation
+ * @return (Nom&) the name of the equation
  */
 inline const Nom& Equation_base::le_nom() const
 {
   return nom_;
 }
 
-/*! @brief Renvoie le domaine des conditions aux limite discretisee associee a l'equation
+/*! @brief Returns the discretized boundary condition domain associated with the equation.
  *
- * @return (Domaine_Cl_dis_base&) Domaine de condition aux limites discretisee
+ * @return (Domaine_Cl_dis_base&) discretized boundary condition domain
  */
 inline Domaine_Cl_dis_base& Equation_base::domaine_Cl_dis()
 {
@@ -346,11 +346,9 @@ inline Domaine_Cl_dis_base& Equation_base::domaine_Cl_dis()
   return le_dom_Cl_dis.valeur();
 }
 
-/*! @brief Renvoie le domaine des conditions aux limite discretisee associee a l'equation
+/*! @brief Returns the discretized boundary condition domain associated with the equation (const version).
  *
- *     (version const)
- *
- * @return (Domaine_Cl_dis_base&) Domaine de condition aux limites discretisee
+ * @return (Domaine_Cl_dis_base&) discretized boundary condition domain
  */
 inline const Domaine_Cl_dis_base& Equation_base::domaine_Cl_dis() const
 {
@@ -358,20 +356,18 @@ inline const Domaine_Cl_dis_base& Equation_base::domaine_Cl_dis() const
   return le_dom_Cl_dis.valeur();
 }
 
-/*! @brief Renvoie le solveur de masse associe a l'equation.
+/*! @brief Returns the mass solver associated with the equation.
  *
- * @return (Solveur_Masse_base&) le solveur de masse associe a l'equation
+ * @return (Solveur_Masse_base&) the mass solver associated with the equation
  */
 inline Solveur_Masse_base& Equation_base::solv_masse()
 {
   return solveur_masse;
 }
 
-/*! @brief Renvoie le solveur de masse associe a l'equation.
+/*! @brief Returns the mass solver associated with the equation (const version).
  *
- * (version const)
- *
- * @return (Solveur_Masse_base&) le solveur de masse associe a l'equation
+ * @return (Solveur_Masse_base&) the mass solver associated with the equation
  */
 inline const Solveur_Masse_base& Equation_base::solv_masse() const
 {

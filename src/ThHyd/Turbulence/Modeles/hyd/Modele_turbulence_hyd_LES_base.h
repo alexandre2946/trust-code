@@ -18,9 +18,9 @@
 
 #include <Modele_turbulence_hyd_0_eq_base.h>
 
-/*! @brief Classe Modele_turbulence_hyd_LES_base Classe representant le modele de turbulence sous maille pour les
+/*! @brief Classe Modele_turbulence_hyd_LES_base Class representing the subgrid-scale turbulence model for the
  *
- *     equations de Navier-Stokes.
+ *     Navier-Stokes equations.
  *
  * @sa Modele_turbulence_hyd_0_eq_base
  */
@@ -36,7 +36,7 @@ public:
   virtual void calculer_longueurs_caracteristiques()=0;
   void calculer_energie_cinetique_turb() override;
 
-  // sauter la classe mere
+  // skip the parent class
   int reprendre(Entree& is) override { return Modele_turbulence_hyd_base::reprendre(is); }
   void imprimer(Sortie& is) const override { return Modele_turbulence_hyd_base::imprimer(is); }
 
@@ -44,8 +44,8 @@ protected:
   DoubleVect l_;
   Motcle methode_;
 
-  static constexpr double CSM1 = 0.063, CSMS1 = 0.112; // Constante viscosite turbulente modele sous maille, sous maille selectif
-  static constexpr double CSM2 = 0.37; // Constante energie cinetique turbulente modele sous maille
+  static constexpr double CSM1 = 0.063, CSMS1 = 0.112; // turbulent viscosity constant for subgrid-scale model, selective subgrid-scale
+  static constexpr double CSM2 = 0.37; // turbulent kinetic energy constant for subgrid-scale model
 };
 
 #endif /* Modele_turbulence_hyd_LES_base_included */

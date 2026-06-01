@@ -38,8 +38,8 @@ Entree& Source_Frottement_interfacial_base::readOn(Entree& is)
   const bool res_en_T = pbm.resolution_en_T();
   if (!res_en_T) Process::exit("Source_Frottement_interfacial_base::readOn NOT YET PORTED TO ENTHALPY EQUATION ! TODO FIXME !!");
 
-  if (pbm.has_correlation("frottement_interfacial")) correlation_ = pbm.get_correlation("frottement_interfacial"); //correlation fournie par le bloc correlation
-  else Correlation_base::typer_lire_correlation(correlation_, pbm, "frottement_interfacial", is); //sinon -> on la lit
+  if (pbm.has_correlation("frottement_interfacial")) correlation_ = pbm.get_correlation("frottement_interfacial"); // correlation provided by the correlation block
+  else Correlation_base::typer_lire_correlation(correlation_, pbm, "frottement_interfacial", is); // otherwise read it
   return is;
 }
 
@@ -55,13 +55,13 @@ void Source_Frottement_interfacial_base::completer()
 void Source_Frottement_interfacial_base::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   const Champ_Face_base& ch = ref_cast(Champ_Face_base, equation().inconnue());
-  if (!matrices.count(ch.le_nom().getString())) return; //rien a faire
+  if (!matrices.count(ch.le_nom().getString())) return; //nothing to do
   Matrice_Morse& mat = *matrices.at(ch.le_nom().getString()), mat2;
   const Domaine_VF& domaine = ref_cast(Domaine_VF, equation().domaine_dis());
   const DoubleTab& inco = ch.valeurs();
   const IntTab& fcl = ch.fcl();
 
-  /* stencil : diagonal par bloc pour les vitesses aux faces, puis chaque composante des vitesses aux elems */
+  /* stencil: block-diagonal for face velocities, then each component of element velocities */
   Stencil stencil(0, 2);
 
   int f, k, l, N = inco.line_size();

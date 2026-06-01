@@ -43,7 +43,7 @@ public:
         return tab_valeurs;
       }
     else
-      return not_implemented_champ_<DoubleVect&>(__func__); /* Cas INUTILE : methode sur-chargee pour CANAL */
+      return not_implemented_champ_<DoubleVect&>(__func__); /* Useless case: method overridden for CANAL */
   }
 
   double valeur_a_compo(const DoubleVect& x, int ncomp) const override
@@ -71,7 +71,7 @@ public:
   double valeur_a_elem_compo(const DoubleVect&, int, int ncomp) const override
   {
     static constexpr bool IS_UNIFORME = (_TYPE_ == Champ_Divers_Type::UNIFORME);
-    return IS_UNIFORME ? valeurs_(0,ncomp) : not_implemented_champ_<double>(__func__); /* methode sur-chargee pour CANAL */
+    return IS_UNIFORME ? valeurs_(0,ncomp) : not_implemented_champ_<double>(__func__); /* method overridden for CANAL */
   }
 
   DoubleTab& valeur_aux(const DoubleTab& , DoubleTab& tab_valeurs) const override
@@ -79,7 +79,7 @@ public:
     static constexpr bool IS_UNIFORME = (_TYPE_ == Champ_Divers_Type::UNIFORME);
     if (IS_UNIFORME)
       {
-        int size = tab_valeurs.dimension_tot(0); // GF dimension_tot pour que la ligne soit valide pour les champs P1B
+        int size = tab_valeurs.dimension_tot(0); // GF dimension_tot so that the line is valid for P1B fields
         int nb_comp = tab_valeurs.line_size();
         bool kernelOnDevice = tab_valeurs.checkDataOnDevice();
         if (kernelOnDevice)
@@ -104,7 +104,7 @@ public:
         return tab_valeurs;
       }
     else
-      return not_implemented_champ_<DoubleTab&>(__func__); // voir classes filles ...
+      return not_implemented_champ_<DoubleTab&>(__func__); // see derived classes ...
   }
 
   DoubleVect& valeur_aux_compo(const DoubleTab&, DoubleVect& tab_valeurs, int ncomp) const override

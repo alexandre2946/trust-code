@@ -52,11 +52,11 @@ int Convection_Diffusion_Espece_Multi_QC::lire_motcle_non_standard(const Motcle&
   if (mot=="diffusion")
     {
       Cerr << "Reading and typing of the diffusion operator : " << finl;
-      //associe mu_sur_Sc dans la diffusivite
+      //associate mu_sur_Sc in the diffusivity
       terme_diffusif.associer_diffusivite(diffusivite_pour_transport());
       ref_cast_non_const(Champ_base,terme_diffusif.diffusivite()).nommer("mu_sur_Schmidt");
       is >> terme_diffusif;
-      // Il faut appeler associer_diffusivite_pour_pas_de_temps
+      // Must call associer_diffusivite_pour_pas_de_temps
       terme_diffusif.associer_diffusivite_pour_pas_de_temps(diffusivite_pour_pas_de_temps());
       return 1;
     }
@@ -76,7 +76,7 @@ int Convection_Diffusion_Espece_Multi_QC::lire_motcle_non_standard(const Motcle&
 
 const Champ_base& Convection_Diffusion_Espece_Multi_QC::diffusivite_pour_pas_de_temps() const
 {
-  // TODO : FIXME : on passe actuellement en parametre mu_sur_Schmidt qu il faut remplacer par nu_sur_Schmidt
+  // TODO : FIXME : currently passing mu_sur_Schmidt as parameter; should be replaced by nu_sur_Schmidt
   return le_fluide->mu_sur_Schmidt();
 }
 
@@ -91,14 +91,14 @@ void Convection_Diffusion_Espece_Multi_QC::completer()
   loi_etat.associer_inconnue(l_inco_ch.valeur());
   loi_etat.associer_espece(*this);
 
-  // remplissage du domaine cl modifiee avec 1 partout au bord...
+  // fill the modified boundary condition domain with 1 everywhere at the boundary...
   zcl_modif_ = domaine_Cl_dis();
 
   Conds_lim& condlims = zcl_modif_->les_conditions_limites();
   int nb = condlims.size();
   for (int i = 0; i < nb; i++)
     {
-      // pour chaque condlim on recupere le champ_front et on met 1 meme si la cond lim est un flux (dans ce cas la convection restera nulle.)
+      // for each boundary condition we retrieve the front field and set it to 1 even if the BC is a flux (in that case convection will remain zero)
       if (sub_type(Neumann_sortie_libre, condlims[i].valeur()))
         {
           ref_cast(Neumann_sortie_libre,condlims[i].valeur()).tab_ext() = 1;
@@ -131,7 +131,7 @@ DoubleTab& Convection_Diffusion_Espece_Multi_QC::derivee_en_temps_inco(DoubleTab
   solveur_masse->appliquer(derivee);
   DoubleTrav derivee_bis(derivee);
 
-  // on commence par retirer phi*div(1 U)
+  // first subtract phi*div(1 U)
   const DoubleTab& frac_mass = inconnue().valeurs();
 
   Convection_Diffusion_Fluide_Dilatable_Proto::calculer_div_rho_u_impl(derivee_bis,*this);
@@ -162,11 +162,11 @@ void Convection_Diffusion_Espece_Multi_QC::assembler(Matrice_Morse& matrice, con
   operateur(0).ajouter(resu);
   int ndl = rho.dimension(0);
 
-  // on retire Divu1 *inco
+  // subtract Divu1 *inco
   DoubleTrav divu1(inco);
   Convection_Diffusion_Fluide_Dilatable_Proto::calculer_div_rho_u_impl(divu1,*this);
 
-  // ajout de la convection
+  // add convection
   operateur(1).l_op_base().contribuer_a_avec(inco, matrice);
   operateur(1).ajouter(resu);
 
@@ -175,7 +175,7 @@ void Convection_Diffusion_Espece_Multi_QC::assembler(Matrice_Morse& matrice, con
       resu(i) -= divu1(i) * inco(i);
       matrice(i, i) += divu1(i);
     }
-  // on divise par rho chaque ligne
+  // divide each row by rho
   for (int som = 0; som < ndl; som++)
     {
       double inv_rho = 1 / rho(som);
@@ -236,7 +236,7 @@ void Convection_Diffusion_Espece_Multi_QC::assembler_blocs_avec_inertie(matrices
   operateur(0).l_op_base().ajouter_blocs(matrices, secmem, semi_impl);
 
   int ndl = rho.dimension(0);
-  // on divise par rho chaque ligne
+  // divide each row by rho
   for (int som = 0; som < ndl; som++)
     {
       double inv_rho = 1 / rho(som);
@@ -245,10 +245,10 @@ void Convection_Diffusion_Espece_Multi_QC::assembler_blocs_avec_inertie(matrices
       secmem(som) *= inv_rho;
     }
 
-  // ajout de la convection
+  // add convection
   operateur(1).l_op_base().ajouter_blocs(matrices, secmem, semi_impl);
 
-  // on retire Divu1 *inco
+  // subtract Divu1 *inco
   DoubleTrav divu1(inco);
   Convection_Diffusion_Fluide_Dilatable_Proto::calculer_div_rho_u_impl(divu1,*this);
 

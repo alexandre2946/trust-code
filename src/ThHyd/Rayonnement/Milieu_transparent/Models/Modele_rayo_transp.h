@@ -53,7 +53,7 @@ private:
   OBS_PTR(Pb_Fluide_base) pb_fluide_rayo_;
   VECT(Face_rayo_transp) les_faces_rayonnantes_;
   int nb_faces_rayonnantes_ = -123, nb_faces_totales_ = -123, ordre_mat_forme_ = -123;
-  double temps_ = -123.; // on garde le temps pour les impressions
+  double temps_ = -123.; // time is kept for printing purposes
   mutable int deja_imprime_ = 0;
 
   DoubleTab les_facteurs_de_forme_, matrice_rayo_, les_flux_radiatifs_;
@@ -62,7 +62,7 @@ private:
   static constexpr double sigma_ = 5.67e-8;
   double relaxation_ = 1.;
 
-  // Par defaut, on suppose qu'il faut inverser la matrice de rayonnement
+  // By default, it is assumed that the radiation matrix must be inverted
   bool lire_matrice_inv_ = false, fic_mat_ray_inv_bin_ = false;
   Nom nom_fic_mat_ray_inv_, nom_pb_rayonnant_;
   int processeur_rayonnant_ = -123;

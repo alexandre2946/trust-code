@@ -18,7 +18,7 @@
 
 #include <Perte_Charge_Gen.h>
 
-//! Factorise les fonctionnalites de plusieurs pertes de charge en VEF, vitesse aux faces
+//! Factorizes the functionalities of several pressure drop terms in VEF, velocity at faces
 /**
    Perte_Charge_Isotrope, Perte_Charge_Directionnelle et
    Perte_Charge_Anisotrope heritent de Perte_Charge_VDF_base. Elles

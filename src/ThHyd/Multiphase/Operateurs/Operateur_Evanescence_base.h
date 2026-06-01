@@ -18,9 +18,7 @@
 
 #include <Operateur_base.h>
 
-/*! @brief classe Operateur_Evanescence Classe generique de la hierarchie des operateurs representant un terme
- *
- *     de gestion de l'evanescence.
+/*! @brief Generic base class in the operator hierarchy for evanescence management terms.
  *
  * @sa Operateur_base Operateur
  */

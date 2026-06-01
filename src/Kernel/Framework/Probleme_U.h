@@ -28,17 +28,17 @@ namespace ICoCo
 class TrioField;
 }
 
-/*! @brief classe Probleme_U
+/*! @brief Probleme_U
  *
- *      Cette classe ajoute des specificites TRUST a l'interface
- *      generale definie dans la classe Problem.
+ *      This class adds TRUST-specific features to the general
+ *      interface defined in the Problem class.
  *
- *      De Probleme_U derivent :
- *      * Probleme_base pour tous les problemes individuels
- *      * Couplage_U pour les couplages de plusieurs Probleme_U
+ *      Derived from Probleme_U:
+ *      * Probleme_base for all individual problems
+ *      * Couplage_U for couplings of several Probleme_U objects
  *
- *      Toutes ces classes doivent satisfaire l'API de Problem
- *      completee par celle de Probleme_U.
+ *      All these classes must satisfy the Problem API
+ *      extended by the Probleme_U API.
  *
  *
  */
@@ -47,7 +47,7 @@ class Probleme_U : public Objet_U
   Declare_base(Probleme_U);
 public :
 
-  // Implementation de l'API de Problem
+  // Implementation of the Problem API
 
   virtual void initialize();
   virtual void terminate();
@@ -90,7 +90,7 @@ public :
 
   virtual void post_initialize() { }
 
-  // Complements a l'API de Problem
+  // Complements to the Problem API
 
   virtual int postraiter(int force=1);
   virtual int limpr() const;

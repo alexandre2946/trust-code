@@ -22,8 +22,8 @@
 
 /*! @brief class Couplage_U
  *
- *      Cette classe implemente Probleme_U dans le cas d'un probleme composite
- *      couplant plusieurs Probleme_U.
+ *      This class implements Probleme_U in the case of a composite problem
+ *      coupling several Probleme_U.
  *
  *
  */
@@ -35,7 +35,7 @@ public:
 
   //////////////////////////////////////////////////
   //                                              //
-  // Implementation de l'interface de Probleme_U  //
+  // Implementation of the Probleme_U interface  //
   //                                              //
   //////////////////////////////////////////////////
 
@@ -79,7 +79,7 @@ public:
 
   ///////////////////////////////////////////////////////////
   //                                                       //
-  // Fin de l'implementation de l'interface de Probleme_U  //
+  // End of the Probleme_U interface implementation  //
   //                                                       //
   ///////////////////////////////////////////////////////////
 

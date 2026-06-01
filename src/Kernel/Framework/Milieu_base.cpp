@@ -39,16 +39,16 @@ Sortie& Milieu_base::printOn(Sortie& os) const
   return os;
 }
 
-/*! @brief Ecrit un objet milieu sur un flot de sortie.
+/*! @brief Writes a medium object to an output stream.
  *
- * Ecrit les caracteristiques du milieu:
- *         - masse volumique
- *         - conductivite
- *         - capacite calorifique
+ * Writes the characteristics of the medium:
+ *         - density
+ *         - conductivity
+ *         - heat capacity
  *         - beta_th
- *         - porosite
+ *         - porosity
  *
- * @param (Sortie& os) le flot de sortie pour l'ecriture
+ * @param (Sortie& os) the output stream for writing
  */
 void  Milieu_base::ecrire(Sortie& os) const
 {
@@ -59,18 +59,18 @@ void  Milieu_base::ecrire(Sortie& os) const
   os << "porosite " << ch_porosites_ << finl;
 }
 
-/*! @brief Lecture d'un milieu sur un flot d'entree.
+/*! @brief Reading of a medium from an input stream.
  *
  * Format:
  *     {
- *      grandeur_physique type_champ bloc de lecture du champ
+ *      physical_quantity field_type field_reading_block
  *     }
  *  cf set_param method to know the understood keywords
  *  cf Param class to know possible options reading
  *
- * @param (Entree& is) le flot d'entree pour la lecture des parametres du milieu
- * @return (Entree&) le flot d'entree modifie
- * @throws accolade ouvrante attendue
+ * @param (Entree& is) the input stream for reading the medium parameters
+ * @return (Entree&) the modified input stream
+ * @throws opening brace expected
  */
 Entree& Milieu_base::readOn(Entree& is)
 {
@@ -102,7 +102,7 @@ void Milieu_base::set_param(Param& param) const
   set_additional_params(param);
 }
 
-// methode utile pour F5 ! F5 n'appelle pas Milieu_base::set_param mais Milieu_base::set_additional_params ...
+// Useful method for F5! F5 does not call Milieu_base::set_param but Milieu_base::set_additional_params ...
 void Milieu_base::set_additional_params(Param& param) const
 {
   param.ajouter("diametre_hyd_champ", &ch_diametre_hyd_); // XD_ADD_P field_base
@@ -113,7 +113,7 @@ void Milieu_base::set_additional_params(Param& param) const
   // XD_CONT Psi(face)=2/(1/Psi(elem1)+1/Psi(elem2)). This keyword is optional.
   param.ajouter("porosites", &porosites_); // XD_ADD_P porosites
   // XD_CONT Porosities.
-  // pour F5 je mets la gravite ici ...
+  // for F5, gravity is added here ...
   param.ajouter("gravite", &ch_g_); // XD_ADD_P field_base
   // XD_CONT Gravity field (optional).
 }
@@ -128,8 +128,8 @@ void Milieu_base::discretiser(const Probleme_base& pb, const  Discretisation_bas
   Cerr << "Medium discretization." << finl;
   const Domaine_dis_base& domaine_dis=pb.domaine_dis();
 
-  // PL: pas le temps de faire plus propre, je fais comme dans Fluide_Incompressible::discretiser pour gerer une conductivite lue dans un fichier MED. Test: Reprise_grossier_fin_VEF
-  // ToDo: reecrire ces deux methodes discretiser
+  // PL: no time to make it cleaner, I do as in Fluide_Incompressible::discretiser to handle a conductivity read from a MED file. Test: Reprise_grossier_fin_VEF
+  // ToDo: rewrite these two discretiser methods
 
   // E. Saikali : The thermal conductivity and diffusivity fields are considered as multi_scalaire fields, sure if the number of components read
   // in the data file for lambda > 1, i.e: case of anisotropic diffusion !
@@ -153,12 +153,12 @@ void Milieu_base::discretiser(const Probleme_base& pb, const  Discretisation_bas
           ch_lambda_->valeurs()=ch_lambda_prov->valeurs();
         }
 
-      if(lambda_nb_comp >1) // Pour anisotrope
+      if(lambda_nb_comp >1) // For anisotropic case
         ch_lambda_->fixer_nature_du_champ(multi_scalaire);
 
       dis.nommer_completer_champ_physique(domaine_dis,"conductivite","W/m/K",ch_lambda_.valeur(),pb);
 
-      // le vrai nom sera donne plus tard
+      // the real name will be given later
       if (sub_type(Champ_Fonc_Tabule,ch_lambda_.valeur()))
         {
           double temps=ch_lambda_->temps();
@@ -203,9 +203,9 @@ void Milieu_base::discretiser(const Probleme_base& pb, const  Discretisation_bas
         {
           const double temps = pb.schema_temps().temps_courant();
           // E. Saikali
-          // XXX : j'ai remis nb_comp = 1, sinon ca bloque dans Solveur_Masse_base => tab_divide_any_shape
-          // parce qu'on a pas line_size % line_size_vx == 0 (cas nb_comp >1 pour rho et cp
-          // TODO : FIXME : faut coder un cas generique dans DoubleVect::tab_divide_any_shape... bon courage
+          // XXX : I reset nb_comp = 1, otherwise it blocks in Solveur_Masse_base => tab_divide_any_shape
+          // because we do not have line_size % line_size_vx == 0 (case nb_comp >1 for rho and cp)
+          // TODO : FIXME : a generic case must be coded in DoubleVect::tab_divide_any_shape... good luck
           dis.discretiser_champ(dis.is_dg() ? "champ_elem" : "temperature", domaine_dis, "rho_cp_comme_T", "J/m^3/K", 1 /* rho->nb_comp() */, temps, ch_rho_Cp_comme_T_);
           dis.discretiser_champ( "champ_elem", domaine_dis,    "rho_cp_elem", "J/m^3/K", 1 /* rho->nb_comp() */, temps,    ch_rho_Cp_elem_);
         }
@@ -217,14 +217,14 @@ void Milieu_base::discretiser(const Probleme_base& pb, const  Discretisation_bas
   discretiser_diametre_hydro(pb,dis);
 }
 
-// methode utile pour F5 ! F5 n'appelle pas Milieu_base::discretiser mais Milieu_base::discretiser_porosite ...
+// Useful method for F5! F5 does not call Milieu_base::discretiser but Milieu_base::discretiser_porosite ...
 void Milieu_base::discretiser_porosite(const Probleme_base& pb, const Discretisation_base& dis)
 {
   if (!zdb_) zdb_ = pb.domaine_dis();
   const double temps = pb.schema_temps().temps_courant();
   Nom fld_name = "porosite_volumique", fld_unit = "rien";
 
-  // On construit porosite_face_ avec un descripteur parallele
+  // We build porosite_face_ with a parallel descriptor
   const MD_Vector& md = ref_cast(Domaine_VF, zdb_.valeur()).md_vector_faces();
   if (!porosite_face_.get_md_vector())
     {
@@ -233,7 +233,7 @@ void Milieu_base::discretiser_porosite(const Probleme_base& pb, const Discretisa
     }
   porosite_face_ = 1.;
 
-  if (ch_porosites_) // Lu par porosites_champ
+  if (ch_porosites_) // Read via porosites_champ
     {
       assert (!is_user_porosites());
       if (porosites_.is_read())
@@ -259,7 +259,7 @@ void Milieu_base::discretiser_porosite(const Probleme_base& pb, const Discretisa
             }
 
           ch_porosites_->fixer_unite(fld_unit);
-          ch_porosites_->valeurs() = ch_in.initial_values(); // On initialise !
+          ch_porosites_->valeurs() = ch_in.initial_values(); // Initialize!
         }
       else if (sub_type(Champ_Fonc_MED,ch_porosites_.valeur()))
         {
@@ -291,20 +291,20 @@ void Milieu_base::discretiser_porosite(const Probleme_base& pb, const Discretisa
         }
 
       is_user_porosites_ = true;
-      // On va utiliser porosites_champ maintenant !
+      // We will now use porosites_champ!
       dis.discretiser_champ("champ_elem", zdb_.valeur(), fld_name, fld_unit, 1, temps, ch_porosites_);
       Domaine_VF& zvf = ref_cast_non_const(Domaine_VF, zdb_.valeur());
-      ch_porosites_->valeurs() = 1.; // On initialise a 1 ...
+      ch_porosites_->valeurs() = 1.; // Initialize to 1 ...
       porosites_.remplir_champ(zvf, ch_porosites_->valeurs(), porosite_face_);
     }
-  else // Pas defini par l'utilisateur
+  else // Not defined by the user
     {
-      // On va utiliser porosites_champ maintenant !
+      // We will now use porosites_champ!
       dis.discretiser_champ("champ_elem", zdb_.valeur(), fld_name, fld_unit, 1, temps, ch_porosites_);
-      ch_porosites_->valeurs() = 1.; // On initialise a 1 ...
+      ch_porosites_->valeurs() = 1.; // Initialize to 1 ...
     }
 
-  // On ajoute pour tous les cas
+  // We add for all cases
   if (sub_type(Champ_Input_P0_Composite, ch_porosites_.valeur()))
     {
       Champ_input_P0& ch_in = ref_cast(Champ_input_P0,ref_cast(Champ_Input_P0_Composite, ch_porosites_.valeur()).input_field());
@@ -314,7 +314,7 @@ void Milieu_base::discretiser_porosite(const Probleme_base& pb, const Discretisa
   else champs_compris_.ajoute_champ(ch_porosites_.valeur());
 
   verifie_champ_porosites();
-  if (is_field_porosites()) calculate_face_porosity(); /* sinon c'est deja rempli ... */
+  if (is_field_porosites()) calculate_face_porosity(); /* otherwise it is already filled ... */
   fill_section_passage_face();
 }
 
@@ -324,16 +324,16 @@ void Milieu_base::discretiser_diametre_hydro(const Probleme_base& pb, const Disc
   const double temps = pb.schema_temps().temps_courant();
   Nom fld_name = "diametre_hydraulique", fld_unit = "m";
 
-  // On construit porosite_face_ avec un descripteur parallele
+  // We build porosite_face_ with a parallel descriptor
   const MD_Vector& md = ref_cast(Domaine_VF, zdb_.valeur()).md_vector_faces();
   if (!diametre_hydraulique_face_.get_md_vector())
     {
       MD_Vector_tools::creer_tableau_distribue(md, diametre_hydraulique_face_, RESIZE_OPTIONS::NOCOPY_NOINIT);
       assert (ref_cast(Domaine_VF, zdb_.valeur()).nb_faces_tot() == diametre_hydraulique_face_.size_totale());
     }
-  diametre_hydraulique_face_ = 0.; /* les diametres hydrauliques valent 0 */
+  diametre_hydraulique_face_ = 0.; /* hydraulic diameters are initialized to 0 */
 
-  if (ch_diametre_hyd_) // Lu par diametre_hyd_champ
+  if (ch_diametre_hyd_) // Read via diametre_hyd_champ
     {
       has_hydr_diam_ = true;
       if (sub_type(Champ_Fonc_MED, ch_diametre_hyd_.valeur()))
@@ -356,15 +356,15 @@ void Milieu_base::discretiser_diametre_hydro(const Probleme_base& pb, const Disc
       else
         dis.nommer_completer_champ_physique(zdb_.valeur(), fld_name, fld_unit, ch_diametre_hyd_.valeur(), pb);
     }
-  else // Pas defini par l'utilisateur
+  else // Not defined by the user
     {
       dis.discretiser_champ("champ_elem", zdb_.valeur(), fld_name, fld_unit, 1, temps, ch_diametre_hyd_);
-      ch_diametre_hyd_->valeurs() = 0.; // On initialise a 0 ...
+      ch_diametre_hyd_->valeurs() = 0.; // Initialize to 0 ...
     }
 
   champs_compris_.ajoute_champ(ch_diametre_hyd_.valeur());
 
-  if (has_hydr_diam_) calculate_face_hydr_diam(); /* sinon c'est deja rempli ... */
+  if (has_hydr_diam_) calculate_face_hydr_diam(); /* otherwise it is already filled ... */
 }
 
 void Milieu_base::calculate_face_hydr_diam()
@@ -386,16 +386,16 @@ void Milieu_base::calculate_face_hydr_diam()
           }
       diametre_hydraulique_face_(f) /= nv;
     }
-  // diametre_hydraulique_face_.echange_espace_virtuel(); // Elie : a voir si utile ... je l'utilise pas pour l'instant
+  // diametre_hydraulique_face_.echange_espace_virtuel(); // Elie: to be checked if useful... not used for now
 }
 
 void Milieu_base::verifie_champ_porosites()
 {
-  // XXX : Elie Saikali : Avant on testait ca :
+  // XXX : Elie Saikali : Previously we tested this:
   // assert(mp_min_vect(porosites_champ->valeurs()) >= 0. && mp_max_vect(porosites_champ->valeurs()) <= 1.);
-  // tomber sur un cas F5 avec printf("%.9g\n", 1.0 - mp_max_vect) = -2.88657986e-15
-  // essayer de comparer avec std::numeric_limits<double>::epsilon() mais l'overflow est > !!
-  // du coup je nettoie le champ comme ca pour le moment ... si c'est raisonable !
+  // encountered an F5 case with printf("%.9g\n", 1.0 - mp_max_vect) = -2.88657986e-15
+  // tried comparing with std::numeric_limits<double>::epsilon() but the overflow is larger !!
+  // so I clean the field like this for now ... if it is reasonable!
   const double min_por = mp_min_vect(ch_porosites_->valeurs()), max_por = mp_max_vect(ch_porosites_->valeurs());
 
   if (min_por >= 0.0 && max_por <= 1.0) { /* do nothing */ }
@@ -446,7 +446,7 @@ void Milieu_base::verifier_coherence_champs(int& err,Nom& msg)
 
 void Milieu_base::preparer_calcul()
 {
-  // ne fait rien!!!
+  // does nothing!!!
 }
 
 void Milieu_base::check_gravity_vector() const
@@ -467,7 +467,7 @@ void Milieu_base::creer_champs_non_lus()
 
 void Milieu_base::warn_old_syntax()
 {
-  if (que_suis_je() != "Fluide_Diphasique") // pour le FT pour le moment ...
+  if (que_suis_je() != "Fluide_Diphasique") // for FT for now ...
     {
       Cerr << "YOU ARE USING AN OLD SYNTAX IN YOUR DATA FILE AND THIS IS NO MORE SUPPORTED !" << finl;
       Cerr << "STARTING FROM TRUST-v1.9.3 : GRAVITY SHOULD BE READ INSIDE THE MEDIUM AND NOT VIA ASSOSCIATION ... " << finl;
@@ -478,13 +478,13 @@ void Milieu_base::warn_old_syntax()
     }
 }
 
-/*! @brief Associe la gravite en controlant dynamiquement le type de l'objet a associer.
+/*! @brief Associates gravity by dynamically checking the type of the object to associate.
  *
- *     Si l'objet est du type OWN_PTR(Champ_Don_base) ou Champ_Don_base
- *     l'association reussit, sinon elle echoue.
+ *     If the object is of type OWN_PTR(Champ_Don_base) or Champ_Don_base
+ *     the association succeeds, otherwise it fails.
  *
- * @param (Objet_U& ob) un objet TRUST devant representer un champ de gravite
- * @return (int) 1 si l'association a reussie, 0 sinon.
+ * @param (Objet_U& ob) a TRUST object representing a gravity field
+ * @return (int) 1 if the association succeeded, 0 otherwise.
  */
 int Milieu_base::associer_(Objet_U& ob)
 {
@@ -505,13 +505,13 @@ int Milieu_base::associer_(Objet_U& ob)
   return 0;
 }
 
-/*! @brief Associe (affecte) un champ de gravite au milieu.
+/*! @brief Associates (assigns) a gravity field to the medium.
  *
- * @param (Champ_Don_base& gravite) champ donne representant la gravite
+ * @param (Champ_Don_base& gravite) given field representing gravity
  */
 void Milieu_base::associer_gravite(const Champ_Don_base& la_gravite)
 {
-  // On verifie que la gravite est de la bonne dimension
+  // We verify that gravity has the correct dimension
   if (Objet_U::dimension!=la_gravite.nb_comp())
     {
       Cerr << "The dimension is " << Objet_U::dimension << " and you create a gravity vector with " << la_gravite.nb_comp() << " components." << finl;
@@ -527,14 +527,14 @@ void Milieu_base::associer_gravite(const Champ_Don_base& la_gravite)
     }
 }
 
-/*! @brief Calcul de alpha=lambda/(rho*Cp).
+/*! @brief Computes alpha=lambda/(rho*Cp).
  *
- * Suivant lambda, rho et Cp alpha peut-etre type comme
- *     un champ uniforme ou un champ uniforme par morceau.
+ * Depending on lambda, rho and Cp, alpha can be typed as
+ *     a uniform field or a piecewise uniform field.
  *
- * @throws violation d'une precondition
- * @throws impossible de calculer alpha car le type des champs
- * lambda,rho,Cp n'est pas compatible ou pas gere.
+ * @throws if a precondition is violated
+ * @throws if alpha cannot be computed because the types of the fields
+ * lambda, rho, Cp are incompatible or not handled.
  */
 void Milieu_base::calculer_alpha()
 {
@@ -613,10 +613,10 @@ void Milieu_base::mettre_a_jour(double temps)
 
   if (ch_rho_Cp_comme_T_) update_rho_cp(temps);
 
-  mettre_a_jour_porosite(temps); // pour F5 !
+  mettre_a_jour_porosite(temps); // for F5!
 }
 
-// methode utile pour F5 ! F5 n'appelle pas Milieu_base::mettre_a_jour mais Milieu_base::mettre_a_jour_porosite ...
+// Utility method for F5! F5 does not call Milieu_base::mettre_a_jour but Milieu_base::mettre_a_jour_porosite ...
 void Milieu_base::mettre_a_jour_porosite(double temps)
 {
   assert(ch_porosites_ && ch_diametre_hyd_);
@@ -628,7 +628,7 @@ void Milieu_base::mettre_a_jour_porosite(double temps)
         calculate_face_porosity();
         fill_section_passage_face();
         ch_porosites_->changer_temps(temps);
-        /* pas besoin je crois mais je laisse en commentaire ;-) */
+        /* not needed I think but leaving as comment ;-) */
         // porosites_champ->valeurs().echange_espace_virtuel();
       }
 
@@ -638,7 +638,7 @@ void Milieu_base::mettre_a_jour_porosite(double temps)
 
 void Milieu_base::update_rho_cp(double temps)
 {
-  // Si l'inconnue est sur le device, on copie les donnees aussi:
+  // If the unknown is on the device, copy the data there too:
   if (equation_.size() && (*(equation_.begin()->second)).inconnue().valeurs().isDataOnDevice())
     {
       mapToDevice(ch_rho_Cp_elem_->valeurs());
@@ -706,12 +706,10 @@ void Milieu_base::creer_alpha()
   ch_alpha_fois_rho_->nommer("alpha_fois_rho");
 }
 
-/*! @brief Renvoie la gravite du milieu si elle a ete associe provoque une erreur sinon.
+/*! @brief Returns the gravity of the medium if it has been associated, raises an error otherwise (const version).
  *
- *     (version const)
- *
- * @return (Champ_Don_base&) le champ representant la gravite du milieu
- * @throws pas de gravite associee au milieu
+ * @return (Champ_Don_base&) the field representing the gravity of the medium
+ * @throws if no gravity is associated with the medium
  */
 const Champ_Don_base& Milieu_base::gravite() const
 {
@@ -724,9 +722,9 @@ const Champ_Don_base& Milieu_base::gravite() const
   return ch_g_ ? ch_g_.valeur() : g_via_associer_.valeur();
 }
 
-/*! @brief Renvoie la gravite du milieu si elle a ete associe provoque une erreur sinon.
+/*! @brief Returns the gravity of the medium if it has been associated, raises an error otherwise.
  *
- * @return (Champ_Don_base&) le champ representant la gravite du milieu
+ * @return (Champ_Don_base&) the field representing the gravity of the medium
  */
 Champ_Don_base& Milieu_base::gravite()
 {
@@ -770,10 +768,10 @@ int Milieu_base::initialiser(const double temps)
   return initialiser_porosite(temps);
 }
 
-// methode utile pour F5 ! F5 n'appelle pas Milieu_base::initialiser mais Milieu_base::initialiser_porosite ...
+// method useful for F5! F5 does not call Milieu_base::initialiser but Milieu_base::initialiser_porosite ...
 int Milieu_base::initialiser_porosite(const double temps)
 {
-  // TODO : XXX : a voir si ICoCo ? faut l'initialiser dans le main ?
+  // TODO : XXX : to check for ICoCo ? it should be initialized in main ?
   assert(ch_porosites_ && ch_diametre_hyd_);
   ch_porosites_->initialiser(temps);
   ch_diametre_hyd_->initialiser(temps);
@@ -788,40 +786,36 @@ void Milieu_base::fill_section_passage_face()
   for (int i = 0; i < fs.size_array(); i++) section_passage_face_[i] = fs[i] * porosite_face_[i];
 }
 
-/*! @brief Renvoie la masse volumique du milieu.
+/*! @brief Returns the mass density of the medium (const version).
  *
- * (version const)
- *
- * @return (Champ_base&) le champ donne representant la masse volumique
+ * @return (Champ_base&) the field representing the mass density
  */
 const Champ_base& Milieu_base::masse_volumique() const
 {
   return ch_rho_.valeur();
 }
 
-/*! @brief Renvoie la masse volumique du milieu.
+/*! @brief Returns the mass density of the medium.
  *
- * @return (Champ_base&) le champ donne representant la masse volumique
+ * @return (Champ_base&) the field representing the mass density
  */
 Champ_base& Milieu_base::masse_volumique()
 {
   return ch_rho_.valeur();
 }
 
-/*! @brief Renvoie la diffusivite du milieu.
+/*! @brief Returns the diffusivity of the medium (const version).
  *
- * (version const)
- *
- * @return (Champ_Don_base&) le champ donne representant la diffusivite
+ * @return (Champ_Don_base&) the field representing the diffusivity
  */
 const Champ_Don_base& Milieu_base::diffusivite() const
 {
   return ch_alpha_.valeur();
 }
 
-/*! @brief Renvoie la diffusivite du milieu.
+/*! @brief Returns the diffusivity of the medium.
  *
- * @return (Champ_Don_base&) le champ donne representant la diffusivite
+ * @return (Champ_Don_base&) the field representing the diffusivity
  */
 Champ_Don_base& Milieu_base::diffusivite()
 {
@@ -838,69 +832,63 @@ Champ_Don_base& Milieu_base::diffusivite_fois_rho()
   return ch_alpha_fois_rho_.valeur();
 }
 
-/*! @brief Renvoie la conductivite du milieu.
+/*! @brief Returns the conductivity of the medium (const version).
  *
- * (version const)
- *
- * @return (Champ_Don_base&) le champ donne representant la conductivite
+ * @return (Champ_Don_base&) the field representing the conductivity
  */
 const Champ_Don_base& Milieu_base::conductivite() const
 {
   return ch_lambda_.valeur();
 }
 
-/*! @brief Renvoie la conductivite du milieu.
+/*! @brief Returns the conductivity of the medium.
  *
- * @return (Champ_Don_base&) le champ donne representant la conductivite
+ * @return (Champ_Don_base&) the field representing the conductivity
  */
 Champ_Don_base& Milieu_base::conductivite()
 {
   return ch_lambda_.valeur();
 }
 
-/*! @brief Renvoie la capacite calorifique du milieu.
+/*! @brief Returns the heat capacity of the medium (const version).
  *
- * (version const)
- *
- * @return (Champ_Don_base&) le champ donne representant la capacite calorifique
+ * @return (Champ_Don_base&) the field representing the heat capacity
  */
 const Champ_Don_base& Milieu_base::capacite_calorifique() const
 {
   return ch_Cp_.valeur();
 }
 
-/*! @brief Renvoie la capacite calorifique du milieu.
+/*! @brief Returns the heat capacity of the medium.
  *
- * @return (Champ_Don_base&) le champ donne representant la capacite calorifique
+ * @return (Champ_Don_base&) the field representing the heat capacity
  */
 Champ_Don_base& Milieu_base::capacite_calorifique()
 {
   return ch_Cp_.valeur();
 }
 
-/*! @brief Renvoie beta_t du milieu.
+/*! @brief Returns beta_t of the medium (const version).
  *
- * (version const)
- *
- * @return (Champ_Don_base&) le champ donne representant beta_t
+ * @return (Champ_Don_base&) the field representing beta_t
  */
 const Champ_Don_base& Milieu_base::beta_t() const
 {
   return ch_beta_th_.valeur();
 }
 
-/*! @brief Renvoie beta_t du milieu.
+/*! @brief Returns beta_t of the medium.
  *
- * @return (Champ_Don_base&) le champ donne representant beta_t
+ * @return (Champ_Don_base&) the field representing beta_t
  */
 Champ_Don_base& Milieu_base::beta_t()
 {
   return ch_beta_th_.valeur();
 }
 
-/*! @brief Renvoie 1 si la gravite a ete initialisee
+/*! @brief Returns 1 if gravity has been initialized.
  *
- * @return (int) 1 si g.non_nul
+ * @return (int) 1 if g is non-null
  */
 int Milieu_base::a_gravite() const
 {
@@ -930,7 +918,7 @@ void Milieu_base::get_noms_champs_postraitables(Noms& nom, Option opt) const
     nom.add(champs_compris_.liste_noms_compris());
 }
 
-/*! @brief Renvoie 0 si le milieu est deja associe a un probleme, 1 sinon
+/*! @brief Returns 0 if the medium is already associated with a problem, 1 otherwise.
  *
  * @return (int)
  */

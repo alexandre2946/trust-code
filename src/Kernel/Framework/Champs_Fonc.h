@@ -20,7 +20,7 @@
 #include <TRUST_Deriv.h>
 #include <TRUST_List.h>
 
-/*! @brief classe Champs_Fonc Liste de OWN_PTR(Champ_Fonc_base)  declaree grace a la macro LIST(X)
+/*! @brief class Champs_Fonc List of OWN_PTR(Champ_Fonc_base) declared through the LIST(X) macro
  *
  * @sa Champ_Fonc_base
  */

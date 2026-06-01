@@ -67,7 +67,7 @@ void Echange_contact_VDF::completer()
   T_autre_pb().fixer_nb_valeurs_temporelles(nb_cases);
 }
 
-/*! @brief Change le i-eme temps futur de la CL.
+/*! @brief Changes the i-th future time of the boundary condition.
  *
  */
 void Echange_contact_VDF::changer_temps_futur(double temps,int i)
@@ -76,7 +76,7 @@ void Echange_contact_VDF::changer_temps_futur(double temps,int i)
   T_autre_pb().changer_temps_futur(temps,i);
 }
 
-/*! @brief Tourne la roue de la CL
+/*! @brief Advances the boundary condition time wheel.
  *
  */
 int Echange_contact_VDF::avancer(double temps)
@@ -86,7 +86,7 @@ int Echange_contact_VDF::avancer(double temps)
   return ok;
 }
 
-/*! @brief Tourne la roue de la CL
+/*! @brief Rewinds the boundary condition time wheel.
  *
  */
 int Echange_contact_VDF::reculer(double temps)
@@ -141,7 +141,7 @@ void calculer_h_local(DoubleTab& tab,const Equation_base& une_eqn,const Domaine_
         }
     }
 
-  // Calcul de tab = 1/(e/lambda + 1/h_paroi) =1/(e/lambda+invhparoi)
+  // Compute tab = 1/(e/lambda + 1/h_paroi) =1/(e/lambda+invhparoi)
   if(!sub_type(Champ_Uniforme,le_milieu.conductivite()))
     {
       const DoubleTab& lambda = le_milieu.conductivite().valeurs();
@@ -157,7 +157,7 @@ void calculer_h_local(DoubleTab& tab,const Equation_base& une_eqn,const Domaine_
             }
         }
     }
-  else  // la conductivite est un OWN_PTR(Champ_base) uniforme
+  else  // the conductivity is a uniform OWN_PTR(Champ_base)
     {
       for (int face=ndeb; face<nfin; face++)
         {
@@ -169,7 +169,7 @@ void calculer_h_local(DoubleTab& tab,const Equation_base& une_eqn,const Domaine_
         }
     }
 
-} // fin du cas Raccord_local_homogene
+} // end of the Raccord_local_homogene case
 
 
 void calculer_h_distant(DoubleTab& tab,const Equation_base& une_eqn,const Domaine_VDF& zvdf_2,const Front_VF& front_vf,const    Milieu_base& le_milieu,double invhparoi,int opt,const Nom& nom_racc2)
@@ -201,7 +201,7 @@ void calculer_h_distant(DoubleTab& tab,const Equation_base& une_eqn,const Domain
       front_vf.frontiere().trace_face_distant(zvdf_2.dist_norm_bord(dist,nom_racc2),e);
     }
 
-  // Calcul de tab = 1/(e/lambda + 1/h_paroi)=1/(e/lambda + invhparoi)
+  // Compute tab = 1/(e/lambda + 1/h_paroi)=1/(e/lambda + invhparoi)
 
   if(!sub_type(Champ_Uniforme,le_milieu.conductivite()))
     {
@@ -214,7 +214,7 @@ void calculer_h_distant(DoubleTab& tab,const Equation_base& une_eqn,const Domain
             tab(face,i) = 1./(e(face)/lambda(face,i)+invhparoi);
           }
     }
-  else  // la conductivite est un OWN_PTR(Champ_base) uniforme
+  else  // the conductivity is a uniform OWN_PTR(Champ_base)
     {
       const DoubleTab& lambda = le_milieu.conductivite().valeurs();
       for (int face=0; face<nb_faces_raccord1; face++)
@@ -224,7 +224,7 @@ void calculer_h_distant(DoubleTab& tab,const Equation_base& une_eqn,const Domain
             tab(face,i) = 1./(e(face)/lambda(0,i)+invhparoi);
           }
     }
-}        // fin du cas Raccord_distant_homogene
+}        // end of the Raccord_distant_homogene case
 
 
 void Echange_contact_VDF::calculer_h_mon_pb(DoubleTab& tab,double invhparoi,int opt)
@@ -274,7 +274,7 @@ int Echange_contact_VDF::initialiser(double temps)
   if (!Echange_global_impose::initialiser(temps))
     return 0;
 
-  // XXX : On rempli les valeurs ici et pas dans le readOn car le milieu de pb2 ets pas encore lu !!!
+  // XXX : Values are filled here and not in readOn because the medium of pb2 is not yet read !!!
   Champ_front_calc& ch = ref_cast(Champ_front_calc, T_autre_pb());
   ch.creer(nom_autre_pb_, nom_bord, nom_champ);
 
@@ -301,7 +301,7 @@ int Echange_contact_VDF::initialiser(double temps)
 
   monolithic = sub_type(Schema_Euler_Implicite, o_eqn.schema_temps()) ?
                ref_cast(Schema_Euler_Implicite, o_eqn.schema_temps()).resolution_monolithique(o_eqn.domaine_application()) : 0;
-  if (!monolithic) return 1; //pas besoin du reste
+  if (!monolithic) return 1; //no need for the rest
   o_domaine.init_virt_e_map();
 
   /* src(i) = (proc, j) : source de l'item i de mdv_elem */
@@ -320,12 +320,12 @@ int Echange_contact_VDF::initialiser(double temps)
       o_proc(f) = src(e, 0), o_item(f) = src(e, 1); //element
     }
 
-  //projection sur la frontiere locale
+  //projection onto the local boundary
   if (o_fvf.frontiere().que_suis_je() == "Raccord_distant_homogene")
     o_fvf.frontiere().trace_face_distant(o_proc, proc), o_fvf.frontiere().trace_face_distant(o_item, l_item);
   else o_fvf.frontiere().trace_face_local(o_proc, proc), o_fvf.frontiere().trace_face_local(o_item, l_item);
 
-  //remplissage
+  //filling
   item.resize(fvf.nb_faces()), item = -1;
   for (int i = 0; i < fvf.nb_faces(); i++)
     if (l_item(i) >= 0)
@@ -363,7 +363,7 @@ void Echange_contact_VDF::mettre_a_jour(double temps)
 
   calculer_Teta_paroi(T_wall_,mon_h,autre_h,is_pb_fluide,temps);
   calculer_Teta_equiv(T_ext().valeurs_au_temps(temps),mon_h,autre_h,is_pb_fluide,temps);
-  // on a calculer Teta paroi, on peut calculer htot dans himp (= mon_h)
+  // Teta_paroi has been computed; now compute htot in himp (= mon_h)
   int taille=mon_h.dimension(0);
   for (int ii=0; ii<taille; ii++)
     for (int jj=0; jj<nb_comp; jj++)
@@ -374,7 +374,7 @@ void Echange_contact_VDF::mettre_a_jour(double temps)
 }
 
 
-/*! @brief remplit Teta_eq utilise T_autre_pb au temps passe en parametre
+/*! @brief Fills Teta_eq using T_autre_pb at the time passed as parameter.
  *
  */
 void Echange_contact_VDF::calculer_Teta_equiv(DoubleTab& Teta_eq,const DoubleTab& mon_h,const DoubleTab& lautre_h,int i,double temps)
@@ -391,7 +391,7 @@ void Echange_contact_VDF::calculer_Teta_equiv(DoubleTab& Teta_eq,const DoubleTab
   Teta_eq.echange_espace_virtuel();
 }
 
-/*! @brief remplit Teta_p utilise T_autre_pb au temps passe en parametre
+/*! @brief Fills Teta_p using T_autre_pb at the time passed as parameter.
  *
  */
 void Echange_contact_VDF::calculer_Teta_paroi(DoubleTab& Teta_p,const DoubleTab& mon_h,const DoubleTab& lautre_h,int i, double temps)
@@ -417,7 +417,7 @@ void Echange_contact_VDF::calculer_Teta_paroi(DoubleTab& Teta_p,const DoubleTab&
     }
 }
 
-// En VDF, les faces de deux raccords doivent etre numerotes de la meme facon
+// In VDF, the faces of two raccords must be numbered in the same way
 int Echange_contact_VDF::verifier_correspondance() const
 {
   const Champ_front_calc& ch=ref_cast(Champ_front_calc, T_autre_pb());

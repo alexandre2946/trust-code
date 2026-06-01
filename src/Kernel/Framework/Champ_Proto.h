@@ -21,17 +21,17 @@
 class Nom;
 class Entree;
 
-/*! @brief classe Champ_Proto Classe representant un prototype de Champ.
+/*! @brief class Champ_Proto Class representing a Field prototype.
  *
- * Tous les classes
- *      representant des champs derivent de Champ_proto. Champ_proto offre
- *      des methodes classiques sur des champs (min, max, norme, += ...)
- *      mais ne contient pas de membre representant des donnees.
- *      La plupart des methodes de Champ_proto font appel aux methodes de
- *      meme nom d'un objet DoubleTab renvoye par la methode abstraite
- *      de Champ_proto valeurs().
+ * All classes
+ *      representing fields derive from Champ_proto. Champ_proto offers
+ *      classic methods on fields (min, max, norm, += ...)
+ *      but does not contain a member representing data.
+ *      Most Champ_proto methods call methods of the same name
+ *      of a DoubleTab object returned by the abstract method
+ *      of Champ_proto valeurs().
  *
- * @sa Champ_base DoubleTab, Classe abstraite., Methode abstraite:, DoubleTab& valeurs()=0, const DoubleTab& valeurs() const
+ * @sa Champ_base DoubleTab, Abstract class., Abstract method:, DoubleTab& valeurs()=0, const DoubleTab& valeurs() const
  */
 class Champ_Proto
 {
@@ -40,7 +40,7 @@ public:
   virtual DoubleTab& valeurs()=0;
   virtual const DoubleTab& valeurs() const =0;
 
-  /* par defaut, ces methodes renvoient valeurs() */
+  /* by default, these methods return valeurs() */
   virtual inline DoubleTab& valeurs(double temps) { return valeurs(); }
   virtual inline const DoubleTab& valeurs(double temps) const { return valeurs(); }
 
@@ -53,7 +53,7 @@ public:
   int lire_dimension(Entree&, const Nom&);
   int lire_dimension(int dim, const Nom& le_nom_);
 
-  // XXX : Elie Saikali : ca c'est interdit !! c'est tout
+  // XXX : Elie Saikali : that's forbidden !! that's all
   double operator()(int i, int j) const = delete;
   double& operator()(int i, int j) = delete;
   double operator()(int i) const = delete;

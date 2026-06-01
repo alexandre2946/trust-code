@@ -33,7 +33,7 @@ Entree& Perte_Charge_PolyMAC_CDO::readOn(Entree& is) { return Perte_Charge_Gen::
 
 DoubleTab& Perte_Charge_PolyMAC_CDO::ajouter(DoubleTab& resu) const
 {
-  if (has_interface_blocs()) return Source_base::ajouter(resu); // pour les classes filles
+  if (has_interface_blocs()) return Source_base::ajouter(resu); // for derived classes
 
   const Domaine_PolyMAC_CDO& domaine = le_dom_poly();
   const Champ_Face_PolyMAC_CDO& ch = ref_cast(Champ_Face_PolyMAC_CDO, equation().inconnue());
@@ -46,14 +46,14 @@ DoubleTab& Perte_Charge_PolyMAC_CDO::ajouter(DoubleTab& resu) const
   double t = equation().schema_temps().temps_courant();
   DoubleVect pos(dimension), ve(dimension), dir(dimension);
 
-  /* contribution de chaque element ou on applique la perte de charge */
+  /* contribution of each element where the pressure drop is applied */
   for (i = 0; i < (pssz ? pssz->nb_elem_tot() : domaine.nb_elem_tot()); i++)
     {
       int e = pssz ? (*pssz)[i] : i;
       for (r = 0; r < dimension; r++)
         pos(r) = xp(e, r);
 
-      /* valeurs evaluees en l'element : nu, Dh, vecteur vitesse, Re, coefficients de perte de charge isotrope et directionel + la direction */
+      /* values evaluated at the element: nu, Dh, velocity vector, Re, isotropic and directional pressure drop coefficients + the direction */
       double nu_e = C_nu ? nu.valeurs()(0, 0) : nu.valeur_a_compo(pos, 0), dh_e = C_dh ? dh.valeurs()(0, 0) : dh.valeur_a_compo(pos, 0);
       for (j = domaine.vedeb(e), ve = 0; j < domaine.vedeb(e + 1); j++)
         for (r = 0; r < dimension; r++)
@@ -61,7 +61,7 @@ DoubleTab& Perte_Charge_PolyMAC_CDO::ajouter(DoubleTab& resu) const
       double n_ve = sqrt(domaine.dot(ve.addr(), ve.addr())), Re = std::max(n_ve * dh_e / nu_e, 1e-10), C_iso, C_dir, v_dir;
       coeffs_perte_charge(ve, pos, t, n_ve, dh_e, nu_e, Re, C_iso, C_dir, v_dir, dir);
 
-      /* contributions aux faces de e */
+      /* contributions at faces of e */
       for (j = 0; j < e_f.dimension(1) && (f = e_f(e, j)) >= 0; j++)
         if (f < domaine.nb_faces() && ch.fcl()(f, 0) < 2)
           {
@@ -70,7 +70,7 @@ DoubleTab& Perte_Charge_PolyMAC_CDO::ajouter(DoubleTab& resu) const
               fb = e_f(e, domaine.m2j(k)), m2vf += pf(f) * (e == f_e(f, 0) ? 1 : -1) * (e == f_e(fb, 0) ? 1 : -1) * domaine.volumes(e) * domaine.m2c(k) * vit(fb) * pf(fb) / pe(e);
             contrib = C_iso * m2vf + fs(f) * pf(f) * (C_dir - C_iso) * domaine.dot(&ve(0), &dir(0)) * (e == f_e(f, 0) ? 1 : -1) * domaine.dot(&xv(f, 0), &dir(0), &xp(e, 0));
             if (contrib <= std::min(C_dir, C_iso) * m2vf)
-              contrib = std::min(C_dir, C_iso) * m2vf; //pour garantir un frottement minimal
+              contrib = std::min(C_dir, C_iso) * m2vf; //to guarantee a minimum friction
             resu(f) -= contrib;
           }
     }
@@ -79,7 +79,7 @@ DoubleTab& Perte_Charge_PolyMAC_CDO::ajouter(DoubleTab& resu) const
 
 void Perte_Charge_PolyMAC_CDO::contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& matrice) const
 {
-  if (has_interface_blocs()) // pour les classes filles
+  if (has_interface_blocs()) // for derived classes
     {
       Source_base::contribuer_a_avec(inco, matrice);
       return;
@@ -102,7 +102,7 @@ void Perte_Charge_PolyMAC_CDO::contribuer_a_avec(const DoubleTab& inco, Matrice_
       for (r = 0; r < dimension; r++)
         pos(r) = xp(e, r);
 
-      /* valeurs evaluees en l'element : nu, Dh, vecteur vitesse, Re, coefficients de perte de charge isotrope et directionel + la direction */
+      /* values evaluated at the element: nu, Dh, velocity vector, Re, isotropic and directional pressure drop coefficients + the direction */
       double nu_e = C_nu ? nu.valeurs()(0, 0) : nu.valeur_a_compo(pos, 0), dh_e = C_dh ? dh.valeurs()(0, 0) : dh.valeur_a_compo(pos, 0);
       for (j = domaine.vedeb(e), ve = 0; j < domaine.vedeb(e + 1); j++)
         for (r = 0; r < dimension; r++)
@@ -110,7 +110,7 @@ void Perte_Charge_PolyMAC_CDO::contribuer_a_avec(const DoubleTab& inco, Matrice_
       double n_ve = sqrt(domaine.dot(ve.addr(), ve.addr())), Re = std::max(n_ve * dh_e / nu_e, 1e-10), C_iso, C_dir, v_dir;
       coeffs_perte_charge(ve, pos, t, n_ve, dh_e, nu_e, Re, C_iso, C_dir, v_dir, dir);
 
-      /* contributions aux faces de e */
+      /* contributions at faces of e */
       for (j = 0; j < e_f.dimension(1) && (f = e_f(e, j)) >= 0; j++)
         if (f < domaine.nb_faces() && ch.fcl()(f, 0) < 2)
           {

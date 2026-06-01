@@ -33,10 +33,10 @@ Implemente_base_sans_constructeur_ni_destructeur(Traitement_particulier_NS_EC,"T
 // XD attr periode floattant periode OPT periode is the keyword to set the period of printing into the file
 // XD_CONT datafile_Ec.son or datafile_Ec_dans_repere_fixe.son.
 
-/*! @brief
+/*! @brief Prints the object to an output stream.
  *
- * @param (Sortie& is) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param is an output stream
+ * @return the modified output stream
  */
 Sortie& Traitement_particulier_NS_EC::printOn(Sortie& is) const
 {
@@ -44,10 +44,10 @@ Sortie& Traitement_particulier_NS_EC::printOn(Sortie& is) const
 }
 
 
-/*! @brief
+/*! @brief Reads the object from an input stream.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param is an input stream
+ * @return the modified input stream
  */
 Entree& Traitement_particulier_NS_EC::readOn(Entree& is)
 {
@@ -118,7 +118,7 @@ Entree& Traitement_particulier_NS_EC::lire(Entree& is)
 
 void Traitement_particulier_NS_EC::ouvrir_fichier(SFichier& s) const
 {
-  // Ouverture du fichier Nom_du_cas_EC.son
+  // Open the file Nom_du_cas_EC.son
   Nom nom_fich(nom_du_cas());
   nom_fich += "_EC";
   if (repere_mobile_)
@@ -145,7 +145,7 @@ void Traitement_particulier_NS_EC::preparer_calcul_particulier()
     {
       SFichier le_fichier;
       ouvrir_fichier(le_fichier);
-      // Ecriture premiere ligne
+      // Write first line
       le_fichier<<"# Temps        Energie_cinetique_totale"<<finl;
       le_fichier<<tinit<<" "<<Ec<<finl;
     }
@@ -168,9 +168,9 @@ void Traitement_particulier_NS_EC::post_traitement_particulier()
     }
 }
 
-/*! @brief Fonction outil utilisee dans calculer_Ec.
+/*! @brief Helper function used in calculer_Ec.
  *
- * Calcule la somme de 0.5*v^2*rho*volumes_entrelaces.
+ * Computes the sum of 0.5*v^2*rho*volumes_entrelaces.
  *
  */
 static double trait_part_calculer_ec_faces(const int         face_debut,
@@ -194,7 +194,7 @@ static double trait_part_calculer_ec_faces(const int         face_debut,
   ArrOfDouble ve(Objet_U::dimension);
   for (int face = face_debut; face < face_fin; face++)
     {
-      // Calcul de la vitesse d'entrainement
+      // Computation of the entrainment velocity
       if (repere_mobile_)
         {
           ve[0]=translation[0];
@@ -246,15 +246,15 @@ static double trait_part_calculer_ec_faces(const int         face_debut,
   return ec;
 }
 
-/*! @brief Meme methode de calcul en VDF et en VEF.
+/*! @brief Same computation method for VDF and VEF.
  *
- *   Si aucun champ de masse volumique n'a ete associe, on calcule
- *    INTEGRALE de 1/2 * u^2 sur le domaine.
- *   Si un champ de masse volumique a ete associe, il doit etre
- *   de type "champ aux faces". On calcule INTEGRALE de 1/2 * rho * u^2.
- *   rho est un champ P0 aux elements, u est P0 sur les volumes entrelaces
- *  Valeur de retour:
- *   La somme sur tous les processeurs de l'integrale de 1/2*rho*u*u.
+ *   If no mass-density field has been associated, computes
+ *    INTEGRAL of 1/2 * u^2 over the domain.
+ *   If a mass-density field has been associated, it must be
+ *   of type "champ aux faces". Computes INTEGRAL of 1/2 * rho * u^2.
+ *   rho is a P0 field at elements, u is P0 on the staggered volumes.
+ *  Return value:
+ *   The sum over all processors of the integral of 1/2*rho*u*u.
  *
  */
 void Traitement_particulier_NS_EC::calculer_Ec(double& energie_cinetique)
@@ -273,7 +273,7 @@ void Traitement_particulier_NS_EC::calculer_Ec(double& energie_cinetique)
   if (repere_mobile_)
     {
       int ok=0;
-      // Verification de l'existence d'un terme source Acceleration dans Navier Stokes
+      // Check for the existence of an Acceleration source term in Navier Stokes
       const Sources& les_sources=mon_equation->sources();
 
       for (const auto& itr : les_sources)
@@ -281,9 +281,9 @@ void Traitement_particulier_NS_EC::calculer_Ec(double& energie_cinetique)
           if (sub_type(Terme_Source_Acceleration,itr.valeur()))
             {
               const Terme_Source_Acceleration& terme_source_acceleration=ref_cast(Terme_Source_Acceleration,itr.valeur());
-              // Verification que les vitesses de translation du repere
-              // mobiles sont bien definies et association des tableaux translation et
-              // eventuellement rotation
+              // Check that the translation velocities of the moving
+              // frame are properly defined and associate the translation and
+              // optionally rotation arrays
               if (terme_source_acceleration.has_champ_vitesse())
                 {
                   translation=terme_source_acceleration.champ_vitesse().valeurs();
@@ -324,7 +324,7 @@ void Traitement_particulier_NS_EC::calculer_Ec(double& energie_cinetique)
     }
   const int nb_front = domaine_VF.nb_front_Cl();
   const ArrOfInt& faces_doubles = domaine_VF.faces_doubles();
-  // Faces de bord
+  // Boundary faces
   for (int i = 0; i < nb_front; i++)
     {
       const Frontiere& fr = domaine_VF.front_VF(i).frontiere();
@@ -333,7 +333,7 @@ void Traitement_particulier_NS_EC::calculer_Ec(double& energie_cinetique)
       ec += trait_part_calculer_ec_faces(debut, nb_faces, 1,
                                          vitesse, volumes_entrelaces, xv, rho, translation, rotation, repere_mobile_, faces_doubles);
     }
-  // Faces a l'interieur du domaine (y compris les faces de joint)
+  // Interior faces of the domain (including joint faces)
   {
     const int debut    = domaine_VF.premiere_face_int();
     const int nb_faces = domaine_VF.nb_faces_internes();

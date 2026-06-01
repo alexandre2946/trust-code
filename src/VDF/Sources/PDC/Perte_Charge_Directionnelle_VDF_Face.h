@@ -18,11 +18,11 @@
 
 #include <Perte_Charge_VDF_base.h>
 
-//!  Perte de charge directionnelle (selon un vecteur unitaire v)
+//!  Directional pressure loss (along a unit vector v)
 /**
  du/dt = - volume * lambda(Re,x,y,z,t) * u.(v / ||v||) * (v / ||v||) * ||u|| / (2 * Dh)
 
- Lecture des arguments :
+ Reading arguments:
 
  Perte_Charge_Directionnelle_VDF_Face diametre_hydraulique {
  lambda expression(Re,x,y,z,t)
@@ -45,11 +45,11 @@ public:
 
 protected:
   void set_param(Param& titi) const override;
-  //! Implemente le calcul effectif de la perte de charge pour un lieu donne
+  //! Implements the effective pressure loss computation for a given location
   void coeffs_perte_charge(const DoubleVect& u, const DoubleVect& pos, double t, double norme_u, double dh, double nu, double reynolds, double& coeff_ortho, double& coeff_long, double& u_l,
                            DoubleVect& v_valeur) const override;
 
-  OWN_PTR(Champ_Don_base) v; //!< Vecteur directeur de la perte de charge.
+  OWN_PTR(Champ_Don_base) v; //!< Direction vector of the pressure loss.
 };
 
 #endif /* Perte_Charge_Directionnelle_VDF_Face_included */

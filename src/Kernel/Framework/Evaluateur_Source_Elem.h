@@ -26,7 +26,7 @@ public:
   void completer() override;
 
 protected:
-  DoubleVect volumes, porosite_vol; // porosites volumiques
+  DoubleVect volumes, porosite_vol; // volumetric porosities
 };
 
 #endif /* Evaluateur_Source_Elem_included */

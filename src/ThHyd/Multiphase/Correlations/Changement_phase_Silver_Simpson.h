@@ -35,7 +35,7 @@ public:
 protected:
   double lambda_ec[2] = { 1, 1 }; //facteurs multiplicatifs d'evaporation / condensation
   double M = -100.; //masse molaire de la vapeur
-  double alpha_min = 0.1; //taux de vide minimal (pour que le changement de phase soit possible a alpha = 0)
+  double alpha_min = 0.1; //minimum void fraction (so that phase change is possible at alpha = 0)
 };
 
 #endif

@@ -57,7 +57,7 @@ int Sortie_libre_Gradient_Pression_impose_VEFPreP1B::initialiser(double temps)
       else
         coeff[ind_face] = distance_3D(face, elem, mon_dom_VEF) * 4.;
     }
-  // On n'appelle pas mettre_a_jour car la mise a jour du champ_front pourrait dependre de l'exterieur !
+  // We do not call mettre_a_jour because the update of champ_front could depend on external factors!
   return calculer_trace_pression();
 }
 

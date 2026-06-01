@@ -19,9 +19,9 @@
 #include <Interprete_geometrique_base.h>
 #include <Domaine.h>
 
-/*! @brief Classe Transformer Applique un changement de coordonnees
+/*! @brief Class Transformer Applies a coordinate transformation.
  *
- *     Structure du jeu de donnee (en dimension 2) :
+ *     Data set structure (in dimension 2):
  *     Transformer dom expr1 expr2
  */
 template <typename _SIZE_>

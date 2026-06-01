@@ -26,17 +26,13 @@ class Param;
 
 static constexpr double CMU = 0.09;
 
-/*! @brief Classe Modele_turbulence_hyd_base Cette classe sert de base a la hierarchie des classes
+/*! @brief Base class for the turbulence model hierarchy for Navier-Stokes equations.
  *
- *     qui representent un modele de turbulence pour les
- *     equations de Navier-Stokes. Il existe deja deux classes derivees
- *     qui representent le modele de turbulence (k,e) et le modele
- *     de turbulence sous maille. Ces deux modeles ont en commun
- *     le calcul d'une viscosite turbulente.
+ *     Two derived classes already exist representing the (k,e) turbulence model and the
+ *     subgrid-scale turbulence model. Both models share the computation of a turbulent viscosity.
  *
- *     B.Mat. : la classe herite de support_champ_masse_volumique.
- *      en Front-Tracking (et plus tard en qc), elle fournit le
- *      mecanisme pour recuperer rho.
+ *     B.Mat.: the class inherits from Support_Champ_Masse_Volumique.
+ *     In Front-Tracking (and later in QC), it provides the mechanism to retrieve rho.
  *
  */
 class Modele_turbulence_hyd_base: public Objet_U, public Support_Champ_Masse_Volumique, public Champs_compris_interface
@@ -60,7 +56,7 @@ public:
   virtual void discretiser();
   void discretiser_visc_turb(const Schema_Temps_base&, Domaine_dis_base&, OWN_PTR(Champ_Fonc_base)&) const;
   void discretiser_corr_visc_turb(const Schema_Temps_base&, Domaine_dis_base&, OWN_PTR(Champ_Fonc_base)&) const;
-  void discretiser_K(const Schema_Temps_base&, Domaine_dis_base&, OWN_PTR(Champ_Fonc_base)&) const; // Utilise par les modeles de tubulence dans TrioCFD
+  void discretiser_K(const Schema_Temps_base&, Domaine_dis_base&, OWN_PTR(Champ_Fonc_base)&) const; // Used by turbulence models in TrioCFD
   virtual void completer() { /* Do nothing */ }
   void associer_eqn(const Equation_base&);
   virtual void associer(const Domaine_dis_base&, const Domaine_Cl_dis_base&) { /* Do nothing */ }
@@ -102,11 +98,10 @@ private:
   DoubleVect borne_visco_turb_;
 };
 
-/*! @brief Renvoie l'equation associee au modele de turbulence.
+/*! @brief Returns the equation associated with the turbulence model.
  *
- * (c'est une equation du type Equation_base)
- *
- * @return (Equation_base&) l'equation associee au modele de turbulence
+ * @brief Returns the equation associated with the turbulence model (of type Equation_base).
+ * @return (Equation_base&) the equation associated with the turbulence model
  */
 inline Equation_base& Modele_turbulence_hyd_base::equation()
 {

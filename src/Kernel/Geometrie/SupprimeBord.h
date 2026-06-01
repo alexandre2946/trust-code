@@ -23,7 +23,7 @@
 
 /*! @brief class SupprimeBord Supprimebord dom  { bord1 , bord2 }
  *
- *  Supprime les frontieres bord1 et bord2
+ *  Removes boundaries bord1 and bord2.
  *
  * @sa Interprete
  */

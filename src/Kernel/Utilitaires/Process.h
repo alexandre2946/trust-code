@@ -35,13 +35,11 @@ class Sortie;
 int get_disable_stop();
 void change_disable_stop(int new_stop);
 
-/*! @brief Classe de base de TRUST (notamment Objet_U).
+/*! @brief Base class of TRUST (in particular Objet_U).
  *
- * Elle fournit quelques services de base
- *    accessibles de partout dans le code (ces services etaient historiquement
- *    des methodes non statiques, depuis que tous ces services sont statiques,
- *    cette classe n'a plus vraiment d'autre fonction que de ranger ces methodes
- *    quelque part)
+ * It provides a few basic services accessible from anywhere in the code.
+ *    These services were historically non-static methods; since all of them are now static,
+ *    this class has no other purpose than to group those methods.
  *
  * @sa Objet_U
  */
@@ -73,7 +71,7 @@ public:
   template<typename _TYPE_>
   static void mp_min_for_each_item(TRUSTArray<_TYPE_>& x) { }
 #else
-  static int me(); /* mon rang dans le groupe courant */
+  static int me(); /* my rank in the current group */
   static int nproc();
   static bool is_parallel();
   static void exit(int exit_code = -1);
@@ -166,8 +164,9 @@ public:
 #endif
 };
 
-/*! @brief Routine de sortie de TRUST dans une region Kokkos
+/*! @brief Exit routine for TRUST within a Kokkos region.
  *
+ * @param str Error message to display.
  */
 #ifndef LATATOOLS
 KOKKOS_INLINE_FUNCTION void Process::Kokkos_exit(const char* str)

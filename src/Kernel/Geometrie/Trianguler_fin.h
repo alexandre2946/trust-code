@@ -19,14 +19,14 @@
 #include <Triangulation_base.h>
 #include <Domaine_forward.h>
 
-/*! @brief Classe Trianguler_fin Cette classe est un interprete qui sert a lire et executer
+/*! @brief Class Trianguler_fin This class is an interpreter that serves to read and execute
  *
- *     la directive Trianguler_fin:
- *         Trianguler_fin nom_domaine
- *     Cette directive est a utiliser en discretisation VEF pour obtenir
- *     un maillage triangulaire a partir d'un maillage constitue de rectangles.
+ *     the Trianguler_fin directive:
+ *         Trianguler_fin domain_name
+ *     This directive is to be used in VEF discretization to obtain
+ *     a triangular mesh from a mesh made up of rectangles.
  *
- * @sa Interprete Rectangle, Cette classe est utilisable en 2D
+ * @sa Interprete Rectangle, This class is usable in 2D
  */
 class Trianguler_fin : public Triangulation_base
 {

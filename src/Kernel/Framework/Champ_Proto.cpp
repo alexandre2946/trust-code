@@ -16,21 +16,21 @@
 #include <Champ_Proto.h>
 #include <Nom.h>
 
-/*! @brief Verification de la dimension du champ Renvoie la dimension du champ
+/*! @brief Verification of the field dimension Returns the dimension of the field
  *
- * @return (int) la dimension du champ
+ * @return (int) the dimension of the field
  */
 int Champ_Proto::lire_dimension(Entree& is , const Nom& le_nom_)
 {
-  // verification meme en optim
+  // verification even in optimized mode
   int dim = -1;
   is >> dim;
   return lire_dimension(dim, le_nom_);
 }
 
-/*! @brief Verification de la dimension du champ Renvoie la dimension du champ
+/*! @brief Verification of the field dimension Returns the dimension of the field
  *
- * @return (int) la dimension du champ
+ * @return (int) the dimension of the field
  */
 int Champ_Proto::lire_dimension(int dim , const Nom& le_nom_)
 {

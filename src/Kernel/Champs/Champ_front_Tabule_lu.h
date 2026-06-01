@@ -19,7 +19,7 @@
 #include <Champ_front_Tabule.h>
 #include <Champ_lu_proto.h>
 
-/*! @brief : classe Champ_front_Tabule_lu Classe derivee de Champ_front_Tabule construit un Champ_front_Tabule a partir d'un fichier sonde
+/*! @brief : class Champ_front_Tabule_lu Derived class of Champ_front_Tabule building a Champ_front_Tabule from a probe file
  *
  * @sa : Champ_front_Tabule
  */

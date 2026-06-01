@@ -21,13 +21,14 @@
 
 class Champ_Don_base;
 
-/*! @brief Classe Echange_interne_impose: Cette classe represente le cas particulier de la classe
+/*! @brief class Echange_interne_impose
  *
- *     Echange_externe_impose ou la paroi d'echange est interne au domaine.
- *     La temperature exterieures definie dans Echange_externe_impose devient alors la
- *     temperature situee de l'autre cote de la paroi interne.
- *     Lorsque la temperature est au centre de l'element (VDF par ex), on modifie aussi le h_gap
- *     fourni pour prendre en compte la demi-maille situee de l'autre cote de la paroi.
+ *   This class represents the special case of Echange_externe_impose
+ *   where the exchange wall is internal to the domain.
+ *   The external temperature defined in Echange_externe_impose becomes the
+ *   temperature located on the other side of the internal wall.
+ *   When the temperature is at the element center (e.g. VDF), the provided h_gap
+ *   is also modified to account for the half-cell on the other side of the wall.
  *
  * @sa Echange_impose_base Echange_global_impose
  */

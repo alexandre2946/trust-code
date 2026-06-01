@@ -21,17 +21,16 @@
 
 Implemente_instanciable_32_64(Faces_32_64,"Faces",Objet_U);
 
-/*! @brief Ecrit les faces sur un flots de sortie.
+/*! @brief Writes the faces to an output stream.
  *
- * On ecrit:
- *       - le type des faces
- *       - les sommets
- *       - les voisins
- *     On ecrit juste le type Type_Face::vide_0D, si le nombre de
- *     faces est nul.
+ * The following are written:
+ *       - the face type
+ *       - the vertices
+ *       - the neighbors
+ *     Only the type Type_Face::vide_0D is written if the number of faces is zero.
  *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param s An output stream.
+ * @return The modified output stream.
  */
 template <typename _SIZE_>
 Sortie& Faces_32_64<_SIZE_>::printOn(Sortie& s ) const
@@ -47,17 +46,16 @@ Sortie& Faces_32_64<_SIZE_>::printOn(Sortie& s ) const
   return s ;
 }
 
-/*! @brief Ecrit les faces sur un flots de sortie.
+/*! @brief Writes the faces to an output stream (binary format).
  *
- * On ecrit:
- *       - le type des faces
- *       - les sommets
- *       - les voisins
- *     On ecrit juste le type Type_Face::vide_0D, si le nombre de
- *     faces est nul.
+ * The following are written:
+ *       - the face type
+ *       - the vertices
+ *       - the neighbors
+ *     Only the type Type_Face::vide_0D is written if the number of faces is zero.
  *
- * @param (Sortie& s) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param s An output stream.
+ * @return The modified output stream.
  */
 template <typename _SIZE_>
 Sortie& Faces_32_64<_SIZE_>::ecrit(Sortie& s ) const
@@ -73,17 +71,16 @@ Sortie& Faces_32_64<_SIZE_>::ecrit(Sortie& s ) const
   return s ;
 }
 
-/*! @brief Lit les specifications d'un objet face a partir d'un flot d'entree.
+/*! @brief Reads the specifications of a face object from an input stream.
  *
- *     On lit:
- *       - le type des faces
- *       - les sommets
- *       - les voisins
- *     Et on reordonne les sommets.
- *     Cree un objets Faces_32_64 avec 0 faces si le type est "vide_0D"
+ *     The following are read:
+ *       - the face type
+ *       - the vertices
+ *       - the neighbors
+ *     Creates a Faces_32_64 object with 0 faces if the type is "vide_0D".
  *
- * @param (Entree& s) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param s An input stream.
+ * @return The modified input stream.
  */
 template <typename _SIZE_>
 Entree& Faces_32_64<_SIZE_>::readOn(Entree& s)
@@ -93,13 +90,13 @@ Entree& Faces_32_64<_SIZE_>::readOn(Entree& s)
   typer(typ);
   if (typ != "vide_0D")
     {
-      // Les sommets et faces ne sont ecrits que si le type n'est pas vide:
+      // Vertices and neighbors are only written if the type is not empty:
       s >> sommets;
       s >> faces_voisins;
     }
   else
     {
-      // pour ne pas planter betement la suite qui suppose nb_dim()==2 et line_size_ > 0
+      // to avoid a crash in the subsequent code that assumes nb_dim()==2 and line_size_ > 0
       sommets.resize(0,1);
       faces_voisins.resize(0,2);
     }
@@ -107,17 +104,16 @@ Entree& Faces_32_64<_SIZE_>::readOn(Entree& s)
 }
 
 
-/*! @brief Lit les specifications d'un objet face a partir d'un flot d'entree.
+/*! @brief Reads the specifications of a face object from an input stream (binary format).
  *
- *     On lit:
- *       - le type des faces
- *       - les sommets
- *       - les voisins
- *     Et on reordonne les sommets.
- *     Ne fait rien si le type lu est "vide_0D"
+ *     The following are read:
+ *       - the face type
+ *       - the vertices
+ *       - the neighbors
+ *     Vertices are reordered after reading. Does nothing if the type read is "vide_0D".
  *
- * @param (Entree& s) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param s An input stream.
+ * @return The modified input stream.
  */
 template <typename _SIZE_>
 Entree& Faces_32_64<_SIZE_>::lit(Entree& s)
@@ -141,13 +137,11 @@ Entree& Faces_32_64<_SIZE_>::lit(Entree& s)
 }
 
 
-/*! @brief Renvoie le numero du plus petit (au sens de la
- *  numerotation des sommets) sommet d'une face
+/*! @brief Returns the index of the smallest vertex (in terms of vertex numbering) of a face.
  *
- * @param (Faces& faces) les faces
- * @param (int face) la face dont on cherche le plus petit sommet
- * @param (int nb_som) le nombre de sommet par face
- * @return (int) le numero du plus petit sommet la face specifiee
+ * @param (int face) the index of the face for which the smallest vertex is sought
+ * @param (int nb_som) the number of vertices per face
+ * @return (int) the index of the smallest vertex of the specified face
  */
 template <typename _SIZE_>
 typename Faces_32_64<_SIZE_>::int_t Faces_32_64<_SIZE_>::ppsf(int_t face, int nb_som) const
@@ -158,15 +152,13 @@ typename Faces_32_64<_SIZE_>::int_t Faces_32_64<_SIZE_>::ppsf(int_t face, int nb
   return som;
 }
 
-/*! @brief Compare 2 faces de 2 ensembles de faces f1 et f2
+/*! @brief Compares 2 faces from 2 face sets f1 and f2 and returns true if they are equal, false otherwise.
  *
- *     et Renvoie 1 si elles sont egales, 0 Sinon.
- *
- * @param (int f1) l'indice de la face dans le premier ensemble de face represente par *this
- * @param (Faces& faces2) le deuxieme ensemble de face
- * @param (int f2) l'indice de la face dans le deuxieme ensemble de face
- * @param (int nb_som) le nombre de sommet par face
- * @return (int) 1 si les 2 faces sont les memes 0 sinon
+ * @param (int f1) the index of the face in the first face set represented by *this
+ * @param (Faces& faces2) the second face set
+ * @param (int f2) the index of the face in the second face set
+ * @param (int nb_som) the number of vertices per face
+ * @return (bool) true if the 2 faces are the same, false otherwise
  */
 template <typename _SIZE_>
 bool Faces_32_64<_SIZE_>::same_face(int_t f1, const Faces_32_64& faces2, int_t f2, int nb_som) const
@@ -179,16 +171,16 @@ bool Faces_32_64<_SIZE_>::same_face(int_t f1, const Faces_32_64& faces2, int_t f
       for(int j=0; j<nb_som && nok ; j++)
         {
           if(sommet(f1, i) == faces2.sommet(f2, j))
-            nok=false;           // memes sommets
+            nok=false;           // same vertices
         }
-      if(nok) ok=false;          // sommet pas trouve ==> pas meme face
+      if(nok) ok=false;          // vertex not found => not the same face
     }
   return ok;
 }
 
-/*! @brief Renvoie un objet de Type_Face representant le type de nom specifie.
+/*! @brief Returns a Type_Face object representing the type with the specified name.
  *
- *     Les noms de types reconnus sont:
+ *     Recognized type names are:
  *              "vide_0D"
  *       "point_1D"
  *       "point_1D_axi"
@@ -199,9 +191,9 @@ bool Faces_32_64<_SIZE_>::same_face(int_t f1, const Faces_32_64& faces2, int_t f
  *       "quadrangle_3D_axi"
  *       "quadrilatere_2D_axi"
  *
- * @param (Motcle& mot) le mot clef representant un type de face
- * @return (Type_Face) le type de face correspondant au parametre mo
- * @throws type de face non reconnu
+ * @param (Motcle& mot) the keyword representing a face type
+ * @return (Type_Face) the face type corresponding to the parameter
+ * @throws unrecognized face type
  */
 template <typename _SIZE_>
 Type_Face Faces_32_64<_SIZE_>::type(const Motcle& mot) const
@@ -246,7 +238,7 @@ Type_Face Faces_32_64<_SIZE_>::type(const Motcle& mot) const
       {
         Cerr << "In the area number " << Process::me() << " " << mot << " is not a type of face." << finl;
         Cerr << "Check your splitting." << finl;
-        // Si mot est vide c'est que l'on tente de relire des Domaines creees avec une version anterieure a la 1.5.1
+        // If mot is empty, an attempt is being made to re-read Domains created with a version prior to 1.5.1
         if (mot=="")
           {
             Cerr << "Your splitting seems to have been done with a TRUST version 1.5 or earlier. Since" << finl;
@@ -257,17 +249,17 @@ Type_Face Faces_32_64<_SIZE_>::type(const Motcle& mot) const
         exit();
       }
     }
-  // pour le compilo :
+  // for the compiler:
   return Type_Face::point_1D;
 }
 
-/*! @brief Renvoie le nom associe a un type de face.
+/*! @brief Returns the name associated with a face type.
  *
- * (inverse de Type_Face Faces_32_64<_SIZE_>::type(const Motcle& ) const)
+ * (inverse of Type_Face Faces_32_64<_SIZE_>::type(const Motcle& ) const)
  *
- * @param (Type_Face& typ) un type de face
- * @return (Motcle&) le nom correspondant au type speficie en parametre
- * @throws type de face non reconnu
+ * @param (Type_Face& typ) a face type
+ * @return (Motcle&) the name corresponding to the specified type
+ * @throws unrecognized face type
  */
 template <typename _SIZE_>
 Motcle& Faces_32_64<_SIZE_>::type(const Type_Face& typ) const
@@ -314,12 +306,12 @@ Motcle& Faces_32_64<_SIZE_>::type(const Type_Face& typ) const
   return mot;
 }
 
-/*! @brief Ajoute des faces.
+/*! @brief Adds faces.
  *
- * Ajouter des faces revient a ajouter des sommets.
+ * Adding faces is equivalent to adding vertices.
  *
- * @param (IntTab& sommet) le tableau des sommets a ajouter
- * @throws les sommets specifies n'ont pas la bonne dimension (1D,2D,3D)
+ * @param (IntTab& sommet) the array of vertices to add
+ * @throws the specified vertices do not have the correct dimension (1D,2D,3D)
  */
 template <typename _SIZE_>
 void Faces_32_64<_SIZE_>::ajouter(const IntTab_t& tab_sommet)
@@ -333,12 +325,12 @@ void Faces_32_64<_SIZE_>::ajouter(const IntTab_t& tab_sommet)
       sommets(oldsz+i,j)=tab_sommet(i,j);
 }
 
-/*! @brief (Re-)dimensionne les faces On redimensionne les voisins en consequence.
+/*! @brief (Re-)sizes the faces. The neighbors are resized accordingly.
  *
- *     Les sommets implicitement ajoutes sont initialises a -1.
+ *     Implicitly added vertices are initialized to -1.
  *
- * @param (int i) le nouveau nombre de face
- * @return (int) le nouveau nombre de face
+ * @param (int i) the new number of faces
+ * @return (int) the new number of faces
  */
 template <typename _SIZE_>
 typename Faces_32_64<_SIZE_>::int_t Faces_32_64<_SIZE_>::dimensionner(int_t i)
@@ -357,9 +349,9 @@ typename Faces_32_64<_SIZE_>::int_t Faces_32_64<_SIZE_>::dimensionner(int_t i)
   return i;
 }
 
-/*! @brief Initialise les voisins des faces joints a -1
+/*! @brief Initializes the neighbors of joint faces to -1.
  *
- * @param (int nb_faces_joint) le nombre de faces representant des Joints
+ * @param (int nb_faces_joint) the number of faces representing Joints
  */
 template <typename _SIZE_>
 void Faces_32_64<_SIZE_>::initialiser_faces_joint(int_t nb_faces_joint)
@@ -369,9 +361,9 @@ void Faces_32_64<_SIZE_>::initialiser_faces_joint(int_t nb_faces_joint)
     faces_voisins(i,0)=faces_voisins(i,1)=-1;
 }
 
-/*! @brief Initialise les sommets des faces joints a -1
+/*! @brief Initializes the vertices of joint faces to -1.
  *
- * @param (int nb_faces_joint) le nombre de faces representant des Joints
+ * @param (int nb_faces_joint) the number of faces representing Joints
  */
 template <typename _SIZE_>
 void Faces_32_64<_SIZE_>::initialiser_sommets_faces_joint(int_t nb_faces_joint)
@@ -382,9 +374,9 @@ void Faces_32_64<_SIZE_>::initialiser_sommets_faces_joint(int_t nb_faces_joint)
       sommets(i,k)=-1;
 }
 
-/*! @brief Type les faces
+/*! @brief Sets the type of the faces.
  *
- * @param (Motcle& typ) le type a donner aux faces
+ * @param (Motcle& typ) the type to assign to the faces
  */
 template <typename _SIZE_>
 void Faces_32_64<_SIZE_>::typer(const Motcle& typ)
@@ -392,10 +384,10 @@ void Faces_32_64<_SIZE_>::typer(const Motcle& typ)
   typer(type(typ));
 }
 
-/*! @brief Type les faces
+/*! @brief Sets the type of the faces.
  *
- * @param (Type_Face& typ) le type a donner aux faces
- * @throws type de face inconnu
+ * @param (Type_Face& typ) the type to assign to the faces
+ * @throws unknown face type
  */
 template <typename _SIZE_>
 void Faces_32_64<_SIZE_>::typer(const Type_Face& typ)
@@ -431,7 +423,7 @@ void Faces_32_64<_SIZE_>::typer(const Type_Face& typ)
       nb_som_face=2; //axi_=1;
       break;
     case Type_Face::polygone_3D:
-      nb_som_face=-1; // sera fixe plus tard
+      nb_som_face=-1; // will be set later
       break;
     default :
       {
@@ -456,11 +448,11 @@ void Faces_32_64<_SIZE_>::typer(const Type_Face& typ)
 }
 
 
-/*! @brief Complete la face specifie: met a jour ses voisins.
+/*! @brief Completes the specified face: updates its neighbors.
  *
- * @param (int face) l'indice de la face a completer
- * @param (int num_elem) le numero de l'element voisin de la face
- * @throws face deja complete
+ * @param (int face) the index of the face to complete
+ * @param (int num_elem) the index of the neighboring element of the face
+ * @throws face already complete
  */
 template <typename _SIZE_>
 void Faces_32_64<_SIZE_>::completer(int_t face, int_t num_elem)
@@ -483,24 +475,24 @@ void Faces_32_64<_SIZE_>::completer(int_t face, int_t num_elem)
     }
 }
 
-/*! @brief Calcule la surface des faces
+/*! @brief Computes the surface area of the faces.
  *
- * @param (DoubleVect& surfaces) le vecteur contenant la surface de chacune des faces.
- * @throws type de face non reconnu
- * @throws calcul de la surface de ce type de face non code
- * @throws calcul de surface errone (surface <= 0)
- * @throws type de face ne correspondant pas a la dimension d'espace
+ * @param (DoubleVect& surfaces) the vector containing the surface area of each face.
+ * @throws unrecognized face type
+ * @throws surface area computation not implemented for this face type
+ * @throws erroneous surface computation (surface <= 0)
+ * @throws face type not consistent with the space dimension
  */
 template <typename _SIZE_>
 void Faces_32_64<_SIZE_>::calculer_surfaces(DoubleVect_t& surfaces) const
 {
   surfaces.resize(nb_faces_tot());
   const Domaine_t& dom=domaine();
-  // Verification qu'en coordonnees cylindriques, r est bien positif (avec tolérance numérique)
+  // Check that in cylindrical coordinates, r is positive (with numerical tolerance)
   if (axi || bidim_axi)
     {
       const int_t nb_som = dom.les_sommets().dimension(0);
-      // Echelle de rayon pour fixer une tolérance robuste
+      // Radius scale to set a robust tolerance
       double rmax = 0.;
       for (int_t i = 0; i < nb_som; i++)
         rmax = std::max(rmax, std::fabs(dom.coord(i,0)));
@@ -535,7 +527,7 @@ void Faces_32_64<_SIZE_>::calculer_surfaces(DoubleVect_t& surfaces) const
 
             if (!Objet_U::bidim_axi)
               {
-                // pur 2D cartésien : surface = longueur
+                // pure 2D Cartesian: surface = length
                 surfaces(face) = L;
                 if(surfaces(face) == 0.)
                   {
@@ -545,8 +537,8 @@ void Faces_32_64<_SIZE_>::calculer_surfaces(DoubleVect_t& surfaces) const
               }
             else
               {
-                // RZ (bidim_axi) : surface du tore engendré par le segment
-                // S = Δθ * r_bar * L, avec r_bar = (r0 + r1)/2 et r ≡ x
+                // RZ (bidim_axi): surface of the torus generated by the segment
+                // S = Δθ * r_bar * L, with r_bar = (r0 + r1)/2 and r ≡ x
                 const double r0 = x0;
                 const double r1 = x1;
                 const double rbar = 0.5 * (r0 + r1);
@@ -566,8 +558,8 @@ void Faces_32_64<_SIZE_>::calculer_surfaces(DoubleVect_t& surfaces) const
             const double z1 = dom.coord(sommet(face,1), 1);
             const double dr = r1 - r0;
             const double dz = z1 - z0;
-            const double L  = std::sqrt(dr*dr + dz*dz);       // longueur du segment
-            const double rbar = 0.5*(r0 + r1);                 // moyenne linéaire de r(s) sur un segment
+            const double L  = std::sqrt(dr*dr + dz*dz);       // segment length
+            const double rbar = 0.5*(r0 + r1);                 // linear average of r(s) over the segment
             surfaces(face) = 2.0 * M_PI * rbar * L; // S = Δθ ∫_Γ r ds = Δθ * r̄ * L
           }
         break;
@@ -630,14 +622,14 @@ void Faces_32_64<_SIZE_>::calculer_surfaces(DoubleVect_t& surfaces) const
       }
     case  Type_Face::quadrangle_3D :
       {
-        // On se base sur Hexa_VEF::normale():
+        // Based on Hexa_VEF::normale():
         for(int_t face=0; face <nb_faces_tot(); face++)
           {
             int_t n0 = sommet(face, 0),
                   n1 = sommet(face, 1),
                   n2 = sommet(face, 2),
                   n3 = sommet(face, 3);
-            // NB: Dans un prisme, il y'a aussi des triangles comme faces... Donc:
+            // NB: In a prism, there are also triangles as faces... Therefore:
             if (n3<0) n3 = n2;
 
             double x1 = dom.coord(n0, 0) - dom.coord(n1, 0);
@@ -768,14 +760,14 @@ void Faces_32_64<_SIZE_>::calculer_surfaces(DoubleVect_t& surfaces) const
 }
 
 
-/*! @brief Calcule les centres de gravite de chaque face.
+/*! @brief Computes the centers of gravity of each face.
  *
- * @param (DoubleTab& xv) tableau contenant les coordonnees des centres de gravite de chaque face. xv(i,j) contient la coordonnee j du centre de gravite de la i-ieme face. On resize le tableau xv et on lui affecte le descripteur parallele du tableau des sommets avant de le remplir.
+ * @param (DoubleTab& xv) array containing the coordinates of the centers of gravity of each face. xv(i,j) contains the j-th coordinate of the center of gravity of the i-th face. The array xv is resized and assigned the parallel descriptor of the vertex array before being filled.
  */
 template <typename _SIZE_>
 void Faces_32_64<_SIZE_>::calculer_centres_gravite(DoubleTab_t& xv) const
 {
-  // Le tableau xv est dimensionne dans ::calculer_centres_gravite
+  // The array xv is sized in ::calculer_centres_gravite
   const Domaine_t& dom=domaine();
   const DoubleTab_t& coord=dom.coord_sommets();
   Faces_32_64::Calculer_centres_gravite(xv, type_face_, coord, sommets);
@@ -788,7 +780,7 @@ void Faces_32_64<_SIZE_>::Calculer_centres_gravite(DoubleTab_t& xv, Type_Face ty
   int_t nb_faces_tot = sommet.dimension_tot(0);
   int dim = coord.dimension_int(1);
   xv.resize(nb_faces_tot, dim);
-  // Copie le descripteur parallele du tableau sommet:
+  // Copy the parallel descriptor of the vertex array:
   xv.set_md_vector(sommet.get_md_vector());
 
   if(nb_faces_tot!=0)
@@ -879,11 +871,11 @@ void Faces_32_64<_SIZE_>::Calculer_centres_gravite(DoubleTab_t& xv, Type_Face ty
     }
 }
 
-/*! @brief Reordonne les faces.
+/*! @brief Reorders the faces.
  *
- * (on ne reordonne que les quadrangles)
+ * (only quadrangles are reordered)
  *
- * @throws type de face non reconnu
+ * @throws unrecognized face type
  */
 template <typename _SIZE_>
 void Faces_32_64<_SIZE_>::reordonner()
@@ -898,7 +890,7 @@ void Faces_32_64<_SIZE_>::reordonner()
       }
     case  Type_Face::segment_2D :
       {
-        // on peut avoir des bords de maillage triangulaire en 3D
+        // one can have boundary faces from a triangular mesh in 3D
         assert(dimension>=2);
         break;
       }
@@ -966,7 +958,7 @@ void Faces_32_64<_SIZE_>::reordonner()
               }
             if (1)
               {
-                // adaptation de Hexaedre_VEF::reordonne
+                // adapted from Hexaedre_VEF::reordonne
                 const DoubleTab_t& coord=dom.les_sommets();
                 int_t s0=S[0], s1=S[1], s2=S[2], s3=S[3];
                 double x03=coord(s3,0)-coord(s0,0);
@@ -987,18 +979,18 @@ void Faces_32_64<_SIZE_>::reordonner()
                 Vecteur3 nplan, nmedian;
                 // rectangle C B
                 //           O A
-                // calcul de n= OA ^ OC
+                // compute n = OA ^ OC
                 Vecteur3::produit_vectoriel(OA,OC,nplan);
-                // calcul de la normale nmedian du plan (OB,n)
+                // compute the normal nmedian of the plane (OB,n)
                 Vecteur3::produit_vectoriel(OB,nplan,nmedian);
 
-                // on regarde si les points A et C sont bien de part et d'autre du plan
+                // check that points A and C are on opposite sides of the plane
                 double psC=Vecteur3::produit_scalaire(nmedian,OA);
                 double psA=Vecteur3::produit_scalaire(nmedian,OC);
 
                 if (psA*psC>0)
                   {
-                    // inversion des sommets 2 et 3
+                    // swap vertices 2 and 3
                     sommet(face,2)=S[3];
                     sommet(face,3)=S[2];
                     Cerr << "Permutation of local nodes 2 and 3 on the face " <<face<<finl;
@@ -1092,10 +1084,10 @@ void Faces_32_64<_SIZE_>::reordonner()
     }
 }
 
-/*! @brief Compare l'objet Faces_32_64 passe en parametre avec l'objet Faces_32_64 lui-meme (this)
+/*! @brief Compares the Faces_32_64 object passed as parameter with this Faces_32_64 object.
  *
- * @param (Faces_32_64& faces) les faces avec lesquel on compare l'objet
- * @param (IntVect& renum) le vecteur renumerotation - renum est de taille 1 et renum contient -1 si il n'y pas le meme nombre de face dans l'objet que dans le parametre faces. - renum autant d'elements que de nombre de face sinon. et renum(i) = le rang de la face i du parametre faces dans l'objet courant
+ * @param (Faces_32_64& faces) the faces to compare against
+ * @param (IntVect& renum) the renumbering vector - renum has size 1 and contains -1 if the number of faces differs; otherwise has as many elements as faces and renum(i) = the index of face i from the parameter faces in the current object
  * @return (IntVect&)
  */
 template <typename _SIZE_>
@@ -1111,7 +1103,7 @@ typename Faces_32_64<_SIZE_>::IntVect_t& Faces_32_64<_SIZE_>::compare(const Face
     }
   if(domaine.le_nom() == son_domaine.le_nom())
     {
-      // il suffit de comparer les numeros des sommets :
+      // just compare the vertex indices:
       TRUSTLists<_SIZE_> listes;
       int_t premier=0;
       int_t numerol, face;
@@ -1154,7 +1146,7 @@ typename Faces_32_64<_SIZE_>::IntVect_t& Faces_32_64<_SIZE_>::compare(const Face
     }
   else
     {
-      // il faut comparer les coordonnees des sommets :
+      // we need to compare the vertex coordinates:
     }
   return renum;
 }

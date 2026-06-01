@@ -20,10 +20,10 @@ Implemente_instanciable(Dimension,"Dimension",Interprete);
 // XD_CONT dim is an integer set to 2 or 3. This instruction is mandatory.
 // XD attr dim entier(into=[2,3]) dim REQ Number of dimensions.
 
-/*! @brief Simple appel a: Interprete::printOn(Sortie&)
+/*! @brief Simple call to: Interprete::printOn(Sortie&)
  *
- * @param (Sortie& os) un flot de sortie
- * @return (Sortie&) le flot de sortie modifie
+ * @param (Sortie& os) an output stream
+ * @return (Sortie&) the modified output stream
  */
 Sortie& Dimension::printOn(Sortie& os) const
 {
@@ -31,10 +31,10 @@ Sortie& Dimension::printOn(Sortie& os) const
 }
 
 
-/*! @brief Simple appel a: Interprete::readOn(Entree&)
+/*! @brief Simple call to: Interprete::readOn(Entree&)
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
  */
 Entree& Dimension::readOn(Entree& is)
 {
@@ -42,15 +42,15 @@ Entree& Dimension::readOn(Entree& is)
 }
 
 
-/*! @brief Fonction principale de l'interprete Dimension Lit la dimension d'espace du probleme.
+/*! @brief Main function of the Dimension interpreter. Reads the space dimension of the problem.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
+ * @param (Entree& is) an input stream
+ * @return (Entree&) the modified input stream
  */
 Entree& Dimension::interpreter(Entree& is)
 {
   is >> dimension;
-  // GF assert permet de tester facilement si un exec est compile avec ou sans les assert
+  // GF assert allows to easily test if an executable is compiled with or without asserts
   assert(dimension>0);
   Cerr << "Dimension::interpreter : dimension = " << dimension << finl;
   return is;

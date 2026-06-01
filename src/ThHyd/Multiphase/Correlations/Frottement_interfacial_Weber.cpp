@@ -30,10 +30,10 @@ Entree& Frottement_interfacial_Weber::readOn(Entree& is)
   param.ajouter("Weber_critique", &We_c);
   param.lire_avec_accolades_depuis(is);
 
-  //identification des phases
+  //phase identification
   const Pb_Multiphase *pbm = sub_type(Pb_Multiphase, pb_.valeur()) ? &ref_cast(Pb_Multiphase, pb_.valeur()) : nullptr;
   if (!pbm || pbm->nb_phases() == 1) Process::exit(que_suis_je() + " : not needed for single-phase flow!");
-  for (int n = 0; n < pbm->nb_phases(); n++) //recherche de n_l, n_g : phase {liquide,gaz}_continu en priorite
+  for (int n = 0; n < pbm->nb_phases(); n++) //search for n_l, n_g: continuous {liquid,gas} phase with priority
     if (pbm->nom_phase(n).debute_par("liquide") && (n_l < 0 || pbm->nom_phase(n).finit_par("continu")))  n_l = n;
     else if (pbm->nom_phase(n).debute_par("gaz") && (n_g < 0 || pbm->nom_phase(n).finit_par("continu"))) n_g = n;
 
@@ -50,9 +50,9 @@ void Frottement_interfacial_Weber::coefficient(const DoubleTab& alpha, const Dou
   int N = ref_cast(Pb_Multiphase, pb_.valeur()).nb_phases();
   int ind_trav = (n_g>n_l) ? (n_l*(N-1)-(n_l-1)*(n_l)/2) + (n_g-n_l-1) : (n_g*(N-1)-(n_g-1)*(n_g)/2) + (n_l-n_g-1);
 
-  double Db = We_c * sigma(ind_trav) / (rho(n_l) * ndv(n_l, n_g) * ndv(n_l, n_g)),					//diametre des bulles
-         Reb = rho(n_l) * ndv(n_l, n_g) * Db / mu(n_l), 											//Reynolds associe a une bulle
-         Cx = 24. / Reb * (1. + 0.1 * pow(Reb, 0.75)); 												//coefficient de trainee
+  double Db = We_c * sigma(ind_trav) / (rho(n_l) * ndv(n_l, n_g) * ndv(n_l, n_g)),					//bubble diameter
+         Reb = rho(n_l) * ndv(n_l, n_g) * Db / mu(n_l), 											//bubble Reynolds number
+         Cx = 24. / Reb * (1. + 0.1 * pow(Reb, 0.75)); 												//drag coefficient
 
   const double pi=2.*acos(0.);
   coeff = 0;

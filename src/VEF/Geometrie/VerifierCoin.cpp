@@ -22,10 +22,10 @@
 
 Implemente_instanciable(VerifierCoin,"VerifierCoin",Interprete_geometrique_base);
 
-/*! @brief Simple appel a: Interprete::printOn(Sortie&) */
+/*! @brief Simple call to: Interprete::printOn(Sortie&) */
 Sortie& VerifierCoin::printOn(Sortie& os) const { return Interprete::printOn(os); }
 
-/*! @brief Simple appel a: Interprete::readOn(Entree&) */
+/*! @brief Simple call to: Interprete::readOn(Entree&) */
 Entree& VerifierCoin::readOn(Entree& is) { return Interprete::readOn(is); }
 
 // Split element `elem` into (dimension+1) sub-elements by inserting a centroid node.
@@ -78,14 +78,14 @@ void VerifierCoin::cut_elem(int elem, const DoubleTab& xp)
   mettre_a_jour_sous_domaine(dom, elem, oldsz, dimension);
 }
 
-/*! @brief Fonction principale de l'interprete: resoudre un probleme
+/*! @brief Main function of the interpreter: solve a problem.
  *
- *     On cherche dynamiquement le type du probleme a resoudre
- *     on resoud le probleme et on effectue les postraitements.
+ *     Dynamically finds the type of problem to solve,
+ *     solves it, and performs post-processing.
  *
- * @param (Entree& is) un flot d'entree
- * @return (Entree&) le flot d'entree modifie
- * @throws type de probleme inconnu
+ * @param is Input stream.
+ * @return Modified input stream.
+ * @throws unknown problem type
  */
 Entree& VerifierCoin::interpreter_(Entree& is)
 {
@@ -132,21 +132,21 @@ Entree& VerifierCoin::interpreter_(Entree& is)
   IntTab& les_elems=dom.les_elems();
   int nbelem=dom.nb_elem();
 
-  // On compte les elements attaches a chaque sommet:
+  // Count the elements attached to each vertex:
   ArrOfInt nb_elem_per_som(nbsom);
   nb_elem_per_som = 0;
   for (int ne = 0; ne < nbelem; ne++)
     for (int ns = 0; ns < dimension+1; ns++)
       nb_elem_per_som(les_elems(ne,ns))++;
 
-  //On decoupe les elements pour le sommet qui pose probleme
+  //Split elements for the problematic vertex
   // PQ : 25/05/07
-  // - soit de maniere automatique (tout sommet rattache qu'a un seul element)
-  // - soit a partir d'une liste de sommets (liste generee lors d'un pre-calcul et tenant compte du type de CL)
-  //   avec comme option de decoupage dans ce cas (lue dans le fichier "decoupage_som") :
+  // - either automatically (every vertex attached to only one element)
+  // - or from a list of vertices (list generated during a pre-computation taking into account the BC type)
+  //   with the following split option in that case (read from the "decoupage_som" file):
   //
-  // 0 : decoupage traditionnel (centre de gravite)
-  // 1 : decoupage en passant par le sommet oppose de l'element voisin
+  // 0 : traditional split (center of gravity)
+  // 1 : split passing through the opposite vertex of the neighboring element
 
   int option_decoupage=-1;
 
@@ -189,7 +189,7 @@ Entree& VerifierCoin::interpreter_(Entree& is)
       for (int somm=0; somm<nbsom; somm++)
         {
           if (nb_elem_per_som(somm) != 1) continue;
-          //On decoupe les elements pour le sommet qui pose probleme
+          //Split elements for the problematic vertex
           int somm_lu = -1, elem_opp, somm_opp, somm1, somm2, elem;
           fic >> somm_lu >> somm_opp >> somm1 >> somm2;
           if (dimension==3)
@@ -198,7 +198,7 @@ Entree& VerifierCoin::interpreter_(Entree& is)
               fic >> somm3;
             }
           fic >> elem >> elem_opp;
-          if(somm_lu!=-1) somm = somm_lu; // -1 indice de fin de fichier
+          if(somm_lu!=-1) somm = somm_lu; // -1 end-of-file marker
           if(nbsom<=somm)
             {
               Cerr << "Error in VerifierCoin::interpreter" << finl;
@@ -210,7 +210,7 @@ Entree& VerifierCoin::interpreter_(Entree& is)
           for(int dir=0; dir<dimension; dir++) Cerr<<sommets(somm,dir)<<" ";
           Cerr<<"..."<<finl;
 
-          if (option_decoupage==1 && dimension==2 && somm_lu!=-1)  // inversion des sommets
+          if (option_decoupage==1 && dimension==2 && somm_lu!=-1)  // inversion of vertices
             {
               les_elems(elem,0) = somm ;
               les_elems(elem,1) = somm_opp ;
@@ -220,13 +220,13 @@ Entree& VerifierCoin::interpreter_(Entree& is)
               les_elems(elem_opp,1) = somm_opp ;
               les_elems(elem_opp,2) = somm2 ;
             }
-          else // creation d'un nouveau sommet au centre de gravite de l'element
+          else // create a new vertex at the center of gravity of the element
             cut_elem(elem, xp);
         }
     }
   else
     {
-      std::map<int,int> som_elem; // Pour trier les sommets comme avant
+      std::map<int,int> som_elem; // To sort vertices as before
       for (int elem = 0; elem < nbelem; elem++)
         for (int ns = 0; ns < dimension+1; ns++)
           {

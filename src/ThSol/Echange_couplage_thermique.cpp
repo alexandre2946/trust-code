@@ -106,7 +106,7 @@ void Echange_couplage_thermique::completer()
       ||nom_pb==Nom("Pb_Conduction") || nom_pb.debute_par("Pb_Conduction_Combustible")
       ||mon_dom_cl_dis->equation().que_suis_je()=="Convection_Diffusion_Concentration")
     {
-      // Pour le front tracking, QC, et conduc_variable, on ne divise pas par Rho*Cp:
+      // For front tracking, QC, and conduc_variable cases, we do not divide by Rho*Cp:
       divise_par_rho_cp_=false;
     }
 }
@@ -215,7 +215,7 @@ int Echange_couplage_thermique::initialiser(double temps)
     }
   else
     {
-      // Cas du multi-calcul ou l'on reinitialise le calcul (on veut garder le phi_ext et champ_front precedents)
+      // Multi-run case where the computation is re-initialised (previous phi_ext and champ_front values are preserved)
       phi_ext_->set_temps_defaut(temps);
       phi_ext_->mettre_a_jour(temps);
       phi_ext_->changer_temps_futur(temps,0);
