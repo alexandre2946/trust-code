@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -39,7 +39,7 @@ protected:
   void update_fields();
   OBS_PTR(Probleme_base) pb_loc_, pb_dist_;
   OBS_PTR(Domaine) dom_loc_, dom_dist_;
-  bool is_initialized_ = false, is_elem_trgt_ = true /* default: at elements */;
+  bool is_initialized_ = false, is_elem_trgt_ = true /* default: at elements */, has_explicit_dom_dist_ = false;
   int use_dec_ = -123;
   double default_value_ = DMAXFLOAT;
   DoubleTab valeurs_elem_, valeurs_faces_elem_;

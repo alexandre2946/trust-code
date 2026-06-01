@@ -61,7 +61,11 @@ Entree& Champ_Fonc_Interp::readOn(Entree& is)
   if (nom_dom_loc == "??") dom_loc_ = pb_loc_->domaine();
   else dom_loc_ = ref_cast(Domaine, Interprete::objet(nom_dom_loc));
   if (nom_dom_dist == "??") dom_dist_ = pb_dist_->domaine();
-  else dom_dist_ = ref_cast(Domaine, Interprete::objet(nom_dom_dist));
+  else
+    {
+      dom_dist_ = ref_cast(Domaine, Interprete::objet(nom_dom_dist));
+      has_explicit_dom_dist_ = true;
+    }
 
   is_elem_trgt_ = (pb_loc_->domaine_dis().que_suis_je() != "Domaine_VEF");
 
@@ -91,6 +95,9 @@ int Champ_Fonc_Interp::initialiser(double temps)
 {
   const int ok = Champ_Fonc_P0_base::initialiser(temps);
   const Champ_base& ch = pb_dist_->has_champ(le_nom()) ? pb_dist_->get_champ(le_nom()) : pb_dist_->get_champ_post(le_nom()).get_champ(espace_stockage_);
+
+  if (!has_explicit_dom_dist_ && ch.a_un_domaine_dis_base())
+    dom_dist_ = ch.domaine_dis_base().domaine();
 
   nb_compo_ = ch.valeurs().line_size();
 
@@ -153,6 +160,7 @@ void Champ_Fonc_Interp::update_fields()
   const Champ_base& ch = pb_dist_->has_champ(le_nom()) ? pb_dist_->get_champ(le_nom()) : pb_dist_->get_champ_post(le_nom()).get_champ(espace_stockage_);
 
   const DoubleTab& distant_values = ch.valeurs();
+  const Domaine_dis_base& dom_dist_dis = ch.a_un_domaine_dis_base() ? ch.domaine_dis_base() : pb_dist_->domaine_dis();
   ConstDoubleTab_parts local_parts(valeurs()), distant_parts(distant_values);
 
   if (local_field_ == nullptr) init_fields();
@@ -166,13 +174,13 @@ void Champ_Fonc_Interp::update_fields()
   local_field_->setArray(local_array_);
 
   // Source Stuff
-  if (pb_dist_->domaine_dis().que_suis_je() == "Domaine_VEF"
-      && pb_dist_->domaine_dis().nb_elem() > 0
-      && distant_values.dimension_tot(0) == ref_cast(Domaine_VF, pb_dist_->domaine_dis()).nb_faces_tot())
+  if (dom_dist_dis.que_suis_je() == "Domaine_VEF"
+      && dom_dist_dis.nb_elem() > 0
+      && distant_values.dimension_tot(0) == ref_cast(Domaine_VF, dom_dist_dis).nb_faces_tot())
     {
       Cerr << finl << "ERROR in Champ_Fonc_Interp : in problem " << pb_loc_->le_nom() << ", the distant field is located at faces!" << finl;
       Cerr << "Use a postprocessing field located at elements instead of " << le_nom() << finl;
-      Cerr << "In your case, try : " << le_nom() << "_elem_" << pb_dist_->domaine().le_nom() << finl;
+      Cerr << "In your case, try : " << le_nom() << "_elem_" << dom_dist_dis.domaine().le_nom() << finl;
       Process::exit();
     }
 
