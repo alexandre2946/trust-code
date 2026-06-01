@@ -1252,8 +1252,13 @@ def addCaseFromTemplate(templateData, targetDirectory, dic, nbProcs=1, targetDat
         os.makedirs(fullDir2, exist_ok=True)
     pthTgt = os.path.join(BUILD_DIRECTORY, targetDirectory, targetData)
     # And copy the .data file:
-    from shutil import copyfile
+    from shutil import copyfile, move
 
+    if os.path.normpath(fullDir) == os.path.normpath(pthTgt):
+        backup = fullDir + ".bak"
+        if not os.path.exists(backup):
+            move(fullDir, backup)
+        fullDir = backup
     copyfile(fullDir, pthTgt)
     tc = addCase(targetDirectory, targetData, nbProcs, execOptions, excluNR, pre_run=pre_run, post_run=post_run)
     tc.substitute_template(dic)
