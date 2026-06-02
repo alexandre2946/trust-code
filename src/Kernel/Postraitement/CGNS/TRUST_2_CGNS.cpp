@@ -308,6 +308,8 @@ void TRUST_2_CGNS::fill_global_infos()
 {
 #ifdef MPI_
   assert (sommets_ && elems_);
+  proc_non_zero_elem_.clear();
+  all_procs_write_ = true;
 
   const bool by_comm_grp = is_comm_group_mode(postraiter_domaine_);
 
