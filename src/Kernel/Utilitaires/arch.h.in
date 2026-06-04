@@ -74,9 +74,6 @@ double atanh(const double&);
 
 // Used for FORTRAN interfaces:
 typedef int integer;
-// This one always remain an int, even when replacing all int by long in the historical (find/replace)
-// 64b building mode:
-typedef int True_int;
 
 extern char* pwd();
 
