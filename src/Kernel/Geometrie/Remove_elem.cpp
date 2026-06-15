@@ -20,7 +20,7 @@
 #include <Scatter.h>
 #include <Param.h>
 
-Implemente_instanciable(Remove_elem, "Remove_elem", Interprete_geometrique_base);
+Implemente_instanciable_32_64(Remove_elem_32_64, "Remove_elem", Interprete_geometrique_base_32_64<_T_>);
 // XD remove_elem interprete remove_elem INHERITS_BRACE Keyword to remove element from a VDF mesh (named domaine_name),
 // XD_CONT either from an explicit list of elements or from a geometric condition defined by a condition f(x,y)>0 in 2D
 // XD_CONT and f(x,y,z)>0 in 3D. All the new borders generated are gathered in one boundary called : newBord (to rename
@@ -30,19 +30,21 @@ Implemente_instanciable(Remove_elem, "Remove_elem", Interprete_geometrique_base)
 // XD_CONT singular nodes as decribed below : \includeimage{{removeelem.jpeg}}
 // XD attr domaine ref_domaine domain REQ Name of domain
 // XD attr bloc remove_elem_bloc bloc REQ not_set
+template <typename _SIZE_>
+Sortie& Remove_elem_32_64<_SIZE_>::printOn(Sortie& os) const { return Interprete::printOn(os); }
 
-Sortie& Remove_elem::printOn(Sortie& os) const { return Interprete::printOn(os); }
+template <typename _SIZE_>
+Entree& Remove_elem_32_64<_SIZE_>::readOn(Entree& is) { return Interprete::readOn(is); }
 
-Entree& Remove_elem::readOn(Entree& is) { return Interprete::readOn(is); }
-
-int Remove_elem::lire_motcle_non_standard(const Motcle& mot, Entree& is)
+template <typename _SIZE_>
+int Remove_elem_32_64<_SIZE_>::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {
   int retval = 1;
   if (mot == "liste")
     {
-      int nb_elem, elem;
+      int_t nb_elem, elem;
       is >> nb_elem;
-      for (int i = 0; i < nb_elem; i++)
+      for (int_t i = 0; i < nb_elem; i++)
         {
           is >> elem;
           listelem.add(elem);
@@ -55,10 +57,11 @@ int Remove_elem::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 }
 
 // XD remove_elem_bloc objet_lecture nul BRACE not_set
-Entree& Remove_elem::interpreter_(Entree& is)
+template <typename _SIZE_>
+Entree& Remove_elem_32_64<_SIZE_>::interpreter_(Entree& is)
 {
-  associer_domaine(is);
-  Param param(que_suis_je());
+  this->associer_domaine(is);
+  Param param(this->que_suis_je());
   Nom fonction;
   param.ajouter_non_std("liste", this); // XD_ADD_P listentier
   // XD_CONT not_set
@@ -80,30 +83,31 @@ Entree& Remove_elem::interpreter_(Entree& is)
       Cerr << " Ok" << finl;
     }
 
-  Scatter::uninit_sequential_domain(domaine());
-  remove_elem_(domaine());
-  Scatter::init_sequential_domain(domaine());
-  NettoieNoeuds::nettoie(domaine());
+  Scatter::uninit_sequential_domain(this->domaine());
+  remove_elem_(this->domaine());
+  Scatter::init_sequential_domain(this->domaine());
+  NettoieNoeuds_32_64<_SIZE_>::nettoie(this->domaine());
   Cerr << "Refinement... OK" << finl;
   return is;
 }
 
-void Remove_elem::recreer_faces(Domaine& domaine, Faces& faces, IntTab& som_face) const
+template <typename _SIZE_>
+void Remove_elem_32_64<_SIZE_>::recreer_faces(Domaine_t& domaine, Faces_t& faces, IntTab_t& som_face) const
 {
-  IntTab& sommets = faces.les_sommets();
-  int nb_faces = sommets.dimension(0);
-  int nbs = (dimension == 2) ? 2 : 4;  // number of vertices per face
-  IntTab faces_recreees(nb_faces, nbs);
+  IntTab_t& sommets = faces.les_sommets();
+  int_t nb_faces = sommets.dimension(0);
+  int nbs = (Objet_U::dimension == 2) ? 2 : 4;  // number of vertices per face
+  IntTab_t faces_recreees(nb_faces, nbs);
 
-  int ii = 0;
+  int_t ii = 0;
 
-  for (int i = 0; i < nb_faces; i++)
+  for (int_t i = 0; i < nb_faces; i++)
     {
-      ArrOfInt ind(4);
+      ArrOfInt_t ind(4);
       ind[0] = sommets(i, 0);
       ind[1] = sommets(i, 1);
-      ind[2] = (dimension == 3) ? sommets(i, 2) : -1;
-      ind[3] = (dimension == 3) ? sommets(i, 3) : -1;
+      ind[2] = (Objet_U::dimension == 3) ? sommets(i, 2) : -1;
+      ind[3] = (Objet_U::dimension == 3) ? sommets(i, 3) : -1;
       ind.ordonne_array(); // sort indices to avoid unexpected index ordering surprises
 
       int trouve = 0;
@@ -128,7 +132,7 @@ void Remove_elem::recreer_faces(Domaine& domaine, Faces& faces, IntTab& som_face
         {
           faces_recreees(ii, 0) = sommets(i, 0);
           faces_recreees(ii, 1) = sommets(i, 1);
-          if (dimension == 3)
+          if (Objet_U::dimension == 3)
             {
               faces_recreees(ii, 2) = sommets(i, 2);
               faces_recreees(ii, 3) = sommets(i, 3);
@@ -143,13 +147,14 @@ void Remove_elem::recreer_faces(Domaine& domaine, Faces& faces, IntTab& som_face
   sommets.ref(faces_recreees);
 }
 
-void Remove_elem::creer_faces(Domaine& dom, Faces& faces, IntTab& som_face) const
+template <typename _SIZE_>
+void Remove_elem_32_64<_SIZE_>::creer_faces(Domaine_t& dom, Faces_t& faces, IntTab_t& som_face) const
 {
   faces.dimensionner(1);
-  IntTab& sommets = faces.les_sommets();
-  int nbsom = domaine().les_sommets().dimension(0);
-  int nbs = (dimension == 2) ? 2 : 4;  // number of vertices per face
-  IntTab faces_recreees(1, nbs);
+  IntTab_t& sommets = faces.les_sommets();
+  int_t nbsom = this->domaine().les_sommets().dimension(0);
+  int nbs = (Objet_U::dimension == 2) ? 2 : 4;  // number of vertices per face
+  IntTab_t faces_recreees(1, nbs);
 
   int ii = 0;
 
@@ -162,7 +167,7 @@ void Remove_elem::creer_faces(Domaine& dom, Faces& faces, IntTab& som_face) cons
               faces_recreees.resize(ii + 1, nbs);
               faces_recreees(ii, 0) = i;
               faces_recreees(ii, 1) = som_face(i, 0, j);
-              if (dimension == 3)
+              if (Objet_U::dimension == 3)
                 {
                   faces_recreees(ii, 2) = som_face(i, 1, j);
                   faces_recreees(ii, 3) = som_face(i, 2, j);
@@ -176,9 +181,10 @@ void Remove_elem::creer_faces(Domaine& dom, Faces& faces, IntTab& som_face) cons
   sommets.ref(faces_recreees);
 }
 
-void Remove_elem::remplir_liste(IntTab& som_face, int ind1, int ind2, int ind3, int ind4) const
+template <typename _SIZE_>
+void Remove_elem_32_64<_SIZE_>::remplir_liste(IntTab_t& som_face, int_t ind1, int_t ind2, int_t ind3, int_t ind4) const
 {
-  ArrOfInt ind(4);
+  ArrOfInt_t ind(4);
   ind[0] = ind1;
   ind[1] = ind2;
   ind[2] = ind3;
@@ -216,32 +222,34 @@ void Remove_elem::remplir_liste(IntTab& som_face, int ind1, int ind2, int ind3, 
     }
 }
 
-void Remove_elem::remove_elem_(Domaine& dom)
+template <typename _SIZE_>
+void Remove_elem_32_64<_SIZE_>::remove_elem_(Domaine_t& dom)
 {
-  if (dom.type_elem()->que_suis_je() == "Rectangle" || dom.type_elem()->que_suis_je() == "Hexaedre")
+  if (dom.type_elem()->que_suis_je() == "Rectangle" || dom.type_elem()->que_suis_je() == "Rectangle_64"
+      || dom.type_elem()->que_suis_je() == "Hexaedre" || dom.type_elem()->que_suis_je() == "Hexaedre_64")
     {
 
-      IntTab& les_elems = dom.les_elems();
-      int oldsz = les_elems.dimension(0);
-      ArrOfInt marq_remove(oldsz);
-      int nbsom = domaine().les_sommets().dimension(0);
+      IntTab_t& les_elems = dom.les_elems();
+      int_t oldsz = les_elems.dimension(0);
+      ArrOfInt_t marq_remove(oldsz);
+      int_t nbsom = this->domaine().les_sommets().dimension(0);
 
-      int nbs = (dimension == 2) ? 4 : 8;  // number of vertices per element
-      IntTab new_elems(oldsz, nbs);
+      int nbs = (Objet_U::dimension == 2) ? 4 : 8;  // number of vertices per element
+      IntTab_t new_elems(oldsz, nbs);
 
-      int nbfacesom = (dimension == 2) ? 4 : 4 * 3; // number of faces connected to a vertex
-      IntTab som_face(nbsom, 3, nbfacesom);
+      int nbfacesom = (Objet_U::dimension == 2) ? 4 : 4 * 3; // number of faces connected to a vertex
+      IntTab_t som_face(nbsom, 3, nbfacesom);
       som_face = -1;
 
       if (f_ok)
         {
-          DoubleTab xg(oldsz, dimension);
+          DoubleTab_t xg(oldsz, Objet_U::dimension);
           dom.type_elem()->calculer_centres_gravite(xg);
-          for (int i = 0; i < oldsz; i++)
+          for (int_t i = 0; i < oldsz; i++)
             {
               f.setVar(0, xg(i, 0));
               f.setVar(1, xg(i, 1));
-              if (dimension == 3)
+              if (Objet_U::dimension == 3)
                 f.setVar(2, xg(i, 2));
               //if(f.eval()) listelem.add(i);
               if ((int) (f.eval() + 0.5))
@@ -257,14 +265,14 @@ void Remove_elem::remove_elem_(Domaine& dom)
 
         }
 
-      int j = 0;
-      Cerr << "-> " << listelem.size() << " elements will be removed from the domain " << domaine().le_nom() << finl;
+      int_t j = 0;
+      Cerr << "-> " << listelem.size() << " elements will be removed from the domain " << this->domaine().le_nom() << finl;
       /*    if (listelem.size()==0)
        {
        Cerr << "May be an error when applying Remove_elem : no elements found." << finl;
        Process::exit();
        } */
-      for (int i = 0; i < oldsz; i++)
+      for (int_t i = 0; i < oldsz; i++)
         {
           if (marq_remove[i] == 0)
             {
@@ -274,35 +282,35 @@ void Remove_elem::remove_elem_(Domaine& dom)
             }
           else
             {
-              if (dimension == 2)
+              if (Objet_U::dimension == 2)
                 {
-                  int i0 = les_elems(i, 0);
-                  int i1 = les_elems(i, 1);
-                  int i2 = les_elems(i, 2);
-                  int i3 = les_elems(i, 3);
+                  int_t i0 = les_elems(i, 0);
+                  int_t i1 = les_elems(i, 1);
+                  int_t i2 = les_elems(i, 2);
+                  int_t i3 = les_elems(i, 3);
 
-                  remplir_liste(som_face, i0, i1, -1, -1);
-                  remplir_liste(som_face, i0, i2, -1, -1);
-                  remplir_liste(som_face, i1, i3, -1, -1);
-                  remplir_liste(som_face, i2, i3, -1, -1);
+                  this->remplir_liste(som_face, i0, i1, -1, -1);
+                  this->remplir_liste(som_face, i0, i2, -1, -1);
+                  this->remplir_liste(som_face, i1, i3, -1, -1);
+                  this->remplir_liste(som_face, i2, i3, -1, -1);
                 }
               else
                 {
-                  int i0 = les_elems(i, 0);
-                  int i1 = les_elems(i, 1);
-                  int i2 = les_elems(i, 2);
-                  int i3 = les_elems(i, 3);
-                  int i4 = les_elems(i, 4);
-                  int i5 = les_elems(i, 5);
-                  int i6 = les_elems(i, 6);
-                  int i7 = les_elems(i, 7);
+                  int_t i0 = les_elems(i, 0);
+                  int_t i1 = les_elems(i, 1);
+                  int_t i2 = les_elems(i, 2);
+                  int_t i3 = les_elems(i, 3);
+                  int_t i4 = les_elems(i, 4);
+                  int_t i5 = les_elems(i, 5);
+                  int_t i6 = les_elems(i, 6);
+                  int_t i7 = les_elems(i, 7);
 
-                  remplir_liste(som_face, i0, i1, i2, i3);
-                  remplir_liste(som_face, i0, i1, i4, i5);
-                  remplir_liste(som_face, i0, i4, i2, i6);
-                  remplir_liste(som_face, i1, i5, i3, i7);
-                  remplir_liste(som_face, i2, i3, i6, i7);
-                  remplir_liste(som_face, i4, i5, i6, i7);
+                  this->remplir_liste(som_face, i0, i1, i2, i3);
+                  this->remplir_liste(som_face, i0, i1, i4, i5);
+                  this->remplir_liste(som_face, i0, i4, i2, i6);
+                  this->remplir_liste(som_face, i1, i5, i3, i7);
+                  this->remplir_liste(som_face, i2, i3, i6, i7);
+                  this->remplir_liste(som_face, i4, i5, i6, i7);
                 }
             }
         }
@@ -319,21 +327,21 @@ void Remove_elem::remove_elem_(Domaine& dom)
         Cerr << " Regeneration of boundaries" << finl;
         for (auto &itr : dom.faces_bord())
           {
-            Faces& les_faces = itr.faces();
-            if (dimension == 2)
+            Faces_t& les_faces = itr.faces();
+            if (Objet_U::dimension == 2)
               les_faces.typer(Type_Face::segment_2D);
             else
               les_faces.typer(Type_Face::quadrangle_3D);
-            recreer_faces(dom, les_faces, som_face);
+            this->recreer_faces(dom, les_faces, som_face);
           }
         Cerr << " addition of a new boundary issued from removed elements" << finl;
-        Bord& new_bord = dom.faces_bord().add(Bord());
+        Bord_32_64<_SIZE_>& new_bord = dom.faces_bord().add(Bord_32_64<_SIZE_>());
         new_bord.nommer("newBord");
-        if (dimension == 2)
+        if (Objet_U::dimension == 2)
           new_bord.typer_faces(Type_Face::segment_2D);
         else
           new_bord.typer_faces(Type_Face::quadrangle_3D);
-        Faces& les_faces = new_bord.faces();
+        Faces_t& les_faces = new_bord.faces();
         creer_faces(dom, les_faces, som_face);
       }
 
@@ -342,8 +350,8 @@ void Remove_elem::remove_elem_(Domaine& dom)
         Cerr << "Regeneration of internal faces" << finl;
         for (auto &itr : dom.bords_int())
           {
-            Faces& les_faces = itr.faces();
-            if (dimension == 2)
+            Faces_t& les_faces = itr.faces();
+            if (Objet_U::dimension == 2)
               les_faces.typer(Type_Face::segment_2D);
             else
               les_faces.typer(Type_Face::quadrangle_3D);
@@ -359,8 +367,14 @@ void Remove_elem::remove_elem_(Domaine& dom)
 
     {
       Cerr << "We do not yet know how to Remove_elem the " << dom.type_elem()->que_suis_je() << "s" << finl;
-      exit();
+      Process::exit();
     }
 }
+
+template class Remove_elem_32_64<int>;
+#if INT_is_64_ == 2
+template class Remove_elem_32_64<trustIdType>;
+#endif
+
 
 

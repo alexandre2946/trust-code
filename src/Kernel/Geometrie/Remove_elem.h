@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -30,21 +30,28 @@
 
 #include <Domaine_forward.h>
 
-class Remove_elem : public Interprete_geometrique_base
+template <typename _SIZE_>
+class Remove_elem_32_64 : public Interprete_geometrique_base_32_64<_SIZE_>
 {
-  Declare_instanciable(Remove_elem);
+  Declare_instanciable_32_64(Remove_elem_32_64);
 
 public :
+  using int_t = _SIZE_;
+  using Domaine_t = Domaine_32_64<_SIZE_>;
+  using Faces_t = Faces_32_64<_SIZE_>;
+  using IntTab_t = IntTab_T<_SIZE_>;
+  using DoubleTab_t = DoubleTab_T<_SIZE_>;
+  using ArrOfInt_t = ArrOfInt_T<_SIZE_>;
 
   Entree& interpreter_(Entree&) override;
-  void remove_elem_(Domaine&);
-  void recreer_faces(Domaine& , Faces&, IntTab&) const;
-  void creer_faces(Domaine& , Faces&, IntTab&) const;
-  void remplir_liste(IntTab&, int, int, int, int) const;
+  void remove_elem_(Domaine_t&);
+  void recreer_faces(Domaine_t& , Faces_t&, IntTab_t&) const;
+  void creer_faces(Domaine_t& , Faces_t&, IntTab_t&) const;
+  void remplir_liste(IntTab_t&, int_t, int_t, int_t, int_t) const;
 
 protected :
 
-  IntList listelem;
+  TRUSTList<_SIZE_> listelem;
   Parser_U f;
   int f_ok = -10;
 private :
