@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.9_beta : Enhancements, modifications and corrected bugs since version 1.9.8 :
 --------------------------------------------------------------------------------------------------
+08/07/26 (Trust) New Keyword  : Remove_elem_64 version of Remove_elem for large mesh.
 --------------------------------------------------------------------------------------------------
 Release notes version 1.9.8 : Enhancements, modifications and corrected bugs since version 1.9.7 :
 --------------------------------------------------------------------------------------------------

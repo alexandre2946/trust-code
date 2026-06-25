@@ -816,7 +816,12 @@ template<typename _SZ_>
 const typename Domaine_32_64<_SZ_>::OctreeRoot_t& Domaine_32_64<_SZ_>::construit_octree() const
 {
   if (!deriv_octree_)
-    deriv_octree_.typer("OctreeRoot");
+    {
+      if constexpr (sizeof(_SZ_) == 4)
+        deriv_octree_.typer("OctreeRoot");
+      else if constexpr (sizeof(_SZ_) == 8)
+        deriv_octree_.typer("OctreeRoot_64");
+    }
   OctreeRoot_t& octree = deriv_octree_.valeur();
   if (!octree.construit())
     {
@@ -832,7 +837,12 @@ template<typename _SZ_>
 const typename Domaine_32_64<_SZ_>::OctreeRoot_t& Domaine_32_64<_SZ_>::construit_octree(int& reel) const
 {
   if (!deriv_octree_)
-    deriv_octree_.typer("OctreeRoot");
+    {
+      if constexpr (sizeof(_SZ_) == 4)
+        deriv_octree_.typer("OctreeRoot");
+      else if constexpr (sizeof(_SZ_) == 8)
+        deriv_octree_.typer("OctreeRoot_64");
+    }
   OctreeRoot_t& octree = deriv_octree_.valeur();
   if (!octree.construit() || (reel != octree.reel()))
     {
