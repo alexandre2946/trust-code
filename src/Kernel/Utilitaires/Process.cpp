@@ -470,15 +470,6 @@ void Process::exit(const Nom& message ,int i)
     {
       Cerr << message << finl;
       Cerr.flush();
-      // Utile pour XData et la creation de syno.py
-      if (getenv("TRUST_USE_XDATA")!=nullptr)
-        {
-          SFichier hier("hierarchie.dump");
-          hier << "\n             KEYWORDS\n";
-          Type_info::hierarchie(hier);
-          hier << "\n             SYNONYMS\n";
-          Synonyme_info::hierarchie(hier);
-        }
       if (!get_disable_stop() && Process::je_suis_maitre())
         {
           Nom nomfic( Objet_U::nom_du_cas() );
@@ -558,7 +549,7 @@ void Process::exit(const Nom& message ,int i)
           PE_Groups::finalize();
         }
     }
-  // Kokkos::finalize();
+  Kokkos::finalize();
   // On force exit();
   if (i==0) i=-1;
   ::exit(i); //Seul ::exit utilise dans le code jusqu'a 01/23. second ajoute car appel recursif a Process::exit si droits ecriture dossier etude manquants
