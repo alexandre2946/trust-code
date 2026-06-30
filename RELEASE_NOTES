@@ -1,4 +1,7 @@
 --------------------------------------------------------------------------------------------------
+Release notes version 1.9.9_beta : Enhancements, modifications and corrected bugs since version 1.9.8 :
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
 Release notes version 1.9.8 : Enhancements, modifications and corrected bugs since version 1.9.7 :
 --------------------------------------------------------------------------------------------------
 27/05/26 (TRUST) Keyword      : In 'declarer_bord_perio', flag 'declare_only' can be used to only register the list of periodic boundaries without performing any geometrical adjustment.

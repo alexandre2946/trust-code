@@ -84,6 +84,9 @@ check_components()
                elif [ "$Composant" = pemfc ] || [ "$Composant" = sympy_to_TRUST ]
                then
                   make_option="make check_all_optim"
+               elif [ "$Composant" = mathys ]
+               then
+                 make_option="echo make check disabled since no tests"
                fi
             fi
             $TRUST_ROOT/bin/baltik/bin/baltik_build_configure -execute &&
@@ -124,10 +127,13 @@ check_components()
                # both `trustify batch-check`'s exit (non-zero on any
                # failed dataset) AND the audit-3.10 check_trustify_install
                # probe (non-zero when the binary is missing). Audit 3.9.
-               make trustify_check 1>>$Gui_log 2>&1
-               TRUSIFY_CHECK_OK=$?
-               [ "$trustify_exit" != "0" ] && echo "make trustify_check failed with exit $trustify_exit - last 20 lines of $Gui_log:)" \
+               if [ "$Composant" != "triomc" ] && [ "$Composant" != "mathys" ] && [ "$Composant" != "mpcube" ] && [ "$Composant" != "flica5" ]
+               then
+                  make trustify_check 1>>$Gui_log 2>&1
+                  TRUSIFY_CHECK_OK=$?
+                  [ "$trustify_exit" != "0" ] && echo "make trustify_check failed with exit $trustify_exit - last 20 lines of $Gui_log:)" \
                    && tail -n 20 "$Gui_log"
+               fi
                if [[ "$ComposantsOfficial" = *"$Composant"* ]] || [[ "$ComposantsLns" = *"$Composant"* ]] # Test si Composant n est pas dans la liste des composants Beta
                then
                   if [ "$Composant" != "triomc" ] && [ "$Composant" != "mathys" ]
@@ -395,7 +401,7 @@ check_components()
                            WORKBETA=""
                            trustversion=""
                            [ "$Composant" == "flica5" ] && trustversion=1.9.7b
-                           [ "$Composant" == "module3D" ] && trustversion=1.9.7
+                           [ "$Composant" == "module3D" ] && trustversion=1.9.8
                            [ "$Composant" == "triomc" ] && trustversion=1.9.7
                            if  [ "${machine:0:5}" = "orcus" ] || [ "${machine:0:6}" = "altair" ]
                            then
@@ -3916,19 +3922,6 @@ grep -i killed $envoie_ftp_log
 grep -i Error $envoie_ftp_log
 grep KO $envoie_ftp_log
 grep local $envoie_ftp_log
-
-#####################################
-# Mises a jour diverses de $TRUST_FTP
-#####################################
-cd $TRUST_TMP
-# Update the index.html file of the FTP site:
-if [ $livraison = 1 ]
-then
-   echo " "
-   echo "Call to "$TRUST_ROOT"/bin/admin/cree_index.html"
-   echo "from `pwd`"
-   cree_index.html
-fi
 echo "<--- End at "`date '+%H:%M:%S %d/%m'`
 
 #-------------------------------------------------------

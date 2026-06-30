@@ -1532,15 +1532,15 @@ def _set_run_parallel():
     _NOT_RUN=False
     _RUN_SEQUENTIAL=False
     _RUN_PARALLEL=True
-    _print("Set parallel run")
+    #_print("Set parallel run")
     
 def _set_use_sserver(v=True):
     global _USE_SSERVER
     _USE_SSERVER=v
-    if v:
-        _print("Using Sserver")
-    else:
-        _print("Disabling Sserver")
+    #if v:
+    #    _print("Using Sserver")
+    #else:
+    #    _print("Disabling Sserver")
         
     
 """

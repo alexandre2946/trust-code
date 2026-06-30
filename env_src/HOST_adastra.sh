@@ -111,7 +111,7 @@ define_soumission_batch()
    then
       mpirun="srun -l $srun_options --mpi=cray_shasta --mem-bind=local --cpu-bind=verbose,cores"
    else
-      mpirun="srun -l $srun_options --mem-bind=none --cpu-bind=verbose,none -- \$TRUST_ROOT/env_src/adastra_acc_binding.sh"
+      mpirun="srun -l $srun_options --mem-bind=none --cpu-bind=verbose,none -- " #\$TRUST_ROOT/env_src/adastra_acc_binding.sh"
    fi
    sub=SLURM
 }

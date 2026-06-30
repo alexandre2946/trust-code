@@ -609,7 +609,7 @@ do
       rm -f *.lata_single core.* convert_jdd
       echo "rm *.cgns files."
       rm -f *.cgns
-      find . -maxdepth 1 -name '*.lata.*' -exec  rm  {} \;
+      rm -f *.lata.*
       echo "rm *_Channel_Flow_Rate_* / *_Pressure_Gradient_* files."
       rm -f *_Channel_Flow_Rate_* *_Pressure_Gradient_*
       echo "rm Moyennes_spatiales_* / reynolds_tau.dat / tauw.dat / u_tau.dat files."

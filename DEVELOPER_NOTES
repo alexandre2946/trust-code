@@ -1,4 +1,7 @@
 -------------------------------------------------------------
+Developer notes version 1.9.9_beta : Changes since version 1.9.8 :
+-------------------------------------------------------------
+-------------------------------------------------------------
 Developer notes version 1.9.8 : Changes since version 1.9.7 :
 -------------------------------------------------------------
 23/05/26 (TRUST) Minor change : Code coverage report moved from $TRUST_ROOT/doc/Coverage/html/index.html to $TRUST_ROOT/share/coverage

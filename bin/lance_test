@@ -1227,8 +1227,8 @@ then
           #BALISE_MODULE
           PAR_NOM=PAR_$NOM
           rm -f core core.*
-          rm -f $NOM.lml $PAR_NOM.lml $NOM*.meshtv $PAR_NOM*.meshtv
-          rm -f $NOM.out $NOM.err Pression.sv Wall_length.xyz
+          rm -f $NOM.lml $PAR_NOM.lml $NOM*.lata $PAR_NOM*.lata*
+          rm -f $NOM.out $NOM.err Wall_length.xyz
           rm -f $PAR_NOM.out $PAR_NOM.err
           # Probleme sur Linux RedHat5.2 :
           [ ${#LD_LIBRARY_PATH} = 0 ] && LD_LIBRARY_PATH=$TRUST_LIB && export LD_LIBRARY_PATH

@@ -2034,9 +2034,8 @@ OPTIMIZE="-O3"
 TRUST_SUPPORTED=0
 case $TRUST_ARCH_CC in
   linux_g++*|cygw*g++*|linux_nvcc_wrapper) TRUST_SUPPORTED=1
-	[ "$TRUST_STDCPP" = c++14 ] && TRUST_SUPPORTED=`echo $TRUST_VERSION_GNU | awk -F. '{ver=$1*100+$2*10+$3;if (ver>=530 && ver<=1511) print "(Supportee)";else print "(Not yet supported or not supported anymore)"}'`
-	[ "$TRUST_STDCPP" = c++17 ] && TRUST_SUPPORTED=`echo $TRUST_VERSION_GNU | awk -F. '{ver=$1*100+$2*10+$3;if (ver>=820 && ver<=1521) print "(Supportee)";else print "(Not yet supported or not supported anymore)"}'`
-	[ "$TRUST_STDCPP" = c++20 ] && TRUST_SUPPORTED=`echo $TRUST_VERSION_GNU | awk -F. '{ver=$1*100+$2*10+$3;if (ver>=1040 && ver<=1521) print "(Supportee)";else print "(Not yet supported or not supported anymore)"}'`
+	[ "$TRUST_STDCPP" = c++17 ] && TRUST_SUPPORTED=`echo $TRUST_VERSION_GNU | awk -F. '{ver=$1*100+$2*10+$3;if (ver>=820 && ver<=1611) print "(Supportee)";else print "(Not yet supported or not supported anymore)"}'`
+	[ "$TRUST_STDCPP" = c++20 ] && TRUST_SUPPORTED=`echo $TRUST_VERSION_GNU | awk -F. '{ver=$1*100+$2*10+$3;if (ver>=1040 && ver<=1611) print "(Supportee)";else print "(Not yet supported or not supported anymore)"}'`
 	[ "`echo $TRUST_SUPPORTED | grep -i Not`" != "" ] && TRUST_SUPPORTED=0
 	# Passage en -O2 car plantages suspects en -O3 avec egcs sur linux
 	# Options TRES severes a ajouter peut etre un jour : -W -Weffc++ -Wfloat-equal

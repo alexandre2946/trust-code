@@ -177,6 +177,12 @@ and it must correspond to a directory containing a valid BALTIK
 configuration file. The 'dependency_name' must match the name of
 the project located at '/path/to/dependency'. 
 
+For example, if you want that your BALTIK project depends on TrioCFD, you should
+add into your project.cfg the following lines:
+
+[dependencies]
+TrioCFD: RelativeOrAbsolutePathToTrioCFD
+
 
 -----------------------
 Recursive dependencies:
