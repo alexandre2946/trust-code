@@ -1,5 +1,4 @@
 #!/bin/bash
-[ "$TRUST_STDCPP" = c++14 ] && exit 0
 [ "$TRUST_STDCPP" = c++17 ] && exit 0
 archive=$TRUST_ROOT/externalpackages/kokkos/arborx-2.0.1.tar.gz # C++ 20 
 
@@ -19,6 +18,7 @@ then
 
       BUILD_TYPES="Release `[ "$build_debug" = "1" ] && echo Debug`"
       BUILD_TYPES="Release Debug"
+      USE_MPI=ON && [ "$TRUST_DISABLE_MPI" -eq 1 ] && USE_MPI=OFF
       for CMAKE_BUILD_TYPE in $BUILD_TYPES
       do
         rm -rf BUILD;mkdir -p BUILD;cd BUILD
@@ -36,7 +36,7 @@ then
         CMAKE_OPT=$CMAKE_OPT" -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE -DCMAKE_INSTALL_PREFIX=$KOKKOS_INSTALL_DIR -DCMAKE_INSTALL_LIBDIR=lib64"
         CMAKE_OPT=$CMAKE_OPT" -DKokkos_ROOT=$KOKKOS_INSTALL_DIR"
         CMAKE_OPT=$CMAKE_OPT" -DKokkos_DIR=$KOKKOS_INSTALL_DIR/lib64/cmake/Kokkos" # Needed on salacia
-        CMAKE_OPT=$CMAKE_OPT" -DARBORX_ENABLE_MPI=ON" # -DARBORX_ENABLE_GPU_AWARE_MPI=ON
+        CMAKE_OPT=$CMAKE_OPT" -DARBORX_ENABLE_MPI=$USE_MPI" # -DARBORX_ENABLE_GPU_AWARE_MPI=ON
         #CMAKE_OPT=$CMAKE_OPT" -DARBORX_ENABLE_EXAMPLES=ON" # Need Boost ?
         echo CMAKE_OPT=$CMAKE_OPT | tee $log_file
         cmake $src_dir $CMAKE_OPT 2>&1 | tee -a $log_file
