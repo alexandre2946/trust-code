@@ -1227,7 +1227,7 @@ then
           #BALISE_MODULE
           PAR_NOM=PAR_$NOM
           rm -f core core.*
-          rm -f $NOM.lml $PAR_NOM.lml $NOM*.lata $PAR_NOM*.lata*
+          rm -f $NOM.lml $PAR_NOM.lml
           rm -f $NOM.out $NOM.err Wall_length.xyz
           rm -f $PAR_NOM.out $PAR_NOM.err
           # Probleme sur Linux RedHat5.2 :

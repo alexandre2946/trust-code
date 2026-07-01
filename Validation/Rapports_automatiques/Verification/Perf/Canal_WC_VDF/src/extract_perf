@@ -3,7 +3,7 @@
 # verification status
 ok=1
 status=0
-if [ "`grep 'Arret des process' $1.err`" = "" ]
+if [ "`grep 'Stopping processes.' $1.err`" = "" ]
 then
    echo "-> Calculation $1 produced an error !"
    err=`ls -rt $1.err .$1.err 2>/dev/null | tail -1`
