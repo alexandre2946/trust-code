@@ -400,9 +400,9 @@ check_components()
                            # Debut de partie a revoir !!!!
                            WORKBETA=""
                            trustversion=""
-                           [ "$Composant" == "flica5" ] && trustversion=1.9.7b
+                           [ "$Composant" == "flica5" ] && trustversion=1.9.8
                            [ "$Composant" == "module3D" ] && trustversion=1.9.8
-                           [ "$Composant" == "triomc" ] && trustversion=1.9.7
+                           [ "$Composant" == "triomc" ] && trustversion=1.9.8
                            if  [ "${machine:0:5}" = "orcus" ] || [ "${machine:0:6}" = "altair" ]
                            then
                               WORKBETA=`$SSHP ssh_ $BATCHMODE $log@$adr -n 'source /home/trust_trio-public/env_TRUST-'$trustversion'.sh 1>/dev/null 2>&1; echo \$TRUST_ROOT;'`

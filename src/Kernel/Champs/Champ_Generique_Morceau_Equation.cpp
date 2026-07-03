@@ -107,7 +107,7 @@ void Champ_Generique_Morceau_Equation::completer(const Postraitement_base& post)
   if (numero_eq_==-1)
     {
       Cerr<<"We can apply a Champ_Generique_Morceau_Equation only to an unknown field of the problem"<<finl;
-      exit();
+      Process::exit();
     }
   ref_eq_ = Pb.equation(numero_eq_);
 
@@ -246,7 +246,7 @@ const Noms Champ_Generique_Morceau_Equation::get_property(const Motcle& query) c
 Entity Champ_Generique_Morceau_Equation::get_localisation(const int index) const
 {
   Entity loc;
-  //For initialization
+  // For initialization
   loc = Entity::NODE;
 
   if (localisation_=="elem")
@@ -281,14 +281,14 @@ void Champ_Generique_Morceau_Equation::nommer_source()
       else
         {
           Cerr<<"This operateur number is not available."<<finl;
-          exit();
+          Process::exit();
         }
     }
   else
     {
       Cerr<<"Currently the only pieces of equations considered for the postprocessing"<<finl;
       Cerr<<"are of type operator"<<finl;
-      exit();
+      Process::exit();
     }
 
   if (Motcle(option_)=="stabilite")
@@ -304,7 +304,7 @@ void Champ_Generique_Morceau_Equation::nommer_source()
   else
     {
       Cerr<<"Currently the only options considered for a piece of equation are \"stabilite\" and \"flux_bords\"."<<finl;
-      exit();
+      Process::exit();
     }
 
 

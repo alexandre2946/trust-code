@@ -157,7 +157,7 @@ void Champ_Post_Operateur_Eqn::completer(const Postraitement_base& post)
   if (ok==0)
     {
       Cerr<<"Error in "<<que_suis_je()<<" unknown localisation"<<finl;
-      exit();
+      Process::exit();
     }
   verification_cas_compo();
 }

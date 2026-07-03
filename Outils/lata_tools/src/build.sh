@@ -46,7 +46,7 @@ fi
 
 # CMake option + implicit use of TRUST_DEFINES and EXTRA_SRCS env var:
 cmake_opt="-DCMAKE_BUILD_TYPE=$build_mode -DCMAKE_INSTALL_PREFIX=$TRUST_ROOT/exec/lata_tools -DCMAKE_C_COMPILER=$TRUST_cc "
-cmake_opt="$cmake_opt -DCMAKE_CXX_COMPILER=$TRUST_CC -DSWIG_EXECUTABLE=$SWIG_EXECUTABLE "
+cmake_opt="$cmake_opt -DCMAKE_CXX_COMPILER=$TRUST_CC -DSWIG_EXECUTABLE=$SWIG_EXECUTABLE -DCMAKE_CXX_STANDARD=${TRUST_STDCPP#c++} "
 cmake $ORG $cmake_opt || exit -1
 
 make -j  $TRUST_NB_PROCS  install || exit -1
