@@ -408,12 +408,25 @@ class SonSEGFile(SonFile):
         if hdr is not None:
             face = re.compile("SEGMENTFACES[X-Z]")
             if hdr[3][1] == "SEGMENTPOINTS":
-                nb_pts = int((len(hdr[1]) - 1) / 2 / self._dim)
-                l2 = [float(hdr[1][i + 2]) for i in range(0, nb_pts * self._dim, 2)]
+                assert self._dim > 0
+                assert self._dim < 4
+                # target the subset of wanted data
+                start_subset = [2, 4, 6]
+                end_subset = [-5, -3, -1]
+                if self._dim <= 2:
+                    start_subset.pop()
+                    end_subset.pop(0)
+                if self._dim <= 1:
+                    start_subset.pop()
+                    end_subset.pop(0)
+                # convert to correct type
+                _line = hdr[1]
+                start = list(map(float, [_line[s] for s in start_subset]))
+                end = list(map(float, [_line[s] for s in end_subset]))
             elif hdr[3][1] == "SEGMENT" or hdr[3][1] == "CIRCLE" or face.match(hdr[3][1]):
                 l2 = [float(hdr[3][i]) for i in range(2, 2 + 2 * self._dim)]
+                start, end = l2[: self._dim], l2[-self._dim:]
             else: raise Exception("Invalid SON file type!")
-            start, end = l2[: self._dim], l2[-self._dim:]
             self.setXTremePoints(start, end)
             self._computeXAxis()
             return hdr
