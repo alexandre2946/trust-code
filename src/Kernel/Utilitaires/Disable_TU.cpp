@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -39,7 +39,7 @@ Entree& Disable_TU::readOn(Entree& is)
   return Interprete::readOn(is);
 }
 
-/*! @brief Main function of the Disable_TU interpreter Set the disable_TU variable to 1.
+/*! @brief Main function of the Disable_TU interpreter Set the disable_TU flag to true.
  *
  * @param (Entree& is) an input stream
  * @return (Entree&) the input stream

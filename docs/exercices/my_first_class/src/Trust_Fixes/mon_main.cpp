@@ -31,7 +31,7 @@
 #endif
 #include <Baltik_Version.h>
 #include <info_atelier.h>
-#include <unistd.h> // Pour chdir for other compiler
+#include <unistd.h> // For chdir for other compilers
 #ifndef __CYGWIN__
 #include <catch_and_trace.h>
 #endif
@@ -54,7 +54,7 @@ void TRUST_global_finalize()
   if (!TRUST_LIBRARY_MODE) return;
 
 #ifdef PETSCKSP_H
-  // On PetscFinalize que si c'est necessaire
+  // Call PetscFinalize only if necessary
   PetscBool isInitialized;
   PetscInitialized(&isInitialized);
   if (isInitialized==PETSC_TRUE)
@@ -74,19 +74,13 @@ mon_main::mon_main(int verbose_level, bool journal_master, Nom log_directory, bo
   journal_master_ = journal_master;
   log_directory_ = log_directory;
   LecFicDiffuse_JDD::apply_verif = apply_verification;
-  // Creation d'un journal temporaire qui ecrit dans Cerr
+  // Create a temporary journal that writes to Cerr
   init_journal_file(verbose_level, 0 /* filename = 0 => Cerr */, 0 /* append */);
   trio_began_mpi_=false;
   disable_stop_=disable_stop;
   change_disable_stop(disable_stop);
 }
 
-// Catching exception signal only in debug mode:
-#ifndef NDEBUG
-bool error_handlers = true;
-#else
-bool error_handlers = false;
-#endif
 static int init_petsc(int argc, char **argv, bool with_mpi,bool& trio_began_mpi_)
 {
 #ifdef PETSCKSP_H
@@ -97,11 +91,11 @@ static int init_petsc(int argc, char **argv, bool with_mpi,bool& trio_began_mpi_
 
   static char help[] = "TRUST may solve linear systems with Petsc library.\n\n" ;
   Nom pwd(::pwd());
-  // On initialise Petsc
+  // Initialize Petsc
 #ifdef MPI_INIT_NEEDS_MPIRUN
   int flag;
   MPI_Initialized(&flag);
-  // si MPI initialise ou si argc>2
+  // if MPI is initialised or if argc>2
   if ((argc>2)||(flag))
     {
       PetscInitialize(&argc, &argv, (char*)0, help);
@@ -115,8 +109,8 @@ static int init_petsc(int argc, char **argv, bool with_mpi,bool& trio_began_mpi_
   PetscDeviceView(device, PETSC_VIEWER_STDERR_WORLD);
   //if (instance==1) PetscLogGpuTime(); // Slow down calculation ! Use -log_view_gpu_time
 #endif
-  // Bizarrerie qui se produit sur une machine (ioulia, MPICH natif): PetscInitialize change le pwd()
-  // en sequentiel et si le binaire n'est pas dans le repertoire de l'etude, le pwd est perdu...
+  // Quirk observed on one machine (ioulia, native MPICH): PetscInitialize changes pwd()
+  // in sequential mode and, if the binary is not in the study directory, the pwd is lost...
   int ierr;
   if (!with_mpi)
     {
@@ -127,22 +121,19 @@ static int init_petsc(int argc, char **argv, bool with_mpi,bool& trio_began_mpi_
           Process::exit();
         }
     }
-  // Equivalent de -abort_on_error (aucune erreur PETSc n'est tolere):
+  // Equivalent to -abort_on_error (no PETSc error is tolerated):
   PetscPushErrorHandler(PetscAbortErrorHandler, PETSC_NULLPTR);
-  // Desactive le signal handler en optimise pour eviter d'etre trop bavard
-  // et de "masquer" les messages d'erreur TRUST:
+  // Disable the signal handler in optimised mode to avoid too much verbosity
+  // and to avoid "masking" TRUST error messages:
   PetscPopSignalHandler();
 
 #ifndef __CYGWIN__
-  if (error_handlers || getenv("TRUST_ENABLE_ERROR_HANDLERS") != nullptr)
-    {
-      Cerr << "Enabling error handlers catching SIGFPE and SIGABORT and giving a trace of where the fault happened." << finl;
-      install_handlers();
-    }
+  Cerr << "Enabling error handlers catching SIGFPE and SIGABORT and giving a trace of where the fault happened." << finl;
+  install_handlers();
 #endif
 #else
 #ifdef MPI_
-  // MPI_Init pour les machines ou Petsc n'est pas installe
+  // MPI_Init for machines where Petsc is not installed
   int flag;
   MPI_Initialized(&flag);
   if (!flag)
@@ -185,7 +176,7 @@ static void instantiate_node_mpi(OWN_PTR(Comm_Group) & ngrp, OWN_PTR(Comm_Group)
 static void init_node_mpi(OWN_PTR(Comm_Group) & ngrp)
 {
 #ifdef MPI_
-  assert(ngrp.non_nul());
+  assert(ngrp);
   Comm_Group_MPI& mpi_on_node = ref_cast(Comm_Group_MPI, ngrp.valeur());
   mpi_on_node.init_comm_on_numa_node();
 #endif
@@ -194,16 +185,16 @@ static void init_node_mpi(OWN_PTR(Comm_Group) & ngrp)
 static void init_node_masters(OWN_PTR(Comm_Group) & master)
 {
 #ifdef MPI_
-  assert(master.non_nul());
+  assert(master);
   Comm_Group_MPI& mm = ref_cast(Comm_Group_MPI, master.valeur());
   mm.init_comm_on_node_master();
 #endif
 }
 
 ///////////////////////////////////////////////////////////
-// Desormais Petsc/MPI_Initialize et Petsc/MPI_Finalize
-// sont dans un seul fichier: mon_main
-// On ne doit pas en voir ailleurs !
+// From now on, Petsc/MPI_Initialize and Petsc/MPI_Finalize
+// are in a single file: mon_main.
+// They must not appear anywhere else!
 //////////////////////////////////////////////////////////
 void mon_main::init_parallel(const int argc, char **argv, bool with_mpi, bool check_enabled, bool with_petsc)
 {
@@ -223,7 +214,7 @@ void mon_main::init_parallel(const int argc, char **argv, bool with_mpi, bool ch
     {
       if (init_petsc(argc, argv, with_mpi, trio_began_mpi_))
         {
-          must_mpi_initialize = false; // Deja fait par Petsc
+          must_mpi_initialize = false; // Already done by Petsc
           arguments_info += "Petsc initialization succeeded.\n";
         }
       else
@@ -241,7 +232,7 @@ void mon_main::init_parallel(const int argc, char **argv, bool with_mpi, bool ch
   // avoid variable 'must_mpi_initialize' set but not used error when MPI disabled
   if (must_mpi_initialize) abort();
 #endif
-  // ***************** Initialisation du parallele *************************
+  // ***************** Parallel initialisation *************************
   Comm_Group::set_check_enabled(check_enabled);
 
   if (with_mpi)
@@ -255,7 +246,7 @@ void mon_main::init_parallel(const int argc, char **argv, bool with_mpi, bool ch
   else
     groupe_trio_.typer("Comm_Group_NoParallel");
 
-  // Initialisation des groupes de communication.
+  // Initialisation of the communication groups.
   PE_Groups::initialize(groupe_trio_);
   arguments_info += "Parallel engine initialized : ";
   arguments_info += groupe_trio_->que_suis_je();
@@ -266,8 +257,8 @@ void mon_main::init_parallel(const int argc, char **argv, bool with_mpi, bool ch
   if (Process::je_suis_maitre())
     Cerr << arguments_info;
 
-  // the node group is instantiated here, so that it's done only once (necessary with ICoCo)
-  // however, it is initialized later, as it involves communication operations, which require statistics to be initialized first...
+  // The node group is instantiated here so it is done only once (necessary with ICoCo).
+  // It is initialised later because it involves communication operations, which require statistics to be initialised first.
   instantiate_node_mpi(node_group_, node_master_, with_mpi);
 
   if (!init_kokkos_before_mpi && !Kokkos::is_initialized())
@@ -317,7 +308,7 @@ void mon_main::finalize()
 #ifdef PETSCKSP_H
   if (!TRUST_LIBRARY_MODE)
     {
-      // On PetscFinalize que si c'est necessaire
+      // Call PetscFinalize only if necessary
       PetscBool isInitialized;
       PetscInitialized(&isInitialized);
       if (isInitialized==PETSC_TRUE)
@@ -335,7 +326,7 @@ void mon_main::finalize()
 #ifdef MPI_
   if (!TRUST_LIBRARY_MODE && trio_began_mpi_)
     {
-      // On MPI_Finalize si MPI_Initialized and not MPI_Finalized
+      // Call MPI_Finalize if MPI_Initialized and not MPI_Finalized
       int flag;
       MPI_Initialized(&flag);
       if (flag)
@@ -352,19 +343,17 @@ void mon_main::finalize()
 
 void mon_main::dowork(const Nom& nom_du_cas)
 {
-  // Le processeur maitre envoie le nom du cas a tous les processeurs
-  // car avec une distribution MPICH 1.2.7 (Debian)
-  // la ligne de commande recuperee avec argv ne contient
-  // pas le nom du jeu de donnees pour les processeurs autres
-  // que le processeur maitre
+  // The master processor broadcasts the case name to all processors,
+  // because with MPICH 1.2.7 (Debian) the command line retrieved via argv
+  // does not contain the dataset name on processors other than the master
   Nom tmp = nom_du_cas;
   envoyer(tmp, 0, -1, 0);
   recevoir(tmp, 0, -1, 0);
   Objet_U::get_set_nom_du_cas() = tmp;
 
   // ******************* Journal ***************************
-  // Initialisation du journal parallele (maintenant qu'on connait le rang
-  //  du processeur et le nom du cas)
+  // Initialisation of the parallel journal (now that the processor rank
+  // and the case name are known)
   {
     // Master process creates log directory if needed
     if (Process::je_suis_maitre() && log_directory_!="")
@@ -387,12 +376,12 @@ void mon_main::dowork(const Nom& nom_du_cas)
         filename += s;
       }
     filename += ".log";
-    // Si journal_master_, seul le process maitre ecrit dans le journal:
+    // If journal_master_ is set, only the master process writes to the journal:
     if (journal_master_ && !Process::je_suis_maitre())
       verbose_level_ = 0;
 
-    // Si un journal unique n'est pas active, alors desactive les journaux logs au dela d'un certain nombre de rangs MPI:
-    // Dans le cas ou l'option "-journal" est specifiee
+    // If a single journal is not enabled, disable individual logs beyond a certain number of MPI ranks.
+    // Applied when the "-journal" option is not specified.
     if (verbose_level_ < 0)
       {
         if (!journal_master_ && Process::force_single_file(Process::nproc(), nom_du_cas+".log"))
@@ -421,13 +410,13 @@ void mon_main::dowork(const Nom& nom_du_cas)
     }
 
   //---------------------------------------------//
-  // Chargement des modules : //
-  // on ne les charges que pour le cas nul, pour verifier avec valgrind
+  // Module loading:
+  // only loaded for the "nul" case, for valgrind verification
   if (Objet_U::nom_du_cas()=="nul")
     {
-      Cerr<<"Chargement des modules:"<<finl;
+      Cerr<<"Loading modules:"<<finl;
 #include <instancie_appel_c.h>
-      Cerr<<"Fin chargement des modules "<<finl;
+      Cerr<<"Finished loading modules "<<finl;
     }
 
   // initializing communicators on node
@@ -464,12 +453,12 @@ void mon_main::dowork(const Nom& nom_du_cas)
 
   info_atelier(Cout);
   Cout<<" " << finl;
-  Cout<<"  Vous traitez le cas " << Objet_U::nom_du_cas() << "\n";
+  Cout<<"  Processing case: " << Objet_U::nom_du_cas() << "\n";
   Cout<<" " << finl;
 
-  // GF on ecrit la hierarchie que si on a un erreur
+  // GF: the class hierarchy is written only on error
   //---------------------------------------------//
-  Cerr<<"Debut de l'execution " << finl;
+  Cerr<<"Beginning execution" << finl;
   {
     Nom nomentree = nom_du_cas;
     nomentree+=".data";
@@ -480,15 +469,15 @@ void mon_main::dowork(const Nom& nom_du_cas)
         SFichier es("convert_jdd");
       }
     #endif */
-    // La verfication est faite maintenant dans LecFicDiffuse_JDD
-    // mias je garde les lignes au cas ou
+    // Verification is now done in LecFicDiffuse_JDD;
+    // keeping these lines just in case
     if (0)
       {
         Cerr << "MAIN: Checking data file for matching { and }" << finl;
         {
           LecFicDiffuse_JDD verifie_entree(nomentree, ios::in);
           interprete_principal_.interpreter_bloc(verifie_entree,
-                                                 Interprete_bloc::FIN /* on attend FIN a la fin */,
+                                                 Interprete_bloc::FIN /* wait for FIN at the end */,
                                                  1 /* verifie_sans_interpreter */);
         }
       }
@@ -497,8 +486,8 @@ void mon_main::dowork(const Nom& nom_du_cas)
       LecFicDiffuse_JDD lit_entree(nomentree, ios::in);
       lit_entree.set_check_types(1);
       interprete_principal_.interpreter_bloc(lit_entree,
-                                             Interprete_bloc::FIN /* on attend FIN a la fin */,
-                                             0 /* interprete pour de vrai */);
+                                             Interprete_bloc::FIN /* wait for FIN at the end */,
+                                             0 /* truly interpret */);
     }
   }
 
@@ -528,15 +517,15 @@ void mon_main::dowork(const Nom& nom_du_cas)
 
 mon_main::~mon_main()
 {
-  // On peut arreter le journal apres les communications:
+  // The journal can be stopped after communications:
   // EDIT 12/02/2020: journal needs communication to be turned on if it's written in HDF5 format
   Process::Journal() << "End of Journal logging" << finl;
   end_journal(verbose_level_);
-  // Destruction de l'interprete principal avant d'arreter le parallele
+  // Destroy the main interpreter before stopping the parallel layer
   interprete_principal_.vide();
   // PetscFinalize/MPI_Finalize
   finalize();
-  // on peut arreter maintenant que l'on a arrete les journaux
+  // Can now finalize now that journals have been stopped
   PE_Groups::finalize();
   groupe_trio_.detach();
   node_group_.detach();
