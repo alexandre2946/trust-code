@@ -43,85 +43,49 @@ echo "Usage: ./`basename $0` [visit | plugins | check]"
 [ "$1" = "" ] && exit -1
 what=$1
 parallel=""
-new=1
-# PL: Migration progressive avec les nouvelles machines vers une procedure plus propre a partir de VisIt 3.1.1
-# Ajouter les OS uniquement si l'ancienne procedure avec VisIt 2.12.1 ne marche pas:
-[ "`grep 'Debian GNU/Linux [7-8]'  				/etc/issue.net 2>/dev/null`" != "" ]		&& new=0
-[ "`grep 'Ubuntu 1[4-7]' 					/etc/issue 2>/dev/null`" != "" ]		&& new=0
-[ "`grep 'Fedora release 2[0-5]' 				/etc/fedora-release 2>/dev/null`" != "" ]	&& new=0
-if [ "${TRUST_VERSION_GNU#4}" != "$TRUST_VERSION_GNU" ] # Normalement avec GNU 6.5.0, Visit 3.1.1 se construit sur Centos (ex: altair)
+
+build=build_new.sh
+version=3_3_3
+version_extp=$version
+export HTTPS="https://github.com/visit-dav/visit/releases/download"
+[ "$MPI_ROOT" != "" ] && parallel="parallel"
+# See https://visit-dav.github.io/visit-website/releases-as-tables/#latest
+[ "`grep 'Ubuntu 20'    /etc/issue 2>/dev/null`" != "" ]                     && os=ubuntu20 && version=3_1_2
+[ "`grep 'Ubuntu 21'    /etc/issue 2>/dev/null`" != "" ]                     && os=ubuntu21 && version=3_2_1
+# En attente de Ubuntu 22 officielle (see https://github.com/visit-dav/visit/discussions/18019#discussioncomment-3478214)
+# Sur Ubuntu 22, je rebascule sur 3_3_2 car fonctionne mieux sur les nouveaux portables que la 3_3_3
+[ "`grep 'Ubuntu 22'    /etc/issue 2>/dev/null`" != "" ]                     && os=ubuntu20 && version=3_3_2
+[ "`grep 'Ubuntu 24'    /etc/issue 2>/dev/null`" != "" ]                     && os=ubuntu20 && version=3_3_2
+[ "`grep 'Ubuntu 26'    /etc/issue 2>/dev/null`" != "" ]                     && os=ubuntu22 && version=3_5_0  # Ubuntu20 v3.3.2 OK, mais pb de processus lances par visit pas tues
+[ "`grep 'Debian GNU/Linux 10' /etc/issue.net 2>/dev/null`" != "" ]          && os=debian10 && version=3_1_3
+[ "`grep 'Debian GNU/Linux 11' /etc/issue.net 2>/dev/null`" != "" ]          && os=debian11 && version=3_3_3
+[ "`grep 'Debian GNU/Linux 12' /etc/issue.net 2>/dev/null`" != "" ]          && os=debian11 && version=3_3_3
+[ "`grep 'Debian GNU/Linux 13' /etc/issue.net 2>/dev/null`" != "" ]  	&& os=debian12 && version=3_4_2  && TRUST_DOWNLOAD_VISIT=1 # Binaire marche meme avec OpenMPI 5.0.5
+[ "`grep 'Debian GNU/Linux forky/sid' /etc/issue.net 2>/dev/null`" != "" ] 	&& os=debian12 && version=3_5_0
+[ "`grep 'CentOS Linux release 8' /etc/centos-release 2>/dev/null`" != "" ] 	&& os=centos8 && version=3_1_1
+[ "`grep 'Rocky Linux release 8' /etc/centos-release 2>/dev/null`" != "" ]   && os=centos8 && version=3_1_1
+[ "`grep 'Rocky Linux 9' /etc/os-release 2>/dev/null`" != "" ]   		&& os=rocky9 && version=3_4_2
+[ "`grep 'Rocky Linux 10' /etc/os-release 2>/dev/null`" != "" ] 		&& os=fedora40 && version=3_4_2  # Binaire fonctionne sur rocky 10 en attendant version officielle
+[ "`grep 'Red Hat Enterprise Linux 10' /etc/os-release 2>/dev/null`" != "" ] && os=fedora40 && version=3_4_2  # Binaire fonctionne sur redhat 10 en attendant version officielle
+[ "`grep 'Fedora release 3[0-1]' /etc/fedora-release 2>/dev/null`" != "" ]   && os=fedora27 && version=3_1_1
+[ "`grep 'Fedora release 3[2-4]' /etc/fedora-release 2>/dev/null`" != "" ]   && os=fedora31 && version=3_4_1 && TRUST_DOWNLOAD_VISIT=1 # Binaire marche meme avec OpenMPI 4.1.6
+[ "`grep 'Fedora release 3[6-8]' /etc/fedora-release 2>/dev/null`" != "" ]   && os=fedora31 && version=3_4_1
+[ "`grep 'Fedora release 4[0-4]' /etc/fedora-release 2>/dev/null`" != "" ]   && os=fedora40 && version=3_4_2
+[ `uname -s` = Darwin ]                                                      && os=arm64 && version=3_3_1
+# A partir de 1.8.4, on essaie de prendre sur PC+MPICH le binaire precompile avec MPICH:
+if [ "$TRUST_WITHOUT_HOST" = 1 ]
 then
-   # GNU 4.x, on construit l'ancien VisIt:
-   [ "`grep 'CentOS Linux release [6-7]' 			/etc/centos-release 2>/dev/null`" != "" ]	&& new=0
-   [ "`grep 'CentOS release [6-7]' 				/etc/centos-release 2>/dev/null`" != "" ]	&& new=0
+   [ "$os" != "" ] && [ ${MPI_ROOT%/mpich} != $MPI_ROOT ] && TRUST_DOWNLOAD_VISIT=1
 fi
-[ "`grep 'Red Hat Enterprise Linux Server release [6-7]' 	/etc/redhat-release 2>/dev/null`" != "" ]	&& new=0
-[ "`grep 'Scientific Linux release 6'				/etc/issue.net 2>/dev/null`" != "" ]		&& new=0 # gutta aar
-
-if [ "$new" = 1 ]
+if [ `uname -s` = Darwin ]
 then
-   # Nouvelle procedure
-   build=build_new.sh
-   version=3_3_3
-   version_extp=$version
-   export HTTPS="https://github.com/visit-dav/visit/releases/download"
-   [ "$MPI_ROOT" != "" ] && parallel="parallel"
-   # See https://visit-dav.github.io/visit-website/releases-as-tables/#latest
-   [ "`grep 'Ubuntu 16.04' /etc/issue 2>/dev/null`" != "" ]                     && os=ubuntu16 && version=3_1_1
-   [ "`grep 'Ubuntu 18.04' /etc/issue 2>/dev/null`" != "" ]                     && os=ubuntu18 && version=3_1_1
-   [ "`grep 'Ubuntu 19'    /etc/issue 2>/dev/null`" != "" ]                     && os=ubuntu19 && version=3_1_1
-   [ "`grep 'Ubuntu 20'    /etc/issue 2>/dev/null`" != "" ]                     && os=ubuntu20 && version=3_1_2
-   [ "`grep 'Ubuntu 21'    /etc/issue 2>/dev/null`" != "" ]                     && os=ubuntu21 && version=3_2_1
-   # En attente de Ubuntu 22 officielle (see https://github.com/visit-dav/visit/discussions/18019#discussioncomment-3478214)
-   # Sur Ubuntu 22, je rebascule sur 3_3_2 car fonctionne mieux sur les nouveaux portables que la 3_3_3
-   [ "`grep 'Ubuntu 22'    /etc/issue 2>/dev/null`" != "" ]                     && os=ubuntu20 && version=3_3_2
-   [ "`grep 'Ubuntu 24'    /etc/issue 2>/dev/null`" != "" ]                     && os=ubuntu20 && version=3_3_2
-   [ "`grep 'Ubuntu 26'    /etc/issue 2>/dev/null`" != "" ]                     && os=ubuntu22 && version=3_5_0  # Ubuntu20 v3.3.2 OK, mais pb de processus lances par visit pas tues
-   [ "`grep 'Debian GNU/Linux 9'  /etc/issue.net 2>/dev/null`" != "" ]          && os=debian9 && version=3_1_1
-   [ "`grep 'Debian GNU/Linux 10' /etc/issue.net 2>/dev/null`" != "" ]          && os=debian10 && version=3_1_3
-   [ "`grep 'Debian GNU/Linux 11' /etc/issue.net 2>/dev/null`" != "" ]          && os=debian11 && version=3_3_3
-   [ "`grep 'Debian GNU/Linux 12' /etc/issue.net 2>/dev/null`" != "" ]          && os=debian11 && version=3_3_3
-   [ "`grep 'Debian GNU/Linux 13' /etc/issue.net 2>/dev/null`" != "" ]  	&& os=debian12 && version=3_4_2  && TRUST_DOWNLOAD_VISIT=1 # Binaire marche meme avec OpenMPI 5.0.5
-   [ "`grep 'Debian GNU/Linux forky/sid' /etc/issue.net 2>/dev/null`" != "" ] 	&& os=debian12 && version=3_5_0
-   [ "`grep 'CentOS Linux release 8' /etc/centos-release 2>/dev/null`" != "" ] 	&& os=centos8 && version=3_1_1
-   [ "`grep 'Rocky Linux release 8' /etc/centos-release 2>/dev/null`" != "" ]   && os=centos8 && version=3_1_1
-   [ "`grep 'Rocky Linux 9' /etc/os-release 2>/dev/null`" != "" ]   		&& os=rocky9 && version=3_4_2
-   [ "`grep 'Rocky Linux 10' /etc/os-release 2>/dev/null`" != "" ] 		&& os=fedora40 && version=3_4_2  # Binaire fonctionne sur rocky 10 en attendant version officielle
-   [ "`grep 'Red Hat Enterprise Linux 10' /etc/os-release 2>/dev/null`" != "" ] && os=fedora40 && version=3_4_2  # Binaire fonctionne sur redhat 10 en attendant version officielle
-   [ "`grep 'Fedora release 2[6-9]' /etc/fedora-release 2>/dev/null`" != "" ]   && os=fedora27 && version=3_1_1
-   [ "`grep 'Fedora release 3[0-1]' /etc/fedora-release 2>/dev/null`" != "" ]   && os=fedora27 && version=3_1_1
-   [ "`grep 'Fedora release 3[2-4]' /etc/fedora-release 2>/dev/null`" != "" ]   && os=fedora31 && version=3_4_1 && TRUST_DOWNLOAD_VISIT=1 # Binaire marche meme avec OpenMPI 4.1.6
-   [ "`grep 'Fedora release 3[6-8]' /etc/fedora-release 2>/dev/null`" != "" ]   && os=fedora31 && version=3_4_1
-   [ "`grep 'Fedora release 4[0-3]' /etc/fedora-release 2>/dev/null`" != "" ]   && os=fedora40 && version=3_4_2
-   [ `uname -s` = Darwin ]                                                      && os=arm64 && version=3_3_1
-   # A partir de 1.8.4, on essaie de prendre sur PC+MPICH le binaire precompile avec MPICH:   
-   if [ "$TRUST_WITHOUT_HOST" = 1 ]
-   then
-      [ "$os" != "" ] && [ ${MPI_ROOT%/mpich} != $MPI_ROOT ] && TRUST_DOWNLOAD_VISIT=1
-   fi
-   if [ `uname -s` = Darwin ]
-   then
-      version_visit=v`echo $version | $TRUST_Awk '{gsub("_",".",$1);print $1}'`
-   else
-      # in the case where we do not download visit, build VisIt 3.3.3 sources since avail in externalpackages
-      [ "$TRUST_DOWNLOAD_VISIT" != "1" ] && version=3_3_3
-      
-      version_visit=v`echo $version | $TRUST_Awk '{gsub("_",".",$1);print $1}'`
-   fi
-
+   version_visit=v`echo $version | $TRUST_Awk '{gsub("_",".",$1);print $1}'`
 else
-   # Ancienne procedure, peu a peu obsolete
-   build=build.sh
-   version=2_12_1
-   version_extp=$version
-   # suppression de python/conda du path :
-   OLDPATH_=$PATH
-   NEWPATH_=`echo $PATH | sed "s/exec\/python\/bin/exec/g"`
-   export PATH=$NEWPATH_
-   export HTTPS="http://portal.nersc.gov/project/visit/releases https://wci.llnl.gov/simulation/computer-codes/visit/executables http://visit.ilight.com/svn/visit/trunk/releases"
-   version_visit=`echo $version | $TRUST_Awk '{gsub("_",".",$1);print $1}'`
-   [ "$MPI_ROOT" != "" ] && parallel="parallel"
-fi   
+   # in the case where we do not download visit, build VisIt 3.3.3 sources since avail in externalpackages
+   [ "$TRUST_DOWNLOAD_VISIT" != "1" ] && version=3_3_3
+
+   version_visit=v`echo $version | $TRUST_Awk '{gsub("_",".",$1);print $1}'`
+fi
 
 echo $version $what $version_visit
 
@@ -244,24 +208,16 @@ then
    ###############################################
    # Build plugins if the VisIt version is built #
    ###############################################
-   # Essai de construire les plugins sur une version telechargee recente de VisIt
-   if [ "$TRUST_DOWNLOAD_VISIT" != 1 ] || [ $new = 1 ]
-   then
-      for plugin in `ls plugins/*/build_plugin 2>/dev/null`
-      do
-	 rep=`dirname $plugin`
-	 cd $rep 1>/dev/null 2>&1
-	 echo "#########################################"
-	 echo "# Building `basename $rep` plugin:"
-	 ./build_plugin || exit -1
-	 cd - 1>/dev/null 2>&1
-	 echo "#########################################" 
-      done
-   else
-      echo "##########################################################################################"
-      echo "Plugins not built cause VisIt version has not been rebuilt on the platform but downloaded."
-      echo "##########################################################################################"
-   fi   
+   for plugin in `ls plugins/*/build_plugin 2>/dev/null`
+   do
+     rep=`dirname $plugin`
+     cd $rep 1>/dev/null 2>&1
+     echo "#########################################"
+     echo "# Building `basename $rep` plugin:"
+     ./build_plugin || exit -1
+     cd - 1>/dev/null 2>&1
+     echo "#########################################"
+   done
      
 elif [ $what = check ]
 then

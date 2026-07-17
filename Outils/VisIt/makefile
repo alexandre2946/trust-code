@@ -18,7 +18,7 @@ $(plugins): ./plugins/Sondes/build_plugin ./plugins/lata/build_plugin plugins/tr
 	./install plugins
 	make $(check)
 
-$(cible): ./makefile ./install ./src/build.sh ./src/build_new.sh $(MPI_INCLUDE)/mpi.h
+$(cible): ./makefile ./install ./src/build_new.sh $(MPI_INCLUDE)/mpi.h
 	make clean
 	./install visit
 
@@ -28,4 +28,3 @@ $(check): *.xml install customlauncher $(TRUST_ROOT)/RELEASE_NOTES
 
 clean:
 	rm -r -f $(install) $(TRUST_ROOT)/build/Outils/VisIt src/*.help 
-	(cd src; ./build.sh clean)
