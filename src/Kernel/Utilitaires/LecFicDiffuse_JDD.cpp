@@ -22,6 +22,7 @@
 Implemente_instanciable_sans_constructeur(LecFicDiffuse_JDD,"LecFicDiffuse_JDD",Lec_Diffuse_base);
 
 bool LecFicDiffuse_JDD::apply_verif = true;
+
 Entree& LecFicDiffuse_JDD::readOn(Entree& s)
 {
   throw;
@@ -32,19 +33,25 @@ Sortie& LecFicDiffuse_JDD::printOn(Sortie& s) const
   throw;
 }
 
-LecFicDiffuse_JDD::LecFicDiffuse_JDD()
+LecFicDiffuse_JDD::LecFicDiffuse_JDD() :
+  Lec_Diffuse_base(),
+  apply_verif(true)
 {
+  set_error_action(ERROR_CONTINUE);
 }
 
-/*! @brief Opens file name.
+/*! @brief ouverture du fichier name.
  *
- * This method must be called on all processors. On failure: exit().
+ * Cette methode doit etre appelee sur tous les processeurs. En cas
+ *   d'echec : exit()
  *
  */
 LecFicDiffuse_JDD::LecFicDiffuse_JDD(const char* name,
-                                     IOS_OPEN_MODE mode)
+                                     IOS_OPEN_MODE mode_): Lec_Diffuse_base()
 {
-  int ok = ouvrir(name, mode);
+
+  //file_.set_error_action(ERROR_CONTINUE);
+  int ok = ouvrir(name, mode_);
   if (!ok && Process::je_suis_maitre())
     {
       Cerr << "File " << name << " does not exist (LecFicDiffuse_JDD)" << finl;
@@ -53,14 +60,14 @@ LecFicDiffuse_JDD::LecFicDiffuse_JDD(const char* name,
 }
 
 
-/*! @brief Opens the file.
+/*! @brief Ouverture du fichier.
  *
- * This method must be called by all processors in the group.
- *  Return value: 1 if ok, 0 otherwise.
+ * Cette methode doit etre appelee par tous les processeurs du groupe.
+ *  Valeur de retour: 1 si ok, 0 sinon
  *
  */
 int LecFicDiffuse_JDD::ouvrir(const char* name,
-                              IOS_OPEN_MODE mode)
+                              IOS_OPEN_MODE mode_)
 {
   int ok = 0;
   if(Process::je_suis_maitre())
@@ -69,7 +76,7 @@ int LecFicDiffuse_JDD::ouvrir(const char* name,
       bool fin_lu = false;
       Motcle fin("fin|end");
       EFichier file_;
-      ok = file_.ouvrir(name, mode);
+      ok = file_.ouvrir(name, mode_);
       if (!ok )
         {
           Cerr << "File " << name << " does not exist (LecFicDiffuse_JDD)" << finl;
@@ -104,7 +111,7 @@ int LecFicDiffuse_JDD::ouvrir(const char* name,
               if (motlu=="#")
                 {
                   // Cerr<<" on passe les commentaires"<<finl;
-                  comments += std::string("[") + std::string(name) + "] : Comments bloc starts at line " + std::to_string(line)+ " ";
+                  comments += "[" + std::string(name) + "] : Comments bloc starts at line " + std::to_string(line)+ " ";
                   int jol = file_.jumpOfLines();
                   for(int jump=0; jump<jol; jump++)
                     prov <<"\n";
@@ -136,7 +143,7 @@ int LecFicDiffuse_JDD::ouvrir(const char* name,
                 {
                   // Cerr<<" on passe le bloc de commentaires"<<finl;
                   int ouvrante=1;
-                  comments += std::string("[") + std::string(name) + "] : Comments bloc starts at line " + std::to_string(line) + " ";
+                  comments += "[" + std::string(name) + "] : Comments bloc starts at line " + std::to_string(line) + " ";
                   while (ouvrante!=0)
                     {
                       int jol = file_.jumpOfLines();
@@ -167,8 +174,8 @@ int LecFicDiffuse_JDD::ouvrir(const char* name,
                   Process::exit(msg);
                 }
 
-              /* GF do not re-enable this code block as it complicates
-                 the translation of data sets to Python
+              /* GF ne pas reactiver ce morceau de code car cela
+                 est complique pour la traduction des jdd en python
                  else if (motlu=="##")
                  {
 
@@ -195,7 +202,6 @@ int LecFicDiffuse_JDD::ouvrir(const char* name,
                     petsc_format = true;
                 }
               file_>>motlu;
-
             }
         }
       if (fin_lu)
@@ -214,6 +220,8 @@ int LecFicDiffuse_JDD::ouvrir(const char* name,
 
       Process::Journal()<<"JDD interpreted: "<<finl<<prov.get_str()<<finl<<finl;
     }
+  attach(chaine_.get_istream());
+
   envoyer_broadcast(ok, 0);
   return ok;
 }

@@ -20,16 +20,16 @@
 #include <communications.h>
 #include <EFichier.h>
 
-/*! @brief Base class for diffused inputs: the master processor reads data from get_entree_master() and broadcasts it
+/*! @brief Classe de base des entrees diffusees: le processeur maitre lit les donnees dans la classe get_entree_master() et les diffuse
  *
- *    to all processors.
- *    Warning: the methods operator>>(), get(), eof(), good() and bad()
- *    must be called simultaneously on all processors.
- *    Derived classes must reimplement get_entree_master().
- *    The get_entree_master() method must return a reference to the input
- *    that serves as source on the master processor; it is never called
- *    on other processors.
- *    Warning: the source input must have set_error_action(ERROR_CONTINUE).
+ *    sur tous les processeurs.
+ *    Attention, les methodes operator>>(), get(), eof(), good() et bad()
+ *    doivent etre appelees simultanement sur tous les processeurs.
+ *    Les classes derivees doivent reimplementer get_entree_master().
+ *    La methode get_entree_master() doit renvoyer une reference a l'entree
+ *    qui sert de source sur le processeur maitre, elle n'est jamais appellee
+ *    sur les autres processeurs.
+ *    Attention: l'entree source doit avoir set_error_action(ERROR_CONTINUE)
  *
  */
 
@@ -38,93 +38,30 @@ class Lec_Diffuse_base: public EFichier
 {
   Declare_base_sans_constructeur(Lec_Diffuse_base);
 public:
-  using Entree::operator>>;
-
-  Entree& operator>>(int& ob) override;
-  Entree& operator>>(long& ob) override;
-  Entree& operator>>(long long& ob) override;
-  Entree& operator>>(float& ob) override;
-  Entree& operator>>(double& ob) override;
-
-  int get(int *ob, std::streamsize n) override;
-  int get(long *ob, std::streamsize n) override;
-  int get(long long *ob, std::streamsize n) override;
-  int get(float *ob, std::streamsize n) override;
-  int get(double *ob, std::streamsize n) override;
-  int get(char *buf, std::streamsize bufsize) override;
-
-  int eof() override;
-  int good() override;
-  int fail() override;
-
-  void set_bin(bool bin) override;
-  void set_check_types(bool flag) override;
-
-  void set_diffuse(bool diffuse) override;
+  using EFichier::operator>>;
 
 protected:
   Lec_Diffuse_base();
-  Lec_Diffuse_base(const Lec_Diffuse_base&) = default;
+  //Lec_Diffuse_base(const Lec_Diffuse_base&) = default;
   Lec_Diffuse_base& operator=(const Lec_Diffuse_base&);
   virtual Entree& get_entree_master() = 0;
 
+
+  virtual void set_diffuse(bool value) override {
+  	this->diffuse_ = value;
+
+	if (Process::je_suis_maitre())
+		set_diffusion(value);
+  } // to temporary disable it
+
+
+    	#pragma GCC diagnostic push
+    	#pragma GCC diagnostic ignored "-Wextra"
+		Lec_Diffuse_base(const Lec_Diffuse_base& other): EFichier(dynamic_cast<const EFichier&>(other)) {}
+		Lec_Diffuse_base(Lec_Diffuse_base& other): EFichier(dynamic_cast<EFichier&>(other)) {}
+    	#pragma GCC diagnostic pop
+
 private:
-  template <typename _TYPE_>
-  int get_template(_TYPE_ *ob, std::streamsize n);
-
-  template <typename _TYPE_>
-  Entree& operator_template(_TYPE_&ob);
 };
-
-template <typename _TYPE_>
-int Lec_Diffuse_base::get_template(_TYPE_ *ob, std::streamsize n)
-{
-  int ok = 0;
-  if (Process::je_suis_maitre())
-    {
-      Entree& is = get_entree_master();
-      assert(is.get_error_action() == ERROR_CONTINUE);
-      ok = is.get(ob, n);
-    }
-  else if (!diffuse_)
-    {
-      Cerr << "Lec_Diffuse_base::get(...) can't be used with diffuse_=0 on non master process." << finl;
-      Process::exit();
-    }
-  if (diffuse_)
-    {
-      envoyer_broadcast(ok, 0);
-      assert(n < std::numeric_limits<int>::max());
-      if (ok)
-        envoyer_broadcast_array(ob, (int)n, 0);
-    }
-  return error_handle(!ok);
-}
-
-template <typename _TYPE_>
-Entree& Lec_Diffuse_base::operator_template(_TYPE_& ob)
-{
-  int ok = 0;
-  if (Process::je_suis_maitre())
-    {
-      Entree& is = get_entree_master();
-      assert(is.get_error_action() == ERROR_CONTINUE);
-      is >> ob;
-      ok = is.good();
-    }
-  else if (!diffuse_)
-    {
-      Cerr << "Lec_Diffuse_base::operator>> can't be used with diffuse_=0 on non master process." << finl;
-      Process::exit();
-    }
-  if (diffuse_)
-    {
-      envoyer_broadcast(ok, 0);
-      if (ok)
-        envoyer_broadcast(ob, 0);
-    }
-  error_handle(!ok);
-  return *this;
-}
 
 #endif

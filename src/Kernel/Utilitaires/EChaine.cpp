@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -35,6 +35,6 @@ void EChaine::init(const char *str)
   if (istrstream_)
     delete istrstream_;
   istrstream_ = new istringstream(str);  // a copy of str is taken
-  set_istream(istrstream_);
+  attach(*istrstream_);
 }
 

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -39,11 +39,24 @@ public:
   {
     set_bin(1);
   };
-  LecFicDiffuseBin(const char* name,IOS_OPEN_MODE mode=ios::in)
+  LecFicDiffuseBin(const char* name,IOS_OPEN_MODE mode_=ios::in)
   {
     set_bin(1);
-    ouvrir(name,mode);
+    ouvrir(name,mode_);
   };
+
+  int ouvrir(const char* name, IOS_OPEN_MODE mode_=ios::in) override
+  {
+    set_bin(1);
+    return LecFicDiffuse::ouvrir(name,mode_);
+  };
+
+
+    	#pragma GCC diagnostic push
+    	#pragma GCC diagnostic ignored "-Wextra"
+		LecFicDiffuseBin(const LecFicDiffuseBin& other): LecFicDiffuse(dynamic_cast<const LecFicDiffuse&>(other)) {}
+		LecFicDiffuseBin(LecFicDiffuseBin& other): LecFicDiffuse(dynamic_cast<LecFicDiffuse&>(other)) {}
+    	#pragma GCC diagnostic pop
 };
 
 #endif

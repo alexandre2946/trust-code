@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -21,29 +21,36 @@
 
 class Objet_U;
 
-/*! @brief Reading from a file in binary format.
+/*! @brief Lecture dans un fichier au format binaire.
  *
- * This class implements the operators and virtual methods of the EFichier class as follows:
- *     There are as many files as there are processes, physically located on the disk of the machine hosting the master task of the Trio-U application (the process of rank 0 in the "tous" group).
- *     The master process reads one item at a time from each file and sends it to the corresponding process.
- *     The same applies to the methods for inspecting the state of a file.
+ * Cette classe implemente les operateurs et les methodes virtuelles de la classe EFichier de la facon suivante :
+ *     Il y a autant de fichiers que de processus, physiquement localises sur le disque de la machine hebergeant la tache maitre de l'applicatin Trio-U (le processus de rang 0 dans le groupe "tous").
+ *     Le processus maitre lit tour a tour un item dans chacun des fichiers et l'envoie au processus correspondant.
+ *     Il en est de meme pour les methodes d'inspection de l'etat d'un fichier.
  *
  */
 
 class LecFicDistribueBin : public LecFicDistribue
 {
   Declare_instanciable_sans_constructeur(LecFicDistribueBin);
-  // the master reads the file and propagates the information
+  // le maitre lit le fichier et propage l'information
 public:
   LecFicDistribueBin()
   {
     set_bin(1);
   };
-  LecFicDistribueBin(const char* name,IOS_OPEN_MODE mode=ios::in)
+  LecFicDistribueBin(const char* name,IOS_OPEN_MODE mode_=ios::in)
   {
     set_bin(1);
-    ouvrir(name,mode);
+    ouvrir(name,mode_);
   };
+
+
+    	#pragma GCC diagnostic push
+    	#pragma GCC diagnostic ignored "-Wextra"
+		LecFicDistribueBin(const LecFicDistribueBin& other): LecFicDistribue(dynamic_cast<const LecFicDistribue&>(other)) {}
+		LecFicDistribueBin(LecFicDistribueBin& other): LecFicDistribue(dynamic_cast<LecFicDistribue&>(other)) {}
+    	#pragma GCC diagnostic pop
 };
 
 #endif

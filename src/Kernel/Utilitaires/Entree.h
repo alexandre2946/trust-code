@@ -80,7 +80,7 @@ class Entree: virtual public Input {
 class Nom;
 int is_a_binary_file(Nom&);
 
-void convert_to(const char *s, True_int& ob);
+void convert_to(const char *s, int& ob);
 void convert_to(const char *s, long& ob);
 void convert_to(const char *s, long long& ob);
 void convert_to(const char *s, float& ob);

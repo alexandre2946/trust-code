@@ -16,6 +16,9 @@
 #ifndef EChaineJDD_included
 #define EChaineJDD_included
 
+#include <cassert>
+
+#include <arch.h>
 #include <Entree.h>
 #include <sstream>
 using std::istringstream;
@@ -34,11 +37,18 @@ public:
   ~EChaineJDD() override;
   void init(const char *str);
 
+
+    	#pragma GCC diagnostic push
+    	#pragma GCC diagnostic ignored "-Wextra"
+		EChaineJDD(const EChaineJDD& other): Input(dynamic_cast<const Input&>(other)) {}
+		EChaineJDD(EChaineJDD& other): Input(dynamic_cast<Input&>(other)) {}
+    	#pragma GCC diagnostic pop
+
   using Entree::operator>>;
   using Entree::get;
-  Entree& operator>>(int& ob) override;
-  Entree& operator>>(double& ob) override;
-  int get(char *ob, std::streamsize bufsize) override;
+  //Entree& operator>>(True_int& ob) override;
+  //Entree& operator>>(double& ob) override;
+  //int get(char *ob, std::streamsize bufsize) override;
 
   void set_track_lines(bool b) { track_lines_ = b ;}
 

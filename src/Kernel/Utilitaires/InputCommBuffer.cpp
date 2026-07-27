@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -20,7 +20,7 @@
 InputCommBuffer::InputCommBuffer()
 {
   set_error_action(ERROR_CONTINUE);
-  bin_ = 1;
+  set_bin(true);
   // Communication buffer should never try to convert int into long:
   avoid_conversion_ = true;
   memorysize_ = 16;

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -29,21 +29,22 @@ Sortie& LecFicDiffuse::printOn(Sortie& s) const
 }
 
 // LecFicDiffuse::LecFicDiffuse():EFichier()
-LecFicDiffuse::LecFicDiffuse()
+LecFicDiffuse::LecFicDiffuse(): Lec_Diffuse_base()
 {
-  file_.set_error_action(ERROR_CONTINUE);
+  set_error_action(ERROR_CONTINUE);
 }
 
-/*! @brief Opens file name.
+/*! @brief ouverture du fichier name.
  *
- * This method must be called on all processors. On failure: exit().
+ * Cette methode doit etre appelee sur tous les processeurs. En cas
+ *   d'echec : exit()
  *
  */
 LecFicDiffuse::LecFicDiffuse(const char* name,
-                             IOS_OPEN_MODE mode)
+                             IOS_OPEN_MODE mode_): Lec_Diffuse_base()
 {
-  file_.set_error_action(ERROR_CONTINUE);
-  int ok = ouvrir(name, mode);
+  set_error_action(ERROR_CONTINUE);
+  int ok = ouvrir(name, mode_);
   if (!ok && Process::je_suis_maitre())
     {
       Cerr << "File " << name << " does not exist (LecFicDiffuse)" << finl;
@@ -51,44 +52,89 @@ LecFicDiffuse::LecFicDiffuse(const char* name,
     }
 }
 
-/*! @brief Opens the file.
+/*! @brief Ouverture du fichier.
  *
- * This method must be called by all processors in the group.
- *  Return value: 1 if ok, 0 otherwise.
+ * Cette methode doit etre appelee par tous les processeurs du groupe.
+ *  Valeur de retour: 1 si ok, 0 sinon
  *
  */
 int LecFicDiffuse::ouvrir(const char* name,
-                          IOS_OPEN_MODE mode)
+                          IOS_OPEN_MODE mode_)
 {
   int ok = 0;
-  if(Process::je_suis_maitre())
-    ok = file_.ouvrir(name, mode);
+
+{
+  int x = 2* (Process::me() == 0);
+  envoyer_broadcast(x, 0);
+  assert(x == 2);
+ }
+
+  Process::barrier();
+  Process::barrier();
+  Process::barrier();
+
+  //if(Process::je_suis_maitre()) {
+    Entree_Fichier_base::ouvrir(name, mode_);
+
+{
+  int x = 3 * (Process::me() == 0);
+  envoyer_broadcast(x, 0);
+  assert(x == 3);
+ }
+
+
+	ok = is_open();
+  //}
+
+{
+  int x = 2 * (Process::me() == 0);
+  envoyer_broadcast(x, 0);
+  assert(x == 2);
+ }
+
+  Process::barrier();
+  Process::barrier();
+  Process::barrier();
+
+{
+  int x = 1 * (Process::me() == 0);
+  envoyer_broadcast(x, 0);
+  assert(x == 1);
+ }
+
   envoyer_broadcast(ok, 0);
+
+{
+  int x = 3 * (Process::me() == 0);
+  envoyer_broadcast(x, 0);
+  assert(x == 3);
+ }
+
   return ok;
 }
 
 /*! @brief
  *
  */
-istream& LecFicDiffuse::get_istream()
+std::istream& LecFicDiffuse::get_istream()
 {
   if(!Process::je_suis_maitre())
     {
       std::cerr << "Error get_istream (LecFicDiffuse)" << std::endl;
       Process::exit();
     }
-  return file_.get_istream();
+  return Entree::get_istream();
 }
 
 /*! @brief
  *
  */
-const istream& LecFicDiffuse::get_istream() const
+const std::istream& LecFicDiffuse::get_istream() const
 {
   if(!Process::je_suis_maitre())
     {
       std::cerr << "Error get_istream (LecFicDiffuse)" << std::endl;
       Process::exit();
     }
-  return file_.get_istream();
+  return get_istream();
 }

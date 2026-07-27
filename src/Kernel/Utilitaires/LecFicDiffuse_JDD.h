@@ -21,28 +21,38 @@
 
 class Objet_U;
 
-/*! @brief This class implements the operators and virtual methods of the EFichier class as follows: The file to read is physically located on the disk of the machine hosting the master task of the Trio-U application (the process of rank 0 in the "tous" group),
+/*! @brief Cette classe implemente les operateurs et les methodes virtuelles de la classe EFichier de la facon suivante : Le fichier a lire est physiquement localise sur le disque de la machine hebergeant la tache maitre de l'application Trio-U (le processus de rang 0 dans le groupe "tous")
  *
- *     and each item read from this file is broadcast to all other processes in the group.
- *     The same applies to the methods for inspecting the state of a file.
+ *     et chaque item lu dans ce fichier est diffuse a tous les autres processus du groupe tous.
+ *     Il en est de meme pour les methodes d'inspection de l'etat d'un fichier.
  *
  */
 
 class LecFicDiffuse_JDD : public Lec_Diffuse_base
 {
   Declare_instanciable_sans_constructeur(LecFicDiffuse_JDD);
-  // the master reads the file and propagates the information
+  // le maitre lit le fichier et propage l'information
 public:
   LecFicDiffuse_JDD();
-  LecFicDiffuse_JDD(const char* name, IOS_OPEN_MODE mode=ios::in);
-  int ouvrir(const char* name, IOS_OPEN_MODE mode=ios::in ) override;
+  LecFicDiffuse_JDD(const char* name, IOS_OPEN_MODE mode_=ios::in, bool apply_verification=true);
+  int ouvrir(const char* name, IOS_OPEN_MODE mode_=ios::in ) override;
   Entree& get_entree_master() override;
   void track_lines(bool b) { chaine_.set_track_lines(b); }
 
-  ///! whether obsolete keywords should be checked or not. True by default.
+  using Lec_Diffuse_base::operator>>;
+
+
+    	#pragma GCC diagnostic push
+    	#pragma GCC diagnostic ignored "-Wextra"
+		LecFicDiffuse_JDD(const LecFicDiffuse_JDD& other): Lec_Diffuse_base(dynamic_cast<const Lec_Diffuse_base&>(other)) {}
+		LecFicDiffuse_JDD(LecFicDiffuse_JDD& other): Lec_Diffuse_base(dynamic_cast<Lec_Diffuse_base&>(other)) {}
+    	#pragma GCC diagnostic pop
+
   static bool apply_verif;
 
 protected:
   EChaineJDD chaine_;
+  ///! whether obsolete keywords should be checked or not. True by default.
+
 };
 #endif

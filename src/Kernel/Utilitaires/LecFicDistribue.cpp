@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -31,7 +31,7 @@ Sortie& LecFicDistribue::printOn(Sortie& s) const
 
 LecFicDistribue::LecFicDistribue(int)
 {
-  bin_=0;
+  set_bin(false);
 }
 LecFicDistribue::LecFicDistribue():EFichier()
 {}
@@ -40,28 +40,28 @@ LecFicDistribue::~LecFicDistribue()
   EFichier::close();
 }
 
-/*! @brief Constructor. Opens the file with the given mode and prot parameters.
+/*! @brief Constructeur Ouvre le fichier avec les parametres mode_ et prot donnes
  *
- *     These parameters are the parameters of the standard open method.
+ *     Ces parametres sont les parametres de la methode open standard
  *
- * @param (const char* name) file name
- * @param (int mode) parameter passed to open
- * @param (int prot) parameter passed to open
+ * @param (const char* name) nom du fichier
+ * @param (int mode_) parametre passe a open
+ * @param (int prot) parametre passe a open
  */
-LecFicDistribue::LecFicDistribue(const char* name, IOS_OPEN_MODE mode)
+LecFicDistribue::LecFicDistribue(const char* name, IOS_OPEN_MODE mode_)
 {
-  LecFicDistribue::ouvrir(name, mode);
+  LecFicDistribue::ouvrir(name, mode_);
 }
 
 
-/*! @brief Opens the file with the given mode and prot parameters. These parameters are the parameters of the standard open method.
+/*! @brief Ouvre le fichier avec les parametres mode_ et prot donnes Ces parametres sont les parametres de la methode open standard
  *
- * @param (const char* name) file name
- * @param (int mode) parameter passed to open
- * @param (int prot) parameter passed to open
+ * @param (const char* name) nom du fichier
+ * @param (int mode_) parametre passe a open
+ * @param (int prot) parametre passe a open
  * @return (Entree&) *this
  */
-int LecFicDistribue::ouvrir(const char* name, IOS_OPEN_MODE mode)
+int LecFicDistribue::ouvrir(const char* name, IOS_OPEN_MODE mode_)
 {
   Nom nom_fic(name);
   if(Process::is_parallel())
@@ -75,8 +75,8 @@ int LecFicDistribue::ouvrir(const char* name, IOS_OPEN_MODE mode)
 
   nom_fic = localisation + "/" + nom_fic;
 #endif
-
-  if (!EFichier::ouvrir((const char*)nom_fic,mode))
+  
+  if (!EFichier::ouvrir((const char*)nom_fic,mode_))
     {
       Cerr << "File " << nom_fic << " not found or could not be opened." << finl;
       return 0;

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -21,7 +21,7 @@
 #include <EntreeSortie.h>
 #include <Process.h>
 
-/*! @brief Reading from a file of objects written in binary format.
+/*! @brief Lecture dans un fichier d'objets ecrits au format binaire
  *
  * @sa SFichierBin EFichier
  */
@@ -34,17 +34,23 @@ public:
   {
     set_bin(1);
   };
-  EFichierBin(const char* name,IOS_OPEN_MODE mode=ios::in)
-  {
-    ifstream_=0;
+  EFichierBin(const char* name,IOS_OPEN_MODE mode_=ios::in) {
+  	// do not use the EFichier opener because it is limited to serial cases
     set_bin(1);
-    ouvrir(name,mode);
-    if(ifstream_->fail())
+    ouvrir(name,mode_);
+    if(fail())
       {
         Cerr << "Error while opening the file " << name << finl;
         Process::exit();
       }
-  };
+  }
+
+
+    	#pragma GCC diagnostic push
+    	#pragma GCC diagnostic ignored "-Wextra"
+		EFichierBin(const EFichierBin& other): EFichier(dynamic_cast<const EFichier&>(other)) {}
+		EFichierBin(EFichierBin& other): EFichier(dynamic_cast<EFichier&>(other)) {}
+    	#pragma GCC diagnostic pop
 };
 
 

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,19 +17,34 @@
 #define EFichier_included
 
 
+#include <arch.h>
 #include <Entree_Fichier_base.h>
+#include <Declare_Inst.h>
 
-/*! @brief File for reading. This class is to the C++ ifstream class what the Entree class is to the
+/*! @brief Fichier en lecture Cette classe est a la classe C++ ifstream ce que la classe Entree est a la
  *
- *     C++ istream class. It virtually redefines the read operators for a file.
+ *     classe C++ istream. Elle redefinit de facon virtuelle les operateurs de lecture dans un fichier.
  *
  */
 
 class EFichier : public Entree_Fichier_base
 {
+
   Declare_instanciable(EFichier);
+
 public:
-  EFichier(const char* name,IOS_OPEN_MODE mode=ios::in);
+
+  using Entree_Fichier_base::Entree_Fichier_base;
+  using Input::operator>>;
+
+  EFichier(const char* name,IOS_OPEN_MODE mode=std::ios::in);
+
+
+    	#pragma GCC diagnostic push
+    	#pragma GCC diagnostic ignored "-Wextra"
+		EFichier(const EFichier& other): Entree_Fichier_base(dynamic_cast<const Entree_Fichier_base&>(other)) {}
+		EFichier(EFichier& other): Entree_Fichier_base(dynamic_cast<Entree_Fichier_base&>(other)) {}
+    	#pragma GCC diagnostic pop
 };
 
 #endif

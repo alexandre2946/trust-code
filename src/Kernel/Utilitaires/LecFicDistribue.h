@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -22,23 +22,30 @@
 
 class Objet_U;
 
-/*! @brief This class implements the operators and virtual methods of the EFichier class as follows: there are as many files as there are processes, physically located on the disk of the machine hosting the master task of the Trio-U application (the process of rank 0 in the "all" group).
+/*! @brief Cette classe implemente les operateurs et les methodes virtuelles de la classe EFichier de la facon suivante : Il y a autant de fichiers que de processus, physiquement localises sur le disque de la machine hebergeant la tache maitre de l'applicatin Trio-U (le processus de rang 0 dans le groupe "tous").
  *
- *     The master process reads one item at a time from each file and sends it to the corresponding process.
- *     The same applies to the methods for inspecting the state of a file.
+ *     Le processus maitre lit tour a tour un item dans chacun des fichiers et l'envoie au processus correspondant.
+ *     Il en est de meme pour les methodes d'inspection de l'etat d'un fichier.
  *
  */
 
 class LecFicDistribue : public EFichier
 {
   Declare_instanciable(LecFicDistribue);
-  // the master reads the file and propagates the information
+  // le maitre lit le fichier et propage l'information
 private :
   LecFicDistribue(int);
 public:
-  LecFicDistribue(const char* name, IOS_OPEN_MODE mode=ios::in);
+  LecFicDistribue(const char* name, IOS_OPEN_MODE mode_=ios::in);
 
-  int ouvrir(const char* name, IOS_OPEN_MODE mode=ios::in) override;
+  int ouvrir(const char* name, IOS_OPEN_MODE mode_=ios::in) override;
+
+
+    	#pragma GCC diagnostic push
+    	#pragma GCC diagnostic ignored "-Wextra"
+		LecFicDistribue(const LecFicDistribue& other): EFichier(dynamic_cast<const EFichier&>(other)) {}
+		LecFicDistribue(LecFicDistribue& other): EFichier(dynamic_cast<EFichier&>(other)) {}
+    	#pragma GCC diagnostic pop
 
 
 protected:

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -19,11 +19,11 @@
 #include <Entree.h>
 #include <sstream>
 using std::istringstream;
-/*! @brief An input stream whose source is a character string.
+/*! @brief Une entree dont la source est une chaine de caracteres.
  *
- * The constructor creates its own copy of the string, so that
- *    the original string can be modified afterwards without modifying
- *    the EChaine.
+ * Le constructeur cree sa propre copie de la chaine, de sorte
+ *    que la chaine d'origine peut etre modifiee ensuite sans modifier
+ *    la EChaine.
  *
  */
 

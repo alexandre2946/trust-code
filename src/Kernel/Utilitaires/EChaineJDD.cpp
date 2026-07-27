@@ -30,17 +30,21 @@ EChaineJDD::EChaineJDD(const char* str) :
   init(str);
 }
 
-EChaineJDD::~EChaineJDD()  { }
+EChaineJDD::~EChaineJDD()  {
+	if (istrstream_)
+		delete istrstream_;
+}
 
 void EChaineJDD::init(const char *str)
 {
   if (istrstream_)
     delete istrstream_;
   istrstream_ = new istringstream(str);  // a copy of str is taken
-  set_istream(istrstream_);
+  attach(*istrstream_);
 }
 
-Entree& EChaineJDD::operator>>(int& ob) { return operator_template<int>(ob); }
+/*
+Entree& EChaineJDD::operator>>(True_int& ob) { return operator_template<True_int>(ob); }
 Entree& EChaineJDD::operator>>(double& ob) { return operator_template<double>(ob); }
 
 int EChaineJDD::get(char *ob, std::streamsize bufsize)
@@ -54,3 +58,4 @@ int EChaineJDD::get(char *ob, std::streamsize bufsize)
   int ret = Entree::get(ob,bufsize);
   return ret;
 }
+*/

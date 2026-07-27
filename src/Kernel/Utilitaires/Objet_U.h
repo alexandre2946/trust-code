@@ -75,6 +75,7 @@ public:
   virtual int    duplique()  const =0;
   virtual Sortie&   printOn(Sortie& ) const;
   virtual Entree&   readOn(Entree& ) ;
+  Input&   readOn(Input& );
   virtual unsigned  taille_memoire() const =0;
   virtual int    est_egal_a(const Objet_U&) const;
   virtual const Nom& le_nom() const;

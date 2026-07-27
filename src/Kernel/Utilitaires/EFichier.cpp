@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2023, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -13,11 +13,12 @@
 *
 *****************************************************************************/
 
+#include <Entree.h>
 #include <EFichier.h>
 
 Implemente_instanciable(EFichier,"EFichier",Entree_Fichier_base);
 
-EFichier::EFichier(const char* name,IOS_OPEN_MODE mode) :Entree_Fichier_base(name,mode)
+EFichier::EFichier(const char* name,IOS_OPEN_MODE mode_) :Entree_Fichier_base(name,mode_)
 {
   if (Process::me()>1)
     {
