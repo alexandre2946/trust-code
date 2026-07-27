@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -19,7 +19,7 @@
 
 LecFicDistribue_sansnum::LecFicDistribue_sansnum(int)
 {
-  bin_=0;
+  set_bin(false);
 }
 LecFicDistribue_sansnum::LecFicDistribue_sansnum():EFichier()
 {}

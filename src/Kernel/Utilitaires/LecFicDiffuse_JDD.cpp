@@ -33,9 +33,7 @@ Sortie& LecFicDiffuse_JDD::printOn(Sortie& s) const
   throw;
 }
 
-LecFicDiffuse_JDD::LecFicDiffuse_JDD() :
-  Lec_Diffuse_base(),
-  apply_verif(true)
+LecFicDiffuse_JDD::LecFicDiffuse_JDD() : Lec_Diffuse_base()
 {
   set_error_action(ERROR_CONTINUE);
 }

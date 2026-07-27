@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2025, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -288,6 +288,17 @@ Sortie& Objet_U::printOn(Sortie& s) const
  */
 Entree& Objet_U::readOn(Entree& s)
 {
+  return s;
+}
+
+Input& Objet_U::readOn(Input& s)
+{
+  Entree e(s);
+  readOn(e);
+
+  // we must transfer the state of e in s (the EOF flag, Good flag...)
+  s.clear();
+  s.setstate(e.rdstate());
   return s;
 }
 

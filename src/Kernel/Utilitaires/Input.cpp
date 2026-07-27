@@ -32,12 +32,12 @@ Input& Input::operator>>(Objet_U& ob) {
 void Input::share(int& ok, char* array, std::streamsize size) {
 	assert(get_diffusion()); // this method call only make sens in diffusion mode
 
-	assert(size < std::numeric_limits<True_int>::max());
+	assert(size < std::numeric_limits<std::streamsize>::max());
 
 	envoyer_broadcast(ok, 0);
 
 	if (ok)
-        envoyer_broadcast_array(array, static_cast<True_int>(size), 0); // send from processor 0 to other processors
+        envoyer_broadcast_array(array, static_cast<int>(size), 0); // send from processor 0 to other processors
 	
     // broadcast stream state
 	share_state();

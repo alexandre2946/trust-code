@@ -22,7 +22,7 @@ InputCommBuffer::InputCommBuffer()
   set_error_action(ERROR_CONTINUE);
   set_bin(true);
   // Communication buffer should never try to convert int into long:
-  avoid_conversion_ = true;
+  set_avoid_conversion(true);
   memorysize_ = 16;
   size_ = 0;
   // Always allocate something (create_stream needs at least one byte
