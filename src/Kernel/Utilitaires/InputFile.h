@@ -12,38 +12,59 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
+#ifndef InputFile_included
+#define InputFile_included
 
-#ifndef Entree_Fichier_base_included
-#define Entree_Fichier_base_included
+#include <fstream>
+#include <string>
 
+#if __cplusplus >= 201703L
+#include <filesystem>
+#endif
 
-#include <InputFile.h>
+#include <Input.h>
+#include <Objet_U.h>
 
-class Entree_Fichier_base: virtual public Entree, public InputFile {
+class InputFile: virtual public Input, public std::ifstream, public Objet_U {
 
-  Declare_base_sans_constructeur(Entree_Fichier_base);
+		//////////////////
+		// constructors //
+		//////////////////
+	
 	public:
-		using Entree::Entree;
-		using InputFile::InputFile;
-		using Input::operator>>;
+		
+		// we hide the std::ifstream constructors and use our own open method
+		InputFile(): Input(), std::ifstream() {}
+		explicit InputFile(const char* file_name, std::ios_base::openmode mode = std::ios_base::in): Input(), std::ifstream() {
+			open(file_name, mode);
+		}
 
+		explicit InputFile(const std::string& file_name, std::ios_base::openmode mode = std::ios_base::in):
+			InputFile(file_name.c_str(), mode) {}
 
     	#pragma GCC diagnostic push
     	#pragma GCC diagnostic ignored "-Wextra"
-
-		Entree_Fichier_base(Entree_Fichier_base& other) {
-			Input::attach(static_cast<Input&>(other));
-		}
-
-		Entree_Fichier_base(const Entree_Fichier_base& other) {
-			Input::attach(static_cast<Input&>(const_cast<Entree_Fichier_base&>(other)));
-		}
-
+		InputFile(const InputFile& other): Input(dynamic_cast<const Input&>(other)) {}
+		InputFile(InputFile& other): Input(dynamic_cast<Input&>(other)) {}
     	#pragma GCC diagnostic pop
 
-  virtual int ouvrir(const char* name, IOS_OPEN_MODE mode=ios::in);
+		/////////////
+		// methods //
+		/////////////
+	
+	public:
+		
+		void open(const char* file_name, std::ios_base::openmode mode = std::ios_base::in);
+		void open(const std::string& file_name, std::ios_base::openmode mode = std::ios_base::in)                       { open(file_name.c_str(), mode); }
+#if __cplusplus >= 201703L
+		void open(const std::filesystem::path& file_name, std::ios_base::openmode mode = std::ios_base::in)             { open(file_name.c_str(), mode); }
+#endif
 
-  std::ifstream& get_ifstream();
+		void close();
+
+	private:
+		
+		void share_buffer();
 };
 
 #endif

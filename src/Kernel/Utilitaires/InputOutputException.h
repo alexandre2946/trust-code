@@ -12,38 +12,40 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
+#ifndef InputOutputException_included
+#define InputOutputException_included
 
-#ifndef Entree_Fichier_base_included
-#define Entree_Fichier_base_included
+#include <exception>
+#include <string>
+
+#include <Entree_Sortie_Error.h>
 
 
-#include <InputFile.h>
+// make InputOutputException derived from Entree_Sortie_Error for backward compatibility
+class InputOutputException : public std::exception, public Entree_Sortie_Error {
+		
+		//////////////////
+		// constructors //
+		//////////////////
 
-class Entree_Fichier_base: virtual public Entree, public InputFile {
-
-  Declare_base_sans_constructeur(Entree_Fichier_base);
 	public:
-		using Entree::Entree;
-		using InputFile::InputFile;
-		using Input::operator>>;
 
+		explicit InputOutputException(const std::string& message_) : message(message_) {}
 
-    	#pragma GCC diagnostic push
-    	#pragma GCC diagnostic ignored "-Wextra"
+		/////////////
+		// methods //
+		/////////////
+	
+		// override what()
+		const char* what() const noexcept override;
 
-		Entree_Fichier_base(Entree_Fichier_base& other) {
-			Input::attach(static_cast<Input&>(other));
-		}
-
-		Entree_Fichier_base(const Entree_Fichier_base& other) {
-			Input::attach(static_cast<Input&>(const_cast<Entree_Fichier_base&>(other)));
-		}
-
-    	#pragma GCC diagnostic pop
-
-  virtual int ouvrir(const char* name, IOS_OPEN_MODE mode=ios::in);
-
-  std::ifstream& get_ifstream();
+		////////////////
+		// attributes //
+		////////////////
+	
+	private:
+	
+		std::string message;
 };
 
 #endif

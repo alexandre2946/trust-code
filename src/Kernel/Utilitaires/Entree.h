@@ -16,124 +16,74 @@
 #ifndef Entree_included
 #define Entree_included
 
-#include <Process.h>
-#include <AbstractIO.h>
-#include <iostream>
-#include <assert.h>
-#include <stdio.h>
-#include <cstdio> // For EOF on GNU >= 4.4
-#include <arch.h> // for LIBLATAFILTER int64
-#include <cstdint>// For INT32_MAX on GNU >= 13
+#include <Input.h>
 
-using std::istream;
-using std::ios;
-
-template <typename T> class TRUST_Ref;
-class TRUST_Ref_Objet_U;
 class Objet_U;
-class Nom;
 
-/*! @brief Class defining operators and methods for all reading operation in an input flow (file, keyboard
- * communication buffer, etc.)
- *
- * @sa Sortie
- */
-class Entree: public AbstractIO
-{
-public:
-  // Constructors
-  Entree();
-  Entree(istream& is);
-  Entree(const Entree& is);
-  virtual ~Entree();
+class Entree: virtual public Input {
+	public:
+		using Input::Input;
 
-  void set_bin(bool bin) override;
+		Entree(const Input& other): Input(other) {}
+		Entree(Input& other): Input(other) {}
 
-  // Assignment operators
-  Entree& operator=(istream& is);
-  Entree& operator=(Entree& is);
 
-  virtual istream& get_istream();
-  virtual const istream& get_istream() const;
-  void set_istream(istream *is);
+	    #pragma GCC diagnostic push
+	    #pragma GCC diagnostic ignored "-Wextra"
 
-  Entree& operator >>(Entree& (*f)(Entree&));
-  Entree& operator >>(istream& (*f)(istream&));
-  Entree& operator >>(ios& (*f)(ios&));
+	    Entree(const Entree& other) : Input(other.rdbuf()) {}
+	    Entree(Entree& other) : Input(other.rdbuf()) {}
 
-  template <typename T>
-  Entree& operator>>(const TRUST_Ref<T>& ) { std::cerr << __func__ << " :: SHOULD NOT BE CALLED ! Use -> !! " << std::endl ; throw; }
+	    #pragma GCC diagnostic pop
+	
+		// forward operator>> to Input implementation (need to do one explicitly for lvalues)
+	    Entree& operator>>(Objet_U& ob) override {
+	        Input::operator>>(ob);
+	        return *this;
+	    }
+	
+	    template <class Type>
+	    Entree& operator>>(Type& value) & {
+	        Input::operator>>(value);
+	        return *this;
+	    }
+	
+	    template <class Type>
+	    Entree& operator>>(Type&) && = delete;
 
-  Entree& operator>>(const TRUST_Ref_Objet_U& ) { std::cerr << __func__ << " :: SHOULD NOT BE CALLED ! Use -> !! " << std::endl ; throw; }
+		void set_check_types(int) {}
 
-  virtual Entree& operator>>(int& ob);
-  virtual Entree& operator>>(long& ob);
-  virtual Entree& operator>>(long long& ob);
-  virtual Entree& operator>>(float& ob);
-  virtual Entree& operator>>(double& ob);
-  virtual Entree& operator>>(std::string& ob);
+		virtual void set_bin(int value) { set_bin(!!value); }
+		virtual void set_bin(bool value) { set_binary(value); }
+		virtual void set_64b(bool value) { set_64_bits(value); }
+		virtual void set_diffuse(bool value) { diffuse_ = true; } // true by default and cannot be change
+		virtual bool get_diffuse() const { return diffuse_; }
 
-  // final
-  virtual Entree& operator>>(Objet_U& ob) final;
+		void set_istream(std::istream* stream_pointer);
+		void set_istream(std::istream& stream);
+		virtual const std::istream& get_istream() const;
+		virtual std::istream& get_istream();
+  		virtual int jumpOfLines();
 
-  virtual int get(int *ob, std::streamsize n);
-  virtual int get(long *ob, std::streamsize n);
-  virtual int get(long long *ob, std::streamsize n);
-  virtual int get(float *ob, std::streamsize n);
-  virtual int get(double *ob, std::streamsize n);
+	public:
 
-  virtual int get(char *buf, std::streamsize bufsize);
-
-  virtual int eof();
-  virtual int jumpOfLines();
-  virtual int fail();
-  virtual int good();
-  virtual void set_check_types(bool flag);
-  bool check_types() const { return check_types_; }
-  enum Error_Action { ERROR_EXIT, ERROR_CONTINUE, ERROR_EXCEPTION };
-  virtual void set_error_action(Error_Action);
-  Error_Action get_error_action();
-
-  inline operator istream& () { return get_istream(); }
-  inline istream& putback(char ch) { return get_istream().putback(ch); }
-  inline bool get_diffuse() { return diffuse_; }
-
-  virtual void set_diffuse(bool diffuse);
-
-protected:
-  // Inline method to handle the trivial case quickly. Otherwise, calls the virtual method error_handle_().
-  inline int error_handle(int fail_flag)
-  {
-    if (!fail_flag) return 1;
-    else return error_handle_(fail_flag);
-  }
-
-  virtual int error_handle_(int fail_flag);
-  bool check_types_ = false;
-  Error_Action error_action_;
-  bool diffuse_; // By default true, but some child classes (e.g. LecFicDiffuse) can set it temporarily to false to not diffuse to other processes
-
-private:
-  istream *istream_;
-
-  template <typename _TYPE_>
-  int get_template(_TYPE_ *ob, std::streamsize n);
-
-  template <typename _TYPE_>
-  Entree& operator_template(_TYPE_& ob);
+		enum Error_Action { ERROR_EXIT, ERROR_CONTINUE, ERROR_EXCEPTION };
+		virtual void set_error_action(Error_Action);
+		Error_Action get_error_action();
+	
+	protected:
+		
+		bool diffuse_ = true; // this flag as no real meaning in TRUST, but some classe use it
 };
 
+// for storing opened binary files
+class Nom;
 int is_a_binary_file(Nom&);
 
-void convert_to(const char *s, int& ob);
+void convert_to(const char *s, True_int& ob);
 void convert_to(const char *s, long& ob);
 void convert_to(const char *s, long long& ob);
 void convert_to(const char *s, float& ob);
 void convert_to(const char *s, double& ob);
-
-// Class returned by Entree when an exception is raised on error
-class Entree_Sortie_Error
-{
-};
 
 #endif

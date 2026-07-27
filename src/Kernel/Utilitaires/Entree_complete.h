@@ -16,80 +16,12 @@
 #ifndef Entree_complete_included
 #define Entree_complete_included
 
-#include <EChaine.h>
+//#include <EChaine.h>
 
-/*! @brief This class behaves like EChaine until the end of the string is reached.
- *
- * The remainder is read from entree2 passed as parameter.
- *   check_types() and error_action() are identical to those of entree2.
- *
- */
+#include <InputConcat.h>
 
-class Entree_complete: public Entree
-{
-public:
-  Entree_complete(const char *str, Entree& entree2);
-  ~Entree_complete() override;
-
-  using Entree::operator>>;
-
-  Entree& operator>>(int& ob) override;
-  Entree& operator>>(long& ob) override;
-  Entree& operator>>(long long& ob) override;
-  Entree& operator>>(float& ob) override;
-  Entree& operator>>(double& ob) override;
-
-  int get(int *ob, std::streamsize n) override;
-  int get(long *ob, std::streamsize n) override;
-  int get(long long*ob, std::streamsize n) override;
-  int get(float *ob, std::streamsize n) override;
-  int get(double *ob, std::streamsize n) override;
-  int get(char *buf, std::streamsize bufsize) override;
-
-  int eof() override;
-  int fail() override;
-  int good() override;
-
-  void set_bin(bool bin) override;
-  void set_error_action(Error_Action) override;
-  void set_check_types(bool flag) override;
-
-protected:
-  Entree& get_input();
-  // If num_entree_ == 0, we are reading from chaine_str, otherwise from entree2_
-  int num_entree_;
-  int str_size_;
-  EChaine chaine_str_;
-  // Reference to the second input (we do not own the pointed object)
-  Entree *entree2_;
-
-private:
-  template <typename _TYPE_>
-  int get_template(_TYPE_ *ob, std::streamsize n);
-
-  template <typename _TYPE_>
-  Entree& operator_template(_TYPE_&ob);
+class Entree_complete: public InputConcat {
+	using InputConcat::InputConcat;
 };
-
-template<typename _TYPE_>
-int Entree_complete::get_template(_TYPE_ *ob, std::streamsize n)
-{
-  // Loop to allow the value array to span across both inputs:
-  for (std::streamsize i = 0; i < n; i++)
-    {
-      Entree& is = get_input();
-      if (! is.get(ob+i, 1))
-        return 0;
-    }
-  return 1;
-}
-
-template<typename _TYPE_>
-Entree& Entree_complete::operator_template(_TYPE_& ob)
-{
-  Entree& is = get_input();
-  is >> ob;
-  return *this;
-}
 
 #endif /* Entree_complete_included */

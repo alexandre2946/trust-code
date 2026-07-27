@@ -12,38 +12,8 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
+#include <InputOutputException.h>
 
-#ifndef Entree_Fichier_base_included
-#define Entree_Fichier_base_included
-
-
-#include <InputFile.h>
-
-class Entree_Fichier_base: virtual public Entree, public InputFile {
-
-  Declare_base_sans_constructeur(Entree_Fichier_base);
-	public:
-		using Entree::Entree;
-		using InputFile::InputFile;
-		using Input::operator>>;
-
-
-    	#pragma GCC diagnostic push
-    	#pragma GCC diagnostic ignored "-Wextra"
-
-		Entree_Fichier_base(Entree_Fichier_base& other) {
-			Input::attach(static_cast<Input&>(other));
-		}
-
-		Entree_Fichier_base(const Entree_Fichier_base& other) {
-			Input::attach(static_cast<Input&>(const_cast<Entree_Fichier_base&>(other)));
-		}
-
-    	#pragma GCC diagnostic pop
-
-  virtual int ouvrir(const char* name, IOS_OPEN_MODE mode=ios::in);
-
-  std::ifstream& get_ifstream();
-};
-
-#endif
+const char* InputOutputException::what() const noexcept {
+	return ("InputOutputException: " + message).c_str();
+}

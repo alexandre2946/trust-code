@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2024, CEA
+* Copyright (c) 2026, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -45,22 +45,14 @@ void Entree_Brute::set_bin(bool bin)
 
 void Entree_Brute::set_data(const char * data, unsigned sz)
 {
-  if(data_)
+  if (istrstream_)
     {
-      // For now forbid multiple calls ... could try deleting data_
-      //Cerr << "Entree_Brute::set_data(): Multiple calls forbidden!  " << finl;
-      //Process::exit(-1);
-      delete[] data_;
-      if (istrstream_)
-        delete istrstream_;
-      istrstream_ = new istringstream();
-      set_istream(istrstream_);
+	  delete istrstream_;
     }
 
-  const std::istream& iss = get_istream();
-  std::streambuf * sb = iss.rdbuf();
+  istrstream_ = new std::istringstream(
+      std::string(data, sz)
+  );
 
-  data_ = new char[sz];
-  std::copy(data, data+sz, data_);
-  sb->pubsetbuf(data_, sz);
+  set_istream(istrstream_);
 }

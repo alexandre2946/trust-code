@@ -12,38 +12,88 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
+#ifndef InputConcat_included
+#define InputConcat_included
 
-#ifndef Entree_Fichier_base_included
-#define Entree_Fichier_base_included
+#include <sstream>
 
+#include <Input.h>
+#include <Nom.h>
 
-#include <InputFile.h>
+class InputConcat : virtual public Input {
+		
+		/////////////
+		// classes //
+		/////////////
+	
+	private:
+		
+		class ConcatBuffer : public std::streambuf {
+			
+				//////////////////
+				// constructors //
+				//////////////////
 
-class Entree_Fichier_base: virtual public Entree, public InputFile {
+			public:
+	
+				ConcatBuffer(std::streambuf* a, std::streambuf* b): first(a), second(b), current(a) {}
 
-  Declare_base_sans_constructeur(Entree_Fichier_base);
+				/////////////
+				// methods //
+				/////////////
+		
+			protected:
+
+				int_type underflow() override {
+					if (!current)
+						return traits_type::eof();
+		
+					int_type c = current->sgetc();
+					if (traits_type::eq_int_type(c, traits_type::eof())) {
+						if (current == first) {
+							current = second;
+							return underflow();
+						}
+						return traits_type::eof();
+					}
+					return c;
+				}
+		
+				int_type uflow() override {
+					int_type c = underflow();
+					if (!traits_type::eq_int_type(c, traits_type::eof()))
+						current->sbumpc();
+					return c;
+				}
+
+				////////////////
+				// attributes //
+				////////////////
+		
+			private:
+
+				std::streambuf* first;
+				std::streambuf* second;
+				std::streambuf* current;
+		};
+
+		//////////////////
+		// constructors //
+		//////////////////
+
 	public:
-		using Entree::Entree;
-		using InputFile::InputFile;
-		using Input::operator>>;
 
+		InputConcat(std::streambuf* a, std::streambuf* b);
+		InputConcat(const Nom& string_, Input& stream);
 
-    	#pragma GCC diagnostic push
-    	#pragma GCC diagnostic ignored "-Wextra"
-
-		Entree_Fichier_base(Entree_Fichier_base& other) {
-			Input::attach(static_cast<Input&>(other));
-		}
-
-		Entree_Fichier_base(const Entree_Fichier_base& other) {
-			Input::attach(static_cast<Input&>(const_cast<Entree_Fichier_base&>(other)));
-		}
-
-    	#pragma GCC diagnostic pop
-
-  virtual int ouvrir(const char* name, IOS_OPEN_MODE mode=ios::in);
-
-  std::ifstream& get_ifstream();
+		////////////////
+		// attributes //
+		////////////////
+	
+	protected:
+	
+		std::stringbuf string; // when used with an input string and a stream
+		ConcatBuffer buffer;
 };
 
 #endif

@@ -12,38 +12,53 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-
-#ifndef Entree_Fichier_base_included
-#define Entree_Fichier_base_included
-
-
 #include <InputFile.h>
 
-class Entree_Fichier_base: virtual public Entree, public InputFile {
-
-  Declare_base_sans_constructeur(Entree_Fichier_base);
-	public:
-		using Entree::Entree;
-		using InputFile::InputFile;
-		using Input::operator>>;
-
-
-    	#pragma GCC diagnostic push
-    	#pragma GCC diagnostic ignored "-Wextra"
-
-		Entree_Fichier_base(Entree_Fichier_base& other) {
-			Input::attach(static_cast<Input&>(other));
-		}
-
-		Entree_Fichier_base(const Entree_Fichier_base& other) {
-			Input::attach(static_cast<Input&>(const_cast<Entree_Fichier_base&>(other)));
-		}
-
-    	#pragma GCC diagnostic pop
-
-  virtual int ouvrir(const char* name, IOS_OPEN_MODE mode=ios::in);
-
-  std::ifstream& get_ifstream();
-};
-
+#ifndef LATATOOLS
+#include <communications.h>
 #endif
+
+
+void InputFile::open(const char* file_name, std::ios_base::openmode mode) {
+	// open the file only on process 0 if shared
+	if (communication_mode == CommunicationMode::Isolated || communication_mode == CommunicationMode::Send) {
+		std::ifstream::open(file_name, mode);
+	}
+
+	// shared the buffer accross process (not usefull but allow to check the buffer state on all process
+	if (communication_mode == CommunicationMode::Send || communication_mode == CommunicationMode::Receive) {
+		share_buffer();
+	}
+}
+
+void InputFile::close() {
+	// close on process 0 if shared
+	if (communication_mode == CommunicationMode::Isolated || communication_mode == CommunicationMode::Send) {
+		std::ifstream::close();
+	}
+
+	// share buffer (none now) (it also share state)
+	if (communication_mode == CommunicationMode::Send || communication_mode == CommunicationMode::Receive) {
+		share_buffer();
+	}
+}
+
+void InputFile::share_buffer() {
+#ifndef LATATOOLS
+	/*
+	// get the buffer on process 0
+	std::streambuf* buffer = nullptr;
+	if (Process::me() == 0)
+		buffer = this->rdbuf();
+
+	// share the pointer to buffer on all process
+	char address[sizeof(std::streambuf*)];
+	std::memcpy(address, &buffer, sizeof(std::streambuf*));
+	envoyer_broadcast_array(address, sizeof(std::streambuf*), 0);
+	std::memcpy(&buffer, address, sizeof(std::streambuf*));
+	*/
+	
+	// share the state of the istream
+	share_state();
+#endif
+}
